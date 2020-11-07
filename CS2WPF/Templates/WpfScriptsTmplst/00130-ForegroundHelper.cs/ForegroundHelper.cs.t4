@@ -1,0 +1,143 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+using System;
+using System.Windows;
+using System.Windows.Controls;
+<#
+
+    string foregroundHelperModelFolder      = "00130-ForegroundHelper.cs";
+    string foregroundHelperModelClassName   = GetModelClassName(Model, foregroundHelperModelFolder);
+    string foregroundHelperModelNameSpace   = GetModelNameSpace(Model, foregroundHelperModelFolder);
+    
+#>
+
+namespace <#= foregroundHelperModelNameSpace #> {
+    public static class <#= foregroundHelperModelClassName #>
+    {
+        private static void ForegroundResourceKeyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is TextBlock)
+            {
+                var element = d as TextBlock;
+                if (element != null)
+                {
+                    if (e.NewValue == null)
+                        element.SetResourceReference(TextBlock.ForegroundProperty, "");
+                    else
+                        element.SetResourceReference(TextBlock.ForegroundProperty, e.NewValue);
+                }
+            } 
+            else
+            {
+                var element = d as Control;
+                if (element != null)
+                {
+                    if (e.NewValue == null)
+                        element.SetResourceReference(Control.ForegroundProperty, "");
+                    else
+                        element.SetResourceReference(Control.ForegroundProperty, e.NewValue);
+                }
+            }
+        }
+
+        public static readonly DependencyProperty ForegroundResourceKeyProperty = DependencyProperty.RegisterAttached("ForegroundResourceKey",
+            typeof(object),
+            typeof(<#= foregroundHelperModelClassName #>),
+            new PropertyMetadata(String.Empty, ForegroundResourceKeyChanged));
+
+        public static void SetForegroundResourceKey(FrameworkElement element, object value)
+        {
+            element.SetValue(ForegroundResourceKeyProperty, value);
+        }
+
+        public static object GetForegroundResourceKey(FrameworkElement element)
+        {
+            return element.GetValue(ForegroundResourceKeyProperty);
+        }
+
+    }
+}
+
+<#+
+
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+
+#>

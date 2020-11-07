@@ -1,0 +1,51 @@
+﻿<UserControl x:Class="CS2WPF.View.UserControlGenerate"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:CS2WPF.View"
+             mc:Ignorable="d" 
+             d:DesignHeight="350" d:DesignWidth="600">
+    <Grid MinHeight="340">
+        <Grid.Resources>
+            <Style x:Key="TextBlockStyle" TargetType="{x:Type TextBlock}">
+                <Setter Property="Margin" Value="3 0 3 0"/>
+            </Style>
+            <Style x:Key="TextBlockBoldStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource TextBlockStyle}">
+                <Setter Property="FontWeight" Value="Bold"/>
+            </Style>
+        </Grid.Resources>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <TextBlock Grid.Row="0" Margin="20 4 0 4" Text="Generated Code" Style="{StaticResource TextBlockBoldStyle}" />
+        <TextBox Grid.Row="1" Margin="10 0 10 0"  MinWidth="100" Text="{Binding GenerateText}" AcceptsReturn="True" 
+                 ScrollViewer.HorizontalScrollBarVisibility="Auto" 
+                 ScrollViewer.VerticalScrollBarVisibility="Auto" 
+                 ScrollViewer.CanContentScroll="True" />
+
+        <GridSplitter Margin="0 8 0 4" Grid.Row="2" ShowsPreview="False" Height="5" 
+                      HorizontalAlignment="Stretch" VerticalAlignment="Center" 
+                      Background="{DynamicResource {x:Static SystemColors.ControlDarkDarkBrushKey}}"  />
+
+        <Grid Grid.Row="3" >
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0" Margin="20 4 0 4"  Style="{StaticResource TextBlockBoldStyle}" Text="Errors"/>
+            <TextBox  Grid.Row="1" Margin="10 0 10 4"  Text="{Binding GenerateError}" AcceptsReturn="True" 
+                       MinWidth="100" 
+                      ScrollViewer.HorizontalScrollBarVisibility="Auto" 
+                      ScrollViewer.VerticalScrollBarVisibility="Auto" 
+                      ScrollViewer.CanContentScroll="True"/>
+        </Grid>
+        
+        <!--</StackPanel>-->
+    </Grid>
+</UserControl>

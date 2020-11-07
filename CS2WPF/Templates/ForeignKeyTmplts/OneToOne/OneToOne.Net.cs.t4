@@ -1,0 +1,25 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ parameter type="System.Boolean"  name="IsRequired" #>
+<#@ parameter type="System.Boolean"  name="WillCascadeOnDelete" #>
+<#@ parameter type="System.String"   name="NavigationName" #>
+<#@ parameter type="System.String"   name="InverseNavigationName" #>
+<#@ parameter type="System.String"   name="MasterClassFullName" #>
+<#@ parameter type="System.Collections.Generic.List<System.String>"  name="ForeignKeyProperties" #>
+.HasRequired( d => d.<#= NavigationName #> )
+            .WithOptional( m => m.<#= InverseNavigationName #> )<#= GetWillCascadeOnDelete(WillCascadeOnDelete) #>;
+<#+
+        string GetWillCascadeOnDelete(bool willCascadeOnDelete)
+        {
+            if (willCascadeOnDelete) {
+                return ".WillCascadeOnDelete(true)";
+            }
+            return "";
+        }
+#>

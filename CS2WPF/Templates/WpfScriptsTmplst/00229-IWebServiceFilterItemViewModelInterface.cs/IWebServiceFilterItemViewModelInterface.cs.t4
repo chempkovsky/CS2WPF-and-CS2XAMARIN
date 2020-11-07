@@ -1,0 +1,186 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+using System;
+using System.Collections.Generic;
+using System.Windows.Input;
+<#
+
+    string IWebServiceFilterDefInterfaceFolder      = "00200-IWebServiceFilterDefInterface.cs";
+    string IWebServiceFilterDefInterfaceClassName   = GetModelClassName(Model, IWebServiceFilterDefInterfaceFolder);
+    string IWebServiceFilterDefInterfaceNameSpace   = GetModelNameSpace(Model, IWebServiceFilterDefInterfaceFolder);
+
+    string IWebServiceFilterOperatorInterfaceFolder      = "00202-IWebServiceFilterOperatorInterface.cs";
+    string IWebServiceFilterOperatorInterfaceClassName   = GetModelClassName(Model, IWebServiceFilterOperatorInterfaceFolder);
+    string IWebServiceFilterOperatorInterfaceNameSpace   = GetModelNameSpace(Model, IWebServiceFilterOperatorInterfaceFolder);
+
+    string IWebServiceFilterRsltInterfaceFolder      = "00204-IWebServiceFilterRsltInterface.cs";
+    string IWebServiceFilterRsltInterfaceClassName   = GetModelClassName(Model, IWebServiceFilterRsltInterfaceFolder);
+    string IWebServiceFilterRsltInterfaceNameSpace   = GetModelNameSpace(Model, IWebServiceFilterRsltInterfaceFolder);
+
+    string NotificationEventArgsFolder      = "00228-NotificationEventArgs.cs";
+    string NotificationEventArgsClassName   = GetModelClassName(Model, NotificationEventArgsFolder);
+    string NotificationEventArgsNameSpace   = GetModelNameSpace(Model, NotificationEventArgsFolder);
+
+    string IWebServiceFilterItemViewModelInterfaceFolder      = "00229-IWebServiceFilterItemViewModelInterface.cs";
+    string IWebServiceFilterItemViewModelInterfaceClassName   = GetModelClassName(Model, IWebServiceFilterItemViewModelInterfaceFolder);
+    string IWebServiceFilterItemViewModelInterfaceNameSpace   = GetModelNameSpace(Model, IWebServiceFilterItemViewModelInterfaceFolder);
+
+    string SelectedFilterOperatorPropertyName = "SelectedFilterOperator";
+    string SelectedFilterDefinitionPropertyName = "SelectedFilterDefinition";
+    string IsReadOnlyPropertyName = "IsReadOnly";
+    string IsEditablePropertyName = "IsEditable";
+    string IsDateInputPropertyName = "IsDateInput";
+    string FilterValuePropertyName = "FilterValue";
+    string FilterValuePromptPropertyName = "FilterValuePrompt";
+    string FilterValuePromptForegroundPropertyName = "FilterValuePromptForeground";
+    string FilterDefinitionsPropertyName = "FilterDefinitions";
+    string FilterOperatorsPropertyName = "FilterOperators";
+    string ModelPropertyName = "Model";
+    string RemoveCommandPropertyName = "RemoveCommand";
+    string RemoveCommandAsEventPropertyName = "RemoveCommandAsEvent";
+
+    List<string> nmSpaces = new List<string>();
+    if (IWebServiceFilterItemViewModelInterfaceNameSpace != IWebServiceFilterDefInterfaceNameSpace) nmSpaces.Add(IWebServiceFilterDefInterfaceNameSpace);
+    if ((IWebServiceFilterItemViewModelInterfaceNameSpace != IWebServiceFilterOperatorInterfaceNameSpace ) && (nmSpaces.IndexOf(IWebServiceFilterOperatorInterfaceNameSpace ) < 0)) 
+        nmSpaces.Add(IWebServiceFilterOperatorInterfaceNameSpace );
+    if ((IWebServiceFilterItemViewModelInterfaceNameSpace != IWebServiceFilterRsltInterfaceNameSpace ) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace ) < 0)) 
+        nmSpaces.Add(IWebServiceFilterRsltInterfaceNameSpace );
+    if ((IWebServiceFilterItemViewModelInterfaceNameSpace != NotificationEventArgsNameSpace ) && (nmSpaces.IndexOf(NotificationEventArgsNameSpace ) < 0)) 
+        nmSpaces.Add(NotificationEventArgsNameSpace );
+
+#>
+<# 
+    foreach(string ns in nmSpaces) {
+#>
+using <#= ns #>;
+<#
+    }
+#>
+
+
+namespace <#= IWebServiceFilterItemViewModelInterfaceNameSpace #> {
+    public interface <#= IWebServiceFilterItemViewModelInterfaceClassName #>
+    {
+        #region <#= SelectedFilterOperatorPropertyName #>
+        string <#= SelectedFilterOperatorPropertyName #> { get; set; }
+        #endregion
+        #region <#= SelectedFilterDefinitionPropertyName #>
+        <#= IWebServiceFilterDefInterfaceClassName #> <#= SelectedFilterDefinitionPropertyName #> { get; set; }
+        #endregion
+        #region <#= IsReadOnlyPropertyName #>
+        bool <#= IsReadOnlyPropertyName #> { get; set; }
+        #endregion
+        #region <#= IsEditablePropertyName #>
+        bool <#= IsEditablePropertyName #> { get; }
+        #endregion
+        #region <#= IsDateInputPropertyName #>
+        bool <#= IsDateInputPropertyName #> { get; set; }
+        #endregion
+        #region <#= FilterValuePropertyName #>
+        dynamic <#= FilterValuePropertyName #> { get; set; }
+        #endregion
+        #region <#= FilterValuePromptPropertyName #>
+        string <#= FilterValuePromptPropertyName #> { get; }
+        #endregion
+        #region <#= FilterValuePromptForegroundPropertyName #>
+        string <#= FilterValuePromptForegroundPropertyName #> { get; }
+        #endregion
+        #region <#= FilterDefinitionsPropertyName #>
+        IEnumerable<<#= IWebServiceFilterDefInterfaceClassName #>> <#= FilterDefinitionsPropertyName #> { get; set; }
+        #endregion
+        #region <#= FilterOperatorsPropertyName #>
+        IEnumerable<<#= IWebServiceFilterOperatorInterfaceClassName #>> <#= FilterOperatorsPropertyName #> { get; set; }
+        #endregion
+        #region <#= ModelPropertyName #>
+        <#= IWebServiceFilterRsltInterfaceClassName #> <#= ModelPropertyName #> { get; set; }
+        #endregion
+        #region <#= RemoveCommandPropertyName #>
+        ICommand <#= RemoveCommandPropertyName #> { get; }
+        event Action<object, <#= NotificationEventArgsClassName #>> <#= RemoveCommandAsEventPropertyName #>;
+        #endregion
+    }
+}
+
+<#+
+
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+
+#>

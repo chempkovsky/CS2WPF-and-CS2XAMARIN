@@ -1,0 +1,42 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="sql" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2REACTJS" #>
+<#@ import namespace="CS2REACTJS.Model" #>
+<#@ import namespace="CS2REACTJS.Model.Serializable" #>
+<#@ parameter type="CS2REACTJS.Model.Serializable.AllowedFileTypesSerializable" name="AllowedFileTypes" #>
+<#@ parameter type="CS2REACTJS.Model.Serializable.FeatureContextSerializable" name="FeatureContext" #>
+<#@ parameter type="CS2REACTJS.Model.Serializable.FeatureSerializable" name="Feature" #>
+<#@ parameter type="CS2REACTJS.Model.Serializable.DbContextSerializable" name="Context" #>
+<#
+//
+// Before you starts:
+// Please reset value for [currentId]
+//
+    int currentId= 0;
+#>
+//
+// 0. do not save the generatee code.
+// 1. just copy it to the clipboard
+// 2. Open the file shared/services/app-glbl-settings.service.tsx
+// 3. find the definition of the 'vwModels'-variable
+// vwModels:  { [key: string]: number } = {
+//   ....
+// };
+// 4. Paste from clipboard inside curly brackets
+//    
+<#    
+    foreach(ModelViewSerializable modelViewSerializable in Context.ModelViews) {
+#>
+     '<#= modelViewSerializable.ViewName #>': <#= currentId #>,
+<#
+        currentId++;
+    }
+#>
+
+

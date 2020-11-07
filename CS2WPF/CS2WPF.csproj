@@ -1,0 +1,940 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MinimumVisualStudioVersion>16.0</MinimumVisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectTypeGuids>{82b43b9b-a64c-4715-b499-d71e9ca2bd60};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <ProjectGuid>{CA3BBA40-2B18-4DB7-8DAA-84BD6CF565DA}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>CS2WPF</RootNamespace>
+    <AssemblyName>CS2WPF</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <GeneratePkgDefFile>true</GeneratePkgDefFile>
+    <UseCodebase>true</UseCodebase>
+    <IncludeAssemblyInVSIXContainer>true</IncludeAssemblyInVSIXContainer>
+    <IncludeDebugSymbolsInVSIXContainer>false</IncludeDebugSymbolsInVSIXContainer>
+    <IncludeDebugSymbolsInLocalVSIXDeployment>false</IncludeDebugSymbolsInLocalVSIXDeployment>
+    <CopyBuildOutputToOutputDirectory>true</CopyBuildOutputToOutputDirectory>
+    <CopyOutputSymbolsToOutputDirectory>true</CopyOutputSymbolsToOutputDirectory>
+    <StartAction>Program</StartAction>
+    <StartProgram Condition="'$(DevEnvDir)' != ''">$(DevEnvDir)devenv.exe</StartProgram>
+    <StartArguments>/rootsuffix Exp</StartArguments>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Commands\CrtDbContextCommand.cs" />
+    <Compile Include="Commands\CrtFeatureScriptsCommand.cs" />
+    <Compile Include="Commands\CrtViewModelCommand.cs" />
+    <Compile Include="Commands\CrtWebApiServiceCommand.cs" />
+    <Compile Include="Commands\CrtWpfScriptsCommand.cs" />
+    <Compile Include="Helpers\BatchProcess\BatchSettingsHelper.cs" />
+    <Compile Include="Helpers\CodeClassHelper.cs" />
+    <Compile Include="Helpers\ContextChangedNotificationService.cs" />
+    <Compile Include="Helpers\EnumBindingSourceExtension.cs" />
+    <Compile Include="Helpers\EnumDescriptionTypeConverter.cs" />
+    <Compile Include="Helpers\FeatureViewModelHelper.cs" />
+    <Compile Include="Helpers\FluentAPIEntityNodeHelper.cs" />
+    <Compile Include="Helpers\FluentAPIForeignKeyHelper.cs" />
+    <Compile Include="Helpers\IsReadyNotificationService.cs" />
+    <Compile Include="Helpers\ModelViewHelper.cs" />
+    <Compile Include="Helpers\OnModelCreatingAnalyzerHelper.cs" />
+    <Compile Include="Helpers\TemplatePathHelper.cs" />
+    <Compile Include="Helpers\UI\ButtonClickedNotificationService.cs" />
+    <Compile Include="Helpers\UI\CommandHandler.cs" />
+    <Compile Include="Helpers\UI\IsReadyViewModel.cs" />
+    <Compile Include="Helpers\UI\MultiValueConverterImp.cs" />
+    <Compile Include="Helpers\UI\NotifyPropertyChangedViewModel.cs" />
+    <Compile Include="Helpers\UI\TreeViewFolderItem.cs" />
+    <Compile Include="Helpers\UI\TreeViewFolderItemBase.cs" />
+    <Compile Include="Helpers\UI\TreeViewFolderItemWithCheck.cs" />
+    <Compile Include="Helpers\UI\WebBrowserUtility.cs" />
+    <Compile Include="Model\AnalyzeOnModelCreating\FluentAPIEntityNode.cs" />
+    <Compile Include="Model\AnalyzeOnModelCreating\FluentAPIExtendedProperty.cs" />
+    <Compile Include="Model\AnalyzeOnModelCreating\FluentAPIForeignKey.cs" />
+    <Compile Include="Model\AnalyzeOnModelCreating\FluentAPIKey.cs" />
+    <Compile Include="Model\AnalyzeOnModelCreating\FluentAPIMethodNode.cs" />
+    <Compile Include="Model\AnalyzeOnModelCreating\FluentAPINavigationProperty.cs" />
+    <Compile Include="Model\AnalyzeOnModelCreating\FluentAPIProperty.cs" />
+    <Compile Include="Model\BatchProcess\BatchItem.cs" />
+    <Compile Include="Model\BatchProcess\BatchSettings.cs" />
+    <Compile Include="Model\BatchProcess\GeneratorBatchStep.cs" />
+    <Compile Include="Model\FeatureItem.cs" />
+    <Compile Include="Model\InfoSourceEnum.cs" />
+    <Compile Include="Model\InputTypeEnum.cs" />
+    <Compile Include="Model\ModelView.cs" />
+    <Compile Include="Model\ModelViewAttribute.cs" />
+    <Compile Include="Model\ModelViewAttributeProperty.cs" />
+    <Compile Include="Model\ModelViewBaseProperty.cs" />
+    <Compile Include="Model\ModelViewFAPIAttribute.cs" />
+    <Compile Include="Model\ModelViewFAPIAttributeProperty.cs" />
+    <Compile Include="Model\ModelViewForeignKey.cs" />
+    <Compile Include="Model\ModelViewKeyProperty.cs" />
+    <Compile Include="Model\ModelViewProperty.cs" />
+    <Compile Include="Model\ModelViewUIBaseProperty.cs" />
+    <Compile Include="Model\ModelViewUIFormProperty.cs" />
+    <Compile Include="Model\ModelViewUIListProperty.cs" />
+    <Compile Include="Model\NavigationTypeEnum.cs" />
+    <Compile Include="Model\Serializable\AllowedFileTypeSerializable.cs" />
+    <Compile Include="Model\Serializable\AllowedFileTypesSerializable.cs" />
+    <Compile Include="Model\Serializable\CommonStaffSerializable.cs" />
+    <Compile Include="Model\Serializable\DbContextSerializable.cs" />
+    <Compile Include="Model\Serializable\FeatureContextSerializable.cs" />
+    <Compile Include="Model\Serializable\FeatureItemSerializable.cs" />
+    <Compile Include="Model\Serializable\FeatureSerializable.cs" />
+    <Compile Include="Model\Serializable\ModelViewAttributePropertySerializable.cs" />
+    <Compile Include="Model\Serializable\ModelViewAttributeSerializable.cs" />
+    <Compile Include="Model\Serializable\ModelViewFAPIAttributePropertySerializable.cs" />
+    <Compile Include="Model\Serializable\ModelViewFAPIAttributeSerializable.cs" />
+    <Compile Include="Model\Serializable\ModelViewForeignKeySerializable.cs" />
+    <Compile Include="Model\Serializable\ModelViewKeyPropertySerializable.cs" />
+    <Compile Include="Model\Serializable\ModelViewPropertyOfFkSerializable.cs" />
+    <Compile Include="Model\Serializable\ModelViewPropertyOfVwSerializable.cs" />
+    <Compile Include="Model\Serializable\ModelViewPropertySerializable.cs" />
+    <Compile Include="Model\Serializable\ModelViewSerializable.cs" />
+    <Compile Include="Model\Serializable\ModelViewUIFormPropertySerializable.cs" />
+    <Compile Include="Model\Serializable\ModelViewUIListPropertySerializable.cs" />
+    <Compile Include="Model\Serializable\ModelViewUIPropertySerializable.cs" />
+    <Compile Include="Model\Serializable\UI\ModelViewPropertyOfVwNotified.cs" />
+    <Compile Include="Model\SolutionCodeElement.cs" />
+    <Compile Include="Model\SolutionProject.cs" />
+    <Compile Include="Model\TemplateCode.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="CS2WPFPackage.cs" />
+    <Compile Include="TemplateProcessingHelpers\TPCallback.cs" />
+    <Compile Include="TemplateProcessingHelpers\TPError.cs" />
+    <Compile Include="TemplateProcessingHelpers\TPResult.cs" />
+    <Compile Include="ViewModel\BaseGenerateViewModel.cs" />
+    <Compile Include="ViewModel\BaseSelectSourceViewModel.cs" />
+    <Compile Include="ViewModel\BatchProcessingViewModel.cs" />
+    <Compile Include="ViewModel\CreateForeignKeyViewModel.cs" />
+    <Compile Include="ViewModel\CreatePrimaryKeyViewModel.cs" />
+    <Compile Include="ViewModel\CreateViewViewModel.cs" />
+    <Compile Include="ViewModel\CreateWebApiViewModel.cs" />
+    <Compile Include="ViewModel\FeatureViewModel.cs" />
+    <Compile Include="ViewModel\GenerateCommonStaffViewModel.cs" />
+    <Compile Include="ViewModel\GenerateDbContextViewModel.cs" />
+    <Compile Include="ViewModel\GenerateViewModel.cs" />
+    <Compile Include="ViewModel\GenerateViewPageModel.cs" />
+    <Compile Include="ViewModel\InvitationViewModel.cs" />
+    <Compile Include="ViewModel\MainWindowBase.cs" />
+    <Compile Include="ViewModel\MainWindowDbContext.cs" />
+    <Compile Include="ViewModel\MainWindowEf2Vm.cs" />
+    <Compile Include="ViewModel\MainWindowFeatureScripts.cs" />
+    <Compile Include="ViewModel\MainWindowWpfScripts.cs" />
+    <Compile Include="ViewModel\MainWindowVm2WebApi.cs" />
+    <Compile Include="ViewModel\ModifyFeatureViewModel.cs" />
+    <Compile Include="ViewModel\SelectDbContextViewModel.cs" />
+    <Compile Include="ViewModel\SelectEntityForGivenDbContextViewModel.cs" />
+    <Compile Include="ViewModel\SelectExistingViewModel.cs" />
+    <Compile Include="ViewModel\SelectFeatureFolderViewModel.cs" />
+    <Compile Include="ViewModel\SelectFolderViewModel.cs" />
+    <Compile Include="ViewModel\SelectForeignKeyViewModel.cs" />
+    <Compile Include="ViewModel\Selectt4TemplateViewModel.cs" />
+    <Compile Include="ViewModel\T4EditorViewModel.cs" />
+    <Compile Include="View\UserControlCreateForeignKey.xaml.cs">
+      <DependentUpon>UserControlCreateForeignKey.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\UserControlCreatePrimKey.xaml.cs">
+      <DependentUpon>UserControlCreatePrimKey.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\UserControlCreateView.xaml.cs">
+      <DependentUpon>UserControlCreateView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\UserControlCreateWebApi.xaml.cs">
+      <DependentUpon>UserControlCreateWebApi.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\UserControlFeature.xaml.cs">
+      <DependentUpon>UserControlFeature.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\UserControlGenerate.xaml.cs">
+      <DependentUpon>UserControlGenerate.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\UserControlInvitation.xaml.cs">
+      <DependentUpon>UserControlInvitation.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\UserControlOneCommand.xaml.cs">
+      <DependentUpon>UserControlOneCommand.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\UserControlSelectExisting.xaml.cs">
+      <DependentUpon>UserControlSelectExisting.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\UserControlSelectFeatureFolder.xaml.cs">
+      <DependentUpon>UserControlSelectFeatureFolder.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\UserControlSelectFolder.xaml.cs">
+      <DependentUpon>UserControlSelectFolder.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\UserControlSelectForeignKey.xaml.cs">
+      <DependentUpon>UserControlSelectForeignKey.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\UserControlSelectSource.xaml.cs">
+      <DependentUpon>UserControlSelectSource.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\UserControlT4Editor.xaml.cs">
+      <DependentUpon>UserControlT4Editor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\UserControlT4SelectTemplate.xaml.cs">
+      <DependentUpon>UserControlT4SelectTemplate.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\WindowBatch.xaml.cs">
+      <DependentUpon>WindowBatch.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\WindowCS2WPF.xaml.cs">
+      <DependentUpon>WindowCS2WPF.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\WindowModifyFeature.xaml.cs">
+      <DependentUpon>WindowModifyFeature.xaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Templates\WpfScriptsTmplst\00080-IAppGlblSettingsService.cs\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00082-AppGlblSettingsService.cs\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00100-GridFlex.cs\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00110-BasicResourceDictionary.xaml\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00120-PathHelper.cs\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00130-ForegroundHelper.cs\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00160-FillHelper.cs\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00140-CommandHelper.cs\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00150-ConvertHelper.cs\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00200-IWebServiceFilterDefInterface.cs\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00202-IWebServiceFilterOperatorInterface.cs\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00204-IWebServiceFilterRsltInterface.cs\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00206-IWebServiceFilterMenuInterface.cs\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00210-WebServiceFilterDef.cs\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00212-WebServiceFilterOperator.cs\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00214-WebServiceFilterRslt.cs\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00216-WebServiceFilterMenu.cs\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00226-NotificationRoutedEventArgs.cs\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00228-NotificationEventArgs.cs\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00229-IWebServiceFilterItemViewModelInterface.cs\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00230-WebServiceFilterItemViewModel.cs\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00232-WebServiceFilterItemUserControl.xaml.cs\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00234-WebServiceFilterItemUserControl.xaml\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00239-IWebServiceFilterViewModelInterface.cs\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00240-WebServiceFilterViewModel.cs\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00244-WebServiceFilterUserControl.xaml\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00250-TablePaginationViewModel.cs\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00252-TablePaginationUserControl.xaml.cs\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00254-TablePaginationUserControl.xaml\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00258-IColumnSelectorItemDefInterface.cs\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00260-ColumnSelectorItemDef.cs\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00262-ColumnSelectorItemDefViewModel.cs\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00264-ColumnSelectorUserControl.xaml.cs\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00265-ColumnSelectorUserControl.xaml\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00266-ColumnSelectorDlgUserControl.xaml.cs\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00267-ColumnSelectorDlgUserControl.xaml\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00268-ColumnSelectorDlgViewModel.cs\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00270-MessageDlgUserControl.xaml.cs\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00272-MessageDlgUserControl.xaml\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00274-MessageDlgViewModel.cs\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00300-securityrole.cs\Readme.html">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00310-securityuser.cs\Readme.html">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00320-securityuser2role.cs\Readme.html">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00330-securitymodel.cs\Readme.html">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00340-securitydashboard.cs\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00350-securitydbcontext.cs\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00400-aspnetrole.cs\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00410-aspnetuser.cs\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00420-aspnetuserroles.cs\Readme.html">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00430-aspnetusermask.cs\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00440-aspnetrolemask.cs\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00450-aspnetmodel.cs\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00460-aspnetdashboard.cs\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00470-aspnetchckdbcontext.cs\Readme.html">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00480-applicationrolemanager.cs\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\01100-.interface.cs\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\01102-.model.cs\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\01200-Page.interface.cs\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\01202-Page.model.cs\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\01300-Filter.interface.cs\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\01302-Filter.model.cs\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\01400-.service.interface.cs\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\01402-.service.cs\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <None Include="source.extension.vsixmanifest">
+      <SubType>Designer</SubType>
+    </None>
+    <Content Include="Templates\AllowedFileTypes\00000-AllowedFileTypes.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\ContextsToImport\aspnetchckdbcontext.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\ContextsToImport\securitydbcontext.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\DbContextTmplts\DbContext.NET.Core.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\DbContextTmplts\DbContext.Net.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\ForeignKeyTmplts\OneToCollection\OneToCollection.Net.Core.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\ForeignKeyTmplts\OneToCollection\OneToCollection.Net.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\ForeignKeyTmplts\OneToOne\OneToOne.Net.Core.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\ForeignKeyTmplts\OneToOne\OneToOne.Net.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\HasKeyTmplst\HasKey.Net.Core.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\HasKeyTmplst\HasKey.Net.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\FeatureScriptsTmplst\30180-AllModelViews.sql\AllModelViews.sql.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\FeatureScriptsTmplst\30185-AllModelViews.ts\AllModelViews.ts.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\FeatureScriptsTmplst\30190-AllDashBoards.sql\AllDashBoards.sql.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\FeatureScriptsTmplst\30195-AllDashBoards.ts\AllDashBoards.ts.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\ViewModelTmplst\ViewModel.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\ViewPageModelTmplst\ViewModelPage.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WebApiServiceTmplst\DefaultWebApiService.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WebApiServiceTmplst\WebApiAspNetBitAggrService.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WebApiServiceTmplst\WebApiAspNetRoleService.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WebApiServiceTmplst\WebApiAspNetUserMasksService.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WebApiServiceTmplst\WebApiAspNetUserRoles.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WebApiServiceTmplst\WebApiAspNetUserService.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WebApiServiceTmplst\WebApiService.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WebApiServiceTmplst\WebApiServiceBitAggr.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00100-GridFlex.cs\GridFlex.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00200-IWebServiceFilterDefInterface.cs\IWebServiceFilterDefInterface.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00202-IWebServiceFilterOperatorInterface.cs\IWebServiceFilterOperatorInterface.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00204-IWebServiceFilterRsltInterface.cs\IWebServiceFilterRsltInterface.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00210-WebServiceFilterDef.cs\WebServiceFilterDef.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00212-WebServiceFilterOperator.cs\WebServiceFilterOperator.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00214-WebServiceFilterRslt.cs\WebServiceFilterRslt.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00120-PathHelper.cs\PathHelper.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00110-BasicResourceDictionary.xaml\BasicResourceDictionary.xaml.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00130-ForegroundHelper.cs\ForegroundHelper.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00140-CommandHelper.cs\CommandHelper.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00150-ConvertHelper.cs\ConvertHelper.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00206-IWebServiceFilterMenuInterface.cs\IWebServiceFilterMenuInterface.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00216-WebServiceFilterMenu.cs\WebServiceFilterMenu.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00230-WebServiceFilterItemViewModel.cs\WebServiceFilterItemViewModel.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00228-NotificationEventArgs.cs\NotificationEventArgs.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00232-WebServiceFilterItemUserControl.xaml.cs\WebServiceFilterItemUserControl.xaml.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00234-WebServiceFilterItemUserControl.xaml\WebServiceFilterItemUserControl.xaml.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00240-WebServiceFilterViewModel.cs\WebServiceFilterViewModel.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00242-WebServiceFilterUserControl.xaml.cs\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00242-WebServiceFilterUserControl.xaml.cs\WebServiceFilterUserControl.xaml.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00244-WebServiceFilterUserControl.xaml\WebServiceFilterItemUserControl.xaml.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00080-IAppGlblSettingsService.cs\IAppGlblSettingsService.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00082-AppGlblSettingsService.cs\AppGlblSettingsService.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\01100-.interface.cs\interface.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\01102-.model.cs\model.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\01200-Page.interface.cs\Page.interface.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\01202-Page.model.cs\Page.model.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\01300-Filter.interface.cs\Filter.interface.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\01302-Filter.model.cs\Filter.model.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\01400-.service.interface.cs\service.interface.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\01402-.service.cs\service.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00250-TablePaginationViewModel.cs\TablePaginationViewModel.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00252-TablePaginationUserControl.xaml.cs\TablePaginationUserControl.xaml.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00254-TablePaginationUserControl.xaml\TablePaginationUserControl.xaml.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00258-IColumnSelectorItemDefInterface.cs\IColumnSelectorItemDefInterface.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00260-ColumnSelectorItemDef.cs\ColumnSelectorItemDef.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00262-ColumnSelectorItemDefViewModel.cs\ColumnSelectorItemDefViewModel.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00264-ColumnSelectorUserControl.xaml.cs\ColumnSelectorUserControl.xaml.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00265-ColumnSelectorUserControl.xaml\ColumnSelectorUserControl.xaml.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00266-ColumnSelectorDlgUserControl.xaml.cs\ColumnSelectorDlgUserControl.xaml.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00267-ColumnSelectorDlgUserControl.xaml\ColumnSelectorDlgUserControl.xaml.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00268-ColumnSelectorDlgViewModel.cs\ColumnSelectorDlgViewModel.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00160-FillHelper.cs\FillHelper.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00270-MessageDlgUserControl.xaml.cs\MessageDlgUserControl.xaml.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00272-MessageDlgUserControl.xaml\MessageDlgUserControl.xaml.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00274-MessageDlgViewModel.cs\MessageDlgViewModel.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00300-securityrole.cs\approle.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00310-securityuser.cs\appuser.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00320-securityuser2role.cs\appuser2role.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00330-securitymodel.cs\appmodel.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00340-securitydashboard.cs\appdashboard.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00350-securitydbcontext.cs\securitydbcontext.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00400-aspnetrole.cs\aspnetrole.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00410-aspnetuser.cs\aspnetuser.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00420-aspnetuserroles.cs\aspnetuserroles.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00430-aspnetusermask.cs\aspnetusermask.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00440-aspnetrolemask.cs\aspnetrolemask.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00450-aspnetmodel.cs\aspnetmodel.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00460-aspnetdashboard.cs\aspnetdashboard.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00470-aspnetchckdbcontext.cs\aspnetchckdbcontext.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00470-aspnetchckdbcontext.cs\aspnetdbcontext.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00480-applicationrolemanager.cs\applicationrolemanager.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00229-IWebServiceFilterItemViewModelInterface.cs\IWebServiceFilterItemViewModelInterface.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00226-NotificationRoutedEventArgs.cs\NotificationRoutedEventArgs.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WpfScriptsTmplst\00239-IWebServiceFilterViewModelInterface.cs\IWebServiceFilterViewModelInterface.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Design" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp">
+      <Version>3.7.0</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.SDK" Version="16.0.206" ExcludeAssets="runtime" />
+    <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="16.9.9">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Newtonsoft.Json">
+      <Version>12.0.3</Version>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <VSCTCompile Include="Commands\CS2WPFPackage.vsct">
+      <ResourceName>Menus.ctmenu</ResourceName>
+    </VSCTCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Commands\Resources\CrtCommand.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="View\UserControlCreateForeignKey.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\UserControlCreatePrimKey.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\UserControlCreateView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\UserControlCreateWebApi.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\UserControlFeature.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\UserControlGenerate.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\UserControlInvitation.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\UserControlOneCommand.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\UserControlSelectExisting.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\UserControlSelectFeatureFolder.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\UserControlSelectFolder.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\UserControlSelectForeignKey.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\UserControlSelectSource.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\UserControlT4Editor.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\UserControlT4SelectTemplate.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\WindowBatch.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\WindowCS2WPF.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\WindowModifyFeature.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Templates\BatchScriptsTmplst\00000-ContextLevelTmplts\" />
+    <Folder Include="Templates\BatchScriptsTmplst\01000-ViewModelLevelTmplts\" />
+    <Folder Include="Templates\FeatureScriptsTmplst\30100-.ftr.component.css\" />
+    <Folder Include="Templates\FeatureScriptsTmplst\30100-.ftr.component.tsx\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != ''" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

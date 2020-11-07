@@ -1,0 +1,630 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.Entity;
+using System.Data.Entity.Infrastructure;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Web.Http;
+using System.Web.Http.Description;
+
+<#
+
+    string GetWithFilterMethodName      = "getwithfilter";
+    string GetCurrUserMasksMethodName   = "getcurrusermasks";
+
+
+    string OperatorSufix = "Oprtr";
+    string webApiServiceNameSpace = GetDestinationNameSpace(Model);
+    string rootEntityNameSpace = GetRootEntityNameSpace(Model);
+    string dbContextNameSpace = GetDbContextNameSpace(Context);
+    string viewModelNameSpace = GetViewModelNameSpace(Model);
+    string webApiServicePrefix = GetWebApiServicePrefix(Model);
+
+#>
+<# if (!string.IsNullOrEmpty(dbContextNameSpace)) {
+ if (!string.Equals(dbContextNameSpace, webApiServiceNameSpace)) { #>
+using <#= dbContextNameSpace #>;
+<# }} #>
+<# if (!string.IsNullOrEmpty(viewModelNameSpace)) {
+ if (!string.Equals(viewModelNameSpace, webApiServiceNameSpace)) {#>
+using <#= viewModelNameSpace #>;
+<# }} #>
+<# if (!string.IsNullOrEmpty(rootEntityNameSpace)) {
+ if (!string.Equals(rootEntityNameSpace, webApiServiceNameSpace)) {#>
+using <#= rootEntityNameSpace #>;
+<# }} #>
+
+namespace <#= webApiServiceNameSpace #> {
+
+    [RoutePrefix("<#= webApiServicePrefix #>")]
+    public class <#= Model.WebApiServiceName #>: ApiController
+    {
+        private int defaultPageSize = 50;
+        private int minPageSize = 5;
+        private int maxPageSize = 150;
+        private <#= Context.DbContextClassName #> db = new <#= Context.DbContextClassName #>();
+
+
+        [HttpGet]
+        [Route("<#= GetCurrUserMasksMethodName #>")]
+        [ResponseType(typeof(<#= Model.PageViewName #>))]
+        public IHttpActionResult <#= GetCurrUserMasksMethodName #>(){
+                <#= Model.PageViewName #> resultObject = new <#= Model.PageViewName #>() {
+                    page = 1,
+                    pagesize = 1,
+                    pagecount = 1,
+                    total = 1
+                };
+                resultObject.items = new List<<#= Model.ViewName #>>();
+                return Ok(resultObject);
+        }
+
+        [HttpGet]
+        [Route("<#= GetWithFilterMethodName #>")]
+        [ResponseType(typeof(<#= Model.PageViewName #>))]
+        public IHttpActionResult <#= GetWithFilterMethodName #>(<#
+        int counter = 0;
+        foreach(ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
+            if (prop.IsUsedByfilter) {
+                if(counter > 0) { 
+#>                , <# } #>[FromUri] <#= GetNullableType(prop)#>[] <#= GetFilterPropertyName(prop, Model) #> 
+                  , [FromUri] string[] <#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #> 
+<#
+                counter++;
+            }
+        }
+#>                <# if(counter > 0) {#>,<# } #> [FromUri] string[] orderby = null, [FromUri] int? page =null, [FromUri] int? pagesize = null)
+        {
+
+            string[] EqualOperators = { "eq", "lk" };
+            string[] ExpectedOperators = { "eq", "lk", "gt", "lt", "ne" };
+
+            int currentPageSize = this.defaultPageSize;
+            int currentPage = 1;
+            if (pagesize.HasValue) {
+                currentPageSize = pagesize.Value;
+                if ((currentPageSize < this.minPageSize) || (currentPageSize > this.maxPageSize)) {
+                    currentPageSize = defaultPageSize;
+                }
+            }
+            if (page.HasValue) {
+                currentPage = page.Value+1;
+                if (currentPage < 1) {
+                    currentPage = 1;
+                }
+            }
+            IQueryable<<#= Model.RootEntityClassName #>> query = 
+                db.<#=            Model.RootEntityDbContextPropertyName #>;
+            
+<#
+        foreach(ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
+            if(!prop.IsUsedByfilter) continue;
+            if (!IsEntityTypeString(prop)) {
+#>
+            if(<#=  GetFilterPropertyName(prop, Model) #> != null) {
+                if(<#=  GetFilterPropertyName(prop, Model) #>.Length > 0) {
+                    int filterCnt = <#=  GetFilterPropertyName(prop, Model) #>.Length;
+                    int operatorCnt = 0;
+                    if(<#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #> != null) {
+                        operatorCnt = <#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #>.Length;
+                    }
+                    List<KeyValuePair<String, int >> filterOprtLst = new List<KeyValuePair<String, int>>();
+<#
+                if (prop.IsNullable) {
+#>
+                    List<<#= prop.UnderlyingTypeName#> ?> filterLst = new List<<#=  prop.UnderlyingTypeName#> ?>();
+                    for(int i = 0; i < filterCnt; i++) {
+                        if( !(<#=  GetFilterPropertyName(prop, Model) #>[i].HasValue) ) continue;
+                        string currOprtr = EqualOperators[0];
+                        if (i < operatorCnt) {
+                            if( ! string.IsNullOrEmpty( <#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #>[i] ) ) {
+                                if (ExpectedOperators.Contains(<#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #>[i])) {
+                                    currOprtr = <#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #>[i];
+                                }
+                            }
+                        }
+                        if (EqualOperators.Contains(currOprtr)) {
+                            filterLst.Add(<#=  GetFilterPropertyName(prop, Model) #>[i]);
+                        } else {
+                            filterOprtLst.Add( new KeyValuePair<String, int>(currOprtr, i) );
+                        }
+                    }
+                    //
+                    // <#= prop.UnderlyingTypeName#> ?[] filter = <#= GetFilterPropertyName(prop, Model)#>.Where(i => i.HasValue).Select(i => i).ToArray();
+                    //
+                    <#= prop.UnderlyingTypeName#> ?[] filter = filterLst.ToArray();
+<#              
+                } else { 
+#>
+                    List<<#= prop.UnderlyingTypeName#> > filterLst = new List<<#= prop.UnderlyingTypeName#> >();
+                    for(int i = 0; i < filterCnt; i++) {
+                        if( !(<#=  GetFilterPropertyName(prop, Model) #>[i].HasValue) ) continue;
+                        string currOprtr = EqualOperators[0];
+                        if (i < operatorCnt) {
+                            if( ! string.IsNullOrEmpty( <#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #>[i] ) ) {
+                                if (ExpectedOperators.Contains(<#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #>[i])) {
+                                    currOprtr = <#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #>[i];
+                                }
+                            }
+                        }
+                        if (EqualOperators.Contains(currOprtr)) {
+                            filterLst.Add(<#=  GetFilterPropertyName(prop, Model) #>[i].Value);
+                        } else {
+                            filterOprtLst.Add( new KeyValuePair<String, int>(currOprtr, i) );
+                        }
+                    }
+
+                   // 
+                   // <#= prop.UnderlyingTypeName#>[] filter = <#=  GetFilterPropertyName(prop, Model)#>.Where(i => i.HasValue).Select(i => i.Value).ToArray();
+                   //
+                   <#= prop.UnderlyingTypeName#>[] filter = filterLst.ToArray();
+<#
+                }
+#>
+<#
+                if (prop.IsNullable) {
+#>
+                    if ( (filter.Length + filterOprtLst.Count) != filterCnt) {
+                        if (filter.Length > 0) {
+                            query = query.Where(p => (filter.Contains(p.<#=  GetChainedPropertyName(prop)#>)) || (p.<#=  GetChainedPropertyName(prop)#> == null));
+                        } else {
+                            query = query.Where(p => (p.<#= GetChainedPropertyName(prop)#> == null) );
+                        }
+                    } else if (filter.Length > 0) {
+                        query = query.Where(p => filter.Contains(p.<#= GetChainedPropertyName(prop)#>));
+                    }
+                    foreach(var fltItm in filterOprtLst) {
+                        <#= prop.TypeFullName #> aflt = <#=  GetFilterPropertyName(prop, Model) #>[ fltItm.Value ];
+                        switch(fltItm.Key) {
+                            case "gt":
+                                query = query.Where(p => p.<#=  GetChainedPropertyName(prop)#> >= aflt );
+                                break;
+                            case "lt":
+                                query = query.Where(p => p.<#=  GetChainedPropertyName(prop)#> <= aflt );
+                                break;
+                            case "ne":
+                                query = query.Where(p => p.<#=  GetChainedPropertyName(prop)#> != aflt );
+                                break;
+                        }
+                    }
+<#
+                } else {
+#>
+                    if (filter.Length > 0) {
+                        query = query.Where(p => filter.Contains(p.<#= GetChainedPropertyName(prop)#>));
+                    }
+                    foreach(var fltItm in filterOprtLst) {
+                        <#= prop.TypeFullName #> aflt = <#=  GetFilterPropertyName(prop, Model) #>[ fltItm.Value ].Value;
+                        switch(fltItm.Key) {
+                            case "gt":
+                                query = query.Where(p => p.<#=  GetChainedPropertyName(prop)#> >= aflt );
+                                break;
+                            case "lt":
+                                query = query.Where(p => p.<#=  GetChainedPropertyName(prop)#> <= aflt );
+                                break;
+                            case "ne":
+                                query = query.Where(p => p.<#=  GetChainedPropertyName(prop)#> != aflt );
+                                break;
+                        }
+                    }
+<#
+                }  /////////// if (prop.IsNullable)
+#>
+
+                }
+            }
+<#
+            } else { /////////////// if (!IsEntityTypeString(prop))
+#>
+            if(<#=                    GetFilterPropertyName(prop, Model)#> != null) {
+                if(<#=                    GetFilterPropertyName(prop, Model)#>.Length > 0) {
+                    int filterCnt = <#=                    GetFilterPropertyName(prop, Model) #>.Length;
+                    int operatorCnt = 0;
+                    if(<#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #> != null) {
+                        operatorCnt = <#=                    GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #>.Length;
+                    }
+                    List<KeyValuePair<String, int >> filterOprtLst = new List<KeyValuePair<String, int>>();
+                    List<<#= prop.UnderlyingTypeName#>> filterLst = new List<<#=  prop.UnderlyingTypeName#>>();
+                    for(int i = 0; i < filterCnt; i++) {
+                        if(  string.IsNullOrEmpty(<#=  GetFilterPropertyName(prop, Model) #>[i]) ) continue;
+                        string currOprtr = EqualOperators[0];
+                        if (i < operatorCnt) {
+                            if( ! string.IsNullOrEmpty( <#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #>[i] ) ) {
+                                if (ExpectedOperators.Contains(<#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #>[i])) {
+                                    currOprtr = <#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #>[i];
+                                }
+                            }
+                        }
+                        if (EqualOperators.Contains(currOprtr)) {
+                            filterLst.Add(<#=  GetFilterPropertyName(prop, Model) #>[i]);
+                        } else {
+                            filterOprtLst.Add( new KeyValuePair<String, int>(currOprtr, i) );
+                        }
+                    }
+
+                    // 
+                    // <#= prop.UnderlyingTypeName#>[] filter = <#=  GetFilterPropertyName(prop, Model)#>.Where(i => (!string.IsNullOrEmpty(i)) ).ToArray();
+                    //
+                    <#= prop.UnderlyingTypeName#>[] filter = filterLst.ToArray();
+                    bool hasNUllFilter = <#= GetFilterPropertyName(prop, Model)#>.Length > (filterLst.Count + filterOprtLst.Count);
+                    switch(filter.Length)
+                    {
+                        case 0:
+                            if (hasNUllFilter) {
+                                query = query.Where(p => p.<#=    GetChainedPropertyName(prop)#> == null);
+                            }
+                            break;
+                        case 1:
+                            {
+                                string aflt0 = filter[0].Trim();
+                                if (hasNUllFilter) {
+                                    query = query.Where(p => (
+                                            (p.<#=                    GetChainedPropertyName(prop)#> == null) ||
+                                            (p.<#=                    GetChainedPropertyName(prop)#>.Contains(aflt0))
+                                            ));
+                                } else {
+                                    query = query.Where(p => (
+                                            (p.<#=                    GetChainedPropertyName(prop)#>.Contains(aflt0))
+                                            ));
+                                }
+                            }
+                            break;
+                        case 2:
+                            {
+                                string aflt0 = filter[0].Trim();
+                                string aflt1 = filter[1].Trim();
+                                if (hasNUllFilter) {
+                                    query = query.Where(p => (
+                                            (p.<#=                    GetChainedPropertyName(prop)#> == null) ||
+                                            (p.<#=                    GetChainedPropertyName(prop)#>.Contains(aflt0)) ||
+                                            (p.<#=                    GetChainedPropertyName(prop)#>.Contains(aflt1))
+                                            ));
+                                } else {
+                                    query = query.Where(p => (
+                                            (p.<#=                    GetChainedPropertyName(prop)#>.Contains(aflt0)) ||
+                                            (p.<#=                    GetChainedPropertyName(prop)#>.Contains(aflt1))
+                                            ));
+                                }
+                            }
+                            break;
+                        case 3:
+                            {
+                                string aflt0 = filter[0].Trim();
+                                string aflt1 = filter[1].Trim();
+                                string aflt2 = filter[2].Trim();
+                                if (hasNUllFilter) {
+                                    query = query.Where(p => (
+                                            (p.<#=                    GetChainedPropertyName(prop)#> == null) ||
+                                            (p.<#=                    GetChainedPropertyName(prop)#>.Contains(aflt0)) ||
+                                            (p.<#=                    GetChainedPropertyName(prop)#>.Contains(aflt1)) ||
+                                            (p.<#=                    GetChainedPropertyName(prop)#>.Contains(aflt2))
+                                            ));
+                                } else {
+                                    query = query.Where(p => (
+                                            (p.<#=                    GetChainedPropertyName(prop)#>.Contains(aflt0)) ||
+                                            (p.<#=                    GetChainedPropertyName(prop)#>.Contains(aflt1)) ||
+                                            (p.<#=                    GetChainedPropertyName(prop)#>.Contains(aflt2))
+                                            ));
+                                }
+                            }
+                            break;
+                        case 4:
+                            {
+                                string aflt0 = filter[0].Trim();
+                                string aflt1 = filter[1].Trim();
+                                string aflt2 = filter[2].Trim();
+                                string aflt3 = filter[3].Trim();
+                                if (hasNUllFilter) {
+                                    query = query.Where(p => (
+                                            (p.<#=                    GetChainedPropertyName(prop)#> == null) ||
+                                            (p.<#=                    GetChainedPropertyName(prop)#>.Contains(aflt0)) ||
+                                            (p.<#=                    GetChainedPropertyName(prop)#>.Contains(aflt1)) ||
+                                            (p.<#=                    GetChainedPropertyName(prop)#>.Contains(aflt2)) ||
+                                            (p.<#=                    GetChainedPropertyName(prop)#>.Contains(aflt3))
+                                            ));
+                                } else {
+                                    query = query.Where(p => (
+                                            (p.<#=                    GetChainedPropertyName(prop)#>.Contains(aflt0)) ||
+                                            (p.<#=                    GetChainedPropertyName(prop)#>.Contains(aflt1)) ||
+                                            (p.<#=                    GetChainedPropertyName(prop)#>.Contains(aflt2)) ||
+                                            (p.<#=                    GetChainedPropertyName(prop)#>.Contains(aflt3))
+                                            ));
+                                }
+                            }
+                            break;
+                        default:
+                            {
+                                string aflt0 = filter[0].Trim();
+                                string aflt1 = filter[1].Trim();
+                                string aflt2 = filter[2].Trim();
+                                string aflt3 = filter[3].Trim();
+                                string aflt4 = filter[4].Trim();
+                                if (hasNUllFilter) {
+                                    query = query.Where(p => (
+                                            (p.<#=                    GetChainedPropertyName(prop)#> == null) ||
+                                            (p.<#=                    GetChainedPropertyName(prop)#>.Contains(aflt0)) ||
+                                            (p.<#=                    GetChainedPropertyName(prop)#>.Contains(aflt1)) ||
+                                            (p.<#=                    GetChainedPropertyName(prop)#>.Contains(aflt2)) ||
+                                            (p.<#=                    GetChainedPropertyName(prop)#>.Contains(aflt3)) ||
+                                            (p.<#=                    GetChainedPropertyName(prop)#>.Contains(aflt4))
+                                            ));
+                                } else {
+                                    query = query.Where(p => (
+                                            (p.<#=                    GetChainedPropertyName(prop)#>.Contains(aflt0)) ||
+                                            (p.<#=                    GetChainedPropertyName(prop)#>.Contains(aflt1)) ||
+                                            (p.<#=                    GetChainedPropertyName(prop)#>.Contains(aflt2)) ||
+                                            (p.<#=                    GetChainedPropertyName(prop)#>.Contains(aflt3)) ||
+                                            (p.<#=                    GetChainedPropertyName(prop)#>.Contains(aflt4))
+                                            ));
+                                }
+
+                            }
+                            break;
+                    }
+                    foreach(var fltItm in filterOprtLst) {
+                        string aflt = <#=  GetFilterPropertyName(prop, Model) #>[ fltItm.Value ];
+                        switch(fltItm.Key) {
+                            case "gt":
+                                query = query.Where(p => p.<#=  GetChainedPropertyName(prop)#>.CompareTo(aflt) >= 0 );
+                                break;
+                            case "lt":
+                                query = query.Where(p => p.<#=  GetChainedPropertyName(prop)#>.CompareTo(aflt) <= 0 );
+                                break;
+                            case "ne":
+                                query = query.Where(p => p.<#=  GetChainedPropertyName(prop)#>.CompareTo(aflt) != 0 );
+                                break;
+                        }
+                    }
+                }
+            }
+<#
+            }
+        }
+#>
+                <#= Model.PageViewName #> resultObject = new <#= Model.PageViewName #>() {
+                    page = 1,
+                    pagesize = 1,
+                    pagecount = 1,
+                    total = 1
+                };
+                if(query.Any()) {
+                    resultObject.items = new List<<#= Model.ViewName #>> {  query.Select(itm => new <#= Model.ViewName #>() {
+<#
+        {
+            int cnt = Model.ScalarProperties.Count-1;
+            for(int i = 0; i < cnt; i++) {
+#>
+                            <#= GetTypeScriptPropertyName(Model.ScalarProperties[i], Model)#> = itm.<#= GetForeignKeyNameChain(Model.ScalarProperties[i].ForeignKeyNameChain) #><#= Model.ScalarProperties[i].OriginalPropertyName #>,
+<#
+            }
+#>
+                            <#= GetTypeScriptPropertyName(Model.ScalarProperties[cnt], Model)#> = itm.<#= GetForeignKeyNameChain(Model.ScalarProperties[cnt].ForeignKeyNameChain) #><#=            Model.ScalarProperties[cnt].OriginalPropertyName #>
+                    }).Aggregate(OredBits) };
+<#
+        }
+#>
+                } else {
+                    resultObject.items = new List<<#= Model.ViewName #>>();
+                }
+                return Ok(resultObject);
+        } // the end of GetWithFilter()-method
+
+        <#= Model.ViewName #> OredBits(<#= Model.ViewName #> rslt, <#= Model.ViewName #> itm) {
+<#
+        {
+            int cnt = Model.ScalarProperties.Count;
+            for(int i = 0; i < cnt; i++) {
+                if ((!(Model.ScalarProperties[i].IsNullable)) && IsPropInteger(Model.ScalarProperties[i])) {
+#>
+                            rslt.<#= GetTypeScriptPropertyName(Model.ScalarProperties[i], Model)#> |= itm.<#= GetTypeScriptPropertyName(Model.ScalarProperties[i], Model)#>;
+<#
+                } else {
+#>
+                            rslt.<#= GetTypeScriptPropertyName(Model.ScalarProperties[i], Model)#> = itm.<#= GetTypeScriptPropertyName(Model.ScalarProperties[i], Model)#>;
+<#
+                }
+            }
+        }
+#>
+            return rslt;
+        }
+
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                db.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+    }
+}
+
+<#+
+    String GetDestinationNameSpace(ModelViewSerializable model) {
+        string result = "";
+        if( !string.IsNullOrEmpty( model.WebApiServiceFolder ) ) {
+            result = model.WebApiServiceFolder.Replace("\\", ".");
+        }
+        if ( !string.IsNullOrEmpty(model.WebApiServiceDefaultProjectNameSpace) ) {
+            if (string.IsNullOrEmpty(result)) {
+                result = model.WebApiServiceDefaultProjectNameSpace;
+            } else {
+                result = model.WebApiServiceDefaultProjectNameSpace + "." + result;
+            }
+        }
+        return result;
+    }
+    String GetDbContextNameSpace(DbContextSerializable context) {
+        string result = context.DbContextFullClassName;
+        
+        if( !string.IsNullOrEmpty( result ) ) {
+            if( !string.IsNullOrEmpty(context.DbContextClassName) ) {
+                if(result.EndsWith("."+context.DbContextClassName)) {
+                    result = result.Substring(0, result.LastIndexOf("."+context.DbContextClassName));
+                }
+            }
+        }
+        return result;
+    }
+    String GetViewModelNameSpace(ModelViewSerializable model) {
+        string result = "";
+        if( !string.IsNullOrEmpty( model.ViewFolder ) ) {
+            result = model.ViewFolder.Replace("\\", ".");
+        }
+        if ( !string.IsNullOrEmpty(model.ViewDefaultProjectNameSpace) ) {
+            if (string.IsNullOrEmpty(result)) {
+                result = model.ViewDefaultProjectNameSpace;
+            } else {
+                result = model.ViewDefaultProjectNameSpace + "." + result;
+            }
+        }
+        return result;
+    }
+    String GetRootEntityNameSpace(ModelViewSerializable model) {
+        return model.RootEntityFullClassName.Substring(0, model.RootEntityFullClassName.LastIndexOf("." + model.RootEntityClassName));
+    }
+    List<String> GetNavigationPaths(ModelViewSerializable model)
+    {
+        List<String> locPaths = new List<String>();
+        if(model.ScalarProperties == null) return locPaths;
+        foreach (ModelViewPropertyOfVwSerializable prop in model.ScalarProperties)
+        {
+            if (string.IsNullOrEmpty(prop.ForeignKeyNameChain)) continue;
+            if (locPaths.Exists(itm => (itm.StartsWith(prop.ForeignKeyNameChain + ".") || (itm.Equals(prop.ForeignKeyNameChain))))) continue;
+            string s = locPaths.Where(itm => (prop.ForeignKeyNameChain.StartsWith(itm + ".") || (itm.Equals(prop.ForeignKeyNameChain)))).FirstOrDefault();
+            if (!string.IsNullOrEmpty(s))
+            {
+                locPaths.Remove(s);
+            }
+            locPaths.Add(prop.ForeignKeyNameChain);
+        }
+        return locPaths;
+    }
+    String GenerateIncludePaths(String src)
+    {
+        if (String.IsNullOrEmpty(src)) return "";
+        string[] sa = src.Split(new char[] { '.' });
+        StringBuilder sb = new StringBuilder(".Include(p => p." + sa[0] + ")");
+        for (int i = 1; i < sa.Length; i++)
+        {
+            sb.Append(".ThenInclude(p => p." + sa[i] + ")");
+        }
+        return sb.ToString();
+    }
+    String GetForeignKeyNameChain(String foreignKeyNameChain) {
+        if (String.IsNullOrEmpty(foreignKeyNameChain)) {
+            return "";
+        } else {
+            return foreignKeyNameChain + ".";
+        }
+    }
+    String GetWebApiServicePrefix(ModelViewSerializable model) {
+        string result = model.WebApiServiceName;
+        if( !string.IsNullOrEmpty( result ) ) {
+            if(result.EndsWith("Controller")) {
+                result = result.Substring(0, result.LastIndexOf("Controller"));
+            }
+            result = result.ToLower();
+        }
+        return result;
+    }
+    String GetNullableType(ModelViewPropertySerializable prop) {
+        if (prop.UnderlyingTypeName.Equals("System.String")) {
+            return prop.UnderlyingTypeName;
+        } else {
+			return prop.UnderlyingTypeName +"?";
+        }
+    }
+    String GetChainedPropertyName(ModelViewPropertySerializable prop) {
+        if (String.IsNullOrEmpty(prop.ForeignKeyNameChain)) {
+            return prop.OriginalPropertyName;
+        } else {
+            return prop.ForeignKeyNameChain + "." + prop.OriginalPropertyName;
+        }
+    }
+    bool IsEntityTypeString(ModelViewPropertySerializable prop) {
+        return prop.UnderlyingTypeName.Equals("System.String");
+    }
+
+    String GetFirstPrimKeyProperty(ModelViewSerializable model) {
+        return model.PrimaryKeyProperties.FirstOrDefault().OriginalPropertyName;
+    }
+
+    String GetLowerCasePropertyName(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+        string result = GetTypeScriptPropertyName(prop, model);
+        if (!string.IsNullOrEmpty(result)) {
+            result = result.ToLower();
+        }
+        return result;
+    }
+    bool IsRootEntityProperty(ModelViewPropertySerializable prop, ModelViewSerializable model) {
+        return string.IsNullOrEmpty(prop.ForeignKeyNameChain);
+    }
+    public string FirstLetterToUpper(string str)
+    {
+        if (str == null)
+            return null;
+        if (str.Length > 1)
+            return char.ToUpper(str[0]) + str.Substring(1);
+        return str.ToUpper();
+    }
+    public string FirstLetterToLower(string str)
+    {
+        if (str == null)
+            return null;
+        if (str.Length > 1)
+            return char.ToLower(str[0]) + str.Substring(1);
+        return str.ToUpper();
+    }
+    string GetTypeScriptPropertyName(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+        if (model.GenerateJSonAttribute) {
+            return prop.ViewPropertyName;
+        } else {
+            return FirstLetterToLower(prop.ViewPropertyName);
+        }
+    }
+    string GetFilterPropertyName(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+        if (model.GenerateJSonAttribute) {
+            return prop.JsonPropertyName;
+        } else {
+            return FirstLetterToLower(prop.ViewPropertyName);
+        }
+    }
+    string GetFilterPropertyOperatorName(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model, string operatorSufix) {
+        if (model.GenerateJSonAttribute) {
+            return prop.JsonPropertyName + operatorSufix;
+        } else {
+            return FirstLetterToLower(prop.ViewPropertyName) + operatorSufix;
+        }
+    }
+    bool IsPropInteger(ModelViewPropertyOfVwSerializable prop) {
+        if(prop == null) return false;
+        if(string.IsNullOrEmpty( prop.TypeFullName )) return false;
+        string tpNm = prop.TypeFullName.ToLower();
+        return 
+            "system.int16".Equals(tpNm) ||
+            "system.int32".Equals(tpNm) ||
+            "system.int64".Equals(tpNm) ||
+            "system.uint16".Equals(tpNm) ||
+            "system.uint32".Equals(tpNm) ||
+            "system.uint64".Equals(tpNm);
+    }
+
+#>

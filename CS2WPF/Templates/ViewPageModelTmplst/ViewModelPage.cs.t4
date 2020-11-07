@@ -1,0 +1,96 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Linq.Expressions;
+<# if(Model.GenerateJSonAttribute) { #>
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
+<# } #>
+
+
+namespace <#= GetModelNameSpace(Model) #> {
+
+    public class <#= Model.PageViewName #> {
+<# if(Model.GenerateJSonAttribute) { #>
+        [JsonProperty(PropertyName = "page")]
+<# } #>
+        public int page { get; set; }
+
+<# if(Model.GenerateJSonAttribute) { #>
+        [JsonProperty(PropertyName = "pagesize")]
+<# } #>
+        public int pagesize { get; set; }
+
+<# if(Model.GenerateJSonAttribute) { #>
+        [JsonProperty(PropertyName = "pagecount")]
+<# } #>
+        public int pagecount { get; set; }
+
+<# if(Model.GenerateJSonAttribute) { #>
+        [JsonProperty(PropertyName = "total")]
+<# } #>
+        public int total { get; set; }
+
+<# if(Model.GenerateJSonAttribute) { #>
+        [JsonProperty(PropertyName = "items")]
+<# } #>
+        public List<<#= Model.ViewName #>> items { get; set; }
+    }
+
+}
+
+<#+
+        string GetPropertyTypeName(ModelViewPropertySerializable prop)
+        {
+            if("System.String".Equals(prop.UnderlyingTypeName, System.StringComparison.OrdinalIgnoreCase)) {
+                return prop.UnderlyingTypeName;
+            }
+            if(prop.IsNullable || (!prop.IsRequiredInView)) {
+                return prop.UnderlyingTypeName + " ?";
+            }
+            return prop.UnderlyingTypeName;
+        }
+        string GetModelNameSpace(ModelViewSerializable model) {
+            string result = model.ViewFolder;
+            if (string.IsNullOrEmpty(result)) {
+                result = "";
+            } else {
+                result = "." + result.Replace("\\",".");
+            }
+            return model.ViewDefaultProjectNameSpace + result;
+        }
+        public string FirstLetterToUpper(string str)
+        {
+            if (str == null)
+                return null;
+            if (str.Length > 1)
+                return char.ToUpper(str[0]) + str.Substring(1);
+            return str.ToUpper();
+        }
+        public string FirstLetterToLower(string str)
+        {
+            if (str == null)
+                return null;
+            if (str.Length > 1)
+                return char.ToLower(str[0]) + str.Substring(1);
+            return str.ToUpper();
+        }
+        string GetTypeScriptPropertyName(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+            if (model.GenerateJSonAttribute) {
+                return prop.ViewPropertyName;
+            } else {
+                return FirstLetterToLower(prop.ViewPropertyName);
+            }
+        }
+
+#>

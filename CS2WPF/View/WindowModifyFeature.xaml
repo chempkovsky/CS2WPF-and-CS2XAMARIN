@@ -1,0 +1,48 @@
+﻿<Window x:Class="CS2WPF.View.WindowModifyFeature"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:cm="clr-namespace:System.ComponentModel;assembly=System"
+        xmlns:local="clr-namespace:CS2WPF.View"
+        mc:Ignorable="d"
+        WindowStartupLocation="CenterOwner"
+        Title="Feature" Height="400" Width="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock  Grid.Row="0" Text="Feature" HorizontalAlignment="Center" FontSize="14" FontWeight="Bold" Margin="0 5 0 5"/>
+
+        <Grid Grid.Row="1" Margin="0 0 0 5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0"   Text="Feature Name:" Margin="10 0 10 0" />
+            <TextBox   Grid.Column="1"   Text="{Binding FeatureName, Mode=TwoWay,  UpdateSourceTrigger=PropertyChanged}" Margin="0 0 10 0"/>
+            <Button Grid.Column="2" Content="Save" Width="80" Margin="0 0 10 0" Command="{Binding UiBtnCommandSave}"/>
+        </Grid>
+        <ListView Grid.Row="2" Margin="5" MinHeight="300"  ItemsSource="{Binding ContextItemsList}" >
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn  Header="Selected" >
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox Margin="3 0 3 0" IsChecked="{Binding IsSelected}" IsHitTestVisible="True"></CheckBox>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn  Header="View Name" DisplayMemberBinding="{Binding ViewName}"/>
+                    <GridViewColumn  Header="File Type" DisplayMemberBinding="{Binding FileType}"/>
+                </GridView>
+            </ListView.View>
+        </ListView>
+    </Grid>
+
+</Window>

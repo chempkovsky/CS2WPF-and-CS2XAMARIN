@@ -1,0 +1,146 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Linq.Expressions;
+<# if(Model.GenerateJSonAttribute) { #>
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
+<# } #>
+
+
+namespace <#= GetModelNameSpace(Model) #> {
+    public class <#= Model.ViewName #> {
+<#
+        foreach (ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
+            if(Model.GenerateJSonAttribute) { 
+#>
+        [JsonProperty(PropertyName = "<#= prop.JsonPropertyName #>")]
+<# 
+            } 
+            if (prop.IsRequiredInView) {
+#>
+        [Required]
+<# 
+            }
+            if(prop.Attributes != null) {
+                foreach(ModelViewAttributeSerializable a in prop.Attributes) {
+                    if ("Required".Equals( a.AttrName, StringComparison.OrdinalIgnoreCase)) {
+                        continue;
+                    }
+                    if ("DatabaseGenerated".Equals( a.AttrName, StringComparison.OrdinalIgnoreCase)) {
+                        continue;
+                    }
+                    if ("Key".Equals( a.AttrName, StringComparison.OrdinalIgnoreCase)) {
+                        continue;
+                    }
+                    if ("ForeignKey".Equals( a.AttrName, StringComparison.OrdinalIgnoreCase)) {
+                        continue;
+                    }
+                    if ("Column".Equals( a.AttrName, StringComparison.OrdinalIgnoreCase)) {
+                        continue;
+                    }
+                    if ("Index".Equals( a.AttrName, StringComparison.OrdinalIgnoreCase)) {
+                        continue;
+                    }
+                    if ("NotMapped".Equals( a.AttrName, StringComparison.OrdinalIgnoreCase)) {
+                        continue;
+                    }
+                    if ("InverseProperty".Equals( a.AttrName, StringComparison.OrdinalIgnoreCase)) {
+                        continue;
+                    }
+                
+                
+#>
+        <#= AttribToString(a) #>
+<#
+                }
+            }
+#>
+        public <#= GetPropertyTypeName(prop) #>  <#= GetTypeScriptPropertyName(prop, Model) #> { get; set; }
+
+<# 
+       } 
+#>
+    }
+}
+
+<#+
+        string GetPropertyTypeName(ModelViewPropertyOfVwSerializable prop)
+        {
+            if("System.String".Equals(prop.UnderlyingTypeName, System.StringComparison.OrdinalIgnoreCase)) {
+                return prop.UnderlyingTypeName;
+            }
+            if(prop.IsNullable || (!prop.IsRequiredInView)) {
+                return prop.UnderlyingTypeName + " ?";
+            }
+            return prop.UnderlyingTypeName;
+        }
+        string GetModelNameSpace(ModelViewSerializable model) {
+            string result = model.ViewFolder;
+            if (string.IsNullOrEmpty(result)) {
+                result = "";
+            } else {
+                result = "." + result.Replace("\\",".");
+            }
+            return model.ViewDefaultProjectNameSpace + result;
+        }
+        public string FirstLetterToUpper(string str)
+        {
+            if (str == null)
+                return null;
+            if (str.Length > 1)
+                return char.ToUpper(str[0]) + str.Substring(1);
+            return str.ToUpper();
+        }
+        public string FirstLetterToLower(string str)
+        {
+            if (str == null)
+                return null;
+            if (str.Length > 1)
+                return char.ToLower(str[0]) + str.Substring(1);
+            return str.ToUpper();
+        }
+        string GetTypeScriptPropertyName(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+            if (model.GenerateJSonAttribute) {
+                return prop.ViewPropertyName;
+            } else {
+                return FirstLetterToLower(prop.ViewPropertyName);
+            }
+        }
+        string AttribToString(ModelViewAttributeSerializable attr) {
+            if(attr == null) return "";
+            string result= "[" + attr.AttrName; 
+            if (attr.VaueProperties == null) {
+                return result + "]";
+            }
+            if (attr.VaueProperties.Count < 1) {
+                return result + "]";
+            }
+            result = result + "(";
+            bool insComma= false;
+            foreach(ModelViewAttributePropertySerializable valProp in attr.VaueProperties) {
+                if (insComma) {
+                    result =  result + ",";
+                } else {
+                    insComma = true;
+                }
+                if(! string.IsNullOrEmpty(valProp.PropName) ) {
+                    if (! valProp.PropName.Contains("...") ) {
+                        result =  result + valProp.PropName + "=";
+                    }
+                }
+                result =  result + valProp.PropValue;
+            }
+            return result + ")]";
+        }
+#>

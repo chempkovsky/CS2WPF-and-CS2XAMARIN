@@ -1,0 +1,130 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+using System;
+using System.Windows;
+using System.Windows.Shapes;
+<#
+
+    string pathHelperModelFolder      = "00120-PathHelper.cs";
+    string pathHelperModelClassName   = GetModelClassName(Model, pathHelperModelFolder);
+    string pathHelperModelNameSpace   = GetModelNameSpace(Model, pathHelperModelFolder);
+    
+#>
+
+namespace <#= pathHelperModelNameSpace #> {
+    public static class <#= pathHelperModelClassName #>
+    {
+        private static void DataResourceKeyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var element = d as Path;
+            if (element != null)
+            {
+
+                if(e.NewValue == null)
+                    element.SetResourceReference(Path.DataProperty, "");
+                else
+                    element.SetResourceReference(Path.DataProperty, e.NewValue);
+            }
+        }
+
+        public static readonly DependencyProperty DataResourceKeyProperty = DependencyProperty.RegisterAttached("DataResourceKey",
+            typeof(object),
+            typeof(<#= pathHelperModelClassName #>),
+            new PropertyMetadata(String.Empty, DataResourceKeyChanged));
+
+        public static void SetDataResourceKey(Path element, object value)
+        {
+            element.SetValue(DataResourceKeyProperty, value);
+        }
+
+        public static object GetDataResourceKey(Path element)
+        {
+            return element.GetValue(DataResourceKeyProperty);
+        }
+
+    }
+}
+
+<#+
+
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+
+#>

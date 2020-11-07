@@ -1,0 +1,105 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="sql" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2REACTJS" #>
+<#@ import namespace="CS2REACTJS.Model" #>
+<#@ import namespace="CS2REACTJS.Model.Serializable" #>
+<#@ parameter type="CS2REACTJS.Model.Serializable.AllowedFileTypesSerializable" name="AllowedFileTypes" #>
+<#@ parameter type="CS2REACTJS.Model.Serializable.FeatureContextSerializable" name="FeatureContext" #>
+<#@ parameter type="CS2REACTJS.Model.Serializable.FeatureSerializable" name="Feature" #>
+<#@ parameter type="CS2REACTJS.Model.Serializable.DbContextSerializable" name="Context" #>
+<#
+//
+// Before you starts:
+// Please reset value for [startFromId]
+//
+    int startFromId= 0;
+#>
+/*
+USE [SecurityDataBase]
+GO
+*/
+<#
+    string ftrFeatureComponentFolder = "30100-.ftr.component.tsx";
+    string insertSql = "insert into [dbo].[securitydashboards]([DashboardPk], [DashboardName], [DashboardDescription]) values (";
+    int currentId = startFromId;
+    foreach(FeatureSerializable featureSerializable in FeatureContext.Features) {
+        string featureClassName = GetFeatureComponentClassName(featureSerializable, ftrFeatureComponentFolder);
+#>
+    <#= insertSql #> <#= currentId #>, '<#= featureClassName #>', 'Description for <#= featureClassName #>')
+    go
+
+<#
+        currentId++;
+    }
+#>
+/*
+----------------------------------------------------------------------------------
+USE [AspNetSecurityDataBase]
+GO
+*/
+<#
+    insertSql = "insert into [dbo].[aspnetdashboards]([DashboardPk], [DashboardName], [DashboardDescription]) values (";
+    currentId = startFromId;
+    foreach(FeatureSerializable featureSerializable in FeatureContext.Features) {
+        string featureClassName = GetFeatureComponentClassName(featureSerializable, ftrFeatureComponentFolder);
+#>
+    <#= insertSql #> <#= currentId #>, '<#= featureClassName #>', 'Description for <#= featureClassName #>')
+    go
+
+<#
+        currentId++;
+    }
+#>
+
+
+
+
+<#+    
+
+    string GetFeatureComponentClassName(FeatureSerializable feature, string fileType) {
+        string result="";
+        if ((feature == null) || string.IsNullOrEmpty(fileType) ) {
+            return result;
+        }
+        if (feature.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            feature.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".component","Component").Replace(".","-");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+        }
+        return sb.ToString();
+    }
+
+#>

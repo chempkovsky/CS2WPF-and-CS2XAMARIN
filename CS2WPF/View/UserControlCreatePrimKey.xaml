@@ -1,0 +1,112 @@
+﻿<UserControl x:Class="CS2WPF.View.UserControlCreatePrimKey"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:CS2WPF.View"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="600">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+        <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <TextBlock FontSize="18" FontWeight="Bold" Text="{Binding InvitationCaption}" />
+            <TextBlock FontSize="14" FontWeight="Bold" Text="{Binding EntityNameCaption}" />
+        </StackPanel>
+        <Grid Grid.Column="0" Grid.Row="1" Margin="18 10 0 0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Vertical">
+                <TextBlock Margin="5">All Not Null Properties</TextBlock>
+                <ListBox Width="200" Height="160" ItemsSource="{Binding EntityProperties}" SelectedIndex="{Binding  EntityPropertiesIndex}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Vertical" >
+                                <TextBlock  Text="{Binding Path=PropName}" FontWeight="Bold"/>
+                                <StackPanel Orientation="Horizontal" >
+                                    <TextBlock  Text="{Binding Path=ShortTypeName}"/>
+                                    <CheckBox Margin="5 0 5 0" IsChecked="{Binding IsNullable}" IsHitTestVisible="False" />
+                                    <TextBlock  Text="Nullable"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </StackPanel>
+            <StackPanel Margin="0 30 0 0" Grid.Row="0" Grid.Column="1" Orientation="Vertical">
+                <Button Margin="5 5 5 2" Content="  &gt;  "     Command="{Binding UiBtnCommandToPrimary}"/>
+                <Button Margin="5 2 5 2" Content="  &lt;  "     Command="{Binding UiBtnCommandFromPrimary}"/>
+                <Button Margin="5 2 5 2" Content="  &lt;&lt;  " Command="{Binding UiBtnCommandAllFromPrimary}"/>
+            </StackPanel>
+            <StackPanel Grid.Row="0" Grid.Column="2" Orientation="Vertical">
+                <TextBlock Margin="5">Primary Key</TextBlock>
+                <ListBox Width="200" Height="120" ItemsSource="{Binding PrimaryKeyProperties}"  SelectedIndex="{Binding  PrimaryKeyPropertiesIndex}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Vertical" >
+                                <TextBlock  Text="{Binding Path=PropName}" FontWeight="Bold"/>
+                                <StackPanel Orientation="Horizontal" >
+                                    <TextBlock  Text="{Binding Path=ShortTypeName}"/>
+                                    <CheckBox Margin="5 0 5 0" IsChecked="{Binding IsNullable}" IsHitTestVisible="False" />
+                                    <TextBlock  Text="Nullable"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+
+                </ListBox>
+                <StackPanel Margin="0 10 0 0" Orientation="Horizontal">
+                    <Button  Margin="5 0 0 0" Content=" Create(Modify) " FontWeight="Bold" Command="{Binding UiBtnCommandCreate}"/>
+                    <Button  Margin="10 0 0 0" Content=" Refresh " FontWeight="Bold" Command="{Binding UiBtnCommandRefresh}"/>
+                </StackPanel>
+            </StackPanel>
+            <StackPanel Margin="0 30 0 0" Grid.Row="0" Grid.Column="3" Orientation="Vertical">
+                <Button Margin="5 5 5 2" Content="   ^   " Command="{Binding UiBtnCommandUp}"/>
+                <Button Margin="5 2 5 2" Content="   v   " Command="{Binding UiBtnCommandDown}"/>
+            </StackPanel>
+        </Grid>
+        <Grid Grid.Column="0" Grid.Row="2" Margin="18 10 0 0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Column="0" Grid.Row="0" FontWeight="Bold" Text="Select Template:" />
+            <ComboBox  Grid.Column="0" Grid.Row="1"   IsEditable="False" 
+                                       ItemsSource ="{Binding Templates}"
+                                       SelectedItem="{Binding SelectedTemplate, Mode=TwoWay}" 
+                                       Width="440"/>
+            <TextBox Grid.Column="0" Margin="0 5 0 0" Grid.Row="2" Width="440" Height="150" 
+                      AcceptsReturn="True" AcceptsTab="True"
+                      ScrollViewer.HorizontalScrollBarVisibility="Auto" 
+                      ScrollViewer.VerticalScrollBarVisibility="Auto" 
+                      ScrollViewer.CanContentScroll="True"
+                      Text="{Binding T4TempateText, UpdateSourceTrigger=PropertyChanged}"  />
+        </Grid>
+    </Grid>
+</UserControl>

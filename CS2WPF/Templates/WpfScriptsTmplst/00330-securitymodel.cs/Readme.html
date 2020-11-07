@@ -1,0 +1,528 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Readme for 00330-securitymodel.cs</title>
+</head>
+<body>
+    <h3>(Context level) Readme for 00330-securitymodel.cs</h3>
+
+    <table cellspacing="5" border="1">
+        <tr>
+            <td>
+                Type
+            </td>
+            <td>
+                C# Entity
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Recomended folder
+            </td>
+            <td>
+                "Security" under Entity Framework C# project
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Generator group
+            </td>
+            <td>
+                Context level
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <strong>File type</strong>
+            </td>
+            <td>
+                C# Entity
+            </td>
+        </tr>
+    </table>
+
+
+    <h3>Before continuing</h3>
+    The security package includes the following View models:
+    <ul>
+        <li>securitypermission-view</li>
+        <li>securitydashboard-view</li>
+        <li>securitymodel-view</li>
+        <li>securityrole-view</li>
+        <li>securityuser-view</li>
+        <li>securityuser2role-view</li>
+    </ul>
+    To prepare them in a project, you must first generate entities (this is a C# part of the project).
+    Run the following scripts for entities
+    <ul>
+        <li>00300-securityrole.cs</li>
+        <li>00310-securityuser.cs</li>
+        <li>00320-securityuser2role.cs</li>
+        <li>00330-securitymodel.cs</li>
+        <li>00340-securitydashboard.cs</li>
+    </ul>
+    and for DB context
+    <ul>
+        <li>00350-securitydbcontext.cs</li>
+    </ul>
+    <strong>
+        Remark
+    </strong>
+    The scripts for entities you must run twice. Not all references are available the first time scripts are run. It's about master detail links.
+    But the second time all the references are in the place. You have the following batch that automates this work.
+    <ul>
+        <li>00020-SecurityEntities.json</li>
+    </ul>
+    Run the following batch to generate DbContext.
+    <ul>
+        <li>00030-SecurityDbContext.json</li>
+    </ul>
+
+    As a result you will obtain the following Entity C# files
+
+    <ul>
+        <li>securitydashboard.cs</li>
+        <li>securitymodel.cs</li>
+        <li>securityrole.cs</li>
+        <li>securityuser.cs</li>
+        <li>securityuser2role.cs</li>
+    </ul>
+    and one Db context C# file
+    <ul>
+        <li>securitydbcontext.cs</li>
+    </ul>
+
+    Having entities and DBcontext, you can perform the next step: model and generate ViewModels
+    <h4>
+        ViewModel for securitydashboard.cs
+    </h4>
+    Include all properties in the ViewModel :
+    <ul>
+        <li>DashboardPk</li>
+        <li>DashboardName</li>
+        <li>DashboardDescription</li>
+    </ul>
+
+    <h4>
+        ViewModel for securitymodel.cs
+    </h4>
+    Include all properties in the ViewModel :
+    <ul>
+        <li>ModelPk</li>
+        <li>ModelName</li>
+        <li>ModelDescription</li>
+    </ul>
+
+    <h4>
+        ViewModel for securityrole.cs
+    </h4>
+    Include all properties in the ViewModel :
+    <ul>
+        <li>RoleName</li>
+        <li>RoleDescription</li>
+        <li>Mask0</li>
+        <li>...</li>
+        <li>MaskD</li>
+        <li>Dask0</li>
+        <li>Dask1</li>
+        <li>Dask2</li>
+    </ul>
+
+    <h4>
+        ViewModel for securityuser.cs
+    </h4>
+    Include all properties in the ViewModel :
+    <ul>
+        <li>UserName</li>
+        <li>UserDescription</li>
+    </ul>
+
+    <h4>
+        securityuser2role.cs Entity requires special attention: Two ViewModels must be created for this Entity
+    </h4>
+    <h5>
+        securityuser2roleView Entity (First ViewModel)
+    </h5>
+    <ul>
+        <li>In the left panel expand <b>Foreign keys</b>-folder choose <b>SecUser: SecUser2Role</b></li>
+        <li>In the right panel using <b>View Name</b>-combo choose <b>securityuserView</b></li>
+        <li>In the right panel using <b>Foreign key prefix</b>-edit enter <b>U</b>-letter</li>
+        <li>In the left panel under <b>SecUser: SecUser2Role</b> expand <b>Properties</b>-folder and choose </li>
+        <li>
+            <ul>
+                <li><b>UUserName</b></li>
+                <li><b>UUserDescription</b></li>
+            </ul>
+        </li>
+        <li>In the left panel expand <b>Foreign keys</b>-folder choose <b>SecRole: SecUser2Role</b></li>
+        <li>In the right panel using <b>View Name</b>-combo choose <b>securityroleView</b></li>
+        <li>In the right panel using <b>Foreign key prefix</b>-edit enter <b>R</b>-letter</li>
+        <li>In the left panel under <b>SecRole: SecUser2Role</b> expand <b>Properties</b>-folder and choose </li>
+        <li>
+            <ul>
+                <li><b>RRoleName</b></li>
+                <li><b>RRoleDescription</b></li>
+            </ul>
+        </li>
+    </ul>
+    That's it. Please ignory hints. Click <b>Next/Save</b> and second <b>Next/Save</b>
+
+    <h5>
+        securitypermissionView Entity (Second ViewModel)
+    </h5>
+    <ul>
+        <li>In the left panel choose <b>securityuser2roleView: securityuser2role</b>- root node folder</li>
+        <li>In the right panel using <b>View Name</b>-edit enter <b>securitypermissionView</b></li>
+        <li>In the right panel using <b>Page View Name</b>-edit enter <b>securitypermissionViewPage</b></li>
+        <li>In the left panel expand <b>Foreign keys</b>-folder choose <b>SecUser: SecUser2Role</b></li>
+        <li>In the right panel using <b>View Name</b>-combo choose <b>securityuserView</b></li>
+        <li>In the right panel using <b>Foreign key prefix</b>-edit enter <b>U</b>-letter</li>
+        <li>In the left panel under <b>SecUser: SecUser2Role</b> expand <b>Properties</b>-folder and DO NOT choose any items </li>
+        <li>-------</li>
+        <li>In the left panel expand <b>Foreign keys</b>-folder choose <b>SecRole: SecUser2Role</b></li>
+        <li>In the right panel using <b>View Name</b>-combo choose <b>securityroleView</b></li>
+        <li>In the right panel using <b>Foreign key prefix</b>-edit enter <b>R</b>-letter</li>
+        <li>In the left panel under <b>SecRole: SecUser2Role</b> expand <b>Properties</b>-folder and choose </li>
+        <li>
+            <ul>
+                <li><b>RMask0</b></li>
+                <li><b>RMask1</b></li>
+                <li><b>...</b></li>
+                <li><b>RMaskD</b></li>
+                <li><b>RDask0</b></li>
+                <li><b>RDask1</b></li>
+                <li><b>RDask2</b></li>
+            </ul>
+        </li>
+        <li>In the right panel under <b>Root Node</b> expand <b>Properties</b>-folder and choose </li>
+        <li>
+            <ul>
+                <li><b>UserName</b></li>
+            </ul>
+        </li>
+    </ul>
+    That's it. Please ignory hints. Click <b>Next/Save</b> and second <b>Next/Save</b>
+
+    <h4>
+        As a result, you will receive the following new files
+    </h4>
+
+    <ul>
+        <li><b>securitydashboardView(Page).cs</b></li>
+        <li><b>securitymodelView(Page).cs</b></li>
+        <li><b>securityroleView(Page).cs</b></li>
+        <li><b>securityuserView(Page).cs</b></li>
+        <li><b>securityuser2roleView(Page).cs</b></li>
+        <li><b>securitypermissionView(Page).cs</b></li>
+    </ul>
+    For all ViewModels above (except <b>securitypermissionView(Page).cs</b>) please use "WebApiService.cs.t4"-script to generate WebApi services.
+    <br />
+    For <b>securitypermissionView(Page).cs</b>-ViewModel please use "WebApiServiceBitAggr.cs.t4"-script to generate WebApi service.
+
+    <h4>
+        WebApi services
+    </h4>
+    For the following ViewModels
+    <ul>
+        <li><b>securitydashboardView</b></li>
+        <li><b>securitymodelView</b></li>
+        <li><b>securityroleView</b></li>
+        <li><b>securityuserView</b></li>
+        <li><b>securityuser2roleView</b></li>
+    </ul>
+    <b>Is Used By Filter</b> and <b>Is Used By Sorting</b> must be checked for all properties.<br />
+    <b>Select all</b>, <b>Select many with pagination</b>, <b>Select one by primary key</b>, <b>Add one</b>, <b>Update one</b>, <b>Delete one</b> must be checked.<br />
+    <b>WebApiService.cs.t4</b>-T4 template must be used to generate WebApi controller
+    <br />--------------<br />
+    For the <b>securitypermissionView</b> ViewModel<br />
+    <b>Is Used By Filter</b> and <b>Is Used By Sorting</b> must be checked only for <b>UserName</b>
+    Only <b>Select many with pagination</b> must be checked.<br />
+    <b>WebApiServiceBitAggr.cs.t4</b>-T4 template must be used to generate WebApi controller
+
+    <h4>
+        Java scripts
+    </h4>
+    Please use the following Batchs to generate css/html/ts files. Each script has online readme with explanation of "how to" and "what for"
+    <ul>
+        <li><b>11100-SecurityInterfasesBatch.json</b></li>
+        <li><b>11400-SecurityWebApiService.json</b></li>
+        <li><b>11401-SecurityWebApiService.json</b></li>
+        <li><b>11420-SecuritySForm.json</b></li>
+        <li><b>11500-SecurityEform.json</b></li>
+        <li><b>11600-SecurityLform.json</b></li>
+        <li><b>12200-SecurityChkMform.json</b></li>
+        <li><b>12205-SecurityChkDform.json</b></li>
+        <li><b>12210-SecurityChkRform.json</b></li>
+        <li><b>12215-Securitylform.json</b></li>
+        <li><b>12220-SecurityO2m.json</b></li>
+    </ul>
+
+    But before generating css/html/ts files you need to define UI-settings for each Security ViewModel.
+    <h4>
+        securitydashboardView
+    </h4>
+    <p>
+        <b>UI List Properties: </b> <b>Shown</b> must be checked for all properties.<br />
+        <b>UI Form Properties: </b> <b>Shown</b> must be checked for all properties.<br />
+        <b>UI Form Properties: </b> <b>Input type New</b>  must be <b>Default</b> for all properties.<br />
+        <b>UI Form Properties: </b> <b>Input type Update</b>  must be <b>Default</b> for all properties.<br />
+        <b>UI Form Properties: </b> <b>Input type Delete</b>  must be <b>ReadOnly</b> for all properties.<br />
+    </p>
+
+    <h4>
+        securitymodelView
+    </h4>
+    <p>
+        <b>UI List Properties: </b> <b>Shown</b> must be checked for all properties.<br />
+        <b>UI Form Properties: </b> <b>Shown</b> must be checked for all properties.<br />
+        <b>UI Form Properties: </b> <b>Input type New</b>  must be <b>Default</b> for all properties.<br />
+        <b>UI Form Properties: </b> <b>Input type Update</b>  must be <b>Default</b> for all properties.<br />
+        <b>UI Form Properties: </b> <b>Input type Delete</b>  must be <b>ReadOnly</b> for all properties.<br />
+    </p>
+
+    <h4>
+        securityroleView
+    </h4>
+    <p>
+        <b>UI List Properties: </b> <b>Shown</b> must be checked only for "RoleName" and  "RoleDescription" properties.<br />
+        <b>UI Form Properties: </b> <b>Shown</b> must be checked for all properties.<br />
+        <b>UI Form Properties: </b> <b>New Line</b> must be checked for "RoleDescription", "Mask5", "MaskB" properties.<br />
+        <b>UI Form Properties: </b> <b>Input type New</b>  must be <b>Default</b> for all properties.<br />
+        <b>UI Form Properties: </b> <b>Input type Update</b>  must be <b>Default</b> for all properties.<br />
+        <b>UI Form Properties: </b> <b>Input type Delete</b>  must be <b>ReadOnly</b> for all properties.<br />
+    </p>
+
+    <h4>
+        securityuserView
+    </h4>
+    <p>
+        <b>UI List Properties: </b> <b>Shown</b> must be checked for all properties.<br />
+        <b>UI Form Properties: </b> <b>Shown</b> must be checked for all properties.<br />
+        <b>UI Form Properties: </b> <b>Input type New</b>  must be <b>Default</b> for all properties.<br />
+        <b>UI Form Properties: </b> <b>Input type Update</b>  must be <b>Default</b> for all properties.<br />
+        <b>UI Form Properties: </b> <b>Input type Delete</b>  must be <b>ReadOnly</b> for all properties.<br />
+    </p>
+
+    <h4>
+        securityuser2roleView
+    </h4>
+    <p>
+        <b>UI List Properties: </b> <b>Shown</b> must be checked for all properties.<br />
+        <b>UI Form Properties: </b> <b>Shown</b> must be checked for all properties.<br />
+        <b>UI Form Properties: </b> <b>Input type New</b>  must be <b>ReadOnly</b> for "UUserDescription" and "RRoleDescription" properties.<br />
+        <b>UI Form Properties: </b> <b>Input type New</b>  must be <b>Search Dialog</b> for "UUserName" property.<br />
+        <b>UI Form Properties: </b> <b>Input type New</b>  must be <b>Combo</b> for "RRoleName" property.<br />
+        <b>UI Form Properties: </b> <b>Input type Update</b>  must be <b>ReadOnly</b> for "UUserDescription" and "RRoleDescription" properties.<br />
+        <b>UI Form Properties: </b> <b>Input type Update</b>  must be <b>Search Dialog</b> for "UUserName" property.<br />
+        <b>UI Form Properties: </b> <b>Input type Update</b>  must be <b>Combo</b> for "RRoleName" property.<br />
+        <b>UI Form Properties: </b> <b>Input type Delete</b>  must be <b>ReadOnly</b> for all properties.<br />
+    </p>
+
+    <h4>
+        securitypermissionView
+    </h4>
+    <p>
+        <b>UI List Properties: </b> <b>Shown</b> must be checked for all properties.<br />
+        <b>UI Form Properties: </b> <b>Shown</b> must be checked for all properties.<br />
+        <b>UI Form Properties: </b> <b>Input type New</b>  must be <b>Default</b> for all properties.<br />
+        <b>UI Form Properties: </b> <b>Input type Update</b>  must be <b>Default</b> for all properties.<br />
+        <b>UI Form Properties: </b> <b>Input type Delete</b>  must be <b>ReadOnly</b> for all properties.<br />
+    </p>
+
+
+    <h4>
+        The table below defines the list of batches in correct order for generation.
+    </h4>
+
+    <table cellspacing="5" border="1">
+        <tr>
+            <td>
+                securitydashboardView
+            </td>
+            <td>
+                <ul>
+                    <li><b>11100-SecurityInterfasesBatch.json</b></li>
+                    <li><b>11400-SecurityWebApiService.json</b></li>
+                    <li><b>11420-SecuritySForm.json</b></li>
+                    <li><b>11500-SecurityEform.json</b></li>
+                    <li><b>11600-SecurityLform.json</b></li>
+                    <li><b>12205-SecurityChkDform.json</b></li>
+                </ul>
+            </td>
+            <td>
+                <b>UI List Properties: </b> <b>Shown</b> must be checked for all properties.<br />
+                <b>UI Form Properties: </b> <b>Shown</b> must be checked for all properties.<br />
+                <b>UI Form Properties: </b> <b>Input type New</b>  must be <b>Default</b> for all properties.<br />
+                <b>UI Form Properties: </b> <b>Input type Update</b>  must be <b>Default</b> for all properties.<br />
+                <b>UI Form Properties: </b> <b>Input type Delete</b>  must be <b>ReadOnly</b> for all properties.<br />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                securitymodelView
+            </td>
+            <td>
+                <ul>
+                    <li><b>11100-SecurityInterfasesBatch.json</b></li>
+                    <li><b>11400-SecurityWebApiService.json</b></li>
+                    <li><b>11420-SecuritySForm.json</b></li>
+                    <li><b>11500-SecurityEform.json</b></li>
+                    <li><b>11600-SecurityLform.json</b></li>
+                    <li><b>12200-SecurityChkMform.json</b></li>
+                </ul>
+
+            </td>
+            <td>
+                <b>UI List Properties: </b> <b>Shown</b> must be checked for all properties.<br />
+                <b>UI Form Properties: </b> <b>Shown</b> must be checked for all properties.<br />
+                <b>UI Form Properties: </b> <b>Input type New</b>  must be <b>Default</b> for all properties.<br />
+                <b>UI Form Properties: </b> <b>Input type Update</b>  must be <b>Default</b> for all properties.<br />
+                <b>UI Form Properties: </b> <b>Input type Delete</b>  must be <b>ReadOnly</b> for all properties.<br />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                securityroleView
+            </td>
+            <td>
+                <ul>
+                    <li><b>11100-SecurityInterfasesBatch.json</b></li>
+                    <li><b>11400-SecurityWebApiService.json</b></li>
+                    <li><b>11420-SecuritySForm.json</b></li>
+                    <li><b>11500-SecurityEform.json</b></li>
+                    <li><b>11600-SecurityLform.json</b></li>
+                    <li><b>12210-SecurityChkRform.json</b></li>
+                </ul>
+            </td>
+            <td>
+                <b>UI List Properties: </b> <b>Shown</b> must be checked only for "RoleName" and  "RoleDescription" properties.<br />
+                <b>UI Form Properties: </b> <b>Shown</b> must be checked for all properties.<br />
+                <b>UI Form Properties: </b> <b>New Line</b> must be checked for "RoleDescription", "Mask5", "MaskB" properties.<br />
+                <b>UI Form Properties: </b> <b>Input type New</b>  must be <b>Default</b> for all properties.<br />
+                <b>UI Form Properties: </b> <b>Input type Update</b>  must be <b>Default</b> for all properties.<br />
+                <b>UI Form Properties: </b> <b>Input type Delete</b>  must be <b>ReadOnly</b> for all properties.<br />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                securityuserView
+            </td>
+            <td>
+                <ul>
+                    <li><b>11100-SecurityInterfasesBatch.json</b></li>
+                    <li><b>11400-SecurityWebApiService.json</b></li>
+                    <li><b>11420-SecuritySForm.json</b></li>
+                    <li><b>11500-SecurityEform.json</b></li>
+                    <li><b>11600-SecurityLform.json</b></li>
+                </ul>
+            </td>
+            <td>
+                <b>UI List Properties: </b> <b>Shown</b> must be checked for all properties.<br />
+                <b>UI Form Properties: </b> <b>Shown</b> must be checked for all properties.<br />
+                <b>UI Form Properties: </b> <b>Input type New</b>  must be <b>Default</b> for all properties.<br />
+                <b>UI Form Properties: </b> <b>Input type Update</b>  must be <b>Default</b> for all properties.<br />
+                <b>UI Form Properties: </b> <b>Input type Delete</b>  must be <b>ReadOnly</b> for all properties.<br />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                securitypermissionView
+            </td>
+            <td>
+                <ul>
+                    <li><b>11100-SecurityInterfasesBatch.json</b></li>
+                    <li><b>11401-SecurityWebApiService.json</b></li>
+                    <li><b>12215-Securitylform.json</b></li>
+                </ul>
+            </td>
+            <td>
+                <b>UI List Properties: </b> <b>Shown</b> must be checked for all properties.<br />
+                <b>UI Form Properties: </b> <b>Shown</b> must be checked for all properties.<br />
+                <b>UI Form Properties: </b> <b>Input type New</b>  must be <b>Default</b> for all properties.<br />
+                <b>UI Form Properties: </b> <b>Input type Update</b>  must be <b>Default</b> for all properties.<br />
+                <b>UI Form Properties: </b> <b>Input type Delete</b>  must be <b>ReadOnly</b> for all properties.<br />
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                securityuser2roleView
+            </td>
+            <td>
+                <ul>
+                    <li><b>11100-SecurityInterfasesBatch.json</b></li>
+                    <li><b>11400-SecurityWebApiService.json</b></li>
+                    <li><b>11420-SecuritySForm.json</b></li>
+                    <li><b>11500-SecurityEform.json</b></li>
+                    <li><b>11600-SecurityLform.json</b></li>
+                </ul>
+            </td>
+            <td>
+                <b>UI List Properties: </b> <b>Shown</b> must be checked for all properties.<br />
+                <b>UI Form Properties: </b> <b>Shown</b> must be checked for all properties.<br />
+                <b>UI Form Properties: </b> <b>Input type New</b>  must be <b>ReadOnly</b> for "UUserDescription" and "RRoleDescription" properties.<br />
+                <b>UI Form Properties: </b> <b>Input type New</b>  must be <b>Search Dialog</b> for "UUserName" property.<br />
+                <b>UI Form Properties: </b> <b>Input type New</b>  must be <b>Combo</b> for "RRoleName" property.<br />
+                <b>UI Form Properties: </b> <b>Input type Update</b>  must be <b>ReadOnly</b> for "UUserDescription" and "RRoleDescription" properties.<br />
+                <b>UI Form Properties: </b> <b>Input type Update</b>  must be <b>Search Dialog</b> for "UUserName" property.<br />
+                <b>UI Form Properties: </b> <b>Input type Update</b>  must be <b>Combo</b> for "RRoleName" property.<br />
+                <b>UI Form Properties: </b> <b>Input type Delete</b>  must be <b>ReadOnly</b> for all properties.<br />
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                securityroleView
+            </td>
+            <td>
+                <ul>
+                    <li><b>12220-SecurityO2m.json</b></li>
+                </ul>
+            </td>
+            <td>
+                <b>UI List Properties: </b> <b>Shown</b> must be checked only for "RoleName" and  "RoleDescription" properties.<br />
+                <b>UI Form Properties: </b> <b>Shown</b> must be checked for all properties.<br />
+                <b>UI Form Properties: </b> <b>New Line</b> must be checked for "RoleDescription", "Mask5", "MaskB" properties.<br />
+                <b>UI Form Properties: </b> <b>Input type New</b>  must be <b>Default</b> for all properties.<br />
+                <b>UI Form Properties: </b> <b>Input type Update</b>  must be <b>Default</b> for all properties.<br />
+                <b>UI Form Properties: </b> <b>Input type Delete</b>  must be <b>ReadOnly</b> for all properties.<br />
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                securityuserView
+            </td>
+            <td>
+                OPTIONAL
+                <ul>
+                    <li><b>12220-SecurityO2m.json</b></li>
+                </ul>
+            </td>
+            <td>
+                <b>UI List Properties: </b> <b>Shown</b> must be checked for all properties.<br />
+                <b>UI Form Properties: </b> <b>Shown</b> must be checked for all properties.<br />
+                <b>UI Form Properties: </b> <b>Input type New</b>  must be <b>Default</b> for all properties.<br />
+                <b>UI Form Properties: </b> <b>Input type Update</b>  must be <b>Default</b> for all properties.<br />
+                <b>UI Form Properties: </b> <b>Input type Delete</b>  must be <b>ReadOnly</b> for all properties.<br />
+            </td>
+        </tr>
+
+    </table>
+
+    <br /><br />
+    The script below produces the same for all views in one batch. <br />
+    You can generate the code step by step as described in the table above <br />
+    or you can generate all files for all views in one step by executing the following script.
+    <table cellspacing="5" border="1">
+        <tr>
+            <td>
+                12230-SecurityAllBatch.json
+            </td>
+        </tr>
+    </table>
+
+</body>
+</html>

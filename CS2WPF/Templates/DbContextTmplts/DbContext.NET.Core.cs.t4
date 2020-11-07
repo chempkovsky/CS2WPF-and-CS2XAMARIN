@@ -1,0 +1,32 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ parameter type="System.String"  name="DestinationNameSpace" #>
+<#@ parameter type="System.String"  name="DestinationClassName" #>
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Text;
+using System.Collections.Generic;
+using System.Configuration;
+
+namespace <#= DestinationNameSpace #>
+{
+    public class <#= DestinationClassName #> : DbContext
+    {
+        //////////////////////////////////////////////////////////////////
+        /// reset ".UseSqlServer"
+        /// reset "ConfigurationManager.ConnectionStrings"
+        /// optionsBuilder.UseSqlServer(ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString);
+        /////////////////////////////////////////////////////////////////
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseSqlServer(ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString);
+        }
+
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+        }
+    }
+}

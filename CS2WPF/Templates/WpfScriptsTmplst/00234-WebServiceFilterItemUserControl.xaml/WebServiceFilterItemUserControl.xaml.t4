@@ -1,0 +1,238 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="xaml" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+
+<#
+
+    string gridFlexModelFolder      = "00100-GridFlex.cs";
+    string gridFlexModelClassName   = GetModelClassName(Model, gridFlexModelFolder);
+    string gridFlexModelNameSpace   = GetModelNameSpace(Model, gridFlexModelFolder);
+    string gridFlexModelProject     = GetModelProjectName(Model, gridFlexModelFolder);
+
+    string pathHelperModelFolder      = "00120-PathHelper.cs";
+    string pathHelperModelClassName   = GetModelClassName(Model, pathHelperModelFolder);
+    string pathHelperModelNameSpace   = GetModelNameSpace(Model, pathHelperModelFolder);
+    string pathHelperModelProject     = GetModelProjectName(Model, pathHelperModelFolder);
+
+    string foregroundHelperModelFolder      = "00130-ForegroundHelper.cs";
+    string foregroundHelperModelClassName   = GetModelClassName(Model, foregroundHelperModelFolder);
+    string foregroundHelperModelNameSpace   = GetModelNameSpace(Model, foregroundHelperModelFolder);
+    string foregroundHelperModelProject     = GetModelProjectName(Model, foregroundHelperModelFolder);
+
+    string WebServiceFilterItemUserControlFolder      = "00232-WebServiceFilterItemUserControl.xaml.cs";
+    string WebServiceFilterItemUserControlClassName   = GetModelClassName(Model, WebServiceFilterItemUserControlFolder);
+    string WebServiceFilterItemUserControlNameSpace   = GetModelNameSpace(Model, WebServiceFilterItemUserControlFolder);
+
+
+    string WebServiceFilterItemUserControlXamlFolder      = "00234-WebServiceFilterItemUserControl.xaml";
+    string WebServiceFilterItemUserControlXamlClassName   = GetModelClassName(Model, WebServiceFilterItemUserControlXamlFolder);
+    string WebServiceFilterItemUserControlXamlNameSpace   = GetModelNameSpace(Model, WebServiceFilterItemUserControlXamlFolder);
+    string WebServiceFilterItemUserControlXamlProject     = GetModelProjectName(Model, WebServiceFilterItemUserControlXamlFolder);
+    
+    string SelectedFilterOperatorPropertyName = "SelectedFilterOperator";
+    string SelectedFilterDefinitionPropertyName = "SelectedFilterDefinition";
+    string IsReadOnlyPropertyName = "IsReadOnly";
+    string IsEditablePropertyName = "IsEditable";
+    string IsDateInputPropertyName = "IsDateInput";
+    string FilterValuePropertyName = "FilterValue";
+    string FilterValuePromptPropertyName = "FilterValuePrompt";
+    string FilterValuePromptForegroundPropertyName = "FilterValuePromptForeground";
+    string FilterDefinitionsPropertyName = "FilterDefinitions";
+    string FilterOperatorsPropertyName = "FilterOperators";
+    string RemoveCommandPropertyName = "RemoveCommand";
+
+
+
+    string gridflexPrefix = "clr-namespace:" + pathHelperModelNameSpace;
+    if(gridFlexModelProject != WebServiceFilterItemUserControlXamlProject) {
+        gridflexPrefix = gridflexPrefix + ";assembly=" + gridFlexModelProject;
+    }
+    string frgrndPrefix = "clr-namespace:" + foregroundHelperModelNameSpace;
+    if(foregroundHelperModelProject != WebServiceFilterItemUserControlXamlProject) {
+        frgrndPrefix = frgrndPrefix + ";assembly=" + foregroundHelperModelProject;
+    }
+
+
+#>
+
+<UserControl x:Class="<#= WebServiceFilterItemUserControlNameSpace #>.<#= WebServiceFilterItemUserControlClassName #>"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:<#= WebServiceFilterItemUserControlNameSpace #>"
+             xmlns:gridflex="<#= gridflexPrefix #>"
+             xmlns:frgrnd="<#= frgrndPrefix #>"
+             mc:Ignorable="d" 
+             d:DesignHeight="150" d:DesignWidth="600" DataContextChanged="UserControl_DataContextChanged">
+    <!--<UserControl.Resources>
+        <ResourceDictionary Source="pack://application:,,,/CommonWpfControlLibrary;component/Themes/BasicResourceDictionary.xaml"/>
+    </UserControl.Resources> -->
+    <Grid gridflex:<#= gridFlexModelClassName #>.HorizontalFlex="true" Margin="0 0 8 0">
+        <StackPanel Margin="8 0 0 0">
+            <Label FontWeight="Bold" >Column name</Label>
+            <ComboBox ItemsSource="{Binding <#= FilterDefinitionsPropertyName #>}" <#= IsEditablePropertyName #>="False" DisplayMemberPath="fltrCaption" 
+                      SelectedItem="{Binding <#= SelectedFilterDefinitionPropertyName #>, Mode=TwoWay}"/>
+
+            <TextBlock>Select Column name</TextBlock>
+        </StackPanel>
+        <Grid Margin="8 0 0 0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="8*"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0" >
+                <Label FontWeight="Bold" >Operator</Label>
+                <ComboBox ItemsSource="{Binding <#= FilterOperatorsPropertyName #>}" <#= IsEditablePropertyName #>="False"  DisplayMemberPath="oCaption" SelectedValuePath="oName"
+                          SelectedValue="{Binding <#= SelectedFilterOperatorPropertyName #>, Mode=TwoWay}"/>
+                <TextBlock>Select operator</TextBlock>
+            </StackPanel>
+            <StackPanel Grid.Column="1" Margin="8 0 0 0">
+                <Label FontWeight="Bold" >Filter value</Label>
+                <Grid >
+                    <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <ContentPresenter Grid.Column="0" Content="{Binding}" HorizontalAlignment="Stretch">
+                        <ContentPresenter.Resources>
+                            <DataTemplate x:Key="TextboxPresenter">
+                                <TextBox HorizontalAlignment="Stretch" Text="{Binding <#= FilterValuePropertyName #>, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" <#= IsReadOnlyPropertyName #>="{Binding <#= IsReadOnlyPropertyName #>}"/>
+                            </DataTemplate>
+                            <DataTemplate x:Key="DatePickerPresenter">
+                                <DatePicker HorizontalAlignment="Stretch" SelectedDate="{Binding <#= FilterValuePropertyName #>, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"  IsEnabled="{Binding <#= IsEditablePropertyName #>}" />
+                            </DataTemplate>
+                        </ContentPresenter.Resources>
+                        <ContentPresenter.Style>
+                            <Style TargetType="{x:Type ContentPresenter}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding <#= IsDateInputPropertyName #>}" Value="False">
+                                        <Setter Property="ContentTemplate" Value="{StaticResource TextboxPresenter}" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding <#= IsDateInputPropertyName #>}" Value="True">
+                                        <Setter Property="ContentTemplate" Value="{StaticResource DatePickerPresenter}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ContentPresenter.Style>
+                    </ContentPresenter>
+                    <Button Grid.Column="1" Background="{x:Null}"
+                            KeyboardNavigation.TabNavigation ="None" ToolTip="Remove item"
+                            Command="{Binding <#= RemoveCommandPropertyName #>}">
+                        <Viewbox   Height="16" Width="16" FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Button}}}" HorizontalAlignment="Center" VerticalAlignment="Center" >
+                            <Canvas  Height="24" Width="24" >
+                                <Path  Data="{DynamicResource TrashCanOutline}" Fill="{DynamicResource Danger}" />
+                            </Canvas>
+                        </Viewbox>
+                    </Button>
+                </Grid>
+                <TextBlock frgrnd:<#= foregroundHelperModelClassName #>.ForegroundResourceKey="{Binding <#= FilterValuePromptForegroundPropertyName #>}" Text="{Binding <#= FilterValuePromptPropertyName #>}"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</UserControl>
+
+
+<#+
+
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+    string GetModelProjectName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileProject)) {
+            return result;
+        }
+        string[] fnArr = refItem.FileProject.Split(new char[] {'\\'}, 100, System.StringSplitOptions.None); 
+        string fn = fnArr[fnArr.Length - 1];
+
+        return fn.Replace(".csproj","");
+    }
+
+#>

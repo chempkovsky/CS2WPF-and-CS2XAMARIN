@@ -1,0 +1,55 @@
+﻿<Window x:Class="CS2WPF.View.WindowCS2WPF"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:cm="clr-namespace:System.ComponentModel;assembly=System"
+        xmlns:local="clr-namespace:CS2WPF.View"
+        mc:Ignorable="d"
+        Title="C# 2 Wpf" Height="520" Width="850" Closing="Window_Closing">
+    <!--<Window.Resources>
+        <cm:BackgroundWorker x:Key="backgroundWorker" WorkerReportsProgress="True" WorkerSupportsCancellation="True"
+                            DoWork="backgroundWorker_DoWork" ProgressChanged="backgroundWorker_ProgressChanged
+                            RunWorkerCompleted="backgroundWorker_Completed"/>
+    </Window.Resources>-->
+    <Window.Resources>
+        <Style TargetType="Button" x:Key="SaveButtonStyle">
+            <Setter Property="OverridesDefaultStyle" Value="True" />
+            <!--<Setter Property="Background" Value="MediumAquamarine" />
+        <Setter Property="Foreground" Value="MediumBlue" />-->
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Grid Background="{TemplateBinding Background}">
+                            <ContentPresenter x:Name="SaveButtonStylePresenter" 
+                                          Content="{TemplateBinding Content}"
+                                          HorizontalAlignment="Center" 
+                                          VerticalAlignment="Center" />
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="true">
+                    <Setter Property="Background" Value="MediumSeaGreen"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="auto"></RowDefinition>
+        </Grid.RowDefinitions>
+        <!--<local:UserControlVMCFS Grid.Row="0"/>-->
+        <StackPanel Orientation="Horizontal" Grid.Row="1" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+            <Button x:Name="PrevBtn"     Margin="10, 7, 1, 7" Command="{Binding PrevBtnCommand}" Content=" &lt;&lt; Previous "></Button>
+            <Button x:Name="NextBtn"     Margin="1,  7, 1,  7" Command="{Binding NextBtnCommand}" Content=" Next &gt;&gt; "/>
+            <Button x:Name="SaveBtn"     Margin="1,  7, 1, 7" Command="{Binding SaveBtnCommand}" Content=" Save " Style="{StaticResource SaveButtonStyle}"/> 
+            <Button x:Name="CancelBtn"   Margin="7,  7, 1, 7" Command="{Binding CancelBtnCommand}" Content=" Cancel " />
+        </StackPanel>
+        <ContentControl Grid.Row="0" Content="{Binding CurrentUserControl}" />
+    </Grid>
+</Window>

@@ -1,0 +1,590 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+using System;
+using System.Collections.Generic;
+using System.Windows;
+using System.Windows.Controls;
+<#
+ 
+    string NotificationEventArgsFolder      = "00228-NotificationEventArgs.cs";
+    string NotificationEventArgsClassName   = GetModelClassName(Model, NotificationEventArgsFolder);
+    string NotificationEventArgsNameSpace   = GetModelNameSpace(Model, NotificationEventArgsFolder);
+
+    string TablePaginationViewModelFolder      = "00250-TablePaginationViewModel.cs";
+    string TablePaginationViewModelClassName   = GetModelClassName(Model, TablePaginationViewModelFolder);
+    string TablePaginationViewModelNameSpace   = GetModelNameSpace(Model, TablePaginationViewModelFolder);
+
+    string TablePaginationUserControlFolder      = "00252-TablePaginationUserControl.xaml.cs";
+    string TablePaginationUserControlClassName   = GetModelClassName(Model, TablePaginationUserControlFolder);
+    string TablePaginationUserControlNameSpace   = GetModelNameSpace(Model, TablePaginationUserControlFolder);
+
+
+    string TitlePropertyName = "Title";
+    string RowsPerPageOptionsPropertyName = "RowsPerPageOptions";
+    string RowsPerPagePropertyName = "RowsPerPage";
+    string SelectedFilterOperatorPropertyName = "SelectedFilterOperator";
+    string OnRowsPerPageChangedEventPropertyName = "OnRowsPerPageChangedEvent";
+    string TpPagePropertyName = "TpPage";
+    string FromTpCountPropertyName = "FromTpCount";
+    string ToTpCountPropertyName = "ToTpCount";
+    string TpCountPropertyName = "TpCount";
+    string BackIconButtonNamePropertyName = "BackIconButtonName";
+    string BackIconButtonTextPropertyName = "BackIconButtonText";
+    string BackIconButtonColorPropertyName = "BackIconButtonColor";
+    string NextIconButtonNamePropertyName = "NextIconButtonName";
+    string NextIconButtonTextPropertyName = "NextIconButtonText";
+    string NextIconButtonColorPropertyName = "NextIconButtonColor";
+    string BackButtonClickedCommandPropertyName = "BackButtonClickedCommand";
+    string NextButtonClickedCommandPropertyName = "NextButtonClickedCommand";
+    string OnPageChangedEventPropertyName = "OnPageChangedEvent";
+    string OnRowsPerPageChangedNotificationPropertyName = "OnRowsPerPageChangedNotification";
+    string OnPageChangedNotificationPropertyName = "OnPageChangedNotification";
+
+    List<string> nmSpaces = new List<string>();
+   if (TablePaginationUserControlNameSpace != TablePaginationViewModelNameSpace) nmSpaces.Add(TablePaginationViewModelNameSpace);
+   if ((TablePaginationUserControlNameSpace != NotificationEventArgsNameSpace) && (nmSpaces.IndexOf(NotificationEventArgsNameSpace) < 0)) 
+        nmSpaces.Add(NotificationEventArgsNameSpace);
+
+#>
+<# 
+    foreach(string ns in nmSpaces) {
+#>
+using <#= ns #>;
+<#
+    }
+#>
+
+
+namespace <#= TablePaginationUserControlNameSpace #> {
+    /// <summary>
+    /// Interaction logic for <#= TablePaginationUserControlClassName #>.xaml
+    /// </summary>
+    public partial class <#= TablePaginationUserControlClassName #> : UserControl
+    {
+        public <#= TablePaginationUserControlClassName #>()
+        {
+            InitializeComponent();
+            DataContext = new <#= TablePaginationViewModelClassName #>();
+        }
+        #region <#= TitlePropertyName #>
+        private void Set<#= TitlePropertyName #>(string model)
+        {
+            <#= TablePaginationViewModelClassName #> vm = DataContext as <#= TablePaginationViewModelClassName #>;
+            if (vm != null)
+            {
+                vm.<#= TitlePropertyName #> = model;
+            }
+        }
+        private static void <#= TitlePropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            <#= TablePaginationUserControlClassName #> inst = d as <#= TablePaginationUserControlClassName #>;
+            if (inst != null)
+            {
+                inst.Set<#= TitlePropertyName #>(e.NewValue as string);
+            }
+        }
+        public static readonly DependencyProperty <#= TitlePropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= TitlePropertyName #>", typeof(string),
+                typeof(WebServiceFilterItemUserControl),
+                new PropertyMetadata(null, <#= TitlePropertyName #>Changed));
+        public string <#= TitlePropertyName #>
+        {
+            get
+            {
+                return (string)GetValue(<#= TitlePropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= TitlePropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= RowsPerPageOptionsPropertyName #>
+        private void Set<#= RowsPerPageOptionsPropertyName #>(IEnumerable<int> opers)
+        {
+            <#= TablePaginationViewModelClassName #> vm = DataContext as <#= TablePaginationViewModelClassName #>;
+            if (vm != null)
+            {
+                vm.<#= RowsPerPageOptionsPropertyName #> = opers;
+            }
+        }
+        private static void <#= RowsPerPageOptionsPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            <#= TablePaginationUserControlClassName #> inst = d as <#= TablePaginationUserControlClassName #>;
+            if (inst != null)
+            {
+                inst.Set<#= RowsPerPageOptionsPropertyName #>(e.NewValue as IEnumerable<int>);
+            }
+        }
+        public static readonly DependencyProperty <#= RowsPerPageOptionsPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= RowsPerPageOptionsPropertyName #>", typeof(IEnumerable<int>),
+                typeof(WebServiceFilterItemUserControl),
+                new PropertyMetadata(null, <#= RowsPerPageOptionsPropertyName #>Changed));
+        public IEnumerable<int> <#= RowsPerPageOptionsPropertyName #>
+        {
+            get
+            {
+                return (IEnumerable<int>)GetValue(<#= RowsPerPageOptionsPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= RowsPerPageOptionsPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= RowsPerPagePropertyName #>
+        private void Set<#= RowsPerPagePropertyName #>(int model)
+        {
+            <#= TablePaginationViewModelClassName #> vm = DataContext as <#= TablePaginationViewModelClassName #>;
+            if (vm != null)
+            {
+                vm.<#= RowsPerPagePropertyName #> = model;
+            }
+        }
+        private static void <#= RowsPerPagePropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            <#= TablePaginationUserControlClassName #> inst = d as <#= TablePaginationUserControlClassName #>;
+            if (inst != null)
+            {
+                int? i = e.NewValue as Nullable<int>;
+                if (!i.HasValue) i = 0;
+                inst.Set<#= RowsPerPagePropertyName #>(i.Value);
+            }
+        }
+        public static readonly DependencyProperty <#= RowsPerPagePropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= RowsPerPagePropertyName #>", typeof(int),
+                typeof(WebServiceFilterItemUserControl),
+                new PropertyMetadata(0, <#= RowsPerPagePropertyName #>Changed));
+        public int <#= RowsPerPagePropertyName #>
+        {
+            get
+            {
+                return (int)GetValue(<#= RowsPerPagePropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= RowsPerPagePropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= TpCountPropertyName #>
+        private void Set<#= TpCountPropertyName #>(int model)
+        {
+            <#= TablePaginationViewModelClassName #> vm = DataContext as <#= TablePaginationViewModelClassName #>;
+            if (vm != null)
+            {
+                vm.<#= TpCountPropertyName #> = model;
+            }
+        }
+        private static void <#= TpCountPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            <#= TablePaginationUserControlClassName #> inst = d as <#= TablePaginationUserControlClassName #>;
+            if (inst != null)
+            {
+                int? i = e.NewValue as Nullable<int>;
+                if (!i.HasValue) i = 0;
+                inst.Set<#= TpCountPropertyName #>(i.Value);
+            }
+        }
+        public static readonly DependencyProperty <#= TpCountPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= TpCountPropertyName #>", typeof(int),
+                typeof(WebServiceFilterItemUserControl),
+                new PropertyMetadata(0, <#= TpCountPropertyName #>Changed));
+        public int <#= TpCountPropertyName #>
+        {
+            get
+            {
+                return (int)GetValue(<#= TpCountPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= TpCountPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= TpPagePropertyName #>
+        private void Set<#= TpPagePropertyName #>(int model)
+        {
+            <#= TablePaginationViewModelClassName #> vm = DataContext as <#= TablePaginationViewModelClassName #>;
+            if (vm != null)
+            {
+                vm.<#= TpPagePropertyName #> = model;
+            }
+        }
+        private static void <#= TpPagePropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            <#= TablePaginationUserControlClassName #> inst = d as <#= TablePaginationUserControlClassName #>;
+            if (inst != null)
+            {
+                int? i = e.NewValue as Nullable<int>;
+                if (!i.HasValue) i = 0;
+                inst.Set<#= TpPagePropertyName #>(i.Value);
+            }
+        }
+        public static readonly DependencyProperty <#= TpPagePropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= TpPagePropertyName #>", typeof(int),
+                typeof(WebServiceFilterItemUserControl),
+                new PropertyMetadata(0, <#= TpPagePropertyName #>Changed));
+        public int <#= TpPagePropertyName #>
+        {
+            get
+            {
+                return (int)GetValue(<#= TpPagePropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= TpPagePropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= BackIconButtonNamePropertyName #>
+        private void Set<#= BackIconButtonNamePropertyName #>(string model)
+        {
+            <#= TablePaginationViewModelClassName #> vm = DataContext as <#= TablePaginationViewModelClassName #>;
+            if (vm != null)
+            {
+                vm.<#= BackIconButtonNamePropertyName #> = model;
+            }
+        }
+        private static void <#= BackIconButtonNamePropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            <#= TablePaginationUserControlClassName #> inst = d as <#= TablePaginationUserControlClassName #>;
+            if (inst != null)
+            {
+                int? i = e.NewValue as Nullable<int>;
+                if (!i.HasValue) i = 0;
+                inst.Set<#= BackIconButtonNamePropertyName #>(e.NewValue as string);
+            }
+        }
+        public static readonly DependencyProperty <#= BackIconButtonNamePropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= BackIconButtonNamePropertyName #>", typeof(string),
+                typeof(WebServiceFilterItemUserControl),
+                new PropertyMetadata(null, <#= BackIconButtonNamePropertyName #>Changed));
+        public string <#= BackIconButtonNamePropertyName #>
+        {
+            get
+            {
+                return (string)GetValue(<#= BackIconButtonNamePropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= BackIconButtonNamePropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= BackIconButtonTextPropertyName #>
+        private void Set<#= BackIconButtonTextPropertyName #>(string model)
+        {
+            <#= TablePaginationViewModelClassName #> vm = DataContext as <#= TablePaginationViewModelClassName #>;
+            if (vm != null)
+            {
+                vm.<#= BackIconButtonTextPropertyName #> = model;
+            }
+        }
+        private static void <#= BackIconButtonTextPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            <#= TablePaginationUserControlClassName #> inst = d as <#= TablePaginationUserControlClassName #>;
+            if (inst != null)
+            {
+                int? i = e.NewValue as Nullable<int>;
+                if (!i.HasValue) i = 0;
+                inst.Set<#= BackIconButtonTextPropertyName #>(e.NewValue as string);
+            }
+        }
+        public static readonly DependencyProperty <#= BackIconButtonTextPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= BackIconButtonTextPropertyName #>", typeof(string),
+                typeof(WebServiceFilterItemUserControl),
+                new PropertyMetadata(null, <#= BackIconButtonTextPropertyName #>Changed));
+        public string <#= BackIconButtonTextPropertyName #>
+        {
+            get
+            {
+                return (string)GetValue(<#= BackIconButtonTextPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= BackIconButtonTextPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= BackIconButtonColorPropertyName #>
+        private void Set<#= BackIconButtonColorPropertyName #>(string model)
+        {
+            <#= TablePaginationViewModelClassName #> vm = DataContext as <#= TablePaginationViewModelClassName #>;
+            if (vm != null)
+            {
+                vm.<#= BackIconButtonColorPropertyName #> = model;
+            }
+        }
+        private static void <#= BackIconButtonColorPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            <#= TablePaginationUserControlClassName #> inst = d as <#= TablePaginationUserControlClassName #>;
+            if (inst != null)
+            {
+                int? i = e.NewValue as Nullable<int>;
+                if (!i.HasValue) i = 0;
+                inst.Set<#= BackIconButtonColorPropertyName #>(e.NewValue as string);
+            }
+        }
+        public static readonly DependencyProperty <#= BackIconButtonColorPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= BackIconButtonColorPropertyName #>", typeof(string),
+                typeof(WebServiceFilterItemUserControl),
+                new PropertyMetadata(null, <#= BackIconButtonColorPropertyName #>Changed));
+        public string <#= BackIconButtonColorPropertyName #>
+        {
+            get
+            {
+                return (string)GetValue(<#= BackIconButtonColorPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= BackIconButtonColorPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= NextIconButtonNamePropertyName #>
+        private void Set<#= NextIconButtonNamePropertyName #>(string model)
+        {
+            <#= TablePaginationViewModelClassName #> vm = DataContext as <#= TablePaginationViewModelClassName #>;
+            if (vm != null)
+            {
+                vm.<#= NextIconButtonNamePropertyName #> = model;
+            }
+        }
+        private static void <#= NextIconButtonNamePropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            <#= TablePaginationUserControlClassName #> inst = d as <#= TablePaginationUserControlClassName #>;
+            if (inst != null)
+            {
+                int? i = e.NewValue as Nullable<int>;
+                if (!i.HasValue) i = 0;
+                inst.Set<#= NextIconButtonNamePropertyName #>(e.NewValue as string);
+            }
+        }
+        public static readonly DependencyProperty <#= NextIconButtonNamePropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= NextIconButtonNamePropertyName #>", typeof(string),
+                typeof(WebServiceFilterItemUserControl),
+                new PropertyMetadata(null, <#= NextIconButtonNamePropertyName #>Changed));
+        public string <#= NextIconButtonNamePropertyName #>
+        {
+            get
+            {
+                return (string)GetValue(<#= NextIconButtonNamePropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= NextIconButtonNamePropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= NextIconButtonTextPropertyName #>
+        private void Set<#= NextIconButtonTextPropertyName #>(string model)
+        {
+            <#= TablePaginationViewModelClassName #> vm = DataContext as <#= TablePaginationViewModelClassName #>;
+            if (vm != null)
+            {
+                vm.<#= NextIconButtonTextPropertyName #> = model;
+            }
+        }
+        private static void <#= NextIconButtonTextPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            <#= TablePaginationUserControlClassName #> inst = d as <#= TablePaginationUserControlClassName #>;
+            if (inst != null)
+            {
+                int? i = e.NewValue as Nullable<int>;
+                if (!i.HasValue) i = 0;
+                inst.Set<#= NextIconButtonTextPropertyName #>(e.NewValue as string);
+            }
+        }
+        public static readonly DependencyProperty <#= NextIconButtonTextPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= NextIconButtonTextPropertyName #>", typeof(string),
+                typeof(WebServiceFilterItemUserControl),
+                new PropertyMetadata(null, <#= NextIconButtonTextPropertyName #>Changed));
+        public string <#= NextIconButtonTextPropertyName #>
+        {
+            get
+            {
+                return (string)GetValue(<#= NextIconButtonTextPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= NextIconButtonTextPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= NextIconButtonColorPropertyName #>
+        private void Set<#= NextIconButtonColorPropertyName #>(string model)
+        {
+            <#= TablePaginationViewModelClassName #> vm = DataContext as <#= TablePaginationViewModelClassName #>;
+            if (vm != null)
+            {
+                vm.<#= NextIconButtonColorPropertyName #> = model;
+            }
+        }
+        private static void <#= NextIconButtonColorPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            <#= TablePaginationUserControlClassName #> inst = d as <#= TablePaginationUserControlClassName #>;
+            if (inst != null)
+            {
+                int? i = e.NewValue as Nullable<int>;
+                if (!i.HasValue) i = 0;
+                inst.Set<#= NextIconButtonColorPropertyName #>(e.NewValue as string);
+            }
+        }
+        public static readonly DependencyProperty <#= NextIconButtonColorPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= NextIconButtonColorPropertyName #>", typeof(string),
+                typeof(WebServiceFilterItemUserControl),
+                new PropertyMetadata(null, <#= NextIconButtonColorPropertyName #>Changed));
+        public string <#= NextIconButtonColorPropertyName #>
+        {
+            get
+            {
+                return (string)GetValue(<#= NextIconButtonColorPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= NextIconButtonColorPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= OnRowsPerPageChangedNotificationPropertyName #>
+        public event Action<object, <#= NotificationEventArgsClassName #>> <#= OnRowsPerPageChangedNotificationPropertyName #>
+        {
+            add
+            {
+                <#= TablePaginationViewModelClassName #> vm = DataContext as <#= TablePaginationViewModelClassName #>;
+                if (vm != null)
+                {
+                    vm.<#= OnRowsPerPageChangedEventPropertyName #> += value;
+                }
+
+            }
+            remove
+            {
+                <#= TablePaginationViewModelClassName #> vm = DataContext as <#= TablePaginationViewModelClassName #>;
+                if (vm != null)
+                {
+                    vm.<#= OnRowsPerPageChangedEventPropertyName #> -= value;
+                }
+            }
+        }
+        #endregion
+        #region <#= OnPageChangedNotificationPropertyName  #>
+        public event Action<object, <#= NotificationEventArgsClassName #>> OnPageChangedNotification
+        {
+            add
+            {
+                <#= TablePaginationViewModelClassName #> vm = DataContext as <#= TablePaginationViewModelClassName #>;
+                if (vm != null)
+                {
+                    vm.<#= OnPageChangedEventPropertyName  #> += value;
+                }
+
+            }
+            remove
+            {
+                <#= TablePaginationViewModelClassName #> vm = DataContext as <#= TablePaginationViewModelClassName #>;
+                if (vm != null)
+                {
+                    vm.<#= OnPageChangedEventPropertyName  #> -= value;
+                }
+            }
+        }
+        #endregion
+    }
+}
+
+<#+
+
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+
+#>

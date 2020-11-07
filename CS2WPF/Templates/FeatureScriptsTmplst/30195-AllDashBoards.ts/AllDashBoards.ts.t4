@@ -1,0 +1,87 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="ts" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2REACTJS" #>
+<#@ import namespace="CS2REACTJS.Model" #>
+<#@ import namespace="CS2REACTJS.Model.Serializable" #>
+<#@ parameter type="CS2REACTJS.Model.Serializable.AllowedFileTypesSerializable" name="AllowedFileTypes" #>
+<#@ parameter type="CS2REACTJS.Model.Serializable.FeatureContextSerializable" name="FeatureContext" #>
+<#@ parameter type="CS2REACTJS.Model.Serializable.FeatureSerializable" name="Feature" #>
+<#@ parameter type="CS2REACTJS.Model.Serializable.DbContextSerializable" name="Context" #>
+<#
+//
+// Before you starts:
+// Please reset value for [currentId]
+//
+    int currentId= 0;
+#>
+//
+// 0. do not save the generated code.
+// 1. just copy it to the clipboard.
+// 2. Open the file shared/services/app-glbl-settings.service.tsx
+// 3. find the definition of the 'dshBrds'-variable
+// dshBrds:  { [key: string]: number } = {
+//   ....
+// };
+// 4. Paste from clipboard inside curly brackets
+//    
+<#
+    string ftrFeatureComponentFolder = "30100-.ftr.component.tsx";
+    foreach(FeatureSerializable featureSerializable in FeatureContext.Features) {
+        string featureClassName = GetFeatureComponentClassName(featureSerializable, ftrFeatureComponentFolder);
+#>
+    '<#= featureClassName #>': <#= currentId #>,
+<#
+        currentId++;
+    }
+#>
+
+
+<#+   
+
+    string GetFeatureComponentClassName(FeatureSerializable feature, string fileType) {
+        string result="";
+        if ((feature == null) || string.IsNullOrEmpty(fileType) ) {
+            return result;
+        }
+        if (feature.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            feature.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".component","Component").Replace(".","-");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+        }
+        return sb.ToString();
+    }
+
+#>

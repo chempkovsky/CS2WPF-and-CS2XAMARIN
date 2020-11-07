@@ -1,0 +1,873 @@
+﻿<UserControl x:Class="CS2WPF.View.UserControlCreateWebApi"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:CS2WPF.View"
+             xmlns:mdlbs="clr-namespace:CS2WPF.Model"
+             xmlns:mdl="clr-namespace:CS2WPF.Model.Serializable"
+             xmlns:mdlui="clr-namespace:CS2WPF.Model.Serializable.UI"
+             xmlns:hlpui="clr-namespace:CS2WPF.Helpers.UI"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <TextBlock Grid.Row="0" Margin="0 10 0 0" Text="Select View For Web Api Service" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center"/>
+        <TextBlock Grid.Row="1"  Margin="20 5 0 5" Text="Select View" FontWeight="Bold" />
+        <ComboBox  Grid.Row="2" Margin="10 7 10 7"  IsEditable="False" 
+                                                    ItemsSource ="{Binding ModelViews}"
+                                                    DisplayMemberPath="ViewName"
+                                                    SelectedItem="{Binding SelectedModel, Mode=TwoWay}" />
+        <Grid Grid.Row="3" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition MinWidth="290" Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <TreeView x:Name="MainTreeView" Grid.Column="0" Margin="7 0 7 0"  BorderBrush="Gray"   SelectedItemChanged="TreeView_SelectedItemChanged"  >
+                <TreeView.Resources>
+
+                    <HierarchicalDataTemplate DataType="{x:Type mdlui:ModelViewPropertyOfVwNotified}">
+                        <HierarchicalDataTemplate.ItemsSource>
+                            <MultiBinding ConverterParameter="Attributes,,Fluent Api Attributes,">
+                                <MultiBinding.Converter >
+                                    <hlpui:MultiValueConverterImp />
+                                </MultiBinding.Converter>
+                                <Binding Path="Attributes" />
+                                <Binding Path="FAPIAttributes" />
+                            </MultiBinding>
+                        </HierarchicalDataTemplate.ItemsSource>
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox Margin="3 0 3 0" IsChecked="{Binding IsUsedByfilter}" IsHitTestVisible="{Binding DataContext.IsWebServiceEditable, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                            <CheckBox Margin="3 0 3 0" IsChecked="{Binding IsUsedBySorting}" IsHitTestVisible="{Binding DataContext.IsWebServiceEditable, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                            <TextBlock Text="{Binding Path=ViewPropertyName}"/>
+                            <TextBlock Text=" : "/>
+                            <TextBlock Text="{Binding Path=OriginalPropertyName}"/>
+                        </StackPanel>
+                    </HierarchicalDataTemplate>
+
+
+                    <HierarchicalDataTemplate DataType="{x:Type mdlbs:ModelViewAttribute}">
+                        <HierarchicalDataTemplate.ItemsSource>
+                            <MultiBinding ConverterParameter="Properties,">
+                                <MultiBinding.Converter >
+                                    <hlpui:MultiValueConverterImp />
+                                </MultiBinding.Converter>
+                                <Binding Path="VaueProperties" />
+                            </MultiBinding>
+                        </HierarchicalDataTemplate.ItemsSource>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding Path=AttrName}"/>
+                            <!--<TextBlock Text=" : "/>
+                            <TextBlock Text="{Binding Path=AttrFullName}"/>-->
+                        </StackPanel>
+                    </HierarchicalDataTemplate>
+                    <DataTemplate DataType="{x:Type mdlbs:ModelViewAttributeProperty}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding Path=PropName}"/>
+                            <!--<TextBlock Text=" = "/>
+                            <TextBlock Text="{Binding Path=PropValue}"/>-->
+                        </StackPanel>
+                    </DataTemplate>
+
+                    <HierarchicalDataTemplate DataType="{x:Type mdlbs:ModelViewFAPIAttribute}">
+                        <HierarchicalDataTemplate.ItemsSource>
+                            <MultiBinding ConverterParameter="Properties,">
+                                <MultiBinding.Converter >
+                                    <hlpui:MultiValueConverterImp />
+                                </MultiBinding.Converter>
+                                <Binding Path="VaueProperties" />
+                            </MultiBinding>
+                        </HierarchicalDataTemplate.ItemsSource>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding Path=AttrName}"/>
+                        </StackPanel>
+                    </HierarchicalDataTemplate>
+                    <DataTemplate DataType="{x:Type mdlbs:ModelViewFAPIAttributeProperty}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding Path=PropValue}"/>
+                        </StackPanel>
+                    </DataTemplate>
+
+
+                    <DataTemplate DataType="{x:Type mdlbs:ModelViewUIFormProperty}">
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox Margin="3 0 3 0" IsChecked="{Binding IsShownInView}"  />
+                            <CheckBox Margin="3 0 3 0" IsChecked="{Binding IsNewLineAfter}" />
+                            <TextBlock Text="{Binding Path=ViewPropertyName}"/>
+                            <TextBlock Text=" : "/>
+                            <TextBlock Text="{Binding Path=OriginalPropertyName}"/>
+                        </StackPanel>
+                    </DataTemplate>
+                    <DataTemplate DataType="{x:Type mdlbs:ModelViewUIListProperty}">
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox Margin="3 0 3 0" IsChecked="{Binding IsShownInView}"  />
+                            <CheckBox Margin="3 0 3 0" IsChecked="{Binding IsNewLineAfter}"  />
+                            <TextBlock Text="{Binding Path=ViewPropertyName}"/>
+                            <TextBlock Text=" : "/>
+                            <TextBlock Text="{Binding Path=OriginalPropertyName}"/>
+                        </StackPanel>
+                    </DataTemplate>
+
+                    <DataTemplate DataType="{x:Type mdl:ModelViewPropertyOfFkSerializable}">
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox Margin="3 0 3 0" IsChecked="{Binding IsSelected}" IsHitTestVisible="False" />
+                            <TextBlock Text="{Binding Path=ViewPropertyName}"/>
+                            <TextBlock Text=" : "/>
+                            <TextBlock Text="{Binding Path=OriginalPropertyName}"/>
+                        </StackPanel>
+                    </DataTemplate>
+                    <DataTemplate DataType="{x:Type mdl:ModelViewKeyPropertySerializable}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding Path=ViewPropertyName}"/>
+                            <TextBlock Text=" : "/>
+                            <TextBlock Text="{Binding Path=OriginalPropertyName}"/>
+                        </StackPanel>
+                    </DataTemplate>
+                    <HierarchicalDataTemplate DataType="{x:Type mdl:ModelViewForeignKeySerializable}">
+                        <HierarchicalDataTemplate.ItemsSource>
+                            <MultiBinding ConverterParameter="Properties,,Primary Key,,Foreign Key,">
+                                <MultiBinding.Converter >
+                                    <hlpui:MultiValueConverterImp />
+                                </MultiBinding.Converter>
+                                <Binding Path="ScalarProperties" />
+                                <Binding Path="PrincipalKeyProps" />
+                                <Binding Path="ForeignKeyProps" />
+                            </MultiBinding>
+                        </HierarchicalDataTemplate.ItemsSource>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding NavigationName}" />
+                            <TextBlock Text=" : "/>
+                            <TextBlock Text="{Binding InverseNavigationName}" />
+                        </StackPanel>
+
+                    </HierarchicalDataTemplate>
+                    <HierarchicalDataTemplate DataType="{x:Type hlpui:TreeViewFolderItem}" ItemsSource="{Binding Path=FolderItems}">
+                        <TextBlock Text="{Binding Path=FolderName}" />
+                    </HierarchicalDataTemplate>
+                    <HierarchicalDataTemplate DataType="{x:Type hlpui:TreeViewFolderItemWithCheck}" ItemsSource="{Binding Path=FolderItems}">
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox Margin="3 0 3 0" IsChecked="{Binding IsChecked}" IsHitTestVisible="False"  />
+                            <TextBlock Text="{Binding Path=FolderName}"/>
+                        </StackPanel>
+                    </HierarchicalDataTemplate>
+                </TreeView.Resources>
+
+
+                <TreeViewItem Tag="Root" x:Name="MainTreeViewRootItem">
+                    <TreeViewItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding SelectedModel.ViewName}" FontWeight="Bold"/>
+                            <TextBlock Text=": " FontWeight="Bold"/>
+                            <TextBlock Text="{Binding SelectedModel.RootEntityClassName}" FontWeight="Bold"/>
+                        </StackPanel>
+                    </TreeViewItem.Header>
+                    <TreeViewItem ItemsSource="{Binding ScalarProperties}" Tag="ScalarProperties">
+                        <TreeViewItem.Header>
+                            <StackPanel Orientation="Horizontal">
+                                <CheckBox Margin="3 0 3 0" IsChecked="{Binding IsUsedByfilter}"  IsHitTestVisible="{Binding DataContext.IsWebServiceEditable, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                                <CheckBox Margin="3 0 3 0" IsChecked="{Binding IsUsedBySorting}" IsHitTestVisible="{Binding DataContext.IsWebServiceEditable, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                                <TextBlock Text="Properties" FontWeight="Bold"/>
+                            </StackPanel>
+                        </TreeViewItem.Header>
+                    </TreeViewItem>
+                    <TreeViewItem ItemsSource="{Binding SelectedModel.ForeignKeys}" Tag="ForeignKeys">
+                        <TreeViewItem.Header>
+                            <TextBlock Text="Foreign Keys" FontWeight="Bold"/>
+                        </TreeViewItem.Header>
+                    </TreeViewItem>
+                    <TreeViewItem ItemsSource="{Binding SelectedModel.PrimaryKeyProperties}"  Tag="PrimaryKeyProperties">
+                        <TreeViewItem.Header>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Primary Key" FontWeight="Bold"/>
+                            </StackPanel>
+                        </TreeViewItem.Header>
+                    </TreeViewItem>
+                    <TreeViewItem ItemsSource="{Binding SelectedModel.AllProperties}"  Tag="Entity Properties">
+                        <TreeViewItem.Header>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Entity Properties" FontWeight="Bold" />
+                            </StackPanel>
+                        </TreeViewItem.Header>
+                    </TreeViewItem>
+                    <TreeViewItem ItemsSource="{Binding UIListProperties}"  Tag="UI List Properties" Visibility="{Binding DataContext.UIListPropertiesVisibility, RelativeSource={RelativeSource AncestorType=UserControl}}">
+                        <TreeViewItem.Header>
+                            <StackPanel Orientation="Horizontal">
+                                <CheckBox Margin="3 0 3 0" IsChecked="{Binding IsShownInListView}"   />
+                                <CheckBox Margin="3 0 3 0" IsChecked="{Binding IsNewLineAfterInListView}"  />
+                                <TextBlock Text="UI List Properties" FontWeight="Bold" />
+                            </StackPanel>
+                        </TreeViewItem.Header>
+                    </TreeViewItem>
+                    <TreeViewItem ItemsSource="{Binding UIFormProperties}"  Tag="UI Form Properties" Visibility="{Binding DataContext.UIFormPropertiesVisibility, RelativeSource={RelativeSource AncestorType=UserControl}}">
+                        <TreeViewItem.Header>
+                            <StackPanel Orientation="Horizontal">
+                                <CheckBox Margin="3 0 3 0" IsChecked="{Binding IsShownInEditView}"   />
+                                <CheckBox Margin="3 0 3 0" IsChecked="{Binding IsNewLineAfterInEditView}"  />
+                                <TextBlock Text="UI Form Properties" FontWeight="Bold" />
+                            </StackPanel>
+                        </TreeViewItem.Header>
+                    </TreeViewItem>
+                </TreeViewItem>
+            </TreeView>
+            <Grid Grid.Column="1" >
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0"  Visibility="{Binding HintVisibility}">
+                    <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <TextBlock   FontSize="24" FontWeight="Bold" HorizontalAlignment="Center">Click TreeView Item to get details</TextBlock>
+                    </StackPanel>
+                </Grid>
+                <Grid Grid.Row="0"  Visibility="{Binding RootVisibility}"  >
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="3*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Row="0"  Grid.Column="0" Text="Root Entity Class Name"  />
+                    <TextBlock Grid.Row="0"  Grid.Column="1" Text="{Binding SelectedModel.RootEntityClassName}" />
+
+                    <TextBlock Grid.Row="1"  Grid.Column="0" Text="Root Entity Full Class Name"  />
+                    <TextBlock Grid.Row="1"  Grid.Column="1" Text="{Binding SelectedModel.RootEntityFullClassName}"  />
+
+                    <TextBlock Grid.Row="2"  Grid.Column="0" Text="Root Entity Project Name"  />
+                    <TextBlock Grid.Row="2"  Grid.Column="1" Text="{Binding SelectedModel.RootEntityUniqueProjectName}"  />
+
+                    <TextBlock Grid.Row="3"  Grid.Column="0" Text="View Name" FontWeight="Bold"/>
+                    <TextBlock Grid.Row="3"  Grid.Column="1" Text="{Binding SelectedModel.ViewName}" FontWeight="Bold"/>
+
+
+                    <TextBlock Grid.Row="4"  Grid.Column="0" Text="View Project"/>
+                    <TextBlock Grid.Row="4"  Grid.Column="1" Text="{Binding SelectedModel.ViewProject}"  />
+
+                    <TextBlock Grid.Row="5"  Grid.Column="0" Text="View Default Project NameSpace"  />
+                    <TextBlock Grid.Row="5"  Grid.Column="1" Text="{Binding SelectedModel.ViewDefaultProjectNameSpace}" />
+
+                    <TextBlock Grid.Row="6"  Grid.Column="0" Text="View Project Folder"  />
+                    <TextBlock Grid.Row="6"  Grid.Column="1" Text="{Binding SelectedModel.ViewFolder}" />
+
+                    <TextBlock Grid.Row="7"  Grid.Column="0" Text="Generate JsonProperty Attribute" />
+                    <CheckBox  Grid.Row="7"  Grid.Column="1" IsChecked="{Binding SelectedModel.GenerateJSonAttribute}"  IsHitTestVisible="False"  VerticalAlignment="Center" HorizontalAlignment="Left"  />
+
+                    <TextBlock Grid.Row="8"  Grid.Column="0" Text="Webapi Service Name"  FontWeight="Bold"/>
+                    <TextBox   Grid.Row="8"  Grid.Column="1" Text="{Binding WebApiServiceName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding IsWebServiceEditable}" Margin="0 0 10 0" />
+
+                    <TextBlock Grid.Row="9" Grid.Column="0" Text="Select All" FontWeight="Bold" />
+                    <CheckBox  Grid.Row="9" Grid.Column="1" IsChecked="{Binding IsWebApiSelectAll}" IsHitTestVisible="{Binding IsViewHasProperties}"   />
+
+                    <TextBlock Grid.Row="10" Grid.Column="0" Text="Select many with pagination" FontWeight="Bold" />
+                    <CheckBox  Grid.Row="10" Grid.Column="1" IsChecked="{Binding IsWebApiSelectManyWithPagination}" IsHitTestVisible="{Binding IsViewHasProperties}"   />
+
+                    <TextBlock Grid.Row="11" Grid.Column="0" Text="Select One By Primary key" FontWeight="Bold" />
+                    <CheckBox  Grid.Row="11" Grid.Column="1" IsChecked="{Binding IsWebApiSelectOneByPrimarykey}" IsHitTestVisible="{Binding IsViewHasRimaryKey}"   />
+
+                    <TextBlock Grid.Row="12" Grid.Column="0" Text="Add Item" FontWeight="Bold" />
+                    <CheckBox  Grid.Row="12" Grid.Column="1" IsChecked="{Binding IsWebApiAdd}" IsHitTestVisible="{Binding IsViewHasAllRequiredProperties}"   />
+
+                    <TextBlock Grid.Row="13" Grid.Column="0" Text="Update Item" FontWeight="Bold" />
+                    <CheckBox  Grid.Row="13" Grid.Column="1" IsChecked="{Binding IsWebApiUpdate}" IsHitTestVisible="{Binding IsViewHasRimaryKey}"   />
+
+                    <TextBlock Grid.Row="14" Grid.Column="0" Text="Delete Item" FontWeight="Bold" />
+                    <CheckBox  Grid.Row="14" Grid.Column="1" IsChecked="{Binding IsWebApiDelete}" IsHitTestVisible="{Binding IsViewHasRimaryKey}"   />
+
+
+                </Grid>
+                <Grid Grid.Row="0" Visibility="{Binding KeyPropertyVisibility}" >
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="3*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Row="0"  Grid.Column="0" Text="Entity Property Name"  />
+                    <TextBlock Grid.Row="0"  Grid.Column="1" Text="{Binding SelectedItem.OriginalPropertyName}"  />
+
+                    <TextBlock Grid.Row="1"  Grid.Column="0" Text="Type Full Name"  />
+                    <TextBlock Grid.Row="1"  Grid.Column="1" Text="{Binding SelectedItem.TypeFullName}" />
+
+                    <TextBlock Grid.Row="2"  Grid.Column="0" Text="Type Is Nullable"  />
+                    <CheckBox  Grid.Row="2"  Grid.Column="1" IsChecked="{Binding SelectedItem.IsNullable}" IsHitTestVisible="False"  VerticalAlignment="Center" HorizontalAlignment="Left" />
+
+                    <TextBlock Grid.Row="3"  Grid.Column="0" Text="Underlying Type Name"  />
+                    <TextBlock Grid.Row="3"  Grid.Column="1" Text="{Binding SelectedItem.UnderlyingTypeName}" />
+
+                    <TextBlock Grid.Row="4"  Grid.Column="0" Text="Property Is Required"  />
+                    <CheckBox  Grid.Row="4"  Grid.Column="1" IsChecked="{Binding SelectedItem.IsRequired}" IsHitTestVisible="False"  VerticalAlignment="Center" HorizontalAlignment="Left" />
+
+                    <TextBlock Grid.Row="5"  Grid.Column="0" Text="Inherited Property Name"  />
+                    <TextBlock Grid.Row="5"  Grid.Column="1" Text="{Binding SelectedItem.ViewPropertyName}" />
+
+                </Grid>
+                <Grid Grid.Row="0" Visibility="{Binding PropertyVisibility}" >
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="3*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Row="0"  Grid.Column="0" Text="Entity Property Name"  />
+                    <TextBlock Grid.Row="0"  Grid.Column="1" Text="{Binding SelectedItem.OriginalPropertyName}"  />
+
+                    <TextBlock Grid.Row="1"  Grid.Column="0" Text="Type Full Name"  />
+                    <TextBlock Grid.Row="1"  Grid.Column="1" Text="{Binding SelectedItem.TypeFullName}" />
+
+                    <TextBlock Grid.Row="2"  Grid.Column="0" Text="Type Is Nullable"  />
+                    <CheckBox  Grid.Row="2"  Grid.Column="1" IsChecked="{Binding SelectedItem.IsNullable}" IsHitTestVisible="False"  VerticalAlignment="Center" HorizontalAlignment="Left" />
+
+                    <TextBlock Grid.Row="3"  Grid.Column="0" Text="Underlying Type Name"  />
+                    <TextBlock Grid.Row="3"  Grid.Column="1" Text="{Binding SelectedItem.UnderlyingTypeName}" />
+
+                    <TextBlock Grid.Row="4"  Grid.Column="0" Text="Entity Property Is Required"  />
+                    <CheckBox  Grid.Row="4"  Grid.Column="1" IsChecked="{Binding SelectedItem.IsRequired}" IsHitTestVisible="False"  VerticalAlignment="Center" HorizontalAlignment="Left" />
+
+                    <TextBlock Grid.Row="5"  Grid.Column="0" Text="View Property Is Required"  />
+                    <CheckBox  Grid.Row="5"  Grid.Column="1" IsChecked="{Binding SelectedItem.IsRequiredInView}" IsHitTestVisible="False"  VerticalAlignment="Center" HorizontalAlignment="Left" />
+
+                    <TextBlock Grid.Row="6"  Grid.Column="0" Text="Is Selected"  />
+                    <CheckBox  Grid.Row="6"  Grid.Column="1" IsChecked="{Binding SelectedItem.IsSelected}" IsHitTestVisible="False" VerticalAlignment="Center" HorizontalAlignment="Left" />
+
+                    <TextBlock Grid.Row="7"  Grid.Column="0" Text="Under Foreign Key"  />
+                    <TextBlock Grid.Row="7"  Grid.Column="1" Text="{Binding SelectedItem.ForeignKeyName}" />
+
+                    <TextBlock Grid.Row="8"  Grid.Column="0" Text="Under Foreign Key Chain"  />
+                    <TextBlock Grid.Row="8"  Grid.Column="1" Text="{Binding SelectedItem.ForeignKeyNameChain}" />
+
+                    <TextBlock Grid.Row="9"  Grid.Column="0" Text="Inherited Property Name"  />
+                    <TextBlock Grid.Row="9"  Grid.Column="1" Text="{Binding SelectedItem.ViewPropertyName}" />
+
+                    <TextBlock Grid.Row="10"  Grid.Column="0" Text="Inherited Json Property Name"  />
+                    <TextBlock Grid.Row="10"  Grid.Column="1" Text="{Binding SelectedItem.JsonPropertyName}" />
+
+
+                </Grid>
+                <Grid Grid.Row="0" Visibility="{Binding ForeignKeyVisibility}" >
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="3*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Row="0"  Grid.Column="0" Text="Navigation Name"  />
+                    <TextBlock Grid.Row="0"  Grid.Column="1" Text="{Binding SelectedItem.NavigationName}"  />
+
+                    <TextBlock Grid.Row="1"  Grid.Column="0" Text="Inverse Navigation Name"  />
+                    <TextBlock Grid.Row="1"  Grid.Column="1" Text="{Binding SelectedItem.InverseNavigationName}" />
+
+                    <TextBlock Grid.Row="2"  Grid.Column="0" Text="Navigation Type"  />
+                    <TextBlock Grid.Row="2"  Grid.Column="1" Text="{Binding SelectedItem.NavigationType}" />
+
+
+                    <TextBlock Grid.Row="3"  Grid.Column="0" Text="Entity Class Name"  />
+                    <TextBlock Grid.Row="3"  Grid.Column="1" Text="{Binding SelectedItem.EntityName}" />
+
+                    <TextBlock Grid.Row="4"  Grid.Column="0" Text="Entity Full Class Name"  />
+                    <TextBlock Grid.Row="4"  Grid.Column="1" Text="{Binding SelectedItem.EntityFullName}" />
+
+                    <TextBlock Grid.Row="5"  Grid.Column="0" Text="Entity Project Name"  />
+                    <TextBlock Grid.Row="5"  Grid.Column="1" Text="{Binding SelectedItem.EntityUniqueProjectName}" />
+
+                    <TextBlock Grid.Row="6"  Grid.Column="0" Text="Inverse Entity Class Name"  />
+                    <TextBlock Grid.Row="6"  Grid.Column="1" Text="{Binding SelectedItem.NavigationEntityName}" />
+
+                    <TextBlock Grid.Row="7"  Grid.Column="0" Text="Inverse Entity Full Class Name"  />
+                    <TextBlock Grid.Row="7"  Grid.Column="1" Text="{Binding SelectedItem.NavigationEntityFullName}" />
+
+                    <TextBlock Grid.Row="8"  Grid.Column="0" Text="Inverse Entity Project Name"  />
+                    <TextBlock Grid.Row="8"  Grid.Column="1" Text="{Binding SelectedItem.NavigationEntityUniqueProjectName}" />
+
+                    <TextBlock Grid.Row="9"  Grid.Column="0" Text="Foreign Key Source"  />
+                    <TextBlock Grid.Row="9"  Grid.Column="1" Text="{Binding SelectedItem.ForeignKeySource}" />
+
+                    <TextBlock Grid.Row="10"  Grid.Column="0" Text="Principal Key Source"  />
+                    <TextBlock Grid.Row="10"  Grid.Column="1" Text="{Binding SelectedItem.PrincipalKeySource}" />
+
+                    <TextBlock Grid.Row="11"  Grid.Column="0" Text="Inverse Navigation Source"  />
+                    <TextBlock Grid.Row="11"  Grid.Column="1" Text="{Binding SelectedItem.InverseNavigationSource}" />
+
+                    <TextBlock Grid.Row="12"  Grid.Column="0" Text="Is Cascade Delete"  />
+                    <CheckBox  Grid.Row="12"  Grid.Column="1" IsChecked="{Binding SelectedItem.IsCascadeDelete}" IsHitTestVisible="False"  VerticalAlignment="Center" HorizontalAlignment="Left" />
+
+                    <TextBlock  Grid.Row="13"  Grid.Column="0" Text="View Name" FontWeight="Bold" />
+                    <TextBlock  Grid.Row="13"  Grid.Column="1" Text="{Binding SelectedItem.ViewName}" FontWeight="Bold"/>
+
+                    <TextBlock  Grid.Row="14"  Grid.Column="0" Text="Foreign Key Prefix"  />
+                    <TextBlock  Grid.Row="14"  Grid.Column="1" Text="{Binding SelectedItem.ForeignKeyPrefix}" />
+                    
+                </Grid>
+                <Grid Grid.Row="0" Visibility="{Binding ScalarPropertyVisibility}" >
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="3*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Row="0"  Grid.Column="0" Text="Entity Property Name"  />
+                    <TextBlock Grid.Row="0"  Grid.Column="1" Text="{Binding SelectedItem.OriginalPropertyName}"  />
+
+                    <TextBlock Grid.Row="1"  Grid.Column="0" Text="Type Full Name"  />
+                    <TextBlock Grid.Row="1"  Grid.Column="1" Text="{Binding SelectedItem.TypeFullName}" />
+
+                    <TextBlock Grid.Row="2"  Grid.Column="0" Text="Type Is Nullable"  />
+                    <CheckBox  Grid.Row="2"  Grid.Column="1" IsChecked="{Binding SelectedItem.IsNullable}" IsHitTestVisible="False"  VerticalAlignment="Center" HorizontalAlignment="Left" />
+
+                    <TextBlock Grid.Row="3"  Grid.Column="0" Text="Underlying Type Name"  />
+                    <TextBlock Grid.Row="3"  Grid.Column="1" Text="{Binding SelectedItem.UnderlyingTypeName}" />
+
+                    <TextBlock Grid.Row="4"  Grid.Column="0" Text="Entity Property Is Required"  />
+                    <CheckBox  Grid.Row="4"  Grid.Column="1" IsChecked="{Binding SelectedItem.IsRequired}" IsHitTestVisible="False"  VerticalAlignment="Center" HorizontalAlignment="Left" />
+
+                    <TextBlock Grid.Row="5"  Grid.Column="0" Text="View Property Is Required"  />
+                    <CheckBox  Grid.Row="5"  Grid.Column="1" IsChecked="{Binding SelectedItem.IsRequiredInView}" IsHitTestVisible="False"  VerticalAlignment="Center" HorizontalAlignment="Left" />
+
+                    <TextBlock Grid.Row="6"  Grid.Column="0" Text="Is Selected"  />
+                    <CheckBox  Grid.Row="6"  Grid.Column="1" IsChecked="{Binding SelectedItem.IsSelected}" IsHitTestVisible="False" VerticalAlignment="Center" HorizontalAlignment="Left" />
+
+                    <TextBlock Grid.Row="7"  Grid.Column="0" Text="Under Foreign Key"  />
+                    <TextBlock Grid.Row="7"  Grid.Column="1" Text="{Binding SelectedItem.ForeignKeyName}" />
+
+                    <TextBlock Grid.Row="8"  Grid.Column="0" Text="Under Foreign Key Chain"  />
+                    <TextBlock Grid.Row="8"  Grid.Column="1" Text="{Binding SelectedItem.ForeignKeyNameChain}" />
+
+                    <TextBlock Grid.Row="9"  Grid.Column="0" Text="Inherited Property Name"  />
+                    <TextBlock Grid.Row="9"  Grid.Column="1" Text="{Binding SelectedItem.ViewPropertyName}" />
+
+                    <TextBlock Grid.Row="10"  Grid.Column="0" Text="Inherited Json Property Name"  />
+                    <TextBlock Grid.Row="10"  Grid.Column="1" Text="{Binding SelectedItem.JsonPropertyName}" />
+
+                    <TextBlock Grid.Row="11"  Grid.Column="0" Text="Is Used By filter" FontWeight="Bold" />
+                    <CheckBox  Grid.Row="11"  Grid.Column="1" IsChecked="{Binding SelectedItem.IsUsedByfilter}" IsHitTestVisible="{Binding IsWebServiceEditable}" VerticalAlignment="Center" HorizontalAlignment="Left" />
+
+                    <TextBlock Grid.Row="12"  Grid.Column="0" Text="Is Used By Sorting" FontWeight="Bold" />
+                    <CheckBox  Grid.Row="12"  Grid.Column="1" IsChecked="{Binding SelectedItem.IsUsedBySorting}" IsHitTestVisible="{Binding IsWebServiceEditable}" VerticalAlignment="Center" HorizontalAlignment="Left" />
+
+                </Grid>
+                <Grid Grid.Row="0"  Visibility="{Binding UIFormPropListVisibility}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Orientation="Vertical">
+                        <Button Margin="5 5 5 2" Content="   ^   " Command="{Binding UiBtnFormCommandUp}"/>
+                        <Button Margin="5 2 5 2" Content="   v   " Command="{Binding UiBtnFormCommandDown}"/>
+                        
+                    </StackPanel>
+                    <ListView Grid.Column="1" Margin="0 0 10 0"
+                              ItemsSource="{Binding UIFormProperties}" 
+                              SelectedItem="{Binding SelectedUIFormProperty}" 
+                              ScrollViewer.HorizontalScrollBarVisibility="Auto" 
+                              ScrollViewer.VerticalScrollBarVisibility="Auto">
+
+                        <ListView.Resources>
+                            <Style TargetType="{x:Type ListView}">
+                                <Setter Property="ItemContainerStyle">
+                                    <Setter.Value>
+                                        <Style TargetType="ListViewItem">
+                                            <Setter Property="VerticalContentAlignment" Value="Top"/>
+                                        </Style>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </ListView.Resources>
+
+                        <ListView.View>
+                            <GridView>
+
+
+                                <GridViewColumn  Header="Property"  DisplayMemberBinding="{Binding ViewPropertyName}" />
+                                <GridViewColumn  Header="Json Prop"  DisplayMemberBinding="{Binding JsonPropertyName}" />
+                                <GridViewColumn  Header="Entity Prop" DisplayMemberBinding="{Binding OriginalPropertyName}"/>
+                                <GridViewColumn  Header="Foreign Key" DisplayMemberBinding="{Binding ForeignKeyName}"/>
+                                <GridViewColumn  Header="Foreign Key Chain" DisplayMemberBinding="{Binding ForeignKeyNameChain}" />
+
+                                <GridViewColumn  Header="Shown"  >
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <CheckBox IsChecked="{Binding IsShownInView}" />
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn  Header="New Line"  >
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <CheckBox IsChecked="{Binding IsNewLineAfter}" />
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn  Header="InputType New"  >
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <ComboBox    IsEditable="False" 
+                                                ItemsSource ="{Binding DataContext.UiInputTypes, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                SelectedItem="{Binding InputTypeWhenAdd, Mode=TwoWay}" 
+                                                MinWidth="120"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn  Header="InputType Update"  >
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <ComboBox    IsEditable="False" 
+                                                ItemsSource ="{Binding DataContext.UiInputTypes, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                SelectedItem="{Binding InputTypeWhenUpdate, Mode=TwoWay}" 
+                                                MinWidth="120"/>
+
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn  Header="InputType Delete"  >
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <ComboBox    IsEditable="False" 
+                                                ItemsSource ="{Binding DataContext.UiInputTypes, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                SelectedItem="{Binding InputTypeWhenDelete, Mode=TwoWay}" 
+                                                MinWidth="120"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                </Grid>
+                <Grid Grid.Row="0"  Visibility="{Binding UIListPropListVisibility}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Orientation="Vertical">
+                        <Button Margin="5 5 5 2" Content="   ^   " Command="{Binding UiBtnListCommandUp}"/>
+                        <Button Margin="5 2 5 2" Content="   v   " Command="{Binding UiBtnListCommandDown}"/>
+
+                    </StackPanel>
+                    <ListView Grid.Column="1" Margin="0 0 10 0"
+                              ItemsSource="{Binding UIListProperties}" 
+                              SelectedItem="{Binding SelectedUIListProperty}" 
+                              ScrollViewer.HorizontalScrollBarVisibility="Auto" 
+                              ScrollViewer.VerticalScrollBarVisibility="Auto">
+
+                        <ListView.Resources>
+                            <Style TargetType="{x:Type ListView}">
+                                <Setter Property="ItemContainerStyle">
+                                    <Setter.Value>
+                                        <Style TargetType="ListViewItem">
+                                            <Setter Property="VerticalContentAlignment" Value="Top"/>
+                                        </Style>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </ListView.Resources>
+
+                        <ListView.View>
+                            <GridView>
+
+                                <GridViewColumn  Header="Property"  DisplayMemberBinding="{Binding ViewPropertyName}" />
+                                <GridViewColumn  Header="Json Prop"  DisplayMemberBinding="{Binding JsonPropertyName}" />
+                                <GridViewColumn  Header="Entity Prop" DisplayMemberBinding="{Binding OriginalPropertyName}"/>
+                                <GridViewColumn  Header="Foreign Key" DisplayMemberBinding="{Binding ForeignKeyName}"/>
+                                <GridViewColumn  Header="Foreign Key Chain" DisplayMemberBinding="{Binding ForeignKeyNameChain}" />
+                                <GridViewColumn  Header="Shown"  >
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <CheckBox IsChecked="{Binding IsShownInView}" />
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn  Header="New Line"  >
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <CheckBox IsChecked="{Binding IsNewLineAfter}" />
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                </Grid>
+
+                <Grid Grid.Row="0" Visibility="{Binding UIFormPropertyVisibility}" >
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="3*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Row="0"  Grid.Column="0" Text="Entity Property Name"  />
+                    <TextBlock Grid.Row="0"  Grid.Column="1" Text="{Binding SelectedItem.OriginalPropertyName}"  />
+
+                    <TextBlock Grid.Row="1"  Grid.Column="0" Text="Property Name"  />
+                    <TextBlock Grid.Row="1"  Grid.Column="1" Text="{Binding SelectedItem.ViewPropertyName}" />
+
+                    <TextBlock Grid.Row="2"  Grid.Column="0" Text="Json Property Name"  />
+                    <TextBlock Grid.Row="2"  Grid.Column="1" Text="{Binding SelectedItem.JsonPropertyName}" />
+
+
+                    <TextBlock Grid.Row="3"  Grid.Column="0" Text="Foreign Key"  />
+                    <TextBlock Grid.Row="3"  Grid.Column="1" Text="{Binding SelectedItem.ForeignKeyName}" />
+
+                    <TextBlock Grid.Row="4"  Grid.Column="0" Text="Foreign Key Chain"  />
+                    <TextBlock Grid.Row="4"  Grid.Column="1" Text="{Binding SelectedItem.ForeignKeyNameChain}" />
+
+                    <TextBlock Grid.Row="5"  Grid.Column="0" Text="Is Shown"  FontWeight="Bold"/>
+                    <CheckBox  Grid.Row="5"  Grid.Column="1" IsChecked="{Binding SelectedItem.IsShownInView}"  VerticalAlignment="Center" HorizontalAlignment="Left" />
+
+                    <TextBlock Grid.Row="6"  Grid.Column="0" Text="Is New Line After Control"  FontWeight="Bold"/>
+                    <CheckBox  Grid.Row="6"  Grid.Column="1" IsChecked="{Binding SelectedItem.IsNewLineAfter}"  VerticalAlignment="Center" HorizontalAlignment="Left" />
+
+
+                    <TextBlock Grid.Row="7"  Grid.Column="0" Text="InputType On New Form"  FontWeight="Bold"/>
+                    <ComboBox  Grid.Row="7"  Grid.Column="1"   IsEditable="False" Margin="0 0 10 0"
+                                                ItemsSource ="{Binding DataContext.UiInputTypes, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                SelectedItem="{Binding SelectedItem.InputTypeWhenAdd, Mode=TwoWay}" 
+                                                MinWidth="120"/>
+
+                    <TextBlock Grid.Row="8"  Grid.Column="0" Text="Select View On New Form"  FontWeight="Bold"/>
+                    <ComboBox  Grid.Row="8"  Grid.Column="1"   IsEditable="False" Margin="0 0 10 0"
+                                                ItemsSource ="{Binding DataContext.ForeignKeyChainViews, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                DisplayMemberPath="ViewName" 
+                                                SelectedValuePath="ViewName"
+                                                SelectedValue="{Binding SelectedItem.ForeifKeyViewNameForAdd, Mode=TwoWay}"
+                                                MinWidth="120"/>
+
+
+                    <TextBlock Grid.Row="9"  Grid.Column="0" Text="InputType On Update Form"  FontWeight="Bold"/>
+                    <ComboBox  Grid.Row="9"  Grid.Column="1"   IsEditable="False" Margin="0 0 10 0"
+                                                ItemsSource ="{Binding DataContext.UiInputTypes, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                SelectedItem="{Binding SelectedItem.InputTypeWhenUpdate, Mode=TwoWay}" 
+                                                MinWidth="120"/>
+
+                    <TextBlock Grid.Row="10"  Grid.Column="0" Text="Select View On Update Form"  FontWeight="Bold"/>
+                    <ComboBox  Grid.Row="10"  Grid.Column="1"   IsEditable="False" Margin="0 0 10 0"
+                                                ItemsSource ="{Binding DataContext.ForeignKeyChainViews, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                DisplayMemberPath="ViewName" 
+                                                SelectedValuePath="ViewName"
+                                                SelectedValue="{Binding SelectedItem.ForeifKeyViewNameForUpd, Mode=TwoWay}"
+                                                MinWidth="120"/>
+
+                    <TextBlock Grid.Row="11"  Grid.Column="0" Text="InputType On Delete Form"  FontWeight="Bold"/>
+                    <ComboBox  Grid.Row="11"  Grid.Column="1"   IsEditable="False" Margin="0 0 10 0"
+                                                ItemsSource ="{Binding DataContext.UiInputTypes, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                SelectedItem="{Binding SelectedItem.InputTypeWhenDelete, Mode=TwoWay}" 
+                                                MinWidth="120"/>
+
+                    <TextBlock Grid.Row="12"  Grid.Column="0" Text="Select View On Delete Form"  FontWeight="Bold"/>
+                    <ComboBox  Grid.Row="12"  Grid.Column="1"   IsEditable="False" Margin="0 0 10 0"
+                                                ItemsSource ="{Binding DataContext.ForeignKeyChainViews, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                DisplayMemberPath="ViewName" 
+                                                SelectedValuePath="ViewName"
+                                                SelectedValue="{Binding SelectedItem.ForeifKeyViewNameForDel, Mode=TwoWay}"
+                                                MinWidth="120"/>
+
+                </Grid>
+
+                <Grid Grid.Row="0" Visibility="{Binding UIListPropertyVisibility}" >
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="3*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Row="0"  Grid.Column="0" Text="Entity Property Name"  />
+                    <TextBlock Grid.Row="0"  Grid.Column="1" Text="{Binding SelectedItem.OriginalPropertyName}"  />
+
+                    <TextBlock Grid.Row="1"  Grid.Column="0" Text="Property Name"  />
+                    <TextBlock Grid.Row="1"  Grid.Column="1" Text="{Binding SelectedItem.ViewPropertyName}" />
+
+                    <TextBlock Grid.Row="2"  Grid.Column="0" Text="Json Property Name"  />
+                    <TextBlock Grid.Row="2"  Grid.Column="1" Text="{Binding SelectedItem.JsonPropertyName}" />
+
+
+                    <TextBlock Grid.Row="3"  Grid.Column="0" Text="Foreign Key"  />
+                    <TextBlock Grid.Row="3"  Grid.Column="1" Text="{Binding SelectedItem.ForeignKeyName}" />
+
+                    <TextBlock Grid.Row="4"  Grid.Column="0" Text="Foreign Key Chain"  />
+                    <TextBlock Grid.Row="4"  Grid.Column="1" Text="{Binding SelectedItem.ForeignKeyNameChain}" />
+
+                    <TextBlock Grid.Row="5"  Grid.Column="0" Text="Is Shown"  FontWeight="Bold"/>
+                    <CheckBox  Grid.Row="5"  Grid.Column="1" IsChecked="{Binding SelectedItem.IsShownInView}"  VerticalAlignment="Center" HorizontalAlignment="Left" />
+
+                    <TextBlock Grid.Row="6"  Grid.Column="0" Text="Is New Line After Control"  FontWeight="Bold"/>
+                    <CheckBox  Grid.Row="6"  Grid.Column="1" IsChecked="{Binding SelectedItem.IsNewLineAfter}"  VerticalAlignment="Center" HorizontalAlignment="Left" />
+
+
+                </Grid>
+
+                <Grid Grid.Row="0" Visibility="{Binding AttributeVisibility}" >
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="3*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Row="0"  Grid.Column="0" Text="Attribute Name"  />
+                    <TextBlock Grid.Row="0"  Grid.Column="1" Text="{Binding SelectedItem.AttrName}"  />
+
+                    <TextBlock Grid.Row="1"  Grid.Column="0" Text="Attribute Full Name"  />
+                    <TextBlock Grid.Row="1"  Grid.Column="1" Text="{Binding SelectedItem.AttrFullName}" />
+
+                </Grid>
+                <Grid Grid.Row="0" Visibility="{Binding AttributePropertyVisibility}" >
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="3*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Row="0"  Grid.Column="0" Text="Property Name"  />
+                    <TextBlock Grid.Row="0"  Grid.Column="1" Text="{Binding SelectedItem.PropName}"  />
+
+                    <TextBlock Grid.Row="1"  Grid.Column="0" Text="Property Value"  />
+                    <TextBox   Grid.Row="1"  Grid.Column="1" Text="{Binding SelectedItem.PropValue, UpdateSourceTrigger=PropertyChanged}" Margin="0 0 10 0"/>
+                </Grid>
+
+                <Grid Grid.Row="0" Visibility="{Binding FAPIAttributeVisibility}" >
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="3*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Row="0"  Grid.Column="0" Text="Attribute Name"  />
+                    <TextBlock Grid.Row="0"  Grid.Column="1" Text="{Binding SelectedItem.AttrName}"  />
+
+
+                </Grid>
+                <Grid Grid.Row="0" Visibility="{Binding FAPIAttributePropertyVisibility}" >
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="3*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Row="0"  Grid.Column="0" Text="Property Value"  />
+                    <TextBlock Grid.Row="0"  Grid.Column="1" Text="{Binding SelectedItem.PropValue}"  />
+                </Grid>
+
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>

@@ -1,0 +1,314 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+using System;
+using System.Collections.Generic;
+using System.Windows;
+using System.Windows.Controls;
+
+<#
+
+    string NotificationEventArgsFolder            = "00228-NotificationEventArgs.cs";
+    string NotificationEventArgsClassName         = GetModelClassName(Model, NotificationEventArgsFolder);
+    string NotificationEventArgsNameSpace         = GetModelNameSpace(Model, NotificationEventArgsFolder);
+    
+    string NotificationRoutedEventArgsFolder      = "00226-NotificationRoutedEventArgs.cs";
+    string NotificationRoutedEventArgsClassName   = GetModelClassName(Model, NotificationRoutedEventArgsFolder);
+    string NotificationRoutedEventArgsNameSpace   = GetModelNameSpace(Model, NotificationRoutedEventArgsFolder);
+
+
+    string IWebServiceFilterItemViewModelInterfaceFolder      = "00229-IWebServiceFilterItemViewModelInterface.cs";
+    string IWebServiceFilterItemViewModelInterfaceClassName   = GetModelClassName(Model, IWebServiceFilterItemViewModelInterfaceFolder);
+    string IWebServiceFilterItemViewModelInterfaceNameSpace   = GetModelNameSpace(Model, IWebServiceFilterItemViewModelInterfaceFolder);
+
+    string WebServiceFilterItemViewModelFolder      = "00230-WebServiceFilterItemViewModel.cs";
+    string WebServiceFilterItemViewModelClassName   = GetModelClassName(Model, WebServiceFilterItemViewModelFolder);
+    string WebServiceFilterItemViewModelNameSpace   = GetModelNameSpace(Model, WebServiceFilterItemViewModelFolder);
+
+    string IWebServiceFilterDefInterfaceFolder      = "00200-IWebServiceFilterDefInterface.cs";
+    string IWebServiceFilterDefInterfaceClassName   = GetModelClassName(Model, IWebServiceFilterDefInterfaceFolder);
+    string IWebServiceFilterDefInterfaceNameSpace   = GetModelNameSpace(Model, IWebServiceFilterDefInterfaceFolder);
+
+    string IWebServiceFilterOperatorInterfaceFolder      = "00202-IWebServiceFilterOperatorInterface.cs";
+    string IWebServiceFilterOperatorInterfaceClassName   = GetModelClassName(Model, IWebServiceFilterOperatorInterfaceFolder);
+    string IWebServiceFilterOperatorInterfaceNameSpace   = GetModelNameSpace(Model, IWebServiceFilterOperatorInterfaceFolder);
+
+    string IWebServiceFilterRsltInterfaceFolder      = "00204-IWebServiceFilterRsltInterface.cs";
+    string IWebServiceFilterRsltInterfaceClassName   = GetModelClassName(Model, IWebServiceFilterRsltInterfaceFolder);
+    string IWebServiceFilterRsltInterfaceNameSpace   = GetModelNameSpace(Model, IWebServiceFilterRsltInterfaceFolder);
+
+
+    string WebServiceFilterItemUserControlFolder      = "00232-WebServiceFilterItemUserControl.xaml.cs";
+    string WebServiceFilterItemUserControlClassName   = GetModelClassName(Model, WebServiceFilterItemUserControlFolder);
+    string WebServiceFilterItemUserControlNameSpace   = GetModelNameSpace(Model, WebServiceFilterItemUserControlFolder);
+
+    string FilterDefinitionsPropertyName = "FilterDefinitions";
+    string FilterOperatorsPropertyName = "FilterOperators";
+    string ModelPropertyName = "Model";
+    string RemoveCommandAsEventPropertyName = "RemoveCommandAsEvent";
+    string RemoveNotificationPropertyName = "RemoveNotification";
+
+    List<string> nmSpaces = new List<string>();
+    if (WebServiceFilterItemUserControlNameSpace != NotificationEventArgsNameSpace) nmSpaces.Add(NotificationEventArgsNameSpace);
+    if ((WebServiceFilterItemUserControlNameSpace != WebServiceFilterItemViewModelNameSpace) && (nmSpaces.IndexOf(WebServiceFilterItemViewModelNameSpace) < 0)) 
+        nmSpaces.Add(WebServiceFilterItemViewModelNameSpace);
+    if ((WebServiceFilterItemUserControlNameSpace != IWebServiceFilterOperatorInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterOperatorInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IWebServiceFilterOperatorInterfaceNameSpace);
+    if ((WebServiceFilterItemUserControlNameSpace != IWebServiceFilterRsltInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IWebServiceFilterRsltInterfaceNameSpace);
+    if ((WebServiceFilterItemUserControlNameSpace != IWebServiceFilterDefInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterDefInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IWebServiceFilterDefInterfaceNameSpace);
+    if ((WebServiceFilterItemUserControlNameSpace != IWebServiceFilterItemViewModelInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterItemViewModelInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IWebServiceFilterItemViewModelInterfaceNameSpace);
+    if ((WebServiceFilterItemUserControlNameSpace != NotificationRoutedEventArgsNameSpace) && (nmSpaces.IndexOf(NotificationRoutedEventArgsNameSpace) < 0)) 
+        nmSpaces.Add(NotificationRoutedEventArgsNameSpace);
+    
+
+#>
+<# 
+    foreach(string ns in nmSpaces) {
+#>
+using <#= ns #>;
+<#
+    }
+#>
+
+namespace <#= WebServiceFilterItemUserControlNameSpace #> {
+    /// <summary>
+    /// Interaction logic for <#= WebServiceFilterItemUserControlClassName #>.xaml
+    /// </summary>
+    public partial class <#= WebServiceFilterItemUserControlClassName #>: UserControl
+    {
+        public <#= WebServiceFilterItemUserControlClassName #>()
+        {
+            InitializeComponent();
+            DataContext = new <#= WebServiceFilterItemViewModelClassName #>();
+        }
+
+        #region <#= FilterDefinitionsPropertyName #>
+        private void SetFilterDefs()
+        {
+            <#= IWebServiceFilterItemViewModelInterfaceClassName #> vm = DataContext as <#= IWebServiceFilterItemViewModelInterfaceClassName #>;
+            if (vm != null)
+            {
+                vm.<#= FilterDefinitionsPropertyName #> = <#= FilterDefinitionsPropertyName #>;
+            }
+        }
+        private static void FltrDefsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            <#= WebServiceFilterItemUserControlClassName #> inst = d as <#= WebServiceFilterItemUserControlClassName #>;
+            if (inst != null)
+            {
+                inst.<#= FilterDefinitionsPropertyName #> = e.NewValue as IEnumerable<<#= IWebServiceFilterDefInterfaceClassName #>>;
+                inst.SetFilterDefs();
+            }
+        }
+        public static readonly DependencyProperty <#= FilterDefinitionsPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= FilterDefinitionsPropertyName #>", typeof(IEnumerable<<#= IWebServiceFilterDefInterfaceClassName #>>),
+                typeof(<#= WebServiceFilterItemUserControlClassName #>),
+                new PropertyMetadata(null, FltrDefsChanged));
+        public IEnumerable<<#= IWebServiceFilterDefInterfaceClassName #>> <#= FilterDefinitionsPropertyName #>
+        {
+            get { 
+                return (IEnumerable<<#= IWebServiceFilterDefInterfaceClassName #>>)GetValue(<#= FilterDefinitionsPropertyName #>Property); 
+            }
+            set { 
+                SetValue(<#= FilterDefinitionsPropertyName #>Property, value); 
+            }
+        }
+        #endregion
+        #region <#= FilterOperatorsPropertyName #>
+        private void SetFilterOperators()
+        {
+            <#= IWebServiceFilterItemViewModelInterfaceClassName #> vm = DataContext as <#= IWebServiceFilterItemViewModelInterfaceClassName #>;
+            if(vm != null)
+            {
+                vm.<#= FilterOperatorsPropertyName #> = <#= FilterOperatorsPropertyName #>;
+            }
+        }
+        private static void FltrOperatorsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            <#= WebServiceFilterItemUserControlClassName #> inst = d as <#= WebServiceFilterItemUserControlClassName #>;
+            if (inst != null)
+            {
+                inst.<#= FilterOperatorsPropertyName #> = e.NewValue as IEnumerable<<#= IWebServiceFilterOperatorInterfaceClassName #>>;
+                inst.SetFilterOperators();
+            }
+        }
+        public static readonly DependencyProperty <#= FilterOperatorsPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= FilterOperatorsPropertyName #>", typeof(IEnumerable<<#= IWebServiceFilterOperatorInterfaceClassName #>>),
+                typeof(<#= WebServiceFilterItemUserControlClassName #>),
+                new PropertyMetadata(null, FltrOperatorsChanged));
+        public IEnumerable<<#= IWebServiceFilterOperatorInterfaceClassName #>> <#= FilterOperatorsPropertyName #>
+        {
+            get { 
+                return (IEnumerable<<#= IWebServiceFilterOperatorInterfaceClassName #>>)GetValue(<#= FilterOperatorsPropertyName #>Property); 
+            }
+            set { 
+                SetValue(<#= FilterOperatorsPropertyName #>Property, value); 
+            }
+        }
+        #endregion
+        #region <#= ModelPropertyName #>
+        private void SetModel()
+        {
+            <#= IWebServiceFilterItemViewModelInterfaceClassName #> vm = DataContext as <#= IWebServiceFilterItemViewModelInterfaceClassName #>;
+            if (vm != null)
+            {
+                vm.<#= ModelPropertyName #> = <#= ModelPropertyName #>;
+            }
+        }
+        private static void FltrItemModelChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            <#= WebServiceFilterItemUserControlClassName #> inst = d as <#= WebServiceFilterItemUserControlClassName #>;
+            if (inst != null)
+            {
+                inst.<#= ModelPropertyName #> = e.NewValue as <#= IWebServiceFilterRsltInterfaceClassName #>;
+                inst.SetModel();
+            }
+        }
+        public static readonly DependencyProperty <#= ModelPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= ModelPropertyName #>", typeof(<#= IWebServiceFilterRsltInterfaceClassName #>),
+                typeof(<#= WebServiceFilterItemUserControlClassName #>),
+                new PropertyMetadata(null, FltrItemModelChanged));
+        public <#= IWebServiceFilterRsltInterfaceClassName #> <#= ModelPropertyName #>
+        {
+            get
+            {
+                return (<#= IWebServiceFilterRsltInterfaceClassName #>)GetValue(<#= ModelPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= ModelPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= RemoveNotificationPropertyName #>
+        public static readonly RoutedEvent <#= RemoveNotificationPropertyName #>Event = 
+                EventManager.RegisterRoutedEvent(
+                "<#= RemoveNotificationPropertyName #>", RoutingStrategy.Bubble, 
+                typeof(RoutedEventHandler), 
+                typeof(<#= WebServiceFilterItemUserControlClassName #>));
+        public event RoutedEventHandler <#= RemoveNotificationPropertyName #>
+        {
+            add { AddHandler(<#= RemoveNotificationPropertyName #>Event, value); }
+            remove { RemoveHandler(<#= RemoveNotificationPropertyName #>Event, value); }
+        }
+        private void UserControl_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if(e.NewValue != null)
+            {
+                <#= IWebServiceFilterItemViewModelInterfaceClassName #> dc = e.NewValue as <#= IWebServiceFilterItemViewModelInterfaceClassName #>;
+                if(dc != null)
+                {
+                    dc.<#= ModelPropertyName #> = <#= ModelPropertyName #>;
+                    dc.<#= FilterDefinitionsPropertyName #> = <#= FilterDefinitionsPropertyName #>;
+                    dc.<#= FilterOperatorsPropertyName #> = <#= FilterOperatorsPropertyName #>;
+                    dc.<#= RemoveCommandAsEventPropertyName #> += <#= RemoveCommandAsEventPropertyName #>Handler;
+                }
+            }
+            if (e.OldValue != null)
+            {
+                <#= IWebServiceFilterItemViewModelInterfaceClassName #> dc = e.OldValue as <#= IWebServiceFilterItemViewModelInterfaceClassName #>;
+                if (dc != null)
+                {
+                    dc.<#= RemoveCommandAsEventPropertyName #> -= <#= RemoveCommandAsEventPropertyName #>Handler;
+                }
+            }
+        }
+        private void <#= RemoveCommandAsEventPropertyName #>Handler(object sender, <#= NotificationEventArgsClassName #> args)
+        {
+            NotificationRoutedEventArgs newEventArgs = new <#= NotificationRoutedEventArgsClassName #>(<#= WebServiceFilterItemUserControlClassName #>.<#= RemoveNotificationPropertyName #>Event);
+            newEventArgs.Sender = args.Sender;
+            newEventArgs.Model = args.Model;
+            RaiseEvent(newEventArgs);
+        }
+        #endregion
+    }
+}
+
+<#+
+
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+
+#>

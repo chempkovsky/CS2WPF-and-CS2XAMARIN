@@ -1,0 +1,225 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+using System.Windows;
+using System.Windows.Controls;
+<#
+
+    string gridFlexModelFolder      = "00100-GridFlex.cs";
+    string gridFlexModelClassName   = GetModelClassName(Model, gridFlexModelFolder);
+    string gridFlexModelNameSpace   = GetModelNameSpace(Model, gridFlexModelFolder);
+    
+#>
+
+namespace <#= gridFlexModelNameSpace #> {
+    public static class <#= gridFlexModelClassName #>
+    {
+
+        public static int LandscapeW = 768;
+        public static int DesktopW = 992;
+
+        public static readonly DependencyProperty HorizontalFlexProperty =
+             DependencyProperty.RegisterAttached(
+                 "HorizontalFlex", typeof(  bool?  ), typeof(<#= gridFlexModelClassName #>),
+                 new PropertyMetadata(null, HorizontalFlexChanged));
+        public static bool? GetRowHorizontalFlex(DependencyObject obj)
+        {
+            
+            return (bool?)obj.GetValue(HorizontalFlexProperty);
+        }
+
+        public static void SetHorizontalFlex(DependencyObject obj, bool? value)
+        {
+            obj.SetValue(HorizontalFlexProperty, value);
+        }
+        public static void HorizontalFlexChanged(DependencyObject obj, DependencyPropertyChangedEventArgs e)
+        {
+            bool nv = false;
+            if(e.NewValue is bool)
+            {
+                nv = (bool)e.NewValue; 
+            }
+            if(obj is Grid)
+            {
+                Grid grd = obj as Grid;
+                if (nv)
+                {
+                    grd.SizeChanged += OnSizeChangedEventHandler;
+                    UpdateGridSetting(grd);
+
+                } else
+                {
+                    grd.SizeChanged -= OnSizeChangedEventHandler;
+                }
+            }
+        }
+        public static void UpdateGridSetting(Grid sender)
+        {
+            double ActualWidth = sender.ActualWidth;
+            foreach(var c in sender.Children)
+            {
+                if (c is DependencyObject)
+                {
+                    var d = c as DependencyObject;
+                    d.SetValue(Grid.RowProperty, 0);
+                    d.SetValue(Grid.ColumnProperty, 0);
+                    d.SetValue(Grid.ColumnSpanProperty, 1);
+                }
+            }
+            sender.RowDefinitions.Clear();
+            sender.ColumnDefinitions.Clear();
+            if (ActualWidth < 1) return;
+            int count = sender.Children.Count;
+            if (count < 1) count = 1;
+            int colDefcount = count;
+            int rowDefcount = 1;
+            if(ActualWidth < LandscapeW)
+            {
+                colDefcount = 1;
+                rowDefcount = count;
+            }
+            else if (ActualWidth < DesktopW) 
+            {
+                colDefcount = count >> 1;
+                if (colDefcount << 1 < count) colDefcount++;
+                rowDefcount = 2;
+
+            }
+            for (int i = 0; i < colDefcount; i++)
+                sender.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Star) });
+            for (int i = 0; i < rowDefcount; i++)
+                sender.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
+
+            int curCol = 0;
+            int curRow = 0;
+            int curId = 0;
+            foreach (var c in sender.Children)
+            {
+                if (c is DependencyObject)
+                {
+                    var d = c as DependencyObject;
+                        d.SetValue(Grid.RowProperty, curRow);
+                        d.SetValue(Grid.ColumnProperty, curCol);
+                    curId++;
+                    if (curId == count)
+                    {
+                        if ((colDefcount > 1) && (colDefcount < count))
+                        {
+                            if ((curCol == (colDefcount - 2)) && (curRow == rowDefcount - 1))
+                            {
+                                d.SetValue(Grid.ColumnSpanProperty, 2);
+                            }
+                        }
+                    }
+                    curCol++;
+                    if (curCol >= colDefcount)
+                    {
+                        curCol = 0;
+                        curRow++;
+                    }
+                }
+            }
+        }
+
+        public static void OnSizeChangedEventHandler(object sender, SizeChangedEventArgs e)
+        {
+            if(!e.WidthChanged) return;
+            if ((e.PreviousSize.Width > 1) && (e.NewSize.Width > 1)) 
+            {
+                if ((e.PreviousSize.Width < LandscapeW) && (e.NewSize.Width < LandscapeW)) return;
+                if ((e.PreviousSize.Width >= DesktopW) && (e.NewSize.Width >= DesktopW)) return;
+                if ((e.PreviousSize.Width >= LandscapeW) && (e.PreviousSize.Width < DesktopW) && (e.NewSize.Width < DesktopW) && (e.NewSize.Width >= LandscapeW)) return;
+            }
+            if (sender != null)
+            {
+                if (sender is Grid)
+                {
+                        UpdateGridSetting(sender as Grid);
+                }
+            }
+        }
+    }
+}
+
+<#+
+
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+
+#>

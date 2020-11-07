@@ -1,0 +1,49 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ parameter type="System.Boolean"  name="IsRequired" #>
+<#@ parameter type="System.Boolean"  name="WillCascadeOnDelete" #>
+<#@ parameter type="System.String"   name="NavigationName" #>
+<#@ parameter type="System.String"   name="InverseNavigationName" #>
+<#@ parameter type="System.String"   name="MasterClassFullName" #>
+<#@ parameter type="System.Collections.Generic.List<System.String>"  name="ForeignKeyProperties" #>
+.<#= GetRequiredOrOptional(IsRequired) #>( d => d.<#= NavigationName #> )
+            .WithMany( m => m.<#= InverseNavigationName #> )
+            .HasForeignKey( d => <#= GetForeignKeyPropertiesList(ForeignKeyProperties, "d.") #> )<#= GetWillCascadeOnDelete(WillCascadeOnDelete) #>;
+<#+
+        string GetWillCascadeOnDelete(bool willCascadeOnDelete)
+        {
+            if (willCascadeOnDelete) {
+                return ".WillCascadeOnDelete(true)";
+            }
+            return "";
+        }
+        string GetRequiredOrOptional(bool isRequired)
+        {
+            if (isRequired) {
+                return "HasRequired";
+            }
+            return "HasOptional";
+        }
+        string GetForeignKeyPropertiesList(System.Collections.Generic.List<System.String> foreignKeyProperties, string prefixName)
+        {
+            if (foreignKeyProperties == null) return "";
+            int cnt = foreignKeyProperties.Count;
+            if (cnt < 1) return "";
+            string result = prefixName + foreignKeyProperties[0];
+            for (int i = 1; i < cnt; i++)
+            {
+                result = result + ", " + prefixName + foreignKeyProperties[i];
+            }
+            if (cnt < 2)
+            {
+                return result;
+            }
+            return "new {" + result + "}";
+        }
+#>

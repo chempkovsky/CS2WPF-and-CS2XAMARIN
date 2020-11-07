@@ -1,0 +1,953 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Readme for 00470-aspnetchckdbcontext.cs</title>
+</head>
+<body>
+    <h3>(Context level) Readme for 00470-aspnetchckdbcontext.cs</h3>
+
+    <table cellspacing="5" border="1">
+        <tr>
+            <td>
+                Type
+            </td>
+            <td>
+                C# Db Context
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Recomended folder
+            </td>
+            <td>
+                "AspNet" under Entity Framework C# project
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Generator group
+            </td>
+            <td>
+                Context level
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <strong>File type</strong>
+            </td>
+            <td>
+                C# Entity
+            </td>
+        </tr>
+    </table>
+
+
+    <h3>Before continuing</h3>
+    The Asp Net Security package includes the following View models:
+    <ul>
+        <li>aspnetdashboardView.cs</li>
+        <li>aspnetmodelView.cs</li>
+        <li>aspnetrolemaskView.cs</li>
+        <li>aspnetroleView.cs</li>
+        <li>aspnetusermaskView.cs</li>
+        <li>aspnetuserrolesView.cs</li>
+        <li>aspnetuserView.cs</li>
+    </ul>
+    To generate them in a project, you must first generate entities (this is a C# part of the project).
+    Run the following scripts for entities
+    <ul>
+        <li>00400-aspnetrole.cs [dummy(mock) class]</li>
+        <li>00410-aspnetuser.cs [dummy(mock) class]</li>
+        <li>00420-aspnetuserroles.cs [dummy(mock) class]</li>
+        <li>00430-aspnetusermask.cs [dummy(mock) class]</li>
+        <li>00440-aspnetrolemask.cs</li>
+        <li>00450-aspnetmodel.cs</li>
+        <li>00460-aspnetdashboard.cs</li>
+    </ul>
+    for DB context
+    <ul>
+        <li>00470-aspnetchckdbcontext.cs</li>
+    </ul>
+    for Role Manager
+    <ul>
+        <li>00480-applicationrolemanager.cs</li>
+    </ul>
+    <strong>
+        Remark #1:
+    </strong>
+    The scripts for entities you must run twice. Not all references are available the first time scripts are run. It's about master detail links.
+    But the second time all the references are in the place. You have the following batch that automates this work.
+    <ul>
+        <li>00040-AspNetEntities.json</li>
+    </ul>
+    Run the following batch to generate DbContext.
+    <ul>
+        <li>00050-AspNetDbContextDev.json</li>
+    </ul>
+    <strong>
+        Remark #2:
+    </strong>
+    There is no batch to generate ApplicationRoleManager-class. Instead of saving the generated code to a file, you should copy it to the clipboard.<br>
+    Next, you should open IdentityConfig.cs which is a part of the Web Api-project and paste generated code from the clipboard.
+    Copy/Paste must be done right after definition of the ApplicationUserManager-class.<br>
+    Instead of running  '00480-applicationrolemanager.cs'-script you can just copy the code from the table below:<br>
+
+    <table cellspacing="5" border="1">
+        <tr>
+            <td>
+                <pre>
+                <code>
+    public class ApplicationRoleManager : RoleManager&lt;IdentityRole&gt;
+    {
+        public ApplicationRoleManager(IRoleStore&lt;IdentityRole, string&gt; roleStore) : base(roleStore)
+        {
+        }
+
+        public static ApplicationRoleManager Create(IdentityFactoryOptions&lt;ApplicationRoleManager&gt; options, IOwinContext context)
+        {
+        ///It is based on the same context as the ApplicationUserManager
+            var appRoleManager = 
+                new ApplicationRoleManager(new RoleStore&lt;IdentityRole&gt; (context.Get&lt;ApplicationDbContext&gt; ()));
+            return appRoleManager;
+        }
+    }
+                    </code>
+                </pre>
+
+            </td>
+        </tr>
+    </table>
+
+    <br>It is not all.<br>
+    Please open 'Startup.Auth.cs'-file which is a part of the Web Api-project and find 'ConfigureAuth(IAppBuilder app){ ... }'-method.
+    Place the cursor immediately after the line of code:<br>
+    'app.CreatePerOwinContext&lt;ApplicationUserManager&gt;(ApplicationUserManager.Create);'
+    <pre>
+    <code>
+            public void ConfigureAuth(IAppBuilder app)
+            {
+                ...
+                app.CreatePerOwinContext(ApplicationDbContext.Create);
+                app.CreatePerOwinContext&lt;ApplicationUserManager&gt;(ApplicationUserManager.Create);
+                --PLACE CURSOR HERE--
+        </code>
+    </pre>
+    And insert the following line of code:<br>
+    'app.CreatePerOwinContext&lt;ApplicationRoleManager&gt;(ApplicationRoleManager.Create);'<br>
+    Here is a result
+    <pre>
+    <code>
+            public void ConfigureAuth(IAppBuilder app)
+            {
+                ...
+                app.CreatePerOwinContext(ApplicationDbContext.Create);
+                app.CreatePerOwinContext&lt;ApplicationUserManager&gt;(ApplicationUserManager.Create);
+                app.CreatePerOwinContext&lt;ApplicationRoleManager&gt;(ApplicationRoleManager.Create);
+                ...
+        </code>
+    </pre>
+
+    <strong>
+        Remark #3:
+    </strong>
+    Some of the objects have been marked as <b>dummy(mock) class</b>. Here is a list.
+    <ul>
+        <li>00400-aspnetrole.cs [dummy(mock) class]</li>
+        <li>00410-aspnetuser.cs [dummy(mock) class]</li>
+        <li>00420-aspnetuserroles.cs [dummy(mock) class]</li>
+        <li>00430-aspnetusermask.cs [dummy(mock) class]</li>
+    </ul>
+    After creating WebApi services (even after generating ViewModels) these classes should be removed from the project. These classes already defined in the WebApi project.
+    <pre>
+    <code>
+            public class ApplicationUser : IdentityUser { ... }
+            public class IdentityRole : IdentityRole&lt;string, IdentityUserRole&gt; { ... }
+            app.CreatePerOwinContext(ApplicationDbContext.Create);
+        </code>
+    </pre>
+    But why You should create these temporary classes?<br>
+    You do this only to give a hint to the wizards you run to create the user interface.<br>
+    On the one hand, under the requirements, you should use ApplicationUserManager and ApplicationRoleManager to manage users and roles.<br>
+    On the other hand, to generate UI the wizards require Web Api services to be in place with a predifined inputs and outputs (As wizards expect).<br>
+    So, the generated Web Api services must have a special (unusual) implementation, that is, not use DbContext, but use the methods
+    of ApplicationUserManager and ApplicationRoleManager classes.<br>
+    To achieve this goal, the following scenarios were created. Here is a list of scripts to generate the WebApi services.<br><br>
+
+    <table cellspacing="5" border="1">
+        <tr>
+            <td>
+                00400-aspnetrole.cs [dummy(mock) class]
+            </td>
+            <td>
+                WebApiAspNetRoleService.cs.t4
+            </td>
+        </tr>
+        <tr>
+            <td>
+                00410-aspnetuser.cs [dummy(mock) class]
+            </td>
+            <td>
+                WebApiAspNetUserService.cs.t4
+            </td>
+        </tr>
+        <tr>
+            <td>
+                00420-aspnetuserroles.cs [dummy(mock) class]
+            </td>
+            <td>
+                WebApiAspNetUserRoles.cs.t4
+            </td>
+        </tr>
+        <tr>
+            <td>
+                00430-aspnetusermask.cs [dummy(mock) class]
+            </td>
+            <td>
+                WebApiAspNetUserMasksService.cs.t4
+            </td>
+        </tr>
+    </table><br>
+
+    <strong>
+        Remark #4:
+    </strong>
+    Pay particular attention to the class generated by the script '00410-aspnetuser.cs'.
+
+    <pre>
+    <code>
+        public class aspnetuser
+        {
+            [Required]
+            [Display(Description = "User Id", Name = "User Id", Prompt = "Enter Id", ShortName = "User Id")]
+            [StringLength(128, MinimumLength = 1, ErrorMessage = "Invalid")]
+            public string Id { get; set; }
+
+            [Display(Description = "User Email", Name = "User Email", Prompt = "Enter Email", ShortName = "User Email")]
+            [StringLength(256, MinimumLength = 0, ErrorMessage = "Invalid")]
+            public string Email { get; set; }
+
+            [Required]
+            [Display(Description = "Email Confirmed", Name = "Email Confirmed", Prompt = "Enter Email Confirmed", ShortName = "Email Confirmed")]
+            public bool EmailConfirmed { get; set; }
+
+            [Display(Description = "Phone Number", Name = "Phone Number", Prompt = "Enter Phone Number", ShortName = "Phone Number")]
+            public string PhoneNumber { get; set; }
+
+            [Required]
+            [Display(Description = "Phone Number Confirmed", Name = "Phone Number Confirmed", Prompt = "Enter Phone Number Confirmed", ShortName = "Phone Number Confirmed")]
+            public bool PhoneNumberConfirmed { get; set; }
+
+            [Required]
+            [Display(Description = "Two Factor Enabled", Name = "Two Factor Enabled", Prompt = "Enter Two Factor Enabled", ShortName = "Two Factor Enabled")]
+            public bool TwoFactorEnabled { get; set; }
+
+            [Display(Description = "Lockout End Date Utc", Name = "Lockout End Date Utc", Prompt = "Enter Lockout End Date Utc", ShortName = "Lockout End Date Utc")]
+            public DateTime? LockoutEndDateUtc { get; set; }
+
+            [Required]
+            [Display(Description = "Lockout Enabled", Name = "Lockout Enabled", Prompt = "Enter Lockout Enabled", ShortName = "Lockout Enabled")]
+            public bool LockoutEnabled { get; set; }
+
+            [Required]
+            [Display(Description = "Access Failed Count", Name = "Access Failed Count", Prompt = "Enter Access Failed Count", ShortName = "Access Failed Count")]
+            public int AccessFailedCount { get; set; }
+
+            [Display(Description = "User Name", Name = "User Name", Prompt = "Enter User Name", ShortName = "User Name")]
+            [StringLength(256, MinimumLength = 1, ErrorMessage = "Invalid")]
+            public string UserName { get; set; }
+
+
+            public virtual ICollection&lt;aspnetuserroles&gt; UserRoles { get; set; }
+            public virtual ICollection&lt;aspnetusermask&gt; UserMasks { get; set; }
+        }
+        </code>
+    </pre>
+    Please use the tool as shown below(or any analog) to compare the generated '00410-aspnetuser.cs' and the class in your application.<br>
+    <pre>
+    <code>
+            dotnet ef dbcontext scaffold ...
+        </code>
+    </pre>
+    Before creating ViewModels, add (or remove) properties to(from) the generated class, if necessary. Do not forget about 'Display'-attribute when you add properties to the class.
+    <br>
+    It should be noted that some of the properties (for instance, password) were removed from the definition of the 'aspnetuser'-class.
+    To understand why, please take a look at the code of the WebApi service that is generated by the 'WebApiAspNetUserService.cs.t4'-script.
+    You can see that 'Add-User' method does not use any properties except 'e-mail'.<br>
+    <b>You can remove all properties from the definition of the 'aspnetuser'-class, except for two: 'Id' and 'UserName'.</b>
+    Do not forget 'aspnetuser'-class is a temporary class. It is used only to determine what the user interface should be.<br>
+    Only one thing that require special attention: property names and types must be equal for the 'aspnetuser'-class and <br>
+    for the CLI-generated class (like dotnet ef dbcontext scaffold).<br><br>
+
+    <strong>
+        Remark #5:
+    </strong>
+    Under '00470-aspnetchckdbcontext.cs' you can find two scripts
+    <ul>
+        <li>aspnetdbcontext.cs.t4 [dummy(mock)  class]</li>
+        <li>aspnetchckdbcontext.cs.t4</li>
+    </ul>
+    You should use 'aspnetdbcontext.cs.t4' to generate UI<br>
+    You should use 'aspnetchckdbcontext.cs.t4' for production<br><br>
+
+    <strong>
+        Remark #6:
+    </strong>
+    Maybe it is not bad idea to extend 'ApplicationDbContext'-class with three entities instead of creating new DbContext for these entities:
+    <ul>
+        <li>00440-aspnetrolemask.cs</li>
+        <li>00450-aspnetmodel.cs</li>
+        <li>00460-aspnetdashboard.cs</li>
+    </ul>
+    If you decide to implement this approach, know that you must do this after creating(generating the code) the user interface.<br>
+
+
+
+    <br>
+    Returning to C# Entities. As a result you will obtain the following C# files
+
+    <ul>
+        <li>aspnetdashboard.cs</li>
+        <li>aspnetmodel.cs</li>
+        <li>aspnetrole.cs [dummy(mock) class]</li>
+        <li>aspnetrolemask.cs</li>
+        <li>aspnetuser.cs [dummy(mock) class]</li>
+        <li>aspnetusermask.cs [dummy(mock) class]</li>
+        <li>aspnetuserroles.cs [dummy(mock) class]</li>
+    </ul>
+    and one Db context C# file
+    <ul>
+        <li>aspnetchckdbcontext.cs [generated with aspnetdbcontext.cs.t4-script] </li>
+    </ul>
+
+    <h3>Modeling and generating ViewModels</h3>
+    Having entities and DBcontext, you can perform the next step: modeling and generating ViewModels.<br>
+    You should use <b>ModelViews Wizard</b>  to accomplish this task. This section describes the structure of ViewModels.<br>
+    But completing this task step by step is not a quick way. Moreover, it is easy to make a mistake.<br>
+    <a href="#HowToImport">Please go to the instructions how to import ViewModel definitions</a>
+
+
+
+    <h4>
+        ViewModel for aspnetdashboard.cs
+    </h4>
+    Include all properties in the ViewModel :
+    <ul>
+        <li>DashboardPk</li>
+        <li>DashboardName</li>
+        <li>DashboardDescription</li>
+    </ul>
+
+    <h4>
+        ViewModel for aspnetmodel.cs
+    </h4>
+    Include all properties in the ViewModel :
+    <ul>
+        <li>ModelPk</li>
+        <li>ModelName</li>
+        <li>ModelDescription</li>
+    </ul>
+
+    <h4>
+        ViewModel for aspnetrole.cs [dummy(mock) class]
+    </h4>
+    Include all properties in the ViewModel :
+    <ul>
+        <li>Id</li>
+        <li>Name</li>
+    </ul>
+
+    <h4>
+        ViewModel for aspnetrolemask.cs
+    </h4>
+    Include all properties in the ViewModel :
+    <ul>
+        <li>RoleName</li>
+        <li>RoleDescription</li>
+        <li>Mask0</li>
+        <li>...</li>
+        <li>MaskD</li>
+        <li>Dask0</li>
+        <li>Dask1</li>
+        <li>Dask2</li>
+    </ul>
+
+    <h4>
+        ViewModel for aspnetuser.cs [dummy(mock) class]
+    </h4>
+    Include all properties in the ViewModel :
+    <ul>
+        <li>Id</li>
+        <li>Email</li>
+        <li>EmailConfirmed</li>
+        <li>PhoneNumber</li>
+        <li>PhoneNumberConfirmed</li>
+        <li>TwoFactorEnabled</li>
+        <li>LockoutEndDateUtc</li>
+        <li>LockoutEnabled</li>
+        <li>AccessFailedCount</li>
+        <li>UserName</li>
+    </ul>
+
+    <h4>
+        ViewModel for aspnetusermask.cs [dummy(mock) class]
+    </h4>
+    Include all properties in the ViewModel :
+    <ul>
+        <li>UserId</li>
+        <li>Mask0</li>
+        <li>...</li>
+        <li>MaskD</li>
+        <li>Dask0</li>
+        <li>Dask1</li>
+        <li>Dask2</li>
+    </ul>
+
+
+    <h4>
+        aspnetuserroles.cs [dummy(mock) class]
+    </h4>
+    <ul>
+        <li>In the left panel expand <b>Foreign keys</b>-folder choose <b>AspNetUser: UserRoles</b></li>
+        <li>In the right panel using <b>View Name</b>-combo choose <b>aspnetuserView</b></li>
+        <li>In the right panel using <b>Foreign key prefix</b>-edit enter <b>U</b>-letter</li>
+        <li>In the left panel under <b>AspNetUser: UserRoles</b> expand <b>Properties</b>-folder and choose </li>
+        <li>
+            <ul>
+                <li><b>UUserName</b></li>
+            </ul>
+        </li>
+        <li>In the left panel expand <b>Foreign keys</b>-folder choose <b>AspNetRole: UserRoles</b></li>
+        <li>In the right panel using <b>View Name</b>-combo choose <b>aspnetroleView</b></li>
+        <li>In the right panel using <b>Foreign key prefix</b>-edit enter <b>R</b>-letter</li>
+        <li>In the left panel under <b>AspNetRole: UserRoles</b> expand <b>Properties</b>-folder and choose </li>
+        <li>
+            <ul>
+                <li><b>RName</b></li>
+            </ul>
+        </li>
+    </ul>
+    That's it.  Click <b>Next/Save</b> and second <b>Next/Save</b>
+
+
+    <h4>
+        As a result, you will receive the following new files
+    </h4>
+
+    <ul>
+        <li><b>aspnetdashboardView(Page).cs</b></li>
+        <li><b>aspnetmodelView(Page).cs</b></li>
+        <li><b>aspnetrolemaskView(Page).cs</b></li>
+        <li><b>aspnetroleView(Page).cs</b></li>
+        <li><b>aspnetusermaskView(Page).cs</b></li>
+        <li><b>aspnetuserrolesView(Page).cs</b></li>
+        <li><b>aspnetuserView(Page).cs</b></li>
+    </ul>
+    Please use "DefaultWebApiService.cs.t4"-script to generate WebApi services for the For following ViewModels.
+    <ul>
+        <li><b>aspnetdashboardView(Page).cs</b></li>
+        <li><b>aspnetmodelView(Page).cs</b></li>
+        <li><b>aspnetrolemaskView(Page).cs</b></li>
+    </ul>
+    <br />
+    For <b>aspnetroleView(Page).cs</b>-ViewModel please use "WebApiAspNetRoleService.cs.t4"-script to generate WebApi service.
+    <br />
+    For <b>aspnetusermaskView(Page).cs</b>-ViewModel please use "WebApiAspNetUserMasksService.cs.t4"-script to generate WebApi service.
+    <br />
+    For <b>aspnetuserrolesView(Page).cs</b>-ViewModel please use "WebApiAspNetUserRoles.cs.t4"-script to generate WebApi service.
+    <br />
+    For <b>aspnetuserView(Page).cs</b>-ViewModel please use "WebApiAspNetUserService.cs.t4"-script to generate WebApi service.
+
+    <h4>
+        WebApi services
+    </h4>
+    For the following ViewModels
+    <ul>
+        <li><b>aspnetdashboardView</b></li>
+        <li><b>aspnetmodelView</b></li>
+        <li><b>aspnetrolemaskView</b></li>
+    </ul>
+    <b>Is Used By Filter</b> and <b>Is Used By Sorting</b> must be checked for all properties.<br />
+    <b>Select all</b>, <b>Select many with pagination</b>, <b>Select one by primary key</b>, <b>Add one</b>, <b>Update one</b>, <b>Delete one</b> must be checked.<br />
+    <b>DefaultWebApiService.cs.t4</b>-T4 template must be used to generate WebApi controller<br /><br />
+    For the following ViewModel
+    <ul>
+        <li><b>aspnetroleView</b></li>
+    </ul>
+    <b>Is Used By Filter</b> and <b>Is Used By Sorting</b> must be checked for all properties.<br />
+    <b>Select all</b>, <b>Select many with pagination</b>, <b>Select one by primary key</b>, <b>Add one</b>, <b>Update one</b>, <b>Delete one</b> must be checked.<br />
+    <b>WebApiAspNetRoleService.cs.t4</b>-T4 template must be used to generate WebApi controller<br /><br />
+    For the following ViewModel
+    <ul>
+        <li><b>aspnetuserView</b></li>
+    </ul>
+    <b>Is Used By Filter</b> must be checked for all properties.<br />
+    <b>Is Used By Sorting</b> must be checked for <b>Id</b> and <b>UserName</b><br />
+    <b>Select all</b>, <b>Select many with pagination</b>, <b>Select one by primary key</b>, <b>Add one</b>, <b>Update one</b>, <b>Delete one</b> must be checked.<br />
+    <b>WebApiAspNetUserService.cs.t4</b>-T4 template must be used to generate WebApi controller<br /><br />
+    For the following ViewModel
+    <ul>
+        <li><b>aspnetuserrolesView</b></li>
+    </ul>
+    <b>Is Used By Filter</b> must be checked for all properties.<br />
+    <b>Is Used By Sorting</b> must be checked for all properties.<br />
+    <b>Select all</b>, <b>Select many with pagination</b>, <b>Select one by primary key</b>, <b>Add one</b>, <b>Update one</b>, <b>Delete one</b> must be checked.<br />
+    <b>WebApiAspNetUserRoles.cs.t4</b>-T4 template must be used to generate WebApi controller<br /><br />
+    For the following ViewModel
+    <ul>
+        <li><b>aspnetusermaskView</b></li>
+    </ul>
+    <b>Is Used By Filter</b> must be checked only for <b>UserId</b>.<br />
+    <b>Is Used By Sorting</b> must NOT be checked for all properties.<br />
+    <b>Select many with pagination</b> must be checked.<br />
+    <b>WebApiAspNetUserMasksService.cs.t4</b>-T4 template must be used to generate WebApi controller<br /><br />
+
+    <h4>
+        Java scripts
+    </h4>
+    Please use the following Batchs to generate css/html/ts files. Each script has online readme with explanation of "how to" and "what for"
+    <ul>
+        <li><b>13100-AspNetInterfasesBatch.json</b></li>
+        <li><b>13400-AspNetWebApiService.json</b></li>
+        <li><b>13401-AspNetWebApiService.json</b></li>
+        <li><b>13420-AspNetSForm.json</b></li>
+        <li><b>13500-AspNetEform.json</b></li>
+        <li><b>13600-AspNetLform.json</b></li>
+        <li><b>14200-AspNetChkMform.json</b></li>
+        <li><b>14205-AspNetChkDform.json</b></li>
+        <li><b>14210-AspNetChkRform.json</b></li>
+        <li><b>14215-AspNetlform.json</b></li>
+        <li><b>14220-AspNetO2m.json</b></li>
+    </ul>
+
+    But before generating css/html/ts files you need to define UI-settings for each Security ViewModel.
+    <h4>
+        aspnetdashboardView
+    </h4>
+    <p>
+        <b>UI List Properties: </b> <b>Shown</b> must be checked for all properties.<br />
+        <b>UI Form Properties: </b> <b>Shown</b> must be checked for all properties.<br />
+        <b>UI Form Properties: </b> <b>Input type New</b>  must be <b>Default</b> for all properties.<br />
+        <b>UI Form Properties: </b> <b>Input type Update</b>  must be <b>Default</b> for all properties.<br />
+        <b>UI Form Properties: </b> <b>Input type Delete</b>  must be <b>ReadOnly</b> for all properties.<br />
+    </p>
+
+    <h4>
+        aspnetmodelView
+    </h4>
+    <p>
+        <b>UI List Properties: </b> <b>Shown</b> must be checked for all properties.<br />
+        <b>UI Form Properties: </b> <b>Shown</b> must be checked for all properties.<br />
+        <b>UI Form Properties: </b> <b>Input type New</b>  must be <b>Default</b> for all properties.<br />
+        <b>UI Form Properties: </b> <b>Input type Update</b>  must be <b>Default</b> for all properties.<br />
+        <b>UI Form Properties: </b> <b>Input type Delete</b>  must be <b>ReadOnly</b> for all properties.<br />
+    </p>
+
+    <h4>
+        aspnetrolemaskView
+    </h4>
+    <p>
+        <b>UI List Properties: </b> <b>Shown</b> must be checked only for "RoleName" and  "RoleDescription" properties.<br />
+        <b>UI Form Properties: </b> <b>Shown</b> must be checked for all properties.<br />
+        <b>UI Form Properties: </b> <b>New Line</b> must be checked for "RoleDescription", "Mask5", "MaskB" properties.<br />
+        <b>UI Form Properties: </b> <b>Input type New</b>  must be <b>Default</b> for all properties.<br />
+        <b>UI Form Properties: </b> <b>Input type Update</b>  must be <b>Default</b> for all properties.<br />
+        <b>UI Form Properties: </b> <b>Input type Delete</b>  must be <b>ReadOnly</b> for all properties.<br />
+    </p>
+
+    <h4>
+        aspnetroleView
+    </h4>
+    <p>
+        <b>UI List Properties: </b> <b>Shown</b> must be checked for all properties.<br />
+        <b>UI Form Properties: </b> <b>Shown</b> must be checked for all properties.<br />
+        <b>UI Form Properties: </b> <b>Input type New</b>  must be <b>Default</b> for all properties.<br />
+        <b>UI Form Properties: </b> <b>Input type Update</b>  must be <b>Default</b> for all properties.<br />
+        <b>UI Form Properties: </b> <b>Input type Delete</b>  must be <b>ReadOnly</b> for all properties.<br />
+    </p>
+
+
+    <h4>
+        aspnetuserView
+    </h4>
+    <p>
+        <b>UI List Properties: </b> <b>Shown</b> must be checked for all properties.<br />
+        <b>UI Form Properties: </b> <b>Shown</b> must be checked for all properties.<br />
+        <b>UI Form Properties: </b> <b>New Line</b> must be checked for "EmailConfirmed", "TwoFactorEnabled"<br />
+        <b>UI Form Properties: </b> <b>Input type New</b>  must be <b>Default</b> for all properties.<br />
+        <b>UI Form Properties: </b> <b>Input type Update</b>  must be <b>Default</b> for all properties.<br />
+        <b>UI Form Properties: </b> <b>Input type Delete</b>  must be <b>ReadOnly</b> for all properties.<br />
+    </p>
+
+    <h4>
+        aspnetuserrolesView
+    </h4>
+    <p>
+        <b>UI List Properties: </b> <b>Shown</b> must be checked for all properties.<br />
+        <b>UI Form Properties: </b> <b>Shown</b> must be checked for all properties.<br />
+        <b>UI Form Properties: </b> <b>Input type New</b>  must be <b>ReadOnly</b> for "UserId" and "RoleId" properties.<br />
+        <b>UI Form Properties: </b> <b>Input type New</b>  must be <b>Search Dialog</b> for "UUserName" property.<br />
+        <b>UI Form Properties: </b> <b>Input type New</b>  must be <b>Combo</b> for "RName" property.<br />
+        <b>UI Form Properties: </b> <b>Input type Update</b>  must be <b>ReadOnly</b> for "UserId" and "RoleId" properties.<br />
+        <b>UI Form Properties: </b> <b>Input type Update</b>  must be <b>Search Dialog</b> for "UUserName" property.<br />
+        <b>UI Form Properties: </b> <b>Input type Update</b>  must be <b>Combo</b> for "RName" property.<br />
+        <b>UI Form Properties: </b> <b>Input type Delete</b>  must be <b>ReadOnly</b> for all properties.<br />
+    </p>
+
+    <h4>
+        aspnetusermaskView
+    </h4>
+    <p>
+        <b>UI List Properties: </b> <b>Shown</b> must be checked for all properties.<br />
+        <b>UI Form Properties: </b> <b>Shown</b> must be checked for all properties.<br />
+        <b>UI Form Properties: </b> <b>Input type New</b>  must be <b>Default</b> for all properties.<br />
+        <b>UI Form Properties: </b> <b>Input type Update</b>  must be <b>Default</b> for all properties.<br />
+        <b>UI Form Properties: </b> <b>Input type Delete</b>  must be <b>ReadOnly</b> for all properties.<br />
+    </p>
+
+
+    <h4>
+        The table below defines the list of batches in correct order for generation.
+    </h4>
+
+    <table cellspacing="5" border="1">
+        <tr>
+            <td>
+                aspnetdashboardView
+            </td>
+            <td>
+                <ul>
+                    <li><b>13100-AspNetInterfasesBatch.json</b></li>
+                    <li><b>13400-AspNetWebApiService.json</b></li>
+                    <li><b>13420-AspNetSForm.json</b></li>
+                    <li><b>13500-AspNetEform.json</b></li>
+                    <li><b>13600-AspNetLform.json</b></li>
+                    <li><b>14205-AspNetChkDform.json</b></li>
+                </ul>
+            </td>
+            <td>
+                <b>UI List Properties: </b> <b>Shown</b> must be checked for all properties.<br />
+                <b>UI Form Properties: </b> <b>Shown</b> must be checked for all properties.<br />
+                <b>UI Form Properties: </b> <b>Input type New</b>  must be <b>Default</b> for all properties.<br />
+                <b>UI Form Properties: </b> <b>Input type Update</b>  must be <b>Default</b> for all properties.<br />
+                <b>UI Form Properties: </b> <b>Input type Delete</b>  must be <b>ReadOnly</b> for all properties.<br />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                aspnetmodelView
+            </td>
+            <td>
+                <ul>
+                    <li><b>13100-AspNetInterfasesBatch.json</b></li>
+                    <li><b>13400-AspNetWebApiService.json</b></li>
+                    <li><b>13420-AspNetSForm.json</b></li>
+                    <li><b>13500-AspNetEform.json</b></li>
+                    <li><b>13600-AspNetLform.json</b></li>
+                    <li><b>14200-AspNetChkMform.json</b></li>
+                </ul>
+
+            </td>
+            <td>
+                <b>UI List Properties: </b> <b>Shown</b> must be checked for all properties.<br />
+                <b>UI Form Properties: </b> <b>Shown</b> must be checked for all properties.<br />
+                <b>UI Form Properties: </b> <b>Input type New</b>  must be <b>Default</b> for all properties.<br />
+                <b>UI Form Properties: </b> <b>Input type Update</b>  must be <b>Default</b> for all properties.<br />
+                <b>UI Form Properties: </b> <b>Input type Delete</b>  must be <b>ReadOnly</b> for all properties.<br />
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                aspnetrolemaskView
+            </td>
+            <td>
+                <ul>
+                    <li><b>13100-AspNetInterfasesBatch.json</b></li>
+                    <li><b>13400-AspNetWebApiService.json</b></li>
+                    <li><b>13420-AspNetSForm.json</b></li>
+                    <li><b>13500-AspNetEform.json</b></li>
+                    <li><b>13600-AspNetLform.json</b></li>
+                    <li><b>14210-AspNetChkRform.json</b></li>
+                </ul>
+            </td>
+            <td>
+                <b>UI List Properties: </b> <b>Shown</b> must be checked only for "RoleName" and  "RoleDescription" properties.<br />
+                <b>UI Form Properties: </b> <b>Shown</b> must be checked for all properties.<br />
+                <b>UI Form Properties: </b> <b>New Line</b> must be checked for "RoleDescription", "Mask5", "MaskB" properties.<br />
+                <b>UI Form Properties: </b> <b>Input type New</b>  must be <b>Default</b> for all properties.<br />
+                <b>UI Form Properties: </b> <b>Input type Update</b>  must be <b>Default</b> for all properties.<br />
+                <b>UI Form Properties: </b> <b>Input type Delete</b>  must be <b>ReadOnly</b> for all properties.<br />
+            </td>
+        </tr>
+
+
+
+
+        <tr>
+            <td>
+                aspnetroleView
+            </td>
+            <td>
+                <ul>
+                    <li><b>13100-AspNetInterfasesBatch.json</b></li>
+                    <li><b>13400-AspNetWebApiService.json</b></li>
+                    <li><b>13420-AspNetSForm.json</b></li>
+                    <li><b>13500-AspNetEform.json</b></li>
+                    <li><b>13600-AspNetLform.json</b></li>
+                </ul>
+            </td>
+            <td>
+                <b>UI List Properties: </b> <b>Shown</b> must be checked for all properties.<br />
+                <b>UI Form Properties: </b> <b>Shown</b> must be checked for all properties.<br />
+                <b>UI Form Properties: </b> <b>Input type New</b>  must be <b>Default</b> for all properties.<br />
+                <b>UI Form Properties: </b> <b>Input type Update</b>  must be <b>Default</b> for all properties.<br />
+                <b>UI Form Properties: </b> <b>Input type Delete</b>  must be <b>ReadOnly</b> for all properties.<br />
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                aspnetuserView
+            </td>
+            <td>
+                <ul>
+                    <li><b>13100-AspNetInterfasesBatch.json</b></li>
+                    <li><b>13400-AspNetWebApiService.json</b></li>
+                    <li><b>13420-AspNetSForm.json</b></li>
+                    <li><b>13500-AspNetEform.json</b></li>
+                    <li><b>13600-AspNetLform.json</b></li>
+                </ul>
+            </td>
+            <td>
+                <b>UI List Properties: </b> <b>Shown</b> must be checked for all properties.<br />
+                <b>UI Form Properties: </b> <b>Shown</b> must be checked for all properties.<br />
+                <b>UI Form Properties: </b> <b>New Line</b> must be checked for "EmailConfirmed", "TwoFactorEnabled"<br />
+                <b>UI Form Properties: </b> <b>Input type New</b>  must be <b>Default</b> for all properties.<br />
+                <b>UI Form Properties: </b> <b>Input type Update</b>  must be <b>Default</b> for all properties.<br />
+                <b>UI Form Properties: </b> <b>Input type Delete</b>  must be <b>ReadOnly</b> for all properties.<br />
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                aspnetuserrolesView
+            </td>
+            <td>
+                <ul>
+                    <li><b>13100-AspNetInterfasesBatch.json</b></li>
+                    <li><b>13400-AspNetWebApiService.json</b></li>
+                    <li><b>13420-AspNetSForm.json</b></li>
+                    <li><b>13500-AspNetEform.json</b></li>
+                    <li><b>13600-AspNetLform.json</b></li>
+                </ul>
+            </td>
+            <td>
+                <b>UI List Properties: </b> <b>Shown</b> must be checked for all properties.<br />
+                <b>UI Form Properties: </b> <b>Shown</b> must be checked for all properties.<br />
+                <b>UI Form Properties: </b> <b>Input type New</b>  must be <b>ReadOnly</b> for "UserId" and "RoleId" properties.<br />
+                <b>UI Form Properties: </b> <b>Input type New</b>  must be <b>Search Dialog</b> for "UUserName" property.<br />
+                <b>UI Form Properties: </b> <b>Input type New</b>  must be <b>Combo</b> for "RName" property.<br />
+                <b>UI Form Properties: </b> <b>Input type Update</b>  must be <b>ReadOnly</b> for "UserId" and "RoleId" properties.<br />
+                <b>UI Form Properties: </b> <b>Input type Update</b>  must be <b>Search Dialog</b> for "UUserName" property.<br />
+                <b>UI Form Properties: </b> <b>Input type Update</b>  must be <b>Combo</b> for "RName" property.<br />
+                <b>UI Form Properties: </b> <b>Input type Delete</b>  must be <b>ReadOnly</b> for all properties.<br />
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                aspnetusermaskView
+            </td>
+            <td>
+                <ul>
+                    <li><b>13100-AspNetInterfasesBatch.json</b></li>
+                    <li><b>13401-AspNetWebApiService.json</b></li>
+                    <li><b>14215-AspNetlform.json</b></li>
+                </ul>
+            </td>
+            <td>
+                <b>UI List Properties: </b> <b>Shown</b> must be checked for all properties.<br />
+                <b>UI Form Properties: </b> <b>Shown</b> must be checked for all properties.<br />
+                <b>UI Form Properties: </b> <b>Input type New</b>  must be <b>Default</b> for all properties.<br />
+                <b>UI Form Properties: </b> <b>Input type Update</b>  must be <b>Default</b> for all properties.<br />
+                <b>UI Form Properties: </b> <b>Input type Delete</b>  must be <b>ReadOnly</b> for all properties.<br />
+            </td>
+        </tr>
+
+
+        <tr>
+            <td>
+                aspnetrolemaskView
+            </td>
+            <td>
+                <ul>
+                    <li><b>14220-AspNetO2m.json</b></li>
+                </ul>
+            </td>
+            <td>
+                <b>UI List Properties: </b> <b>Shown</b> must be checked only for "RoleName" and  "RoleDescription" properties.<br />
+                <b>UI Form Properties: </b> <b>Shown</b> must be checked for all properties.<br />
+                <b>UI Form Properties: </b> <b>New Line</b> must be checked for "RoleDescription", "Mask5", "MaskB" properties.<br />
+                <b>UI Form Properties: </b> <b>Input type New</b>  must be <b>Default</b> for all properties.<br />
+                <b>UI Form Properties: </b> <b>Input type Update</b>  must be <b>Default</b> for all properties.<br />
+                <b>UI Form Properties: </b> <b>Input type Delete</b>  must be <b>ReadOnly</b> for all properties.<br />
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                aspnetuserView
+            </td>
+            <td>
+                OPTIONAL
+                <ul>
+                    <li><b>14220-AspNetO2m.json</b></li>
+                </ul>
+            </td>
+            <td>
+                <b>UI List Properties: </b> <b>Shown</b> must be checked for all properties.<br />
+                <b>UI Form Properties: </b> <b>Shown</b> must be checked for all properties.<br />
+                <b>UI Form Properties: </b> <b>New Line</b> must be checked for "EmailConfirmed", "TwoFactorEnabled"<br />
+                <b>UI Form Properties: </b> <b>Input type New</b>  must be <b>Default</b> for all properties.<br />
+                <b>UI Form Properties: </b> <b>Input type Update</b>  must be <b>Default</b> for all properties.<br />
+                <b>UI Form Properties: </b> <b>Input type Delete</b>  must be <b>ReadOnly</b> for all properties.<br />
+            </td>
+        </tr>
+    </table>
+
+    <br /><br />
+    The script below produces the same for all views in one batch. <br />
+    You can generate the code step by step as described in the table above <br />
+    or you can generate all files for all views in one step by executing the following script.
+    <table cellspacing="5" border="1">
+        <tr>
+            <td>
+                14230-AspNetAllBatch.json
+            </td>
+        </tr>
+    </table>
+
+    <h3 id="HowToImport">How to import "aspnet...View" definitions</h3>
+    <strong>
+        Step #1: Find the file "aspnetchckdbcontext.json"
+    </strong>
+    <br />
+    Refer to the Microsoft documentation to find out where the "* .vsix" files are installed.<br />
+    And find the folder with 'CS2REACTJS.dll'-library.<br />
+    It should be something like this
+    <pre>
+    <code>
+            %AppData%\Local\Microsoft\VisualStudio\xxx\Extensions\yyy\
+        </code>
+    </pre>
+    wheere "xxx" and "yyy" are auto-generated names like "16.0_5e517fbc" or "jxefmsfk.cwd". <br />
+    In the folder with the file "CS2REACTJS.dll" should be the folder with the name "Templates". <br />
+    Go to "Templates\ContextsToImport"-folder <br />
+    "aspnetchckdbcontext.json"-file is there. <br />
+    Copy this file to a folder that will be easy to open later.<br /><br />
+
+    <strong>
+        Step #2: Run "ModelViews Wizard"
+    </strong><br />
+    In Visual Studio, right-click the folder in which you intend to create ViewModel classes.<br />
+    In the context menu, select "(2)ModelViews Wizard"<br />
+    On the first page of the wizard, click Next.<br />
+    On the second page, select Context-project and the "aspnetchckdbcontext"-DbContext and click Next.<br />
+    On the third page, select Entities-project and the "aspnetdashboardView"-Entity and click Next.<br />
+    <b>On the fourth page,</b><br />
+    Make sure that the combobox is empty.
+    <ul>
+        <li>Click "import"-button</li>
+        <li>In the dialog select "aspnetchckdbcontext.json"-file and click Ok</li>
+        <li>In the combobox select "aspnetdashboardView"</li>
+        <li>"Select view"-checkbox must set to "checked" state</li>
+        <li>Click "Next"</li>
+    </ul>
+    <b>On the fifth page,</b><br />
+    Make sure all properties are selected.
+    <ul>
+        <li>DashboardPk</li>
+        <li>DashboardName</li>
+        <li>DashboardDescription</li>
+    </ul>
+    And "Generate jsonProperties"-checkbox is checked.<br />
+    Click Next/Generate/Save buttons two times to create both classes.
+    <ul>
+        <li>aspnetdashboardView</li>
+        <li>aspnetdashboardViewPage</li>
+    </ul>
+    <strong>
+        Step #3: Repeat step 2 for all AspNet entities.
+    </strong><br />
+    <b>Note #1:</b> On the fourth page, for each entity you should click import-button.
+    <b>Import procedure executed ONLY for the selected entity and not for all.</b><br />
+    <b>Note #2:</b> The order in which ModelViews are created is important.</b>
+    Here is a correct order:
+    <ul>
+        <li>aspnetdashboardView</li>
+        <li>aspnetmodelView</li>
+        <li>aspnetrolemaskView</li>
+        <li>aspnetroleView</li>
+        <li>aspnetuserView</li>
+        <li>aspnetuserrolesView</li>
+        <li>aspnetusermaskView</li>
+    </ul>
+    <strong>
+        Step #4: Run "WebApiServices Wizard"
+    </strong><br />
+    In Visual Studio, right-click the folder in which you intend to create WebApi Service classes.<br />
+    In the context menu, select "(3)WebApiServices Wizard"<br />
+    On the first page of the wizard, click Next.<br />
+    On the second page, select Context-project and the "aspnetchckdbcontext"-DbContext and click Next.<br />
+    On the third page, select "aspnetdashboardView" (for example) and make sure that<br />
+    <b>Is Used By Filter</b> and <b>Is Used By Sorting</b> are checked according to the requirement<br />
+    Click Next.<br />
+    The following requirement must be met:
+    <br />
+    For <b>aspnetdashboardView(Page).cs</b>-ViewModel please use "DefaultWebApiService.cs.t4"-script to generate WebApi service.
+    <br />
+    For <b>aspnetmodelView(Page).cs</b>-ViewModel please use "DefaultWebApiService.cs.t4"-script to generate WebApi service.
+    <br />
+    For <b>aspnetrolemaskView(Page).cs</b>-ViewModel please use "DefaultWebApiService.cs.t4"-script to generate WebApi service.
+    <br />
+    For <b>aspnetroleView(Page).cs</b>-ViewModel please use "WebApiAspNetRoleService.cs.t4"-script to generate WebApi service.
+    <br />
+    For <b>aspnetusermaskView(Page).cs</b>-ViewModel please use "WebApiAspNetUserMasksService.cs.t4"-script to generate WebApi service.
+    <br />
+    For <b>aspnetuserrolesView(Page).cs</b>-ViewModel please use "WebApiAspNetUserRoles.cs.t4"-script to generate WebApi service.
+    <br />
+    For <b>aspnetuserView(Page).cs</b>-ViewModel please use "WebApiAspNetUserService.cs.t4"-script to generate WebApi service.
+    <br />
+    <b>Note #1:</b> The import procedure in step 2 also defines <b>Is Used By Filter</b> and <b>Is Used By Sorting</b>.
+
+    <strong>
+        Step #5: Run "Javascripts Wizard"
+    </strong><br />
+    In Visual Studio, right-click the "src\app"-folder of your REACTJS project.<br />
+    In the context menu, select "(4)Javascripts Wizard"<br />
+    On the first page of the wizard, click Next.<br />
+    On the second page, select Context-project and the "aspnetchckdbcontext"-DbContext and click Next.<br />
+    On the third page, select <b>"==Context=="</b> and click Next<br />
+    <b>On the fourth page,</b><br />
+    Click the "Import common staff"-button<br />
+    In the Open File dialog box, select the Wizard repository for your main context. You will find this file at the root-folder of your Visual Studio solution.<br />
+    Click Ok<br />
+    After importing 'common staff'<br />
+    Click "Back"-button<br />
+    On the third page, select <b>aspnetdashboardView</b> and click Next<br />
+    <b>You are on the fourth page again</b><br />
+    Click "Batch Processing"-button<br />
+    In the "Batch Actions"-dialog select "14230-AspNetAllBatch.json" and execute it.<br />
+    That's it.<br />
+    <b>Note #1:</b> The import procedure in step 2 also defines <b>UI List Properties</b> and <b>UI Form Properties</b>.<br />
+    So, you do not need to define them. Just make sure they are set according to the requirement.<br />
+    <br />
+
+
+
+
+
+</body>
+</html>

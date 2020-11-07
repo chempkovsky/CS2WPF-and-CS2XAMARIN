@@ -1,0 +1,468 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Dynamic;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Windows.Input;
+<#
+
+    
+    string NotificationEventArgsFolder      = "00228-NotificationEventArgs.cs";
+    string NotificationEventArgsClassName   = GetModelClassName(Model, NotificationEventArgsFolder);
+    string NotificationEventArgsNameSpace   = GetModelNameSpace(Model, NotificationEventArgsFolder);
+
+    string commandHelperModelFolder      = "00140-CommandHelper.cs";
+    string commandHelperModelClassName   = GetModelClassName(Model, commandHelperModelFolder);
+    string commandHelperModelNameSpace   = GetModelNameSpace(Model, commandHelperModelFolder);
+
+
+    string TablePaginationViewModelFolder      = "00250-TablePaginationViewModel.cs";
+    string TablePaginationViewModelClassName   = GetModelClassName(Model, TablePaginationViewModelFolder);
+    string TablePaginationViewModelNameSpace   = GetModelNameSpace(Model, TablePaginationViewModelFolder);
+
+
+    string TitlePropertyName = "Title";
+    string RowsPerPageOptionsPropertyName = "RowsPerPageOptions";
+    string RowsPerPagePropertyName = "RowsPerPage";
+    string SelectedFilterOperatorPropertyName = "SelectedFilterOperator";
+    string OnRowsPerPageChangedEventPropertyName = "OnRowsPerPageChangedEvent";
+    string TpPagePropertyName = "TpPage";
+    string FromTpCountPropertyName = "FromTpCount";
+    string ToTpCountPropertyName = "ToTpCount";
+    string TpCountPropertyName = "TpCount";
+    string BackIconButtonNamePropertyName = "BackIconButtonName";
+    string BackIconButtonTextPropertyName = "BackIconButtonText";
+    string BackIconButtonColorPropertyName = "BackIconButtonColor";
+    string NextIconButtonNamePropertyName = "NextIconButtonName";
+    string NextIconButtonTextPropertyName = "NextIconButtonText";
+    string NextIconButtonColorPropertyName = "NextIconButtonColor";
+    string BackButtonClickedCommandPropertyName = "BackButtonClickedCommand";
+    string NextButtonClickedCommandPropertyName = "NextButtonClickedCommand";
+    string OnPageChangedEventPropertyName = "OnPageChangedEvent";
+
+    List<string> nmSpaces = new List<string>();
+    if (TablePaginationViewModelNameSpace != NotificationEventArgsNameSpace) nmSpaces.Add(NotificationEventArgsNameSpace);
+    if ((TablePaginationViewModelNameSpace != commandHelperModelNameSpace) && (nmSpaces.IndexOf(commandHelperModelNameSpace) < 0)) 
+        nmSpaces.Add(commandHelperModelNameSpace);
+
+#>
+<# 
+    foreach(string ns in nmSpaces) {
+#>
+using <#= ns #>;
+<#
+    }
+#>
+
+
+namespace <#= TablePaginationViewModelNameSpace #> {
+    public class <#= TablePaginationViewModelClassName #>: INotifyPropertyChanged
+    {
+        #region INotifyPropertyChanged
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string name = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+        #endregion
+        #region <#= TitlePropertyName #>
+        string _<#= TitlePropertyName #> = "Rows per page";
+        public string <#= TitlePropertyName #>
+        {
+            get
+            {
+                return _<#= TitlePropertyName #>;
+            }
+            set
+            {
+                if (_<#= TitlePropertyName #> != value)
+                {
+                    _<#= TitlePropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion 
+        #region <#= RowsPerPageOptionsPropertyName #>
+        IEnumerable<int> _<#= RowsPerPageOptionsPropertyName #> = null;
+        public IEnumerable<int> <#= RowsPerPageOptionsPropertyName #>
+        {
+            get
+            {
+                return _<#= RowsPerPageOptionsPropertyName #>;
+            }
+            set
+            {
+                if (_<#= RowsPerPageOptionsPropertyName #> != value)
+                {
+                    _<#= RowsPerPageOptionsPropertyName #> = value;
+                    OnPropertyChanged();
+                    if (_<#= RowsPerPageOptionsPropertyName #> == null)
+                    {
+                        _<#= RowsPerPagePropertyName #> = 0;
+                    } else
+                    {
+                        if(_<#= RowsPerPageOptionsPropertyName #>.Count() < 1)
+                        {
+                            _<#= RowsPerPagePropertyName #> = 0;
+                        } else
+                        {
+                            _<#= RowsPerPagePropertyName #> = _<#= RowsPerPageOptionsPropertyName #>.First();
+                        }
+                    }
+                    OnPropertyChanged("<#= RowsPerPagePropertyName #>");
+                }
+            }
+        }
+        #endregion
+        #region <#= RowsPerPagePropertyName #>
+        int _<#= RowsPerPagePropertyName #> = 0;
+        public int <#= RowsPerPagePropertyName #>
+        {
+            get
+            {
+                return _<#= RowsPerPagePropertyName #>;
+            }
+            set
+            {
+                if (_<#= RowsPerPagePropertyName #> != value)
+                {
+                    <#= RowsPerPagePropertyName #> = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged("<#= FromTpCountPropertyName #>");
+                    OnPropertyChanged("<#= ToTpCountPropertyName #>");
+                    <#= TpPagePropertyName  #> = 0;
+                    if (<#= OnRowsPerPageChangedEventPropertyName  #> != null)
+                    {
+                        dynamic model = new ExpandoObject();
+                        model.<#= TpPagePropertyName  #> = <#= TpPagePropertyName  #>;
+                        model.<#= RowsPerPagePropertyName #> = <#= RowsPerPagePropertyName #>;
+                        var ev = new <#= NotificationEventArgsClassName #>() { Sender = this, Model = model };
+                        <#= OnRowsPerPageChangedEventPropertyName  #>(this, ev);
+                    }
+                }
+            }
+        }
+        #endregion
+        #region <#= TpCountPropertyName #>
+        int _<#= TpCountPropertyName #> = 0;
+        public int <#= TpCountPropertyName #>
+        {
+            get
+            {
+                return _<#= TpCountPropertyName #>;
+            }
+            set
+            {
+                if (_<#= TpCountPropertyName #> != value)
+                {
+                    _<#= TpCountPropertyName #> = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged("<#= FromTpCountPropertyName #>");
+                    OnPropertyChanged("<#= ToTpCountPropertyName #>");
+                }
+            }
+        }
+        #endregion
+        #region <#= TpPagePropertyName #>
+        int _<#= TpPagePropertyName #> = 0;
+        public int <#= TpPagePropertyName #>
+        {
+            get
+            {
+                return _<#= TpPagePropertyName #>;
+            }
+            set
+            {
+                if (_<#= TpPagePropertyName #> != value)
+                {
+                    _<#= TpPagePropertyName #> = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged("<#= FromTpCountPropertyName #>");
+                    OnPropertyChanged("<#= ToTpCountPropertyName #>");
+                }
+            }
+        }
+        #endregion
+        #region <#= FromTpCountPropertyName #>
+        public int <#= FromTpCountPropertyName #>
+        {
+            get
+            {
+                return <#= TpPagePropertyName #> * <#= RowsPerPagePropertyName #> + 1;
+            }
+        }
+        #endregion
+        #region <#= ToTpCountPropertyName #>
+        public int <#= ToTpCountPropertyName #>
+        {
+            get
+            {
+                int toCnt = <#= TpPagePropertyName #> * <#= RowsPerPagePropertyName #> + <#= RowsPerPagePropertyName #>;
+                if (toCnt > <#= TpCountPropertyName #>) toCnt = <#= TpCountPropertyName #>;
+                return toCnt;
+            }
+        }
+        #endregion
+
+        #region <#= BackIconButtonNamePropertyName #>
+        string _<#= BackIconButtonNamePropertyName #> = "ChevronLeft";
+        public string <#= BackIconButtonNamePropertyName #>
+        {
+            get
+            {
+                return _<#= BackIconButtonNamePropertyName #>;
+            }
+            set
+            {
+                if (_<#= BackIconButtonNamePropertyName #> != value)
+                {
+                    _<#= BackIconButtonNamePropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+        #region <#= BackIconButtonTextPropertyName #>
+        string _<#= BackIconButtonTextPropertyName #> = string.Empty;
+        public string <#= BackIconButtonTextPropertyName #>
+        {
+            get
+            {
+                return _<#= BackIconButtonTextPropertyName #>;
+            }
+            set
+            {
+                if (_<#= BackIconButtonTextPropertyName #> != value)
+                {
+                    _<#= BackIconButtonTextPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+        #region <#= BackIconButtonColorPropertyName #>
+        string _<#= BackIconButtonColorPropertyName #> = "Primary";
+        public string <#= BackIconButtonColorPropertyName #>
+        {
+            get
+            {
+                return _<#= BackIconButtonColorPropertyName #>;
+            }
+            set
+            {
+                if (_<#= BackIconButtonColorPropertyName #> != value)
+                {
+                    _<#= BackIconButtonColorPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+        #region <#= NextIconButtonNamePropertyName #>
+        string _<#= NextIconButtonNamePropertyName #> = "ChevronRight";
+        public string <#= NextIconButtonNamePropertyName #>
+        {
+            get
+            {
+                return _<#= NextIconButtonNamePropertyName #>;
+            }
+            set
+            {
+                if (_<#= NextIconButtonNamePropertyName #> != value)
+                {
+                    _<#= NextIconButtonNamePropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+        #region <#= NextIconButtonTextPropertyName #>
+        string _<#= NextIconButtonTextPropertyName #> = string.Empty;
+        public string <#= NextIconButtonTextPropertyName #>
+        {
+            get
+            {
+                return _<#= NextIconButtonTextPropertyName #>;
+            }
+            set
+            {
+                if (_<#= NextIconButtonTextPropertyName #> != value)
+                {
+                    _<#= NextIconButtonTextPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+        #region <#= NextIconButtonColorPropertyName #>
+        string _<#= NextIconButtonColorPropertyName #> = "Primary";
+        public string <#= NextIconButtonColorPropertyName #>
+        {
+            get
+            {
+                return _<#= NextIconButtonColorPropertyName #>;
+            }
+            set
+            {
+                if (_<#= NextIconButtonColorPropertyName #> != value)
+                {
+                    _<#= NextIconButtonColorPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+        #region <#= BackButtonClickedCommandPropertyName #>
+        private ICommand _<#= BackButtonClickedCommandPropertyName #>;
+        public ICommand <#= BackButtonClickedCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= BackButtonClickedCommandPropertyName #> ?? (_<#= BackButtonClickedCommandPropertyName #> = new CommandHelper((param) => <#= BackButtonClickedCommandPropertyName #>Action(param), (param) => <#= BackButtonClickedCommandPropertyName #>CanExecute(param)));
+            }
+        }
+        protected void <#= BackButtonClickedCommandPropertyName #>Action(object param)
+        {
+            if (<#= TpPagePropertyName #> > 0)
+            {
+                <#= TpPagePropertyName #> = <#= TpPagePropertyName #> - 1;
+                if (<#= OnPageChangedEventPropertyName #> != null)
+                {
+                    dynamic model = new ExpandoObject();
+                    model.<#= TpPagePropertyName #> = <#= TpPagePropertyName #>;
+                    model.<#= RowsPerPagePropertyName #> = <#= RowsPerPagePropertyName #>;
+                    var ev = new <#= NotificationEventArgsClassName #>() { Sender = this, Model = model };
+                    <#= OnPageChangedEventPropertyName #>(this, ev);
+                }
+            }
+        }
+        protected bool <#= BackButtonClickedCommandPropertyName #>CanExecute(object param)
+        {
+            return (<#= TpPagePropertyName #> > 0);
+        }
+        #endregion
+        #region <#= NextButtonClickedCommandPropertyName #>
+        private ICommand _<#= NextButtonClickedCommandPropertyName #>;
+        public ICommand <#= NextButtonClickedCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= NextButtonClickedCommandPropertyName #> ?? (_<#= NextButtonClickedCommandPropertyName #> = new CommandHelper((param) => <#= NextButtonClickedCommandPropertyName #>Action(param), (param) => <#= NextButtonClickedCommandPropertyName #>CanExecute(param)));
+            }
+        }
+        protected void <#= NextButtonClickedCommandPropertyName #>Action(object param)
+        {
+            if(<#= ToTpCountPropertyName #> < <#= TpCountPropertyName #>)
+            {
+                <#= TpPagePropertyName #> = <#= TpPagePropertyName #> + 1;
+                if (<#= OnPageChangedEventPropertyName #> != null)
+                {
+                    dynamic model = new ExpandoObject();
+                    model.<#= TpPagePropertyName #> = <#= TpPagePropertyName #>;
+                    model.<#= RowsPerPagePropertyName #> = <#= RowsPerPagePropertyName #>;
+                    var ev = new <#= NotificationEventArgsClassName #>() { Sender = this, Model = model };
+                    <#= OnPageChangedEventPropertyName #>(this, ev);
+                }
+            }
+        }
+        protected bool <#= NextButtonClickedCommandPropertyName #>CanExecute(object param)
+        {
+            return (<#= ToTpCountPropertyName #> < <#= TpCountPropertyName #>);
+        }
+        #endregion
+        #region <#= OnPageChangedEventPropertyName #>
+        public event Action<object, <#= NotificationEventArgsClassName #>> <#= OnPageChangedEventPropertyName #>;
+        #endregion
+        #region <#= OnRowsPerPageChangedEventPropertyName  #>
+        public event Action<object, <#= NotificationEventArgsClassName #>> <#= OnRowsPerPageChangedEventPropertyName  #>;
+        #endregion
+    }
+}
+
+<#+
+
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+
+#>

@@ -1,0 +1,33 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ parameter type="System.String"  name="DestinationNameSpace" #>
+<#@ parameter type="System.String"  name="DestinationClassName" #>
+using System;
+using System.Linq;
+using System.Web;
+using System.Collections.Generic;
+using System.Data.Entity;
+
+namespace <#= DestinationNameSpace #>
+{
+    public class <#= DestinationClassName #> : DbContext
+    {
+        
+        public <#= DestinationClassName #>()
+          : base("name=DefaultConnection")
+        {
+        }
+
+        public <#= DestinationClassName #>(string ConnectionString)
+          : base("name=" + ConnectionString)
+        {
+        }
+
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        {
+        }
+
+    }
+}

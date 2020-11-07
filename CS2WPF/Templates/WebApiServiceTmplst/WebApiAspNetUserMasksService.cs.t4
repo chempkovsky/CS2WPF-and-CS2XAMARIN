@@ -1,0 +1,501 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.Entity;
+using System.Data.Entity.Infrastructure;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Web.Http;
+using System.Web.Http.Description;
+using Microsoft.AspNet.Identity.Owin;
+using Microsoft.AspNet.Identity;
+
+<#
+    string aspnetrolemaskViewName = "aspnetrolemaskView";
+    
+    ModelViewSerializable rolemaskViewModel = GetModelViewByName(Context, aspnetrolemaskViewName);
+    string UserIdPropName           = "UserId";
+
+
+    string GetWithFilterMethodName      = "getwithfilter";
+    string GetCurrUserMasksMethodName   = "getcurrusermasks";
+
+
+    string OperatorSufix = "Oprtr";
+    string webApiServiceNameSpace = GetDestinationNameSpace(Model);
+    string rootEntityNameSpace = GetRootEntityNameSpace(Model);
+    string dbContextNameSpace = GetDbContextNameSpace(Context);
+    string viewModelNameSpace = GetViewModelNameSpace(Model);
+    string webApiServicePrefix = GetWebApiServicePrefix(Model);
+
+#>
+<# if (!string.IsNullOrEmpty(dbContextNameSpace)) {
+ if (!string.Equals(dbContextNameSpace, webApiServiceNameSpace)) { #>
+using <#= dbContextNameSpace #>;
+<# }} #>
+<# if (!string.IsNullOrEmpty(viewModelNameSpace)) {
+ if (!string.Equals(viewModelNameSpace, webApiServiceNameSpace)) {#>
+using <#= viewModelNameSpace #>;
+<# }} #>
+<# if (!string.IsNullOrEmpty(rootEntityNameSpace)) {
+ if (!string.Equals(rootEntityNameSpace, webApiServiceNameSpace)) {#>
+using <#= rootEntityNameSpace #>;
+<# }} #>
+
+namespace <#= webApiServiceNameSpace #> {
+
+    [RoutePrefix("<#= webApiServicePrefix #>")]
+    public class <#= Model.WebApiServiceName #>: ApiController
+    {
+        private int defaultPageSize = 50;
+        private int minPageSize = 5;
+        private int maxPageSize = 150;
+        private ApplicationUserManager _userManager;
+        private <#= Context.DbContextClassName #> db = new <#= Context.DbContextClassName #>();
+
+        public ApplicationUserManager UserManager
+        {
+            get
+            {
+                return _userManager ?? Request.GetOwinContext().GetUserManager<ApplicationUserManager>();
+            }
+            private set
+            {
+                _userManager = value;
+            }
+        }
+
+
+        [HttpGet]
+        [Route("<#= GetCurrUserMasksMethodName #>")]
+        [ResponseType(typeof(<#= Model.PageViewName #>))]
+        public IHttpActionResult <#= GetCurrUserMasksMethodName #>(){
+            <#= Model.PageViewName #> resultObject = new <#= Model.PageViewName #>() {
+                page = 1,
+                pagesize = 1,
+                pagecount = 1,
+                total = 1
+            };
+            resultObject.items = new List<<#= Model.ViewName #>>();
+            <#= Model.ViewName #> rsltItm =  new <#= Model.ViewName #>();
+            resultObject.items.Add(rsltItm);
+<#
+            for(int i = 0; i < Model.ScalarProperties.Count; i++) {
+                if ((!(Model.ScalarProperties[i].IsNullable)) && IsPropInteger(Model.ScalarProperties[i])) {
+#>
+            rsltItm.<#= GetTypeScriptPropertyName(Model.ScalarProperties[i], Model)#> = 0;
+<#
+                } 
+            }
+#>
+
+            string <#= UserIdPropName #> = User.Identity.GetUserId();
+            IList<string> rls = UserManager.GetRoles(UserId);
+            if(rls == null)
+            {
+                return Ok(resultObject);
+            }
+            if (rls.Count < 1)
+            {
+                return Ok(resultObject);
+            }
+            IQueryable<<#= rolemaskViewModel.RootEntityClassName #>> query = 
+                db.<#= rolemaskViewModel.RootEntityDbContextPropertyName #>
+                .Where(r => rls.Contains( r.RoleName ));
+            if(query.Any()) {
+                resultObject.items = new List<<#= Model.ViewName #>> { query.Select(itm => new <#= Model.ViewName #>() {
+<#
+            {
+            List<ModelViewPropertyOfVwSerializable> commonProps= new List<ModelViewPropertyOfVwSerializable>();
+            foreach(ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
+                if( rolemaskViewModel.ScalarProperties.Any(p => p.ViewPropertyName == prop.ViewPropertyName) ) {
+                    commonProps.Add(prop);
+                }
+            }
+            {
+                int cnt = commonProps.Count-1;
+                for(int i = 0; i < cnt; i++) {
+#>
+                            <#= GetTypeScriptPropertyName(commonProps[i], Model)#> = itm.<#= GetForeignKeyNameChain(commonProps[i].ForeignKeyNameChain) #><#= commonProps[i].OriginalPropertyName #>,
+<#
+                }
+#>
+                            <#= GetTypeScriptPropertyName(commonProps[cnt], Model)#> = itm.<#= GetForeignKeyNameChain(commonProps[cnt].ForeignKeyNameChain) #><#=  commonProps[cnt].OriginalPropertyName #>
+                    }).Aggregate(OredBits) };
+<#
+             }
+             }
+#>
+                resultObject.items[0].<#= UserIdPropName #> = <#= UserIdPropName #>;
+            } 
+            return Ok(resultObject);
+        }
+
+
+        [HttpGet]
+        [Route("<#= GetWithFilterMethodName #>")]
+        [ResponseType(typeof(<#= Model.PageViewName #>))]
+        public IHttpActionResult <#= GetWithFilterMethodName #>(<#
+        int counter = 0;
+        foreach(ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
+            if (prop.IsUsedByfilter) {
+                if(counter > 0) { 
+#>                , <# } #>[FromUri] <#= GetNullableType(prop)#>[] <#= GetFilterPropertyName(prop, Model) #> 
+                  , [FromUri] string[] <#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #> 
+<#
+                counter++;
+            }
+        }
+#>                <# if(counter > 0) {#>,<# } #> [FromUri] string[] orderby = null, [FromUri] int? page =null, [FromUri] int? pagesize = null)
+        {
+<#
+        foreach(ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
+            if(!prop.IsUsedByfilter) continue;
+            if(prop.OriginalPropertyName != UserIdPropName) continue;
+#>
+            bool hasNo = true;
+<#
+            if (!IsEntityTypeString(prop)) {
+#>
+            <#= prop.UnderlyingTypeName #> <#= UserIdPropName #>;
+<#
+            } else {
+#>
+            <#= prop.UnderlyingTypeName #> <#= UserIdPropName #> = null;
+<#
+            } 
+#>
+            if(<#=  GetFilterPropertyName(prop, Model) #> != null) {
+                if(<#=  GetFilterPropertyName(prop, Model) #>.Length > 0) {
+                    int filterCnt = <#=  GetFilterPropertyName(prop, Model) #>.Length;
+                    for(int i = 0; i < filterCnt; i++) {
+<#
+            if (!IsEntityTypeString(prop)) {
+#>
+                        if( !(<#=  GetFilterPropertyName(prop, Model) #>[i].HasValue) ) continue;
+                        <#= UserIdPropName #> = <#=  GetFilterPropertyName(prop, Model) #>[i].Value;
+<#
+            } else {
+#>
+                        if(  string.IsNullOrEmpty(<#=  GetFilterPropertyName(prop, Model) #>[i]) ) continue;
+                        <#= UserIdPropName #> = <#=  GetFilterPropertyName(prop, Model) #>[i];
+<#
+            } 
+#>
+                        hasNo = false;
+                        break;
+                    }
+
+                }
+            }
+<#
+        }
+#>
+            <#= Model.PageViewName #> resultObject = new <#= Model.PageViewName #>() {
+                page = 1,
+                pagesize = 1,
+                pagecount = 1,
+                total = 1,
+                items = new List<<#= Model.ViewName #>>()
+            };
+            <#= Model.ViewName #> rsltItm =  new <#= Model.ViewName #>();
+            resultObject.items.Add(rsltItm);
+<#
+            for(int i = 0; i < Model.ScalarProperties.Count; i++) {
+                if ((!(Model.ScalarProperties[i].IsNullable)) && IsPropInteger(Model.ScalarProperties[i])) {
+#>
+            rsltItm.<#= GetTypeScriptPropertyName(Model.ScalarProperties[i], Model)#> = 0;
+<#
+                } 
+            }
+#>
+            if (hasNo) {
+                return Ok(resultObject);
+            }
+            //
+            // ApplicationUser usr = UserManager.Users.Where(u => u.Id == <#= UserIdPropName #>).FirstOrDefault();
+            //if (usr == null) {
+            //    return Ok(resultObject);
+            //}
+            //List<string> rls = usr.Roles.Select(r => r.RoleId).ToList();
+            //
+
+            IList<string> rls = UserManager.GetRoles(UserId);
+            if(rls == null)
+            {
+                return Ok(resultObject);
+            }
+            if (rls.Count < 1)
+            {
+                return Ok(resultObject);
+            }
+            IQueryable<<#= rolemaskViewModel.RootEntityClassName #>> query = 
+                db.<#= rolemaskViewModel.RootEntityDbContextPropertyName #>
+                .Where(r => rls.Contains( r.RoleName ));
+            if(query.Any()) {
+                resultObject.items = new List<<#= Model.ViewName #>> { query.Select(itm => new <#= Model.ViewName #>() {
+<#
+            {
+            List<ModelViewPropertyOfVwSerializable> commonProps= new List<ModelViewPropertyOfVwSerializable>();
+            foreach(ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
+                if( rolemaskViewModel.ScalarProperties.Any(p => p.ViewPropertyName == prop.ViewPropertyName) ) {
+                    commonProps.Add(prop);
+                }
+            }
+            {
+                int cnt = commonProps.Count-1;
+                for(int i = 0; i < cnt; i++) {
+#>
+                            <#= GetTypeScriptPropertyName(commonProps[i], Model)#> = itm.<#= GetForeignKeyNameChain(commonProps[i].ForeignKeyNameChain) #><#= commonProps[i].OriginalPropertyName #>,
+<#
+                }
+#>
+                            <#= GetTypeScriptPropertyName(commonProps[cnt], Model)#> = itm.<#= GetForeignKeyNameChain(commonProps[cnt].ForeignKeyNameChain) #><#=  commonProps[cnt].OriginalPropertyName #>
+                    }).Aggregate(OredBits) };
+<#
+             }
+             }
+#>
+                resultObject.items[0].<#= UserIdPropName #> = <#= UserIdPropName #>;
+            } 
+            return Ok(resultObject);
+        } // the end of GetWithFilter()-method
+
+        <#= Model.ViewName #> OredBits(<#= Model.ViewName #> rslt, <#= Model.ViewName #> itm) {
+<#
+        {
+            List<ModelViewPropertyOfVwSerializable> commonProps= new List<ModelViewPropertyOfVwSerializable>();
+            foreach(ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
+                if( rolemaskViewModel.ScalarProperties.Any(p => p.ViewPropertyName == prop.ViewPropertyName) ) {
+                    commonProps.Add(prop);
+                }
+            }
+            int cnt = commonProps.Count;
+            for(int i = 0; i < cnt; i++) {
+                if ((!(commonProps[i].IsNullable)) && IsPropInteger(commonProps[i])) {
+#>
+                            rslt.<#= GetTypeScriptPropertyName(commonProps[i], Model)#> |= itm.<#= GetTypeScriptPropertyName(commonProps[i], Model)#>;
+<#
+                } else {
+#>
+                            rslt.<#= GetTypeScriptPropertyName(commonProps[i], Model)#> = itm.<#= GetTypeScriptPropertyName(commonProps[i], Model)#>;
+<#
+                }
+            }
+        }
+#>
+            return rslt;
+        }
+
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                db.Dispose();
+                if(_userManager != null) {
+                    _userManager.Dispose();
+                    _userManager = null;
+                }
+            }
+            base.Dispose(disposing);
+        }
+    }
+}
+
+<#+
+    String GetDestinationNameSpace(ModelViewSerializable model) {
+        string result = "";
+        if( !string.IsNullOrEmpty( model.WebApiServiceFolder ) ) {
+            result = model.WebApiServiceFolder.Replace("\\", ".");
+        }
+        if ( !string.IsNullOrEmpty(model.WebApiServiceDefaultProjectNameSpace) ) {
+            if (string.IsNullOrEmpty(result)) {
+                result = model.WebApiServiceDefaultProjectNameSpace;
+            } else {
+                result = model.WebApiServiceDefaultProjectNameSpace + "." + result;
+            }
+        }
+        return result;
+    }
+    String GetDbContextNameSpace(DbContextSerializable context) {
+        string result = context.DbContextFullClassName;
+        
+        if( !string.IsNullOrEmpty( result ) ) {
+            if( !string.IsNullOrEmpty(context.DbContextClassName) ) {
+                if(result.EndsWith("."+context.DbContextClassName)) {
+                    result = result.Substring(0, result.LastIndexOf("."+context.DbContextClassName));
+                }
+            }
+        }
+        return result;
+    }
+    String GetViewModelNameSpace(ModelViewSerializable model) {
+        string result = "";
+        if( !string.IsNullOrEmpty( model.ViewFolder ) ) {
+            result = model.ViewFolder.Replace("\\", ".");
+        }
+        if ( !string.IsNullOrEmpty(model.ViewDefaultProjectNameSpace) ) {
+            if (string.IsNullOrEmpty(result)) {
+                result = model.ViewDefaultProjectNameSpace;
+            } else {
+                result = model.ViewDefaultProjectNameSpace + "." + result;
+            }
+        }
+        return result;
+    }
+    String GetRootEntityNameSpace(ModelViewSerializable model) {
+        return model.RootEntityFullClassName.Substring(0, model.RootEntityFullClassName.LastIndexOf("." + model.RootEntityClassName));
+    }
+    List<String> GetNavigationPaths(ModelViewSerializable model)
+    {
+        List<String> locPaths = new List<String>();
+        if(model.ScalarProperties == null) return locPaths;
+        foreach (ModelViewPropertyOfVwSerializable prop in model.ScalarProperties)
+        {
+            if (string.IsNullOrEmpty(prop.ForeignKeyNameChain)) continue;
+            if (locPaths.Exists(itm => (itm.StartsWith(prop.ForeignKeyNameChain + ".") || (itm.Equals(prop.ForeignKeyNameChain))))) continue;
+            string s = locPaths.Where(itm => (prop.ForeignKeyNameChain.StartsWith(itm + ".") || (itm.Equals(prop.ForeignKeyNameChain)))).FirstOrDefault();
+            if (!string.IsNullOrEmpty(s))
+            {
+                locPaths.Remove(s);
+            }
+            locPaths.Add(prop.ForeignKeyNameChain);
+        }
+        return locPaths;
+    }
+    String GenerateIncludePaths(String src)
+    {
+        if (String.IsNullOrEmpty(src)) return "";
+        string[] sa = src.Split(new char[] { '.' });
+        StringBuilder sb = new StringBuilder(".Include(p => p." + sa[0] + ")");
+        for (int i = 1; i < sa.Length; i++)
+        {
+            sb.Append(".ThenInclude(p => p." + sa[i] + ")");
+        }
+        return sb.ToString();
+    }
+    String GetForeignKeyNameChain(String foreignKeyNameChain) {
+        if (String.IsNullOrEmpty(foreignKeyNameChain)) {
+            return "";
+        } else {
+            return foreignKeyNameChain + ".";
+        }
+    }
+    String GetWebApiServicePrefix(ModelViewSerializable model) {
+        string result = model.WebApiServiceName;
+        if( !string.IsNullOrEmpty( result ) ) {
+            if(result.EndsWith("Controller")) {
+                result = result.Substring(0, result.LastIndexOf("Controller"));
+            }
+            result = result.ToLower();
+        }
+        return result;
+    }
+    String GetNullableType(ModelViewPropertySerializable prop) {
+        if (prop.UnderlyingTypeName.Equals("System.String")) {
+            return prop.UnderlyingTypeName;
+        } else {
+			return prop.UnderlyingTypeName +"?";
+        }
+    }
+    String GetChainedPropertyName(ModelViewPropertySerializable prop) {
+        if (String.IsNullOrEmpty(prop.ForeignKeyNameChain)) {
+            return prop.OriginalPropertyName;
+        } else {
+            return prop.ForeignKeyNameChain + "." + prop.OriginalPropertyName;
+        }
+    }
+    bool IsEntityTypeString(ModelViewPropertySerializable prop) {
+        return prop.UnderlyingTypeName.Equals("System.String");
+    }
+
+    String GetFirstPrimKeyProperty(ModelViewSerializable model) {
+        return model.PrimaryKeyProperties.FirstOrDefault().OriginalPropertyName;
+    }
+
+    String GetLowerCasePropertyName(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+        string result = GetTypeScriptPropertyName(prop, model);
+        if (!string.IsNullOrEmpty(result)) {
+            result = result.ToLower();
+        }
+        return result;
+    }
+    bool IsRootEntityProperty(ModelViewPropertySerializable prop, ModelViewSerializable model) {
+        return string.IsNullOrEmpty(prop.ForeignKeyNameChain);
+    }
+    public string FirstLetterToUpper(string str)
+    {
+        if (str == null)
+            return null;
+        if (str.Length > 1)
+            return char.ToUpper(str[0]) + str.Substring(1);
+        return str.ToUpper();
+    }
+    public string FirstLetterToLower(string str)
+    {
+        if (str == null)
+            return null;
+        if (str.Length > 1)
+            return char.ToLower(str[0]) + str.Substring(1);
+        return str.ToUpper();
+    }
+    string GetTypeScriptPropertyName(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+        if (model.GenerateJSonAttribute) {
+            return prop.ViewPropertyName;
+        } else {
+            return FirstLetterToLower(prop.ViewPropertyName);
+        }
+    }
+    string GetFilterPropertyName(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+        if (model.GenerateJSonAttribute) {
+            return prop.JsonPropertyName;
+        } else {
+            return FirstLetterToLower(prop.ViewPropertyName);
+        }
+    }
+    string GetFilterPropertyOperatorName(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model, string operatorSufix) {
+        if (model.GenerateJSonAttribute) {
+            return prop.JsonPropertyName + operatorSufix;
+        } else {
+            return FirstLetterToLower(prop.ViewPropertyName) + operatorSufix;
+        }
+    }
+    bool IsPropInteger(ModelViewPropertyOfVwSerializable prop) {
+        if(prop == null) return false;
+        if(string.IsNullOrEmpty( prop.TypeFullName )) return false;
+        string tpNm = prop.TypeFullName.ToLower();
+        return 
+            "system.int16".Equals(tpNm) ||
+            "system.int32".Equals(tpNm) ||
+            "system.int64".Equals(tpNm) ||
+            "system.uint16".Equals(tpNm) ||
+            "system.uint32".Equals(tpNm) ||
+            "system.uint64".Equals(tpNm);
+    }
+    ModelViewSerializable GetModelViewByName(DbContextSerializable context, string viewName) {
+        if ((context == null) || (string.IsNullOrEmpty(viewName))) {
+           return null;
+        }
+        if (context.ModelViews == null) {
+           return null;
+        }
+        return context.ModelViews.Where(v => v.ViewName == viewName).FirstOrDefault();
+    }
+
+
+#>

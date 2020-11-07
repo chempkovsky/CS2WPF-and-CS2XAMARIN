@@ -1,0 +1,66 @@
+﻿<UserControl x:Class="CS2WPF.View.UserControlSelectFeatureFolder"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:CS2WPF.View"
+             xmlns:hlprs="clr-namespace:CS2WPF.Helpers.UI"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <TextBlock Grid.Row="1" Grid.Column="0" Margin="0 5 0 5" Text="Feature Action Type" HorizontalAlignment="Center" FontWeight="Bold" FontSize="16"/>
+        <TextBlock Grid.Row="2" Grid.Column="0" Margin="15 0 0 5" Text="Select Action Type" FontWeight="Bold"/>
+        <Grid Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <ComboBox  Grid.Column="0" IsEditable="False" Margin="10 7 10 7"
+                                       ItemsSource ="{Binding T4Folders}"
+                                       SelectedItem="{Binding T4SelectedFolder, Mode=TwoWay}" />
+            <Button Grid.Column="1" Margin="1,7,10,7" Width="120" Command="{Binding UiBtnFormCommandBatch}">batch processing</Button>
+            <!--<Button Grid.Column="2" Margin="1,7,10,7" Width="130" Command="{Binding UiBtnFormCommandImport}">Import common staff</Button>-->
+        </Grid>
+        <TextBlock Grid.Row="4" Grid.Column="0" Margin="15 5 0 5" Text="Enter file name(without extension)" FontWeight="Bold" />
+        <TextBox Grid.Row="5" Grid.Column="0" Margin="10 0 10 0" Text="{Binding FileName, UpdateSourceTrigger=PropertyChanged}" />
+        <TextBlock Grid.Row="6" Grid.Column="0" Margin="15 5 0 0" Text="Created Action Types:" FontWeight="Bold" />
+
+
+
+        <ListView Grid.Row="7" Grid.Column="0"    ItemsSource="{Binding CreatedActions}" >
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn  Header="Action type"  DisplayMemberBinding="{Binding FileType}"/>
+                    <GridViewColumn  Header="File Name"   DisplayMemberBinding="{Binding FileName}"/>
+                    <GridViewColumn  Header="Extension" DisplayMemberBinding="{Binding Extension}" />
+                    <GridViewColumn  Header="Project" Width="150"  DisplayMemberBinding="{Binding FileProject}" />
+                    <GridViewColumn  Header="Project Folder" Width="200" DisplayMemberBinding="{Binding FileFolder}" />
+                    <GridViewColumn  Header="Default Project NameSpace" Width="150" DisplayMemberBinding="{Binding FileDefaultProjectNameSpace}" />
+                </GridView>
+            </ListView.View>
+        </ListView>
+        <GridSplitter Grid.Row="8" Margin="5"  Grid.Column="0"  ShowsPreview="False" Height="5" 
+                      HorizontalAlignment="Stretch" VerticalAlignment="Center" 
+                      Background="{DynamicResource {x:Static SystemColors.ControlDarkDarkBrushKey}}"  />
+        <WebBrowser  Grid.Row="9" Margin="5" VerticalAlignment="Top" MinHeight="40" 
+                     hlprs:WebBrowserUtility.BindableSource="{Binding WebAddress}"
+                     ScrollViewer.HorizontalScrollBarVisibility="Auto" 
+                     ScrollViewer.VerticalScrollBarVisibility="Auto" 
+                     />
+
+
+    </Grid>
+</UserControl>

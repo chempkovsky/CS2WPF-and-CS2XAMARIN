@@ -1,0 +1,129 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+using System;
+using System.Windows;
+using System.Windows.Shapes;
+<#
+
+    string FillHelperModelFolder      = "00160-FillHelper.cs";
+    string FillHelperModelClassName   = GetModelClassName(Model, FillHelperModelFolder);
+    string FillHelperModelNameSpace   = GetModelNameSpace(Model, FillHelperModelFolder);
+    
+#>
+
+namespace <#= FillHelperModelNameSpace #> {
+    public static class <#= FillHelperModelClassName #>
+    {
+        private static void FillResourceKeyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is Shape)
+            {
+                var element = d as Shape;
+                if (element != null)
+                {
+                    if (e.NewValue == null)
+                        element.SetResourceReference(Shape.FillProperty, "");
+                    else
+                        element.SetResourceReference(Shape.FillProperty, e.NewValue);
+                }
+            }
+        }
+        public static readonly DependencyProperty FillResourceKeyProperty = DependencyProperty.RegisterAttached("FillResourceKey",
+            typeof(object),
+            typeof(<#= FillHelperModelClassName #>),
+            new PropertyMetadata(String.Empty, FillResourceKeyChanged));
+
+        public static void SetFillResourceKey(FrameworkElement element, object value)
+        {
+            element.SetValue(FillResourceKeyProperty, value);
+        }
+        public static object GetForegroundResourceKey(FrameworkElement element)
+        {
+            return element.GetValue(FillResourceKeyProperty);
+        }
+    }
+}
+
+<#+
+
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+
+#>

@@ -1,0 +1,58 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="sql" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2REACTJS" #>
+<#@ import namespace="CS2REACTJS.Model" #>
+<#@ import namespace="CS2REACTJS.Model.Serializable" #>
+<#@ parameter type="CS2REACTJS.Model.Serializable.AllowedFileTypesSerializable" name="AllowedFileTypes" #>
+<#@ parameter type="CS2REACTJS.Model.Serializable.FeatureContextSerializable" name="FeatureContext" #>
+<#@ parameter type="CS2REACTJS.Model.Serializable.FeatureSerializable" name="Feature" #>
+<#@ parameter type="CS2REACTJS.Model.Serializable.DbContextSerializable" name="Context" #>
+<#
+//
+// Before you starts:
+// Please reset value for [startFromId]
+//
+    int startFromId= 0;
+#>
+/*
+USE [SecurityDataBase]
+GO
+*/
+<#
+
+    string insertSql = "insert into [dbo].[securitymodels]([ModelPk], [ModelName], [ModelDescription]) values (";
+    int currentId = startFromId;
+    foreach(ModelViewSerializable modelViewSerializable in Context.ModelViews) {
+#>
+    <#= insertSql #> <#= currentId #>, '<#= modelViewSerializable.ViewName #>', 'Description for <#= modelViewSerializable.ViewName #>')
+    go
+
+<#
+        currentId++;
+    }
+#>
+/*
+----------------------------------------------------------------------------------
+USE [AspNetSecurityDataBase]
+GO
+*/
+<#
+    insertSql = "insert into [dbo].[aspnetmodels]([ModelPk], [ModelName], [ModelDescription]) values (";
+    currentId = startFromId;
+    foreach(ModelViewSerializable modelViewSerializable in Context.ModelViews) {
+#>
+    <#= insertSql #> <#= currentId #>, '<#= modelViewSerializable.ViewName #>', 'Description for <#= modelViewSerializable.ViewName #>')
+    go
+
+<#
+        currentId++;
+    }
+#>
+
+

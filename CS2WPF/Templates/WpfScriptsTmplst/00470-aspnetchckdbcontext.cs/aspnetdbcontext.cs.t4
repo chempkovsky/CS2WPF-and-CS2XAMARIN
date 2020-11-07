@@ -1,0 +1,196 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2REACTJS" #>
+<#@ import namespace="CS2REACTJS.Model" #>
+<#@ import namespace="CS2REACTJS.Model.Serializable" #>
+<#@ parameter type="CS2REACTJS.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2REACTJS.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="System.String" name="DefaultProjectNameSpace" #>
+
+<#
+
+    string aspnetroleFolder             = "00400-aspnetrole.cs";
+    string aspnetuserFolder             = "00410-aspnetuser.cs";
+    string aspnetuserroleFolder         = "00420-aspnetuserroles.cs";
+    string aspnetdbcontextFolder        = "00430-aspnetdbcontext.cs";
+    string aspnetusermaskFolder         = "00430-aspnetusermask.cs";
+
+    string aspnetrolemaskFolder         = "00440-aspnetrolemask.cs";
+    string aspnetmodelFolder            = "00450-aspnetmodel.cs";
+    string aspnetdashboardFolder        = "00460-aspnetdashboard.cs";
+
+
+    string aspnetchckdbcontextFolder    = "00470-aspnetchckdbcontext.cs";
+#>
+
+using System;
+using System.Linq;
+using System.Web;
+using System.Collections.Generic;
+using System.Data.Entity;
+
+/*
+    This is a dummy(mock) class, and you must remove it from the project after generating the user interface.
+*/
+
+namespace <#= GetNameSpaceName(Model, aspnetchckdbcontextFolder, DefaultProjectNameSpace) #>
+{
+    public class <#= GetEntityClassName(Model, aspnetchckdbcontextFolder) #> : DbContext
+    {
+
+        public <#= GetEntityClassName(Model, aspnetchckdbcontextFolder) #>()
+          : base("name=DefaultConnection")
+        {
+        }
+
+        public <#= GetEntityClassName(Model, aspnetchckdbcontextFolder) #>(string ConnectionString)
+          : base("name=" + ConnectionString)
+        {
+        }
+
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        {
+
+            modelBuilder.Entity<<#= GetEntityClassName(Model, aspnetmodelFolder) #>>().
+                Property(p => p.ModelPk).HasDatabaseGeneratedOption(System.ComponentModel.DataAnnotations.Schema.DatabaseGeneratedOption.None);
+            modelBuilder.Entity<<#= GetEntityClassName(Model, aspnetdashboardFolder) #>>().
+                Property(p => p.DashboardPk).HasDatabaseGeneratedOption(System.ComponentModel.DataAnnotations.Schema.DatabaseGeneratedOption.None);
+
+
+            modelBuilder.Entity<<#= GetEntityClassName(Model, aspnetmodelFolder) #>>().HasKey(p => p.ModelPk);
+            modelBuilder.Entity<<#= GetEntityClassName(Model, aspnetdashboardFolder) #>>().HasKey(p => p.DashboardPk);
+            modelBuilder.Entity<<#= GetEntityClassName(Model, aspnetrolemaskFolder) #>>().HasKey(p => p.RoleName);
+
+
+
+//-------------------------------------------
+// begin code to remove
+
+            modelBuilder.Entity<<#= GetEntityClassName(Model, aspnetuserFolder) #>>().
+                Property(p => p.Id).HasDatabaseGeneratedOption(System.ComponentModel.DataAnnotations.Schema.DatabaseGeneratedOption.Computed);
+            modelBuilder.Entity<<#= GetEntityClassName(Model, aspnetroleFolder) #>>().
+                Property(p => p.Id).HasDatabaseGeneratedOption(System.ComponentModel.DataAnnotations.Schema.DatabaseGeneratedOption.Computed);
+
+            modelBuilder.Entity<<#= GetEntityClassName(Model, aspnetusermaskFolder) #>>().HasKey(p => p.UserId);
+            modelBuilder.Entity<<#= GetEntityClassName(Model, aspnetuserroleFolder) #>>().HasKey(p => new { p.UserId, p.RoleId });
+            modelBuilder.Entity<<#= GetEntityClassName(Model, aspnetuserFolder) #>>().HasKey(p => p.Id);
+            modelBuilder.Entity<<#= GetEntityClassName(Model, aspnetroleFolder) #>>().HasKey(p => p.Id);
+
+            modelBuilder.Entity<<#= GetEntityClassName(Model, aspnetuserroleFolder) #>>().HasRequired(d => d.AspNetUser)
+                .WithMany(m => m.UserRoles)
+                .HasForeignKey(d => d.UserId);
+
+            modelBuilder.Entity<<#= GetEntityClassName(Model, aspnetuserroleFolder) #>>().HasRequired(d => d.AspNetRole)
+                .WithMany(m => m.UserRoles)
+                .HasForeignKey(d => d.RoleId);
+
+
+            modelBuilder.Entity<<#= GetEntityClassName(Model, aspnetusermaskFolder) #>>().HasRequired(d => d.AspNetUser)
+                .WithMany(m => m.UserMasks)
+                .HasForeignKey(d => d.UserId);
+
+// end code to remove
+//-------------------------------------------
+
+
+        }
+
+//-------------------------------------------
+// begin code to remove
+
+        public DbSet< <#= GetEntityClassName(Model, aspnetroleFolder) #> > aspnetroleDbSet
+        {
+            get;
+            set;
+        }
+
+        public DbSet< <#= GetEntityClassName(Model, aspnetuserFolder) #> > aspnetuserDbSet
+        {
+            get;
+            set;
+        }
+
+        public DbSet< <#= GetEntityClassName(Model, aspnetuserroleFolder) #> > aspnetuserroleDbSet
+        {
+            get;
+            set;
+        }
+
+        public DbSet< <#= GetEntityClassName(Model, aspnetusermaskFolder) #> > aspnetusermaskDbSet
+        {
+            get;
+            set;
+        }
+
+
+// end code to remove
+//-------------------------------------------
+        public DbSet< <#= GetEntityClassName(Model, aspnetmodelFolder) #> > aspnetmodellDbSet
+        {
+            get;
+            set;
+        }
+
+        public DbSet< <#= GetEntityClassName(Model, aspnetdashboardFolder) #> > aspnetdashboardDbSet
+        {
+            get;
+            set;
+        }
+
+        public DbSet< <#= GetEntityClassName(Model, aspnetrolemaskFolder) #> > aspnetrolemaskDbSet
+        {
+            get;
+            set;
+        }
+
+
+    }
+}
+
+<#+
+    string GetEntityClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType) ) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        return refItem.FileName;
+    }
+    string GetNameSpaceName(ModelViewSerializable model, string currFolder, string  DefaultProjectNameSpace) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(currFolder)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable curItem= 
+            model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+        if (curItem == null) {
+            return result;
+        }
+        result = curItem.FileFolder.Replace("\\",".");
+        if(string.IsNullOrEmpty(DefaultProjectNameSpace)) {
+            return result;
+        } 
+        return DefaultProjectNameSpace + "." + result;
+    }
+
+
+#>

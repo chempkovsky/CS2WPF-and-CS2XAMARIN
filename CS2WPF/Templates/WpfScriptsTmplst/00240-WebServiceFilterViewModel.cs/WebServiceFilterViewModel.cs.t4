@@ -1,0 +1,547 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using System.Windows;
+using System.Windows.Input;
+
+<#
+    string IWebServiceFilterDefInterfaceFolder      = "00200-IWebServiceFilterDefInterface.cs";
+    string IWebServiceFilterDefInterfaceClassName   = GetModelClassName(Model, IWebServiceFilterDefInterfaceFolder);
+    string IWebServiceFilterDefInterfaceNameSpace   = GetModelNameSpace(Model, IWebServiceFilterDefInterfaceFolder);
+
+    string IWebServiceFilterOperatorInterfaceFolder      = "00202-IWebServiceFilterOperatorInterface.cs";
+    string IWebServiceFilterOperatorInterfaceClassName   = GetModelClassName(Model, IWebServiceFilterOperatorInterfaceFolder);
+    string IWebServiceFilterOperatorInterfaceNameSpace   = GetModelNameSpace(Model, IWebServiceFilterOperatorInterfaceFolder);
+
+    string IWebServiceFilterRsltInterfaceFolder      = "00204-IWebServiceFilterRsltInterface.cs";
+    string IWebServiceFilterRsltInterfaceClassName   = GetModelClassName(Model, IWebServiceFilterRsltInterfaceFolder);
+    string IWebServiceFilterRsltInterfaceNameSpace   = GetModelNameSpace(Model, IWebServiceFilterRsltInterfaceFolder);
+
+    string NotificationEventArgsFolder      = "00228-NotificationEventArgs.cs";
+    string NotificationEventArgsClassName   = GetModelClassName(Model, NotificationEventArgsFolder);
+    string NotificationEventArgsNameSpace   = GetModelNameSpace(Model, NotificationEventArgsFolder);
+
+    string WebServiceFilterRsltFolder      = "00214-WebServiceFilterRslt.cs";
+    string WebServiceFilterRsltClassName   = GetModelClassName(Model, WebServiceFilterRsltFolder);
+    string WebServiceFilterRsltNameSpace   = GetModelNameSpace(Model, WebServiceFilterRsltFolder);
+
+    string IWebServiceFilterMenuInterfaceFolder      = "00206-IWebServiceFilterMenuInterface.cs";
+    string IWebServiceFilterMenuInterfaceClassName   = GetModelClassName(Model, IWebServiceFilterMenuInterfaceFolder);
+    string IWebServiceFilterMenuInterfaceNameSpace   = GetModelNameSpace(Model, IWebServiceFilterMenuInterfaceFolder);
+
+    string commandHelperModelFolder      = "00140-CommandHelper.cs";
+    string commandHelperModelClassName   = GetModelClassName(Model, commandHelperModelFolder);
+    string commandHelperModelNameSpace   = GetModelNameSpace(Model, commandHelperModelFolder);
+
+    string IWebServiceFilterViewModelInterfaceFolder      = "00239-IWebServiceFilterViewModelInterface.cs";
+    string IWebServiceFilterViewModelInterfaceClassName   = GetModelClassName(Model, IWebServiceFilterViewModelInterfaceFolder);
+    string IWebServiceFilterViewModelInterfaceNameSpace   = GetModelNameSpace(Model, IWebServiceFilterViewModelInterfaceFolder);
+
+
+    string WebServiceFilterViewModelFolder      = "00240-WebServiceFilterViewModel.cs";
+    string WebServiceFilterViewModelClassName   = GetModelClassName(Model, WebServiceFilterViewModelFolder);
+    string WebServiceFilterViewModelNameSpace   = GetModelNameSpace(Model, WebServiceFilterViewModelFolder);
+
+    string FilterDefinitionsPropertyName = "FilterDefinitions";
+    string FilterOperatorsPropertyName = "FilterOperators";
+    string HiddenFiltersPropertyName = "HiddenFilters";
+    string FiltersPropertyName = "Filters";
+    string ShowBackBtnPropertyName = "ShowBackBtn";
+    string ShowBackBtnVisibilityPropertyName = "ShowBackBtnVisibility";
+    string ShowAddFilterBtnPropertyName = "ShowAddFilterBtn";
+    string AddFilterBtnVisibilityPropertyName = "AddFilterBtnVisibility";
+    string CaptionPropertyName = "Caption";
+    string BackBtnClickedCommandPropertyName = "BackBtnClickedCommand";
+    string BackBtnClickedCommandAsEventPropertyName = "BackBtnClickedCommandAsEvent";
+    string AddFilterBtnClickedCommandPropertyName = "AddFilterBtnClickedCommand";
+    string RemoveFilterBtnClickedCommandPropertyName = "RemoveFilterBtnClickedCommand";
+    string RemoveAllFiltersBtnClickedCommandPropertyName = "RemoveAllFiltersBtnClickedCommand";
+    string ApplyFilterBtnClickedCommandPropertyName = "ApplyFilterBtnClickedCommand";
+    string ApplyFilterBtnClickedCommandAsEventPropertyName = "ApplyFilterBtnClickedCommandAsEvent";
+    string ContainerMenuItemsPropertyName = "ContainerMenuItems";
+    string ContainerMenuItemClickedCommandPropertyName = "ContainerMenuItemClickedCommand";
+    string ContainerMenuItemClickedCommandAsEventPropertyName = "ContainerMenuItemClickedCommandAsEvent";
+
+    List<string> nmSpaces = new List<string>();
+    if (WebServiceFilterViewModelNameSpace != IWebServiceFilterDefInterfaceNameSpace) nmSpaces.Add(IWebServiceFilterDefInterfaceNameSpace);
+    if ((WebServiceFilterViewModelNameSpace != IWebServiceFilterOperatorInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterOperatorInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IWebServiceFilterOperatorInterfaceNameSpace);
+    if ((WebServiceFilterViewModelNameSpace != IWebServiceFilterRsltInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IWebServiceFilterRsltInterfaceNameSpace);
+    if ((WebServiceFilterViewModelNameSpace != NotificationEventArgsNameSpace) && (nmSpaces.IndexOf(NotificationEventArgsNameSpace) < 0)) 
+        nmSpaces.Add(NotificationEventArgsNameSpace);
+    if ((WebServiceFilterViewModelNameSpace != WebServiceFilterRsltNameSpace) && (nmSpaces.IndexOf(WebServiceFilterRsltNameSpace) < 0)) 
+        nmSpaces.Add(WebServiceFilterRsltNameSpace);
+    if ((WebServiceFilterViewModelNameSpace != IWebServiceFilterMenuInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterMenuInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IWebServiceFilterMenuInterfaceNameSpace);
+    if ((WebServiceFilterViewModelNameSpace != commandHelperModelNameSpace) && (nmSpaces.IndexOf(commandHelperModelNameSpace) < 0)) 
+        nmSpaces.Add(commandHelperModelNameSpace);
+    if ((WebServiceFilterViewModelNameSpace != commandHelperModelNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterViewModelInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IWebServiceFilterViewModelInterfaceNameSpace);
+
+
+#>
+<# 
+    foreach(string ns in nmSpaces) {
+#>
+using <#= ns #>;
+<#
+    }
+#>
+
+
+
+namespace <#= WebServiceFilterViewModelNameSpace #> {
+    public class <#= WebServiceFilterViewModelClassName #>: INotifyPropertyChanged, <#= IWebServiceFilterViewModelInterfaceClassName #>
+    {
+        #region INotifyPropertyChanged
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string name = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+        #endregion
+        #region <#= FilterDefinitionsPropertyName #>
+        IEnumerable<<#= IWebServiceFilterDefInterfaceClassName #>> _<#= FilterDefinitionsPropertyName #> = null;
+        public IEnumerable<<#= IWebServiceFilterDefInterfaceClassName #>> <#= FilterDefinitionsPropertyName #>
+        {
+            get
+            {
+                return _<#= FilterDefinitionsPropertyName #>;
+            }
+            set
+            {
+                if (_<#= FilterDefinitionsPropertyName #> != value)
+                {
+                    _<#= FilterDefinitionsPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+        #region <#= FilterOperatorsPropertyName #>
+        IEnumerable<<#= IWebServiceFilterOperatorInterfaceClassName #>> _<#= FilterOperatorsPropertyName #> = new List<<#= IWebServiceFilterOperatorInterfaceClassName #>>()
+        {
+            new WebServiceFilterOperator(){oName= "eq", oCaption= "=="},
+            new WebServiceFilterOperator(){oName= "gt", oCaption= ">="},
+            new WebServiceFilterOperator(){oName= "lt", oCaption= "=<"},
+            new WebServiceFilterOperator(){oName= "ne", oCaption= "<>"},
+            new WebServiceFilterOperator(){oName= "lk", oCaption= "Like"},
+        };
+        public IEnumerable<<#= IWebServiceFilterOperatorInterfaceClassName #>> <#= FilterOperatorsPropertyName #>
+        {
+            get
+            {
+                return _<#= FilterOperatorsPropertyName #>;
+            }
+            set
+            {
+                if (_<#= FilterOperatorsPropertyName #> != value)
+                {
+                    _<#= FilterOperatorsPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+        #region <#= HiddenFiltersPropertyName #>
+        IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>> _<#= HiddenFiltersPropertyName #> = null;
+        public IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>> <#= HiddenFiltersPropertyName #>
+        {
+            get
+            {
+                return _<#= HiddenFiltersPropertyName #>;
+            }
+            set
+            {
+                if (_<#= HiddenFiltersPropertyName #> != value)
+                {
+                    _<#= HiddenFiltersPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+        #region <#= FiltersPropertyName #>
+        ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>> _<#= FiltersPropertyName #> = new ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>()
+        {
+            new <#= WebServiceFilterRsltClassName #>()
+        };
+        public ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>> <#= FiltersPropertyName #>
+        {
+            get
+            {
+                return _<#= FiltersPropertyName #>;
+            }
+            set
+            {
+                if (_<#= FiltersPropertyName #> != value)
+                {
+                    _<#= FiltersPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+        #region <#= ShowBackBtnPropertyName #>
+        bool _<#= ShowBackBtnPropertyName #> = false;
+        public bool <#= ShowBackBtnPropertyName #>
+        {
+            get
+            {
+                return _<#= ShowBackBtnPropertyName #>;
+            }
+            set
+            {
+                if (_<#= ShowBackBtnPropertyName #> != value)
+                {
+                    _<#= ShowBackBtnPropertyName #> = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged("<#= ShowBackBtnVisibilityPropertyName #>");
+                }
+            }
+        }
+        public Visibility <#= ShowBackBtnVisibilityPropertyName #>
+        {
+            get
+            {
+                if (<#= ShowBackBtnPropertyName #>) return Visibility.Visible;
+                return Visibility.Collapsed;
+            }
+        }
+
+        #endregion
+        #region  <#= ShowAddFilterBtnPropertyName #>
+        bool _<#= ShowAddFilterBtnPropertyName #> = true;
+        public bool <#= ShowAddFilterBtnPropertyName #>
+        {
+            get
+            {
+                return _<#= ShowAddFilterBtnPropertyName #>;
+            }
+            set
+            {
+                if (_<#= ShowAddFilterBtnPropertyName #> != value)
+                {
+                    _<#= ShowAddFilterBtnPropertyName #> = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged("<#= AddFilterBtnVisibilityPropertyName #>");
+                }
+            }
+        }
+        public Visibility <#= AddFilterBtnVisibilityPropertyName #>
+        {
+            get
+            {
+                if (<#= ShowAddFilterBtnPropertyName #>) return Visibility.Visible;
+                return Visibility.Collapsed;
+            }
+        }
+
+        #endregion
+        #region <#= CaptionPropertyName #>
+        public string _<#= CaptionPropertyName #> = string.Empty;
+        public string <#= CaptionPropertyName #>
+        {
+            get
+            {
+                return _<#= CaptionPropertyName #>;
+            }
+            set
+            {
+                if (_<#= CaptionPropertyName #> != value)
+                {
+                    _<#= CaptionPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+        #region <#= BackBtnClickedCommandPropertyName #>
+        private ICommand _<#= BackBtnClickedCommandPropertyName #>;
+        public ICommand <#= BackBtnClickedCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= BackBtnClickedCommandPropertyName #> ?? (_<#= BackBtnClickedCommandPropertyName #> = new CommandHelper((param) => BackBtnClickedCommandAction(param), (param) => BackBtnClickedCommandCanExecute(param)));
+            }
+        }
+        protected void BackBtnClickedCommandAction(object param)
+        {
+            if (<#= BackBtnClickedCommandAsEventPropertyName #> != null)
+            {
+                var ev = new <#= NotificationEventArgsClassName #>() { Sender = this, Model = null };
+                <#= BackBtnClickedCommandAsEventPropertyName #>(this, ev);
+            }
+        }
+        protected bool BackBtnClickedCommandCanExecute(object param)
+        {
+            return <#= ShowBackBtnPropertyName #>;
+        }
+        public event Action<object, <#= NotificationEventArgsClassName #>> <#= BackBtnClickedCommandAsEventPropertyName #>;
+        #endregion
+        #region <#= AddFilterBtnClickedCommandPropertyName #>
+        private ICommand _<#= AddFilterBtnClickedCommandPropertyName #>;
+        public ICommand <#= AddFilterBtnClickedCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= AddFilterBtnClickedCommandPropertyName #> ?? (_<#= AddFilterBtnClickedCommandPropertyName #> = new CommandHelper((param) => AddFilterBtnClickedCommandAction(param), (param) => AddFilterBtnClickedCommandCanExecute(param)));
+            }
+        }
+        protected void AddFilterBtnClickedCommandAction(object param)
+        {
+            if (_<#= FiltersPropertyName #> == null) <#= FiltersPropertyName #> = new ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>();
+            <#= FiltersPropertyName #>.Add(new <#= WebServiceFilterRsltClassName #>());
+        }
+        protected bool AddFilterBtnClickedCommandCanExecute(object param)
+        {
+            return <#= ShowAddFilterBtnPropertyName #>;
+        }
+        #endregion
+        #region <#= RemoveFilterBtnClickedCommandPropertyName #>
+        private ICommand _<#= RemoveFilterBtnClickedCommandPropertyName #>;
+        public ICommand <#= RemoveFilterBtnClickedCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= RemoveFilterBtnClickedCommandPropertyName #> ?? (_<#= RemoveFilterBtnClickedCommandPropertyName #> = new CommandHelper((param) => RemoveFilterBtnClickedCommandAction(param), (param) => RemoveFilterBtnClickedCommandCanExecute(param)));
+            }
+        }
+        protected void RemoveFilterBtnClickedCommandAction(object param)
+        {
+            if (_<#= FiltersPropertyName #> == null) <#= FiltersPropertyName #> = new ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>();
+            if (<#= FiltersPropertyName #>.Count < 1)
+            {
+                <#= FiltersPropertyName #>.Add(new <#= WebServiceFilterRsltClassName #>());
+                return;
+            }
+            if (<#= FiltersPropertyName #>.Count < 2)
+            {
+                return;
+            }
+            <#= NotificationEventArgsClassName #> ev = param as <#= NotificationEventArgsClassName #>;
+            if (ev != null) {
+                <#= IWebServiceFilterRsltInterfaceClassName #> model = ev.Model as <#= IWebServiceFilterRsltInterfaceClassName #>;
+                Filters.Remove(model);
+            }
+        }
+        protected bool RemoveFilterBtnClickedCommandCanExecute(object param)
+        {
+            return true;
+        }
+        #endregion
+        #region <#= RemoveAllFiltersBtnClickedCommandPropertyName #>
+        private ICommand _<#= RemoveAllFiltersBtnClickedCommandPropertyName #>;
+        public ICommand <#= RemoveAllFiltersBtnClickedCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= RemoveAllFiltersBtnClickedCommandPropertyName #> ?? (_<#= RemoveAllFiltersBtnClickedCommandPropertyName #> = new CommandHelper((param) => RemoveAllFiltersBtnClickedCommandAction(param), (param) => RemoveAllFiltersBtnClickedCommandCanExecute(param)));
+            }
+        }
+        protected void RemoveAllFiltersBtnClickedCommandAction(object param)
+        {
+            if (_<#= FiltersPropertyName #> == null) <#= FiltersPropertyName #> = new ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>();
+            <#= FiltersPropertyName #>.Clear();
+            if (<#= FiltersPropertyName #>.Count < 1)
+            {
+                <#= FiltersPropertyName #>.Add(new <#= WebServiceFilterRsltClassName #>());
+                return;
+            }
+        }
+        protected bool RemoveAllFiltersBtnClickedCommandCanExecute(object param)
+        {
+            return true;
+        }
+        #endregion
+        #region <#= ApplyFilterBtnClickedCommandPropertyName #>
+        private ICommand _<#= ApplyFilterBtnClickedCommandPropertyName #>;
+        public ICommand <#= ApplyFilterBtnClickedCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= ApplyFilterBtnClickedCommandPropertyName #> ?? (_<#= ApplyFilterBtnClickedCommandPropertyName #> = new CommandHelper((param) => ApplyFilterBtnClickedCommandAction(param), (param) => ApplyFilterBtnClickedCommandCanExecute(param)));
+            }
+        }
+        protected void ApplyFilterBtnClickedCommandAction(object param)
+        {
+            if (<#= ApplyFilterBtnClickedCommandAsEventPropertyName #> == null) return;
+            IList<<#= IWebServiceFilterRsltInterfaceClassName #>> rslt = new List<<#= IWebServiceFilterRsltInterfaceClassName #>>();
+            if (_<#= FiltersPropertyName #> != null)
+            {
+                foreach(<#= IWebServiceFilterRsltInterfaceClassName #> flt in <#= FiltersPropertyName #>)
+                {
+                    if (string.IsNullOrEmpty(flt.fltrError))
+                    {
+                        if(flt.fltrValue != null)
+                        {
+                            dynamic v =  ConvertHelper.TryToConvert(flt.fltrDataType, flt.fltrValue);
+                            if (v != null)
+                            {
+                                rslt.Add(new <#= WebServiceFilterRsltClassName #>() { fltrName = flt.fltrName, fltrDataType = flt.fltrDataType, fltrOperator = flt.fltrOperator, fltrValue = v });
+                            }
+                        }
+                    }
+                }
+            }
+            if (_<#= HiddenFiltersPropertyName #> != null)
+            {
+                foreach (<#= IWebServiceFilterRsltInterfaceClassName #> flt in <#= HiddenFiltersPropertyName #>)
+                {
+                    if (string.IsNullOrEmpty(flt.fltrError))
+                    {
+                        if (flt.fltrValue != null)
+                        {
+                            dynamic v = ConvertHelper.TryToConvert(flt.fltrDataType, flt.fltrValue);
+                            if (v != null)
+                            {
+                                rslt.Add(new <#= WebServiceFilterRsltClassName #>() { fltrName = flt.fltrName, fltrDataType = flt.fltrDataType, fltrOperator = flt.fltrOperator, fltrValue = v });
+                            }
+                        }
+                    }
+                }
+            }
+            <#= NotificationEventArgsClassName #> ev = new <#= NotificationEventArgsClassName #>() { Sender = this, Model= rslt};
+            <#= ApplyFilterBtnClickedCommandAsEventPropertyName #>(this, ev);
+        }
+        protected bool ApplyFilterBtnClickedCommandCanExecute(object param)
+        {
+            return true;
+        }
+        public event Action<object, <#= NotificationEventArgsClassName #>> <#= ApplyFilterBtnClickedCommandAsEventPropertyName #>;
+        #endregion
+        #region <#= ContainerMenuItemsPropertyName #>
+        IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> _<#= ContainerMenuItemsPropertyName #> = null;
+        public IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> <#= ContainerMenuItemsPropertyName #>
+        {
+            get
+            {
+                return _<#= ContainerMenuItemsPropertyName #>;
+            }
+            set
+            {
+                if (_<#= ContainerMenuItemsPropertyName #> != value)
+                {
+                    _<#= ContainerMenuItemsPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+        #region <#= ContainerMenuItemClickedCommandPropertyName #>
+        private ICommand _<#= ContainerMenuItemClickedCommandPropertyName #>;
+        public ICommand <#= ContainerMenuItemClickedCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= ContainerMenuItemClickedCommandPropertyName #> ?? (_<#= ContainerMenuItemClickedCommandPropertyName #> = new CommandHelper((param) => ContainerMenuItemClickedCommandAction(param), (param) => ContainerMenuItemClickedCommandCanExecute(param)));
+            }
+        }
+        protected void ContainerMenuItemClickedCommandAction(object param)
+        {
+            if (<#= ContainerMenuItemClickedCommandAsEventPropertyName #> != null)
+            {
+                <#= IWebServiceFilterMenuInterfaceClassName #> mnItm = param as <#= IWebServiceFilterMenuInterfaceClassName #>;
+                if (mnItm != null) { 
+                    var ev = new <#= NotificationEventArgsClassName #>() { Sender = this, Model = mnItm };
+                    <#= ContainerMenuItemClickedCommandAsEventPropertyName #>(this, ev);
+                }
+            }
+        }
+        protected bool ContainerMenuItemClickedCommandCanExecute(object param)
+        {
+            return true;
+        }
+        public event Action<object, <#= NotificationEventArgsClassName #>> <#= ContainerMenuItemClickedCommandAsEventPropertyName #>;
+        #endregion
+    }
+}
+
+<#+
+
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+
+#>

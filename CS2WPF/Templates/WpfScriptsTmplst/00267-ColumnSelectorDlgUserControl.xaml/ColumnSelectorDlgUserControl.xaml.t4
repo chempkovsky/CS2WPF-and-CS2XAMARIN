@@ -1,0 +1,164 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="xaml" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+
+<#
+
+    string ColumnSelectorUserControlFolder            = "00264-ColumnSelectorUserControl.xaml.cs";
+    string ColumnSelectorUserControlClassName         = GetModelClassName(Model, ColumnSelectorUserControlFolder);
+    string ColumnSelectorUserControlNameSpace         = GetModelNameSpace(Model, ColumnSelectorUserControlFolder);
+    string ColumnSelectorUserControlProject           = GetModelProjectName(Model, ColumnSelectorUserControlFolder);
+
+
+    string ColumnSelectorDlgUserControlFolder            = "00266-ColumnSelectorDlgUserControl.xaml.cs";
+    string ColumnSelectorDlgUserControlClassName         = GetModelClassName(Model, ColumnSelectorDlgUserControlFolder);
+    string ColumnSelectorDlgUserControlNameSpace         = GetModelNameSpace(Model, ColumnSelectorDlgUserControlFolder);
+
+
+    string ColumnSelectorDlgUserControlXamlFolder      = "00267-ColumnSelectorDlgUserControl.xaml";
+    string ColumnSelectorDlgUserControlXamlClassName   = GetModelClassName(Model, ColumnSelectorDlgUserControlXamlFolder);
+    string ColumnSelectorDlgUserControlXamlNameSpace   = GetModelNameSpace(Model, ColumnSelectorDlgUserControlXamlFolder);
+    string ColumnSelectorDlgUserControlXamlProject     = GetModelProjectName(Model, ColumnSelectorDlgUserControlXamlFolder);
+    
+    string TitlePropertyName = "Title";
+    string ColumnsPropertyName = "Columns";
+    string OkCommandPropertyName = "OkCommand";
+    string CancelCommandPropertyName = "CancelCommand";
+
+    string csuc = "clr-namespace:" + ColumnSelectorUserControlNameSpace;
+    if(ColumnSelectorUserControlProject != ColumnSelectorDlgUserControlXamlProject) {
+        csuc = csuc + ";assembly=" + ColumnSelectorUserControlProject;
+    }
+
+#>
+
+<UserControl x:Class="<#= ColumnSelectorDlgUserControlNameSpace #>.<#= ColumnSelectorDlgUserControlClassName #>"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+
+             xmlns:csuc="<#= csuc #>"
+
+             mc:Ignorable="d" 
+             MinHeight="250" MinWidth="350" 
+             d:DesignHeight="50" d:DesignWidth="350">
+    <Grid >
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Label Grid.Row="0" FontWeight="Bold" Content="{Binding <#= TitlePropertyName #>}" Margin="8"/>
+        <csuc:ColumnSelectorUserControl Grid.Row="1" Columns="{Binding <#= ColumnsPropertyName #>}" Margin="8"/>
+        <StackPanel Orientation="Horizontal" Grid.Row="2" Margin="8">
+            <Button Content=" Ok " MinWidth="80" Command="{Binding <#= OkCommandPropertyName #>}"/>
+            <Button Content=" Cancel " MinWidth="80" Margin="8 0 0 0" Command="{Binding <#= CancelCommandPropertyName #>}"/>
+        </StackPanel>
+    </Grid>
+</UserControl>
+
+
+<#+
+
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+    string GetModelProjectName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileProject)) {
+            return result;
+        }
+        string[] fnArr = refItem.FileProject.Split(new char[] {'\\'}, 100, System.StringSplitOptions.None); 
+        string fn = fnArr[fnArr.Length - 1];
+
+        return fn.Replace(".csproj","");
+    }
+
+#>

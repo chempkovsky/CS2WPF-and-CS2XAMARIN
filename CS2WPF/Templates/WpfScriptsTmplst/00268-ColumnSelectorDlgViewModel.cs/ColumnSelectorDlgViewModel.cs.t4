@@ -1,0 +1,320 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Windows.Input;
+using Prism.Services.Dialogs;
+<#
+
+    string commandHelperModelFolder      = "00140-CommandHelper.cs";
+    string commandHelperModelClassName   = GetModelClassName(Model, commandHelperModelFolder);
+    string commandHelperModelNameSpace   = GetModelNameSpace(Model, commandHelperModelFolder);
+
+    string IColumnSelectorItemDefInterfaceFolder      = "00258-IColumnSelectorItemDefInterface.cs";
+    string IColumnSelectorItemDefInterfaceClassName   = GetModelClassName(Model, IColumnSelectorItemDefInterfaceFolder);
+    string IColumnSelectorItemDefInterfaceNameSpace   = GetModelNameSpace(Model, IColumnSelectorItemDefInterfaceFolder);
+
+    string ColumnSelectorItemDefFolder      = "00260-ColumnSelectorItemDef.cs";
+    string ColumnSelectorItemDefClassName   = GetModelClassName(Model, ColumnSelectorItemDefFolder);
+    string ColumnSelectorItemDefNameSpace   = GetModelNameSpace(Model, ColumnSelectorItemDefFolder);
+
+
+    string ColumnSelectorItemDefViewModelFolder      = "00262-ColumnSelectorItemDefViewModel.cs";
+    string ColumnSelectorItemDefViewModelClassName   = GetModelClassName(Model, ColumnSelectorItemDefViewModelFolder);
+    string ColumnSelectorItemDefViewModelNameSpace   = GetModelNameSpace(Model, ColumnSelectorItemDefViewModelFolder);
+
+    string ColumnSelectorDlgUserControlFolder            = "00266-ColumnSelectorDlgUserControl.xaml.cs";
+    string ColumnSelectorDlgUserControlClassName         = GetModelClassName(Model, ColumnSelectorDlgUserControlFolder);
+    string ColumnSelectorDlgUserControlNameSpace         = GetModelNameSpace(Model, ColumnSelectorDlgUserControlFolder);
+
+
+    string ColumnSelectorDlgViewModelFolder      = "00268-ColumnSelectorDlgViewModel.cs";
+    string ColumnSelectorDlgViewModelClassName   = GetModelClassName(Model, ColumnSelectorDlgViewModelFolder);
+    string ColumnSelectorDlgViewModelNameSpace   = GetModelNameSpace(Model, ColumnSelectorDlgViewModelFolder);
+
+    string TitlePropertyName = "Title";
+    string ColumnsPropertyName = "Columns";
+    string IsCheckedPropertyName = "IsChecked";
+    string CaptionPropertyName = "Caption";
+    string NamePropertyName = "Name";
+    string OkCommandPropertyName = "OkCommand";
+    string CancelCommandPropertyName = "CancelCommand";
+
+    List<string> nmSpaces = new List<string>();
+    if (ColumnSelectorDlgViewModelNameSpace != IColumnSelectorItemDefInterfaceNameSpace) nmSpaces.Add(IColumnSelectorItemDefInterfaceNameSpace);
+    if ((ColumnSelectorDlgViewModelNameSpace != ColumnSelectorItemDefViewModelNameSpace) && (nmSpaces.IndexOf(ColumnSelectorItemDefViewModelNameSpace) < 0)) 
+        nmSpaces.Add(ColumnSelectorItemDefViewModelNameSpace);
+    if ((ColumnSelectorDlgViewModelNameSpace != commandHelperModelNameSpace) && (nmSpaces.IndexOf(commandHelperModelNameSpace) < 0)) 
+        nmSpaces.Add(commandHelperModelNameSpace);
+    if ((ColumnSelectorDlgViewModelNameSpace != ColumnSelectorItemDefNameSpace) && (nmSpaces.IndexOf(ColumnSelectorItemDefNameSpace) < 0)) 
+        nmSpaces.Add(ColumnSelectorItemDefNameSpace);
+
+
+#>
+<# 
+    foreach(string ns in nmSpaces) {
+#>
+using <#= ns #>;
+<#
+    }
+#>
+
+//////////////////////////
+//   REMINDER :
+//
+//    public class CommonServicesModuleModule : IModule
+//    {
+//        ...
+//        public void RegisterTypes(IContainerRegistry containerRegistry)
+//        {
+//            ...
+//            containerRegistry.RegisterDialog<<#= ColumnSelectorDlgUserControlClassName #>, <#= ColumnSelectorDlgViewModelClassName #>>("ColumnSelectorDlg");
+//            ...
+//        }
+//        ...
+//    }
+//
+//////////////////////////
+
+namespace <#= ColumnSelectorDlgViewModelNameSpace #> {
+    public class <#= ColumnSelectorDlgViewModelClassName #>: INotifyPropertyChanged, IDialogAware
+    {
+        #region INotifyPropertyChanged
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string name = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+        #endregion
+        #region <#= TitlePropertyName #>
+        string _<#= TitlePropertyName #> = string.Empty;
+        public string <#= TitlePropertyName #>
+        {
+            get
+            {
+                return _<#= TitlePropertyName #>;
+            }
+            set
+            {
+                if (_<#= TitlePropertyName #> != value)
+                {
+                    _<#= TitlePropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+        #region IDialogAware
+        public event Action<IDialogResult> RequestClose;
+
+        public bool CanCloseDialog()
+        {
+            return true;
+        }
+
+        public void OnDialogClosed()
+        {
+            
+        }
+
+        public void OnDialogOpened(IDialogParameters parameters)
+        {
+            if (parameters == null) return;
+            if (parameters.ContainsKey("<#= TitlePropertyName #>"))
+            {
+                <#= TitlePropertyName #> = parameters.GetValue<string>("<#= TitlePropertyName #>");
+            }
+            if (parameters.ContainsKey("<#= ColumnsPropertyName #>"))  
+            {
+                IEnumerable<<#= IColumnSelectorItemDefInterfaceClassName #>> cols = parameters.GetValue<IEnumerable<<#= IColumnSelectorItemDefInterfaceClassName #>>>("<#= ColumnsPropertyName #>");
+                if (cols != null)
+                { 
+                    ObservableCollection<<#= ColumnSelectorItemDefViewModelClassName #>> l<#= ColumnsPropertyName #> = null;
+                    foreach (var col in cols)
+                    {
+                        if (col != null)
+                        {
+                            if (l<#= ColumnsPropertyName #> == null) l<#= ColumnsPropertyName #> = new ObservableCollection<<#= ColumnSelectorItemDefViewModelClassName #>>();
+                            l<#= ColumnsPropertyName #>.Add(
+                                new <#= ColumnSelectorItemDefViewModelClassName #>()
+                                {
+                                    <#= NamePropertyName #> = col.<#= NamePropertyName #>,
+                                    <#= CaptionPropertyName #> = col.<#= CaptionPropertyName #>,
+                                    <#= IsCheckedPropertyName #> = col.<#= IsCheckedPropertyName #>
+                                });
+                        }
+                    }
+                    <#= ColumnsPropertyName #> = l<#= ColumnsPropertyName #>;
+                }
+            }
+        }
+        #endregion
+        #region <#= ColumnsPropertyName #>
+        ObservableCollection<<#= ColumnSelectorItemDefViewModelClassName #>> _<#= ColumnsPropertyName #> = null;
+        public ObservableCollection<<#= ColumnSelectorItemDefViewModelClassName #>> <#= ColumnsPropertyName #>
+        {
+            get
+            {
+                return _<#= ColumnsPropertyName #>;
+            }
+            set
+            {
+                if (_<#= ColumnsPropertyName #> != value)
+                {
+                    _<#= ColumnsPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+        #region <#= OkCommandPropertyName #>
+        private ICommand _<#= OkCommandPropertyName #>;
+        public ICommand <#= OkCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= OkCommandPropertyName #> ?? (_<#= OkCommandPropertyName #> = new CommandHelper((param) => <#= OkCommandPropertyName #>Action(param), (param) => <#= OkCommandPropertyName #>CanExecute(param)));
+            }
+        }
+        protected void <#= OkCommandPropertyName #>Action(object param)
+        {
+            if ((RequestClose != null) && <#= OkCommandPropertyName #>CanExecute(null))
+            {
+                IList<<#= IColumnSelectorItemDefInterfaceClassName #>> rcolumns = new List<<#= IColumnSelectorItemDefInterfaceClassName #>>();
+                foreach (var col in <#= ColumnsPropertyName #>)
+                {
+                    rcolumns.Add(new <#= ColumnSelectorItemDefClassName #>()
+                    {
+                        <#= NamePropertyName #> = col.<#= NamePropertyName #>,
+                        <#= CaptionPropertyName #> = col.<#= CaptionPropertyName #>,
+                        <#= IsCheckedPropertyName #> = col.<#= IsCheckedPropertyName #>
+                    });
+                }
+                DialogParameters parameters = new DialogParameters();
+                parameters.Add("Columns", rcolumns);
+                DialogResult result = new DialogResult(ButtonResult.OK, parameters);
+                RequestClose?.Invoke(result);
+            }
+        }
+        protected bool <#= OkCommandPropertyName #>CanExecute(object param)
+        {
+            if (<#= ColumnsPropertyName #> != null)
+            {
+                return <#= ColumnsPropertyName #>.Any(c => c.IsChecked);
+            }
+            return false;
+        }
+        #endregion
+        #region <#= CancelCommandPropertyName #>
+        private ICommand _<#= CancelCommandPropertyName #>;
+        public ICommand <#= CancelCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= CancelCommandPropertyName #> ?? (_<#= CancelCommandPropertyName #> = new CommandHelper((param) => <#= CancelCommandPropertyName #>Action(param), (param) => <#= CancelCommandPropertyName #>CanExecute(param)));
+            }
+        }
+        protected void <#= CancelCommandPropertyName #>Action(object param)
+        {
+            if (RequestClose != null)
+            {
+                DialogResult result = new DialogResult(ButtonResult.Cancel);
+                RequestClose?.Invoke(result);
+            }
+
+        }
+        protected bool <#= CancelCommandPropertyName #>CanExecute(object param)
+        {
+            return true;
+        }
+        #endregion
+    }
+}
+
+<#+
+
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+
+#>
