@@ -24,37 +24,39 @@
     string FillHelperModelNameSpace   = GetModelNameSpace(Model, FillHelperModelFolder);
     string FillHelperModelProject     = GetModelProjectName(Model, FillHelperModelFolder);
 
-    string MessageDlgUserControlFolder            = "00270-MessageDlgUserControl.xaml.cs";
-    string MessageDlgUserControlClassName         = GetModelClassName(Model, MessageDlgUserControlFolder);
-    string MessageDlgUserControlNameSpace         = GetModelNameSpace(Model, MessageDlgUserControlFolder);
+    string MessageUserControlFolder            = "00270-MessageUserControl.xaml.cs";
+    string MessageUserControlClassName         = GetModelClassName(Model, MessageUserControlFolder);
+    string MessageUserControlNameSpace         = GetModelNameSpace(Model, MessageUserControlFolder);
 
 
-    string MessageDlgUserControlXamlFolder      = "00272-MessageDlgUserControl.xaml";
-    string MessageDlgUserControlXamlClassName   = GetModelClassName(Model, MessageDlgUserControlXamlFolder);
-    string MessageDlgUserControlXamlNameSpace   = GetModelNameSpace(Model, MessageDlgUserControlXamlFolder);
-    string MessageDlgUserControlXamlProject     = GetModelProjectName(Model, MessageDlgUserControlXamlFolder);
+    string MessageUserControlXamlFolder      = "00272-MessageUserControl.xaml";
+    string MessageUserControlXamlClassName   = GetModelClassName(Model, MessageUserControlXamlFolder);
+    string MessageUserControlXamlNameSpace   = GetModelNameSpace(Model, MessageUserControlXamlFolder);
+    string MessageUserControlXamlProject     = GetModelProjectName(Model, MessageUserControlXamlFolder);
     
     string TitlePropertyName = "Title";
+    string MessagePropertyName = "Message";
     string MessageIconNamePropertyName = "MessageIconName";
     string MessageIconColorPropertyName = "MessageIconColor";
-    string MessagePropertyName = "Message";
-    string OkVisibilityPropertyName = "OkVisibility";
-    string CancelVisibilityPropertyName = "CancelVisibility";
+    string ShowOkBtnPropertyName = "ShowOkBtn";
+    string ShowCancelBtnPropertyName = "ShowCancelBtn";
+    string OkNotificationPropertyName = "OkNotification";
     string OkCommandPropertyName = "OkCommand";
+    string CancelNotificationPropertyName = "CancelNotification";
     string CancelCommandPropertyName = "CancelCommand";
 
     string pthPrefix = "clr-namespace:" + pathHelperModelNameSpace;
-    if(pathHelperModelProject != MessageDlgUserControlXamlProject) {
+    if(pathHelperModelProject != MessageUserControlXamlProject) {
         pthPrefix = pthPrefix + ";assembly=" + pathHelperModelProject;
     }
     string fllPrefix = "clr-namespace:" + FillHelperModelNameSpace;
-    if(FillHelperModelProject != MessageDlgUserControlXamlProject) {
+    if(FillHelperModelProject != MessageUserControlXamlProject) {
         fllPrefix = fllPrefix + ";assembly=" + FillHelperModelProject;
     }
 
 #>
 
-<UserControl x:Class="<#= MessageDlgUserControlNameSpace #>.<#= MessageDlgUserControlClassName #>"
+<UserControl x:Class="<#= MessageUserControlNameSpace #>.<#= MessageUserControlClassName #>"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -62,13 +64,13 @@
 
              xmlns:pth="<#= pthPrefix #>"
              xmlns:fll="<#= fllPrefix #>"
+             x:Name="MsgUsrCntrlRootNode"
 
              mc:Ignorable="d" 
              d:DesignHeight="150" d:DesignWidth="400" MaxWidth="480" MinWidth="250">
      <!--<UserControl.Resources>
         <ResourceDictionary Source="pack://application:,,,/CommonWpfCustomControlLibrary;component/Themes/BasicResourceDictionary.xaml"/>
     </UserControl.Resources>-->
-
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -81,16 +83,38 @@
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <Label FontWeight="Bold" Grid.Row="0" Grid.Column="1" Content="{Binding <#= TitlePropertyName #>}"/>
+        <Label FontWeight="Bold" Grid.Row="0" Grid.Column="1" Content="{Binding <#= TitlePropertyName #>, ElementName=MsgUsrCntrlRootNode}"/>
         <Viewbox   Height="24" Width="24"  Margin="16 8 8 0" Grid.Row="2" Grid.Column="0">
-                <Canvas  Height="24" Width="24"  >
-                    <Path pth:PathHelper.DataResourceKey="{Binding <#= MessageIconNamePropertyName #>}" fll:FillHelper.FillResourceKey="{Binding <#= MessageIconColorPropertyName #>}"/>
-                </Canvas>
+            <Canvas  Height="24" Width="24"  >
+            <Path pth:PathHelper.DataResourceKey="{Binding <#= MessageIconNamePropertyName #>, ElementName=MsgUsrCntrlRootNode}" fll:FillHelper.FillResourceKey="{Binding <#= MessageIconColorPropertyName #>, ElementName=MsgUsrCntrlRootNode}"/>
+            </Canvas>
          </Viewbox>
-        <TextBlock TextWrapping="Wrap" Grid.Row="2" Grid.Column="1" Margin="8 8 0 0" Text="{Binding <#= MessagePropertyName #>}"/>
+        <TextBlock TextWrapping="Wrap" Grid.Row="2" Grid.Column="1" Margin="8 8 0 0" Text="{Binding <#= MessagePropertyName #>, ElementName=MsgUsrCntrlRootNode}"/>
         <StackPanel Orientation="Horizontal" Grid.Row="4" Grid.Column="2" Margin="8">
-            <Button Content="Ok" MinWidth="64" Command="{Binding <#= OkCommandPropertyName #>}" Visibility="{Binding <#= OkVisibilityPropertyName #>}"/>
-            <Button Content="Cancel" MinWidth="64" Margin="8 0 0 0" Command="{Binding <#= CancelCommandPropertyName #>}" Visibility="{Binding <#= CancelVisibilityPropertyName #>}"/>
+            <Button Content="Ok" MinWidth="64" Command="{Binding <#= OkCommandPropertyName #>, ElementName=MsgUsrCntrlRootNode}" >
+                <Button.Resources>
+                    <Style TargetType="{x:Type Button}">
+                        <Setter Property="Visibility" Value="Hidden" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding <#= ShowOkBtnPropertyName #>, ElementName=MsgUsrCntrlRootNode}" Value="true">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Resources>
+            </Button>
+            <Button Content="Cancel" MinWidth="64" Margin="8 0 0 0" Command="{Binding <#= CancelCommandPropertyName #>, ElementName=MsgUsrCntrlRootNode}" >
+                <Button.Resources>
+                    <Style TargetType="{x:Type Button}">
+                        <Setter Property="Visibility" Value="Hidden" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding <#= ShowCancelBtnPropertyName #>, ElementName=MsgUsrCntrlRootNode}" Value="true">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Resources>
+            </Button>
         </StackPanel>
     </Grid>
 </UserControl>

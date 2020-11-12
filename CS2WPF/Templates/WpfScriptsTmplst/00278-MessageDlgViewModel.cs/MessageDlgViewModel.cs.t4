@@ -28,20 +28,20 @@ using Prism.Services.Dialogs;
     string MessageDlgUserControlNameSpace         = GetModelNameSpace(Model, MessageDlgUserControlFolder);
 
 
-    string MessageDlgViewModelFolder      = "00274-MessageDlgViewModel.cs";
+    string MessageDlgViewModelFolder      = "00278-MessageDlgViewModel.cs";
     string MessageDlgViewModelClassName   = GetModelClassName(Model, MessageDlgViewModelFolder);
     string MessageDlgViewModelNameSpace   = GetModelNameSpace(Model, MessageDlgViewModelFolder);
 
     string TitlePropertyName = "Title";
+    string MessagePropertyName = "Message";
     string MessageIconNamePropertyName = "MessageIconName";
     string MessageIconColorPropertyName = "MessageIconColor";
-    string MessagePropertyName = "Message";
-    string OkVisibilityPropertyName = "OkVisibility";
-    string CancelVisibilityPropertyName = "CancelVisibility";
+    string ShowOkBtnPropertyName = "ShowOkBtn";
+    string ShowCancelBtnPropertyName = "ShowCancelBtn";
+    string OkNotificationPropertyName = "OkNotification";
     string OkCommandPropertyName = "OkCommand";
+    string CancelNotificationPropertyName = "CancelNotification";
     string CancelCommandPropertyName = "CancelCommand";
-    string OkVisiblePropertyName = "OkVisible";
-    string CancelVisiblePropertyName = "CancelVisible";
     
     List<string> nmSpaces = new List<string>();
     if (MessageDlgViewModelNameSpace != commandHelperModelNameSpace) nmSpaces.Add(commandHelperModelNameSpace);
@@ -65,7 +65,7 @@ using <#= ns #>;
 //        public void RegisterTypes(IContainerRegistry containerRegistry)
 //        {
 //            ...
-//            containerRegistry.RegisterDialog<<#= MessageDlgUserControlClassName #>, <#= MessageDlgViewModelClassName #>>("ColumnSelectorDlg");
+//            containerRegistry.RegisterDialog<<#= MessageDlgUserControlClassName #>, <#= MessageDlgViewModelClassName #>>("MessageDlg");
 //            ...
 //        }
 //        ...
@@ -133,17 +133,14 @@ namespace <#= MessageDlgViewModelNameSpace #> {
             {
                 <#= MessageIconColorPropertyName #> = parameters.GetValue<string>("<#= MessageIconColorPropertyName #>");
             }
-            if (parameters.ContainsKey("<#= CancelVisiblePropertyName #>"))
+            if (parameters.ContainsKey("<#= ShowCancelBtnPropertyName #>"))
             {
-                _<#= CancelVisibilityPropertyName #> = parameters.GetValue<bool>("<#= CancelVisiblePropertyName #>");
-                OnPropertyChanged("<#= CancelVisibilityPropertyName #>");
+                <#= ShowCancelBtnPropertyName #> = parameters.GetValue<bool>("<#= ShowCancelBtnPropertyName #>");
             }
-            if (parameters.ContainsKey("<#= OkVisiblePropertyName #>"))
+            if (parameters.ContainsKey("<#= ShowOkBtnPropertyName #>"))
             {
-                _<#= OkVisibilityPropertyName #> = parameters.GetValue<bool>("<#= OkVisiblePropertyName #>");
-                OnPropertyChanged("<#= OkVisibilityPropertyName #>");
+                <#= ShowOkBtnPropertyName #> = parameters.GetValue<bool>("<#= ShowOkBtnPropertyName #>");
             }
-
         }
         #endregion
         #region <#= MessagePropertyName #>
@@ -200,23 +197,39 @@ namespace <#= MessageDlgViewModelNameSpace #> {
             }
         }
         #endregion
-        #region <#= OkVisibilityPropertyName #>
-        bool _<#= OkVisibilityPropertyName #> = true;
-        public Visibility <#= OkVisibilityPropertyName #>
+        #region <#= ShowOkBtnPropertyName #>
+        bool _<#= ShowOkBtnPropertyName #> = true;
+        public bool <#= ShowOkBtnPropertyName #>
         {
             get
             {
-                if (_<#= OkVisibilityPropertyName #>) return Visibility.Visible; else return Visibility.Collapsed;
+                return _<#= ShowOkBtnPropertyName #>;
+            }
+            set
+            {
+                if (_<#= ShowOkBtnPropertyName #> != value)
+                {
+                    _<#= ShowOkBtnPropertyName #> = value;
+                    OnPropertyChanged();
+                }
             }
         }
         #endregion
-        #region <#= CancelVisibilityPropertyName #>
-        bool _<#= CancelVisibilityPropertyName #> = false;
-        public Visibility <#= CancelVisibilityPropertyName #>
+        #region <#= ShowCancelBtnPropertyName #>
+        bool _<#= ShowCancelBtnPropertyName #> = false;
+        public bool <#= ShowCancelBtnPropertyName #>
         {
             get
             {
-                if (_<#= CancelVisibilityPropertyName #>) return Visibility.Visible; else return Visibility.Collapsed;
+                return _<#= ShowCancelBtnPropertyName #>;
+            }
+            set
+            {
+                if (_<#= ShowCancelBtnPropertyName #> != value)
+                {
+                    _<#= ShowCancelBtnPropertyName #> = value;
+                    OnPropertyChanged();
+                }
             }
         }
         #endregion

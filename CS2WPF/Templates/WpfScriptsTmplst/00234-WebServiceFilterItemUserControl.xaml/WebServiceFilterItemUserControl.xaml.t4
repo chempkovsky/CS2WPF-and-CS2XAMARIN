@@ -19,20 +19,9 @@
     string gridFlexModelNameSpace   = GetModelNameSpace(Model, gridFlexModelFolder);
     string gridFlexModelProject     = GetModelProjectName(Model, gridFlexModelFolder);
 
-    string pathHelperModelFolder      = "00120-PathHelper.cs";
-    string pathHelperModelClassName   = GetModelClassName(Model, pathHelperModelFolder);
-    string pathHelperModelNameSpace   = GetModelNameSpace(Model, pathHelperModelFolder);
-    string pathHelperModelProject     = GetModelProjectName(Model, pathHelperModelFolder);
-
-    string foregroundHelperModelFolder      = "00130-ForegroundHelper.cs";
-    string foregroundHelperModelClassName   = GetModelClassName(Model, foregroundHelperModelFolder);
-    string foregroundHelperModelNameSpace   = GetModelNameSpace(Model, foregroundHelperModelFolder);
-    string foregroundHelperModelProject     = GetModelProjectName(Model, foregroundHelperModelFolder);
-
     string WebServiceFilterItemUserControlFolder      = "00232-WebServiceFilterItemUserControl.xaml.cs";
     string WebServiceFilterItemUserControlClassName   = GetModelClassName(Model, WebServiceFilterItemUserControlFolder);
     string WebServiceFilterItemUserControlNameSpace   = GetModelNameSpace(Model, WebServiceFilterItemUserControlFolder);
-
 
     string WebServiceFilterItemUserControlXamlFolder      = "00234-WebServiceFilterItemUserControl.xaml";
     string WebServiceFilterItemUserControlXamlClassName   = GetModelClassName(Model, WebServiceFilterItemUserControlXamlFolder);
@@ -40,26 +29,22 @@
     string WebServiceFilterItemUserControlXamlProject     = GetModelProjectName(Model, WebServiceFilterItemUserControlXamlFolder);
     
     string SelectedFilterOperatorPropertyName = "SelectedFilterOperator";
-    string SelectedFilterDefinitionPropertyName = "SelectedFilterDefinition";
-    string IsReadOnlyPropertyName = "IsReadOnly";
-    string IsEditablePropertyName = "IsEditable";
-    string IsDateInputPropertyName = "IsDateInput";
-    string FilterValuePropertyName = "FilterValue";
-    string FilterValuePromptPropertyName = "FilterValuePrompt";
-    string FilterValuePromptForegroundPropertyName = "FilterValuePromptForeground";
-    string FilterDefinitionsPropertyName = "FilterDefinitions";
     string FilterOperatorsPropertyName = "FilterOperators";
+    string SelectedFilterDefinitionPropertyName = "SelectedFilterDefinition";
+    string FilterDefinitionsPropertyName = "FilterDefinitions";
+    string FilterValuePropertyName = "FilterValue";
+    string IsDateInputPropertyName = "IsDateInput";
+    string IsFilterValueReadOnlyPropertyName = "IsFilterValueReadOnly";
+    string FilterErrorPropertyName = "FilterError";
+    string FilterValuePromptPropertyName = "FilterValuePrompt";
+    string RemoveNotificationPropertyName = "RemoveNotification";
     string RemoveCommandPropertyName = "RemoveCommand";
+    string DefaultTexBlockForegroundPropertyName = "DefaultTexBlockForeground";
 
 
-
-    string gridflexPrefix = "clr-namespace:" + pathHelperModelNameSpace;
+    string gridflexPrefix = "clr-namespace:" + gridFlexModelNameSpace;
     if(gridFlexModelProject != WebServiceFilterItemUserControlXamlProject) {
         gridflexPrefix = gridflexPrefix + ";assembly=" + gridFlexModelProject;
-    }
-    string frgrndPrefix = "clr-namespace:" + foregroundHelperModelNameSpace;
-    if(foregroundHelperModelProject != WebServiceFilterItemUserControlXamlProject) {
-        frgrndPrefix = frgrndPrefix + ";assembly=" + foregroundHelperModelProject;
     }
 
 
@@ -71,19 +56,19 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:<#= WebServiceFilterItemUserControlNameSpace #>"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
              xmlns:gridflex="<#= gridflexPrefix #>"
-             xmlns:frgrnd="<#= frgrndPrefix #>"
+             x:Name="FltrItmUsrCntrlRootNode"
              mc:Ignorable="d" 
-             d:DesignHeight="150" d:DesignWidth="600" DataContextChanged="UserControl_DataContextChanged">
+             d:DesignHeight="150" d:DesignWidth="600">
     <!--<UserControl.Resources>
         <ResourceDictionary Source="pack://application:,,,/CommonWpfControlLibrary;component/Themes/BasicResourceDictionary.xaml"/>
     </UserControl.Resources> -->
     <Grid gridflex:<#= gridFlexModelClassName #>.HorizontalFlex="true" Margin="0 0 8 0">
         <StackPanel Margin="8 0 0 0">
             <Label FontWeight="Bold" >Column name</Label>
-            <ComboBox ItemsSource="{Binding <#= FilterDefinitionsPropertyName #>}" <#= IsEditablePropertyName #>="False" DisplayMemberPath="fltrCaption" 
-                      SelectedItem="{Binding <#= SelectedFilterDefinitionPropertyName #>, Mode=TwoWay}"/>
-
+            <ComboBox ItemsSource="{Binding <#= FilterDefinitionsPropertyName #>, ElementName=FltrItmUsrCntrlRootNode}" IsEditable="False" DisplayMemberPath="fltrCaption" 
+                      SelectedItem="{Binding <#= SelectedFilterDefinitionPropertyName #>, ElementName=FltrItmUsrCntrlRootNode, Mode=TwoWay}"/>
             <TextBlock>Select Column name</TextBlock>
         </StackPanel>
         <Grid Margin="8 0 0 0">
@@ -93,8 +78,8 @@
             </Grid.ColumnDefinitions>
             <StackPanel Grid.Column="0" >
                 <Label FontWeight="Bold" >Operator</Label>
-                <ComboBox ItemsSource="{Binding <#= FilterOperatorsPropertyName #>}" <#= IsEditablePropertyName #>="False"  DisplayMemberPath="oCaption" SelectedValuePath="oName"
-                          SelectedValue="{Binding <#= SelectedFilterOperatorPropertyName #>, Mode=TwoWay}"/>
+                <ComboBox ItemsSource="{Binding <#= FilterOperatorsPropertyName #>, ElementName=FltrItmUsrCntrlRootNode}" IsEditable="False"  DisplayMemberPath="oCaption" SelectedValuePath="oName"
+                          SelectedValue="{Binding <#= SelectedFilterOperatorPropertyName #>, ElementName=FltrItmUsrCntrlRootNode, Mode=TwoWay}"/>
                 <TextBlock>Select operator</TextBlock>
             </StackPanel>
             <StackPanel Grid.Column="1" Margin="8 0 0 0">
@@ -104,31 +89,51 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <ContentPresenter Grid.Column="0" Content="{Binding}" HorizontalAlignment="Stretch">
+                    <ContentPresenter Grid.Column="0" HorizontalAlignment="Stretch">
                         <ContentPresenter.Resources>
                             <DataTemplate x:Key="TextboxPresenter">
-                                <TextBox HorizontalAlignment="Stretch" Text="{Binding <#= FilterValuePropertyName #>, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" <#= IsReadOnlyPropertyName #>="{Binding <#= IsReadOnlyPropertyName #>}"/>
+                                <TextBox HorizontalAlignment="Stretch" Text="{Binding <#= FilterValuePropertyName #>, ElementName=FltrItmUsrCntrlRootNode, UpdateSourceTrigger=PropertyChanged}">
+                                    <TextBox.Resources>
+                                        <Style TargetType="{x:Type TextBox}">
+                                            <Setter Property="IsReadOnly" Value="true" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding <#= IsFilterValueReadOnlyPropertyName #>, ElementName=FltrItmUsrCntrlRootNode}" Value="false">
+                                                    <Setter Property="IsReadOnly" Value="false" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBox.Resources>
+                                </TextBox>
                             </DataTemplate>
                             <DataTemplate x:Key="DatePickerPresenter">
-                                <DatePicker HorizontalAlignment="Stretch" SelectedDate="{Binding <#= FilterValuePropertyName #>, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"  IsEnabled="{Binding <#= IsEditablePropertyName #>}" />
+                                <DatePicker HorizontalAlignment="Stretch" SelectedDate="{Binding <#= FilterValuePropertyName #>, ElementName=FltrItmUsrCntrlRootNode, UpdateSourceTrigger=PropertyChanged}"   >
+                                    <DatePicker.Resources>
+                                        <Style TargetType="{x:Type DatePicker}">
+                                            <Setter Property="IsEnabled" Value="False" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding <#= IsFilterValueReadOnlyPropertyName #>, ElementName=FltrItmUsrCntrlRootNode}" Value="False">
+                                                    <Setter Property="IsEnabled" Value="True"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </DatePicker.Resources>
+                                </DatePicker>
                             </DataTemplate>
                         </ContentPresenter.Resources>
                         <ContentPresenter.Style>
                             <Style TargetType="{x:Type ContentPresenter}">
+                                <Setter Property="ContentTemplate" Value="{StaticResource TextboxPresenter}" />
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding <#= IsDateInputPropertyName #>}" Value="False">
-                                        <Setter Property="ContentTemplate" Value="{StaticResource TextboxPresenter}" />
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding <#= IsDateInputPropertyName #>}" Value="True">
+                                    <DataTrigger Binding="{Binding <#= IsDateInputPropertyName #>, ElementName=FltrItmUsrCntrlRootNode}" Value="True">
                                         <Setter Property="ContentTemplate" Value="{StaticResource DatePickerPresenter}" />
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
                         </ContentPresenter.Style>
                     </ContentPresenter>
-                    <Button Grid.Column="1" Background="{x:Null}"
+                    <Button Grid.Column="1" BorderBrush="{x:Null}" Background="{x:Null}"
                             KeyboardNavigation.TabNavigation ="None" ToolTip="Remove item"
-                            Command="{Binding <#= RemoveCommandPropertyName #>}">
+                            Command="{Binding <#= RemoveCommandPropertyName #>, ElementName=FltrItmUsrCntrlRootNode}">
                         <Viewbox   Height="16" Width="16" FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Button}}}" HorizontalAlignment="Center" VerticalAlignment="Center" >
                             <Canvas  Height="24" Width="24" >
                                 <Path  Data="{DynamicResource TrashCanOutline}" Fill="{DynamicResource Danger}" />
@@ -136,7 +141,19 @@
                         </Viewbox>
                     </Button>
                 </Grid>
-                <TextBlock frgrnd:<#= foregroundHelperModelClassName #>.ForegroundResourceKey="{Binding <#= FilterValuePromptForegroundPropertyName #>}" Text="{Binding <#= FilterValuePromptPropertyName #>}"/>
+                <TextBlock Text="{Binding <#= FilterValuePromptPropertyName #>, ElementName=FltrItmUsrCntrlRootNode}">
+                    <TextBlock.Resources>
+                        <x:Static x:Key="stringempty" Member="sys:String.Empty" />
+                        <Style TargetType="{x:Type TextBlock}">
+                            <Setter Property="Foreground" Value="{DynamicResource Danger}" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding <#= FilterErrorPropertyName #>, ElementName=FltrItmUsrCntrlRootNode}" Value="{StaticResource stringempty}">
+                                    <Setter Property="Foreground" Value="{StaticResource <#= DefaultTexBlockForegroundPropertyName #>}" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Resources>
+                </TextBlock>
             </StackPanel>
         </Grid>
     </Grid>

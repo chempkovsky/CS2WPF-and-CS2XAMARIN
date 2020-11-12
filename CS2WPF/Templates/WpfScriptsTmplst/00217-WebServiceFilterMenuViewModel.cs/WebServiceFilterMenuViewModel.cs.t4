@@ -11,25 +11,50 @@
 <#@ import namespace="CS2WPF.Model.Serializable" #>
 <#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
-using System.Windows.Controls;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 <#
 
-    string MessageDlgUserControlFolder            = "00270-MessageDlgUserControl.xaml.cs";
-    string MessageDlgUserControlClassName         = GetModelClassName(Model, MessageDlgUserControlFolder);
-    string MessageDlgUserControlNameSpace         = GetModelNameSpace(Model, MessageDlgUserControlFolder);
+    string IWebServiceFilterMenuInterfaceFolder      = "00206-IWebServiceFilterMenuInterface.cs";
+    string IWebServiceFilterMenuInterfaceClassName   = GetModelClassName(Model, IWebServiceFilterMenuInterfaceFolder);
+    string IWebServiceFilterMenuInterfaceNameSpace   = GetModelNameSpace(Model, IWebServiceFilterMenuInterfaceFolder);
+
+    
+    string WebServiceFilterMenuViewModelFolder      = "00217-WebServiceFilterMenuViewModel.cs";
+    string WebServiceFilterMenuViewModelClassName   = GetModelClassName(Model, WebServiceFilterMenuViewModelFolder);
+    string WebServiceFilterMenuViewModelNameSpace   = GetModelNameSpace(Model, WebServiceFilterMenuViewModelFolder);
 
 #>
+<# 
+    if(IWebServiceFilterMenuInterfaceNameSpace != WebServiceFilterMenuViewModelNameSpace) { 
+#>
+using <#= IWebServiceFilterMenuInterfaceNameSpace #>;
+<#
+    }
+#>
 
-namespace <#= MessageDlgUserControlNameSpace #> {
-    /// <summary>
-    /// Interaction logic for <#= MessageDlgUserControlClassName #>.xaml
-    /// </summary>
-    public partial class <#= MessageDlgUserControlClassName #>: UserControl
+namespace <#= WebServiceFilterMenuViewModelNameSpace #> {
+    public class <#= WebServiceFilterMenuViewModelClassName #>: <#= IWebServiceFilterMenuInterfaceClassName #>, INotifyPropertyChanged
     {
-        public <#= MessageDlgUserControlClassName #>()
+        #region INotifyPropertyChanged
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string name = null)
         {
-            InitializeComponent();
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
+        #endregion
+        protected string _Id;
+        public string Id { get { return _Id; } set { if(_Id != value) { _Id = value; OnPropertyChanged(); } } }
+        protected string _Caption;
+        public string Caption { get { return _Caption; } set { if(_Caption != value) { _Caption = value; OnPropertyChanged(); } } }
+        protected string _IconName;
+        public string IconName { get { return _IconName; } set { if(_IconName != value) { _IconName = value; OnPropertyChanged(); } } }
+        protected string _IconColor;
+        public string IconColor { get { return _IconColor; } set { if(_IconColor != value) { _IconColor = value; OnPropertyChanged(); } } }
+        protected bool _Enabled;
+        public bool Enabled { get { return _Enabled; } set { if(_Enabled != value) { _Enabled = value; OnPropertyChanged(); } } }
+        protected dynamic _Data;
+        public dynamic Data { get { return _Data; } set { if(_Data != value) { _Data = value; OnPropertyChanged(); } } }
     }
 }
 

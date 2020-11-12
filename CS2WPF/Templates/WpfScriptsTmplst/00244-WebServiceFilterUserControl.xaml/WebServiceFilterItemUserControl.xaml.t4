@@ -14,10 +14,6 @@
 
 <#
 
-    string WebServiceFilterUserControlFolder      = "00242-WebServiceFilterUserControl.xaml.cs";
-    string WebServiceFilterUserControlClassName   = GetModelClassName(Model, WebServiceFilterUserControlFolder);
-    string WebServiceFilterUserControlNameSpace   = GetModelNameSpace(Model, WebServiceFilterUserControlFolder);
-
     string WebServiceFilterItemUserControlXamlFolder      = "00234-WebServiceFilterItemUserControl.xaml";
     string WebServiceFilterItemUserControlXamlClassName   = GetModelClassName(Model, WebServiceFilterItemUserControlXamlFolder);
     string WebServiceFilterItemUserControlXamlNameSpace   = GetModelNameSpace(Model, WebServiceFilterItemUserControlXamlFolder);
@@ -39,27 +35,41 @@
     string pathHelperModelNameSpace   = GetModelNameSpace(Model, pathHelperModelFolder);
     string pathHelperModelProject     = GetModelProjectName(Model, pathHelperModelFolder);
 
+    string WebServiceFilterUserControlFolder      = "00242-WebServiceFilterUserControl.xaml.cs";
+    string WebServiceFilterUserControlClassName   = GetModelClassName(Model, WebServiceFilterUserControlFolder);
+    string WebServiceFilterUserControlNameSpace   = GetModelNameSpace(Model, WebServiceFilterUserControlFolder);
 
     string WebServiceFilterUserControlXamlFolder      = "00244-WebServiceFilterUserControl.xaml";
     string WebServiceFilterUserControlXamlClassName   = GetModelClassName(Model, WebServiceFilterUserControlXamlFolder);
     string WebServiceFilterUserControlXamlNameSpace   = GetModelNameSpace(Model, WebServiceFilterUserControlXamlFolder);
     string WebServiceFilterUserControlXamlProject     = GetModelProjectName(Model, WebServiceFilterItemUserControlXamlFolder);
     
-    string FilterDefinitionsPropertyName = "FilterDefinitions";
-    string FilterOperatorsPropertyName = "FilterOperators";
-    string FiltersPropertyName = "Filters";
-    string ModelPropertyName = "Model";
-    string RemoveFilterBtnClickedCommandPropertyName = "RemoveFilterBtnClickedCommand";
-    string ContainerMenuItemClickedCommandPropertyName = "ContainerMenuItemClickedCommand";
-    string ContainerMenuItemClickedCommandAsEventPropertyName = "ContainerMenuItemClickedCommandAsEvent";
-    string ContainerMenuItemsPropertyName = "ContainerMenuItems";
-    string ApplyFilterBtnClickedCommandPropertyName = "ApplyFilterBtnClickedCommand";
-    string RemoveAllFiltersBtnClickedCommandPropertyName = "RemoveAllFiltersBtnClickedCommand";
-    string AddFilterBtnVisibilityPropertyName = "AddFilterBtnVisibility";
-    string AddFilterBtnClickedCommandPropertyName = "AddFilterBtnClickedCommand";
-    string BackBtnClickedCommandPropertyName = "BackBtnClickedCommand";
-    string ShowBackBtnVisibilityPropertyName = "ShowBackBtnVisibility";
     string CaptionPropertyName = "Caption";
+    string FilterHeightPropertyName = "FilterHeight";
+    string HiddenFiltersPropertyName = "HiddenFilters";
+    string FiltersPropertyName = "Filters";
+    string FilterOperatorsPropertyName = "FilterOperators";
+    string FilterDefinitionsPropertyName = "FilterDefinitions";
+    string ShowBackBtnPropertyName = "ShowBackBtn";
+    string ShowAddFilterBtnPropertyName = "ShowAddFilterBtn";
+    string ContainerMenuItemsPropertyName = "ContainerMenuItems";
+    string ContainerMenuItemClickedNotificationPropertyName = "ContainerMenuItemClickedNotification";
+    string ContainerMenuItemClickedCommandPropertyName = "ContainerMenuItemClickedCommand";
+    string BackBtnClickedNotificationPropertyName = "BackBtnClickedNotification";
+    string BackBtnClickedCommandPropertyName = "BackBtnClickedCommand";
+    string ApplyFilterBtnClickedNotificationPropertyName = "ApplyFilterBtnClickedNotification";
+    string ApplyFilterBtnClickedCommandPropertyName = "ApplyFilterBtnClickedCommand";
+    string AddFilterBtnClickedCommandPropertyName = "AddFilterBtnClickedCommand";
+    string RemoveFilterBtnClickedCommandPropertyName = "RemoveFilterBtnClickedCommand";
+    string RemoveAllFiltersBtnClickedCommandPropertyName = "RemoveAllFiltersBtnClickedCommand";
+    string SelectedFilterDataTypePropertyName = "SelectedFilterDataType";
+    string SelectedFilterNamePropertyName = "SelectedFilterName";
+    string SelectedFilterOperatorPropertyName = "SelectedFilterOperator";
+    string FilterValuePropertyName = "FilterValue";
+    string FilterErrorPropertyName = "FilterError";
+    string RemoveNotificationPropertyName = "RemoveNotification";
+
+
 
     string fltitmPrefix = "clr-namespace:"+ WebServiceFilterItemUserControlXamlNameSpace;
     if(WebServiceFilterItemUserControlXamlProject != WebServiceFilterUserControlXamlProject) {
@@ -88,9 +98,11 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:i="clr-namespace:Microsoft.Xaml.Behaviors;assembly=Microsoft.Xaml.Behaviors"
              xmlns:fltitm="<#= fltitmPrefix #>"
+             xmlns:frgrnd="<#= frgrndPrefix #>"
              xmlns:pth="<#= pthPrefix #>"
-             xmlns:fll="<#= fllPrefix #>"
+             
 
+             x:Name="FltrUsrCntrlRootNode"
              mc:Ignorable="d" 
              d:DesignHeight="250" d:DesignWidth="600">
     <!-- <UserControl.Resources>
@@ -99,7 +111,18 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition/>
+            <RowDefinition>
+                <RowDefinition.Resources>
+                    <Style TargetType="{x:Type RowDefinition}">
+                        <Setter Property="Height" Value="{Binding <#= FilterHeightPropertyName #>, ElementName=FltrUsrCntrlRootNode}" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding <#= FilterHeightPropertyName #>, ElementName=FltrUsrCntrlRootNode}" Value="{x:Null}">
+                                <Setter Property="Height" Value="Auto" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </RowDefinition.Resources>
+            </RowDefinition>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
@@ -109,54 +132,81 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <Label FontWeight="Bold" Grid.Column="0" Margin="24 0 0 0" Content="{Binding <#= CaptionPropertyName #>}"/>
+            <Label FontWeight="Bold" Grid.Column="0" Margin="24 0 0 0" Content="{Binding <#= CaptionPropertyName #>, ElementName=FltrUsrCntrlRootNode}"/>
             <Button Grid.Column="2" Margin="0 0 24 0" BorderBrush="{x:Null}" Background="{x:Null}"
-                        KeyboardNavigation.TabNavigation ="None" ToolTip="Navigate back"
-                        Visibility="{Binding <#= ShowBackBtnVisibilityPropertyName #>}"
-                        Command="{Binding <#= BackBtnClickedCommandPropertyName #>}">
+                        Foreground="{DynamicResource Primary}"  KeyboardNavigation.TabNavigation ="None" ToolTip="Navigate back"
+                        Command="{Binding <#= BackBtnClickedCommandPropertyName #>, ElementName=FltrUsrCntrlRootNode}">
+                <Button.Resources>
+                    <Style TargetType="{x:Type Button}">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding <#= ShowBackBtnPropertyName #>, ElementName=FltrUsrCntrlRootNode}" Value="true">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Resources>
                 <Viewbox   Height="16" Width="16" FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Button}}}" HorizontalAlignment="Center" VerticalAlignment="Center" >
                     <Canvas  Height="24" Width="24" >
-                        <Path  Data="{DynamicResource ArrowLeftCircle}" Fill="{DynamicResource Primary}" />
+                        <Path  Data="{DynamicResource ArrowLeftCircle}" Fill="{Binding Foreground, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Button}}}" />
                     </Canvas>
                 </Viewbox>
             </Button>
 
 
-
             <StackPanel Grid.Column="3" Orientation="Horizontal" Margin="0 0 8 0">
                 <Button BorderBrush="{x:Null}" Background="{x:Null}"
-                        KeyboardNavigation.TabNavigation ="None" ToolTip="Add Filter Item"
-                        Visibility="{Binding <#= AddFilterBtnVisibilityPropertyName #>}"
-                                Command="{Binding <#= AddFilterBtnClickedCommandPropertyName #>}">
+                        Foreground="{DynamicResource Primary}"  KeyboardNavigation.TabNavigation ="None" ToolTip="Add Filter Item"
+                        Command="{Binding <#= AddFilterBtnClickedCommandPropertyName #>, ElementName=FltrUsrCntrlRootNode}">
+                    <Button.Resources>
+                        <Style TargetType="{x:Type Button}">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding <#= ShowAddFilterBtnPropertyName #>, ElementName=FltrUsrCntrlRootNode}" Value="true">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Resources>
                     <Viewbox   Height="16" Width="16" FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Button}}}" HorizontalAlignment="Center" VerticalAlignment="Center" >
                         <Canvas  Height="24" Width="24" >
-                            <Path  Data="{DynamicResource FilterPlus}" Fill="{DynamicResource Primary}" />
+                            <Path  Data="{DynamicResource FilterPlus}" Fill="{Binding Foreground, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Button}}}" />
                         </Canvas>
                     </Viewbox>
                 </Button>
                 <Button BorderBrush="{x:Null}" Background="{x:Null}"
-                        KeyboardNavigation.TabNavigation ="None" ToolTip="Remove All Filter Items"
-                        Visibility="{Binding <#= AddFilterBtnVisibilityPropertyName #>}"
-                        Command="{Binding <#= RemoveAllFiltersBtnClickedCommandPropertyName #>}"
-                        >
+                        Foreground="{DynamicResource Danger}"  KeyboardNavigation.TabNavigation ="None" ToolTip="Remove All Filter Items"
+                        Command="{Binding <#= RemoveAllFiltersBtnClickedCommandPropertyName #>, ElementName=FltrUsrCntrlRootNode}">
+                    <Button.Resources>
+                        <Style TargetType="{x:Type Button}">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding <#= ShowAddFilterBtnPropertyName #>, ElementName=FltrUsrCntrlRootNode}" Value="true">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Resources>
                     <Viewbox   Height="16" Width="16" FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Button}}}" HorizontalAlignment="Center" VerticalAlignment="Center" >
                         <Canvas  Height="24" Width="24" >
-                            <Path  Data="{DynamicResource FilterRemove}" Fill="{DynamicResource Danger}" />
+                            <Path  Data="{DynamicResource FilterRemove}" Fill="{Binding Foreground, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Button}}}" />
                         </Canvas>
                     </Viewbox>
                 </Button>
                 <Separator Margin="0 0 8 0"/>
                 <Button Margin="0 0 8 0" BorderBrush="{x:Null}" Background="{x:Null}"
-                                KeyboardNavigation.TabNavigation ="None" ToolTip="Query data"
-                                Command="{Binding <#= ApplyFilterBtnClickedCommandPropertyName #>}">
+                                Foreground="{DynamicResource Primary}"  KeyboardNavigation.TabNavigation ="None" ToolTip="Query data"
+                                Command="{Binding <#= ApplyFilterBtnClickedCommandPropertyName #>, ElementName=FltrUsrCntrlRootNode}">
                     <Viewbox   Height="16" Width="16" FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Button}}}" HorizontalAlignment="Center" VerticalAlignment="Center" >
                         <Canvas  Height="24" Width="24" >
-                            <Path  Data="{DynamicResource Refresh}" Fill="{DynamicResource Primary}" />
+                            <Path  Data="{DynamicResource Refresh}" Fill="{Binding Foreground, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Button}}}" />
                         </Canvas>
                     </Viewbox>
                 </Button>
             </StackPanel>
-            <ItemsControl Grid.Column="4" ItemsSource="{Binding <#= ContainerMenuItemsPropertyName #>}" Margin="0 0 8 0" >
+
+
+            <ItemsControl Grid.Column="4" ItemsSource="{Binding <#= ContainerMenuItemsPropertyName #>, ElementName=FltrUsrCntrlRootNode}" Margin="0 0 8 0" >
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <StackPanel Orientation="Horizontal"/>
@@ -164,34 +214,39 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Button ToolTip="{Binding Caption}" BorderBrush="{x:Null}" Background="{x:Null}" IsEnabled="{Binding Enabled}"
-                                Command="{Binding Path=DataContext.<#= ContainerMenuItemClickedCommandPropertyName #>, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"
+                        <Button BorderBrush="{x:Null}" Background="{x:Null}"
+                                ToolTip="{Binding Caption}" frgrnd:<#= foregroundHelperModelClassName #>.ForegroundResourceKey="{Binding IconColor}" IsEnabled="{Binding Enabled}"
+                                Command="{Binding <#= ContainerMenuItemClickedCommandPropertyName #>, ElementName=FltrUsrCntrlRootNode}"
                                 CommandParameter="{Binding}">
                             <Viewbox   Height="16" Width="16" FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Button}}}" HorizontalAlignment="Center" VerticalAlignment="Center" >
                                 <Canvas  Height="24" Width="24" >
-                                    <Path  pth:<#= pathHelperModelClassName #>.DataResourceKey="{Binding IconName}" fll:FillHelper.FillResourceKey="{Binding IconColor}" />
+                                    <Path  pth:<#= pathHelperModelClassName #>.DataResourceKey="{Binding IconName}" Fill="{Binding Foreground, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Button}}}" />
                                 </Canvas>
                             </Viewbox>
                         </Button>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
-
         </Grid>
-        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" >
-            <ItemsControl ItemsSource="{Binding <#= FiltersPropertyName #>}"  >
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Height="Auto">
+            <ItemsControl Grid.Row="1" ItemsSource="{Binding <#= FiltersPropertyName #>, ElementName=FltrUsrCntrlRootNode}"  >
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <fltitm:<#= WebServiceFilterItemUserControlXamlClassName #>
-                            <#= FilterOperatorsPropertyName #>="{Binding Path=DataContext.<#= FilterOperatorsPropertyName #>, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}" 
-                            <#= FilterDefinitionsPropertyName #>="{Binding Path=DataContext.<#= FilterDefinitionsPropertyName #>, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}" 
-                            <#= ModelPropertyName #>="{Binding Path=DataContext, RelativeSource={RelativeSource TemplatedParent}}">
+                            <#= FilterOperatorsPropertyName #>="{Binding <#= FilterOperatorsPropertyName #>, ElementName=FltrUsrCntrlRootNode}" 
+                            <#= FilterDefinitionsPropertyName #>="{Binding <#= FilterDefinitionsPropertyName #>, ElementName=FltrUsrCntrlRootNode}"
+                            <#= FilterErrorPropertyName #>="{Binding fltrError, Mode=OneWayToSource}"
+                            <#= FilterValuePropertyName #>="{Binding fltrValue, Mode=OneWayToSource}"
+                            <#= SelectedFilterOperatorPropertyName #>="{Binding fltrOperator, Mode=OneWayToSource}"
+                            <#= SelectedFilterDataTypePropertyName #>="{Binding fltrDataType, Mode=OneWayToSource}"
+                            <#= SelectedFilterNamePropertyName #>="{Binding fltrName, Mode=OneWayToSource}">
                             <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="RemoveNotification">
-                                    <i:InvokeCommandAction Command="{Binding Path=DataContext.<#= RemoveFilterBtnClickedCommandPropertyName #>, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ItemsControl}}}" PassEventArgsToCommand="True"/>
+                                <i:EventTrigger EventName="<#= RemoveNotificationPropertyName #>">
+                                    <i:InvokeCommandAction CommandParameter="{Binding}"
+                                        Command="{Binding RemoveFilterBtnClickedCommand, ElementName=FltrUsrCntrlRootNode}" />
                                 </i:EventTrigger>
                             </i:Interaction.Triggers>
-                        </fltitm:<#= WebServiceFilterItemUserControlXamlClassName #>>
+                        </fltitm:WebServiceFilterItemUserControl>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>

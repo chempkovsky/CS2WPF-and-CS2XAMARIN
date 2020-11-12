@@ -1,0 +1,130 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+<#
+
+    string IWebServiceFilterRsltInterfaceFolder      = "00204-IWebServiceFilterRsltInterface.cs";
+    string IWebServiceFilterRsltInterfaceClassName   = GetModelClassName(Model, IWebServiceFilterRsltInterfaceFolder);
+    string IWebServiceFilterRsltInterfaceNameSpace   = GetModelNameSpace(Model, IWebServiceFilterRsltInterfaceFolder);
+
+    
+    string WebServiceFilterRsltViewModelFolder      = "00215-WebServiceFilterRsltViewModel.cs";
+    string WebServiceFilterRsltViewModelClassName   = GetModelClassName(Model, WebServiceFilterRsltViewModelFolder);
+    string WebServiceFilterRsltViewModelNameSpace   = GetModelNameSpace(Model, WebServiceFilterRsltViewModelFolder);
+
+#>
+<# 
+    if(IWebServiceFilterRsltInterfaceNameSpace != WebServiceFilterRsltViewModelNameSpace) { 
+#>
+using <#= IWebServiceFilterRsltInterfaceNameSpace #>;
+<#
+    }
+#>
+
+namespace <#= WebServiceFilterRsltViewModelNameSpace #> {
+    public class <#= WebServiceFilterRsltViewModelClassName #>: <#= IWebServiceFilterRsltInterfaceClassName #>, INotifyPropertyChanged
+    {
+        #region INotifyPropertyChanged
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string name = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+        #endregion
+        protected string _fltrName;
+        public string fltrName { get { return _fltrName; } set { if(_fltrName != value) { _fltrName = value; OnPropertyChanged(); } } }
+        protected string _fltrDataType;
+        public string fltrDataType { get { return _fltrDataType; } set { if(_fltrDataType != value) { _fltrDataType = value; OnPropertyChanged(); } } }
+        protected string _fltrOperator;
+        public string fltrOperator { get { return _fltrOperator; } set { if(_fltrOperator != value) { _fltrOperator = value; OnPropertyChanged(); } } }
+        protected dynamic _fltrValue;
+        public dynamic fltrValue { get { return _fltrValue; } set { if(_fltrValue != value) { _fltrValue = value; OnPropertyChanged(); } } }
+        protected string _fltrError;
+        public string fltrError { get { return _fltrError; } set { if(_fltrError != value) { _fltrError = value; OnPropertyChanged(); } } }
+    }
+}
+
+<#+
+
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+
+#>

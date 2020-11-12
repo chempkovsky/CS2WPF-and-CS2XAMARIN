@@ -25,6 +25,10 @@ using Prism.Services.Dialogs;
     string commandHelperModelClassName   = GetModelClassName(Model, commandHelperModelFolder);
     string commandHelperModelNameSpace   = GetModelNameSpace(Model, commandHelperModelFolder);
 
+    string NotificationRoutedEventArgsFolder      = "00226-NotificationRoutedEventArgs.cs";
+    string NotificationRoutedEventArgsClassName   = GetModelClassName(Model, NotificationRoutedEventArgsFolder);
+    string NotificationRoutedEventArgsNameSpace   = GetModelNameSpace(Model, NotificationRoutedEventArgsFolder);
+
     string IColumnSelectorItemDefInterfaceFolder      = "00258-IColumnSelectorItemDefInterface.cs";
     string IColumnSelectorItemDefInterfaceClassName   = GetModelClassName(Model, IColumnSelectorItemDefInterfaceFolder);
     string IColumnSelectorItemDefInterfaceNameSpace   = GetModelNameSpace(Model, IColumnSelectorItemDefInterfaceFolder);
@@ -63,7 +67,8 @@ using Prism.Services.Dialogs;
         nmSpaces.Add(commandHelperModelNameSpace);
     if ((ColumnSelectorDlgViewModelNameSpace != ColumnSelectorItemDefNameSpace) && (nmSpaces.IndexOf(ColumnSelectorItemDefNameSpace) < 0)) 
         nmSpaces.Add(ColumnSelectorItemDefNameSpace);
-
+    if ((ColumnSelectorDlgViewModelNameSpace != NotificationRoutedEventArgsNameSpace) && (nmSpaces.IndexOf(NotificationRoutedEventArgsNameSpace) < 0)) 
+        nmSpaces.Add(NotificationRoutedEventArgsNameSpace);
 
 #>
 <# 
@@ -193,31 +198,35 @@ namespace <#= ColumnSelectorDlgViewModelNameSpace #> {
         }
         protected void <#= OkCommandPropertyName #>Action(object param)
         {
-            if ((RequestClose != null) && <#= OkCommandPropertyName #>CanExecute(null))
-            {
-                IList<<#= IColumnSelectorItemDefInterfaceClassName #>> rcolumns = new List<<#= IColumnSelectorItemDefInterfaceClassName #>>();
-                foreach (var col in <#= ColumnsPropertyName #>)
-                {
-                    rcolumns.Add(new <#= ColumnSelectorItemDefClassName #>()
+            <#= NotificationRoutedEventArgsClassName #> evnt = param as <#= NotificationRoutedEventArgsClassName #>;
+            if (evnt != null) {
+                IEnumerable<<#= IColumnSelectorItemDefInterfaceClassName #>> clmns = evnt.Model as IEnumerable<<#= IColumnSelectorItemDefInterfaceClassName #>>;
+                if(clmns != null) {
+                    IList<<#= IColumnSelectorItemDefInterfaceClassName #>> rcolumns = new List<<#= IColumnSelectorItemDefInterfaceClassName #>>();
+                    foreach (var col in clmns)
                     {
-                        <#= NamePropertyName #> = col.<#= NamePropertyName #>,
-                        <#= CaptionPropertyName #> = col.<#= CaptionPropertyName #>,
-                        <#= IsCheckedPropertyName #> = col.<#= IsCheckedPropertyName #>
-                    });
+                        rcolumns.Add(new <#= ColumnSelectorItemDefClassName #>()
+                        {
+                            <#= NamePropertyName #> = col.<#= NamePropertyName #>,
+                            <#= CaptionPropertyName #> = col.<#= CaptionPropertyName #>,
+                            <#= IsCheckedPropertyName #> = col.<#= IsCheckedPropertyName #>
+                        });
+                    }
+                    DialogParameters parameters = new DialogParameters();
+                    parameters.Add("Columns", rcolumns);
+                    DialogResult result = new DialogResult(ButtonResult.OK, parameters);
+                    RequestClose?.Invoke(result);
                 }
-                DialogParameters parameters = new DialogParameters();
-                parameters.Add("Columns", rcolumns);
-                DialogResult result = new DialogResult(ButtonResult.OK, parameters);
-                RequestClose?.Invoke(result);
             }
         }
         protected bool <#= OkCommandPropertyName #>CanExecute(object param)
         {
-            if (<#= ColumnsPropertyName #> != null)
-            {
-                return <#= ColumnsPropertyName #>.Any(c => c.IsChecked);
-            }
-            return false;
+            // if (<#= ColumnsPropertyName #> != null)
+            // {
+            //     return <#= ColumnsPropertyName #>.Any(c => c.IsChecked);
+            // }
+            //return false;
+            return true;
         }
         #endregion
         #region <#= CancelCommandPropertyName #>

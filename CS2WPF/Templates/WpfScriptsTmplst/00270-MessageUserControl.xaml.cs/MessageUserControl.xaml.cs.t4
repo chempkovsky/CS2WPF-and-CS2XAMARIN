@@ -11,43 +11,33 @@
 <#@ import namespace="CS2WPF.Model.Serializable" #>
 <#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+using System;
 using System.Windows;
 using System.Windows.Controls;
-using System.Collections.Generic;
 using System.Windows.Input;
-using System.Linq;
 <#
 
     string commandHelperModelFolder      = "00140-CommandHelper.cs";
     string commandHelperModelClassName   = GetModelClassName(Model, commandHelperModelFolder);
     string commandHelperModelNameSpace   = GetModelNameSpace(Model, commandHelperModelFolder);
 
-    string NotificationRoutedEventArgsFolder      = "00226-NotificationRoutedEventArgs.cs";
-    string NotificationRoutedEventArgsClassName   = GetModelClassName(Model, NotificationRoutedEventArgsFolder);
-    string NotificationRoutedEventArgsNameSpace   = GetModelNameSpace(Model, NotificationRoutedEventArgsFolder);
-    
-    string IColumnSelectorItemDefInterfaceFolder      = "00258-IColumnSelectorItemDefInterface.cs";
-    string IColumnSelectorItemDefInterfaceClassName   = GetModelClassName(Model, IColumnSelectorItemDefInterfaceFolder);
-    string IColumnSelectorItemDefInterfaceNameSpace   = GetModelNameSpace(Model, IColumnSelectorItemDefInterfaceFolder);
+    string MessageUserControlFolder     = "00270-MessageUserControl.xaml.cs";
+    string MessageUserControlClassName  = GetModelClassName(Model, MessageUserControlFolder);
+    string MessageUserControlNameSpace  = GetModelNameSpace(Model, MessageUserControlFolder);
 
-    string ColumnSelectorUserControlFolder            = "00264-ColumnSelectorUserControl.xaml.cs";
-    string ColumnSelectorUserControlClassName         = GetModelClassName(Model, ColumnSelectorUserControlFolder);
-    string ColumnSelectorUserControlNameSpace         = GetModelNameSpace(Model, ColumnSelectorUserControlFolder);
-
-
-    string ColumnsPropertyName = "Columns";
+    string TitlePropertyName = "Title";
+    string MessagePropertyName = "Message";
+    string MessageIconNamePropertyName = "MessageIconName";
+    string MessageIconColorPropertyName = "MessageIconColor";
+    string ShowOkBtnPropertyName = "ShowOkBtn";
+    string ShowCancelBtnPropertyName = "ShowCancelBtn";
     string OkNotificationPropertyName = "OkNotification";
     string OkCommandPropertyName = "OkCommand";
     string CancelNotificationPropertyName = "CancelNotification";
     string CancelCommandPropertyName = "CancelCommand";
 
-
     List<string> nmSpaces = new List<string>();
-    if (ColumnSelectorUserControlNameSpace != IColumnSelectorItemDefInterfaceNameSpace) nmSpaces.Add(IColumnSelectorItemDefInterfaceNameSpace);
-   if ((ColumnSelectorUserControlNameSpace != NotificationRoutedEventArgsNameSpace) && (nmSpaces.IndexOf(NotificationRoutedEventArgsNameSpace) < 0)) 
-        nmSpaces.Add(NotificationRoutedEventArgsNameSpace);
-   if ((ColumnSelectorUserControlNameSpace != commandHelperModelNameSpace) && (nmSpaces.IndexOf(commandHelperModelNameSpace) < 0)) 
-        nmSpaces.Add(commandHelperModelNameSpace);
+   if (MessageUserControlNameSpace != commandHelperModelNameSpace) nmSpaces.Add(commandHelperModelNameSpace);
 
 #>
 <# 
@@ -58,32 +48,121 @@ using <#= ns #>;
     }
 #>
 
-
-namespace <#= ColumnSelectorUserControlNameSpace #> {
+namespace <#= MessageUserControlNameSpace #> {
     /// <summary>
-    /// Interaction logic for <#= ColumnSelectorUserControlClassName #>.xaml
+    /// Interaction logic for <#= MessageUserControlClassName #>.xaml
     /// </summary>
-    public partial class <#= ColumnSelectorUserControlClassName #>: UserControl
+    public partial class <#= MessageUserControlClassName #>: UserControl
     {
-        public <#= ColumnSelectorUserControlClassName #>()
+        public <#= MessageUserControlClassName #>()
         {
             InitializeComponent();
         }
-        #region <#= ColumnsPropertyName #>
-        public static readonly DependencyProperty <#= ColumnsPropertyName #>Property =
+        #region <#= TitlePropertyName #>
+        public static readonly DependencyProperty <#= TitlePropertyName #>Property =
                 DependencyProperty.Register(
-                "<#= ColumnsPropertyName #>", typeof(IEnumerable<<#= IColumnSelectorItemDefInterfaceClassName #>>),
-                typeof(<#= ColumnSelectorUserControlClassName #>),
+                "<#= TitlePropertyName #>", typeof(string),
+                typeof(<#= MessageUserControlClassName #>),
                 new PropertyMetadata(null));
-        public IEnumerable<<#= IColumnSelectorItemDefInterfaceClassName #>> <#= ColumnsPropertyName #>
+        public string <#= TitlePropertyName #>
         {
             get
             {
-                return (IEnumerable<<#= IColumnSelectorItemDefInterfaceClassName #>>)GetValue(<#= ColumnsPropertyName #>Property);
+                return (string)GetValue(<#= TitlePropertyName #>Property);
             }
             set
             {
-                SetValue(<#= ColumnsPropertyName #>Property, value);
+                SetValue(<#= TitlePropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= MessagePropertyName #>
+        public static readonly DependencyProperty <#= MessagePropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= MessagePropertyName #>", typeof(string),
+                typeof(<#= MessageUserControlClassName #>),
+                new PropertyMetadata(null));
+        public string <#= MessagePropertyName #>
+        {
+            get
+            {
+                return (string)GetValue(<#= MessagePropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= MessagePropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= MessageIconNamePropertyName #>
+        public static readonly DependencyProperty <#= MessageIconNamePropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= MessageIconNamePropertyName #>", typeof(string),
+                typeof(<#= MessageUserControlClassName #>),
+                new PropertyMetadata(null));
+        public string <#= MessageIconNamePropertyName #>
+        {
+            get
+            {
+                return (string)GetValue(<#= MessageIconNamePropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= MessageIconNamePropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= MessageIconColorPropertyName #>
+        public static readonly DependencyProperty <#= MessageIconColorPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= MessageIconColorPropertyName #>", typeof(string),
+                typeof(<#= MessageUserControlClassName #>),
+                new PropertyMetadata(null));
+        public string <#= MessageIconColorPropertyName #>
+        {
+            get
+            {
+                return (string)GetValue(<#= MessageIconColorPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= MessageIconColorPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= ShowOkBtnPropertyName #>
+        public static readonly DependencyProperty <#= ShowOkBtnPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= ShowOkBtnPropertyName #>", typeof(Nullable<bool>),
+                typeof(<#= MessageUserControlClassName #>),
+                new PropertyMetadata(null));
+        public Nullable<bool> <#= ShowOkBtnPropertyName #>
+        {
+            get
+            {
+                return (Nullable<bool>)GetValue(<#= ShowOkBtnPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= ShowOkBtnPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= ShowCancelBtnPropertyName #>
+        public static readonly DependencyProperty <#= ShowCancelBtnPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= ShowCancelBtnPropertyName #>", typeof(Nullable<bool>),
+                typeof(<#= MessageUserControlClassName #>),
+                new PropertyMetadata(null));
+        public Nullable<bool> <#= ShowCancelBtnPropertyName #>
+        {
+            get
+            {
+                return (Nullable<bool>)GetValue(<#= ShowCancelBtnPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= ShowCancelBtnPropertyName #>Property, value);
             }
         }
         #endregion
@@ -92,8 +171,8 @@ namespace <#= ColumnSelectorUserControlNameSpace #> {
                 EventManager.RegisterRoutedEvent(
                 "<#= OkNotificationPropertyName #>", RoutingStrategy.Bubble,
                 typeof(RoutedEventHandler),
-                typeof(<#= ColumnSelectorUserControlClassName #>));
-        public event RoutedEventHandler OkNotification
+                typeof(<#= MessageUserControlClassName #>));
+        public event RoutedEventHandler <#= OkNotificationPropertyName #>
         {
             add { AddHandler(<#= OkNotificationPropertyName #>Event, value); }
             remove { RemoveHandler(<#= OkNotificationPropertyName #>Event, value); }
@@ -110,18 +189,11 @@ namespace <#= ColumnSelectorUserControlNameSpace #> {
         }
         protected void <#= OkCommandPropertyName #>Action(object param)
         {
-            <#= NotificationRoutedEventArgsClassName #> newEventArgs = new <#= NotificationRoutedEventArgsClassName #>(<#= ColumnSelectorUserControlClassName #>.<#= OkNotificationPropertyName #>Event);
-            newEventArgs.Sender = this;
-            newEventArgs.Model = <#= ColumnsPropertyName #>;
-            RaiseEvent(newEventArgs);
+            RaiseEvent(new RoutedEventArgs(<#= MessageUserControlClassName #>.<#= OkNotificationPropertyName #>Event));
         }
         protected bool <#= OkCommandPropertyName #>CanExecute(object param)
         {
-            if (<#= ColumnsPropertyName #> != null)
-            {
-                return <#= ColumnsPropertyName #>.Any(c => c.IsChecked);
-            }
-            return false;
+            return <#= ShowOkBtnPropertyName #>.HasValue ? <#= ShowOkBtnPropertyName #>.Value : false;
         }
         #endregion
         #region <#= CancelNotificationPropertyName #>
@@ -129,7 +201,7 @@ namespace <#= ColumnSelectorUserControlNameSpace #> {
                 EventManager.RegisterRoutedEvent(
                 "<#= CancelNotificationPropertyName #>", RoutingStrategy.Bubble,
                 typeof(RoutedEventHandler),
-                typeof(<#= ColumnSelectorUserControlClassName #>));
+                typeof(<#= MessageUserControlClassName #>));
         public event RoutedEventHandler <#= CancelNotificationPropertyName #>
         {
             add { AddHandler(<#= CancelNotificationPropertyName #>Event, value); }
@@ -147,14 +219,11 @@ namespace <#= ColumnSelectorUserControlNameSpace #> {
         }
         protected void <#= CancelCommandPropertyName #>Action(object param)
         {
-            <#= NotificationRoutedEventArgsClassName #> newEventArgs = new <#= NotificationRoutedEventArgsClassName #>(<#= ColumnSelectorUserControlClassName #>.<#= CancelNotificationPropertyName #>Event);
-            newEventArgs.Sender = this;
-            // newEventArgs.Model = null;
-            RaiseEvent(newEventArgs);
+            RaiseEvent(new RoutedEventArgs(<#= MessageUserControlClassName #>.<#= CancelNotificationPropertyName #>Event));
         }
         protected bool <#= CancelCommandPropertyName #>CanExecute(object param)
         {
-            return true;
+            return <#= ShowCancelBtnPropertyName #>.HasValue ? <#= ShowCancelBtnPropertyName #>.Value : false;
         }
         #endregion
     }
