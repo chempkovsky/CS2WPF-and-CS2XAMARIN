@@ -19,9 +19,10 @@ using System.Windows.Input;
 using Prism.Services.Dialogs;
 <#
 
-    string commandHelperModelFolder      = "00140-CommandHelper.cs";
-    string commandHelperModelClassName   = GetModelClassName(Model, commandHelperModelFolder);
-    string commandHelperModelNameSpace   = GetModelNameSpace(Model, commandHelperModelFolder);
+
+    string RoutedCommandExtFolder      = "00224-RoutedCommandExt.cs";
+    string RoutedCommandExtClassName   = GetModelClassName(Model, RoutedCommandExtFolder);
+    string RoutedCommandExtNameSpace   = GetModelNameSpace(Model, RoutedCommandExtFolder);
 
     string MessageDlgUserControlFolder            = "00270-MessageDlgUserControl.xaml.cs";
     string MessageDlgUserControlClassName         = GetModelClassName(Model, MessageDlgUserControlFolder);
@@ -38,13 +39,13 @@ using Prism.Services.Dialogs;
     string MessageIconColorPropertyName = "MessageIconColor";
     string ShowOkBtnPropertyName = "ShowOkBtn";
     string ShowCancelBtnPropertyName = "ShowCancelBtn";
-    string OkNotificationPropertyName = "OkNotification";
     string OkCommandPropertyName = "OkCommand";
-    string CancelNotificationPropertyName = "CancelNotification";
     string CancelCommandPropertyName = "CancelCommand";
+    string RoutedCommandHandlersPropertyName = "RoutedCommandHandlers";
     
     List<string> nmSpaces = new List<string>();
-    if (MessageDlgViewModelNameSpace != commandHelperModelNameSpace) nmSpaces.Add(commandHelperModelNameSpace);
+    if ((MessageDlgViewModelNameSpace != RoutedCommandExtNameSpace) && (nmSpaces.IndexOf(RoutedCommandExtNameSpace) < 0)) 
+        nmSpaces.Add(RoutedCommandExtNameSpace);
 
 
 #>
@@ -76,6 +77,16 @@ using <#= ns #>;
 namespace <#= MessageDlgViewModelNameSpace #> {
     public class <#= MessageDlgViewModelClassName #>: INotifyPropertyChanged, IDialogAware
     {
+        public <#= MessageDlgViewModelClassName #>() {
+            CommandBindingCollection cbsc = new CommandBindingCollection();
+            CommandBinding cb = new CommandBinding(<#= RoutedCommandExtClassName #>.<#= OkCommandPropertyName #>, new ExecutedRoutedEventHandler(this.Executed<#= OkCommandPropertyName #>), new CanExecuteRoutedEventHandler(CanExecute<#= OkCommandPropertyName #>));
+            cbsc.Add(cb);
+
+            cb = new CommandBinding(<#= RoutedCommandExtClassName #>.<#= CancelCommandPropertyName #>, new ExecutedRoutedEventHandler(this.Executed<#= CancelCommandPropertyName #>), new CanExecuteRoutedEventHandler(CanExecute<#= CancelCommandPropertyName #>));
+            cbsc.Add(cb);
+
+            _<#= RoutedCommandHandlersPropertyName #> = cbsc;
+        }
         #region INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName] string name = null)
@@ -233,50 +244,54 @@ namespace <#= MessageDlgViewModelNameSpace #> {
             }
         }
         #endregion
-
-        #region <#= OkCommandPropertyName #>
-        private ICommand _<#= OkCommandPropertyName #>;
-        public ICommand <#= OkCommandPropertyName #>
+        #region <#= RoutedCommandHandlersPropertyName #>
+        protected CommandBindingCollection _<#= RoutedCommandHandlersPropertyName #> = null;
+        public CommandBindingCollection <#= RoutedCommandHandlersPropertyName #>
         {
             get
             {
-                return _<#= OkCommandPropertyName #> ?? (_<#= OkCommandPropertyName #> = new CommandHelper((param) => <#= OkCommandPropertyName #>Action(param), (param) => <#= OkCommandPropertyName #>CanExecute(param)));
+                return _<#= RoutedCommandHandlersPropertyName #>;
+            }
+            set
+            {
+                if (_<#= RoutedCommandHandlersPropertyName #> != value)
+                {
+                    _<#= RoutedCommandHandlersPropertyName #> = value;
+                    OnPropertyChanged();
+                }
             }
         }
-        protected void <#= OkCommandPropertyName #>Action(object param)
+        #endregion
+        #region <#= OkCommandPropertyName #>
+        public void Executed<#= OkCommandPropertyName #>(object sender, ExecutedRoutedEventArgs e)
         {
+            e.Handled = true;
             if (RequestClose != null)
             {
                 DialogResult result = new DialogResult(ButtonResult.OK);
                 RequestClose?.Invoke(result);
             }
         }
-        protected bool <#= OkCommandPropertyName #>CanExecute(object param)
+        public void CanExecute<#= OkCommandPropertyName #>(object sender, CanExecuteRoutedEventArgs e)
         {
-            return true;
+            e.Handled = true;
+            e.CanExecute = true;
         }
         #endregion
         #region <#= CancelCommandPropertyName #>
-        private ICommand _<#= CancelCommandPropertyName #>;
-        public ICommand <#= CancelCommandPropertyName #>
+        public void Executed<#= CancelCommandPropertyName #>(object sender, ExecutedRoutedEventArgs e)
         {
-            get
-            {
-                return _<#= CancelCommandPropertyName #> ?? (_<#= CancelCommandPropertyName #> = new CommandHelper((param) => <#= CancelCommandPropertyName #>Action(param), (param) => <#= CancelCommandPropertyName #>CanExecute(param)));
-            }
-        }
-        protected void <#= CancelCommandPropertyName #>Action(object param)
-        {
+            e.Handled = true;
             if (RequestClose != null)
             {
                 DialogResult result = new DialogResult(ButtonResult.Cancel);
                 RequestClose?.Invoke(result);
             }
-
         }
-        protected bool <#= CancelCommandPropertyName #>CanExecute(object param)
+        public void CanExecute<#= CancelCommandPropertyName #>(object sender, CanExecuteRoutedEventArgs e)
         {
-            return true;
+            e.Handled = true;
+            e.CanExecute = true;
         }
         #endregion
     }

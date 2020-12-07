@@ -1,0 +1,781 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+using System;
+using System.Text;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
+
+<#
+
+    string IAppGlblSettingsServiceFolder      = "00080-IAppGlblSettingsService";
+    string IAppGlblSettingsServiceClassName   = GetContextModelClassName(Context, IAppGlblSettingsServiceFolder);
+    string IAppGlblSettingsServiceNameSpace   = GetContextModelNameSpace(Context, IAppGlblSettingsServiceFolder);
+
+
+    string modelInterfaceFolder             = "01100-Interface.cs";
+    string modelInterfaceClassName          = GetInterfaceName(Model);
+    string modelInterfaceNameSpace          = GetModelNameSpace(Model, modelInterfaceFolder);
+
+    string modelFolder                      = "01102-Model.cs";
+    string modelClassName                   = GetModelName(Model);
+    string modelNameSpace                   = GetModelNameSpace(Model, modelFolder);
+
+    string modelPageInterfaceFolder         = "01200-Page.interface.cs";
+    string modelPageInterfaceClassName      = GetPageInterfaceName(Model);
+    string modelPageInterfaceNameSpace      = GetModelNameSpace(Model, modelPageInterfaceFolder);
+
+    string modelPageFolder                  = "01202-Page.model.cs";
+    string modelPageClassName               = GetModelPageName(Model);
+    string modelPageNameSpace               = GetModelNameSpace(Model, modelPageFolder);
+
+    string modelFilterInterfaceFolder       = "01300-Filter.interface.cs";
+    string modelFilterInterfaceClassName    = GetFilterInterfaceName(Model);
+    string modelFilterInterfaceNameSpace    = GetModelNameSpace(Model, modelFilterInterfaceFolder);
+
+
+    string modelServiceInterfaceFolder       = "01400-Service.interface.cs";
+    string modelServiceInterfaceClassName    = GetModelServiceInterfaceName(Model);
+    string modelServiceInterfaceNameSpace    = GetModelNameSpace(Model, modelServiceInterfaceFolder);
+
+    string modelServiceFolder                = "01402-Service.cs";
+    string modelServiceClassName             = GetModelServiceName(Model);
+    string modelServiceNameSpace             = GetModelNameSpace(Model, modelServiceFolder);
+
+
+
+    string FilterOperatorSuffix = "Oprtr";
+    string EqualOperator = "eq";
+    string getAuthInfoHeaderMethodName      = "GetAuthInfoHeader";
+
+
+    string GetAllMethodName                 = "getall";
+    string GetWithFilterMethodName          = "getwithfilter";
+    string GetOneMethodName                 = "getone";
+    string UpdateOneMethodName              = "updateone";
+    string AddOneMethodName                 = "addone";
+    string DeleteOneMethodName              = "deleteone";
+    string AppSettingServicePropertyName    = "appGlblSettings";
+
+
+    List<ModelViewPropertyOfVwSerializable> primKeys= new List<ModelViewPropertyOfVwSerializable>();
+    {
+        // collect primkey props
+        if ((Model.PrimaryKeyProperties != null) && (Model.ScalarProperties != null)) {
+            foreach(ModelViewKeyPropertySerializable pk in Model.PrimaryKeyProperties) {
+                ModelViewPropertyOfVwSerializable scProp= 
+                    Model.ScalarProperties.Where(p => ((p.OriginalPropertyName == pk.OriginalPropertyName) && (string.IsNullOrEmpty(p.ForeignKeyNameChain)))).FirstOrDefault();
+                if(scProp == null) {
+                    if (Model.ForeignKeys != null) {
+                        foreach(ModelViewForeignKeySerializable fk in Model.ForeignKeys) {
+                            if ((fk.ForeignKeyProps != null) && (fk.PrincipalKeyProps != null)) {
+                                int cnt = fk.ForeignKeyProps.Count;
+                                if (cnt < fk.PrincipalKeyProps.Count)
+                                {
+                                    cnt = fk.PrincipalKeyProps.Count;
+                                }
+                                for(int i = 0; i < cnt; i++)
+                                {
+                                    if(fk.ForeignKeyProps[i].OriginalPropertyName == pk.OriginalPropertyName)
+                                    {
+                                        scProp=
+                                            Model.ScalarProperties.Where(p =>
+                                            ((p.OriginalPropertyName == fk.PrincipalKeyProps[i].OriginalPropertyName) && (p.ForeignKeyNameChain == fk.NavigationName))).FirstOrDefault();
+                                    }
+                                    if(scProp != null) {
+                                        break;
+                                    }
+                                }
+                            }
+                            if(scProp != null) {
+                                break;
+                            }
+                        }
+                    }
+                }
+                if(scProp != null) {
+                    primKeys.Add(scProp);
+                }
+            }
+        }
+    }
+
+
+
+    List<string> nmSpaces = new List<string>();
+    if (modelServiceNameSpace != modelInterfaceNameSpace) nmSpaces.Add(modelInterfaceNameSpace);
+    if ((modelServiceNameSpace != modelPageInterfaceNameSpace) && (nmSpaces.IndexOf(modelPageInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(modelPageInterfaceNameSpace);
+    if ((modelServiceNameSpace != modelFilterInterfaceNameSpace) && (nmSpaces.IndexOf(modelFilterInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(modelFilterInterfaceNameSpace);
+    if ((modelServiceNameSpace != modelServiceInterfaceNameSpace) && (nmSpaces.IndexOf(modelServiceInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(modelServiceInterfaceNameSpace);
+    if ((modelServiceNameSpace != modelNameSpace) && (nmSpaces.IndexOf(modelNameSpace) < 0)) 
+        nmSpaces.Add(modelNameSpace);
+    if ((modelServiceNameSpace != modelPageNameSpace) && (nmSpaces.IndexOf(modelPageNameSpace) < 0)) 
+        nmSpaces.Add(modelPageNameSpace);
+    if ((modelServiceNameSpace != IAppGlblSettingsServiceNameSpace) && (nmSpaces.IndexOf(IAppGlblSettingsServiceNameSpace) < 0)) 
+        nmSpaces.Add(IAppGlblSettingsServiceNameSpace);
+
+
+
+#>
+<# 
+    foreach(string ns in nmSpaces) {
+#>
+using <#= ns #>;
+<#
+    }
+#>
+
+namespace <#= modelServiceNameSpace #> {
+    public class <#= modelServiceClassName #>: <#= modelServiceInterfaceClassName #>
+    {
+        protected <#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName #> = null;
+        protected string serviceUrl = null;
+        protected HttpClient client = null;
+        public <#= modelServiceClassName #>(<#= IAppGlblSettingsServiceClassName #> agstt) {
+            this.<#= AppSettingServicePropertyName #> = agstt;
+            this.serviceUrl = this.<#= AppSettingServicePropertyName #>.GetWebApiPrefix("<#= Model.ViewName #>") + "<#= GetWebApiServicePrefix(Model) #>";
+            this.client = this.<#= AppSettingServicePropertyName #>.Client;
+        }
+<# 
+    if (Model.IsWebApiSelectAll) { 
+#>
+        public async Task<IList<<#= modelInterfaceClassName #>>> <#= GetAllMethodName #>() {
+            try
+            {
+                HttpResponseMessage response = await client.GetAsync(serviceUrl + "/" + "<#= GetAllMethodName #>");
+                response.EnsureSuccessStatusCode();
+                string responseBody = await response.Content.ReadAsStringAsync();
+                return new List<<#= modelInterfaceClassName #>>( JsonConvert.DeserializeObject<IList<<#= modelClassName #>>>(responseBody) );
+            } 
+            catch(Exception e)
+            {
+                <#= AppSettingServicePropertyName #>.SendErrorMessage("http", e.Message);
+                return null;
+            }
+        }
+<#
+    }
+    if (Model.IsWebApiSelectManyWithPagination) { 
+#>
+        public async Task<<#= modelPageInterfaceClassName #>> <#= GetWithFilterMethodName #>(<#= modelFilterInterfaceClassName #> filter) {
+            string prms = null;
+            if(filter != null) {
+<#
+        foreach(ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
+            if (! prop.IsUsedByfilter) {
+                continue;
+            }
+#>
+                if (filter.<#= GetModelPropertyName(prop, Model) #> != null) {
+<#          if(prop.IsNullable) { 
+#>
+                    bool hasNull = false;
+<#
+            }
+#>
+                    foreach(var val in filter.<#= GetModelPropertyName(prop, Model) #>) {
+<#          if(prop.IsNullable) { 
+#>
+                        if(val != null) {
+<#
+            }
+#>
+                            if(prms == null)
+                                prms = "?" + Uri.EscapeDataString("<#= GetModelPropertyName(prop, Model) #>") + "=" + Uri.EscapeDataString(val.ToString());
+                            else 
+                                prms += "&" + Uri.EscapeDataString("<#= GetModelPropertyName(prop, Model) #>") + "=" + Uri.EscapeDataString(val.ToString());
+<#          if(prop.IsNullable) { 
+#>
+                        } 
+                        else hasNull = true;
+<#
+            }
+#>
+                    }
+<#          if(prop.IsNullable) { 
+#>
+                    if(hasNull) {
+                            if(prms == null)
+                                prms = "?" + Uri.EscapeDataString("<#= GetModelPropertyName(prop, Model) #>") + "=" ;
+                            else 
+                                prms += "&" + Uri.EscapeDataString("<#= GetModelPropertyName(prop, Model) #>") + "=";
+                    }
+<#
+            }
+#>
+                }
+<#
+        }
+        foreach(ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
+            if (! prop.IsUsedByfilter) {
+                continue;
+            }
+#>
+                if(filter.<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix)#> != null) {
+                    foreach(var val in filter.<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix)#>) {
+                        if(val != null) {
+                            if(prms == null)
+                                prms = "?" + Uri.EscapeDataString("<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #>") + "=" +  Uri.EscapeDataString(val.ToString());
+                            else 
+                                prms += "&" + Uri.EscapeDataString("<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #>") + "=" + Uri.EscapeDataString(val.ToString());
+                        } else {
+                            if(prms == null)
+                                prms = "?" + Uri.EscapeDataString("<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #>") + "=" +  Uri.EscapeDataString("<#= EqualOperator #>");
+                            else 
+                                prms += "&" + Uri.EscapeDataString("<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #>") + "=" + Uri.EscapeDataString("<#= EqualOperator #>");
+                        }
+                    }
+                }
+<#
+        }
+#>
+                if(filter.orderby != null) {
+                    foreach(var ordb in filter.orderby) {
+                        if( !string.IsNullOrEmpty(ordb) ) {
+                            if(prms == null)
+                                prms = "?" + Uri.EscapeDataString("orderby") + "=" +  Uri.EscapeDataString(ordb);
+                            else 
+                                prms += "&" + Uri.EscapeDataString("orderby") + "=" + Uri.EscapeDataString(ordb);
+                        }
+                    }
+                }
+                if(filter.page.HasValue) {
+                    if(prms == null)
+                        prms = "?" + Uri.EscapeDataString("page") + "=" +  Uri.EscapeDataString(filter.page.Value.ToString());
+                    else 
+                        prms += "&" + Uri.EscapeDataString("page") + "=" + Uri.EscapeDataString(filter.page.Value.ToString());
+                }
+                if(filter.pagesize.HasValue) {
+                    if(prms == null)
+                        prms = "?" + Uri.EscapeDataString("pagesize") + "=" +  Uri.EscapeDataString(filter.pagesize.Value.ToString());
+                    else 
+                        prms += "&" + Uri.EscapeDataString("pagesize") + "=" + Uri.EscapeDataString(filter.pagesize.Value.ToString());
+                }
+            }
+            if(prms == null) prms = "";
+            try
+            {
+                HttpResponseMessage response = await client.GetAsync(serviceUrl + "/" + "<#= GetWithFilterMethodName #>" + prms);
+                response.EnsureSuccessStatusCode();
+                string responseBody = await response.Content.ReadAsStringAsync();
+                return  JsonConvert.DeserializeObject<<#= modelPageClassName #>>(responseBody) ;
+            } 
+            catch(Exception e)
+            {
+                <#= AppSettingServicePropertyName #>.SendErrorMessage("http", e.Message);
+                return null;
+            }
+        }
+<#
+    }
+    if (Model.IsWebApiSelectOneByPrimarykey) { 
+#>
+        public async Task<<#= modelInterfaceClassName #>> <#= GetOneMethodName #>(<# 
+        {
+            bool isNotFirst = false;
+            foreach(ModelViewPropertyOfVwSerializable prop in primKeys) { 
+                 if(isNotFirst){#>, <#} else {isNotFirst = true;} #><#=  GetPropertyTypeName(prop) #> <#= GetModelPropertyName(prop, Model) #> <#
+            }
+        }
+        #>) {
+            string prms = null;
+<#
+        foreach(ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
+            if(! (primKeys.Contains(prop))) {
+                continue;
+            }
+            if(prop.IsNullable) { 
+#>
+            if(<#= GetModelPropertyName(prop, Model) #> != null) {
+<#
+            }
+#>
+                if(prms == null)
+                    prms = "?" + Uri.EscapeDataString("<#= GetModelPropertyName(prop, Model) #>") + "=" +  Uri.EscapeDataString(<#= GetModelPropertyName(prop, Model) #>.ToString());
+                else 
+                    prms += "&" + Uri.EscapeDataString("<#= GetModelPropertyName(prop, Model) #>") + "=" + Uri.EscapeDataString(<#= GetModelPropertyName(prop, Model) #>.ToString());
+<#
+            if(prop.IsNullable) { 
+#>
+            }
+<#
+            }
+        }
+#>
+            if(prms == null) prms = "";
+            try
+            {
+                HttpResponseMessage response = await client.GetAsync(serviceUrl + "/" + "<#= GetOneMethodName #>" + prms);
+                response.EnsureSuccessStatusCode();
+                string responseBody = await response.Content.ReadAsStringAsync();
+                return  JsonConvert.DeserializeObject<<#= modelClassName #>>(responseBody) ;
+            } 
+            catch(Exception e)
+            {
+                <#= AppSettingServicePropertyName #>.SendErrorMessage("http", e.Message);
+                return null;
+            }
+        }
+<#
+    }
+    if (Model.IsWebApiUpdate) { 
+#>
+        public async Task<<#= modelInterfaceClassName #>> <#= UpdateOneMethodName #>(<#= modelInterfaceClassName #> item) {
+            if(item == null) {
+                <#= AppSettingServicePropertyName #>.SendErrorMessage("http", "Input item is not defined");
+                return null;
+            }
+            try
+            {
+                var stringContent = new StringContent(JsonConvert.SerializeObject(item), Encoding.UTF8, "application/json");
+                HttpResponseMessage response = await client.PutAsync(serviceUrl + "/" + "<#= UpdateOneMethodName #>", stringContent);
+                response.EnsureSuccessStatusCode();
+                string responseBody = await response.Content.ReadAsStringAsync();
+                return  JsonConvert.DeserializeObject<<#= modelClassName #>>(responseBody) ;
+            } 
+            catch(Exception e)
+            {
+                <#= AppSettingServicePropertyName #>.SendErrorMessage("http", e.Message);
+                return null;
+            }
+        }
+<#
+    }
+    if (Model.IsWebApiAdd) { 
+        List<ModelViewPropertyOfVwSerializable> identProps = GetDatabaseGeneratedProp(Model);
+#>
+        public async Task<<#= modelInterfaceClassName #>> <#= AddOneMethodName #>(<#= modelInterfaceClassName #> item) {
+            if(item == null) {
+                <#= AppSettingServicePropertyName #>.SendErrorMessage("http", "Input item is not defined");
+                return null;
+            }
+<#
+        foreach (ModelViewPropertyOfVwSerializable identProp in identProps) {
+#>
+            if(item.<#= GetModelPropertyName(identProp, Model) #> == null) {
+                item["<#= GetModelPropertyName(identProp, Model) #>"] = <#= GetDefaultVal(identProp) #>;
+            }
+<#
+        }
+#>
+            try
+            {
+                var stringContent = new StringContent(JsonConvert.SerializeObject(item), Encoding.UTF8, "application/json");
+                HttpResponseMessage response = await client.PostAsync(serviceUrl + "/" + "<#= AddOneMethodName #>", stringContent);
+                response.EnsureSuccessStatusCode();
+                string responseBody = await response.Content.ReadAsStringAsync();
+                return  JsonConvert.DeserializeObject<<#= modelClassName #>>(responseBody) ;
+            } 
+            catch(Exception e)
+            {
+                <#= AppSettingServicePropertyName #>.SendErrorMessage("http", e.Message);
+                return null;
+            }
+        }
+<#
+    }
+    if (Model.IsWebApiDelete) { 
+#>
+        public async Task<<#= modelInterfaceClassName #>> <#= DeleteOneMethodName #>(<# 
+        {
+            bool isNotFirst = false;
+            foreach(ModelViewPropertyOfVwSerializable prop in primKeys) { 
+                 if(isNotFirst){#>, <#} else {isNotFirst = true;} #><#=  GetPropertyTypeName(prop) #> <#= GetModelPropertyName(prop, Model) #> <#
+            }
+        }
+        #>) {
+            string prms = null;
+<#
+        foreach(ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
+            if(! (primKeys.Contains(prop))) {
+                continue;
+            }
+            if(prop.IsNullable) { 
+#>
+            if(<#= GetModelPropertyName(prop, Model) #> != null) {
+<#
+            }
+#>
+                if(prms == null)
+                    prms = "?" + Uri.EscapeDataString("<#= GetModelPropertyName(prop, Model) #>") + "=" +  Uri.EscapeDataString(<#= GetModelPropertyName(prop, Model) #>.ToString());
+                else 
+                    prms += "&" + Uri.EscapeDataString("<#= GetModelPropertyName(prop, Model) #>") + "=" + Uri.EscapeDataString(<#= GetModelPropertyName(prop, Model) #>.ToString());
+<#
+            if(prop.IsNullable) { 
+#>
+            }
+<#
+            }
+        }
+#>
+            if(prms == null) prms = "";
+            try
+            {
+                HttpResponseMessage response = await client.GetAsync(serviceUrl + "/" + "<#= DeleteOneMethodName #>" + prms);
+                response.EnsureSuccessStatusCode();
+                string responseBody = await response.Content.ReadAsStringAsync();
+                return  JsonConvert.DeserializeObject<<#= modelClassName #>>(responseBody) ;
+            } 
+            catch(Exception e)
+            {
+                <#= AppSettingServicePropertyName #>.SendErrorMessage("http", e.Message);
+                return null;
+            }
+        }
+<#
+    }
+#>
+    }
+}
+
+<#+
+    string GetModelPageName(ModelViewSerializable model) {
+        return FirstLetterToUpper(model.PageViewName);
+    }
+    string GetModelServiceInterfaceName(ModelViewSerializable model) {
+        return "I" + model.ViewName + "Service";
+    }
+    string GetModelServiceName(ModelViewSerializable model) {
+        return FirstLetterToUpper(model.ViewName)+ "Service";
+    }
+    string GetFilterPropertyOperatorName(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model, string operatorSufix) {
+        if (model.GenerateJSonAttribute) {
+            return prop.JsonPropertyName + operatorSufix;
+        } else {
+            return FirstLetterToLower(prop.ViewPropertyName) + operatorSufix;
+        }
+    }
+    string GetFilterInterfaceName(ModelViewSerializable model) {
+        return "I"+model.ViewName + "Filter";
+    }
+    string GetPageInterfaceName(ModelViewSerializable model) {
+        return "I"+model.PageViewName;
+    }
+    string GetInterfaceName(ModelViewSerializable model) {
+        return "I"+model.ViewName;
+    }
+    string GetModelName(ModelViewSerializable model) {
+        return FirstLetterToUpper(model.ViewName);
+    }
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+    public string FirstLetterToUpper(string str)
+    {
+        if (str == null)
+            return null;
+        if (str.Length > 1)
+            return char.ToUpper(str[0]) + str.Substring(1);
+        return str.ToUpper();
+    }
+    public string FirstLetterToLower(string str)
+    {
+        if (str == null)
+            return null;
+        if (str.Length > 1)
+            return char.ToLower(str[0]) + str.Substring(1);
+        return str.ToUpper();
+    }
+    string GetModelPropertyName(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+        if (model.GenerateJSonAttribute) {
+            return prop.ViewPropertyName;
+        } else {
+            return FirstLetterToLower(prop.ViewPropertyName);
+        }
+    }
+    string AttribToString(ModelViewAttributeSerializable attr) {
+        if(attr == null) return "";
+        string result= "[" + attr.AttrName; 
+        if (attr.VaueProperties == null) {
+            return result + "]";
+        }
+        if (attr.VaueProperties.Count < 1) {
+            return result + "]";
+        }
+        result = result + "(";
+        bool insComma= false;
+        foreach(ModelViewAttributePropertySerializable valProp in attr.VaueProperties) {
+            if (insComma) {
+                result =  result + ",";
+            } else {
+                insComma = true;
+            }
+            if(! string.IsNullOrEmpty(valProp.PropName) ) {
+                if (! valProp.PropName.Contains("...") ) {
+                    result =  result + valProp.PropName + "=";
+                }
+            }
+            result =  result + valProp.PropValue;
+        }
+        return result + ")]";
+    }
+    string GetPropertyTypeName(ModelViewPropertyOfVwSerializable prop)
+    {
+        if("System.String".Equals(prop.UnderlyingTypeName, System.StringComparison.OrdinalIgnoreCase)) {
+            return prop.UnderlyingTypeName;
+        }
+        if(prop.IsNullable || (!prop.IsRequiredInView)) {
+            return prop.UnderlyingTypeName + " ?";
+        }
+        return prop.UnderlyingTypeName;
+    }
+    string GetWebApiServicePrefix(ModelViewSerializable model) {
+        string result = model.WebApiServiceName;
+        if( !string.IsNullOrEmpty( result ) ) {
+            if(result.EndsWith("Controller")) {
+                result = result.Substring(0, result.LastIndexOf("Controller"));
+            }
+            result = result.ToLower();
+        }
+        return result;
+    }
+    bool HasAtributeWithValue(ModelViewPropertyOfVwSerializable sclrProp, string attrName, string attrVal) {
+        if ((sclrProp != null) && (!string.IsNullOrEmpty(attrName)) && (!string.IsNullOrEmpty(attrVal)) ) {
+            if (sclrProp.Attributes != null) {
+                foreach(ModelViewAttributeSerializable a in sclrProp.Attributes) {
+                    if (attrName.Equals(a.AttrName, StringComparison.InvariantCultureIgnoreCase)) {
+                        if (a.VaueProperties != null) {
+                            foreach(ModelViewAttributePropertySerializable v in a.VaueProperties) {
+                                if(!string.IsNullOrEmpty( v.PropValue )) {
+                                    if(v.PropValue.ToLower().Contains(attrVal)) {
+                                        return true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    bool HasAtribute(ModelViewPropertyOfVwSerializable sclrProp, string attrName) {
+        if ((sclrProp != null) && (!string.IsNullOrEmpty(attrName))) {
+            if (sclrProp.Attributes != null) {
+                foreach(ModelViewAttributeSerializable a in sclrProp.Attributes) {
+                    if (attrName.Equals(a.AttrName, StringComparison.InvariantCultureIgnoreCase)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    bool HasFluentAtributeWithValue(ModelViewPropertyOfVwSerializable sclrProp, string attrName, string attrVal) {
+        if ((sclrProp != null) && (!string.IsNullOrEmpty(attrName)) && (!string.IsNullOrEmpty(attrVal)) ) {
+            if (sclrProp.FAPIAttributes != null) {
+                foreach(ModelViewFAPIAttributeSerializable a in sclrProp.FAPIAttributes) {
+                    if (attrName.Equals(a.AttrName, StringComparison.InvariantCultureIgnoreCase)) {
+                        if (a.VaueProperties != null) {
+                            foreach(ModelViewFAPIAttributePropertySerializable v in a.VaueProperties) {
+                                if(!string.IsNullOrEmpty( v.PropValue )) {
+                                    if(v.PropValue.ToLower().Contains(attrVal)) {
+                                        return true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    bool HasFluentAtribute(ModelViewPropertyOfVwSerializable sclrProp, string[] attrName) {
+        if ((sclrProp != null) && (attrName != null)  ) {
+            if ((sclrProp.FAPIAttributes != null) && (attrName.Length > 0)) {
+                return sclrProp.FAPIAttributes.Any(a => attrName.Contains(a.AttrName));
+            }
+        }
+        return false;
+    }
+    bool IsIdentityProperty(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+        if (HasAtribute(prop, "ConcurrencyCheck") || HasAtribute(prop, "Timestamp")) {
+            return true;
+        }
+        if (HasAtributeWithValue(prop, "DatabaseGenerated", "identity") || HasAtributeWithValue(prop, "DatabaseGenerated", "computed")) {
+            return true;
+        }
+        if(HasFluentAtribute(prop, new string[] {"UseSqlServerIdentityColumn", "ForSqlServerUseSequenceHiLo", "ValueGeneratedOnAdd", "ValueGeneratedOnAddOrUpdate", "IsConcurrencyToken", "IsRowVersion"} )) {
+            return true;
+        }
+        return HasFluentAtributeWithValue(prop, "HasDatabaseGeneratedOption", "identity") || HasFluentAtributeWithValue(prop, "HasDatabaseGeneratedOption", "computed");
+    }
+    List<ModelViewPropertyOfVwSerializable> GetDatabaseGeneratedProp(ModelViewSerializable model) {
+        List<ModelViewPropertyOfVwSerializable> rslt = new List<ModelViewPropertyOfVwSerializable>();
+        if(model == null) return null;
+        if(model.ScalarProperties == null) return null;
+        foreach(ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable in model.ScalarProperties) {
+            if(IsIdentityProperty(modelViewPropertyOfVwSerializable, model)) {
+                rslt.Add(modelViewPropertyOfVwSerializable);
+            }
+        }
+        return rslt;
+    }
+    string GetDefaultVal(ModelViewPropertyOfVwSerializable prop) {
+        if(prop == null) {
+            return "0";
+        }
+        string result = "";
+        switch(prop.UnderlyingTypeName.ToLower()) {
+            case "system.boolean": 
+                result =  "false";
+                break;
+            case "system.guid":
+            case "system.string":
+                result =  "\"0\"";
+                break;
+            default:
+                result =  "0";
+                break;
+        }
+        return result;
+    }
+    string GetContextModelNameSpace(DbContextSerializable context, string fileType) {
+        string result="";
+        if ((context == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (context.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            context.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+    string GetContextModelClassName(DbContextSerializable context, string fileType) {
+        string result="";
+        if ((context == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (context.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            context.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+
+#>

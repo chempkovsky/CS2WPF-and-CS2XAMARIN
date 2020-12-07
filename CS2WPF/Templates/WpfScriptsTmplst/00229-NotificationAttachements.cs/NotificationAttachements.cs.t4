@@ -1,0 +1,215 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+using System.Windows;
+<#
+
+    string NotificationRoutedEventTriggerFolder      = "00230-NotificationRoutedEventTrigger.sc";
+    string NotificationRoutedEventTriggerClassName   = GetModelClassName(Model, NotificationRoutedEventTriggerFolder);
+    string NotificationRoutedEventTriggerNameSpace   = GetModelNameSpace(Model, NotificationRoutedEventTriggerFolder);
+
+    
+    string NotificationAttachementsFolder      = "00228-NotificationAttachements.sc";
+    string NotificationAttachementsClassName   = GetModelClassName(Model, NotificationAttachementsFolder);
+    string NotificationAttachementsNameSpace   = GetModelNameSpace(Model, NotificationAttachementsFolder);
+
+    string ContainerMenuItemClickedNotificationPropertyName = "ContainerMenuItemClickedNotification";
+    string BackBtnClickedNotificationPropertyName = "BackBtnClickedNotification";
+    string ApplyFilterBtnClickedNotificationPropertyName = "ApplyFilterBtnClickedNotification";
+    string TableMenuItemClickedNotificationPropertyName = "TableMenuItemItemClickedNotification";
+    string RowMenuItemClickedNotificationPropertyName = "RowMenuItemItemClickedNotification";
+
+#>
+
+namespace <#= NotificationAttachementsNameSpace #> {
+
+    /*
+    In code behind of the child control
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            // Any OriginalSource if needed. For instance:
+            var originalSource =  new List<int>() {1,2,3 }
+
+            // RoutedEventArgs:
+            NotificationRoutedEventArgs ev =
+                new NotificationRoutedEventArgs(<#= NotificationAttachementsClassName #>.CommonAttachedNotificationEvent, originalSource)
+                {
+                    Sender = this,
+                    Model = this
+                };
+            // Raise Event:
+            RaiseEvent(ev);
+        }
+      
+    In the parent control we intercept attached event and send it to the viewModel if needed
+    <UserControl 
+            ...
+            xmlns:atc="clr-namespace:CommonWpfCustomControlLibrary.Classes;assembly=CommonWpfCustomControlLibrary"
+            ...
+            >
+       <i:Interaction.Triggers>
+            <atc:<#= NotificationRoutedEventTriggerClassName #> RoutedEvent = "atc:<#= NotificationAttachementsClassName #>.CommonAttachedNotification" >
+                 < i:InvokeCommandAction Command = "{Binding BackBtnClickedCommand}" PassEventArgsToCommand="True"/>
+            </atc:NotificationRoutedEventTrigger>
+        </i:Interaction.Triggers>
+        ...
+    </UserControl>
+    */
+
+
+    public static class <#= NotificationAttachementsClassName #>
+    {
+        public static readonly RoutedEvent CommonAttachedNotificationEvent
+            = EventManager.RegisterRoutedEvent("CommonAttachedNotification", RoutingStrategy.Bubble,typeof(RoutedEventHandler),typeof(NotificationAttachements));
+        public static void AddCommonAttachedNotificationHandler(DependencyObject o, RoutedEventHandler handler)
+        {
+            ((UIElement)o).AddHandler(NotificationAttachements.CommonAttachedNotificationEvent, handler);
+        }
+        public static void RemoveCommonAttachedNotificationHandler(DependencyObject o, RoutedEventHandler handler)
+        {
+            ((UIElement)o).RemoveHandler(NotificationAttachements.CommonAttachedNotificationEvent, handler);
+        }
+
+        public static readonly RoutedEvent <#= ContainerMenuItemClickedNotificationPropertyName #>Event
+            = EventManager.RegisterRoutedEvent("<#= ContainerMenuItemClickedNotificationPropertyName #>", RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(NotificationAttachements));
+        public static void Add<#= ContainerMenuItemClickedNotificationPropertyName #>Handler(DependencyObject o, RoutedEventHandler handler)
+        {
+            ((UIElement)o).AddHandler(NotificationAttachements.<#= ContainerMenuItemClickedNotificationPropertyName #>Event, handler);
+        }
+        public static void Remove<#= ContainerMenuItemClickedNotificationPropertyName #>Handler(DependencyObject o, RoutedEventHandler handler)
+        {
+            ((UIElement)o).RemoveHandler(NotificationAttachements.<#= ContainerMenuItemClickedNotificationPropertyName #>Event, handler);
+        }
+
+
+        public static readonly RoutedEvent <#= BackBtnClickedNotificationPropertyName #>Event
+            = EventManager.RegisterRoutedEvent("<#= BackBtnClickedNotificationPropertyName #>", RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(NotificationAttachements));
+        public static void Add<#= BackBtnClickedNotificationPropertyName #>Handler(DependencyObject o, RoutedEventHandler handler)
+        {
+            ((UIElement)o).AddHandler(NotificationAttachements.<#= BackBtnClickedNotificationPropertyName #>Event, handler);
+        }
+        public static void Remove<#= BackBtnClickedNotificationPropertyName #>Handler(DependencyObject o, RoutedEventHandler handler)
+        {
+            ((UIElement)o).RemoveHandler(NotificationAttachements.<#= BackBtnClickedNotificationPropertyName #>Event, handler);
+        }
+
+
+        public static readonly RoutedEvent <#= ApplyFilterBtnClickedNotificationPropertyName #>Event
+            = EventManager.RegisterRoutedEvent("<#= ApplyFilterBtnClickedNotificationPropertyName #>", RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(NotificationAttachements));
+        public static void Add<#= ApplyFilterBtnClickedNotificationPropertyName #>Handler(DependencyObject o, RoutedEventHandler handler)
+        {
+            ((UIElement)o).AddHandler(NotificationAttachements.<#= ApplyFilterBtnClickedNotificationPropertyName #>Event, handler);
+        }
+        public static void Remove<#= ApplyFilterBtnClickedNotificationPropertyName #>Handler(DependencyObject o, RoutedEventHandler handler)
+        {
+            ((UIElement)o).RemoveHandler(NotificationAttachements.<#= ApplyFilterBtnClickedNotificationPropertyName #>Event, handler);
+        }
+
+        public static readonly RoutedEvent <#= TableMenuItemItemClickedNotificationPropertyName #>Event
+            = EventManager.RegisterRoutedEvent("<#= TableMenuItemItemClickedNotificationPropertyName #>", RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(NotificationAttachements));
+        public static void Add<#= TableMenuItemItemClickedNotificationPropertyName #>Handler(DependencyObject o, RoutedEventHandler handler)
+        {
+            ((UIElement)o).AddHandler(NotificationAttachements.<#= TableMenuItemItemClickedNotificationPropertyName #>Event, handler);
+        }
+        public static void Remove<#= TableMenuItemItemClickedNotificationPropertyName #>Handler(DependencyObject o, RoutedEventHandler handler)
+        {
+            ((UIElement)o).RemoveHandler(NotificationAttachements.<#= TableMenuItemItemClickedNotificationPropertyName #>Event, handler);
+        }
+
+
+        public static readonly RoutedEvent <#= RowMenuItemItemClickedNotificationPropertyName #>Event
+            = EventManager.RegisterRoutedEvent("<#= RowMenuItemItemClickedNotificationPropertyName #>", RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(NotificationAttachements));
+        public static void Add<#= RowMenuItemItemClickedNotificationPropertyName #>Handler(DependencyObject o, RoutedEventHandler handler)
+        {
+            ((UIElement)o).AddHandler(NotificationAttachements.<#= RowMenuItemItemClickedNotificationPropertyName #>Event, handler);
+        }
+        public static void Remove<#= RowMenuItemItemClickedNotificationPropertyName #>Handler(DependencyObject o, RoutedEventHandler handler)
+        {
+            ((UIElement)o).RemoveHandler(NotificationAttachements.<#= RowMenuItemItemClickedNotificationPropertyName #>Event, handler);
+        }
+    }
+}
+
+<#+
+
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+
+#>

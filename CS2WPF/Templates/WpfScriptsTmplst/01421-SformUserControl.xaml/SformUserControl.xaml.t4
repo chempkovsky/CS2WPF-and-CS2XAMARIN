@@ -1,0 +1,554 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="xaml" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+
+<#
+
+    string pathHelperModelFolder      = "00120-PathHelper.cs";
+    string pathHelperModelClassName   = GetContextModelClassName(Context, pathHelperModelFolder);
+    string pathHelperModelNameSpace   = GetContextModelNameSpace(Context, pathHelperModelFolder);
+    string pathHelperModelProject     = GetContextModelProjectName(Context, pathHelperModelFolder);
+
+    string FillHelperModelFolder      = "00160-FillHelper.cs";
+    string FillHelperModelClassName   = GetContextModelClassName(Context, FillHelperModelFolder);
+    string FillHelperModelNameSpace   = GetContextModelNameSpace(Context, FillHelperModelFolder);
+    string FillHelperModelProject     = GetContextModelProjectName(Context, FillHelperModelFolder);
+
+    string AttachedPropertiesExtFolder      = "00226-AttachedPropertiesExt.cs";
+    string AttachedPropertiesExtClassName   = GetContextModelClassName(Context, AttachedPropertiesExtFolder);
+    string AttachedPropertiesExtNameSpace   = GetContextModelNameSpace(Context, AttachedPropertiesExtFolder);
+    string AttachedPropertiesExtProject     = GetContextModelProjectName(Context, AttachedPropertiesExtFolder);
+
+    string FreezableProxyFolder      = "00228-FreezableProxy.cs";
+    string FreezableProxyClassName   = GetContextModelClassName(Context, FreezableProxyFolder);
+    string FreezableProxyNameSpace   = GetContextModelNameSpace(Context, FreezableProxyFolder);
+    string FreezableProxyProject     = GetContextModelProjectName(Context, FreezableProxyFolder);
+
+    string WebServiceFilterUserControlFolder      = "00242-WebServiceFilterUserControl.xaml.cs";
+    string WebServiceFilterUserControlClassName   = GetContextModelClassName(Context, WebServiceFilterUserControlFolder);
+    string WebServiceFilterUserControlNameSpace   = GetContextModelNameSpace(Context, WebServiceFilterUserControlFolder);
+    string WebServiceFilterUserControlProject     = GetContextModelProjectName(Context, WebServiceFilterUserControlFolder);
+
+    string TablePaginationUserControlFolder      = "00252-TablePaginationUserControl.xaml.cs";
+    string TablePaginationUserControlClassName   = GetContextModelClassName(Context, TablePaginationUserControlFolder);
+    string TablePaginationUserControlNameSpace   = GetContextModelNameSpace(Context, TablePaginationUserControlFolder);
+    string TablePaginationUserControlProject     = GetContextModelProjectName(Context, TablePaginationUserControlFolder);
+
+    string SformUserControlFolder           = "01420-SformUserControl.xaml.cs";
+    string SformUserControlClassName        = GetModelClassName(Model, SformUserControlFolder);
+    string SformUserControlNameSpace        = GetModelNameSpace(Model, SformUserControlFolder);
+
+    string SformUserControlXamlFolder      = "01421-SformUserControl.xaml";
+    string SformUserControlXamlClassName   = GetModelClassName(Model, SformUserControlXamlFolder);
+    string SformUserControlXamlNameSpace   = GetModelNameSpace(Model, SformUserControlXamlFolder);
+    string SformUserControlXamlProject     = GetModelProjectName(Model, SformUserControlXamlFolder);
+    
+
+
+    string CaptionPropertyName = "Caption";
+    string ShowFilterPropertyName = "ShowFilter";
+    string FilterHeightPropertyName = "FilterHeight";
+    string HiddenFiltersPropertyName = "HiddenFilters";
+    string FiltersPropertyName = "Filters";
+    string FilterOperatorsPropertyName = "FilterOperators";
+    string FilterDefinitionsPropertyName = "FilterDefinitions";
+    string ShowBackBtnPropertyName = "ShowBackBtn";
+    string ShowAddFilterBtnPropertyName = "ShowAddFilterBtn";
+    string ContainerMenuItemsPropertyName = "ContainerMenuItems";
+    string ApplyFilterBtnClickedCommandPropertyName = "ApplyFilterBtnClickedCommand";
+    string IsInQueryPropertyName = "IsInQuery";
+    string SelectedColumnsPropertyName = "SelectedColumns";
+
+
+    string RowsPerPageOptionsPropertyName = "RowsPerPageOptions";
+    string RowsPerPagePropertyName = "RowsPerPage";
+    string TotalCountPropertyName = "TotalCount";
+    string CurrentPagePropertyName = "CurrentPage";
+
+
+    string OnLoadedCommandPropertyName = "OnLoadedCommand";
+
+    string RegisterRoutedCommandBindingsPropertyName = "RegisterRoutedCommandBindings";
+    string RegisterRoutedEventBindingsPropertyName = "RegisterRoutedEventBindings";
+    string DataGridServerSortingPropertyName = "DataGridServerSorting";
+    string RoutedCommandHandlersPropertyName = "RoutedCommandHandlers";
+    string RoutedEventHandlersPropertyName = "RoutedEventHandlers";
+    string DataSourcePropertyName = "DataSource";
+    string ShortNameLabelProperty   = "ShortName";
+    string RowMenuItemsPropertyName = "RowMenuItems";
+    string TableMenuItemsPropertyName = "TableMenuItems";
+
+    string wsfucPrefix = "clr-namespace:" + WebServiceFilterUserControlNameSpace;
+    if(SformUserControlXamlProject != WebServiceFilterUserControlProject) {
+        wsfucPrefix = wsfucPrefix + ";assembly=" + WebServiceFilterUserControlProject;
+    }
+    string tpgnucPrefix = "clr-namespace:" + TablePaginationUserControlNameSpace;
+    if(SformUserControlXamlProject != TablePaginationUserControlProject) {
+        tpgnucPrefix = tpgnucPrefix + ";assembly=" + TablePaginationUserControlProject;
+    }
+    string attachedPrefix = "clr-namespace:" + AttachedPropertiesExtNameSpace;
+    if(SformUserControlXamlProject != AttachedPropertiesExtProject) {
+        attachedPrefix = attachedPrefix + ";assembly=" + AttachedPropertiesExtProject;
+    }
+    string freezablePrefix = "clr-namespace:" + FreezableProxyNameSpace;
+    if(SformUserControlXamlProject != FreezableProxyProject) {
+        freezablePrefix = freezablePrefix + ";assembly=" + FreezableProxyProject;
+    }
+    string pathPrefix = "clr-namespace:" + pathHelperModelNameSpace;
+    if(SformUserControlXamlProject != pathHelperModelProject) {
+        pathPrefix = pathPrefix + ";assembly=" + pathHelperModelProject;
+    }
+    string fillPrefix = "clr-namespace:" + FillHelperModelNameSpace;
+    if(SformUserControlXamlProject != FillHelperModelProject) {
+        fillPrefix = fillPrefix + ";assembly=" + FillHelperModelProject;
+    }
+
+
+
+#>
+
+<UserControl x:Class="<#= SformUserControlNameSpace #>.<#= SformUserControlClassName #>"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             xmlns:prism="http://prismlibrary.com/" 
+             prism:ViewModelLocator.AutoWireViewModel="True"                          
+
+             xmlns:wsfuc="<#= wsfucPrefix #>" 
+             xmlns:tpgnuc="<#= tpgnucPrefix #>" 
+             xmlns:atch="<#= attachedPrefix #>" 
+             xmlns:pth="<#= pathPrefix #>" 
+             xmlns:fill="<#= fillPrefix #>" 
+             xmlns:frzp="<#= freezablePrefix #>" 
+
+
+             x:Name="SformUsrCntrlRootNode"
+             mc:Ignorable="d" 
+             d:DesignHeight="50" d:DesignWidth="350"
+             atch:<#= AttachedPropertiesExtClassName #>.<#= RegisterRoutedCommandBindingsPropertyName #>="{Binding <#= RoutedCommandHandlersPropertyName #>}"
+             atch:<#= AttachedPropertiesExtClassName #>.<#= RegisterRoutedEventBindingsPropertyName #>="{Binding <#= RoutedEventHandlersPropertyName #>}"
+            >
+    <UserControl.Resources>
+        <frzp:<#= FreezableProxyClassName #> x:Key="userControlContext" Data="{Binding}"/>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <wsfuc:<#= WebServiceFilterUserControlClassName #> Grid.Row="0" 
+            <#= CaptionPropertyName #>="{Binding <#= CaptionPropertyName #>, Mode=OneWay, ElementName=SformUsrCntrlRootNode}"
+            <#= ShowBackBtnPropertyName #>="{Binding <#= ShowBackBtnPropertyName #>, Mode=OneWay, ElementName=SformUsrCntrlRootNode}"
+            <#= ShowAddFilterBtnPropertyName #>="{Binding <#= ShowAddFilterBtnPropertyName #>, Mode=OneWay, ElementName=SformUsrCntrlRootNode}"
+            <#= HiddenFiltersPropertyName #>="{Binding <#= HiddenFiltersPropertyName #>, Mode=OneWay}"
+            <#= FilterDefinitionsPropertyName #>="{Binding <#= FilterDefinitionsPropertyName #>, Mode=OneWay}"
+            <#= ContainerMenuItemsPropertyName #>="{Binding <#= ContainerMenuItemsPropertyName #>, Mode=OneWay, ElementName=SformUsrCntrlRootNode}"
+            <#= FilterHeightPropertyName #>="{Binding <#= FilterHeightPropertyName #>, Mode=OneWay, ElementName=SformUsrCntrlRootNode}">
+            <wsfuc:<#= WebServiceFilterUserControlClassName #>.Resources>
+                <Style TargetType="{x:Type wsfuc:<#= WebServiceFilterUserControlClassName #>}">
+                    <Setter Property="Visibility" Value="Visible"/>
+                    <Setter Property="IsEnabled" Value="False"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding <#= ShowFilterPropertyName #>, ElementName=SformUsrCntrlRootNode}" Value="false">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding <#= IsInQueryPropertyName #>}" Value="False">
+                            <Setter Property="IsEnabled" Value="True" />
+                        </DataTrigger>
+                    </Style.Triggers>
+
+                </Style>
+            </wsfuc:<#= WebServiceFilterUserControlClassName #>.Resources>
+        </wsfuc:<#= WebServiceFilterUserControlClassName #>>
+        <ProgressBar Grid.Row="1" Height="10" IsIndeterminate="{Binding <#= IsInQueryPropertyName #>, Mode=OneWay}"/>
+
+         <DataGrid Grid.Row="2" ItemsSource="{Binding <#= DataSourcePropertyName #>}" MaxHeight="{Binding GridHeight, ElementName=SformUsrCntrlRootNode}"
+            atch:<#= AttachedPropertiesExtClassName #>.<#= DataGridServerSortingPropertyName #>="True"
+            AutoGenerateColumns="False" FrozenColumnCount ="1" SelectionMode="Single" IsReadOnly="True" SelectionUnit="FullRow">
+            <DataGrid.Resources>
+               <frzp:<#= FreezableProxyClassName #> x:Key="gridCurrentItem" Data="{Binding CurrentItem, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}"/>
+               <Style TargetType="{x:Type DataGrid}">
+                    <Setter Property="IsEnabled" Value="False"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding <#= IsInQueryPropertyName #>}" Value="False">
+                            <Setter Property="IsEnabled" Value="True" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </DataGrid.Resources>
+            <DataGrid.ContextMenu >
+                <ContextMenu ItemsSource="{Binding Data.<#= RowMenuItemsPropertyName #>, Source={StaticResource userControlContext}}">
+                    <ContextMenu.ItemContainerStyle>
+                        <Style TargetType="{x:Type MenuItem}">
+                            <Setter Property="MenuItem.Header" Value="{Binding Caption}"/>
+                            <Setter Property="MenuItem.Command" Value="{Binding Command}"/>
+                            <Setter Property="MenuItem.CommandParameter" Value="{Binding Data, Source={StaticResource gridCurrentItem}}" />
+                            <!-- <Setter Property="MenuItem.Icon">
+                                <Setter.Value>
+                                    <Viewbox   Height="16" Width="16">
+                                        <Canvas  Height="24" Width="24" >
+                                            <Path  pth:<#= pathHelperModelClassName #>.DataResourceKey="{Binding IconName}" fill:<#= FillHelperModelClassName #>.FillResourceKey="{Binding IconColor}" />
+                                        </Canvas>
+                                    </Viewbox>
+                                </Setter.Value>
+                            </Setter> -->
+                        </Style>
+                    </ContextMenu.ItemContainerStyle>
+                </ContextMenu>
+           </DataGrid.ContextMenu>
+
+            <DataGrid.Columns>
+                <DataGridTemplateColumn CanUserReorder="False" CanUserSort="False" CanUserResize="False" >
+                    <DataGridTemplateColumn.Header>
+                        <Menu BorderBrush="{x:Null}" Background="{x:Null}">
+                            <MenuItem  ItemsSource="{Binding Data.<#= TableMenuItemsPropertyName #>, Source={StaticResource userControlContext}}" >
+                                <MenuItem.Header>
+                                    <Viewbox   Height="16" Width="16" FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type MenuItem}}}" HorizontalAlignment="Center" VerticalAlignment="Center" >
+                                        <Canvas  Height="24" Width="24" >
+                                            <Path  Data="{DynamicResource DotsVertical}" Fill="{Binding Foreground, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type MenuItem}}}" />
+                                        </Canvas>
+                                    </Viewbox>
+                                </MenuItem.Header>
+                                <MenuItem.ItemContainerStyle>
+                                    <Style>
+                                        <Setter Property="MenuItem.Header" Value="{Binding Caption}"/>
+                                        <!-- <Setter Property="MenuItem.Icon">
+                                            <Setter.Value>
+                                                <Viewbox   Height="16" Width="16">
+                                                    <Canvas  Height="24" Width="24" >
+                                                        <Path  pth:<#= pathHelperModelClassName #>.DataResourceKey="{Binding IconName}" fill:<#= FillHelperModelClassName #>.FillResourceKey="{Binding IconColor}" />
+                                                    </Canvas>
+                                                </Viewbox>
+                                            </Setter.Value>
+                                        </Setter> -->
+                                        <Setter Property="MenuItem.Command" Value="{Binding Command}"/>
+                                        <Setter Property="MenuItem.CommandParameter" Value="{Binding}"/>
+                                    </Style>
+                                </MenuItem.ItemContainerStyle>
+                            </MenuItem>
+                        </Menu>
+                    </DataGridTemplateColumn.Header>
+                </DataGridTemplateColumn>
+
+<#
+    {
+        int cntr= 0; 
+    foreach(ModelViewUIListPropertySerializable modelViewUIListPropertySerializable in Model.UIListProperties) {
+        if (!modelViewUIListPropertySerializable.IsShownInView) {
+            continue;
+        }
+        string IsSortable= hasSortHeader(modelViewUIListPropertySerializable, Model) ? "True": "False";
+        if (IsBooleanInput(modelViewUIListPropertySerializable, Model)) {
+#>
+                <DataGridCheckBoxColumn CanUserReorder="True" CanUserResize="True" CanUserSort="<#= IsSortable #>"
+                    Visibility="{Binding Path=Data.<#= SelectedColumnsPropertyName #>[(sys:Int32)<#= cntr #>].IsChecked, Mode=OneWay,  Converter={StaticResource BooleanToVisibilityConverter}, Source={StaticResource userControlContext}}"
+                    Header="<#= GetDisplayAttributeValueString2(modelViewUIListPropertySerializable, Model, ShortNameLabelProperty) #>" Binding="{Binding <#= GetModelPropertyNameEx2(modelViewUIListPropertySerializable, Model) #>}">
+<#
+        } else {
+#>
+                <DataGridTextColumn  CanUserReorder="True" CanUserResize="True" CanUserSort="<#= IsSortable #>"
+                    Visibility="{Binding Path=Data.<#= SelectedColumnsPropertyName #>[(sys:Int32)<#= cntr #>].IsChecked, Mode=OneWay,  Converter={StaticResource BooleanToVisibilityConverter}, Source={StaticResource userControlContext}}"
+                    Header="<#= GetDisplayAttributeValueString2(modelViewUIListPropertySerializable, Model, ShortNameLabelProperty) #>"  Binding="{Binding <#= GetModelPropertyNameEx2(modelViewUIListPropertySerializable, Model) #>}"/>
+<#
+        }
+        cntr++;
+    }
+    }
+#>
+            </DataGrid.Columns>
+         </DataGrid>
+
+
+        <tpgnuc:<#= TablePaginationUserControlClassName #> Grid.Row="3"
+            <#= TotalCountPropertyName #>="{Binding <#= TotalCountPropertyName #>, Mode=OneWay}"
+            <#= CurrentPagePropertyName #>="{Binding <#= CurrentPagePropertyName #>, Mode=TwoWay}"
+            <#= RowsPerPagePropertyName #>="{Binding <#= RowsPerPagePropertyName #>, Mode=TwoWay}"
+            <#= RowsPerPageOptionsPropertyName #>="{Binding <#= RowsPerPageOptionsPropertyName #>, Mode=OneWay}">
+            <tpgnuc:<#= TablePaginationUserControlClassName #>.Resources>
+                <Style TargetType="{x:Type tpgnuc:<#= TablePaginationUserControlClassName #>}">
+                    <Setter Property="IsEnabled" Value="False"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding <#= IsInQueryPropertyName #>}" Value="False">
+                            <Setter Property="IsEnabled" Value="True" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </tpgnuc:<#= TablePaginationUserControlClassName #>.Resources>    
+       </tpgnuc:<#= TablePaginationUserControlClassName #>>
+    </Grid>
+</UserControl>
+
+
+<#+
+
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+    string GetModelProjectName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileProject)) {
+            return result;
+        }
+        string[] fnArr = refItem.FileProject.Split(new char[] {'\\'}, 100, System.StringSplitOptions.None); 
+        string fn = fnArr[fnArr.Length - 1];
+
+        return fn.Replace(".csproj","");
+    }
+    string GetContextModelNameSpace(DbContextSerializable context, string fileType) {
+        string result="";
+        if ((context == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (context.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            context.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+    string GetContextModelClassName(DbContextSerializable context, string fileType) {
+        string result="";
+        if ((context == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (context.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            context.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+    string GetContextModelProjectName(DbContextSerializable context, string fileType) {
+        string result="";
+        if ((context == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (context.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            context.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileProject)) {
+            return result;
+        }
+        string[] fnArr = refItem.FileProject.Split(new char[] {'\\'}, 100, System.StringSplitOptions.None); 
+        string fn = fnArr[fnArr.Length - 1];
+
+        return fn.Replace(".csproj","");
+    }
+    string GetDisplayAttributeValueString2(ModelViewUIListPropertySerializable prop, ModelViewSerializable model, string propName) {
+            ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
+            if (sclrProp == null)
+            {
+                return prop.ViewPropertyName;
+            }
+            if(sclrProp.Attributes == null)
+            {
+                return prop.ViewPropertyName;
+            }
+            ModelViewAttributeSerializable attr =
+                sclrProp.Attributes.Where(a => a.AttrName == "Display").FirstOrDefault();
+            if (attr == null)
+            {
+                return prop.ViewPropertyName;
+            }
+            if (attr.VaueProperties == null)
+            {
+                return prop.ViewPropertyName;
+            }
+            ModelViewAttributePropertySerializable attrProp = 
+                attr.VaueProperties.Where(v => v.PropName == propName).FirstOrDefault();
+            if (attrProp == null)
+            {
+                return prop.ViewPropertyName;
+            }
+            if (string.IsNullOrEmpty( attrProp.PropValue ) )
+            {
+                return prop.ViewPropertyName;
+            } else
+            {
+                char[] charsToTrim = { '"', ' '};
+                return attrProp.PropValue.Trim(charsToTrim);
+            }
+    }
+    public string FirstLetterToLower(string str)
+    {
+        if (str == null)
+            return null;
+        if (str.Length > 1)
+            return char.ToLower(str[0]) + str.Substring(1);
+        return str.ToUpper();
+    }
+    bool IsBooleanInput(ModelViewUIListPropertySerializable prop, ModelViewSerializable model) {
+        if((prop == null) || (model == null)) return false;
+        ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
+        if (sclrProp == null)
+        {
+            return false;
+        }
+        return"System.Boolean".Equals(sclrProp.UnderlyingTypeName) || "Boolean".Equals(sclrProp.UnderlyingTypeName) || "bool".Equals(sclrProp.UnderlyingTypeName);
+    }
+    bool hasSortHeader(ModelViewUIListPropertySerializable modelViewUIListPropertySerializable, ModelViewSerializable model) {
+        if ((model == null) || (modelViewUIListPropertySerializable == null)) {
+            return false;
+        }
+        if ((model.UIListProperties == null) || (model.ScalarProperties == null)) {
+            return false;
+        }
+        return model.ScalarProperties.Any(s => s.ViewPropertyName == modelViewUIListPropertySerializable.ViewPropertyName && s.IsUsedBySorting);
+    }
+    string GetModelPropertyName(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+        if (model.GenerateJSonAttribute) {
+            return prop.ViewPropertyName;
+        } else {
+            return FirstLetterToLower(prop.ViewPropertyName);
+        }
+    }
+    string GetModelPropertyNameEx(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model) {
+        ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
+        return GetModelPropertyName(sclrProp, model);
+    }
+    string GetModelPropertyNameEx2(ModelViewUIListPropertySerializable prop, ModelViewSerializable model) {
+        ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
+        return GetModelPropertyName(sclrProp, model);
+    }
+
+#>

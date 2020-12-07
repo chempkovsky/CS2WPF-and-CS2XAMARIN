@@ -1,0 +1,346 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+using System;
+using System.Collections.Generic;
+using System.Windows;
+using System.Windows.Controls;
+using CommonInterfacesClassLibrary.Interfaces;
+<#
+
+    string IWebServiceFilterMenuInterfaceFolder      = "00206-IWebServiceFilterMenuInterface.cs";
+    string IWebServiceFilterMenuInterfaceClassName   = GetModelClassName(Model, IWebServiceFilterMenuInterfaceFolder);
+    string IWebServiceFilterMenuInterfaceNameSpace   = GetModelNameSpace(Model, IWebServiceFilterMenuInterfaceFolder);
+
+
+    string IWebServiceFilterRsltInterfaceFolder      = "00204-IWebServiceFilterRsltInterface.cs";
+    string IWebServiceFilterRsltInterfaceClassName   = GetModelClassName(Model, IWebServiceFilterRsltInterfaceFolder);
+    string IWebServiceFilterRsltInterfaceNameSpace   = GetModelNameSpace(Model, IWebServiceFilterRsltInterfaceFolder);
+
+
+    string ProxyUserControlFolder     = "00280-ProxyUserControl.xaml.cs";
+    string ProxyUserControlClassName  = GetModelClassName(Model, ProxyUserControlFolder);
+    string ProxyUserControlNameSpace  = GetModelNameSpace(Model, ProxyUserControlFolder);
+
+    string CaptionPropertyName = "Caption";
+    string FilterHeightPropertyName = "FilterHeight";
+    string ShowFilterPropertyName = "ShowFilter";
+    string ShowAddFilterBtnPropertyName = "ShowAddFilterBtn";
+    string ShowBackBtnPropertyName = "ShowBackBtn";
+    string GridHeightPropertyName = "GridHeight";
+    string TableMenuItemsPropertyName = "TableMenuItems";
+    string RowMenuItemsPropertyName = "RowMenuItems";
+    string ContainerMenuItemsPropertyName = "ContainerMenuItems";
+    string HiddenFiltersPropertyName = "HiddenFilters";
+
+
+    List<string> nmSpaces = new List<string>();
+    if ((ProxyUserControlNameSpace != IWebServiceFilterMenuInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterMenuInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IWebServiceFilterMenuInterfaceNameSpace);
+    if ((ProxyUserControlNameSpace != IWebServiceFilterRsltInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IWebServiceFilterRsltInterfaceNameSpace);
+
+#>
+<# 
+    foreach(string ns in nmSpaces) {
+#>
+using <#= ns #>;
+<#
+    }
+#>
+
+namespace <#= ProxyUserControlNameSpace #> {
+    /// <summary>
+    /// Interaction logic for <#= ProxyUserControlClassName #>.xaml
+    /// </summary>
+    public partial class <#= ProxyUserControlClassName #>: UserControl
+    {
+        public <#= ProxyUserControlClassName #>()
+        {
+            InitializeComponent();
+        }
+        #region <#= CaptionPropertyName #>
+        public static readonly DependencyProperty <#= CaptionPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= CaptionPropertyName #>", typeof(string),
+                typeof(<#= ProxyUserControlClassName #>),
+                new PropertyMetadata(null));
+        public string <#= CaptionPropertyName #>
+        {
+            get
+            {
+                return (string)GetValue(<#= CaptionPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= CaptionPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= FilterHeightPropertyName #>
+        public static readonly DependencyProperty <#= FilterHeightPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= FilterHeightPropertyName #>", typeof(Nullable<double>),
+                typeof(<#= ProxyUserControlClassName #>),
+                new PropertyMetadata(null));
+        public Nullable<double> <#= FilterHeightPropertyName #>
+        {
+            get
+            {
+                return (Nullable<double>)GetValue(<#= FilterHeightPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= FilterHeightPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= HiddenFiltersPropertyName #>
+        public static readonly DependencyProperty <#= HiddenFiltersPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= HiddenFiltersPropertyName #>", typeof(IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>),
+                typeof(<#= ProxyUserControlClassName #>),
+                new PropertyMetadata(null));
+        public IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>> <#= HiddenFiltersPropertyName #>
+        {
+            get
+            {
+                return (IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>)GetValue(<#= HiddenFiltersPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= HiddenFiltersPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= ShowFilterPropertyName #>
+        public static readonly DependencyProperty <#= ShowFilterPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= ShowFilterPropertyName #>", typeof(Nullable<bool>),
+                typeof(<#= ProxyUserControlClassName #>),
+                new PropertyMetadata(true));
+        public Nullable<bool> <#= ShowFilterPropertyName #>
+        {
+            get
+            {
+                return (Nullable<bool>)GetValue(<#= ShowFilterPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= ShowFilterPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= ShowBackBtnPropertyName #>
+        private static void <#= ShowBackBtnPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e) {
+            <#= ProxyUserControlClassName #> inst = d as <#= ProxyUserControlClassName #>;
+            if ((inst != null) && (e.NewValue is bool))
+            {
+                inst.<#= ShowBackBtnPropertyName #> = (bool)e.NewValue;
+            }
+        }
+        public static readonly DependencyProperty <#= ShowBackBtnPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= ShowBackBtnPropertyName #>", typeof(bool),
+                typeof(<#= ProxyUserControlClassName #>),
+                new PropertyMetadata(false, <#= ShowBackBtnPropertyName #>Changed));
+        public bool <#= ShowBackBtnPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= ShowBackBtnPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= ShowBackBtnPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= ShowAddFilterBtnPropertyName #>
+        private static void <#= ShowAddFilterBtnPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e) {
+            <#= ProxyUserControlClassName #> inst = d as <#= ProxyUserControlClassName #>;
+            if ((inst != null) && (e.NewValue is bool))
+            {
+                inst.<#= ShowAddFilterBtnPropertyName #> = (bool)e.NewValue;
+            }
+        }
+        public static readonly DependencyProperty <#= ShowAddFilterBtnPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= ShowAddFilterBtnPropertyName #>", typeof(bool),
+                typeof(<#= ProxyUserControlClassName #>),
+                new PropertyMetadata(true, <#= ShowAddFilterBtnPropertyName #>Changed));
+        public bool <#= ShowAddFilterBtnPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= ShowAddFilterBtnPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= ShowAddFilterBtnPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= ContainerMenuItemsPropertyName #>
+        public static readonly DependencyProperty <#= ContainerMenuItemsPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= ContainerMenuItemsPropertyName #>", typeof(IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>),
+                typeof(<#= ProxyUserControlClassName #>),
+                new PropertyMetadata(null));
+        public IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> <#= ContainerMenuItemsPropertyName #>
+        {
+            get
+            {
+                return (IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>)GetValue(<#= ContainerMenuItemsPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= ContainerMenuItemsPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= GridHeightPropertyName #>
+        public static readonly DependencyProperty <#= GridHeightPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= GridHeightPropertyName #>", typeof(Nullable<double>),
+                typeof(<#= ProxyUserControlClassName #>),
+                new PropertyMetadata(null));
+        public Nullable<double> <#= GridHeightPropertyName #>
+        {
+            get
+            {
+                return (Nullable<double>)GetValue(<#= GridHeightPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= GridHeightPropertyName #>Property, value);
+            }
+        }
+        #endregion
+
+        #region <#= TableMenuItemsPropertyName #>
+        public static readonly DependencyProperty <#= TableMenuItemsPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= TableMenuItemsPropertyName #>", typeof(IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>),
+                typeof(<#= ProxyUserControlClassName #>),
+                new PropertyMetadata(null));
+        public IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> <#= TableMenuItemsPropertyName #>
+        {
+            get
+            {
+                return (IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>)GetValue(<#= TableMenuItemsPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= TableMenuItemsPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= RowMenuItemsPropertyName #>
+        public static readonly DependencyProperty <#= RowMenuItemsPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= RowMenuItemsPropertyName #>", typeof(IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>),
+                typeof(<#= ProxyUserControlClassName #>),
+                new PropertyMetadata(null));
+        public IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> <#= RowMenuItemsPropertyName #>
+        {
+            get
+            {
+                return (IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>)GetValue(<#= RowMenuItemsPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= RowMenuItemsPropertyName #>Property, value);
+            }
+        }
+        #endregion
+
+
+    
+
+
+    }
+}
+
+<#+
+
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+
+#>

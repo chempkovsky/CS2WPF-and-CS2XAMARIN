@@ -19,6 +19,12 @@
     string gridFlexModelNameSpace   = GetModelNameSpace(Model, gridFlexModelFolder);
     string gridFlexModelProject     = GetModelProjectName(Model, gridFlexModelFolder);
 
+    string RoutedCommandExtFolder      = "00224-RoutedCommandExt.cs";
+    string RoutedCommandExtClassName   = GetModelClassName(Model, RoutedCommandExtFolder);
+    string RoutedCommandExtNameSpace   = GetModelNameSpace(Model, RoutedCommandExtFolder);
+    string RoutedCommandExtProject     = GetModelProjectName(Model, RoutedCommandExtFolder);
+
+
     string WebServiceFilterItemUserControlFolder      = "00232-WebServiceFilterItemUserControl.xaml.cs";
     string WebServiceFilterItemUserControlClassName   = GetModelClassName(Model, WebServiceFilterItemUserControlFolder);
     string WebServiceFilterItemUserControlNameSpace   = GetModelNameSpace(Model, WebServiceFilterItemUserControlFolder);
@@ -37,14 +43,24 @@
     string IsFilterValueReadOnlyPropertyName = "IsFilterValueReadOnly";
     string FilterErrorPropertyName = "FilterError";
     string FilterValuePromptPropertyName = "FilterValuePrompt";
-    string RemoveNotificationPropertyName = "RemoveNotification";
-    string RemoveCommandPropertyName = "RemoveCommand";
     string DefaultTexBlockForegroundPropertyName = "DefaultTexBlockForeground";
+    string SelectedModelRefPropertyName = "SelectedModelRef";
+
+    //////////////////////////////// 
+    string AddWebServiceFilterItemCommandPropertyName = "AddWebServiceFilterItemCommand";
+    string RemoveWebServiceFilterItemCommandPropertyName = "RemoveWebServiceFilterItemCommand";
+    string RemoveAllWebServiceFilterItemCommandPropertyName = "RemoveAllWebServiceFilterItemCommand";
+    string NavigationBackCommandPropertyName = "NavigationBackCommand";
+    ////////////////////////////////
 
 
     string gridflexPrefix = "clr-namespace:" + gridFlexModelNameSpace;
     if(gridFlexModelProject != WebServiceFilterItemUserControlXamlProject) {
         gridflexPrefix = gridflexPrefix + ";assembly=" + gridFlexModelProject;
+    }
+    string routedCommandPrefix = "clr-namespace:" + RoutedCommandExtNameSpace;
+    if(RoutedCommandExtProject != WebServiceFilterItemUserControlXamlProject) {
+        routedCommandPrefix = routedCommandPrefix + ";assembly=" + RoutedCommandExtProject;
     }
 
 
@@ -56,6 +72,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:<#= WebServiceFilterItemUserControlNameSpace #>"
+             xmlns:crtcmd="<#= routedCommandPrefix #>"
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
              xmlns:gridflex="<#= gridflexPrefix #>"
              x:Name="FltrItmUsrCntrlRootNode"
@@ -133,7 +150,8 @@
                     </ContentPresenter>
                     <Button Grid.Column="1" BorderBrush="{x:Null}" Background="{x:Null}"
                             KeyboardNavigation.TabNavigation ="None" ToolTip="Remove item"
-                            Command="{Binding <#= RemoveCommandPropertyName #>, ElementName=FltrItmUsrCntrlRootNode}">
+                            CommandParameter="{Binding <#= SelectedModelRefPropertyName #>, ElementName=FltrItmUsrCntrlRootNode}"
+                            Command="{x:Static crtcmd:<#= RoutedCommandExtClassName #>.<#= RemoveWebServiceFilterItemCommandPropertyName #>}">
                         <Viewbox   Height="16" Width="16" FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Button}}}" HorizontalAlignment="Center" VerticalAlignment="Center" >
                             <Canvas  Height="24" Width="24" >
                                 <Path  Data="{DynamicResource TrashCanOutline}" Fill="{DynamicResource Danger}" />

@@ -47,9 +47,10 @@ using System.Windows.Input;
     string IWebServiceFilterDefInterfaceClassName   = GetModelClassName(Model, IWebServiceFilterDefInterfaceFolder);
     string IWebServiceFilterDefInterfaceNameSpace   = GetModelNameSpace(Model, IWebServiceFilterDefInterfaceFolder);
 
-    string NotificationRoutedEventArgsFolder      = "00226-NotificationRoutedEventArgs.cs";
-    string NotificationRoutedEventArgsClassName   = GetModelClassName(Model, NotificationRoutedEventArgsFolder);
-    string NotificationRoutedEventArgsNameSpace   = GetModelNameSpace(Model, NotificationRoutedEventArgsFolder);
+    string RoutedCommandExtFolder      = "00224-RoutedCommandExt.cs";
+    string RoutedCommandExtClassName   = GetModelClassName(Model, RoutedCommandExtFolder);
+    string RoutedCommandExtNameSpace   = GetModelNameSpace(Model, RoutedCommandExtFolder);
+
 
     string IWebServiceFilterViewModelInterfaceFolder      = "00239-IWebServiceFilterViewModelInterface.cs";
     string IWebServiceFilterViewModelInterfaceClassName   = GetModelClassName(Model, IWebServiceFilterViewModelInterfaceFolder);
@@ -76,15 +77,20 @@ using System.Windows.Input;
     string ShowBackBtnPropertyName = "ShowBackBtn";
     string ShowAddFilterBtnPropertyName = "ShowAddFilterBtn";
     string ContainerMenuItemsPropertyName = "ContainerMenuItems";
-    string ContainerMenuItemClickedNotificationPropertyName = "ContainerMenuItemClickedNotification";
-    string ContainerMenuItemClickedCommandPropertyName = "ContainerMenuItemClickedCommand";
-    string BackBtnClickedNotificationPropertyName = "BackBtnClickedNotification";
-    string BackBtnClickedCommandPropertyName = "BackBtnClickedCommand";
     string ApplyFilterBtnClickedNotificationPropertyName = "ApplyFilterBtnClickedNotification";
     string ApplyFilterBtnClickedCommandPropertyName = "ApplyFilterBtnClickedCommand";
     string AddFilterBtnClickedCommandPropertyName = "AddFilterBtnClickedCommand";
-    string RemoveFilterBtnClickedCommandPropertyName = "RemoveFilterBtnClickedCommand";
-    string RemoveAllFiltersBtnClickedCommandPropertyName = "RemoveAllFiltersBtnClickedCommand";
+    string SelectedModelRefPropertyName = "SelectedModelRef";
+
+    //////////////////////////////// 
+    string AddWebServiceFilterItemCommandPropertyName = "AddWebServiceFilterItemCommand";
+    string RemoveWebServiceFilterItemCommandPropertyName = "RemoveWebServiceFilterItemCommand";
+    string RemoveAllWebServiceFilterItemCommandPropertyName = "RemoveAllWebServiceFilterItemCommand";
+    string NavigationBackCommandPropertyName = "NavigationBackCommand";
+    string ApplyFilterCommandPropertyName = "ApplyFilterCommand";
+    string OnFilterCommandPropertyName = "OnFilterCommand";
+    ////////////////////////////////
+
 
     List<string> nmSpaces = new List<string>();
     if (WebServiceFilterUserControlNameSpace != IWebServiceFilterDefInterfaceNameSpace) nmSpaces.Add(IWebServiceFilterDefInterfaceNameSpace);
@@ -104,8 +110,9 @@ using System.Windows.Input;
         nmSpaces.Add(WebServiceFilterRsltNameSpace);
     if ((WebServiceFilterUserControlNameSpace != convertHelperModelNameSpace) && (nmSpaces.IndexOf(convertHelperModelNameSpace) < 0)) 
         nmSpaces.Add(convertHelperModelNameSpace);
-    if ((WebServiceFilterUserControlNameSpace != NotificationRoutedEventArgsNameSpace) && (nmSpaces.IndexOf(NotificationRoutedEventArgsNameSpace) < 0)) 
-        nmSpaces.Add(NotificationRoutedEventArgsNameSpace);
+    if ((WebServiceFilterUserControlNameSpace != RoutedCommandExtNameSpace) && (nmSpaces.IndexOf(RoutedCommandExtNameSpace) < 0)) 
+        nmSpaces.Add(RoutedCommandExtNameSpace);
+    
     
 #>
 <# 
@@ -123,6 +130,8 @@ namespace <#= WebServiceFilterUserControlNameSpace #> {
     /// </summary>
     public partial class <#= WebServiceFilterUserControlClassName #>: UserControl
     {
+        public static RoutedCommand <#= OnFilterCommandPropertyName #> = new RoutedCommand("<#= OnFilterCommandPropertyName #>", typeof(<#= WebServiceFilterUserControlClassName #>));
+
         public <#= WebServiceFilterUserControlClassName #>()
         {
             InitializeComponent();
@@ -151,7 +160,7 @@ namespace <#= WebServiceFilterUserControlNameSpace #> {
                 "<#= FilterHeightPropertyName #>", typeof(Nullable<double>),
                 typeof(<#= WebServiceFilterUserControlClassName #>),
                 new PropertyMetadata(null));
-        public Nullable<double> FilterHeight
+        public Nullable<double> <#= FilterHeightPropertyName #>
         {
             get
             {
@@ -220,7 +229,7 @@ namespace <#= WebServiceFilterUserControlNameSpace #> {
         }
         #endregion
         #region <#= FilterDefinitionsPropertyName #>
-        private static void FilterDefinitionsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void <#= FilterDefinitionsPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             <#= WebServiceFilterUserControlClassName #> inst = d as <#= WebServiceFilterUserControlClassName #>;
             if (inst != null)
@@ -247,16 +256,23 @@ namespace <#= WebServiceFilterUserControlNameSpace #> {
         }
         #endregion
         #region <#= ShowBackBtnPropertyName #>
+        private static void <#= ShowBackBtnPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e) {
+            <#= WebServiceFilterUserControlClassName #> inst = d as <#= WebServiceFilterUserControlClassName #>;
+            if ((inst != null) && (e.NewValue is bool))
+            {
+                inst.<#= ShowBackBtnPropertyName #> = (bool)e.NewValue;
+            }
+        }
         public static readonly DependencyProperty <#= ShowBackBtnPropertyName #>Property =
                 DependencyProperty.Register(
-                "<#= ShowBackBtnPropertyName #>", typeof(Nullable<bool>),
+                "<#= ShowBackBtnPropertyName #>", typeof(bool),
                 typeof(<#= WebServiceFilterUserControlClassName #>),
-                new PropertyMetadata(null));
-        public Nullable<bool> <#= ShowBackBtnPropertyName #>
+                new PropertyMetadata(false, <#= ShowBackBtnPropertyName #>Changed));
+        public bool <#= ShowBackBtnPropertyName #>
         {
             get
             {
-                return (Nullable<bool>)GetValue(<#= ShowBackBtnPropertyName #>Property);
+                return (bool)GetValue(<#= ShowBackBtnPropertyName #>Property);
             }
             set
             {
@@ -265,16 +281,23 @@ namespace <#= WebServiceFilterUserControlNameSpace #> {
         }
         #endregion
         #region <#= ShowAddFilterBtnPropertyName #>
+        private static void <#= ShowAddFilterBtnPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e) {
+            <#= WebServiceFilterUserControlClassName #> inst = d as <#= WebServiceFilterUserControlClassName #>;
+            if ((inst != null) && (e.NewValue is bool))
+            {
+                inst.<#= ShowAddFilterBtnPropertyName #> = (bool)e.NewValue;
+            }
+        }
         public static readonly DependencyProperty <#= ShowAddFilterBtnPropertyName #>Property =
                 DependencyProperty.Register(
-                "<#= ShowAddFilterBtnPropertyName #>", typeof(Nullable<bool>),
+                "<#= ShowAddFilterBtnPropertyName #>", typeof(bool),
                 typeof(<#= WebServiceFilterUserControlClassName #>),
-                new PropertyMetadata(null));
-        public Nullable<bool> <#= ShowAddFilterBtnPropertyName #>
+                new PropertyMetadata(true, <#= ShowAddFilterBtnPropertyName #>Changed));
+        public bool <#= ShowAddFilterBtnPropertyName #>
         {
             get
             {
-                return (Nullable<bool>)GetValue(<#= ShowAddFilterBtnPropertyName #>Property);
+                return (bool)GetValue(<#= ShowAddFilterBtnPropertyName #>Property);
             }
             set
             {
@@ -300,97 +323,8 @@ namespace <#= WebServiceFilterUserControlNameSpace #> {
             }
         }
         #endregion
-        #region <#= ContainerMenuItemClickedNotificationPropertyName #>
-        public static readonly RoutedEvent <#= ContainerMenuItemClickedNotificationPropertyName #>Event =
-                EventManager.RegisterRoutedEvent(
-                "<#= ContainerMenuItemClickedNotificationPropertyName #>", RoutingStrategy.Bubble,
-                typeof(RoutedEventHandler),
-                typeof(<#= WebServiceFilterUserControlClassName #>));
-        public event RoutedEventHandler <#= ContainerMenuItemClickedNotificationPropertyName #>
-        {
-            add { AddHandler(<#= ContainerMenuItemClickedNotificationPropertyName #>Event, value); }
-            remove { RemoveHandler(<#= ContainerMenuItemClickedNotificationPropertyName #>Event, value); }
-        }
-        #endregion
-        #region <#= ContainerMenuItemClickedCommandPropertyName #>
-        private ICommand _<#= ContainerMenuItemClickedCommandPropertyName #>;
-        public ICommand <#= ContainerMenuItemClickedCommandPropertyName #>
-        {
-            get
-            {
-                return _<#= ContainerMenuItemClickedCommandPropertyName #> ?? (_<#= ContainerMenuItemClickedCommandPropertyName #> = new CommandHelper((param) => <#= ContainerMenuItemClickedCommandPropertyName #>Action(param), (param) => <#= ContainerMenuItemClickedCommandPropertyName #>CanExecute(param)));
-            }
-        }
-        protected void <#= ContainerMenuItemClickedCommandPropertyName #>Action(object param)
-        {
-            <#= NotificationRoutedEventArgsClassName #> newEventArgs = new <#= NotificationRoutedEventArgsClassName #>(<#= WebServiceFilterUserControlClassName #>.<#= ContainerMenuItemClickedNotificationPropertyName #>Event)
-            {
-                Sender = this,
-                Model = param
-            };
-            RaiseEvent(newEventArgs);
-        }
-        protected bool <#= ContainerMenuItemClickedCommandPropertyName #>CanExecute(object param)
-        {
-            return true;
-        }
-        #endregion
-        #region <#= BackBtnClickedNotificationPropertyName #>
-        public static readonly RoutedEvent <#= BackBtnClickedNotificationPropertyName #>Event =
-                EventManager.RegisterRoutedEvent(
-                "<#= BackBtnClickedNotificationPropertyName #>", RoutingStrategy.Bubble,
-                typeof(RoutedEventHandler),
-                typeof(<#= WebServiceFilterUserControlClassName #>));
-        public event RoutedEventHandler <#= BackBtnClickedNotificationPropertyName #>
-        {
-            add { AddHandler(<#= BackBtnClickedNotificationPropertyName #>Event, value); }
-            remove { RemoveHandler(<#= BackBtnClickedNotificationPropertyName #>Event, value); }
-        }
-        #endregion
-        #region <#= BackBtnClickedCommandPropertyName #>
-        private ICommand _<#= BackBtnClickedCommandPropertyName #>;
-        public ICommand <#= BackBtnClickedCommandPropertyName #>
-        {
-            get
-            {
-                return _<#= BackBtnClickedCommandPropertyName #> ?? (_<#= BackBtnClickedCommandPropertyName #> = new CommandHelper((param) => <#= BackBtnClickedCommandPropertyName #>Action(param), (param) => <#= BackBtnClickedCommandPropertyName #>CanExecute(param)));
-            }
-        }
-        protected void <#= BackBtnClickedCommandPropertyName #>Action(object param)
-        {
-            <#= NotificationRoutedEventArgsClassName #> newEventArgs = new <#= NotificationRoutedEventArgsClassName #>(<#= WebServiceFilterUserControlClassName #>.<#= BackBtnClickedNotificationPropertyName #>Event);
-            newEventArgs.Sender = this;
-            newEventArgs.Model = param;
-            RaiseEvent(newEventArgs);
-        }
-        protected bool <#= BackBtnClickedCommandPropertyName #>CanExecute(object param)
-        {
-            return true;
-        }
-        #endregion
-        #region <#= ApplyFilterBtnClickedNotificationPropertyName #>
-        public static readonly RoutedEvent <#= ApplyFilterBtnClickedNotificationPropertyName #>Event =
-                EventManager.RegisterRoutedEvent(
-                "<#= ApplyFilterBtnClickedNotificationPropertyName #>", RoutingStrategy.Bubble,
-                typeof(RoutedEventHandler),
-                typeof(<#= WebServiceFilterUserControlClassName #>));
-        public event RoutedEventHandler <#= ApplyFilterBtnClickedNotificationPropertyName #>
-        {
-            add { AddHandler(<#= ApplyFilterBtnClickedNotificationPropertyName #>Event, value); }
-            remove { RemoveHandler(<#= ApplyFilterBtnClickedNotificationPropertyName #>Event, value); }
-        }
-        #endregion
-        #region <#= ApplyFilterBtnClickedCommandPropertyName #>
-        private ICommand _<#= ApplyFilterBtnClickedCommandPropertyName #>;
-        public ICommand <#= ApplyFilterBtnClickedCommandPropertyName #>
-        {
-            get
-            {
-                return _<#= ApplyFilterBtnClickedCommandPropertyName #> ?? (_<#= ApplyFilterBtnClickedCommandPropertyName #> = new CommandHelper((param) => <#= ApplyFilterBtnClickedCommandPropertyName #>Action(param), (param) => <#= ApplyFilterBtnClickedCommandPropertyName #>CanExecute(param)));
-            }
-        }
-        protected void <#= ApplyFilterBtnClickedCommandPropertyName #>Action(object param)
-        {
+        #region <#= OnFilterCommandPropertyName #>
+        protected IList<<#= IWebServiceFilterRsltInterfaceClassName #>> InternalDefineFilter() {
             IList<<#= IWebServiceFilterRsltInterfaceClassName #>> rslt = new List<<#= IWebServiceFilterRsltInterfaceClassName #>>();
             if (<#= FiltersPropertyName #> != null)
             {
@@ -426,44 +360,31 @@ namespace <#= WebServiceFilterUserControlNameSpace #> {
                     }
                 }
             }
-            <#= NotificationRoutedEventArgsClassName #> newEventArgs = new <#= NotificationRoutedEventArgsClassName #>(<#= WebServiceFilterUserControlClassName #>.<#= ApplyFilterBtnClickedNotificationPropertyName #>Event);
-            newEventArgs.Sender = this;
-            newEventArgs.Model = rslt;
-            RaiseEvent(newEventArgs);
+            return rslt;
         }
-        protected bool <#= ApplyFilterBtnClickedCommandPropertyName #>CanExecute(object param)
+        private void Executed<#= OnFilterCommandPropertyName #>(object sender, ExecutedRoutedEventArgs e)
         {
-            return true;
+            e.Handled = true;
+            IList<<#= IWebServiceFilterRsltInterfaceClassName #>> rslt = InternalDefineFilter();
+            <#= RoutedCommandExtClassName #>.<#= ApplyFilterCommandPropertyName #>.Execute(rslt, this);
+        }
+        private void CanExecute<#= OnFilterCommandPropertyName #>(object sender, CanExecuteRoutedEventArgs e) {
+            e.Handled = true;
+            IList<<#= IWebServiceFilterRsltInterfaceClassName #>> rslt = InternalDefineFilter();
+            e.CanExecute = <#= RoutedCommandExtClassName #>.<#= ApplyFilterCommandPropertyName #>.CanExecute(rslt, this);
         }
         #endregion
-        #region <#= AddFilterBtnClickedCommandPropertyName #>
-        private ICommand _<#= AddFilterBtnClickedCommandPropertyName #>;
-        public ICommand <#= AddFilterBtnClickedCommandPropertyName #>
-        {
-            get
-            {
-                return _<#= AddFilterBtnClickedCommandPropertyName #> ?? (_<#= AddFilterBtnClickedCommandPropertyName #> = new CommandHelper((param) => <#= AddFilterBtnClickedCommandPropertyName #>Action(param), (param) => <#= AddFilterBtnClickedCommandPropertyName #>CanExecute(param)));
-            }
-        }
-        protected void <#= AddFilterBtnClickedCommandPropertyName #>Action(object param)
+        #region <#= AddWebServiceFilterItemCommandPropertyName #>
+        private void Executed<#= AddWebServiceFilterItemCommandPropertyName #>(object sender, ExecutedRoutedEventArgs e)
         {
             <#= FiltersPropertyName #>.Add(new <#= WebServiceFilterRsltViewModelClassName #>());
         }
-        protected bool <#= AddFilterBtnClickedCommandPropertyName #>CanExecute(object param)
-        {
-            return <#= ShowAddFilterBtnPropertyName #>.HasValue ? <#= ShowAddFilterBtnPropertyName #>.Value : false;
+        private void CanExecute<#= AddWebServiceFilterItemCommandPropertyName #>(object sender, CanExecuteRoutedEventArgs e) {
+            e.CanExecute =  <#= ShowAddFilterBtnPropertyName #>;
         }
         #endregion
-        #region <#= RemoveFilterBtnClickedCommandPropertyName #>
-        private ICommand _<#= RemoveFilterBtnClickedCommandPropertyName #>;
-        public ICommand <#= RemoveFilterBtnClickedCommandPropertyName #>
-        {
-            get
-            {
-                return _<#= RemoveFilterBtnClickedCommandPropertyName #> ?? (_<#= RemoveFilterBtnClickedCommandPropertyName #> = new CommandHelper((param) => <#= RemoveFilterBtnClickedCommandPropertyName #>Action(param), (param) => <#= RemoveFilterBtnClickedCommandPropertyName #>CanExecute(param)));
-            }
-        }
-        protected void <#= RemoveFilterBtnClickedCommandPropertyName #>Action(object param)
+        #region <#= RemoveWebServiceFilterItemCommandPropertyName #>
+        private void Executed<#= RemoveWebServiceFilterItemCommandPropertyName #>(object sender, ExecutedRoutedEventArgs e)
         {
             if (<#= FiltersPropertyName #>.Count < 1)
             {
@@ -474,34 +395,24 @@ namespace <#= WebServiceFilterUserControlNameSpace #> {
             {
                 return;
             }
-            <#= IWebServiceFilterRsltInterfaceClassName #> itm = param as <#= IWebServiceFilterRsltInterfaceClassName #>;
+            <#= IWebServiceFilterRsltInterfaceClassName #> itm = e.Parameter as <#= IWebServiceFilterRsltInterfaceClassName #>;
             if (itm != null)
             {
                 <#= FiltersPropertyName #>.Remove(itm);
             }
         }
-        protected bool <#= RemoveFilterBtnClickedCommandPropertyName #>CanExecute(object param)
-        {
-            return true;
+        private void CanExecute<#= RemoveWebServiceFilterItemCommandPropertyName #>(object sender, CanExecuteRoutedEventArgs e) {
+            e.CanExecute =  (e.Parameter as <#= IWebServiceFilterRsltInterfaceClassName #>) != null;
         }
         #endregion
-        #region <#= RemoveAllFiltersBtnClickedCommandPropertyName #>
-        private ICommand _<#= RemoveAllFiltersBtnClickedCommandPropertyName #>;
-        public ICommand <#= RemoveAllFiltersBtnClickedCommandPropertyName #>
+        #region <#= RemoveAllWebServiceFilterItemCommandPropertyName #>
+        private void Executed<#= RemoveAllWebServiceFilterItemCommandPropertyName #>(object sender, ExecutedRoutedEventArgs e)
         {
-            get
-            {
-                return _<#= RemoveAllFiltersBtnClickedCommandPropertyName #> ?? (_<#= RemoveAllFiltersBtnClickedCommandPropertyName #> = new CommandHelper((param) => <#= RemoveAllFiltersBtnClickedCommandPropertyName #>Action(param), (param) => <#= RemoveAllFiltersBtnClickedCommandPropertyName #>CanExecute(param)));
-            }
+            <#= FiltersPropertyName #>.Clear();
+            <#= FiltersPropertyName #>.Add(new <#= WebServiceFilterRsltViewModelClassName #>());
         }
-        protected void <#= RemoveAllFiltersBtnClickedCommandPropertyName #>Action(object param)
-        {
-            Filters.Clear();
-            Filters.Add(new <#= WebServiceFilterRsltViewModelClassName #>());
-        }
-        protected bool <#= RemoveAllFiltersBtnClickedCommandPropertyName #>CanExecute(object param)
-        {
-            return true;
+        private void CanExecute<#= RemoveAllWebServiceFilterItemCommandPropertyName #>(object sender, CanExecuteRoutedEventArgs e) {
+            e.CanExecute =  true;
         }
         #endregion
     }

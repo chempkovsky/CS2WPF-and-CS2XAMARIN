@@ -13,20 +13,11 @@
 <#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 <#
  
-    string commandHelperModelFolder      = "00140-CommandHelper.cs";
-    string commandHelperModelClassName   = GetModelClassName(Model, commandHelperModelFolder);
-    string commandHelperModelNameSpace   = GetModelNameSpace(Model, commandHelperModelFolder);
-
-    string NotificationRoutedEventArgsFolder      = "00226-NotificationRoutedEventArgs.cs";
-    string NotificationRoutedEventArgsClassName   = GetModelClassName(Model, NotificationRoutedEventArgsFolder);
-    string NotificationRoutedEventArgsNameSpace   = GetModelNameSpace(Model, NotificationRoutedEventArgsFolder);
-
     string TablePaginationUserControlFolder      = "00252-TablePaginationUserControl.xaml.cs";
     string TablePaginationUserControlClassName   = GetModelClassName(Model, TablePaginationUserControlFolder);
     string TablePaginationUserControlNameSpace   = GetModelNameSpace(Model, TablePaginationUserControlFolder);
@@ -42,28 +33,16 @@ using System.Windows.Input;
     string PreviousButtonIconNamePropertyName = "PreviousButtonIconName";
     string PreviousButtonToolTipPropertyName = "PreviousButtonToolTip";
     string PreviousButtonIconColorPropertyName = "PreviousButtonIconColor";
-    string PreviousButtonClickedCommandPropertyName = "PreviousButtonClickedCommand";
     string NextButtonIconNamePropertyName = "NextButtonIconName";
     string NextButtonToolTipPropertyName = "NextButtonToolTip";
     string NextButtonIconColorPropertyName = "NextButtonIconColor";
-    string NextButtonClickedCommandPropertyName = "NextButtonClickedCommand";
-    string NewPageClickedNotificationPropertyName  = "NewPageClickedNotification";
-    string RowsPerPageChangedNotificationPropertyName  = "RowsPerPageChangedNotification";
-    string RowsPerPageChangedCommandPropertyName  = "RowsPerPageChangedCommand";
 
+    string CurrentPageChangedPropertyName  = "CurrentPageChanged";
+    string RowsPerPageChangedPropertyName  = "RowsPerPageChanged";
+    string TotalCountChangedPropertyName  = "TotalCountChanged";
+    string NextPageCommandPropertyName  = "NextPageCommand";
+    string PreviousPageCommandPropertyName  = "PreviousPageCommand";
 
-    List<string> nmSpaces = new List<string>();
-   if (TablePaginationUserControlNameSpace != commandHelperModelNameSpace) nmSpaces.Add(commandHelperModelNameSpace);
-   if ((TablePaginationUserControlNameSpace != NotificationRoutedEventArgsNameSpace) && (nmSpaces.IndexOf(NotificationRoutedEventArgsNameSpace) < 0)) 
-        nmSpaces.Add(NotificationRoutedEventArgsNameSpace);
-
-#>
-<# 
-    foreach(string ns in nmSpaces) {
-#>
-using <#= ns #>;
-<#
-    }
 #>
 
 namespace <#= TablePaginationUserControlNameSpace #> {
@@ -80,7 +59,9 @@ namespace <#= TablePaginationUserControlNameSpace #> {
         {
             if(<#= CurrentPagePropertyName #>.HasValue && <#= RowsPerPagePropertyName #>.HasValue && <#= TotalCountPropertyName #>.HasValue)
             {
-                <#= CountFromPropertyName #> = <#= CurrentPagePropertyName #>.Value * <#= RowsPerPagePropertyName #>.Value + 1;
+                int w = <#= CurrentPagePropertyName #>.Value * <#= RowsPerPagePropertyName #>.Value + 1;
+                if(w > <#= TotalCountPropertyName #>.Value) w = <#= TotalCountPropertyName #>.Value;
+                <#= CountFromPropertyName #> = w;
                 int v = <#= CurrentPagePropertyName #>.Value * <#= RowsPerPagePropertyName #>.Value + <#= RowsPerPagePropertyName #>.Value;
                 if (v > <#= TotalCountPropertyName #>.Value) v = <#= TotalCountPropertyName #>.Value;
                 <#= CountToPropertyName #> = v;
@@ -133,12 +114,8 @@ namespace <#= TablePaginationUserControlNameSpace #> {
             TablePaginationUserControl inst = d as TablePaginationUserControl;
             if (inst != null)
             {
-                inst.<#= CurrentPagePropertyName #> = 0;
                 inst.ResetToAndFrom();
-
-                <#= NotificationRoutedEventArgsClassName #> newEventArgs = new <#= NotificationRoutedEventArgsClassName #>(<#= TablePaginationUserControlClassName #>.<#= RowsPerPageChangedNotificationPropertyName #>Event);
-                newEventArgs.Sender = inst;
-                newEventArgs.Model = inst.<#= RowsPerPagePropertyName #>;
+                RoutedPropertyChangedEventArgs<Nullable<int>> newEventArgs = new RoutedPropertyChangedEventArgs<Nullable<int>>(e.OldValue as Nullable<int>, e.NewValue as Nullable<int>, <#= TablePaginationUserControlClassName #>.<#= RowsPerPageChangedPropertyName #>Event);
                 inst.RaiseEvent(newEventArgs);
             }
         }
@@ -203,6 +180,8 @@ namespace <#= TablePaginationUserControlNameSpace #> {
             if (inst != null)
             {
                 inst.ResetToAndFrom();
+                RoutedPropertyChangedEventArgs<Nullable<int>> newEventArgs = new RoutedPropertyChangedEventArgs<Nullable<int>>(e.OldValue as Nullable<int>, e.NewValue as Nullable<int>, <#= TablePaginationUserControlClassName #>.<#= TotalCountChangedPropertyName #>Event);
+                inst.RaiseEvent(newEventArgs);
             }
         }
         public static readonly DependencyProperty <#= TotalCountPropertyName #>Property =
@@ -229,6 +208,8 @@ namespace <#= TablePaginationUserControlNameSpace #> {
             if (inst != null)
             {
                 inst.ResetToAndFrom();
+                RoutedPropertyChangedEventArgs<Nullable<int>> newEventArgs = new RoutedPropertyChangedEventArgs<Nullable<int>>(e.OldValue as Nullable<int>, e.NewValue as Nullable<int>, <#= TablePaginationUserControlClassName #>.<#= CurrentPageChangedPropertyName #>Event);
+                inst.RaiseEvent(newEventArgs);
             }
         }
         public static readonly DependencyProperty <#= CurrentPagePropertyName #>Property =
@@ -302,32 +283,6 @@ namespace <#= TablePaginationUserControlNameSpace #> {
             }
         }
         #endregion
-        #region <#= PreviousButtonClickedCommandPropertyName #>
-        private ICommand _<#= PreviousButtonClickedCommandPropertyName #>;
-        public ICommand <#= PreviousButtonClickedCommandPropertyName #>
-        {
-            get
-            {
-                return _<#= PreviousButtonClickedCommandPropertyName #> ?? (_<#= PreviousButtonClickedCommandPropertyName #> = new CommandHelper((param) => <#= PreviousButtonClickedCommandPropertyName #>Action(param), (param) => <#= PreviousButtonClickedCommandPropertyName #>CanExecute(param)));
-            }
-        }
-        protected void <#= PreviousButtonClickedCommandPropertyName #>Action(object param)
-        {
-            if (<#= CurrentPagePropertyName #>.HasValue ? <#= CurrentPagePropertyName #>.Value > 0 : false)
-            {
-                int newVal = <#= CurrentPagePropertyName #>.Value - 1;
-                <#= CurrentPagePropertyName #> = newVal;
-                <#= NotificationRoutedEventArgsClassName #> newEventArgs = new <#= NotificationRoutedEventArgsClassName #>(TablePaginationUserControl.NewPageClickedNotificationEvent);
-                newEventArgs.Sender = this;
-                newEventArgs.Model = newVal;
-                RaiseEvent(newEventArgs);
-            }
-        }
-        protected bool <#= PreviousButtonClickedCommandPropertyName #>CanExecute(object param)
-        {
-            return (<#= CurrentPagePropertyName #>.HasValue ? <#= CurrentPagePropertyName #>.Value > 0 : false);
-        }
-        #endregion
         #region <#= NextButtonIconNamePropertyName #>
         public static readonly DependencyProperty <#= NextButtonIconNamePropertyName #>Property =
                 DependencyProperty.Register(
@@ -382,56 +337,98 @@ namespace <#= TablePaginationUserControlNameSpace #> {
             }
         }
         #endregion
-        #region <#= NextButtonClickedCommandPropertyName #>
-        private ICommand _<#= NextButtonClickedCommandPropertyName #>;
-        public ICommand <#= NextButtonClickedCommandPropertyName #>
+        #region <#= CurrentPageChangedPropertyName #>Event
+        public static readonly RoutedEvent <#= CurrentPageChangedPropertyName #>Event = EventManager.RegisterRoutedEvent("<#= CurrentPageChangedPropertyName #>", RoutingStrategy.Bubble, typeof(RoutedPropertyChangedEventHandler<Nullable<int>>), typeof(<#= TablePaginationUserControlClassName #>));
+        public static void Add<#= CurrentPageChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<Nullable<int>> handler)
         {
-            get
+            UIElement uie = d as UIElement;
+            if (uie != null)
             {
-                return _<#= NextButtonClickedCommandPropertyName #> ?? (_<#= NextButtonClickedCommandPropertyName #> = new CommandHelper((param) => <#= NextButtonClickedCommandPropertyName #>Action(param), (param) => NextButtonClickedCommandCanExecute(param)));
+                uie.AddHandler(<#= TablePaginationUserControlClassName #>.<#= CurrentPageChangedPropertyName #>Event, handler);
             }
         }
-        protected void <#= NextButtonClickedCommandPropertyName #>Action(object param)
+        public static void Remove<#= CurrentPageChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<Nullable<int>> handler)
         {
-            if (<#= CurrentPagePropertyName #>.HasValue && <#= CountToPropertyName #>.HasValue && <#= TotalCountPropertyName #>.HasValue ? <#= CountToPropertyName #>.Value < <#= TotalCountPropertyName #>.Value : false)
+            UIElement uie = d as UIElement;
+            if (uie != null)
             {
-                int newVal = <#= CurrentPagePropertyName #>.Value + 1;
-                <#= CurrentPagePropertyName #> = newVal;
-                <#= NotificationRoutedEventArgsClassName #> newEventArgs = new <#= NotificationRoutedEventArgsClassName #>(TablePaginationUserControl.<#= NewPageClickedNotificationPropertyName #>Event);
-                newEventArgs.Sender = this;
-                newEventArgs.Model = newVal;
-                RaiseEvent(newEventArgs);
+                uie.RemoveHandler(<#= TablePaginationUserControlClassName #>.<#= CurrentPageChangedPropertyName #>Event, handler);
             }
         }
-        protected bool <#= NextButtonClickedCommandPropertyName #>CanExecute(object param)
+        #endregion
+        #region <#= RowsPerPageChangedPropertyName #>Event
+        public static readonly RoutedEvent <#= RowsPerPageChangedPropertyName #>Event = EventManager.RegisterRoutedEvent("<#= RowsPerPageChangedPropertyName #>", RoutingStrategy.Bubble, typeof(RoutedPropertyChangedEventHandler<Nullable<int>>), typeof(<#= TablePaginationUserControlClassName #>));
+        public static void Add<#= RowsPerPageChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<Nullable<int>> handler)
         {
-            return (<#= CountToPropertyName #>.HasValue && <#= TotalCountPropertyName #>.HasValue ?  <#= CountToPropertyName #>.Value < <#= TotalCountPropertyName #>.Value : false);
+            UIElement uie = d as UIElement;
+            if (uie != null)
+            {
+                uie.AddHandler(<#= TablePaginationUserControlClassName #>.<#= RowsPerPageChangedPropertyName #>Event, handler);
+            }
+        }
+        public static void Remove<#= RowsPerPageChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<Nullable<int>> handler)
+        {
+            UIElement uie = d as UIElement;
+            if (uie != null)
+            {
+                uie.RemoveHandler(<#= TablePaginationUserControlClassName #>.<#= RowsPerPageChangedPropertyName #>Event, handler);
+            }
         }
         #endregion
-        #region <#= NewPageClickedNotificationPropertyName #>
-        public static readonly RoutedEvent <#= NewPageClickedNotificationPropertyName #>Event =
-                EventManager.RegisterRoutedEvent(
-                "<#= NewPageClickedNotificationPropertyName #>", RoutingStrategy.Bubble,
-                typeof(RoutedEventHandler),
-                typeof(<#= TablePaginationUserControlClassName #>));
-        public event RoutedEventHandler <#= NewPageClickedNotificationPropertyName #>
+        #region <#= TotalCountChangedPropertyName #>Event
+        public static readonly RoutedEvent <#= TotalCountChangedPropertyName #>Event = EventManager.RegisterRoutedEvent("<#= TotalCountChangedPropertyName #>", RoutingStrategy.Bubble, typeof(RoutedPropertyChangedEventHandler<Nullable<int>>), typeof(<#= TablePaginationUserControlClassName #>));
+        public static void Add<#= TotalCountChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<Nullable<int>> handler)
         {
-            add { AddHandler(<#= NewPageClickedNotificationPropertyName #>Event, value); }
-            remove { RemoveHandler(<#= NewPageClickedNotificationPropertyName #>Event, value); }
+            UIElement uie = d as UIElement;
+            if (uie != null)
+            {
+                uie.AddHandler(<#= TablePaginationUserControlClassName #>.<#= TotalCountChangedPropertyName #>Event, handler);
+            }
+        }
+        public static void Remove<#= TotalCountChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<Nullable<int>> handler)
+        {
+            UIElement uie = d as UIElement;
+            if (uie != null)
+            {
+                uie.RemoveHandler(<#= TablePaginationUserControlClassName #>.<#= TotalCountChangedPropertyName #>Event, handler);
+            }
         }
         #endregion
-        #region <#= RowsPerPageChangedNotificationPropertyName #>
-        public static readonly RoutedEvent <#= RowsPerPageChangedNotificationPropertyName #>Event =
-                EventManager.RegisterRoutedEvent(
-                "<#= RowsPerPageChangedNotificationPropertyName #>", RoutingStrategy.Bubble,
-                typeof(RoutedEventHandler),
-                typeof(<#= TablePaginationUserControlClassName #>));
-        public event RoutedEventHandler <#= RowsPerPageChangedNotificationPropertyName #>
+        #region RoutedCommands
+        public static RoutedCommand <#= NextPageCommandPropertyName #> = new RoutedCommand("<#= NextPageCommandPropertyName #>", typeof(<#= TablePaginationUserControlClassName #>));
+        public static RoutedCommand <#= PreviousPageCommandPropertyName #> = new RoutedCommand("<#= PreviousPageCommandPropertyName #>", typeof(<#= TablePaginationUserControlClassName #>));
+        #endregion
+        #region <#= NextPageCommandPropertyName #>
+        private void Executed<#= NextPageCommandPropertyName #>(object sender, ExecutedRoutedEventArgs e)
         {
-            add { AddHandler(<#= RowsPerPageChangedNotificationPropertyName #>Event, value); }
-            remove { RemoveHandler(<#= RowsPerPageChangedNotificationPropertyName #>Event, value); }
+            if (CurrentPage.HasValue && CountTo.HasValue && TotalCount.HasValue ? CountTo.Value < TotalCount.Value : false)
+            {
+                CurrentPage = CurrentPage.Value + 1;
+            }
+        }
+        private void CanExecute<#= NextPageCommandPropertyName #>(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = (CountTo.HasValue && TotalCount.HasValue ? CountTo.Value < TotalCount.Value : false);
+            e.Handled = true;
         }
         #endregion
+        #region <#= PreviousPageCommandPropertyName #>
+        private void Executed<#= PreviousPageCommandPropertyName #>(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (CurrentPage.HasValue ? CurrentPage.Value > 0 : false)
+            {
+                CurrentPage = CurrentPage.Value - 1;
+            }
+        }
+        private void CanExecute<#= PreviousPageCommandPropertyName #>(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = (CurrentPage.HasValue ? CurrentPage.Value > 0 : false);
+            e.Handled = true;
+        }
+        #endregion
+
+
+
    }
 }
 

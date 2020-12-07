@@ -24,6 +24,11 @@
     string FillHelperModelNameSpace   = GetModelNameSpace(Model, FillHelperModelFolder);
     string FillHelperModelProject     = GetModelProjectName(Model, FillHelperModelFolder);
 
+    string RoutedCommandExtFolder      = "00224-RoutedCommandExt.cs";
+    string RoutedCommandExtClassName   = GetModelClassName(Model, RoutedCommandExtFolder);
+    string RoutedCommandExtNameSpace   = GetModelNameSpace(Model, RoutedCommandExtFolder);
+    string RoutedCommandExtProject     = GetModelProjectName(Model, RoutedCommandExtFolder);
+
     string MessageUserControlFolder            = "00270-MessageUserControl.xaml.cs";
     string MessageUserControlClassName         = GetModelClassName(Model, MessageUserControlFolder);
     string MessageUserControlNameSpace         = GetModelNameSpace(Model, MessageUserControlFolder);
@@ -40,9 +45,7 @@
     string MessageIconColorPropertyName = "MessageIconColor";
     string ShowOkBtnPropertyName = "ShowOkBtn";
     string ShowCancelBtnPropertyName = "ShowCancelBtn";
-    string OkNotificationPropertyName = "OkNotification";
     string OkCommandPropertyName = "OkCommand";
-    string CancelNotificationPropertyName = "CancelNotification";
     string CancelCommandPropertyName = "CancelCommand";
 
     string pthPrefix = "clr-namespace:" + pathHelperModelNameSpace;
@@ -54,6 +57,11 @@
         fllPrefix = fllPrefix + ";assembly=" + FillHelperModelProject;
     }
 
+    string routedCommandPrefix = "clr-namespace:" + RoutedCommandExtNameSpace;
+    if(RoutedCommandExtProject != MessageUserControlXamlProject) {
+        routedCommandPrefix = routedCommandPrefix + ";assembly=" + RoutedCommandExtProject;
+    }
+
 #>
 
 <UserControl x:Class="<#= MessageUserControlNameSpace #>.<#= MessageUserControlClassName #>"
@@ -61,6 +69,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+
+             xmlns:crtcmd="<#= routedCommandPrefix #>"
 
              xmlns:pth="<#= pthPrefix #>"
              xmlns:fll="<#= fllPrefix #>"
@@ -91,7 +101,7 @@
          </Viewbox>
         <TextBlock TextWrapping="Wrap" Grid.Row="2" Grid.Column="1" Margin="8 8 0 0" Text="{Binding <#= MessagePropertyName #>, ElementName=MsgUsrCntrlRootNode}"/>
         <StackPanel Orientation="Horizontal" Grid.Row="4" Grid.Column="2" Margin="8">
-            <Button Content="Ok" MinWidth="64" Command="{Binding <#= OkCommandPropertyName #>, ElementName=MsgUsrCntrlRootNode}" >
+            <Button Content="Ok" MinWidth="64" Command="{x:Static crtcmd:<#= RoutedCommandExtClassName #>.<#= OkCommandPropertyName #>}">
                 <Button.Resources>
                     <Style TargetType="{x:Type Button}">
                         <Setter Property="Visibility" Value="Hidden" />
@@ -103,7 +113,7 @@
                     </Style>
                 </Button.Resources>
             </Button>
-            <Button Content="Cancel" MinWidth="64" Margin="8 0 0 0" Command="{Binding <#= CancelCommandPropertyName #>, ElementName=MsgUsrCntrlRootNode}" >
+            <Button Content="Cancel" MinWidth="64" Margin="8 0 0 0" Command="{x:Static crtcmd:<#= RoutedCommandExtClassName #>.<#= CancelCommandPropertyName #>}">
                 <Button.Resources>
                     <Style TargetType="{x:Type Button}">
                         <Setter Property="Visibility" Value="Hidden" />

@@ -1,0 +1,222 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+using System.Reflection;
+using System.Windows;
+using System.Windows.Data;
+using System.Collections.Specialized;
+using Prism.Regions;
+<#
+
+    string ProxyUserControlFolder     = "00280-ProxyUserControl.xaml.cs";
+    string ProxyUserControlClassName  = GetModelClassName(Model, ProxyUserControlFolder);
+    string ProxyUserControlNameSpace  = GetModelNameSpace(Model, ProxyUserControlFolder);
+
+
+    string ProxyUserControlRegionAdapterFolder      = "00284-ProxyUserControlRegionAdapter.cs";
+    string ProxyUserControlRegionAdapterClassName   = GetModelClassName(Model, ProxyUserControlRegionAdapterFolder);
+    string ProxyUserControlRegionAdapterNameSpace   = GetModelNameSpace(Model, ProxyUserControlRegionAdapterFolder);
+
+    string CaptionPropertyName = "Caption";
+    string FilterHeightPropertyName = "FilterHeight";
+    string HiddenFiltersPropertyName = "HiddenFilters";
+    string ShowFilterPropertyName = "ShowFilter";
+    string ShowBackBtnPropertyName = "ShowBackBtn";
+    string ShowAddFilterBtnPropertyName = "ShowAddFilterBtn";
+    string ContainerMenuItemsPropertyName = "ContainerMenuItems";
+    string GridHeightPropertyName = "GridHeight";
+    string TableMenuItemsPropertyName = "TableMenuItems";
+
+    string RowMenuItemsPropertyName = "RowMenuItems";
+
+
+
+
+#>
+
+<# 
+    if(ProxyUserControlRegionAdapterNameSpace != ProxyUserControlNameSpace) { 
+#>
+using <#= ProxyUserControlNameSpace #>;
+<#
+    }
+#>
+
+
+/*
+    In the App.xaml.cs the following lines of code must be inserted:
+
+    protected override void ConfigureRegionAdapterMappings(RegionAdapterMappings regionAdapterMappings)
+    {
+        base.ConfigureRegionAdapterMappings(regionAdapterMappings);
+        regionAdapterMappings.RegisterMapping<<#= ProxyUserControlClassName #>, <#= ProxyUserControlRegionAdapterClassName #>>();
+    }
+*/
+
+
+namespace <#= ProxyUserControlRegionAdapterNameSpace #> {
+
+
+    public class <#= ProxyUserControlRegionAdapterClassName #>: RegionAdapterBase<<#= ProxyUserControlClassName #>>
+    {
+        public <#= ProxyUserControlRegionAdapterClassName #>(IRegionBehaviorFactory factory): base(factory)
+        {
+        }
+        protected void SetBinding(FrameworkElement element, <#= ProxyUserControlClassName #> regionTarget, BindingMode mode, string propertyName) {
+            var fieldInfo = element.GetType().GetField(propertyName + "Property", BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy);
+            if(fieldInfo!= null)
+            {
+                DependencyProperty dp = fieldInfo.GetValue(null) as DependencyProperty;
+                if(dp != null)
+                {
+                    BindingOperations.SetBinding(element, dp, new Binding(propertyName) { Source=regionTarget, Mode= mode } );
+                }
+            }
+        }
+        protected void ClearBinding(FrameworkElement element, <#= ProxyUserControlClassName #> regionTarget, string propertyName) {
+            var fieldInfo = element.GetType().GetField(propertyName + "Property", BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy);
+            if (fieldInfo != null)
+            {
+                DependencyProperty dp = fieldInfo.GetValue(null) as DependencyProperty;
+                if (dp != null)
+                {
+                    Binding bb = BindingOperations.GetBinding(element, dp);
+                    if (bb != null)
+                    {
+                        if (bb.Source == regionTarget)
+                        {
+                            BindingOperations.ClearBinding(element, dp);
+                        }
+                    }
+                }
+            }
+        }
+        protected override void Adapt(IRegion region, <#= ProxyUserControlClassName #> regionTarget)
+        {
+            region.Views.CollectionChanged += (s, e) =>
+            {
+                if (e.Action == NotifyCollectionChangedAction.Add)
+                {
+                    foreach (FrameworkElement element in e.NewItems)
+                    {
+                        regionTarget.Content = element;
+                        SetBinding(element, regionTarget, BindingMode.OneWay, "<#= CaptionPropertyName #>");
+                        SetBinding(element, regionTarget, BindingMode.OneWay, "<#= FilterHeightPropertyName #>");
+                        SetBinding(element, regionTarget, BindingMode.OneWay, "<#= HiddenFiltersPropertyName #>");
+                        SetBinding(element, regionTarget, BindingMode.OneWay, "<#= ShowFilterPropertyName #>");
+                        SetBinding(element, regionTarget, BindingMode.OneWay, "<#= ShowBackBtnPropertyName #>");
+                        SetBinding(element, regionTarget, BindingMode.OneWay, "<#= ShowAddFilterBtnPropertyName #>");
+                        SetBinding(element, regionTarget, BindingMode.OneWay, "<#= ContainerMenuItemsPropertyName #>");
+                        SetBinding(element, regionTarget, BindingMode.OneWay, "<#= GridHeightPropertyName #>");
+                        SetBinding(element, regionTarget, BindingMode.OneWay, "<#= TableMenuItemsPropertyName #>");
+                        SetBinding(element, regionTarget, BindingMode.OneWay, "<#= RowMenuItemsPropertyName #>");
+                    }
+                }
+                if (e.Action == NotifyCollectionChangedAction.Remove)
+                {
+                    foreach (FrameworkElement element in e.NewItems)
+                    {
+                        regionTarget.Content = null;
+                        ClearBinding(element, regionTarget, "<#= CaptionPropertyName #>");
+                        ClearBinding(element, regionTarget, "<#= FilterHeightPropertyName #>");
+                        ClearBinding(element, regionTarget, "<#= HiddenFiltersPropertyName #>");
+                        ClearBinding(element, regionTarget, "<#= ShowFilterPropertyName #>");
+                        ClearBinding(element, regionTarget, "<#= ShowBackBtnPropertyName #>");
+                        ClearBinding(element, regionTarget, "<#= ShowAddFilterBtnPropertyName #>");
+                        ClearBinding(element, regionTarget, "<#= ContainerMenuItemsPropertyName #>");
+                        ClearBinding(element, regionTarget, "<#= GridHeightPropertyName #>");
+                        ClearBinding(element, regionTarget, "<#= TableMenuItemsPropertyName #>");
+                        ClearBinding(element, regionTarget, "<#= RowMenuItemsPropertyName #>");
+                    }
+                }
+            };
+        }
+        protected override IRegion CreateRegion()
+        {
+            return new SingleActiveRegion();
+        }
+    }
+}
+
+<#+
+
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+
+#>

@@ -17,10 +17,6 @@ using System.Windows.Controls;
 using System.Windows.Input;
 <#
 
-    string commandHelperModelFolder      = "00140-CommandHelper.cs";
-    string commandHelperModelClassName   = GetModelClassName(Model, commandHelperModelFolder);
-    string commandHelperModelNameSpace   = GetModelNameSpace(Model, commandHelperModelFolder);
-
     string MessageUserControlFolder     = "00270-MessageUserControl.xaml.cs";
     string MessageUserControlClassName  = GetModelClassName(Model, MessageUserControlFolder);
     string MessageUserControlNameSpace  = GetModelNameSpace(Model, MessageUserControlFolder);
@@ -31,21 +27,9 @@ using System.Windows.Input;
     string MessageIconColorPropertyName = "MessageIconColor";
     string ShowOkBtnPropertyName = "ShowOkBtn";
     string ShowCancelBtnPropertyName = "ShowCancelBtn";
-    string OkNotificationPropertyName = "OkNotification";
-    string OkCommandPropertyName = "OkCommand";
-    string CancelNotificationPropertyName = "CancelNotification";
-    string CancelCommandPropertyName = "CancelCommand";
 
-    List<string> nmSpaces = new List<string>();
-   if (MessageUserControlNameSpace != commandHelperModelNameSpace) nmSpaces.Add(commandHelperModelNameSpace);
+   
 
-#>
-<# 
-    foreach(string ns in nmSpaces) {
-#>
-using <#= ns #>;
-<#
-    }
 #>
 
 namespace <#= MessageUserControlNameSpace #> {
@@ -164,66 +148,6 @@ namespace <#= MessageUserControlNameSpace #> {
             {
                 SetValue(<#= ShowCancelBtnPropertyName #>Property, value);
             }
-        }
-        #endregion
-        #region <#= OkNotificationPropertyName #>
-        public static readonly RoutedEvent <#= OkNotificationPropertyName #>Event =
-                EventManager.RegisterRoutedEvent(
-                "<#= OkNotificationPropertyName #>", RoutingStrategy.Bubble,
-                typeof(RoutedEventHandler),
-                typeof(<#= MessageUserControlClassName #>));
-        public event RoutedEventHandler <#= OkNotificationPropertyName #>
-        {
-            add { AddHandler(<#= OkNotificationPropertyName #>Event, value); }
-            remove { RemoveHandler(<#= OkNotificationPropertyName #>Event, value); }
-        }
-        #endregion
-        #region <#= OkCommandPropertyName #>
-        private ICommand _<#= OkCommandPropertyName #>;
-        public ICommand <#= OkCommandPropertyName #>
-        {
-            get
-            {
-                return _<#= OkCommandPropertyName #> ?? (_<#= OkCommandPropertyName #> = new CommandHelper((param) => <#= OkCommandPropertyName #>Action(param), (param) => <#= OkCommandPropertyName #>CanExecute(param)));
-            }
-        }
-        protected void <#= OkCommandPropertyName #>Action(object param)
-        {
-            RaiseEvent(new RoutedEventArgs(<#= MessageUserControlClassName #>.<#= OkNotificationPropertyName #>Event));
-        }
-        protected bool <#= OkCommandPropertyName #>CanExecute(object param)
-        {
-            return <#= ShowOkBtnPropertyName #>.HasValue ? <#= ShowOkBtnPropertyName #>.Value : false;
-        }
-        #endregion
-        #region <#= CancelNotificationPropertyName #>
-        public static readonly RoutedEvent <#= CancelNotificationPropertyName #>Event =
-                EventManager.RegisterRoutedEvent(
-                "<#= CancelNotificationPropertyName #>", RoutingStrategy.Bubble,
-                typeof(RoutedEventHandler),
-                typeof(<#= MessageUserControlClassName #>));
-        public event RoutedEventHandler <#= CancelNotificationPropertyName #>
-        {
-            add { AddHandler(<#= CancelNotificationPropertyName #>Event, value); }
-            remove { RemoveHandler(<#= CancelNotificationPropertyName #>Event, value); }
-        }
-        #endregion
-        #region <#= CancelCommandPropertyName #>
-        private ICommand _<#= CancelCommandPropertyName #>;
-        public ICommand <#= CancelCommandPropertyName #>
-        {
-            get
-            {
-                return _<#= CancelCommandPropertyName #> ?? (_<#= CancelCommandPropertyName #> = new CommandHelper((param) => <#= CancelCommandPropertyName #>Action(param), (param) => <#= CancelCommandPropertyName #>CanExecute(param)));
-            }
-        }
-        protected void <#= CancelCommandPropertyName #>Action(object param)
-        {
-            RaiseEvent(new RoutedEventArgs(<#= MessageUserControlClassName #>.<#= CancelNotificationPropertyName #>Event));
-        }
-        protected bool <#= CancelCommandPropertyName #>CanExecute(object param)
-        {
-            return <#= ShowCancelBtnPropertyName #>.HasValue ? <#= ShowCancelBtnPropertyName #>.Value : false;
         }
         #endregion
     }

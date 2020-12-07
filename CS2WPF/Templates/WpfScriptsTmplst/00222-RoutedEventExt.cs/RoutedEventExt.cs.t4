@@ -1,0 +1,418 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+using System;
+using System.Windows;
+using System.Collections.Generic;
+using System.ComponentModel;
+using CommonInterfacesClassLibrary.Interfaces;
+using System.Windows.Controls;
+
+<#
+
+
+    string IWebServiceFilterDefInterfaceFolder      = "00200-IWebServiceFilterDefInterface.cs";
+    string IWebServiceFilterDefInterfaceClassName   = GetModelClassName(Model, IWebServiceFilterDefInterfaceFolder);
+    string IWebServiceFilterDefInterfaceNameSpace   = GetModelNameSpace(Model, IWebServiceFilterDefInterfaceFolder);
+
+    string IWebServiceFilterOperatorInterfaceFolder      = "00202-IWebServiceFilterOperatorInterface.cs";
+    string IWebServiceFilterOperatorInterfaceClassName   = GetModelClassName(Model, IWebServiceFilterOperatorInterfaceFolder);
+    string IWebServiceFilterOperatorInterfaceNameSpace   = GetModelNameSpace(Model, IWebServiceFilterOperatorInterfaceFolder);
+
+    string IWebServiceFilterRsltInterfaceFolder      = "00204-IWebServiceFilterRsltInterface.cs";
+    string IWebServiceFilterRsltInterfaceClassName   = GetModelClassName(Model, IWebServiceFilterRsltInterfaceFolder);
+    string IWebServiceFilterRsltInterfaceNameSpace   = GetModelNameSpace(Model, IWebServiceFilterRsltInterfaceFolder);
+    
+    string IWebServiceFilterMenuInterfaceFolder      = "00206-IWebServiceFilterMenuInterface.cs";
+    string IWebServiceFilterMenuInterfaceClassName   = GetModelClassName(Model, IWebServiceFilterMenuInterfaceFolder);
+    string IWebServiceFilterMenuInterfaceNameSpace   = GetModelNameSpace(Model, IWebServiceFilterMenuInterfaceFolder);
+
+
+    string RoutedEventExtFolder      = "00222-RoutedEventExt.cs";
+    string RoutedEventExtClassName   = GetModelClassName(Model, RoutedEventExtFolder);
+    string RoutedEventExtNameSpace   = GetModelNameSpace(Model, RoutedEventExtFolder);
+
+
+    string HiddenFiltersPropertyChangedPropertyName = "HiddenFiltersPropertyChanged";
+    string FilterOperatorsPropertyChangedPropertyName = "FilterOperatorsPropertyChanged";
+    string FilterDefinitionsPropertyChangedPropertyName = "FilterDefinitionsPropertyChanged";
+    string ContainerMenuItemsPropertyChangedPropertyName = "ContainerMenuItemsPropertyChanged";
+    string ShowBackBtnPropertyChangedPropertyName = "ShowBackBtnPropertyChanged";
+    string ShowAddFilterBtnPropertyChangedPropertyName = "ShowAddFilterBtnPropertyChanged";
+    string CaptionPropertyChangedPropertyName = "CaptionPropertyChanged";
+    string FilterHeightPropertyChangedPropertyName = "FilterHeightPropertyChanged";
+    string GridHeightPropertyChangedPropertyName = "GridHeightPropertyChanged";
+    string TableMenuItemsPropertyChangedPropertyName = "TableMenuItemsPropertyChanged";
+    string RowMenuItemsPropertyChangedPropertyName = "RowMenuItemsPropertyChanged";
+    string DataGridSortingChangedPropertyName = "DataGridSortingChanged";
+    string SformSelectionChangedPropertyName = "SformSelectionChanged";
+
+    List<string> nmSpaces = new List<string>();
+    if ((RoutedEventExtNameSpace != IWebServiceFilterRsltInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IWebServiceFilterRsltInterfaceNameSpace);
+    if ((RoutedEventExtNameSpace != IWebServiceFilterOperatorInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterOperatorInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IWebServiceFilterOperatorInterfaceNameSpace);
+    if ((RoutedEventExtNameSpace != IWebServiceFilterDefInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterDefInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IWebServiceFilterDefInterfaceNameSpace);
+    if ((RoutedEventExtNameSpace != IWebServiceFilterMenuInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterMenuInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IWebServiceFilterMenuInterfaceNameSpace);
+
+#>
+<# 
+    foreach(string ns in nmSpaces) {
+#>
+using <#= ns #>;
+<#
+    }
+#>
+
+
+
+namespace <#= RoutedEventExtNameSpace #> {
+    public static class <#= RoutedEventExtClassName #>
+    {
+        #region <#= HiddenFiltersPropertyChangedPropertyName #>
+        public static readonly RoutedEvent <#= HiddenFiltersPropertyChangedPropertyName #>Event = EventManager.RegisterRoutedEvent("<#= HiddenFiltersPropertyChangedPropertyName #>", RoutingStrategy.Bubble, typeof(RoutedPropertyChangedEventHandler<IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>>), typeof(<#= RoutedEventExtClassName #>));
+        public static void Add<#= HiddenFiltersPropertyChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>> handler)
+        {
+            UIElement uie = d as UIElement;
+            if (uie != null)
+            {
+                uie.AddHandler(<#= RoutedEventExtClassName #>.<#= HiddenFiltersPropertyChangedPropertyName #>Event, handler);
+            }
+        }
+        public static void Remove<#= HiddenFiltersPropertyChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>> handler)
+        {
+            UIElement uie = d as UIElement;
+            if (uie != null)
+            {
+                uie.RemoveHandler(<#= RoutedEventExtClassName #>.<#= HiddenFiltersPropertyChangedPropertyName #>Event, handler);
+            }
+        }
+        #endregion
+
+        #region <#= FilterOperatorsPropertyChangedPropertyName #>
+        public static readonly RoutedEvent <#= FilterOperatorsPropertyChangedPropertyName #>Event = EventManager.RegisterRoutedEvent("<#= FilterOperatorsPropertyChangedPropertyName #>", RoutingStrategy.Bubble, typeof(RoutedPropertyChangedEventHandler<IEnumerable<<#= IWebServiceFilterOperatorInterfaceClassName #>>>), typeof(<#= RoutedEventExtClassName #>));
+        public static void Add<#= FilterOperatorsPropertyChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<IEnumerable<<#= IWebServiceFilterOperatorInterfaceClassName #>>> handler)
+        {
+            UIElement uie = d as UIElement;
+            if (uie != null)
+            {
+                uie.AddHandler(<#= RoutedEventExtClassName #>.<#= FilterOperatorsPropertyChangedPropertyName #>Event, handler);
+            }
+        }
+        public static void Remove<#= FilterOperatorsPropertyChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<IEnumerable<<#= IWebServiceFilterOperatorInterfaceClassName #>>> handler)
+        {
+            UIElement uie = d as UIElement;
+            if (uie != null)
+            {
+                uie.RemoveHandler(<#= RoutedEventExtClassName #>.<#= FilterOperatorsPropertyChangedPropertyName #>Event, handler);
+            }
+        }
+        #endregion
+
+        #region <#= FilterDefinitionsPropertyChangedPropertyName #>
+        public static readonly RoutedEvent <#= FilterDefinitionsPropertyChangedPropertyName #>Event = EventManager.RegisterRoutedEvent("<#= FilterDefinitionsPropertyChangedPropertyName #>", RoutingStrategy.Bubble, typeof(RoutedPropertyChangedEventHandler<IEnumerable<<#= IWebServiceFilterDefInterfaceClassName #>>>), typeof(<#= RoutedEventExtClassName #>));
+        public static void Add<#= FilterDefinitionsPropertyChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<IEnumerable<<#= IWebServiceFilterDefInterfaceClassName #>>> handler)
+        {
+            UIElement uie = d as UIElement;
+            if (uie != null)
+            {
+                uie.AddHandler(<#= RoutedEventExtClassName #>.<#= FilterDefinitionsPropertyChangedPropertyName #>Event, handler);
+            }
+        }
+        public static void Remove<#= FilterDefinitionsPropertyChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<IEnumerable<<#= IWebServiceFilterDefInterfaceClassName #>>> handler)
+        {
+            UIElement uie = d as UIElement;
+            if (uie != null)
+            {
+                uie.RemoveHandler(<#= RoutedEventExtClassName #>.<#= FilterDefinitionsPropertyChangedPropertyName #>Event, handler);
+            }
+        }
+        #endregion
+
+        #region <#= ContainerMenuItemsPropertyChangedPropertyName #>
+        public static readonly RoutedEvent <#= ContainerMenuItemsPropertyChangedPropertyName #>Event = EventManager.RegisterRoutedEvent("<#= ContainerMenuItemsPropertyChangedPropertyName #>", RoutingStrategy.Bubble, typeof(RoutedPropertyChangedEventHandler<IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>>), typeof(<#= RoutedEventExtClassName #>));
+        public static void Add<#= ContainerMenuItemsPropertyChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>> handler)
+        {
+            UIElement uie = d as UIElement;
+            if (uie != null)
+            {
+                uie.AddHandler(<#= RoutedEventExtClassName #>.<#= ContainerMenuItemsPropertyChangedPropertyName #>Event, handler);
+            }
+        }
+        public static void Remove<#= ContainerMenuItemsPropertyChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>> handler)
+        {
+            UIElement uie = d as UIElement;
+            if (uie != null)
+            {
+                uie.RemoveHandler(<#= RoutedEventExtClassName #>.<#= ContainerMenuItemsPropertyChangedPropertyName #>Event, handler);
+            }
+        }
+        #endregion
+
+        #region <#= ShowBackBtnPropertyChangedPropertyName #>
+        public static readonly RoutedEvent <#= ShowBackBtnPropertyChangedPropertyName #>Event = EventManager.RegisterRoutedEvent("<#= ShowBackBtnPropertyChangedPropertyName #>", RoutingStrategy.Bubble, typeof(RoutedPropertyChangedEventHandler<bool>), typeof(<#= RoutedEventExtClassName #>));
+        public static void Add<#= ShowBackBtnPropertyChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<bool> handler)
+        {
+            UIElement uie = d as UIElement;
+            if (uie != null)
+            {
+                uie.AddHandler(<#= RoutedEventExtClassName #>.<#= ShowBackBtnPropertyChangedPropertyName #>Event, handler);
+            }
+        }
+        public static void Remove<#= ShowBackBtnPropertyChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<bool> handler)
+        {
+            UIElement uie = d as UIElement;
+            if (uie != null)
+            {
+                uie.RemoveHandler(<#= RoutedEventExtClassName #>.<#= ShowBackBtnPropertyChangedPropertyName #>Event, handler);
+            }
+        }
+        #endregion
+
+        #region <#= ShowAddFilterBtnPropertyChangedPropertyName #>
+        public static readonly RoutedEvent <#= ShowAddFilterBtnPropertyChangedPropertyName #>Event = EventManager.RegisterRoutedEvent("<#= ShowAddFilterBtnPropertyChangedPropertyName #>", RoutingStrategy.Bubble, typeof(RoutedPropertyChangedEventHandler<bool>), typeof(<#= RoutedEventExtClassName #>));
+        public static void Add<#= ShowAddFilterBtnPropertyChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<bool> handler)
+        {
+            UIElement uie = d as UIElement;
+            if (uie != null)
+            {
+                uie.AddHandler(<#= RoutedEventExtClassName #>.<#= ShowAddFilterBtnPropertyChangedPropertyName #>Event, handler);
+            }
+        }
+        public static void Remove<#= ShowAddFilterBtnPropertyChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<bool> handler)
+        {
+            UIElement uie = d as UIElement;
+            if (uie != null)
+            {
+                uie.RemoveHandler(<#= RoutedEventExtClassName #>.<#= ShowAddFilterBtnPropertyChangedPropertyName #>Event, handler);
+            }
+        }
+        #endregion
+
+        #region <#= CaptionPropertyChangedPropertyName #>
+        public static readonly RoutedEvent <#= CaptionPropertyChangedPropertyName #>Event = EventManager.RegisterRoutedEvent("<#= CaptionPropertyChangedPropertyName #>", RoutingStrategy.Bubble, typeof(RoutedPropertyChangedEventHandler<string>), typeof(<#= RoutedEventExtClassName #>));
+        public static void Add<#= CaptionPropertyChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<string> handler)
+        {
+            UIElement uie = d as UIElement;
+            if (uie != null)
+            {
+                uie.AddHandler(<#= RoutedEventExtClassName #>.<#= CaptionPropertyChangedPropertyName #>Event, handler);
+            }
+        }
+        public static void Remove<#= CaptionPropertyChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<string> handler)
+        {
+            UIElement uie = d as UIElement;
+            if (uie != null)
+            {
+                uie.RemoveHandler(<#= RoutedEventExtClassName #>.<#= CaptionPropertyChangedPropertyName #>Event, handler);
+            }
+        }
+        #endregion
+
+        #region <#= FilterHeightPropertyChangedPropertyName #>
+        public static readonly RoutedEvent <#= FilterHeightPropertyChangedPropertyName #>Event = EventManager.RegisterRoutedEvent("<#= FilterHeightPropertyChangedPropertyName #>", RoutingStrategy.Bubble, typeof(RoutedPropertyChangedEventHandler<Nullable<double>>), typeof(<#= RoutedEventExtClassName #>));
+        public static void Add<#= FilterHeightPropertyChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<Nullable<double>> handler)
+        {
+            UIElement uie = d as UIElement;
+            if (uie != null)
+            {
+                uie.AddHandler(<#= RoutedEventExtClassName #>.<#= FilterHeightPropertyChangedPropertyName #>Event, handler);
+            }
+        }
+        public static void Remove<#= FilterHeightPropertyChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<Nullable<double>> handler)
+        {
+            UIElement uie = d as UIElement;
+            if (uie != null)
+            {
+                uie.RemoveHandler(<#= RoutedEventExtClassName #>.<#= FilterHeightPropertyChangedPropertyName #>Event, handler);
+            }
+        }
+        #endregion
+
+        #region <#= GridHeightPropertyChangedPropertyName #>
+        public static readonly RoutedEvent <#= GridHeightPropertyChangedPropertyName #>Event = EventManager.RegisterRoutedEvent("<#= GridHeightPropertyChangedPropertyName #>", RoutingStrategy.Bubble, typeof(RoutedPropertyChangedEventHandler<Nullable<double>>), typeof(<#= RoutedEventExtClassName #>));
+        public static void Add<#= GridHeightPropertyChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<Nullable<double>> handler)
+        {
+            UIElement uie = d as UIElement;
+            if (uie != null)
+            {
+                uie.AddHandler(<#= RoutedEventExtClassName #>.<#= GridHeightPropertyChangedPropertyName #>Event, handler);
+            }
+        }
+        public static void Remove<#= GridHeightPropertyChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<Nullable<double>> handler)
+        {
+            UIElement uie = d as UIElement;
+            if (uie != null)
+            {
+                uie.RemoveHandler(<#= RoutedEventExtClassName #>.<#= GridHeightPropertyChangedPropertyName #>Event, handler);
+            }
+        }
+        #endregion
+
+        #region <#= TableMenuItemsPropertyChangedPropertyName #>
+        public static readonly RoutedEvent <#= TableMenuItemsPropertyChangedPropertyName #>Event = EventManager.RegisterRoutedEvent("<#= TableMenuItemsPropertyChangedPropertyName #>", RoutingStrategy.Bubble, typeof(RoutedPropertyChangedEventHandler<IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>>), typeof(<#= RoutedEventExtClassName #>));
+        public static void Add<#= TableMenuItemsPropertyChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>> handler)
+        {
+            UIElement uie = d as UIElement;
+            if (uie != null)
+            {
+                uie.AddHandler(<#= RoutedEventExtClassName #>.<#= TableMenuItemsPropertyChangedPropertyName #>Event, handler);
+            }
+        }
+        public static void Remove<#= TableMenuItemsPropertyChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>> handler)
+        {
+            UIElement uie = d as UIElement;
+            if (uie != null)
+            {
+                uie.RemoveHandler(<#= RoutedEventExtClassName #>.<#= TableMenuItemsPropertyChangedPropertyName #>Event, handler);
+            }
+        }
+        #endregion
+
+        #region <#= RowMenuItemsPropertyChangedPropertyName #>
+        public static readonly RoutedEvent <#= RowMenuItemsPropertyChangedPropertyName #>Event = EventManager.RegisterRoutedEvent("<#= RowMenuItemsPropertyChangedPropertyName #>", RoutingStrategy.Bubble, typeof(RoutedPropertyChangedEventHandler<IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>>), typeof(<#= RoutedEventExtClassName #>));
+        public static void Add<#= RowMenuItemsPropertyChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>> handler)
+        {
+            UIElement uie = d as UIElement;
+            if (uie != null)
+            {
+                uie.AddHandler(<#= RoutedEventExtClassName #>.<#= RowMenuItemsPropertyChangedPropertyName #>Event, handler);
+            }
+        }
+        public static void Remove<#= RowMenuItemsPropertyChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>> handler)
+        {
+            UIElement uie = d as UIElement;
+            if (uie != null)
+            {
+                uie.RemoveHandler(<#= RoutedEventExtClassName #>.<#= RowMenuItemsPropertyChangedPropertyName #>Event, handler);
+            }
+        }
+        #endregion
+
+        #region <#= DataGridSortingChangedPropertyName #>
+        public static readonly RoutedEvent <#= DataGridSortingChangedPropertyName #>Event = EventManager.RegisterRoutedEvent("<#= DataGridSortingChangedPropertyName #>", RoutingStrategy.Bubble, typeof(RoutedPropertyChangedEventHandler<Nullable<SortDescription>>), typeof(RoutedEventExt));
+        public static void Add<#= DataGridSortingChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<Nullable<SortDescription>> handler)
+        {
+            UIElement uie = d as UIElement;
+            if (uie != null)
+            {
+                uie.AddHandler(RoutedEventExt.<#= DataGridSortingChangedPropertyName #>Event, handler);
+            }
+        }
+        public static void Remove<#= DataGridSortingChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<Nullable<SortDescription>> handler)
+        {
+            UIElement uie = d as UIElement;
+            if (uie != null)
+            {
+                uie.RemoveHandler(RoutedEventExt.<#= DataGridSortingChangedPropertyName #>Event, handler);
+            }
+        }
+        #endregion
+
+        #region <#= SformSelectionChangedPropertyName #>
+        public static readonly RoutedEvent <#= SformSelectionChangedPropertyName #>Event = EventManager.RegisterRoutedEvent("<#= SformSelectionChangedPropertyName #>", RoutingStrategy.Bubble, typeof(SelectionChangedEventHandler), typeof(RoutedEventExt));
+        public static void Add<#= SformSelectionChangedPropertyName #>(DependencyObject d, SelectionChangedEventHandler handler)
+        {
+            UIElement uie = d as UIElement;
+            if (uie != null)
+            {
+                uie.AddHandler(RoutedEventExt.<#= SformSelectionChangedPropertyName #>Event, handler);
+            }
+        }
+        public static void Remove<#= SformSelectionChangedPropertyName #>(DependencyObject d, SelectionChangedEventHandler handler)
+        {
+            UIElement uie = d as UIElement;
+            if (uie != null)
+            {
+                uie.RemoveHandler(RoutedEventExt.<#= SformSelectionChangedPropertyName #>Event, handler);
+            }
+        }
+        #endregion
+
+    }
+}
+
+<#+
+
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+
+#>

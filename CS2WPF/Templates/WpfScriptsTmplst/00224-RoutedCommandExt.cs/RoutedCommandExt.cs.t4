@@ -1,0 +1,122 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+using System.Windows.Input;
+<#
+
+    
+    string RoutedCommandExtFolder      = "00224-RoutedCommandExt.cs";
+    string RoutedCommandExtClassName   = GetModelClassName(Model, RoutedCommandExtFolder);
+    string RoutedCommandExtNameSpace   = GetModelNameSpace(Model, RoutedCommandExtFolder);
+
+    string AddWebServiceFilterItemCommandPropertyName = "AddWebServiceFilterItemCommand";
+    string RemoveWebServiceFilterItemCommandPropertyName = "RemoveWebServiceFilterItemCommand";
+    string RemoveAllWebServiceFilterItemCommandPropertyName = "RemoveAllWebServiceFilterItemCommand";
+    string NavigationBackCommandPropertyName = "NavigationBackCommand";
+    string ApplyFilterCommandPropertyName = "ApplyFilterCommand";
+    string RefreshSformCommandPropertyName = "RefreshSformCommand";
+    string SelectColumnsCommandPropertyName = "SelectColumnsCommand";
+    string OkCommandPropertyName = "OkCommand";
+    string CancelCommandPropertyName = "CancelCommand";
+
+
+#>
+
+namespace <#= RoutedCommandExtNameSpace #> {
+    public static class <#= RoutedCommandExtClassName #>
+    {
+        public static RoutedCommand <#= AddWebServiceFilterItemCommandPropertyName #> = new RoutedCommand("<#= AddWebServiceFilterItemCommandPropertyName #>", typeof(<#= RoutedCommandExtClassName #>));
+        public static RoutedCommand <#= RemoveWebServiceFilterItemCommandPropertyName #> = new RoutedCommand("<#= RemoveWebServiceFilterItemCommandPropertyName #>", typeof(<#= RoutedCommandExtClassName #>));
+        public static RoutedCommand <#= RemoveAllWebServiceFilterItemCommandPropertyName #> = new RoutedCommand("<#= RemoveAllWebServiceFilterItemCommandPropertyName #>", typeof(<#= RoutedCommandExtClassName #>));
+        public static RoutedCommand <#= NavigationBackCommandPropertyName #> = new RoutedCommand("<#= NavigationBackCommandPropertyName #>", typeof(<#= RoutedCommandExtClassName #>));
+        public static RoutedCommand <#= ApplyFilterCommandPropertyName #> = new RoutedCommand("<#= ApplyFilterCommandPropertyName #>", typeof(<#= RoutedCommandExtClassName #>));
+        public static RoutedCommand <#= RefreshSformCommandPropertyName #> = new RoutedCommand("<#= RefreshSformCommandPropertyName #>", typeof(<#= RoutedCommandExtClassName #>));
+        public static RoutedCommand <#= SelectColumnsCommandPropertyName #> = new RoutedCommand("<#= SelectColumnsCommandPropertyName #>", typeof(<#= RoutedCommandExtClassName #>));
+        public static RoutedCommand <#= OkCommandPropertyName #> = new RoutedCommand("<#= OkCommandPropertyName #>", typeof(<#= RoutedCommandExtClassName #>));
+        public static RoutedCommand <#= CancelCommandPropertyName #> = new RoutedCommand("<#= CancelCommandPropertyName #>", typeof(<#= RoutedCommandExtClassName #>));
+
+    }
+}
+
+<#+
+
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+
+#>

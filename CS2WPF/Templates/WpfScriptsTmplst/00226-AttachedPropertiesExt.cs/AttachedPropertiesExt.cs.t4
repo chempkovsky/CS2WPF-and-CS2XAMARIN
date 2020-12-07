@@ -1,0 +1,263 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+<#
+
+    
+    string AttachedPropertiesExtFolder      = "00226-AttachedPropertiesExt.cs";
+    string AttachedPropertiesExtClassName   = GetModelClassName(Model, AttachedPropertiesExtFolder);
+    string AttachedPropertiesExtNameSpace   = GetModelNameSpace(Model, AttachedPropertiesExtFolder);
+
+
+    string RegisterRoutedCommandBindingsPropertyName = "RegisterRoutedCommandBindings";
+    string RegisterRoutedEventBindingsPropertyName = "RegisterRoutedEventBindings";
+    string DataGridServerSortingPropertyName = "DataGridServerSorting";
+
+
+#>
+
+namespace <#= AttachedPropertiesExtNameSpace #> {
+    public static class <#= AttachedPropertiesExtClassName #>
+    {
+
+        #region <#= RegisterRoutedCommandBindingsPropertyName #>
+        public static DependencyProperty <#= RegisterRoutedCommandBindingsPropertyName #>Property =  
+            DependencyProperty.RegisterAttached("<#= RegisterRoutedCommandBindingsPropertyName #>", 
+                                                typeof(CommandBindingCollection), 
+                                                typeof(<#= AttachedPropertiesExtClassName #>), 
+                                                new PropertyMetadata(null, <#= RegisterRoutedCommandBindingsPropertyName #>Changed));
+        public static void Set<#= RegisterRoutedCommandBindingsPropertyName #>(UIElement element, CommandBindingCollection value)
+        {
+            if(element != null)
+            element.SetValue(<#= RegisterRoutedCommandBindingsPropertyName #>Property, value);
+        }
+        public static CommandBindingCollection Get<#= RegisterRoutedCommandBindingsPropertyName #>(UIElement element)
+        {
+            return (element != null ? (CommandBindingCollection)element.GetValue(<#= RegisterRoutedCommandBindingsPropertyName #>Property) : null);
+        }
+        private static void <#= RegisterRoutedCommandBindingsPropertyName #>Changed(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+        {
+            UIElement element = sender as UIElement;
+            if (element != null)
+            {
+                CommandBindingCollection bindings = e.OldValue as CommandBindingCollection;
+                if (bindings != null)
+                {
+                    foreach(CommandBinding commandBinding in bindings)
+                    {
+                        if(element.CommandBindings.Contains(commandBinding))
+                        {
+                            element.CommandBindings.Remove(commandBinding);
+                        }
+                    }
+                }
+                bindings = e.NewValue as CommandBindingCollection;
+                if (bindings != null)
+                {
+                    element.CommandBindings.AddRange(bindings);
+                }
+            }
+        }
+        #endregion
+
+        #region <#= RegisterRoutedEventBindingsPropertyName #>
+        public static DependencyProperty <#= RegisterRoutedEventBindingsPropertyName #>Property =  
+            DependencyProperty.RegisterAttached("<#= RegisterRoutedEventBindingsPropertyName #>", 
+                                                typeof(IEnumerable<ValueTuple<RoutedEvent, Delegate, bool>>), 
+                                                typeof(<#= AttachedPropertiesExtClassName #>), 
+                                                new PropertyMetadata(null, <#= RegisterRoutedEventBindingsPropertyName #>Changed));
+        public static void Set<#= RegisterRoutedEventBindingsPropertyName #>(UIElement element, IEnumerable<ValueTuple<RoutedEvent, Delegate, bool>> value)
+        {
+            if(element != null)
+            element.SetValue(<#= RegisterRoutedEventBindingsPropertyName #>Property, value);
+        }
+        public static IEnumerable<ValueTuple<RoutedEvent, Delegate, bool>> Get<#= RegisterRoutedEventBindingsPropertyName #>(UIElement element)
+        {
+            return (element != null ? (IEnumerable<ValueTuple<RoutedEvent, Delegate, bool>>)element.GetValue(<#= RegisterRoutedEventBindingsPropertyName #>Property) : null);
+        }
+        private static void <#= RegisterRoutedEventBindingsPropertyName #>Changed(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+        {
+            UIElement element = sender as UIElement;
+            if (element != null)
+            {
+                IEnumerable<ValueTuple<RoutedEvent, Delegate, bool>> items = e.OldValue as IEnumerable<ValueTuple<RoutedEvent, Delegate, bool>>;
+                if (items != null)
+                {
+                    foreach(ValueTuple<RoutedEvent, Delegate, bool> itm in items)
+                    {
+                        if((itm.Item1 != null) && (itm.Item2 != null))
+                        {
+                            element.RemoveHandler(itm.Item1, itm.Item2);
+                        }
+                    }
+                }
+                items = e.NewValue as IEnumerable<ValueTuple<RoutedEvent, Delegate, bool>>;
+                if (items != null)
+                {
+                    foreach (ValueTuple<RoutedEvent, Delegate, bool> itm in items)
+                    {
+                        if ((itm.Item1 != null) && (itm.Item2 != null))
+                        {
+                            element.AddHandler(itm.Item1, itm.Item2, itm.Item3);
+                        }
+                    }
+                }
+            }
+        }
+        #endregion
+
+        #region <#= DataGridServerSortingPropertyName #>
+        public static DependencyProperty <#= DataGridServerSortingPropertyName #>Property =
+            DependencyProperty.RegisterAttached("<#= DataGridServerSortingPropertyName #>",
+                                                typeof(bool),
+                                                typeof(AttachedPropertiesExt),
+                                                new PropertyMetadata(false, <#= DataGridServerSortingPropertyName #>Changed));
+        public static void Set<#= DataGridServerSortingPropertyName #>(UIElement element, bool value)
+        {
+            if (element != null)
+                element.SetValue(<#= DataGridServerSortingPropertyName #>Property, value);
+        }
+        public static bool Get<#= DataGridServerSortingPropertyName #>(UIElement element)
+        {
+            return (element != null ? (bool)element.GetValue(<#= DataGridServerSortingPropertyName #>Property) : false);
+        }
+        private static void OnServerSort(object sender, DataGridSortingEventArgs e)
+        {
+            DataGrid dg = sender as DataGrid;
+            if (dg == null) return;
+            if (e.Column.SortDirection == null)
+            {
+                e.Column.SortDirection = System.ComponentModel.ListSortDirection.Ascending;
+            }
+            else
+            {
+                e.Column.SortDirection =
+                    e.Column.SortDirection == System.ComponentModel.ListSortDirection.Ascending ?
+                    System.ComponentModel.ListSortDirection.Descending :
+                    System.ComponentModel.ListSortDirection.Ascending;
+            }
+            e.Handled = true;
+            
+            RoutedPropertyChangedEventArgs<Nullable<SortDescription>> eventArgs =
+                new RoutedPropertyChangedEventArgs<Nullable<SortDescription>>(
+                    null,
+                    new SortDescription(e.Column.SortMemberPath, e.Column.SortDirection.Value),
+                    RoutedEventExt.DataGridSortingChangedEvent);
+            dg.RaiseEvent(eventArgs);
+        }
+        private static void <#= DataGridServerSortingPropertyName #>Changed(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+        {
+            DataGrid dg = sender as DataGrid;
+            if (dg != null)
+            {
+                Nullable<bool> sortMode = e.OldValue as Nullable<bool>;
+                if (sortMode.HasValue)
+                {
+                    if(sortMode.Value)
+                    {
+                        dg.Sorting -= OnServerSort;
+                    }
+                }
+                sortMode = e.NewValue as Nullable<bool>;
+                if (sortMode.HasValue)
+                {
+                    if (sortMode.Value)
+                    {
+                        dg.Sorting += OnServerSort;
+                    }
+                }
+            }
+        }
+        #endregion
+
+    }
+}
+
+<#+
+
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+
+#>

@@ -51,7 +51,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:i="clr-namespace:Microsoft.Xaml.Behaviors;assembly=Microsoft.Xaml.Behaviors"
 
              xmlns:csuc="<#= csuc #>"
 
@@ -65,19 +64,10 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Label Grid.Row="0" FontWeight="Bold" Content="{Binding <#= TitlePropertyName #>}" Margin="8"/>
-        <csuc:ColumnSelectorUserControl x:Name="ClmnSelUsrCntrl"  Grid.Row="1" Columns="{Binding <#= ColumnsPropertyName #>}" Margin="8">
-            <i:Interaction.Triggers>
-                <i:EventTrigger EventName="<#= OkNotificationPropertyName #>">
-                    <i:InvokeCommandAction Command="{Binding <#= OkCommandPropertyName #>}" PassEventArgsToCommand="True"/>
-                </i:EventTrigger>
-                <i:EventTrigger EventName="<#= CancelNotificationPropertyName #>">
-                    <i:InvokeCommandAction Command="{Binding <#= CancelCommandPropertyName #>}" />
-                </i:EventTrigger>
-            </i:Interaction.Triggers>
-        </csuc:ColumnSelectorUserControl>
+        <csuc:ColumnSelectorUserControl x:Name="ClmnSelUsrCntrl"  Grid.Row="1" Columns="{Binding <#= ColumnsPropertyName #>}" Margin="8" />
         <StackPanel Orientation="Horizontal" Grid.Row="2" Margin="8">
-            <Button Content=" Ok " MinWidth="80" Command="{Binding <#= OkCommandPropertyName #>, ElementName=ClmnSelUsrCntrl}"/>
-            <Button Content=" Cancel " MinWidth="80" Margin="8 0 0 0" Command="{Binding <#= CancelCommandPropertyName #>, ElementName=ClmnSelUsrCntrl}"/>
+            <Button Content=" Ok " MinWidth="80" Command="{Binding <#= OkCommandPropertyName #>}"/>
+            <Button Content=" Cancel " MinWidth="80" Margin="8 0 0 0" Command="{Binding <#= CancelCommandPropertyName #>}"/>
         </StackPanel>
     </Grid>
 </UserControl>

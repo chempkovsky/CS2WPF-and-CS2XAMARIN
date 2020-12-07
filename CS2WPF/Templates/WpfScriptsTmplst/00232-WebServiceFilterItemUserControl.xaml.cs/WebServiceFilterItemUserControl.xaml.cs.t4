@@ -31,9 +31,9 @@ using System.Linq;
     string IWebServiceFilterOperatorInterfaceClassName   = GetModelClassName(Model, IWebServiceFilterOperatorInterfaceFolder);
     string IWebServiceFilterOperatorInterfaceNameSpace   = GetModelNameSpace(Model, IWebServiceFilterOperatorInterfaceFolder);
 
-    string NotificationRoutedEventArgsFolder      = "00226-NotificationRoutedEventArgs.cs";
-    string NotificationRoutedEventArgsClassName   = GetModelClassName(Model, NotificationRoutedEventArgsFolder);
-    string NotificationRoutedEventArgsNameSpace   = GetModelNameSpace(Model, NotificationRoutedEventArgsFolder);
+    string IWebServiceFilterRsltInterfaceFolder      = "00204-IWebServiceFilterRsltInterface.cs";
+    string IWebServiceFilterRsltInterfaceClassName   = GetModelClassName(Model, IWebServiceFilterRsltInterfaceFolder);
+    string IWebServiceFilterRsltInterfaceNameSpace   = GetModelNameSpace(Model, IWebServiceFilterRsltInterfaceFolder);
 
     string WebServiceFilterItemUserControlFolder      = "00232-WebServiceFilterItemUserControl.xaml.cs";
     string WebServiceFilterItemUserControlClassName   = GetModelClassName(Model, WebServiceFilterItemUserControlFolder);
@@ -52,10 +52,10 @@ using System.Linq;
     string RemoveCommandPropertyName = "RemoveCommand";
     string SelectedFilterDataTypePropertyName = "SelectedFilterDataType";
     string SelectedFilterNamePropertyName = "SelectedFilterName";
-    
+    string SelectedModelRefPropertyName = "SelectedModelRef";
 
     List<string> nmSpaces = new List<string>();
-    if (WebServiceFilterItemUserControlNameSpace != NotificationRoutedEventArgsNameSpace) nmSpaces.Add(NotificationRoutedEventArgsNameSpace);
+    if (WebServiceFilterItemUserControlNameSpace != IWebServiceFilterDefInterfaceNameSpace) nmSpaces.Add(IWebServiceFilterDefInterfaceNameSpace);
     if ((WebServiceFilterItemUserControlNameSpace != IWebServiceFilterOperatorInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterOperatorInterfaceNameSpace) < 0)) 
         nmSpaces.Add(IWebServiceFilterOperatorInterfaceNameSpace);
     if ((WebServiceFilterItemUserControlNameSpace != IWebServiceFilterDefInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterDefInterfaceNameSpace) < 0)) 
@@ -287,16 +287,23 @@ namespace <#= WebServiceFilterItemUserControlNameSpace #> {
                               "date".Equals(<#= SelectedFilterDefinitionPropertyName #>.fltrDataType, StringComparison.OrdinalIgnoreCase);
             }
         }
+        private static void <#= IsDateInputPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e) {
+            <#= WebServiceFilterItemUserControlClassName #> inst = d as <#= WebServiceFilterItemUserControlClassName #>;
+            if ((inst != null) && (e.NewValue is bool))
+            {
+                inst.<#= IsDateInputPropertyName #> = (bool)e.NewValue;
+            }
+        }
         public static readonly DependencyProperty <#= IsDateInputPropertyName #>Property =
                 DependencyProperty.Register(
-                "<#= IsDateInputPropertyName #>", typeof(Nullable<bool>),
+                "<#= IsDateInputPropertyName #>", typeof(bool),
                 typeof(<#= WebServiceFilterItemUserControlClassName #>),
-                new PropertyMetadata(null));
-        public Nullable<bool> <#= IsDateInputPropertyName #>
+                new PropertyMetadata(false, <#= IsDateInputPropertyName #>Changed));
+        public bool <#= IsDateInputPropertyName #>
         {
             get
             {
-                return (Nullable<bool>)GetValue(<#= IsDateInputPropertyName #>Property);
+                return (bool)GetValue(<#= IsDateInputPropertyName #>Property);
             }
             set
             {
@@ -316,16 +323,23 @@ namespace <#= WebServiceFilterItemUserControlNameSpace #> {
                 <#= IsFilterValueReadOnlyPropertyName #> = string.IsNullOrEmpty(<#= SelectedFilterDefinitionPropertyName #>.fltrDataType);
             }
         }
+        private static void <#= IsFilterValueReadOnlyPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e) {
+            <#= WebServiceFilterItemUserControlClassName #> inst = d as <#= WebServiceFilterItemUserControlClassName #>;
+            if ((inst != null) && (e.NewValue is bool))
+            {
+                inst.<#= IsFilterValueReadOnlyPropertyName #> = (bool)e.NewValue;
+            }
+        }
         public static readonly DependencyProperty <#= IsFilterValueReadOnlyPropertyName #>Property =
                 DependencyProperty.Register(
-                "<#= IsFilterValueReadOnlyPropertyName #>", typeof(Nullable<bool>),
+                "<#= IsFilterValueReadOnlyPropertyName #>", typeof(bool),
                 typeof(<#= WebServiceFilterItemUserControlClassName #>),
-                new PropertyMetadata(true));
-        public Nullable<bool> IsFilterValueReadOnly
+                new PropertyMetadata(true, <#= IsFilterValueReadOnlyPropertyName #>Changed));
+        public bool <#= IsFilterValueReadOnlyPropertyName #>
         {
             get
             {
-                return (Nullable<bool>)GetValue(<#= IsFilterValueReadOnlyPropertyName #>Property);
+                return (bool)GetValue(<#= IsFilterValueReadOnlyPropertyName #>Property);
             }
             set
             {
@@ -348,7 +362,7 @@ namespace <#= WebServiceFilterItemUserControlNameSpace #> {
                 {
                     <#= FilterErrorPropertyName #> = "Empty filter item will not be applied";
                 }
-                else if (IsDateInput.HasValue ? IsDateInput.Value : false) {
+                else if (IsDateInput) {
                     if(<#= FilterValuePropertyName #> is DateTime)
                     {
                         <#= FilterErrorPropertyName #> = string.Empty;
@@ -582,39 +596,25 @@ namespace <#= WebServiceFilterItemUserControlNameSpace #> {
             }
         }
         #endregion
-        #region <#= RemoveNotificationPropertyName #>
-        public static readonly RoutedEvent <#= RemoveNotificationPropertyName #>Event = 
-                EventManager.RegisterRoutedEvent(
-                "<#= RemoveNotificationPropertyName #>", RoutingStrategy.Bubble, 
-                typeof(RoutedEventHandler), 
-                typeof(<#= WebServiceFilterItemUserControlClassName #>));
-        public event RoutedEventHandler <#= RemoveNotificationPropertyName #>
-        {
-            add { AddHandler(<#= RemoveNotificationPropertyName #>Event, value); }
-            remove { RemoveHandler(<#= RemoveNotificationPropertyName #>Event, value); }
-        }
-        #endregion
-        #region <#= RemoveCommandPropertyName #>
-        private ICommand _<#= RemoveCommandPropertyName #>;
-        public ICommand <#= RemoveCommandPropertyName #>
+        #region <#= SelectedModelRefPropertyName #>
+        public static readonly DependencyProperty <#= SelectedModelRefPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= SelectedModelRefPropertyName #>", typeof(<#= IWebServiceFilterRsltInterfaceClassName #>),
+                typeof(<#= WebServiceFilterItemUserControlClassName #>),
+                new PropertyMetadata(null));
+        public <#= IWebServiceFilterRsltInterfaceClassName #> <#= SelectedModelRefPropertyName #>
         {
             get
             {
-                return _<#= RemoveCommandPropertyName #> ?? (_<#= RemoveCommandPropertyName #> = new <#= commandHelperModelClassName #>((param) => <#= RemoveCommandPropertyName #>Action(param), (param) => <#= RemoveCommandPropertyName #>CanExecute(param)));
+                return (<#= IWebServiceFilterRsltInterfaceClassName #>)GetValue(<#= SelectedModelRefPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= SelectedModelRefPropertyName #>Property, value);
             }
         }
-        protected void <#= RemoveCommandPropertyName #>Action(object param)
-        {
-            <#= NotificationRoutedEventArgsClassName #> newEventArgs = new <#= NotificationRoutedEventArgsClassName #>(<#= WebServiceFilterItemUserControlClassName #>.<#= RemoveNotificationPropertyName #>Event);
-            newEventArgs.Sender = this;
-            newEventArgs.Model = param;
-            RaiseEvent(newEventArgs);
-        }
-        protected bool <#= RemoveCommandPropertyName #>CanExecute(object param)
-        {
-            return true;
-        }
         #endregion
+
     }
 }
 

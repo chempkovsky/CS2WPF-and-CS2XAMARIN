@@ -14,6 +14,10 @@
 
 <#
 
+    string AttachedPropertiesExtFolder      = "00226-AttachedPropertiesExt.cs";
+    string AttachedPropertiesExtClassName   = GetModelClassName(Model, AttachedPropertiesExtFolder);
+    string AttachedPropertiesExtNameSpace   = GetModelNameSpace(Model, AttachedPropertiesExtFolder);
+    string AttachedPropertiesExtProject     = GetModelProjectName(Model, AttachedPropertiesExtFolder);
 
     string MessageUserControlFolder            = "00270-MessageUserControl.xaml.cs";
     string MessageUserControlClassName         = GetModelClassName(Model, MessageUserControlFolder);
@@ -36,14 +40,17 @@
     string MessageIconColorPropertyName = "MessageIconColor";
     string ShowOkBtnPropertyName = "ShowOkBtn";
     string ShowCancelBtnPropertyName = "ShowCancelBtn";
-    string OkNotificationPropertyName = "OkNotification";
-    string OkCommandPropertyName = "OkCommand";
-    string CancelNotificationPropertyName = "CancelNotification";
-    string CancelCommandPropertyName = "CancelCommand";
+    string RegisterRoutedCommandBindingsPropertyName = "RegisterRoutedCommandBindings";
+    string RoutedCommandHandlersPropertyName = "RoutedCommandHandlers";
+
 
     string msgusrctrlPrefix = "clr-namespace:" + MessageUserControlNameSpace;
     if(MessageUserControlProject != MessageDlgUserControlXamlProject) {
         msgusrctrlPrefix = msgusrctrlPrefix + ";assembly=" + MessageUserControlProject;
+    }
+    string attachedPrefix = "clr-namespace:" + AttachedPropertiesExtNameSpace;
+    if(AttachedPropertiesExtProject != MessageDlgUserControlXamlProject) {
+        attachedPrefix = attachedPrefix + ";assembly=" + AttachedPropertiesExtProject;
     }
 
 #>
@@ -53,8 +60,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:i="clr-namespace:Microsoft.Xaml.Behaviors;assembly=Microsoft.Xaml.Behaviors"
              xmlns:msgusrctrl="<#= msgusrctrlPrefix #>"
+
+             xmlns:atch="<#= attachedPrefix #>" 
+             atch:<#= AttachedPropertiesExtClassName #>.<#= RegisterRoutedCommandBindingsPropertyName #>="{Binding <#= RoutedCommandHandlersPropertyName #>}"
 
              mc:Ignorable="d" 
              d:DesignHeight="150" d:DesignWidth="400" >
@@ -65,14 +74,6 @@
         <#= MessageIconColorPropertyName #>="{Binding <#= MessageIconColorPropertyName #>}"
         <#= ShowOkBtnPropertyName #>="{Binding <#= ShowOkBtnPropertyName #>}"
         <#= ShowCancelBtnPropertyName #>="{Binding <#= ShowCancelBtnPropertyName #>}">
-        <i:Interaction.Triggers>
-            <i:EventTrigger EventName="<#= OkNotificationPropertyName #>">
-                <i:InvokeCommandAction Command="{Binding <#= OkCommandPropertyName #>}" />
-            </i:EventTrigger>
-            <i:EventTrigger EventName="<#= CancelNotificationPropertyName #>">
-                <i:InvokeCommandAction Command="{Binding <#= CancelCommandPropertyName #>}" />
-            </i:EventTrigger>
-        </i:Interaction.Triggers>
     </msgusrctrl:MessageUserControl>
 </UserControl>
 

@@ -17,11 +17,11 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 <#
 
-    string modelInterfaceFolder         = "01100-.interface.cs";
+    string modelInterfaceFolder         = "01100-Interface.cs";
     string modelInterfaceClassName      = GetInterfaceName(Model);
     string modelInterfaceNameSpace      = GetModelNameSpace(Model, modelInterfaceFolder);
 
-    string modelFolder                  = "01102-.model.cs";
+    string modelFolder                  = "01102-Model.cs";
     string modelClassName               = GetModelName(Model);
     string modelNameSpace               = GetModelNameSpace(Model, modelFolder);
 
@@ -94,8 +94,9 @@ namespace <#= modelPageNameSpace #> {
         return "I"+model.PageViewName;
     }
     string GetInterfaceName(ModelViewSerializable model) {
-        return "I"+model.ViewName;
+        return "I"+ GetModelName(model);
     }
+
     string GetModelName(ModelViewSerializable model) {
         return FirstLetterToUpper(model.ViewName);
     }
