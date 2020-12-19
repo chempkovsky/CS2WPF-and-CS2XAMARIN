@@ -15,8 +15,12 @@ using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
-using CommonInterfacesClassLibrary.Interfaces;
+
 <#
+
+    string EformModeEnumFolder      = "00026-EformModeEnum.cs";
+    string EformModeEnumClassName   = GetModelClassName(Model, EformModeEnumFolder);
+    string EformModeEnumNameSpace   = GetModelNameSpace(Model, EformModeEnumFolder);
 
     string IWebServiceFilterMenuInterfaceFolder      = "00206-IWebServiceFilterMenuInterface.cs";
     string IWebServiceFilterMenuInterfaceClassName   = GetModelClassName(Model, IWebServiceFilterMenuInterfaceFolder);
@@ -42,6 +46,12 @@ using CommonInterfacesClassLibrary.Interfaces;
     string RowMenuItemsPropertyName = "RowMenuItems";
     string ContainerMenuItemsPropertyName = "ContainerMenuItems";
     string HiddenFiltersPropertyName = "HiddenFilters";
+    string ShowSubmitPropertyName = "ShowSubmit";
+    string FormControlModelPropertyName = "FormControlModel";
+    string EformModePropertyName = "EformMode";
+    string CanAddPropertyName = "CanAdd";
+    string CanUpdPropertyName = "CanUpdate";
+    string CanDelPropertyName = "CanDelete";
 
 
     List<string> nmSpaces = new List<string>();
@@ -49,6 +59,8 @@ using CommonInterfacesClassLibrary.Interfaces;
         nmSpaces.Add(IWebServiceFilterMenuInterfaceNameSpace);
     if ((ProxyUserControlNameSpace != IWebServiceFilterRsltInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace) < 0)) 
         nmSpaces.Add(IWebServiceFilterRsltInterfaceNameSpace);
+    if ((ProxyUserControlNameSpace != EformModeEnumNameSpace) && (nmSpaces.IndexOf(EformModeEnumNameSpace) < 0)) 
+        nmSpaces.Add(EformModeEnumNameSpace);
 
 #>
 <# 
@@ -264,9 +276,136 @@ namespace <#= ProxyUserControlNameSpace #> {
             }
         }
         #endregion
+        #region <#= ShowSubmitPropertyName #>
+        public static readonly DependencyProperty <#= ShowSubmitPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= ShowSubmitPropertyName #>", typeof(bool),
+                typeof(<#= ProxyUserControlClassName #>),
+                new PropertyMetadata(true));
+        public bool <#= ShowSubmitPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= ShowSubmitPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= ShowSubmitPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= FormControlModelPropertyName #>
+        public static readonly DependencyProperty <#= FormControlModelPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= FormControlModelPropertyName #>", typeof(object),
+                typeof(<#= ProxyUserControlClassName #>),
+                new PropertyMetadata(null));
+        public object <#= FormControlModelPropertyName #>
+        {
+            get
+            {
+                return (object)GetValue(<#= FormControlModelPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= FormControlModelPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= EformModePropertyName #>
+        public static readonly DependencyProperty <#= EformModePropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= EformModePropertyName #>", typeof(<#= EformModeEnumClassName #>),
+                typeof(<#= ProxyUserControlClassName #>),
+                new PropertyMetadata(<#= EformModeEnumClassName #>.DeleteMode));
+        public <#= EformModeEnumClassName #> <#= EformModePropertyName #>
+        {
+            get
+            {
+                return (<#= EformModeEnumClassName #>)GetValue(<#= EformModePropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= EformModePropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= CanAddPropertyName #>
+        private static void <#= CanAddPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e) {
+            <#= ProxyUserControlClassName #> inst = d as <#= ProxyUserControlClassName #>;
+            if ((inst != null) && (e.NewValue is bool))
+            {
+                inst.<#= CanAddPropertyName #> = (bool)e.NewValue;
+            }
+        }
+        public static readonly DependencyProperty <#= CanAddPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= CanAddPropertyName #>", typeof(bool),
+                typeof(<#= ProxyUserControlClassName #>),
+                new PropertyMetadata(false, <#= CanAddPropertyName #>Changed));
+        public bool <#= CanAddPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= CanAddPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= CanAddPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= CanUpdPropertyName #>
+        private static void <#= CanUpdPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e) {
+            <#= ProxyUserControlClassName #> inst = d as <#= ProxyUserControlClassName #>;
+            if ((inst != null) && (e.NewValue is bool))
+            {
+                inst.<#= CanUpdPropertyName #> = (bool)e.NewValue;
+            }
+        }
+        public static readonly DependencyProperty <#= CanUpdPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= CanUpdPropertyName #>", typeof(bool),
+                typeof(<#= ProxyUserControlClassName #>),
+                new PropertyMetadata(false, <#= CanUpdPropertyName #>Changed));
+        public bool <#= CanUpdPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= CanUpdPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= CanUpdPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= CanDelPropertyName #>
+        private static void <#= CanDelPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e) {
+            <#= ProxyUserControlClassName #> inst = d as <#= ProxyUserControlClassName #>;
+            if ((inst != null) && (e.NewValue is bool))
+            {
+                inst.<#= CanDelPropertyName #> = (bool)e.NewValue;
+            }
+        }
+        public static readonly DependencyProperty <#= CanDelPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= CanDelPropertyName #>", typeof(bool),
+                typeof(<#= ProxyUserControlClassName #>),
+                new PropertyMetadata(false, <#= CanDelPropertyName #>Changed));
+        public bool <#= CanDelPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= CanDelPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= CanDelPropertyName #>Property, value);
+            }
+        }
+        #endregion
 
-
-    
 
 
     }

@@ -67,9 +67,6 @@ using System.Windows.Controls;
     string modelServiceInterfaceNameSpace    = GetModelNameSpace(Model, modelServiceInterfaceFolder);
 
 
-
-
-
     string commandHelperModelFolder      = "00140-CommandHelper.cs";
     string commandHelperModelClassName   = GetContextModelClassName(Context, commandHelperModelFolder);
     string commandHelperModelNameSpace   = GetContextModelNameSpace(Context, commandHelperModelFolder);
@@ -91,23 +88,29 @@ using System.Windows.Controls;
     string RoutedEventExtClassName                  = GetContextModelClassName(Context, RoutedEventExtFolder);
     string RoutedEventExtNameSpace                  = GetContextModelNameSpace(Context, RoutedEventExtFolder);
 
-    string SformUserControlFolder           = "01420-SformUserControl.xaml.cs";
-    string SformUserControlClassName        = GetModelClassName(Model, SformUserControlFolder);
-    string SformUserControlNameSpace        = GetModelNameSpace(Model, SformUserControlFolder);
 
-    string SdlgUserControlFolder           = "01436-SdlgUserControl.xaml.cs";
-    string SdlgUserControlClassName        = GetModelClassName(Model, SdlgUserControlFolder);
-    string SdlgUserControlNameSpace        = GetModelNameSpace(Model, SdlgUserControlFolder);
+    string LformUserControlFolder           = "01596-LformUserControl.xaml.cs";
+    string LformUserControlClassName        = GetModelClassName(Model, LformUserControlFolder);
+    string LformUserControlNameSpace        = GetModelNameSpace(Model, LformUserControlFolder);
 
-    string SdlgViewModelFolder      = "01440-SdlgViewModel.cs";
-    string SdlgViewModelClassName   = GetModelClassName(Model, SdlgViewModelFolder);
-    string SdlgViewModelNameSpace   = GetModelNameSpace(Model, SdlgViewModelFolder);
+    string LdlgUserControlFolder           = "01616-LdlgUserControl.xaml.cs";
+    string LdlgUserControlClassName        = GetModelClassName(Model, LdlgUserControlFolder);
+    string LdlgUserControlNameSpace        = GetModelNameSpace(Model, LdlgUserControlFolder);
+
+    string LdlgViewModelFolder             = "01620-LdlgViewModel.cs";
+    string LdlgViewModelClassName          = GetModelClassName(Model, LdlgViewModelFolder);
+    string LdlgViewModelNameSpace          = GetModelNameSpace(Model, LdlgViewModelFolder);
 
 
     string CaptionPropertyName                  = "Caption";
     string FilterHeightPropertyName             = "FilterHeight";
     string GridHeightPropertyName               = "GridHeight";
     string HiddenFiltersPropertyName            = "HiddenFilters";
+    string CanAddPropertyName                   = "CanAdd";
+    string CanUpdPropertyName                   = "CanUpdate";
+    string CanDelPropertyName                   = "CanDelete";
+
+
 
     string AppSettingServicePropertyName    = "GlblSettingsSrv";
     string SformSelectionChangedPropertyName = "SformSelectionChanged";
@@ -123,17 +126,17 @@ using System.Windows.Controls;
 
 
     List<string> nmSpaces = new List<string>();
-    if ((SdlgViewModelNameSpace != IWebServiceFilterRsltInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace) < 0)) 
+    if ((LdlgViewModelNameSpace != IWebServiceFilterRsltInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace) < 0)) 
         nmSpaces.Add(IWebServiceFilterRsltInterfaceNameSpace);
-    if ((SdlgViewModelNameSpace != IAppGlblSettingsServiceNameSpace) && (nmSpaces.IndexOf(IAppGlblSettingsServiceNameSpace) < 0)) 
+    if ((LdlgViewModelNameSpace != IAppGlblSettingsServiceNameSpace) && (nmSpaces.IndexOf(IAppGlblSettingsServiceNameSpace) < 0)) 
         nmSpaces.Add(IAppGlblSettingsServiceNameSpace);
-    if ((SdlgViewModelNameSpace != RoutedEventExtNameSpace) && (nmSpaces.IndexOf(RoutedEventExtNameSpace) < 0)) 
+    if ((LdlgViewModelNameSpace != RoutedEventExtNameSpace) && (nmSpaces.IndexOf(RoutedEventExtNameSpace) < 0)) 
         nmSpaces.Add(RoutedEventExtNameSpace);
-//    if ((SdlgViewModelNameSpace != SformUserControlNameSpace) && (nmSpaces.IndexOf(SformUserControlNameSpace) < 0)) 
-//        nmSpaces.Add(SformUserControlNameSpace);
-    if ((SdlgViewModelNameSpace != modelInterfaceNameSpace) && (nmSpaces.IndexOf(modelInterfaceNameSpace) < 0)) 
+//    if ((LdlgViewModelNameSpace != LformUserControlNameSpace) && (nmSpaces.IndexOf(LformUserControlNameSpace) < 0)) 
+//        nmSpaces.Add(LformUserControlNameSpace);
+    if ((LdlgViewModelNameSpace != modelInterfaceNameSpace) && (nmSpaces.IndexOf(modelInterfaceNameSpace) < 0)) 
         nmSpaces.Add(modelInterfaceNameSpace);
-    if ((SdlgViewModelNameSpace != commandHelperModelNameSpace) && (nmSpaces.IndexOf(commandHelperModelNameSpace) < 0)) 
+    if ((LdlgViewModelNameSpace != commandHelperModelNameSpace) && (nmSpaces.IndexOf(commandHelperModelNameSpace) < 0)) 
         nmSpaces.Add(commandHelperModelNameSpace);
 
 
@@ -154,17 +157,17 @@ using <#= ns #>;
         public void RegisterTypes(IContainerRegistry containerRegistry)
         {
             ...
-            containerRegistry.RegisterDialog<<#= SdlgUserControlClassName #>, <#= SdlgViewModelClassName #>>("<#= SdlgViewModelClassName #>");
+            containerRegistry.RegisterDialog<<#= LdlgUserControlClassName #>, <#= LdlgViewModelClassName #>>("<#= LdlgViewModelClassName #>");
             ...
         }
 */
 
-namespace <#= SdlgViewModelNameSpace #> {
-    public class <#= SdlgViewModelClassName #>: INotifyPropertyChanged, IDialogAware
+namespace <#= LdlgViewModelNameSpace #> {
+    public class <#= LdlgViewModelClassName #>: INotifyPropertyChanged, IDialogAware
     {
         protected <#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName #>=null;
         protected IDialogService _dialogService=null;
-        public <#= SdlgViewModelClassName #>(<#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName  #>, IDialogService dialogService) {
+        public <#= LdlgViewModelClassName #>(<#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName  #>, IDialogService dialogService) {
 
             this.<#= AppSettingServicePropertyName #> = <#= AppSettingServicePropertyName #>;
             this._dialogService = dialogService;
@@ -197,7 +200,7 @@ namespace <#= SdlgViewModelNameSpace #> {
         protected <#= modelInterfaceClassName #> _<#= SelectedItemPropertyName #> = null;
 
 //        protected void On<#= SformSelectionChangedPropertyName #>(object sender, SelectionChangedEventArgs e) {
-//            if (e.OriginalSource is <#= SformUserControlClassName #>) 
+//            if (e.OriginalSource is <#= LformUserControlClassName #>) 
 //            {
 //                _<#= SelectedItemPropertyName #> = null;
 //                if(e.AddedItems != null) {
@@ -263,6 +266,18 @@ namespace <#= SdlgViewModelNameSpace #> {
             if (parameters.ContainsKey("<#= GridHeightPropertyName #>"))
             {
                 <#= GridHeightPropertyName #> = parameters.GetValue<Nullable<double>>("<#= GridHeightPropertyName #>");
+            }
+            if (parameters.ContainsKey("<#= CanAddPropertyName #>"))
+            {
+                <#= CanAddPropertyName #> = parameters.GetValue<bool>("<#= CanAddPropertyName #>");
+            }
+            if (parameters.ContainsKey("<#= CanUpdPropertyName #>"))
+            {
+                <#= CanUpdPropertyName #> = parameters.GetValue<bool>("<#= CanUpdPropertyName #>");
+            }
+            if (parameters.ContainsKey("<#= CanDelPropertyName #>"))
+            {
+                <#= CanDelPropertyName #> = parameters.GetValue<bool>("<#= CanDelPropertyName #>");
             }
             if (parameters.ContainsKey("<#= HiddenFiltersPropertyName #>"))  
             {
@@ -380,6 +395,63 @@ namespace <#= SdlgViewModelNameSpace #> {
                 if (_<#= HiddenFiltersPropertyName #> != value)
                 {
                     _<#= HiddenFiltersPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+
+        #region <#= CanAddPropertyName #>
+        bool _<#= CanAddPropertyName #> = true;
+        public bool <#= CanAddPropertyName #>
+        {
+            get
+            {
+                return _<#= CanAddPropertyName #>;
+            }
+            set
+            {
+                if (_<#= CanAddPropertyName #> != value)
+                {
+                    _<#= CanAddPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+
+        #region <#= CanUpdPropertyName #>
+        bool _<#= CanUpdPropertyName #> = true;
+        public bool <#= CanUpdPropertyName #>
+        {
+            get
+            {
+                return _<#= CanUpdPropertyName #>;
+            }
+            set
+            {
+                if (_<#= CanUpdPropertyName #> != value)
+                {
+                    _<#= CanUpdPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+
+        #region <#= CanDelPropertyName #>
+        bool _<#= CanDelPropertyName #> = true;
+        public bool <#= CanDelPropertyName #>
+        {
+            get
+            {
+                return _<#= CanDelPropertyName #>;
+            }
+            set
+            {
+                if (_<#= CanDelPropertyName #> != value)
+                {
+                    _<#= CanDelPropertyName #> = value;
                     OnPropertyChanged();
                 }
             }

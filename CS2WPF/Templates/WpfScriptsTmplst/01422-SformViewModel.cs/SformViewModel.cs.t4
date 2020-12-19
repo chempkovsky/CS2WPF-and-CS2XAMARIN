@@ -143,6 +143,9 @@ using System.Windows.Controls;
     string SelectedColumnsPropertyName = "SelectedColumns";
     string SformSelectionChangedPropertyName = "SformSelectionChanged";
     string RegionPropertyName = "Region";
+    string SformSelectionChangedCommandPropertyName = "SformSelectionChangedCommand";
+    string CopyToModelMethodName            = "CopyToModel";
+    string CopyToModelNotifyMethodName      = "CopyToModelNotify";
 
 
     string DisplayLabelProperty     = "Name";
@@ -152,7 +155,13 @@ using System.Windows.Controls;
     string AppSettingServicePropertyName    = "GlblSettingsSrv";
     string FilterOperatorSuffix             = "Oprtr";
     string GetWithFilterMethodName          = "getwithfilter";
-    string ColumnSelectorDlgPropertyName = "ColumnSelectorDlg";
+    string ColumnSelectorDlgPropertyName    = "ColumnSelectorDlg";
+
+    string SformAfterAddItemCommandPropertyName = "SformAfterAddItemCommand";
+    string SformAfterUpdItemCommandPropertyName = "SformAfterUpdItemCommand";
+    string SformAfterDelItemCommandPropertyName = "SformAfterDelItemCommand";
+
+
 
     List<string> nmSpaces = new List<string>();
     if ((SformViewModelNameSpace != commandHelperModelNameSpace) && (nmSpaces.IndexOf(commandHelperModelNameSpace) < 0)) 
@@ -267,6 +276,13 @@ namespace <#= SformViewModelNameSpace #> {
             cbsc.Add(cb);
 
 
+            cb = new CommandBinding(<#= RoutedCommandExtClassName #>.<#= SformAfterAddItemCommandPropertyName #>, new ExecutedRoutedEventHandler(this.Executed<#= SformAfterAddItemCommandPropertyName #>), new CanExecuteRoutedEventHandler(CanExecute<#= SformAfterAddItemCommandPropertyName #>));
+            cbsc.Add(cb);
+            cb = new CommandBinding(<#= RoutedCommandExtClassName #>.<#= SformAfterUpdItemCommandPropertyName #>, new ExecutedRoutedEventHandler(this.Executed<#= SformAfterUpdItemCommandPropertyName #>), new CanExecuteRoutedEventHandler(CanExecute<#= SformAfterUpdItemCommandPropertyName #>));
+            cbsc.Add(cb);
+            cb = new CommandBinding(<#= RoutedCommandExtClassName #>.<#= SformAfterDelItemCommandPropertyName #>, new ExecutedRoutedEventHandler(this.Executed<#= SformAfterDelItemCommandPropertyName #>), new CanExecuteRoutedEventHandler(CanExecute<#= SformAfterDelItemCommandPropertyName #>));
+            cbsc.Add(cb);
+
             _<#= RoutedCommandHandlersPropertyName #> = cbsc;
             _<#= TableMenuItemsPropertyName #> = GetDefault<#= TableMenuItemsPropertyName #>();
         }
@@ -281,7 +297,9 @@ namespace <#= SformViewModelNameSpace #> {
         public void OnSelectionChanged(object sender, SelectionChangedEventArgs e) {
             if ((e.OriginalSource is DataGrid) && (sender is UIElement))
             {
-                (sender as UIElement).RaiseEvent(new SelectionChangedEventArgs(<#= RoutedEventExtClassName #>.<#= SformSelectionChangedPropertyName #>Event, e.RemovedItems, e.AddedItems));
+                // (sender as UIElement).RaiseEvent(new SelectionChangedEventArgs(<#= RoutedEventExtClassName #>.<#= SformSelectionChangedPropertyName #>Event, e.RemovedItems, e.AddedItems));
+                Tuple<string, System.Collections.IList, System.Collections.IList> itm = new Tuple<string, System.Collections.IList, System.Collections.IList>("<#= modelInterfaceClassName #>", e.RemovedItems, e.AddedItems);
+                <#= RoutedCommandExtClassName #>.<#= SformSelectionChangedCommandPropertyName  #>.Execute(itm, (sender as UIElement));
             }
         }
         private async void OnLoaded(object sender, RoutedEventArgs e)
@@ -836,12 +854,121 @@ namespace <#= SformViewModelNameSpace #> {
                 if (ds == null) { ds = new ObservableCollection<<#= modelInterfaceClassName #>>(); } else { ds.Clear(); }
                 if(rslt.items != null) {
                     foreach(<#= modelInterfaceClassName #> itm in rslt.items) {
-                        ds.Add(itm);
+                        ds.Add(<#= FormRootServicePropertyName #>.<#= CopyToModelNotifyMethodName #>(itm, null));
                     }
                 }
                 <#= DataSourcePropertyName #> = ds;
             }
             <#= IsInQueryPropertyName #> = false;
+        }
+        #endregion
+
+        #region <#= SformAfterAddItemCommandPropertyName #>
+        public void Executed<#= SformAfterAddItemCommandPropertyName #>(object sender, ExecutedRoutedEventArgs e) {
+            e.Handled = true;
+            <#= modelInterfaceClassName #> prm = e.Parameter as  <#= modelInterfaceClassName #>;
+            if(prm == null) return;
+            ObservableCollection<<#= modelInterfaceClassName #>> ds = <#= DataSourcePropertyName #> as ObservableCollection<<#= modelInterfaceClassName #>>;
+            ds.Add(<#= FormRootServicePropertyName #>.<#= CopyToModelNotifyMethodName #>(prm, null));
+        }
+        public void CanExecute<#= SformAfterAddItemCommandPropertyName #>(object sender, CanExecuteRoutedEventArgs e) {
+            e.Handled = true;
+            e.CanExecute = !<#= IsInQueryPropertyName #>;
+        }
+        #endregion
+
+        #region <#= SformAfterUpdItemCommandPropertyName #>
+        public void Executed<#= SformAfterUpdItemCommandPropertyName #>(object sender, ExecutedRoutedEventArgs e) {
+            e.Handled = true;
+            <#= modelInterfaceClassName #> prm = e.Parameter as  <#= modelInterfaceClassName #>;
+            if(prm == null) return;
+            ObservableCollection<<#= modelInterfaceClassName #>> ds = <#= DataSourcePropertyName #> as ObservableCollection<<#= modelInterfaceClassName #>>;
+            if (ds.IndexOf(prm) > -1) {
+                return;
+            }
+<#
+    {
+        List<ModelViewPropertyOfVwSerializable> primKeyProps = GetModelPrimaryKeyProps(Model);
+#>
+            <#= modelInterfaceClassName #> rw = ds.Where(d => 
+<#
+        bool isNotFirst= false;
+        foreach(ModelViewPropertyOfVwSerializable pkpModelViewPropertyOfVwSerializable in primKeyProps) {
+            if(isNotFirst) {
+#>
+                    and (d.<#= GetModelPropertyName(pkpModelViewPropertyOfVwSerializable, Model) #> == prm.<#= GetModelPropertyName(pkpModelViewPropertyOfVwSerializable, Model) #>)
+<#
+            } else {
+                isNotFirst = true;
+#>
+                        (d.<#= GetModelPropertyName(pkpModelViewPropertyOfVwSerializable, Model) #> == prm.<#= GetModelPropertyName(pkpModelViewPropertyOfVwSerializable, Model) #>)
+<#
+            }
+        }
+#>
+                    ).FirstOrDefault();
+<#
+    }
+#>
+            if (rw != null) {
+                <#= FormRootServicePropertyName #>.<#= CopyToModelMethodName #>(prm, rw);
+            } else {
+                ds.Add(<#= FormRootServicePropertyName #>.<#= CopyToModelNotifyMethodName #>(prm, null));
+            }
+        }
+        public void CanExecute<#= SformAfterUpdItemCommandPropertyName #>(object sender, CanExecuteRoutedEventArgs e) {
+            e.Handled = true;
+            e.CanExecute = !<#= IsInQueryPropertyName #>;
+        }
+        #endregion
+
+
+        #region <#= SformAfterDelItemCommandPropertyName #>
+        public void Executed<#= SformAfterDelItemCommandPropertyName #>(object sender, ExecutedRoutedEventArgs e) {
+            e.Handled = true;
+            <#= modelInterfaceClassName #> prm = e.Parameter as  <#= modelInterfaceClassName #>;
+            if(prm == null) return;
+            ObservableCollection<<#= modelInterfaceClassName #>> ds = <#= DataSourcePropertyName #> as ObservableCollection<<#= modelInterfaceClassName #>>;
+            int indx = ds.IndexOf(prm);
+            if (indx > -1) {
+                ds.RemoveAt(indx);
+                return;
+            }
+<#
+    {
+        List<ModelViewPropertyOfVwSerializable> primKeyProps = GetModelPrimaryKeyProps(Model);
+#>
+            <#= modelInterfaceClassName #> rw = ds.Where(d => 
+<#
+        bool isNotFirst= false;
+        foreach(ModelViewPropertyOfVwSerializable pkpModelViewPropertyOfVwSerializable in primKeyProps) {
+            if(isNotFirst) {
+#>
+                    and (d.<#= GetModelPropertyName(pkpModelViewPropertyOfVwSerializable, Model) #> == prm.<#= GetModelPropertyName(pkpModelViewPropertyOfVwSerializable, Model) #>)
+<#
+            } else {
+                isNotFirst = true;
+#>
+                        (d.<#= GetModelPropertyName(pkpModelViewPropertyOfVwSerializable, Model) #> == prm.<#= GetModelPropertyName(pkpModelViewPropertyOfVwSerializable, Model) #>)
+<#
+            }
+        }
+#>
+                    ).FirstOrDefault();
+<#
+    }
+#>
+            if (rw != null) {
+                indx = ds.IndexOf(prm);
+                if (indx > -1) {
+                    ds.RemoveAt(indx);
+                    return;
+                }
+            }
+        }
+        public void CanExecute<#= SformAfterDelItemCommandPropertyName #>(object sender, CanExecuteRoutedEventArgs e) {
+            e.Handled = true;
+            e.CanExecute = !<#= IsInQueryPropertyName #>;
         }
         #endregion
     }
@@ -1311,6 +1438,48 @@ namespace <#= SformViewModelNameSpace #> {
     string GetModelPropertyNameEx2(ModelViewUIListPropertySerializable prop, ModelViewSerializable model) {
         ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
         return GetModelPropertyName(sclrProp, model);
+    }
+    List<ModelViewPropertyOfVwSerializable> GetModelPrimaryKeyProps(ModelViewSerializable model) {
+        List<ModelViewPropertyOfVwSerializable> result = new List<ModelViewPropertyOfVwSerializable>();
+        if (model == null)
+        {
+            return result;
+        }
+        if ((model.PrimaryKeyProperties == null) || (model.ScalarProperties == null)) {
+            return result;
+        }
+        foreach(ModelViewKeyPropertySerializable modelViewKeyPropertySerializable in model.PrimaryKeyProperties) {
+            ModelViewPropertyOfVwSerializable prop =
+                model.ScalarProperties.Where(p => p.ViewPropertyName == modelViewKeyPropertySerializable.ViewPropertyName).FirstOrDefault();
+            if(prop != null) {
+                result.Add(prop);
+            } else {
+                if(model.ForeignKeys != null) {
+                    foreach(ModelViewForeignKeySerializable modelViewForeignKeySerializable in model.ForeignKeys) {
+                        if ((modelViewForeignKeySerializable.PrincipalKeyProps != null) && (modelViewForeignKeySerializable.ForeignKeyProps != null)) {
+                            for(int i = 0; i < modelViewForeignKeySerializable.ForeignKeyProps.Count; i++) {
+                                if(modelViewForeignKeySerializable.ForeignKeyProps[i].OriginalPropertyName == modelViewKeyPropertySerializable.OriginalPropertyName ) {
+                                    if(i < modelViewForeignKeySerializable.PrincipalKeyProps.Count) {
+                                        prop =
+                                        model.ScalarProperties.Where(p => 
+                                            (p.OriginalPropertyName == modelViewForeignKeySerializable.PrincipalKeyProps[i].OriginalPropertyName)
+                                            &&
+                                            (p.ForeignKeyName == modelViewForeignKeySerializable.NavigationName)
+                                        ).FirstOrDefault();
+                                    }
+                                }
+                                if(prop != null) break;
+                            }
+                        }
+                        if(prop != null) break;
+                    }
+                    if(prop != null) {
+                        result.Add(prop);
+                    }
+                }
+            }
+        }
+        return result;
     }
 
 #>

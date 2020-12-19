@@ -12,38 +12,36 @@
 <#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
 using System;
-using System.Collections.Generic;
-using System.Net.Http;
+using System.Windows.Data;
 <#
 
-    string IAppGlblSettingsServiceFolder      = "00080-IAppGlblSettingsService";
-    string IAppGlblSettingsServiceClassName   = GetModelClassName(Model, IAppGlblSettingsServiceFolder);
-    string IAppGlblSettingsServiceNameSpace   = GetModelNameSpace(Model, IAppGlblSettingsServiceFolder);
+    string InverseBooleanConverterFolder      = "00170-InverseBooleanConverter.cs";
+    string InverseBooleanConverterClassName   = GetModelClassName(Model, InverseBooleanConverterFolder);
+    string InverseBooleanConverterNameSpace   = GetModelNameSpace(Model, InverseBooleanConverterFolder);
     
-    string ShowErrorMethodName                  = "ShowErrorMessage";
-
 #>
 
-namespace <#= IAppGlblSettingsServiceNameSpace #> {
-    public interface  <#= IAppGlblSettingsServiceClassName #>
+namespace <#= InverseBooleanConverterNameSpace #> {
+    [ValueConversion(typeof(bool), typeof(bool))]
+    public class <#= InverseBooleanConverterClassName #>: IValueConverter
     {
-        double FilterHeightAddition { get; set; }
-        double FilterHeightFactor { get; set; }
-        double TableHeightAddition { get; set; }
-        double TableHeightFactor { get; set; }
-        event Action<object, string> OnMessageNotification;
-        event Action<object, string> OnUserChangedNotification;
-        string GetWebApiPrefix(string ViewName);
-        string GetSecurityWebApiPrefix();
-        double getDialogWidth(string ViewName);
-        string UserName { get; set; }
-        dynamic AuthInfo { get; set; }
-        List<KeyValuePair<string, string>> GetAuthInfoHeader();
-        int[] Permissions { get; set; }
-        int GetViewModelMask(string vwModel);
-        int GetDashBrdMask(string dshBrd);
-        HttpClient Client  { get; }
-        void <#= ShowErrorMethodName #>(string errorType, string errorMsg);
+        #region IValueConverter Members
+        public object Convert(object value, Type targetType, object parameter,
+            System.Globalization.CultureInfo culture)
+        {
+            if (targetType != typeof(bool))
+                throw new InvalidOperationException("The target must be a boolean");
+
+            return !(bool)value;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter,
+            System.Globalization.CultureInfo culture)
+        {
+            throw new NotSupportedException();
+        }
+
+        #endregion
     }
 }
 

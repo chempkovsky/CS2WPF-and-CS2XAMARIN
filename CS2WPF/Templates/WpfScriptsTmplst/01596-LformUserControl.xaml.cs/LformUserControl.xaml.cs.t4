@@ -15,8 +15,15 @@ using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
+using System.Collections.ObjectModel;
+using System.Windows.Input;
 
 <#
+
+    string EformModeEnumFolder      = "00026-EformModeEnum.cs";
+    string EformModeEnumClassName   = GetContextModelClassName(Context, EformModeEnumFolder);
+    string EformModeEnumNameSpace   = GetContextModelNameSpace(Context, EformModeEnumFolder);
+
     string IWebServiceFilterRsltInterfaceFolder      = "00204-IWebServiceFilterRsltInterface.cs";
     string IWebServiceFilterRsltInterfaceClassName   = GetContextModelClassName(Context, IWebServiceFilterRsltInterfaceFolder);
     string IWebServiceFilterRsltInterfaceNameSpace   = GetContextModelNameSpace(Context, IWebServiceFilterRsltInterfaceFolder);
@@ -29,18 +36,27 @@ using System.Windows.Controls;
     string RoutedEventExtClassName                  = GetContextModelClassName(Context, RoutedEventExtFolder);
     string RoutedEventExtNameSpace                  = GetContextModelNameSpace(Context, RoutedEventExtFolder);
 
-    string SformUserControlFolder                   = "01420-SformUserControl.xaml.cs";
-    string SformUserControlClassName                = GetModelClassName(Model, SformUserControlFolder);
-    string SformUserControlNameSpace                = GetModelNameSpace(Model, SformUserControlFolder);
+
+    string modelInterfaceFolder                     = "01100-Interface.cs";
+    string modelInterfaceClassName                  = GetInterfaceName(Model);
+    string modelInterfaceNameSpace                  = GetModelNameSpace(Model, modelInterfaceFolder);
+
+
+    string LformUserControlFolder                   = "01596-LformUserControl.xaml.cs";
+    string LformUserControlClassName                = GetModelClassName(Model, LformUserControlFolder);
+    string LformUserControlNameSpace                = GetModelNameSpace(Model, LformUserControlFolder);
 
 
     string CaptionPropertyName = "Caption";
+    string ShowBackBtnPropertyName = "ShowBackBtn";
     string FilterHeightPropertyName = "FilterHeight";
     string ShowFilterPropertyName = "ShowFilter";
     string ShowAddFilterBtnPropertyName = "ShowAddFilterBtn";
     string GridHeightPropertyName = "GridHeight";
+    string ContainerMenuItemsPropertyName = "ContainerMenuItems";
 
-    string ShowBackBtnPropertyName = "ShowBackBtn";
+    string HiddenFiltersPropertyName = "HiddenFilters";
+    string HiddenFiltersPropertyChangedPropertyName = "HiddenFiltersPropertyChanged";
 
     string TableMenuItemsPropertyName = "TableMenuItems";
     string TableMenuItemsPropertyChangedPropertyName = "TableMenuItemsPropertyChanged";
@@ -48,26 +64,25 @@ using System.Windows.Controls;
     string RowMenuItemsPropertyName = "RowMenuItems";
     string RowMenuItemsPropertyChangedPropertyName = "RowMenuItemsPropertyChanged";
 
-    string ContainerMenuItemsPropertyName = "ContainerMenuItems";
 
-    string HiddenFiltersPropertyName = "HiddenFilters";
-    string HiddenFiltersPropertyChangedPropertyName = "HiddenFiltersPropertyChanged";
-
-    string SelectedItemPropertyName = "SelectedItem";
-    string CurrentItemPropertyName = "CurrentItem";
-
-    string OnLoadedPropertyName = "OnLoaded";
+    string CanAddPropertyName                   = "CanAdd";
+    string CanAddPropertyChangedPropertyName    = "CanAddPropertyChanged";
+    string CanUpdPropertyName                   = "CanUpdate";
+    string CanUpdPropertyChangedPropertyName    = "CanUpdatePropertyChanged";
+    string CanDelPropertyName                   = "CanDelete";
+    string CanDelPropertyChangedPropertyName    = "CanDeletePropertyChanged";
 
 
 
     List<string> nmSpaces = new List<string>();
-    if ((SformUserControlNameSpace != IWebServiceFilterRsltInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace) < 0)) 
+    if ((LformUserControlNameSpace != IWebServiceFilterRsltInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace) < 0)) 
         nmSpaces.Add(IWebServiceFilterRsltInterfaceNameSpace);
-    if ((SformUserControlNameSpace != IWebServiceFilterMenuInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterMenuInterfaceNameSpace) < 0)) 
+    if ((LformUserControlNameSpace != IWebServiceFilterMenuInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterMenuInterfaceNameSpace) < 0)) 
         nmSpaces.Add(IWebServiceFilterMenuInterfaceNameSpace);
-    if ((SformUserControlNameSpace != RoutedEventExtNameSpace) && (nmSpaces.IndexOf(RoutedEventExtNameSpace) < 0)) 
+    if ((LformUserControlNameSpace != RoutedEventExtNameSpace) && (nmSpaces.IndexOf(RoutedEventExtNameSpace) < 0)) 
         nmSpaces.Add(RoutedEventExtNameSpace);
-
+    if ((LformUserControlNameSpace != modelInterfaceNameSpace) && (nmSpaces.IndexOf(modelInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(modelInterfaceNameSpace);
     
 #>
 <# 
@@ -79,21 +94,22 @@ using <#= ns #>;
 #>
 
 
-namespace <#= SformUserControlNameSpace #> {
+namespace <#= LformUserControlNameSpace #> {
     /// <summary>
-    /// Interaction logic for <#= SformUserControlClassName #>.xaml
+    /// Interaction logic for <#= LformUserControlClassName #>.xaml
     /// </summary>
-    public partial class <#= SformUserControlClassName #>: UserControl
+    public partial class <#= LformUserControlClassName #>: UserControl
     {
-        public <#= SformUserControlClassName #>()
+        public <#= LformUserControlClassName #>()
         {
             InitializeComponent();
         }
+
         #region <#= CaptionPropertyName #>
         public static readonly DependencyProperty <#= CaptionPropertyName #>Property =
                 DependencyProperty.Register(
                 "<#= CaptionPropertyName #>", typeof(string),
-                typeof(<#= SformUserControlClassName #>),
+                typeof(<#= LformUserControlClassName #>),
                 new PropertyMetadata(null));
         public string <#= CaptionPropertyName #>
         {
@@ -107,11 +123,64 @@ namespace <#= SformUserControlNameSpace #> {
             }
         }
         #endregion
+
+        #region <#= ContainerMenuItemsPropertyName #>
+        public static readonly DependencyProperty <#= ContainerMenuItemsPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= ContainerMenuItemsPropertyName #>", typeof(IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>),
+                typeof(<#= LformUserControlClassName #>),
+                new PropertyMetadata(null));
+        public IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> <#= ContainerMenuItemsPropertyName #>
+        {
+            get
+            {
+                return (IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>)GetValue(<#= ContainerMenuItemsPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= ContainerMenuItemsPropertyName #>Property, value);
+            }
+        }
+        #endregion
+
+
+        #region <#= HiddenFiltersPropertyName #>
+        private static void <#= HiddenFiltersPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            <#= LformUserControlClassName #> inst = d as <#= LformUserControlClassName #>;
+            if (inst != null)
+            {
+                RoutedPropertyChangedEventArgs<IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>> eventArgs =
+                    new RoutedPropertyChangedEventArgs<IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>>(
+                        e.OldValue as IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>,
+                        e.NewValue as IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>,
+                        <#= RoutedEventExtClassName #>.<#= HiddenFiltersPropertyChangedPropertyName #>Event);
+                inst.RaiseEvent(eventArgs);
+            }
+        }
+        public static readonly DependencyProperty <#= HiddenFiltersPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= HiddenFiltersPropertyName #>", typeof(IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>),
+                typeof(<#= LformUserControlClassName #>),
+                new PropertyMetadata(null, <#= HiddenFiltersPropertyName #>Changed));
+        public IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>> <#= HiddenFiltersPropertyName #>
+        {
+            get
+            {
+                return (IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>)GetValue(<#= HiddenFiltersPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= HiddenFiltersPropertyName #>Property, value);
+            }
+        }
+        #endregion
+
         #region <#= FilterHeightPropertyName #>
         public static readonly DependencyProperty <#= FilterHeightPropertyName #>Property =
                 DependencyProperty.Register(
                 "<#= FilterHeightPropertyName #>", typeof(Nullable<double>),
-                typeof(<#= SformUserControlClassName #>),
+                typeof(<#= LformUserControlClassName #>),
                 new PropertyMetadata(null));
         public Nullable<double> FilterHeight
         {
@@ -129,7 +198,7 @@ namespace <#= SformUserControlNameSpace #> {
         public static readonly DependencyProperty <#= ShowFilterPropertyName #>Property =
                 DependencyProperty.Register(
                 "<#= ShowFilterPropertyName #>", typeof(Nullable<bool>),
-                typeof(<#= SformUserControlClassName #>),
+                typeof(<#= LformUserControlClassName #>),
                 new PropertyMetadata(true));
         public Nullable<bool> <#= ShowFilterPropertyName #>
         {
@@ -147,7 +216,7 @@ namespace <#= SformUserControlNameSpace #> {
         public static readonly DependencyProperty <#= ShowAddFilterBtnPropertyName #>Property =
                 DependencyProperty.Register(
                 "<#= ShowAddFilterBtnPropertyName #>", typeof(Nullable<bool>),
-                typeof(<#= SformUserControlClassName #>),
+                typeof(<#= LformUserControlClassName #>),
                 new PropertyMetadata(null));
         public Nullable<bool> <#= ShowAddFilterBtnPropertyName #>
         {
@@ -165,7 +234,7 @@ namespace <#= SformUserControlNameSpace #> {
         public static readonly DependencyProperty <#= ShowBackBtnPropertyName #>Property =
                 DependencyProperty.Register(
                 "<#= ShowBackBtnPropertyName #>", typeof(Nullable<bool>),
-                typeof(<#= SformUserControlClassName #>),
+                typeof(<#= LformUserControlClassName #>),
                 new PropertyMetadata(null));
         public Nullable<bool> <#= ShowBackBtnPropertyName #>
         {
@@ -183,7 +252,7 @@ namespace <#= SformUserControlNameSpace #> {
         public static readonly DependencyProperty <#= GridHeightPropertyName #>Property =
                 DependencyProperty.Register(
                 "<#= GridHeightPropertyName #>", typeof(Nullable<double>),
-                typeof(<#= SformUserControlClassName #>),
+                typeof(<#= LformUserControlClassName #>),
                 new PropertyMetadata(null));
         public Nullable<double> <#= GridHeightPropertyName #>
         {
@@ -200,7 +269,7 @@ namespace <#= SformUserControlNameSpace #> {
         #region <#= TableMenuItemsPropertyName #>
         private static void <#= TableMenuItemsPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            <#= SformUserControlClassName #> inst = d as <#= SformUserControlClassName #>;
+            <#= LformUserControlClassName #> inst = d as <#= LformUserControlClassName #>;
             if (inst != null)
             {
                 RoutedPropertyChangedEventArgs<IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>> eventArgs =
@@ -214,7 +283,7 @@ namespace <#= SformUserControlNameSpace #> {
         public static readonly DependencyProperty <#= TableMenuItemsPropertyName #>Property =
                 DependencyProperty.Register(
                 "<#= TableMenuItemsPropertyName #>", typeof(IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>),
-                typeof(<#= SformUserControlClassName #>),
+                typeof(<#= LformUserControlClassName #>),
                 new PropertyMetadata(null, <#= TableMenuItemsPropertyName #>Changed));
         public IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> <#= TableMenuItemsPropertyName #>
         {
@@ -231,7 +300,7 @@ namespace <#= SformUserControlNameSpace #> {
         #region <#= RowMenuItemsPropertyName #>
         private static void <#= RowMenuItemsPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            <#= SformUserControlClassName #> inst = d as <#= SformUserControlClassName #>;
+            <#= LformUserControlClassName #> inst = d as <#= LformUserControlClassName #>;
             if (inst != null)
             {
                 RoutedPropertyChangedEventArgs<IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>> eventArgs =
@@ -245,7 +314,7 @@ namespace <#= SformUserControlNameSpace #> {
         public static readonly DependencyProperty <#= RowMenuItemsPropertyName #>Property =
                 DependencyProperty.Register(
                 "<#= RowMenuItemsPropertyName #>", typeof(IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>),
-                typeof(<#= SformUserControlClassName #>),
+                typeof(<#= LformUserControlClassName #>),
                 new PropertyMetadata(null, <#= RowMenuItemsPropertyName #>Changed));
         public IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> <#= RowMenuItemsPropertyName #>
         {
@@ -259,55 +328,124 @@ namespace <#= SformUserControlNameSpace #> {
             }
         }
         #endregion
-        #region <#= ContainerMenuItemsPropertyName #>
-        public static readonly DependencyProperty <#= ContainerMenuItemsPropertyName #>Property =
-                DependencyProperty.Register(
-                "<#= ContainerMenuItemsPropertyName #>", typeof(IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>),
-                typeof(<#= SformUserControlClassName #>),
-                new PropertyMetadata(null));
-        public IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> <#= ContainerMenuItemsPropertyName #>
+        #region <#= CanAddPropertyName #>
+        private static void <#= CanAddPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            get
-            {
-                return (IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>)GetValue(<#= ContainerMenuItemsPropertyName #>Property);
-            }
-            set
-            {
-                SetValue(<#= ContainerMenuItemsPropertyName #>Property, value);
-            }
-        }
-        #endregion
-        #region <#= HiddenFiltersPropertyName #>
-        private static void <#= HiddenFiltersPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            <#= SformUserControlClassName #> inst = d as <#= SformUserControlClassName #>;
+            <#= LformUserControlClassName #> inst = d as <#= LformUserControlClassName #>;
             if (inst != null)
             {
-                RoutedPropertyChangedEventArgs<IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>> eventArgs =
-                    new RoutedPropertyChangedEventArgs<IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>>(
-                        e.OldValue as IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>,
-                        e.NewValue as IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>,
-                        <#= RoutedEventExtClassName #>.<#= HiddenFiltersPropertyChangedPropertyName #>Event);
+                
+                bool oldVal = false;
+                if (e.OldValue is bool) oldVal = (bool)e.OldValue;
+                bool newVal = false;
+                if (e.NewValue is bool) newVal = (bool)e.NewValue;
+
+                RoutedPropertyChangedEventArgs<bool> eventArgs =
+                    new RoutedPropertyChangedEventArgs<bool>(
+                        oldVal,
+                        newVal,
+                        <#= RoutedEventExtClassName #>.<#= CanAddPropertyChangedPropertyName #>Event);
                 inst.RaiseEvent(eventArgs);
             }
         }
-        public static readonly DependencyProperty <#= HiddenFiltersPropertyName #>Property =
+        public static readonly DependencyProperty <#= CanAddPropertyName #>Property =
                 DependencyProperty.Register(
-                "<#= HiddenFiltersPropertyName #>", typeof(IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>),
-                typeof(<#= SformUserControlClassName #>),
-                new PropertyMetadata(null, <#= HiddenFiltersPropertyName #>Changed));
-        public IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>> <#= HiddenFiltersPropertyName #>
+                "<#= CanAddPropertyName #>", typeof(bool),
+                typeof(<#= LformUserControlClassName #>),
+                new PropertyMetadata(true, <#= CanAddPropertyName #>Changed));
+        public bool <#= CanAddPropertyName #>
         {
             get
             {
-                return (IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>)GetValue(<#= HiddenFiltersPropertyName #>Property);
+                return (bool)GetValue(<#= CanAddPropertyName #>Property);
             }
             set
             {
-                SetValue(<#= HiddenFiltersPropertyName #>Property, value);
+                SetValue(<#= CanAddPropertyName #>Property, value);
             }
         }
         #endregion
+        #region <#= CanUpdPropertyName #>
+        private static void <#= CanUpdPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            <#= LformUserControlClassName #> inst = d as <#= LformUserControlClassName #>;
+            if (inst != null)
+            {
+                
+                bool oldVal = false;
+                if (e.OldValue is bool) oldVal = (bool)e.OldValue;
+                bool newVal = false;
+                if (e.NewValue is bool) newVal = (bool)e.NewValue;
+
+                RoutedPropertyChangedEventArgs<bool> eventArgs =
+                    new RoutedPropertyChangedEventArgs<bool>(
+                        oldVal,
+                        newVal,
+                        <#= RoutedEventExtClassName #>.<#= CanUpdPropertyChangedPropertyName #>Event);
+                inst.RaiseEvent(eventArgs);
+            }
+        }
+        public static readonly DependencyProperty <#= CanUpdPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= CanUpdPropertyName #>", typeof(bool),
+                typeof(<#= LformUserControlClassName #>),
+                new PropertyMetadata(true, <#= CanUpdPropertyName #>Changed));
+        public bool <#= CanUpdPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= CanUpdPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= CanUpdPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= CanDelPropertyName #>
+        private static void <#= CanDelPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            <#= LformUserControlClassName #> inst = d as <#= LformUserControlClassName #>;
+            if (inst != null)
+            {
+                
+                bool oldVal = false;
+                if (e.OldValue is bool) oldVal = (bool)e.OldValue;
+                bool newVal = false;
+                if (e.NewValue is bool) newVal = (bool)e.NewValue;
+
+                RoutedPropertyChangedEventArgs<bool> eventArgs =
+                    new RoutedPropertyChangedEventArgs<bool>(
+                        oldVal,
+                        newVal,
+                        <#= RoutedEventExtClassName #>.<#= CanDelPropertyChangedPropertyName #>Event);
+                inst.RaiseEvent(eventArgs);
+            }
+        }
+        public static readonly DependencyProperty <#= CanDelPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= CanDelPropertyName #>", typeof(bool),
+                typeof(<#= LformUserControlClassName #>),
+                new PropertyMetadata(true, <#= CanDelPropertyName #>Changed));
+        public bool <#= CanDelPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= CanDelPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= CanDelPropertyName #>Property, value);
+            }
+        }
+        #endregion
+
+
+
+
+
+
+
     }
 }
 

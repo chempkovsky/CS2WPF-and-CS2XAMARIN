@@ -11,39 +11,21 @@
 <#@ import namespace="CS2WPF.Model.Serializable" #>
 <#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
-using System;
-using System.Collections.Generic;
-using System.Net.Http;
+
 <#
 
-    string IAppGlblSettingsServiceFolder      = "00080-IAppGlblSettingsService";
-    string IAppGlblSettingsServiceClassName   = GetModelClassName(Model, IAppGlblSettingsServiceFolder);
-    string IAppGlblSettingsServiceNameSpace   = GetModelNameSpace(Model, IAppGlblSettingsServiceFolder);
-    
-    string ShowErrorMethodName                  = "ShowErrorMessage";
+    string EformModeEnumFolder      = "00026-EformModeEnum.cs";
+    string EformModeEnumClassName   = GetModelClassName(Model, EformModeEnumFolder);
+    string EformModeEnumNameSpace   = GetModelNameSpace(Model, EformModeEnumFolder);
 
 #>
 
-namespace <#= IAppGlblSettingsServiceNameSpace #> {
-    public interface  <#= IAppGlblSettingsServiceClassName #>
+namespace <#= EformModeEnumNameSpace #> {
+    public enum <#= EformModeEnumClassName #>: uint
     {
-        double FilterHeightAddition { get; set; }
-        double FilterHeightFactor { get; set; }
-        double TableHeightAddition { get; set; }
-        double TableHeightFactor { get; set; }
-        event Action<object, string> OnMessageNotification;
-        event Action<object, string> OnUserChangedNotification;
-        string GetWebApiPrefix(string ViewName);
-        string GetSecurityWebApiPrefix();
-        double getDialogWidth(string ViewName);
-        string UserName { get; set; }
-        dynamic AuthInfo { get; set; }
-        List<KeyValuePair<string, string>> GetAuthInfoHeader();
-        int[] Permissions { get; set; }
-        int GetViewModelMask(string vwModel);
-        int GetDashBrdMask(string dshBrd);
-        HttpClient Client  { get; }
-        void <#= ShowErrorMethodName #>(string errorType, string errorMsg);
+        AddMode=1,
+        UpdateMode=2,
+        DeleteMode=3
     }
 }
 

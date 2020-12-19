@@ -12,62 +12,150 @@
 <#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
 using System;
-using System.Collections.Generic;
 using System.Windows;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using System.Windows.Input;
+using System.Collections.ObjectModel;
+using System.Collections.Generic;
+using Prism.Services.Dialogs;
 using System.Windows.Controls;
 
 <#
-    string IWebServiceFilterRsltInterfaceFolder      = "00204-IWebServiceFilterRsltInterface.cs";
-    string IWebServiceFilterRsltInterfaceClassName   = GetContextModelClassName(Context, IWebServiceFilterRsltInterfaceFolder);
-    string IWebServiceFilterRsltInterfaceNameSpace   = GetContextModelNameSpace(Context, IWebServiceFilterRsltInterfaceFolder);
+
+    string EformModeEnumFolder                      = "00026-EformModeEnum.cs";
+    string EformModeEnumClassName                   = GetContextModelClassName(Context, EformModeEnumFolder);
+    string EformModeEnumNameSpace                   = GetContextModelNameSpace(Context, EformModeEnumFolder);
+
+
+    string IWebServiceFilterDefInterfaceFolder      = "00200-IWebServiceFilterDefInterface.cs";
+    string IWebServiceFilterDefInterfaceClassName   = GetContextModelClassName(Context, IWebServiceFilterDefInterfaceFolder);
+    string IWebServiceFilterDefInterfaceNameSpace   = GetContextModelNameSpace(Context, IWebServiceFilterDefInterfaceFolder);
+
 
     string IWebServiceFilterMenuInterfaceFolder      = "00206-IWebServiceFilterMenuInterface.cs";
     string IWebServiceFilterMenuInterfaceClassName   = GetContextModelClassName(Context, IWebServiceFilterMenuInterfaceFolder);
     string IWebServiceFilterMenuInterfaceNameSpace   = GetContextModelNameSpace(Context, IWebServiceFilterMenuInterfaceFolder);
 
-    string RoutedEventExtFolder                     = "00222-RoutedEventExt.cs";
-    string RoutedEventExtClassName                  = GetContextModelClassName(Context, RoutedEventExtFolder);
-    string RoutedEventExtNameSpace                  = GetContextModelNameSpace(Context, RoutedEventExtFolder);
+    string WebServiceFilterRsltViewModelFolder      = "00215-WebServiceFilterRsltViewModel.cs";
+    string WebServiceFilterRsltViewModelClassName   = GetContextModelClassName(Context, WebServiceFilterRsltViewModelFolder);
+    string WebServiceFilterRsltViewModelNameSpace   = GetContextModelNameSpace(Context, WebServiceFilterRsltViewModelFolder);
+
+    string WebServiceFilterDefViewModelFolder      = "00211-WebServiceFilterDefViewModel.cs";
+    string WebServiceFilterDefViewModelClassName   = GetContextModelClassName(Context, WebServiceFilterDefViewModelFolder);
+    string WebServiceFilterDefViewModelNameSpace   = GetContextModelNameSpace(Context, WebServiceFilterDefViewModelFolder);
+
+    string WebServiceFilterMenuViewModelFolder      = "00217-WebServiceFilterMenuViewModel.cs";
+    string WebServiceFilterMenuViewModelClassName   = GetContextModelClassName(Context, WebServiceFilterMenuViewModelFolder);
+    string WebServiceFilterMenuViewModelNameSpace   = GetContextModelNameSpace(Context, WebServiceFilterMenuViewModelFolder);
+
+    string RoutedCommandExtFolder      = "00224-RoutedCommandExt.cs";
+    string RoutedCommandExtClassName   = GetContextModelClassName(Context, RoutedCommandExtFolder);
+    string RoutedCommandExtNameSpace   = GetContextModelNameSpace(Context, RoutedCommandExtFolder);
+
+    string TablePaginationUserControlFolder      = "00252-TablePaginationUserControl.xaml.cs";
+    string TablePaginationUserControlClassName   = GetContextModelClassName(Context, TablePaginationUserControlFolder);
+    string TablePaginationUserControlNameSpace   = GetContextModelNameSpace(Context, TablePaginationUserControlFolder);
+
+    string IColumnSelectorItemDefInterfaceFolder      = "00258-IColumnSelectorItemDefInterface.cs";
+    string IColumnSelectorItemDefInterfaceClassName   = GetContextModelClassName(Context, IColumnSelectorItemDefInterfaceFolder);
+    string IColumnSelectorItemDefInterfaceNameSpace   = GetContextModelNameSpace(Context, IColumnSelectorItemDefInterfaceFolder);
+
+    string ColumnSelectorItemDefViewModelFolder      = "00262-ColumnSelectorItemDefViewModel.cs";
+    string ColumnSelectorItemDefViewModelClassName   = GetContextModelClassName(Context, ColumnSelectorItemDefViewModelFolder);
+    string ColumnSelectorItemDefViewModelNameSpace   = GetContextModelNameSpace(Context, ColumnSelectorItemDefViewModelFolder);
+
+
+
+    string modelPageInterfaceFolder         = "01200-Page.interface.cs";
+    string modelPageInterfaceClassName      = GetPageInterfaceName(Model);
+    string modelPageInterfaceNameSpace      = GetModelNameSpace(Model, modelPageInterfaceFolder);
+
+    string modelFilterInterfaceFolder       = "01300-Filter.interface.cs";
+    string modelFilterInterfaceClassName    = GetFilterInterfaceName(Model);
+    string modelFilterInterfaceNameSpace    = GetModelNameSpace(Model, modelFilterInterfaceFolder);
+
+    string modelFilterFolder                = "01302-Filter.model.cs";
+    string modelFilterClassName             = GetFilterName(Model);
+    string modelFilterNameSpace             = GetModelNameSpace(Model, modelFilterFolder);
+
+    string modelServiceInterfaceFolder       = "01400-Service.interface.cs";
+    string modelServiceInterfaceClassName    = GetModelServiceInterfaceName(Model);
+    string modelServiceInterfaceNameSpace    = GetModelNameSpace(Model, modelServiceInterfaceFolder);
+
+
+
+
+
+    string commandHelperModelFolder      = "00140-CommandHelper.cs";
+    string commandHelperModelClassName   = GetContextModelClassName(Context, commandHelperModelFolder);
+    string commandHelperModelNameSpace   = GetContextModelNameSpace(Context, commandHelperModelFolder);
+
+
+    string modelInterfaceFolder         = "01100-Interface.cs";
+    string modelInterfaceClassName      = GetInterfaceName(Model);
+    string modelInterfaceNameSpace      = GetModelNameSpace(Model, modelInterfaceFolder);
+
+    string IAppGlblSettingsServiceFolder      = "00080-IAppGlblSettingsService";
+    string IAppGlblSettingsServiceClassName   = GetContextModelClassName(Context, IAppGlblSettingsServiceFolder);
+    string IAppGlblSettingsServiceNameSpace   = GetContextModelNameSpace(Context, IAppGlblSettingsServiceFolder);
+
+    string IWebServiceFilterRsltInterfaceFolder      = "00204-IWebServiceFilterRsltInterface.cs";
+    string IWebServiceFilterRsltInterfaceClassName   = GetContextModelClassName(Context, IWebServiceFilterRsltInterfaceFolder);
+    string IWebServiceFilterRsltInterfaceNameSpace   = GetContextModelNameSpace(Context, IWebServiceFilterRsltInterfaceFolder);
 
     string SformUserControlFolder                   = "01420-SformUserControl.xaml.cs";
     string SformUserControlClassName                = GetModelClassName(Model, SformUserControlFolder);
     string SformUserControlNameSpace                = GetModelNameSpace(Model, SformUserControlFolder);
 
+    string EformUserControlFolder                   = "01496-EformUserControl.xaml.cs";
+    string EformUserControlClassName                = GetModelClassName(Model, EformUserControlFolder);
+    string EformUserControlNameSpace                = GetModelNameSpace(Model, EformUserControlFolder);
 
-    string CaptionPropertyName = "Caption";
-    string FilterHeightPropertyName = "FilterHeight";
-    string ShowFilterPropertyName = "ShowFilter";
-    string ShowAddFilterBtnPropertyName = "ShowAddFilterBtn";
-    string GridHeightPropertyName = "GridHeight";
+    string EdlgUserControlFolder            = "01516-EdlgUserControl.xaml.cs";
+    string EdlgUserControlClassName         = GetModelClassName(Model, EdlgUserControlFolder);
+    string EdlgUserControlNameSpace         = GetModelNameSpace(Model, EdlgUserControlFolder);
 
-    string ShowBackBtnPropertyName = "ShowBackBtn";
+    string EdlgViewModelFolder              = "01520-EdlgViewModel.cs";
+    string EdlgViewModelClassName           = GetModelClassName(Model, EdlgViewModelFolder);
+    string EdlgViewModelNameSpace           = GetModelNameSpace(Model, EdlgViewModelFolder);
 
-    string TableMenuItemsPropertyName = "TableMenuItems";
-    string TableMenuItemsPropertyChangedPropertyName = "TableMenuItemsPropertyChanged";
 
-    string RowMenuItemsPropertyName = "RowMenuItems";
-    string RowMenuItemsPropertyChangedPropertyName = "RowMenuItemsPropertyChanged";
+    string CaptionPropertyName                  = "Caption";
+    string HiddenFiltersPropertyName            = "HiddenFilters";
+    string EformModePropertyName                = "EformMode";
+    string FormControlModelPropertyName         = "FormControlModel";
+    string ShowSubmitPropertyName               = "ShowSubmit";
 
-    string ContainerMenuItemsPropertyName = "ContainerMenuItems";
 
-    string HiddenFiltersPropertyName = "HiddenFilters";
-    string HiddenFiltersPropertyChangedPropertyName = "HiddenFiltersPropertyChanged";
 
-    string SelectedItemPropertyName = "SelectedItem";
-    string CurrentItemPropertyName = "CurrentItem";
+    string AppSettingServicePropertyName        = "GlblSettingsSrv";
+    string RoutedCommandHandlersPropertyName    = "RoutedCommandHandlers";
 
-    string OnLoadedPropertyName = "OnLoaded";
+    string EformOkCommandPropertyName           = "EformOkCommand";
+    string EformCancelCommandPropertyName       = "EformCancelCommand";
+
 
 
 
     List<string> nmSpaces = new List<string>();
-    if ((SformUserControlNameSpace != IWebServiceFilterRsltInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace) < 0)) 
+    if ((EdlgViewModelNameSpace != IWebServiceFilterRsltInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace) < 0)) 
         nmSpaces.Add(IWebServiceFilterRsltInterfaceNameSpace);
-    if ((SformUserControlNameSpace != IWebServiceFilterMenuInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterMenuInterfaceNameSpace) < 0)) 
-        nmSpaces.Add(IWebServiceFilterMenuInterfaceNameSpace);
-    if ((SformUserControlNameSpace != RoutedEventExtNameSpace) && (nmSpaces.IndexOf(RoutedEventExtNameSpace) < 0)) 
-        nmSpaces.Add(RoutedEventExtNameSpace);
+    if ((EdlgViewModelNameSpace != IAppGlblSettingsServiceNameSpace) && (nmSpaces.IndexOf(IAppGlblSettingsServiceNameSpace) < 0)) 
+        nmSpaces.Add(IAppGlblSettingsServiceNameSpace);
+    if ((EdlgViewModelNameSpace != EformUserControlNameSpace) && (nmSpaces.IndexOf(EformUserControlNameSpace) < 0)) 
+        nmSpaces.Add(EformUserControlNameSpace);
+    if ((EdlgViewModelNameSpace != modelInterfaceNameSpace) && (nmSpaces.IndexOf(modelInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(modelInterfaceNameSpace);
+    if ((EdlgViewModelNameSpace != commandHelperModelNameSpace) && (nmSpaces.IndexOf(commandHelperModelNameSpace) < 0)) 
+        nmSpaces.Add(commandHelperModelNameSpace);
+    if ((EdlgViewModelNameSpace != EformModeEnumNameSpace) && (nmSpaces.IndexOf(EformModeEnumNameSpace) < 0)) 
+        nmSpaces.Add(EformModeEnumNameSpace);
+    if ((EdlgViewModelNameSpace != RoutedCommandExtNameSpace) && (nmSpaces.IndexOf(RoutedCommandExtNameSpace) < 0)) 
+        nmSpaces.Add(RoutedCommandExtNameSpace);
 
+
+    
     
 #>
 <# 
@@ -78,249 +166,236 @@ using <#= ns #>;
     }
 #>
 
+/*
+    In the file of IModule-class the following line of code must be inserted:
 
-namespace <#= SformUserControlNameSpace #> {
-    /// <summary>
-    /// Interaction logic for <#= SformUserControlClassName #>.xaml
-    /// </summary>
-    public partial class <#= SformUserControlClassName #>: UserControl
-    {
-        public <#= SformUserControlClassName #>()
+        public void RegisterTypes(IContainerRegistry containerRegistry)
         {
-            InitializeComponent();
+            ...
+            containerRegistry.RegisterDialog<<#= EdlgUserControlClassName #>, <#= EdlgViewModelClassName #>>("<#= EdlgViewModelClassName #>");
+            ...
         }
+*/
+
+namespace <#= EdlgViewModelNameSpace #> {
+    public class <#= EdlgViewModelClassName #>: INotifyPropertyChanged, IDialogAware
+    {
+        protected <#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName #>=null;
+        protected IDialogService _dialogService=null;
+        public <#= EdlgViewModelClassName #>(<#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName  #>, IDialogService dialogService) {
+
+            this.<#= AppSettingServicePropertyName #> = <#= AppSettingServicePropertyName #>;
+            this._dialogService = dialogService;
+
+            CommandBinding cb = null;
+            CommandBindingCollection cbsc = new CommandBindingCollection();
+            cb = new CommandBinding(<#= RoutedCommandExtClassName #>.<#= EformCancelCommandPropertyName #>, new ExecutedRoutedEventHandler(this.Executed<#= EformCancelCommandPropertyName #>), new CanExecuteRoutedEventHandler(CanExecute<#= EformCancelCommandPropertyName #>));
+            cbsc.Add(cb);
+            cb = new CommandBinding(<#= RoutedCommandExtClassName #>.<#= EformOkCommandPropertyName #>, new ExecutedRoutedEventHandler(this.Executed<#= EformOkCommandPropertyName #>), new CanExecuteRoutedEventHandler(CanExecute<#= EformOkCommandPropertyName #>));
+            cbsc.Add(cb);
+            _<#= RoutedCommandHandlersPropertyName #> = cbsc;
+
+        }
+        #region INotifyPropertyChanged
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string name = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+        #endregion
+
+        #region IDialogAware
+        public event Action<IDialogResult> RequestClose;
+        string _Title = "";
+        public string Title {
+            get { return _Title; }
+            set {
+                if(_Title != value) {
+                    _Title = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public bool CanCloseDialog()
+        {
+            return true;
+        }
+        public void OnDialogClosed()
+        {
+            
+        }
+        public void OnDialogOpened(IDialogParameters parameters)
+        {
+            if (parameters == null) return;
+            if (parameters.ContainsKey("<#= CaptionPropertyName #>"))
+            {
+                <#= CaptionPropertyName #> = parameters.GetValue<string>("<#= CaptionPropertyName #>");
+                Title = <#= CaptionPropertyName #>;
+            }
+            if (parameters.ContainsKey("<#= HiddenFiltersPropertyName #>"))  
+            {
+                <#= HiddenFiltersPropertyName #> = parameters.GetValue<IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>>("<#= HiddenFiltersPropertyName #>");
+            }
+            if (parameters.ContainsKey("<#= EformModePropertyName #>"))  
+            {
+                <#= EformModePropertyName #> = parameters.GetValue<<#= EformModeEnumClassName #>>("<#= EformModePropertyName #>");
+            }
+            if (parameters.ContainsKey("<#= FormControlModelPropertyName #>"))  
+            {
+                <#= FormControlModelPropertyName #> = parameters.GetValue<<#= modelInterfaceClassName #>>("<#= FormControlModelPropertyName #>");
+            }
+            if (parameters.ContainsKey("<#= ShowSubmitPropertyName #>"))  
+            {
+                <#= ShowSubmitPropertyName #> = parameters.GetValue<bool>("<#= ShowSubmitPropertyName #>");
+            }
+        }
+        #endregion
+
+        #region <#= RoutedCommandHandlersPropertyName #>
+        protected CommandBindingCollection _<#= RoutedCommandHandlersPropertyName #> = null;
+        public CommandBindingCollection <#= RoutedCommandHandlersPropertyName #>
+        { 
+            get
+            {
+                return _<#= RoutedCommandHandlersPropertyName #>;
+            }
+            set
+            {
+                if (_<#= RoutedCommandHandlersPropertyName #> != value)
+                {
+                    _<#= RoutedCommandHandlersPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+
         #region <#= CaptionPropertyName #>
-        public static readonly DependencyProperty <#= CaptionPropertyName #>Property =
-                DependencyProperty.Register(
-                "<#= CaptionPropertyName #>", typeof(string),
-                typeof(<#= SformUserControlClassName #>),
-                new PropertyMetadata(null));
+        string _<#= CaptionPropertyName #> = null;
         public string <#= CaptionPropertyName #>
         {
             get
             {
-                return (string)GetValue(<#= CaptionPropertyName #>Property);
+                return _<#= CaptionPropertyName #>;
             }
             set
             {
-                SetValue(<#= CaptionPropertyName #>Property, value);
+                if (_<#= CaptionPropertyName #> != value)
+                {
+                    _<#= CaptionPropertyName #> = value;
+                    OnPropertyChanged();
+                }
             }
         }
         #endregion
-        #region <#= FilterHeightPropertyName #>
-        public static readonly DependencyProperty <#= FilterHeightPropertyName #>Property =
-                DependencyProperty.Register(
-                "<#= FilterHeightPropertyName #>", typeof(Nullable<double>),
-                typeof(<#= SformUserControlClassName #>),
-                new PropertyMetadata(null));
-        public Nullable<double> FilterHeight
-        {
-            get
-            {
-                return (Nullable<double>)GetValue(<#= FilterHeightPropertyName #>Property);
-            }
-            set
-            {
-                SetValue(<#= FilterHeightPropertyName #>Property, value);
-            }
-        }
-        #endregion
-        #region <#= ShowFilterPropertyName #>
-        public static readonly DependencyProperty <#= ShowFilterPropertyName #>Property =
-                DependencyProperty.Register(
-                "<#= ShowFilterPropertyName #>", typeof(Nullable<bool>),
-                typeof(<#= SformUserControlClassName #>),
-                new PropertyMetadata(true));
-        public Nullable<bool> <#= ShowFilterPropertyName #>
-        {
-            get
-            {
-                return (Nullable<bool>)GetValue(<#= ShowFilterPropertyName #>Property);
-            }
-            set
-            {
-                SetValue(<#= ShowFilterPropertyName #>Property, value);
-            }
-        }
-        #endregion
-        #region <#= ShowAddFilterBtnPropertyName #>
-        public static readonly DependencyProperty <#= ShowAddFilterBtnPropertyName #>Property =
-                DependencyProperty.Register(
-                "<#= ShowAddFilterBtnPropertyName #>", typeof(Nullable<bool>),
-                typeof(<#= SformUserControlClassName #>),
-                new PropertyMetadata(null));
-        public Nullable<bool> <#= ShowAddFilterBtnPropertyName #>
-        {
-            get
-            {
-                return (Nullable<bool>)GetValue(<#= ShowAddFilterBtnPropertyName #>Property);
-            }
-            set
-            {
-                SetValue(<#= ShowAddFilterBtnPropertyName #>Property, value);
-            }
-        }
-        #endregion
-        #region <#= ShowBackBtnPropertyName #>
-        public static readonly DependencyProperty <#= ShowBackBtnPropertyName #>Property =
-                DependencyProperty.Register(
-                "<#= ShowBackBtnPropertyName #>", typeof(Nullable<bool>),
-                typeof(<#= SformUserControlClassName #>),
-                new PropertyMetadata(null));
-        public Nullable<bool> <#= ShowBackBtnPropertyName #>
-        {
-            get
-            {
-                return (Nullable<bool>)GetValue(<#= ShowBackBtnPropertyName #>Property);
-            }
-            set
-            {
-                SetValue(<#= ShowBackBtnPropertyName #>Property, value);
-            }
-        }
-        #endregion
-        #region <#= GridHeightPropertyName #>
-        public static readonly DependencyProperty <#= GridHeightPropertyName #>Property =
-                DependencyProperty.Register(
-                "<#= GridHeightPropertyName #>", typeof(Nullable<double>),
-                typeof(<#= SformUserControlClassName #>),
-                new PropertyMetadata(null));
-        public Nullable<double> <#= GridHeightPropertyName #>
-        {
-            get
-            {
-                return (Nullable<double>)GetValue(<#= GridHeightPropertyName #>Property);
-            }
-            set
-            {
-                SetValue(<#= GridHeightPropertyName #>Property, value);
-            }
-        }
-        #endregion
-        #region <#= TableMenuItemsPropertyName #>
-        private static void <#= TableMenuItemsPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            <#= SformUserControlClassName #> inst = d as <#= SformUserControlClassName #>;
-            if (inst != null)
-            {
-                RoutedPropertyChangedEventArgs<IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>> eventArgs =
-                    new RoutedPropertyChangedEventArgs<IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>>(
-                        e.OldValue as IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>,
-                        e.NewValue as IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>,
-                        <#= RoutedEventExtClassName #>.<#= TableMenuItemsPropertyChangedPropertyName #>Event);
-                inst.RaiseEvent(eventArgs);
-            }
-        }
-        public static readonly DependencyProperty <#= TableMenuItemsPropertyName #>Property =
-                DependencyProperty.Register(
-                "<#= TableMenuItemsPropertyName #>", typeof(IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>),
-                typeof(<#= SformUserControlClassName #>),
-                new PropertyMetadata(null, <#= TableMenuItemsPropertyName #>Changed));
-        public IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> <#= TableMenuItemsPropertyName #>
-        {
-            get
-            {
-                return (IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>)GetValue(<#= TableMenuItemsPropertyName #>Property);
-            }
-            set
-            {
-                SetValue(<#= TableMenuItemsPropertyName #>Property, value);
-            }
-        }
-        #endregion
-        #region <#= RowMenuItemsPropertyName #>
-        private static void <#= RowMenuItemsPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            <#= SformUserControlClassName #> inst = d as <#= SformUserControlClassName #>;
-            if (inst != null)
-            {
-                RoutedPropertyChangedEventArgs<IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>> eventArgs =
-                    new RoutedPropertyChangedEventArgs<IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>>(
-                        e.OldValue as IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>,
-                        e.NewValue as IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>,
-                        <#= RoutedEventExtClassName #>.<#= RowMenuItemsPropertyChangedPropertyName #>Event);
-                inst.RaiseEvent(eventArgs);
-            }
-        }
-        public static readonly DependencyProperty <#= RowMenuItemsPropertyName #>Property =
-                DependencyProperty.Register(
-                "<#= RowMenuItemsPropertyName #>", typeof(IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>),
-                typeof(<#= SformUserControlClassName #>),
-                new PropertyMetadata(null, <#= RowMenuItemsPropertyName #>Changed));
-        public IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> <#= RowMenuItemsPropertyName #>
-        {
-            get
-            {
-                return (IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>)GetValue(<#= RowMenuItemsPropertyName #>Property);
-            }
-            set
-            {
-                SetValue(<#= RowMenuItemsPropertyName #>Property, value);
-            }
-        }
-        #endregion
-        #region <#= ContainerMenuItemsPropertyName #>
-        public static readonly DependencyProperty <#= ContainerMenuItemsPropertyName #>Property =
-                DependencyProperty.Register(
-                "<#= ContainerMenuItemsPropertyName #>", typeof(IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>),
-                typeof(<#= SformUserControlClassName #>),
-                new PropertyMetadata(null));
-        public IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> <#= ContainerMenuItemsPropertyName #>
-        {
-            get
-            {
-                return (IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>)GetValue(<#= ContainerMenuItemsPropertyName #>Property);
-            }
-            set
-            {
-                SetValue(<#= ContainerMenuItemsPropertyName #>Property, value);
-            }
-        }
-        #endregion
+
         #region <#= HiddenFiltersPropertyName #>
-        private static void <#= HiddenFiltersPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            <#= SformUserControlClassName #> inst = d as <#= SformUserControlClassName #>;
-            if (inst != null)
-            {
-                RoutedPropertyChangedEventArgs<IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>> eventArgs =
-                    new RoutedPropertyChangedEventArgs<IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>>(
-                        e.OldValue as IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>,
-                        e.NewValue as IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>,
-                        <#= RoutedEventExtClassName #>.<#= HiddenFiltersPropertyChangedPropertyName #>Event);
-                inst.RaiseEvent(eventArgs);
-            }
-        }
-        public static readonly DependencyProperty <#= HiddenFiltersPropertyName #>Property =
-                DependencyProperty.Register(
-                "<#= HiddenFiltersPropertyName #>", typeof(IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>),
-                typeof(<#= SformUserControlClassName #>),
-                new PropertyMetadata(null, <#= HiddenFiltersPropertyName #>Changed));
-        public IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>> <#= HiddenFiltersPropertyName #>
+        IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>> _<#= HiddenFiltersPropertyName #> = null;
+        public IEnumerable<IWebServiceFilterRsltInterface> <#= HiddenFiltersPropertyName #>
         {
             get
             {
-                return (IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>)GetValue(<#= HiddenFiltersPropertyName #>Property);
+                return _<#= HiddenFiltersPropertyName #>;
             }
             set
             {
-                SetValue(<#= HiddenFiltersPropertyName #>Property, value);
+                if (_<#= HiddenFiltersPropertyName #> != value)
+                {
+                    _<#= HiddenFiltersPropertyName #> = value;
+                    OnPropertyChanged();
+                }
             }
+        }
+        #endregion
+
+        #region <#= EformModePropertyName #>    
+        protected <#= EformModeEnumClassName #> _<#= EformModePropertyName #> = <#= EformModeEnumClassName #>.DeleteMode;
+        public <#= EformModeEnumClassName #> <#= EformModePropertyName #>
+        {
+            get
+            {
+                return _<#= EformModePropertyName #>;
+            }
+            set
+            {
+                if (_<#= EformModePropertyName #> != value) {
+                    _<#= EformModePropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+
+        #region <#= FormControlModelPropertyName #>
+        protected <#= modelInterfaceClassName #> _<#= FormControlModelPropertyName #> = null;
+        public <#= modelInterfaceClassName #> <#= FormControlModelPropertyName #>
+        {
+            get
+            {
+                return _<#= FormControlModelPropertyName #>;
+            }
+            set
+            {
+                if (_<#= FormControlModelPropertyName #> != value) {
+                    _<#= FormControlModelPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+
+        #region <#= ShowSubmitPropertyName #>
+        bool _<#= ShowSubmitPropertyName #> = true;
+        public bool <#= ShowSubmitPropertyName #>
+        {
+            get
+            {
+                return _<#= ShowSubmitPropertyName #>;
+            }
+            set
+            {
+                if (_<#= ShowSubmitPropertyName #> != value)
+                {
+                    _<#= ShowSubmitPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+
+        #region <#= EformCancelCommandPropertyName #>
+        public void Executed<#= EformCancelCommandPropertyName #>(object sender, ExecutedRoutedEventArgs e) {
+            e.Handled = true;
+            if (RequestClose != null)
+            {
+                DialogResult result = new DialogResult(ButtonResult.Cancel);
+                RequestClose?.Invoke(result);
+            }
+        }
+        public void CanExecute<#= EformCancelCommandPropertyName #>(object sender, CanExecuteRoutedEventArgs e) {
+            e.Handled = true;
+            e.CanExecute = true;
+        }
+        #endregion
+
+        #region <#= EformOkCommandPropertyName #>
+        public void Executed<#= EformOkCommandPropertyName #>(object sender, ExecutedRoutedEventArgs e) {
+            e.Handled = true;
+            DialogParameters parameters = new DialogParameters();
+            parameters.Add("<#= FormControlModelPropertyName #>", e.Parameter as <#= modelInterfaceClassName #>);
+            DialogResult result = new DialogResult(ButtonResult.OK, parameters);
+            RequestClose?.Invoke(result);
+        }
+        public void CanExecute<#= EformOkCommandPropertyName #>(object sender, CanExecuteRoutedEventArgs e) {
+            e.Handled = true;
+            e.CanExecute = true;
         }
         #endregion
     }
 }
 
 <#+
-    string GetModelPageName(ModelViewSerializable model) {
-        return FirstLetterToUpper(model.PageViewName);
-    }
-    string GetModelServiceInterfaceName(ModelViewSerializable model) {
-        return "I" + model.ViewName + "Service";
-    }
-    string GetModelServiceName(ModelViewSerializable model) {
-        return FirstLetterToUpper(model.ViewName)+ "Service";
-    }
     string GetFilterPropertyOperatorName(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model, string operatorSufix) {
         if (model.GenerateJSonAttribute) {
             return prop.JsonPropertyName + operatorSufix;
@@ -334,12 +409,17 @@ namespace <#= SformUserControlNameSpace #> {
     string GetPageInterfaceName(ModelViewSerializable model) {
         return "I"+model.PageViewName;
     }
+
+    string GetModelServiceInterfaceName(ModelViewSerializable model) {
+        return "I" + model.ViewName + "Service";
+    }
     string GetInterfaceName(ModelViewSerializable model) {
         return "I"+model.ViewName;
     }
-    string GetModelName(ModelViewSerializable model) {
-        return FirstLetterToUpper(model.ViewName);
+    string GetFilterName(ModelViewSerializable model) {
+        return FirstLetterToUpper(model.ViewName) + "Filter";
     }
+
     string GetModelNameSpace(ModelViewSerializable model, string fileType) {
         string result="";
         if ((model == null) || string.IsNullOrEmpty(fileType)) {
@@ -367,7 +447,6 @@ namespace <#= SformUserControlNameSpace #> {
         }
         return defaultNameSpace + delim + filePath;
     }
-
     string GetModelClassName(ModelViewSerializable model, string fileType) {
         string result="";
         if ((model == null) || string.IsNullOrEmpty(fileType)) {
@@ -407,27 +486,6 @@ namespace <#= SformUserControlNameSpace #> {
                 
         }
         return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
-    }
-    string GetModelProjectName(ModelViewSerializable model, string fileType) {
-        string result="";
-        if ((model == null) || string.IsNullOrEmpty(fileType)) {
-            return result;
-        }
-        if (model.CommonStaffs == null) {
-            return result;
-        }
-        CommonStaffSerializable refItem= 
-            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
-        if (refItem == null) {
-            return result;
-        }
-        if(string.IsNullOrEmpty(refItem.FileProject)) {
-            return result;
-        }
-        string[] fnArr = refItem.FileProject.Split(new char[] {'\\'}, 100, System.StringSplitOptions.None); 
-        string fn = fnArr[fnArr.Length - 1];
-
-        return fn.Replace(".csproj","");
     }
     string GetContextModelNameSpace(DbContextSerializable context, string fileType) {
         string result="";
@@ -496,27 +554,7 @@ namespace <#= SformUserControlNameSpace #> {
         }
         return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
     }
-    string GetContextModelProjectName(DbContextSerializable context, string fileType) {
-        string result="";
-        if ((context == null) || string.IsNullOrEmpty(fileType)) {
-            return result;
-        }
-        if (context.CommonStaffs == null) {
-            return result;
-        }
-        CommonStaffSerializable refItem= 
-            context.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
-        if (refItem == null) {
-            return result;
-        }
-        if(string.IsNullOrEmpty(refItem.FileProject)) {
-            return result;
-        }
-        string[] fnArr = refItem.FileProject.Split(new char[] {'\\'}, 100, System.StringSplitOptions.None); 
-        string fn = fnArr[fnArr.Length - 1];
 
-        return fn.Replace(".csproj","");
-    }
     public string FirstLetterToUpper(string str)
     {
         if (str == null)
@@ -549,16 +587,6 @@ namespace <#= SformUserControlNameSpace #> {
         } else {
             return FirstLetterToLower(prop.ViewPropertyName);
         }
-    }
-    string GetModelPropertyNameEx(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model) {
-        if ((prop == null) || (model == null)) return "";
-        ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
-        return GetModelPropertyName(sclrProp, model);
-    }
-    string GetModelPropertyNameEx2(ModelViewUIListPropertySerializable prop, ModelViewSerializable model) {
-        if ((prop == null) || (model == null)) return "";
-        ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
-        return GetModelPropertyName(sclrProp, model);
     }
     string GetCCharpDatatype(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
         if ((prop == null) || (model == null)) return "";
@@ -788,6 +816,49 @@ namespace <#= SformUserControlNameSpace #> {
             }
         }
         return result;
+    }
+    string GetDisplayAttributeValueString2(ModelViewUIListPropertySerializable prop, ModelViewSerializable model, string propName) {
+            ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
+            if (sclrProp == null)
+            {
+                return prop.ViewPropertyName;
+            }
+            if(sclrProp.Attributes == null)
+            {
+                return prop.ViewPropertyName;
+            }
+            ModelViewAttributeSerializable attr =
+                sclrProp.Attributes.Where(a => a.AttrName == "Display").FirstOrDefault();
+            if (attr == null)
+            {
+                return prop.ViewPropertyName;
+            }
+            if (attr.VaueProperties == null)
+            {
+                return prop.ViewPropertyName;
+            }
+            ModelViewAttributePropertySerializable attrProp = 
+                attr.VaueProperties.Where(v => v.PropName == propName).FirstOrDefault();
+            if (attrProp == null)
+            {
+                return prop.ViewPropertyName;
+            }
+            if (string.IsNullOrEmpty( attrProp.PropValue ) )
+            {
+                return prop.ViewPropertyName;
+            } else
+            {
+                char[] charsToTrim = { '"', ' '};
+                return attrProp.PropValue.Trim(charsToTrim);
+            }
+    }
+    string GetModelPropertyNameEx(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model) {
+        ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
+        return GetModelPropertyName(sclrProp, model);
+    }
+    string GetModelPropertyNameEx2(ModelViewUIListPropertySerializable prop, ModelViewSerializable model) {
+        ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
+        return GetModelPropertyName(sclrProp, model);
     }
 
 #>

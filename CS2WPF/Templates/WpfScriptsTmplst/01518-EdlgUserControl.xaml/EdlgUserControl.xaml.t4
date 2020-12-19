@@ -25,58 +25,45 @@
     string ProxyUserControlProject          = GetContextModelProjectName(Context, ProxyUserControlFolder);
 
 
-    string SformUserControlFolder           = "01420-SformUserControl.xaml.cs";
-    string SformUserControlClassName        = GetModelClassName(Model, SformUserControlFolder);
-    string SformUserControlNameSpace        = GetModelNameSpace(Model, SformUserControlFolder);
+    string EformUserControlFolder           = "01496-EformUserControl.xaml.cs";
+    string EformUserControlClassName        = GetModelClassName(Model, EformUserControlFolder);
+    string EformUserControlNameSpace        = GetModelNameSpace(Model, EformUserControlFolder);
 
-    string SdlgUserControlFolder           = "01436-SdlgUserControl.xaml.cs";
-    string SdlgUserControlClassName        = GetModelClassName(Model, SdlgUserControlFolder);
-    string SdlgUserControlNameSpace        = GetModelNameSpace(Model, SdlgUserControlFolder);
-    string SdlgUserControlProject          = GetModelProjectName(Model, SdlgUserControlFolder);
+    string EdlgUserControlFolder           = "01516-EdlgUserControl.xaml.cs";
+    string EdlgUserControlClassName        = GetModelClassName(Model, EdlgUserControlFolder);
+    string EdlgUserControlNameSpace        = GetModelNameSpace(Model, EdlgUserControlFolder);
+    string EdlgUserControlProject          = GetModelProjectName(Model, EdlgUserControlFolder);
 
-    string SdlgUserControlXamlFolder      = "01438-SdlgUserControl.xaml";
-    string SdlgUserControlXamlClassName   = GetModelClassName(Model, SdlgUserControlXamlFolder);
-    string SdlgUserControlXamlNameSpace   = GetModelNameSpace(Model, SdlgUserControlXamlFolder);
-    string SdlgUserControlXamlProject     = GetModelProjectName(Model, SdlgUserControlXamlFolder);
+    string EdlgUserControlXamlFolder      = "01518-EdlgUserControl.xaml";
+    string EdlgUserControlXamlClassName   = GetModelClassName(Model, EdlgUserControlXamlFolder);
+    string EdlgUserControlXamlNameSpace   = GetModelNameSpace(Model, EdlgUserControlXamlFolder);
+    string EdlgUserControlXamlProject     = GetModelProjectName(Model, EdlgUserControlXamlFolder);
 
     
 
     string CaptionPropertyName = "Caption";
-    string FilterHeightPropertyName = "FilterHeight";
-    string ShowFilterPropertyName = "ShowFilter";
-    string ShowAddFilterBtnPropertyName = "ShowAddFilterBtn";
-    string ShowBackBtnPropertyName = "ShowBackBtn";
-    string GridHeightPropertyName = "GridHeight";
-    string TableMenuItemsPropertyName = "TableMenuItems";
-    string RowMenuItemsPropertyName = "RowMenuItems";
-    string ContainerMenuItemsPropertyName = "ContainerMenuItems";
     string HiddenFiltersPropertyName = "HiddenFilters";
-
+    string ShowSubmitPropertyName = "ShowSubmit";
+    string FormControlModelPropertyName = "FormControlModel";
+    string EformModePropertyName = "EformMode";
 
     string RegisterRoutedCommandBindingsPropertyName = "RegisterRoutedCommandBindings";
-    string RegisterRoutedEventBindingsPropertyName = "RegisterRoutedEventBindings";
-    string DataGridServerSortingPropertyName = "DataGridServerSorting";
-    string RoutedEventHandlersPropertyName = "RoutedEventHandlers";
-    string RoutedCommandHandlersPropertyName = "RoutedCommandHandlers";
+    string RoutedCommandHandlersPropertyName    = "RoutedCommandHandlers";
 
-
-    string OkCommandPropertyName = "OkCommand";
-    string CancelCommandPropertyName = "CancelCommand";
     string RegionPropertyName = "Region";
 
-
     string proxyPrefix = "clr-namespace:" + ProxyUserControlNameSpace;
-    if(ProxyUserControlProject != SdlgUserControlXamlProject) {
+    if(ProxyUserControlProject != EdlgUserControlXamlProject) {
         proxyPrefix = proxyPrefix + ";assembly=" + ProxyUserControlProject;
     }
     string attachedPrefix = "clr-namespace:" + AttachedPropertiesExtNameSpace;
-    if(AttachedPropertiesExtProject != SdlgUserControlXamlProject) {
+    if(AttachedPropertiesExtProject != EdlgUserControlXamlProject) {
         attachedPrefix = attachedPrefix + ";assembly=" + AttachedPropertiesExtProject;
     }
 
 #>
 
-<UserControl x:Class="<#= SdlgUserControlNameSpace #>.<#= SdlgUserControlClassName #>"
+<UserControl x:Class="<#= EdlgUserControlNameSpace #>.<#= EdlgUserControlClassName #>"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -88,7 +75,6 @@
              xmlns:prx="<#= proxyPrefix #>" 
 
              xmlns:atch="<#= attachedPrefix #>" 
-             atch:<#= AttachedPropertiesExtClassName #>.<#= RegisterRoutedEventBindingsPropertyName #>="{Binding <#= RoutedEventHandlersPropertyName #>}"
              atch:<#= AttachedPropertiesExtClassName #>.<#= RegisterRoutedCommandBindingsPropertyName #>="{Binding <#= RoutedCommandHandlersPropertyName #>}"
 
              mc:Ignorable="d" 
@@ -96,25 +82,18 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <prx:<#= ProxyUserControlClassName #> Grid.Row="0"
 
-            prism:RegionManager.RegionName="<#= SformUserControlClassName #><#= RegionPropertyName #>"
+            prism:RegionManager.RegionName="<#= EformUserControlClassName #><#= RegionPropertyName #>"
 
             <#= CaptionPropertyName #>="{Binding <#= CaptionPropertyName #>}" 
-            <#= FilterHeightPropertyName #>="{Binding <#= FilterHeightPropertyName #>}" 
-            <#= ShowFilterPropertyName #>="True" 
-            <#= ShowAddFilterBtnPropertyName #>="True" 
-            <#= GridHeightPropertyName #>="{Binding <#= GridHeightPropertyName #>}" 
-            <#= ShowBackBtnPropertyName #>="False" 
             <#= HiddenFiltersPropertyName #>="{Binding <#= HiddenFiltersPropertyName #>}" 
+            <#= ShowSubmitPropertyName #>="{Binding <#= ShowSubmitPropertyName #>}" 
+            <#= FormControlModelPropertyName #>="{Binding <#= FormControlModelPropertyName #>}" 
+            <#= EformModePropertyName #>="{Binding <#= EformModePropertyName #>}" 
             >
         </prx:<#= ProxyUserControlClassName #>>
-        <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="8">
-                <Button Content=" Ok " MinWidth="80" Command="{Binding <#= OkCommandPropertyName #>}"/>
-                <Button Content=" Cancel " MinWidth="80" Margin="8 0 0 0" Command="{Binding <#= CancelCommandPropertyName #>}"/>
-        </StackPanel>
     </Grid>
 </UserControl>
 

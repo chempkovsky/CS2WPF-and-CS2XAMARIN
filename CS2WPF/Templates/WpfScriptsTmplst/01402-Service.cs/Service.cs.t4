@@ -33,6 +33,14 @@ using Newtonsoft.Json;
     string modelClassName                   = GetModelName(Model);
     string modelNameSpace                   = GetModelNameSpace(Model, modelFolder);
 
+    string NotifyInterfaceFolder            = "01104-NotifyInterface.cs";
+    string NotifyInterfaceClassName         = GetNotifyInterfaceName(Model);
+    string NotifyInterfaceNameSpace         = GetModelNameSpace(Model, NotifyInterfaceFolder);
+
+    string ModelNotifyFolder                = "01106-ModelNotify.cs";
+    string ModelNotifyClassName             = GetModelNotifyName(Model);
+    string ModelNotifyNameSpace             = GetModelNameSpace(Model, ModelNotifyFolder);
+
     string modelPageInterfaceFolder         = "01200-Page.interface.cs";
     string modelPageInterfaceClassName      = GetPageInterfaceName(Model);
     string modelPageInterfaceNameSpace      = GetModelNameSpace(Model, modelPageInterfaceFolder);
@@ -59,6 +67,7 @@ using Newtonsoft.Json;
     string FilterOperatorSuffix = "Oprtr";
     string EqualOperator = "eq";
     string getAuthInfoHeaderMethodName      = "GetAuthInfoHeader";
+    string ShowErrorMethodName              = "ShowErrorMessage";
 
 
     string GetAllMethodName                 = "getall";
@@ -67,6 +76,8 @@ using Newtonsoft.Json;
     string UpdateOneMethodName              = "updateone";
     string AddOneMethodName                 = "addone";
     string DeleteOneMethodName              = "deleteone";
+    string CopyToModelMethodName            = "CopyToModel";
+    string CopyToModelNotifyMethodName      = "CopyToModelNotify";
     string AppSettingServicePropertyName    = "appGlblSettings";
 
 
@@ -128,8 +139,10 @@ using Newtonsoft.Json;
         nmSpaces.Add(modelPageNameSpace);
     if ((modelServiceNameSpace != IAppGlblSettingsServiceNameSpace) && (nmSpaces.IndexOf(IAppGlblSettingsServiceNameSpace) < 0)) 
         nmSpaces.Add(IAppGlblSettingsServiceNameSpace);
-
-
+    if ((modelServiceNameSpace != ModelNotifyNameSpace) && (nmSpaces.IndexOf(ModelNotifyNameSpace) < 0)) 
+        nmSpaces.Add(ModelNotifyNameSpace);
+    if ((modelServiceNameSpace != NotifyInterfaceNameSpace) && (nmSpaces.IndexOf(NotifyInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(NotifyInterfaceNameSpace);
 
 #>
 <# 
@@ -164,7 +177,7 @@ namespace <#= modelServiceNameSpace #> {
             } 
             catch(Exception e)
             {
-                <#= AppSettingServicePropertyName #>.SendErrorMessage("http", e.Message);
+                <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("http", e.Message);
                 return null;
             }
         }
@@ -277,7 +290,7 @@ namespace <#= modelServiceNameSpace #> {
             } 
             catch(Exception e)
             {
-                <#= AppSettingServicePropertyName #>.SendErrorMessage("http", e.Message);
+                <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("http", e.Message);
                 return null;
             }
         }
@@ -327,7 +340,7 @@ namespace <#= modelServiceNameSpace #> {
             } 
             catch(Exception e)
             {
-                <#= AppSettingServicePropertyName #>.SendErrorMessage("http", e.Message);
+                <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("http", e.Message);
                 return null;
             }
         }
@@ -337,7 +350,7 @@ namespace <#= modelServiceNameSpace #> {
 #>
         public async Task<<#= modelInterfaceClassName #>> <#= UpdateOneMethodName #>(<#= modelInterfaceClassName #> item) {
             if(item == null) {
-                <#= AppSettingServicePropertyName #>.SendErrorMessage("http", "Input item is not defined");
+                <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("http", "Input item is not defined");
                 return null;
             }
             try
@@ -350,7 +363,7 @@ namespace <#= modelServiceNameSpace #> {
             } 
             catch(Exception e)
             {
-                <#= AppSettingServicePropertyName #>.SendErrorMessage("http", e.Message);
+                <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("http", e.Message);
                 return null;
             }
         }
@@ -361,7 +374,7 @@ namespace <#= modelServiceNameSpace #> {
 #>
         public async Task<<#= modelInterfaceClassName #>> <#= AddOneMethodName #>(<#= modelInterfaceClassName #> item) {
             if(item == null) {
-                <#= AppSettingServicePropertyName #>.SendErrorMessage("http", "Input item is not defined");
+                <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("http", "Input item is not defined");
                 return null;
             }
 <#
@@ -383,7 +396,7 @@ namespace <#= modelServiceNameSpace #> {
             } 
             catch(Exception e)
             {
-                <#= AppSettingServicePropertyName #>.SendErrorMessage("http", e.Message);
+                <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("http", e.Message);
                 return null;
             }
         }
@@ -433,13 +446,37 @@ namespace <#= modelServiceNameSpace #> {
             } 
             catch(Exception e)
             {
-                <#= AppSettingServicePropertyName #>.SendErrorMessage("http", e.Message);
+                <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("http", e.Message);
                 return null;
             }
         }
 <#
     }
 #>
+        public <#= NotifyInterfaceClassName #> <#= CopyToModelNotifyMethodName #>(<#= modelInterfaceClassName #>  src, <#= NotifyInterfaceClassName #> dest = null) {
+            if(dest == null) dest = new <#= ModelNotifyClassName #>();
+            if(src == null) return dest;
+<#
+        foreach (ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
+#>
+            dest.<#= GetModelPropertyName(prop, Model) #> = src.<#= GetModelPropertyName(prop, Model) #>;
+<# 
+       } 
+#>
+            return dest;
+        }
+        public <#= modelInterfaceClassName #> <#= CopyToModelMethodName #>(<#= modelInterfaceClassName #>  src, <#= modelInterfaceClassName #> dest = null) {
+            if(dest == null) dest = new <#= modelClassName #>();
+            if(src == null) return dest;
+<#
+        foreach (ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
+#>
+            dest.<#= GetModelPropertyName(prop, Model) #> = src.<#= GetModelPropertyName(prop, Model) #>;
+<# 
+       } 
+#>
+            return dest;
+        }
     }
 }
 
@@ -469,8 +506,14 @@ namespace <#= modelServiceNameSpace #> {
     string GetInterfaceName(ModelViewSerializable model) {
         return "I"+model.ViewName;
     }
+    string GetNotifyInterfaceName(ModelViewSerializable model) {
+        return GetInterfaceName(model) + "Notify";
+    }
     string GetModelName(ModelViewSerializable model) {
         return FirstLetterToUpper(model.ViewName);
+    }
+    string GetModelNotifyName(ModelViewSerializable model) {
+        return FirstLetterToUpper(model.ViewName) + "Notify";
     }
     string GetModelNameSpace(ModelViewSerializable model, string fileType) {
         string result="";

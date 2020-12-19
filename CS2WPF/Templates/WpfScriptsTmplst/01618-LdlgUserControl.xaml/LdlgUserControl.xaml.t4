@@ -24,22 +24,22 @@
     string ProxyUserControlNameSpace        = GetContextModelNameSpace(Context, ProxyUserControlFolder);
     string ProxyUserControlProject          = GetContextModelProjectName(Context, ProxyUserControlFolder);
 
+    string LformUserControlFolder          = "01596-LformUserControl.xaml.cs";
+    string LformUserControlClassName       = GetModelClassName(Model, LformUserControlFolder);
+    string LformUserControlNameSpace       = GetModelNameSpace(Model, LformUserControlFolder);
 
-    string SformUserControlFolder           = "01420-SformUserControl.xaml.cs";
-    string SformUserControlClassName        = GetModelClassName(Model, SformUserControlFolder);
-    string SformUserControlNameSpace        = GetModelNameSpace(Model, SformUserControlFolder);
+    string LdlgUserControlFolder           = "01616-LdlgUserControl.xaml.cs";
+    string LdlgUserControlClassName        = GetModelClassName(Model, LdlgUserControlFolder);
+    string LdlgUserControlNameSpace        = GetModelNameSpace(Model, LdlgUserControlFolder);
+    string LdlgUserControlProject          = GetModelProjectName(Model, LdlgUserControlFolder);
 
-    string SdlgUserControlFolder           = "01436-SdlgUserControl.xaml.cs";
-    string SdlgUserControlClassName        = GetModelClassName(Model, SdlgUserControlFolder);
-    string SdlgUserControlNameSpace        = GetModelNameSpace(Model, SdlgUserControlFolder);
-    string SdlgUserControlProject          = GetModelProjectName(Model, SdlgUserControlFolder);
-
-    string SdlgUserControlXamlFolder      = "01438-SdlgUserControl.xaml";
-    string SdlgUserControlXamlClassName   = GetModelClassName(Model, SdlgUserControlXamlFolder);
-    string SdlgUserControlXamlNameSpace   = GetModelNameSpace(Model, SdlgUserControlXamlFolder);
-    string SdlgUserControlXamlProject     = GetModelProjectName(Model, SdlgUserControlXamlFolder);
-
+    string LdlgUserControlXamlFolder      = "01618-LdlgUserControl.xaml";
+    string LdlgUserControlXamlClassName   = GetModelClassName(Model, LdlgUserControlXamlFolder);
+    string LdlgUserControlXamlNameSpace   = GetModelNameSpace(Model, LdlgUserControlXamlFolder);
+    string LdlgUserControlXamlProject     = GetModelProjectName(Model, LdlgUserControlXamlFolder);
     
+
+
 
     string CaptionPropertyName = "Caption";
     string FilterHeightPropertyName = "FilterHeight";
@@ -51,6 +51,10 @@
     string RowMenuItemsPropertyName = "RowMenuItems";
     string ContainerMenuItemsPropertyName = "ContainerMenuItems";
     string HiddenFiltersPropertyName = "HiddenFilters";
+
+    string CanAddPropertyName                   = "CanAdd";
+    string CanUpdPropertyName                   = "CanUpdate";
+    string CanDelPropertyName                   = "CanDelete";
 
 
     string RegisterRoutedCommandBindingsPropertyName = "RegisterRoutedCommandBindings";
@@ -66,17 +70,17 @@
 
 
     string proxyPrefix = "clr-namespace:" + ProxyUserControlNameSpace;
-    if(ProxyUserControlProject != SdlgUserControlXamlProject) {
+    if(ProxyUserControlProject != LdlgUserControlXamlProject) {
         proxyPrefix = proxyPrefix + ";assembly=" + ProxyUserControlProject;
     }
     string attachedPrefix = "clr-namespace:" + AttachedPropertiesExtNameSpace;
-    if(AttachedPropertiesExtProject != SdlgUserControlXamlProject) {
+    if(AttachedPropertiesExtProject != LdlgUserControlXamlProject) {
         attachedPrefix = attachedPrefix + ";assembly=" + AttachedPropertiesExtProject;
     }
 
 #>
 
-<UserControl x:Class="<#= SdlgUserControlNameSpace #>.<#= SdlgUserControlClassName #>"
+<UserControl x:Class="<#= LdlgUserControlNameSpace #>.<#= LdlgUserControlClassName #>"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -100,7 +104,7 @@
         </Grid.RowDefinitions>
         <prx:<#= ProxyUserControlClassName #> Grid.Row="0"
 
-            prism:RegionManager.RegionName="<#= SformUserControlClassName #><#= RegionPropertyName #>"
+            prism:RegionManager.RegionName="<#= LformUserControlClassName #><#= RegionPropertyName #>"
 
             <#= CaptionPropertyName #>="{Binding <#= CaptionPropertyName #>}" 
             <#= FilterHeightPropertyName #>="{Binding <#= FilterHeightPropertyName #>}" 
@@ -109,6 +113,10 @@
             <#= GridHeightPropertyName #>="{Binding <#= GridHeightPropertyName #>}" 
             <#= ShowBackBtnPropertyName #>="False" 
             <#= HiddenFiltersPropertyName #>="{Binding <#= HiddenFiltersPropertyName #>}" 
+
+            <#= CanAddPropertyName #>="{Binding <#= CanAddPropertyName #>}" 
+            <#= CanUpdPropertyName #>="{Binding <#= CanUpdPropertyName #>}" 
+            <#= CanDelPropertyName #>="{Binding <#= CanDelPropertyName #>}" 
             >
         </prx:<#= ProxyUserControlClassName #>>
         <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="8">

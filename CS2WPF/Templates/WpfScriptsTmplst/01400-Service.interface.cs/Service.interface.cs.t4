@@ -19,6 +19,10 @@ using System.Threading.Tasks;
     string modelInterfaceClassName          = GetInterfaceName(Model);
     string modelInterfaceNameSpace          = GetModelNameSpace(Model, modelInterfaceFolder);
 
+    string NotifyInterfaceFolder            = "01104-NotifyInterface.cs";
+    string NotifyInterfaceClassName         = GetNotifyInterfaceName(Model);
+    string NotifyInterfaceNameSpace         = GetModelNameSpace(Model, NotifyInterfaceFolder);
+
     string modelPageInterfaceFolder         = "01200-Page.interface.cs";
     string modelPageInterfaceClassName      = GetPageInterfaceName(Model);
     string modelPageInterfaceNameSpace      = GetModelNameSpace(Model, modelPageInterfaceFolder);
@@ -26,7 +30,6 @@ using System.Threading.Tasks;
     string modelFilterInterfaceFolder       = "01300-Filter.interface.cs";
     string modelFilterInterfaceClassName    = GetFilterInterfaceName(Model);
     string modelFilterInterfaceNameSpace    = GetModelNameSpace(Model, modelFilterInterfaceFolder);
-
 
     string modelServiceInterfaceFolder       = "01400-Service.interface.cs";
     string modelServiceInterfaceClassName    = GetModelServiceInterfaceName(Model);
@@ -40,6 +43,8 @@ using System.Threading.Tasks;
     string UpdateOneMethodName          = "updateone";
     string AddOneMethodName             = "addone";
     string DeleteOneMethodName          = "deleteone";
+    string CopyToModelMethodName        = "CopyToModel";
+    string CopyToModelNotifyMethodName  = "CopyToModelNotify";
 
 
     List<ModelViewPropertyOfVwSerializable> primKeys= new List<ModelViewPropertyOfVwSerializable>();
@@ -92,6 +97,8 @@ using System.Threading.Tasks;
         nmSpaces.Add(modelPageInterfaceNameSpace);
     if ((modelServiceInterfaceNameSpace != modelFilterInterfaceNameSpace) && (nmSpaces.IndexOf(modelFilterInterfaceNameSpace) < 0)) 
         nmSpaces.Add(modelFilterInterfaceNameSpace);
+    if ((modelServiceInterfaceNameSpace != NotifyInterfaceNameSpace) && (nmSpaces.IndexOf(NotifyInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(NotifyInterfaceNameSpace);
 
 #>
 <# 
@@ -151,6 +158,8 @@ namespace <#= modelServiceInterfaceNameSpace #> {
 <#
     }
 #>
+        <#= NotifyInterfaceClassName #> <#= CopyToModelNotifyMethodName #>(<#= modelInterfaceClassName #>  src, <#= NotifyInterfaceClassName #> dest = null);
+        <#= modelInterfaceClassName #> <#= CopyToModelMethodName #>(<#= modelInterfaceClassName #>  src, <#= modelInterfaceClassName #> dest = null);
     }
 }
 
@@ -176,6 +185,9 @@ namespace <#= modelServiceInterfaceNameSpace #> {
     }
     string GetInterfaceName(ModelViewSerializable model) {
         return "I"+model.ViewName;
+    }
+    string GetNotifyInterfaceName(ModelViewSerializable model) {
+        return GetInterfaceName(model) + "Notify";
     }
     string GetModelName(ModelViewSerializable model) {
         return FirstLetterToUpper(model.ViewName);

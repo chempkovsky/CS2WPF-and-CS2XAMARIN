@@ -20,6 +20,9 @@ using System.Windows.Controls;
 
 <#
 
+    string EformModeEnumFolder      = "00026-EformModeEnum.cs";
+    string EformModeEnumClassName   = GetModelClassName(Model, EformModeEnumFolder);
+    string EformModeEnumNameSpace   = GetModelNameSpace(Model, EformModeEnumFolder);
 
     string IWebServiceFilterDefInterfaceFolder      = "00200-IWebServiceFilterDefInterface.cs";
     string IWebServiceFilterDefInterfaceClassName   = GetModelClassName(Model, IWebServiceFilterDefInterfaceFolder);
@@ -56,6 +59,12 @@ using System.Windows.Controls;
     string RowMenuItemsPropertyChangedPropertyName = "RowMenuItemsPropertyChanged";
     string DataGridSortingChangedPropertyName = "DataGridSortingChanged";
     string SformSelectionChangedPropertyName = "SformSelectionChanged";
+    string FormControlModelChangedPropertyName = "FormControlModelChanged";
+    string EformModeChangedPropertyName = "EformModeChanged";
+    string CanAddPropertyChangedPropertyName    = "CanAddPropertyChanged";
+    string CanUpdPropertyChangedPropertyName    = "CanUpdatePropertyChanged";
+    string CanDelPropertyChangedPropertyName    = "CanDeletePropertyChanged";
+
 
     List<string> nmSpaces = new List<string>();
     if ((RoutedEventExtNameSpace != IWebServiceFilterRsltInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace) < 0)) 
@@ -66,7 +75,10 @@ using System.Windows.Controls;
         nmSpaces.Add(IWebServiceFilterDefInterfaceNameSpace);
     if ((RoutedEventExtNameSpace != IWebServiceFilterMenuInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterMenuInterfaceNameSpace) < 0)) 
         nmSpaces.Add(IWebServiceFilterMenuInterfaceNameSpace);
+    if ((RoutedEventExtNameSpace != EformModeEnumNameSpace) && (nmSpaces.IndexOf(EformModeEnumNameSpace) < 0)) 
+        nmSpaces.Add(EformModeEnumNameSpace);
 
+    
 #>
 <# 
     foreach(string ns in nmSpaces) {
@@ -340,6 +352,105 @@ namespace <#= RoutedEventExtNameSpace #> {
             }
         }
         #endregion
+
+        #region <#= FormControlModelChangedPropertyName #>
+        public static readonly RoutedEvent <#= FormControlModelChangedPropertyName #>Event = EventManager.RegisterRoutedEvent("<#= FormControlModelChangedPropertyName #>", RoutingStrategy.Bubble, typeof(RoutedPropertyChangedEventHandler<object>), typeof(RoutedEventExt));
+        public static void Add<#= FormControlModelChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<object> handler)
+        {
+            UIElement uie = d as UIElement;
+            if (uie != null)
+            {
+                uie.AddHandler(RoutedEventExt.<#= FormControlModelChangedPropertyName #>Event, handler);
+            }
+        }
+        public static void Remove<#= FormControlModelChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<object> handler)
+        {
+            UIElement uie = d as UIElement;
+            if (uie != null)
+            {
+                uie.RemoveHandler(RoutedEventExt.<#= FormControlModelChangedPropertyName #>Event, handler);
+            }
+        }
+        #endregion
+
+        #region <#= EformModeChangedPropertyName #>
+        public static readonly RoutedEvent <#= EformModeChangedPropertyName #>Event = EventManager.RegisterRoutedEvent("<#= EformModeChangedPropertyName #>", RoutingStrategy.Bubble, typeof(RoutedPropertyChangedEventHandler<<#= EformModeEnumClassName #>>), typeof(RoutedEventExt));
+        public static void Add<#= EformModeChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<<#= EformModeEnumClassName #>> handler)
+        {
+            UIElement uie = d as UIElement;
+            if (uie != null)
+            {
+                uie.AddHandler(RoutedEventExt.<#= EformModeChangedPropertyName #>Event, handler);
+            }
+        }
+        public static void Remove<#= EformModeChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<<#= EformModeEnumClassName #>> handler)
+        {
+            UIElement uie = d as UIElement;
+            if (uie != null)
+            {
+                uie.RemoveHandler(RoutedEventExt.<#= EformModeChangedPropertyName #>Event, handler);
+            }
+        }
+        #endregion
+        #region <#= CanAddPropertyChangedPropertyName #>
+        public static readonly RoutedEvent <#= CanAddPropertyChangedPropertyName #>Event = EventManager.RegisterRoutedEvent("<#= CanAddPropertyChangedPropertyName #>", RoutingStrategy.Bubble, typeof(RoutedPropertyChangedEventHandler<bool>), typeof(<#= RoutedEventExtClassName #>));
+        public static void Add<#= CanAddPropertyChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<bool> handler)
+        {
+            UIElement uie = d as UIElement;
+            if (uie != null)
+            {
+                uie.AddHandler(<#= RoutedEventExtClassName #>.<#= CanAddPropertyChangedPropertyName #>Event, handler);
+            }
+        }
+        public static void Remove<#= CanAddPropertyChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<bool> handler)
+        {
+            UIElement uie = d as UIElement;
+            if (uie != null)
+            {
+                uie.RemoveHandler(<#= RoutedEventExtClassName #>.<#= CanAddPropertyChangedPropertyName #>Event, handler);
+            }
+        }
+        #endregion
+        #region <#= CanUpdPropertyChangedPropertyName #>
+        public static readonly RoutedEvent <#= CanUpdPropertyChangedPropertyName #>Event = EventManager.RegisterRoutedEvent("<#= CanUpdPropertyChangedPropertyName #>", RoutingStrategy.Bubble, typeof(RoutedPropertyChangedEventHandler<bool>), typeof(<#= RoutedEventExtClassName #>));
+        public static void Add<#= CanUpdPropertyChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<bool> handler)
+        {
+            UIElement uie = d as UIElement;
+            if (uie != null)
+            {
+                uie.AddHandler(<#= RoutedEventExtClassName #>.<#= CanUpdPropertyChangedPropertyName #>Event, handler);
+            }
+        }
+        public static void Remove<#= CanUpdPropertyChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<bool> handler)
+        {
+            UIElement uie = d as UIElement;
+            if (uie != null)
+            {
+                uie.RemoveHandler(<#= RoutedEventExtClassName #>.<#= CanUpdPropertyChangedPropertyName #>Event, handler);
+            }
+        }
+        #endregion
+        #region <#= CanDelPropertyChangedPropertyName #>
+        public static readonly RoutedEvent <#= CanDelPropertyChangedPropertyName #>Event = EventManager.RegisterRoutedEvent("<#= CanDelPropertyChangedPropertyName #>", RoutingStrategy.Bubble, typeof(RoutedPropertyChangedEventHandler<bool>), typeof(<#= RoutedEventExtClassName #>));
+        public static void Add<#= CanDelPropertyChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<bool> handler)
+        {
+            UIElement uie = d as UIElement;
+            if (uie != null)
+            {
+                uie.AddHandler(<#= RoutedEventExtClassName #>.<#= CanDelPropertyChangedPropertyName #>Event, handler);
+            }
+        }
+        public static void Remove<#= CanDelPropertyChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<bool> handler)
+        {
+            UIElement uie = d as UIElement;
+            if (uie != null)
+            {
+                uie.RemoveHandler(<#= RoutedEventExtClassName #>.<#= CanDelPropertyChangedPropertyName #>Event, handler);
+            }
+        }
+        #endregion
+
+
 
     }
 }

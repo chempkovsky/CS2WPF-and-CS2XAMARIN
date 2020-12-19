@@ -26,7 +26,8 @@ using System.Net.Http.Headers;
     string AppGlblSettingsServiceClassName   = GetModelClassName(Model, AppGlblSettingsServiceFolder);
     string AppGlblSettingsServiceNameSpace   = GetModelNameSpace(Model, AppGlblSettingsServiceFolder);
     
-    string getAuthInfoHeaderMethodName = "GetAuthInfoHeader";
+    string getAuthInfoHeaderMethodName          = "GetAuthInfoHeader";
+    string ShowErrorMethodName                  = "ShowErrorMessage";
 #>
 <#
     if(IAppGlblSettingsServiceNameSpace != AppGlblSettingsServiceNameSpace)
@@ -248,7 +249,7 @@ namespace <#= AppGlblSettingsServiceNameSpace #> {
                 return _Client;
             }
         }
-        public void SendErrorMessage(string errorType, string errorMsg) {
+        public void <#= ShowErrorMethodName #>(string errorType, string errorMsg) {
         }
 
    }
