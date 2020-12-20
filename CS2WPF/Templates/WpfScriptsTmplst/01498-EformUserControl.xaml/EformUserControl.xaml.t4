@@ -128,7 +128,13 @@
         invboolconvPrefix = invboolconvPrefix + ";assembly=" + InverseBooleanConverterProject;
     }
 
-
+    bool ModelHasAutoCompleteTextBox = false;
+    foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) {
+        ModelHasAutoCompleteTextBox = ModelHasAutoCompleteTextBox ?  ModelHasAutoCompleteTextBox :
+            (modelViewUIFormPropertySerializable.InputTypeWhenAdd == InputTypeEnum.Typeahead) ||
+            (modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.Typeahead) ||
+            (modelViewUIFormPropertySerializable.InputTypeWhenDelete == InputTypeEnum.Typeahead) ;
+    }
 
 #>
 
@@ -149,7 +155,13 @@
              xmlns:crtcmd="<#= routedCommandPrefix #>"
              xmlns:gridflex="<#= gridflexPrefix #>"
              xmlns:invboolconv="<#= invboolconvPrefix #>"
-
+<# 
+    if (ModelHasAutoCompleteTextBox) {
+#>
+             xmlns:acttb="http://wpfcontrols.com/"
+<# 
+    }
+#>
 
              x:Name="EformUsrCntrlRootNode"
              mc:Ignorable="d" 
@@ -323,8 +335,8 @@
                                                         ValidatesOnDataErrors=True, 
                                                         ValidatesOnNotifyDataErrors=True ,
                                                         ValidatesOnExceptions=True,
-                                                        NotifyOnValidationError=True}">
-                                    LoadingContent="Loading..."
+                                                        NotifyOnValidationError=True}"
+                                    LoadingContent="Loading...">
                                     <!-- <acttb:AutoCompleteTextBox.LoadingContent>
                                         <TextBlock Text="Loading..."/>
                                     </acttb:AutoCompleteTextBox.LoadingContent> -->
@@ -374,9 +386,9 @@
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBox x:Uid="<#=  GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ButtonSufix) #>"
+                                <TextBox x:Uid="<#=  GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>"
                                     IsReadOnly="True" Grid.Column="0"
-                                    Text="{Binding <#=  GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ButtonSufix) #>.<#= GetControlListPropertyName(modelViewUIFormPropertySerializable, Model, Context, InputTypeId) #>, Mode=OneWay,
+                                    Text="{Binding <#=  GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>, Mode=OneWay,
                                                         TargetNullValue='',
                                                         UpdateSourceTrigger=PropertyChanged, 
                                                         ValidatesOnDataErrors=True, 

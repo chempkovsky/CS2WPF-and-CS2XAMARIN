@@ -26,6 +26,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Controls;
 using System.Reflection;
 using System.ComponentModel.DataAnnotations;
+using System.Collections;
 <#
 
     string EformModeEnumFolder                      = "00026-EformModeEnum.cs";
@@ -37,7 +38,7 @@ using System.ComponentModel.DataAnnotations;
     string IAppGlblSettingsServiceNameSpace         = GetContextModelNameSpace(Context, IAppGlblSettingsServiceFolder);
 
     string commandHelperModelFolder                 = "00140-CommandHelper.cs";
-    string commandHelperModelClassName              = GetContextModelNameSpace(Context, commandHelperModelFolder);
+    string commandHelperModelClassName              = GetContextModelClassName(Context, commandHelperModelFolder);
     string commandHelperModelNameSpace              = GetContextModelNameSpace(Context, commandHelperModelFolder);
 
     string IWebServiceFilterRsltInterfaceFolder     = "00204-IWebServiceFilterRsltInterface.cs";
@@ -483,7 +484,7 @@ namespace <#= EformViewModelNameSpace #> {
 <#   
                     if (HasOnValChangedMethod(Context, Model, modelViewUIFormPropertySerializable)) {
 #>
-                    Task.Run( async () => { <#=  GetExpressionForOnValChangedMethod(modelViewUIFormPropertySerializable, Model) #>(value, true)); });
+                    Task.Run( async () => { <#=  GetExpressionForOnValChangedMethod(modelViewUIFormPropertySerializable, Model) #>(value, true); });
 <#    
                     }
 #>
@@ -1176,7 +1177,7 @@ if (ModelHasDoInitMethod) {
                             }
 #>
                         <#= UIDispatcherInvokePropertyName #>(() => {
-                            <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>('http', "Could not get item by primary key for <#= viewName #>");
+                            <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("http", "Could not get item by primary key for <#= viewName #>");
                         });
                     }
                 }
@@ -1305,7 +1306,7 @@ if (ModelHasDoInitMethod) {
                                 }
                             }
 #>
-                        await <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>('http', error)
+                        <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("http", "Could not get item by primary key for <#= viewName #>");
                     }
             }
 <#  
@@ -1371,7 +1372,7 @@ if (ModelHasDoInitMethod) {
                             if (directMasters.Count < 1) {
 #>
 
-            <#= GetFilterInterfaceNameEx(Context, viewName) #> flt = new <#= GetFilterNameEx(Context, viewName) #>();
+            <#= GetFilterInterfaceNameEx(Context, viewName) #> flt = <#= FormServicePrefix #><#= viewName #>.GetFilter();
             <#= GetOrderBy(modelViewUIFormPropertySerializable, Model, Context, inptTp,"flt") #>
             <#= GetPageInterfaceNameEx(Context, viewName) #> data = await this.<#= servisPropNm #>.<#= GetWithFilterMethodName #>(flt);
             if (data != null) {
@@ -1379,18 +1380,18 @@ if (ModelHasDoInitMethod) {
                 if (data.items != null) {
                     foreach(<#= GetInterfaceNameEx(Context, viewName) #> itm in data.items) {
                         if (newLst == null) newLst = new ObservableCollection<<#= GetInterfaceNameEx(Context, viewName) #>>();
-                        <#= GetExpressionForControlList(modelViewUIFormPropertySerializable, Model, ComboSufix) #> newLst.Add(<#= servisPropNm #>.<#= CopyToModelNotifyMethodName #>(itm));
+                        newLst.Add(<#= servisPropNm #>.<#= CopyToModelNotifyMethodName #>(itm));
                     }
                 }
                 int indx = -1;
-                if ((newLst != null) && (<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #> != null)) {
-                    <#= GetInterfaceNameEx(Context, viewName) #> lfc = <#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #>;
+                if ((newLst != null) && ((<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #> as <#= GetInterfaceNameEx(Context, viewName) #>) != null)) {
+                    <#= GetInterfaceNameEx(Context, viewName) #> lfc = <#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #> as <#= GetInterfaceNameEx(Context, viewName) #>;
                     <#= GetInterfaceNameEx(Context, viewName) #> slctItm = newLst.Where(e => <#= GetPrimKeyFilterForFindIndexMethod(Context, viewName, "e", "lfc")  #>).FirstOrDefault();
                     if(slctItm != null) {
                         indx = newLst.IndexOf(slctItm);
                         if(indx > -1) {
                             newLst.RemoveAt(indx);
-                            newLst.InsertItem(indx, lfc);
+                            newLst.Insert(indx, lfc);
                         }
                     }
                 }
@@ -1407,7 +1408,7 @@ if (ModelHasDoInitMethod) {
                 });
                 await <#= GetExpressionForOnValChangedMethod(modelViewUIFormPropertySerializable, Model) #>(null, true);
                 <#= UIDispatcherInvokePropertyName #>(() => {
-                    <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>('http', "Could not populate ComboBox for <#= viewName #>");
+                    <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("http", "Could not populate ComboBox for <#= viewName #>");
                 });
             }
 <#
@@ -1415,7 +1416,7 @@ if (ModelHasDoInitMethod) {
                                 List<ModelViewPropertyOfVwSerializable> allForeignKeyProps = GetAllForeignKeyProps(locView);
 #>
             bool hasNoVal = <#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #> == null;
-            <#= GetFilterInterfaceNameEx(Context, viewName) #> flt = new <#= GetFilterNameEx(Context, viewName) #>();
+            <#= GetFilterInterfaceNameEx(Context, viewName) #> flt = <#= FormServicePrefix #><#= viewName #>.GetFilter();
             if (! hasNoVal) {
                 <#= GetInterfaceNameEx(Context, viewName) #> lfc = <#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #>;
 <#
@@ -1575,18 +1576,18 @@ if (ModelHasDoInitMethod) {
                     if (data.items != null) {
                         foreach(<#= GetInterfaceNameEx(Context, viewName) #> itm in data.items) {
                             if (newLst == null) newLst = new ObservableCollection<<#= GetInterfaceNameEx(Context, viewName) #>>();
-                            <#= GetExpressionForControlList(modelViewUIFormPropertySerializable, Model, ComboSufix) #> newLst.Add(<#= servisPropNm #>.<#= CopyToModelNotifyMethodName #>(itm));
+                            newLst.Add(<#= servisPropNm #>.<#= CopyToModelNotifyMethodName #>(itm));
                         }
                     }
                     int indx = -1;
-                    if ((newLst != null) && (<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #> != null)) {
-                        <#= GetInterfaceNameEx(Context, viewName) #> lfc = <#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #>;
+                    if ((newLst != null) && ((<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #> as <#= GetInterfaceNameEx(Context, viewName) #>) != null)) {
+                        <#= GetInterfaceNameEx(Context, viewName) #> lfc = <#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #> as <#= GetInterfaceNameEx(Context, viewName) #>;
                         <#= GetInterfaceNameEx(Context, viewName) #> slctItm = newLst.Where(e => <#= GetPrimKeyFilterForFindIndexMethod(Context, viewName, "e", "lfc")  #>).FirstOrDefault();
                         if(slctItm != null) {
                             indx = newLst.IndexOf(slctItm);
                             if(indx > -1) {
                                 newLst.RemoveAt(indx);
-                                newLst.InsertItem(indx, lfc);
+                                newLst.Insert(indx, lfc);
                             }
                         }
                     }
@@ -1631,7 +1632,7 @@ if (ModelHasDoInitMethod) {
     public ISuggestionProvider <#= GetExpressionForOnFilterTypeaheadControlListMethod(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>Provider
     {
         get { return _<#= GetExpressionForOnFilterTypeaheadControlListMethod(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>Provider ?? 
-                    (_<#= GetExpressionForOnFilterTypeaheadControlListMethod(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>Provider = new SuggestionProvider(new Func<string, IEnumerable>(<#= GetExpressionForOnFilterTypeaheadControlListMethod(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>))); }
+                    (_<#= GetExpressionForOnFilterTypeaheadControlListMethod(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>Provider = new SuggestionProvider(<#= GetExpressionForOnFilterTypeaheadControlListMethod(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>)); }
 
         set
         {
@@ -1643,7 +1644,7 @@ if (ModelHasDoInitMethod) {
         }
     }
     // this method is not async
-    public IEnumerable <#= GetExpressionForOnFilterTypeaheadControlListMethod(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>(inFilter: string) {
+    public IEnumerable <#= GetExpressionForOnFilterTypeaheadControlListMethod(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>(string inFilter) {
 <#  
                     bool genElse = false;
                     for(int inptTp = 1; inptTp < 4; inptTp++) {
@@ -1688,7 +1689,7 @@ if (ModelHasDoInitMethod) {
         }
 #>
             bool hasNoVal = false;
-            <#= GetFilterInterfaceName(locView) #> flt = new <#= GetFilterName(locView) #>();
+            <#= GetFilterInterfaceName(locView) #> flt = <#= FormServicePrefix #><#= locView.ViewName #>.GetFilter();
 <#
                             if (directMasters.Count > 0) {
                                 List<ModelViewPropertyOfVwSerializable> allForeignKeyProps = GetAllForeignKeyProps(locView);
@@ -1843,6 +1844,7 @@ if (ModelHasDoInitMethod) {
                         } // if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.Typeahead) {
                     } // for(int inptTp = 1; inptTp < 4; inptTp++) {
 #>
+        return null;
     }
 <#  
                 } // if(HasTypeahead(modelViewUIFormPropertySerializable, Model)) {
@@ -1858,7 +1860,7 @@ if (ModelHasDoInitMethod) {
                 if (HasInitMethod(modelViewUIFormPropertySerializable, Model) && 
                     HasOnValChangedMethod(Context, Model, modelViewUIFormPropertySerializable)) {
 #>
-    public async Task <#= GetExpressionForOnValChangedMethod(modelViewUIFormPropertySerializable, Model) #>(object inVal, bool dscrdChld) {
+    public async Task <#= GetExpressionForOnValChangedMethod(modelViewUIFormPropertySerializable, Model) #>(object inputVal, bool dscrdChld) {
 <#  
                     bool genElse = false;
                     for(int inptTp = 1; inptTp < 4; inptTp++) {
@@ -1914,12 +1916,13 @@ if (ModelHasDoInitMethod) {
                             if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.Typeahead) {
 
 #>
-
+            <#= GetInterfaceName(locView) #> inVal = inputVal as <#= GetInterfaceName(locView) #>;
             bool hasNoVal = inVal == null;
             if (hasNoVal) { dscrdChld = true; }
 <#
                             } else {
 #>
+            <#= GetInterfaceName(locView) #> inVal = inputVal as <#= GetInterfaceName(locView) #>;
             bool hasNoVal = inVal == null;
             if (hasNoVal) { dscrdChld = true; }
 <#
@@ -2047,19 +2050,29 @@ if (ModelHasDoInitMethod) {
 <#
                             }
                         }
+               {
+                                bool showUIDispatcher1 = locViewPrimKeys != null;
+                                showUIDispatcher1 = showUIDispatcher1 ? (locViewPrimKeys.Count > 0) : false;
+                                bool showUIDispatcher2 = dependentScalarProps != null;
+                                showUIDispatcher2 = showUIDispatcher2 ? (dependentScalarProps.Count > 0) : false;
+
 #>
             if (hasNoVal) { 
 <#
+                        if (showUIDispatcher1 || showUIDispatcher2) {
+#>
+                <#= UIDispatcherInvokePropertyName #>(() => {
+<#
+                        }
+
                                 foreach(ModelViewUIFormPropertySerializable dependentModelViewUIFormPropertySerializable in dependentScalarProps) {
                                         ModelViewPropertyOfVwSerializable viewProp =
                                             GetOnValChangeViewPropName(Context, Model, modelViewUIFormPropertySerializable, dependentModelViewUIFormPropertySerializable, inptTp);
                                         if(viewProp != null) {
 #>
-                <#= UIDispatcherInvokePropertyName #>(() => {
                     _<#= GetModelPropertyNameEx(dependentModelViewUIFormPropertySerializable, Model) #> = null;
                     OnPropertyChanged("<#= GetModelPropertyNameEx(dependentModelViewUIFormPropertySerializable, Model) #>");
                     ValidateFiled(null, "<#= GetModelPropertyNameEx(dependentModelViewUIFormPropertySerializable, Model) #>");
-                });
 <#
                                         } else {
 #>
@@ -2073,20 +2086,28 @@ if (ModelHasDoInitMethod) {
                                         foreach(ModelViewPropertyOfVwSerializable dependentPkScalarProp in dependentPkScalarProps) {
                                             if(!dependentScalarProps.Any(p => p.ViewPropertyName == dependentPkScalarProp.ViewPropertyName)) {
 #>
-                <#= UIDispatcherInvokePropertyName #>(() => {
                     _<#= GetModelPropertyName(dependentPkScalarProp, Model) #> = null;
                     OnPropertyChanged("<#= GetModelPropertyName(dependentPkScalarProp, Model) #>");
                     ValidateFiled(null, "<#= GetModelPropertyName(dependentPkScalarProp, Model) #>");
-                });
 <#
                                             }
                                         }
                                     }
                                 }
+                        if (showUIDispatcher1 || showUIDispatcher2) {
+#>
+                });
+<#
+                        }
 
 #>
             } else {
 <#
+                        if (showUIDispatcher1 || showUIDispatcher2) {
+#>
+                <#= UIDispatcherInvokePropertyName #>(() => {
+<#
+                        }
                                 foreach(ModelViewUIFormPropertySerializable dependentModelViewUIFormPropertySerializable in dependentScalarProps) {
 
                                         ModelViewPropertyOfVwSerializable viewProp =
@@ -2094,11 +2115,9 @@ if (ModelHasDoInitMethod) {
                                         if(viewProp != null) {
 
 #>
-                <#= UIDispatcherInvokePropertyName #>(() => {
                     _<#= GetModelPropertyNameEx(dependentModelViewUIFormPropertySerializable, Model) #> = inVal.<#=  GetModelPropertyName(viewProp,locView) #>;
                     OnPropertyChanged("<#= GetModelPropertyNameEx(dependentModelViewUIFormPropertySerializable, Model) #>");
                     ValidateFiled(_<#= GetModelPropertyNameEx(dependentModelViewUIFormPropertySerializable, Model) #>, "<#= GetModelPropertyNameEx(dependentModelViewUIFormPropertySerializable, Model) #>");
-                });
 <#
                                         } else {
 #>
@@ -2112,20 +2131,26 @@ if (ModelHasDoInitMethod) {
                                         foreach(ModelViewPropertyOfVwSerializable dependentPkScalarProp in dependentPkScalarProps) {
                                             if(!dependentScalarProps.Any(p => p.ViewPropertyName == dependentPkScalarProp.ViewPropertyName)) {
 #>
-                <#= UIDispatcherInvokePropertyName #>(() => {
                     _<#= GetModelPropertyName(dependentPkScalarProp, Model) #> = inVal.<#=  GetModelPropertyName(locViewPrimKey, locView) #>;
                     OnPropertyChanged("<#= GetModelPropertyName(dependentPkScalarProp, Model) #>");
                     ValidateFiled(_<#= GetModelPropertyName(dependentPkScalarProp, Model) #>, "<#= GetModelPropertyName(dependentPkScalarProp, Model) #>");
-                });
 <#
                                             }
                                         }
                                     }
                                 }
+                        if (showUIDispatcher1 || showUIDispatcher2) {
+#>
+                });
+<#
+                        }
 #>
             }
 <#
-                            }
+               }
+                            } ///// the end of if(dependentScalarProps.Count > 0) {
+
+
                         foreach(ModelViewUIFormPropertySerializable dtlModelViewUIFormPropertySerializable in details) {
                             if (GetInputTypeWhenXXX(dtlModelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.Combo) {
 #>
@@ -2305,10 +2330,7 @@ if (ModelHasDoInitMethod) {
                             } // foreach(ModelViewUIFormPropertySerializable directMasterProp in directMasters) {
 #>
             if (hasNoVal) {
-                let msg = {
-                    message:'Could not start dialog: not all master data is defined.'
-                };
-                this.<#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>('Form Error', msg)
+                <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("Form Error", "Could not start dialog: not all master data is defined.");
                 return;                           
             }
             IList<<#= IWebServiceFilterRsltInterfaceClassName #>> hddnFltrs = new List<<#= IWebServiceFilterRsltInterfaceClassName #>>();
@@ -2367,12 +2389,12 @@ if (ModelHasDoInitMethod) {
                         } // if (directMasters.Count > 0) {
 #>
 
-            _dialogService.ShowDialog("<#= GetModelClassName(locView, SdlgViewModelFolder) #>", dlgParams, async (rslt) => {
+            dialogService.ShowDialog("<#= GetModelClassName(locView, SdlgViewModelFolder) #>", dlgParams, async (rslt) => {
                 if (rslt == null) return;
                 if (rslt.Result != ButtonResult.OK) return;
                 if (rslt.Parameters.ContainsKey("SelectedItem"))
                 {
-                    object itm = rslt.Parameters.GetValue<ILitGenreView>("SelectedItem");
+                    object itm = rslt.Parameters.GetValue<object>("SelectedItem");
                     if (itm == null) return;
                     <#= UIDispatcherInvokePropertyName #>(() => {
                         _<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ButtonSufix) #> = itm;
@@ -2594,6 +2616,7 @@ if (ModelHasDoInitMethod) {
                 }
                 return;
             }
+            string msgfiledName = filedName;
 <#
         if (ModelHasDoInitMethod) {
 #>            
@@ -2615,12 +2638,17 @@ if (ModelHasDoInitMethod) {
                 if (HasButton(modelViewUIFormPropertySerializable, Model)  && modelViewUIFormPropertySerializable.IsShownInView) {
 #>
                 case "<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ButtonSufix) #>":
+                    requiredAttribute = new RequiredAttribute();
+                    msg = requiredAttribute.FormatErrorMessage(string.Empty);
+                    msgfiledName = "<#= GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>";
                     break;
 <#
                 }
                 if (HasTypeahead(modelViewUIFormPropertySerializable, Model)  && modelViewUIFormPropertySerializable.IsShownInView) {  
 #>
                 case "<#=  GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>":
+                    requiredAttribute = new RequiredAttribute();
+                    msg = requiredAttribute.FormatErrorMessage(string.Empty);
                     break;
 <#
                 }
@@ -2630,8 +2658,8 @@ if (ModelHasDoInitMethod) {
                     break;
             }
             if (!string.IsNullOrEmpty(msg)) {
-                ValidationDataErrors[filedName] = new List<string>() { msg };
-                RaiseErrorsChanged(filedName);
+                ValidationDataErrors[msgfiledName] = new List<string>() { msg };
+                RaiseErrorsChanged(msgfiledName);
             }
 <#
         }
@@ -2648,7 +2676,7 @@ if (ModelHasDoInitMethod) {
         InputTypeEnum InputTypeWhenXXX ;
         for (int InputTypeId = 1; InputTypeId <= 3; InputTypeId++) {
 #>
-            if (<#= EformModePropertyName #> == <#= EformModeEnumClassName #>.<#= GetInputTypeToEnumName(InputTypeId) #>)
+            if (<#= EformModePropertyName #> == <#= EformModeEnumClassName #>.<#= GetInputTypeToEnumName(InputTypeId) #>) {
 <#
             foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) {
                 switch(InputTypeId) {
@@ -2700,7 +2728,7 @@ if (ModelHasDoInitMethod) {
         InputTypeEnum InputTypeWhenXXX ;
         for (int InputTypeId = 1; InputTypeId <= 3; InputTypeId++) {
 #>
-            if (<#= EformModePropertyName #> == <#= EformModeEnumClassName #>.<#= GetInputTypeToEnumName(InputTypeId) #>)
+            if (<#= EformModePropertyName #> == <#= EformModeEnumClassName #>.<#= GetInputTypeToEnumName(InputTypeId) #>) {
 <#
             foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) {
                 switch(InputTypeId) {
@@ -2732,6 +2760,9 @@ if (ModelHasDoInitMethod) {
                     }
                 }
             }
+#>
+            }
+<#
         }
     }
 #>

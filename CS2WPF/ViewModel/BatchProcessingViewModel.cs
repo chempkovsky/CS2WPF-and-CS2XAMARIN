@@ -266,7 +266,7 @@ namespace CS2WPF.ViewModel
                         FileName =
                             currentSerializableModel.ViewName + BatchSettingsHelper.TrimPrefix(Path.GetFileNameWithoutExtension(batchItem.GeneratorType));
                     }
-                    FileName = BatchSettingsHelper.GetHyphenedName(FileName);
+                    //FileName = BatchSettingsHelper.GetHyphenedName(FileName);
                     sb.AppendLine("    Batch Item: Creating Shallow Copy");
                     ModelViewSerializable ShallowCopy = null;
                     if (currentSerializableModel.ViewName == SerializableModel.ViewName)

@@ -53,6 +53,10 @@ using Newtonsoft.Json;
     string modelFilterInterfaceClassName    = GetFilterInterfaceName(Model);
     string modelFilterInterfaceNameSpace    = GetModelNameSpace(Model, modelFilterInterfaceFolder);
 
+    string modelFilterFolder                = "01302-Filter.model.cs";
+    string modelFilterClassName             = GetFilterName(Model);
+    string modelFilterNameSpace             = GetModelNameSpace(Model, modelFilterFolder);
+
 
     string modelServiceInterfaceFolder       = "01400-Service.interface.cs";
     string modelServiceInterfaceClassName    = GetModelServiceInterfaceName(Model);
@@ -143,6 +147,8 @@ using Newtonsoft.Json;
         nmSpaces.Add(ModelNotifyNameSpace);
     if ((modelServiceNameSpace != NotifyInterfaceNameSpace) && (nmSpaces.IndexOf(NotifyInterfaceNameSpace) < 0)) 
         nmSpaces.Add(NotifyInterfaceNameSpace);
+    if ((modelServiceNameSpace != modelFilterNameSpace) && (nmSpaces.IndexOf(modelFilterNameSpace) < 0)) 
+        nmSpaces.Add(modelFilterNameSpace);
 
 #>
 <# 
@@ -153,6 +159,17 @@ using <#= ns #>;
     }
 #>
 
+/*
+    In the file of IModule-class the following lines of code must be inserted:
+
+        public void RegisterTypes(IContainerRegistry containerRegistry)
+        {
+            ...
+            containerRegistry.Register<<#= modelServiceInterfaceClassName #>, <#= modelServiceClassName #>>();
+            ...
+        }
+
+*/
 namespace <#= modelServiceNameSpace #> {
     public class <#= modelServiceClassName #>: <#= modelServiceInterfaceClassName #>
     {
@@ -379,11 +396,13 @@ namespace <#= modelServiceNameSpace #> {
             }
 <#
         foreach (ModelViewPropertyOfVwSerializable identProp in identProps) {
+            if(IsPropertyTypeNullable(identProp)) {
 #>
             if(item.<#= GetModelPropertyName(identProp, Model) #> == null) {
-                item["<#= GetModelPropertyName(identProp, Model) #>"] = <#= GetDefaultVal(identProp) #>;
+                item.<#= GetModelPropertyName(identProp, Model) #> = <#= GetDefaultVal(identProp) #>;
             }
 <#
+            }
         }
 #>
             try
@@ -439,7 +458,7 @@ namespace <#= modelServiceNameSpace #> {
             if(prms == null) prms = "";
             try
             {
-                HttpResponseMessage response = await client.GetAsync(serviceUrl + "/" + "<#= DeleteOneMethodName #>" + prms);
+                HttpResponseMessage response = await client.DeleteAsync(serviceUrl + "/" + "<#= DeleteOneMethodName #>" + prms);
                 response.EnsureSuccessStatusCode();
                 string responseBody = await response.Content.ReadAsStringAsync();
                 return  JsonConvert.DeserializeObject<<#= modelClassName #>>(responseBody) ;
@@ -477,6 +496,10 @@ namespace <#= modelServiceNameSpace #> {
 #>
             return dest;
         }
+
+        public <#= modelFilterInterfaceClassName #> GetFilter() {
+            return new <#= modelFilterClassName #>();
+        }
     }
 }
 
@@ -499,6 +522,9 @@ namespace <#= modelServiceNameSpace #> {
     }
     string GetFilterInterfaceName(ModelViewSerializable model) {
         return "I"+model.ViewName + "Filter";
+    }
+    string GetFilterName(ModelViewSerializable model) {
+        return FirstLetterToUpper(model.ViewName) + "Filter";
     }
     string GetPageInterfaceName(ModelViewSerializable model) {
         return "I"+model.PageViewName;
@@ -819,6 +845,18 @@ namespace <#= modelServiceNameSpace #> {
                 
         }
         return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+    bool IsPropertyNullable(ModelViewPropertyOfVwSerializable prop) {
+        if("System.String".Equals(prop.UnderlyingTypeName, System.StringComparison.OrdinalIgnoreCase)) {
+            return true;
+        }
+        return (prop.IsNullable || (!prop.IsRequiredInView)); 
+    }
+    bool IsPropertyTypeNullable(ModelViewPropertyOfVwSerializable prop) {
+        if("System.String".Equals(prop.UnderlyingTypeName, System.StringComparison.OrdinalIgnoreCase)) {
+            return true;
+        }
+        return prop.IsNullable; 
     }
 
 #>

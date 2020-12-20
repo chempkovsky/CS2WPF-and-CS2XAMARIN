@@ -549,7 +549,7 @@ namespace <#= SformViewModelNameSpace #> {
             <#= HiddenFiltersPropertyName #> = newhfs;
             <#= CurrentFilterPropertyName #> = newhfs;
 
-            IEnumerable<<#= IWebServiceFilterDefInterfaceClassName #>> fltDf = 
+            ObservableCollection<<#= IWebServiceFilterDefInterfaceClassName #>> fltDf = 
                 new ObservableCollection<<#= IWebServiceFilterDefInterfaceClassName #>>() {
 <#
             foreach(ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable in Model.ScalarProperties) {
@@ -608,7 +608,7 @@ namespace <#= SformViewModelNameSpace #> {
                             if ( modelViewPropertyOfVwSerializable.ForeignKeyNameChain.StartsWith(modelViewForeignKeySerializable.NavigationName + ".") || 
                                 (modelViewPropertyOfVwSerializable.ForeignKeyNameChain == modelViewForeignKeySerializable.NavigationName) ) {
 #>
-                fltDf.Add(new <#= WebServiceFilterDefViewModelClassName #>{fltrName="<#= GetModelPropertyName(modelViewPropertyOfVwSerializable, Model)#>", fltrCaption="<#= GetDisplayAttributeValueString(modelViewPropertyOfVwSerializable, Model, DisplayLabelProperty) #>",  fltrDataType="<#= GetCCharpDatatype(modelViewPropertyOfVwSerializable, Model) #>", fltrMaxLen=<#= GetMaxLen(modelViewPropertyOfVwSerializable, Model) #>, fltrMin=<#= GetMinVal(modelViewPropertyOfVwSerializable, Model) #>, fltrMax=<#= GetMaxVal(modelViewPropertyOfVwSerializable, Model) #> });
+                fltDf.Add(new <#= WebServiceFilterDefViewModelClassName #>() {fltrName="<#= GetModelPropertyName(modelViewPropertyOfVwSerializable, Model)#>", fltrCaption="<#= GetDisplayAttributeValueString(modelViewPropertyOfVwSerializable, Model, DisplayLabelProperty) #>",  fltrDataType="<#= GetCCharpDatatype(modelViewPropertyOfVwSerializable, Model) #>", fltrMaxLen=<#= GetMaxLen(modelViewPropertyOfVwSerializable, Model) #>, fltrMin=<#= GetMinVal(modelViewPropertyOfVwSerializable, Model) #>, fltrMax=<#= GetMaxVal(modelViewPropertyOfVwSerializable, Model) #> });
 <#
                             }
                         }
@@ -896,7 +896,7 @@ namespace <#= SformViewModelNameSpace #> {
         foreach(ModelViewPropertyOfVwSerializable pkpModelViewPropertyOfVwSerializable in primKeyProps) {
             if(isNotFirst) {
 #>
-                    and (d.<#= GetModelPropertyName(pkpModelViewPropertyOfVwSerializable, Model) #> == prm.<#= GetModelPropertyName(pkpModelViewPropertyOfVwSerializable, Model) #>)
+                    && (d.<#= GetModelPropertyName(pkpModelViewPropertyOfVwSerializable, Model) #> == prm.<#= GetModelPropertyName(pkpModelViewPropertyOfVwSerializable, Model) #>)
 <#
             } else {
                 isNotFirst = true;
@@ -944,7 +944,7 @@ namespace <#= SformViewModelNameSpace #> {
         foreach(ModelViewPropertyOfVwSerializable pkpModelViewPropertyOfVwSerializable in primKeyProps) {
             if(isNotFirst) {
 #>
-                    and (d.<#= GetModelPropertyName(pkpModelViewPropertyOfVwSerializable, Model) #> == prm.<#= GetModelPropertyName(pkpModelViewPropertyOfVwSerializable, Model) #>)
+                    && (d.<#= GetModelPropertyName(pkpModelViewPropertyOfVwSerializable, Model) #> == prm.<#= GetModelPropertyName(pkpModelViewPropertyOfVwSerializable, Model) #>)
 <#
             } else {
                 isNotFirst = true;
