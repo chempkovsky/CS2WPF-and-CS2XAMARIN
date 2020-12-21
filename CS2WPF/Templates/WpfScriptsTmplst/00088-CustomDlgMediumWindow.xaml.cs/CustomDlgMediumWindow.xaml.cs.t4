@@ -1,0 +1,159 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Shapes;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using Prism.Services.Dialogs;
+<#
+
+    string CustomDlgMediumWindowFolder      = "00088-CustomDlgMediumWindow.xaml.cs";
+    string CustomDlgMediumWindowClassName   = GetModelClassName(Model, CustomDlgMediumWindowFolder);
+    string CustomDlgMediumWindowNameSpace   = GetModelNameSpace(Model, CustomDlgMediumWindowFolder);
+    
+#>
+
+/*
+
+    In the file of IModule-class the following line of code must be inserted:
+
+        public void RegisterTypes(IContainerRegistry containerRegistry)
+        {
+            ...
+            // default dialog
+            containerRegistry.RegisterDialogWindow<<#= CustomDlgMediumWindowClassName #>>();
+            // named dialog
+            containerRegistry.RegisterDialogWindow<<#= CustomDlgMediumWindowClassName #>>("<#= CustomDlgMediumWindowClassName #>");
+            ...
+        }
+
+*/
+
+namespace <#= CustomDlgMediumWindowNameSpace #> {
+    public partial class <#= CustomDlgMediumWindowClassName #>: Window, IDialogWindow, INotifyPropertyChanged
+    {
+        public <#= CustomDlgMediumWindowClassName #>()
+        {
+            _InitialWidth = System.Windows.SystemParameters.PrimaryScreenWidth * 0.6;
+            InitializeComponent();
+        }
+        #region INotifyPropertyChanged
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string name = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+        #endregion
+
+        #region IDialogWindow
+        protected IDialogResult _Result = null;
+        public IDialogResult Result {
+            get { return _Result; }
+            set { _Result = value; }
+        }
+        #endregion
+
+        protected double _InitialWidth = double.NaN;
+        public double InitialWidth {get { return _InitialWidth; } }
+
+        private void <#= CustomDlgMediumWindowClassName #>Name_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            this.SizeToContent = SizeToContent.Height;
+        }
+    }
+}
+
+<#+
+
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+
+#>

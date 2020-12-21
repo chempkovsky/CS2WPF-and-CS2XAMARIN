@@ -1049,20 +1049,20 @@ if (ModelHasDoInitMethod) {
                                             ModelViewPropertyOfVwSerializable frgnKpModelViewPropertyOfVwSerializable = foreignKeyProps[loci];
                                             if (GetInputTypeWhenXXX(dtlModelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.Combo) {
 #>
-                if(<#= GetModelPropertyNameWithSufix(dtlModelViewUIFormPropertySerializable, Model, ComboSufix) #> != null) { 
-                        <#= GetPrimKeyVarName(primKpModelViewPropertyOfVwSerializable) #> = <#= GetModelPropertyNameWithSufix(dtlModelViewUIFormPropertySerializable, Model, ComboSufix) #>.<#= GetModelPropertyName(frgnKpModelViewPropertyOfVwSerializable, detailView) #>;
+                if((<#= GetModelPropertyNameWithSufix(dtlModelViewUIFormPropertySerializable, Model, ComboSufix) #> as <#= GetInterfaceName(detailView) #>) != null) { 
+                        <#= GetPrimKeyVarName(primKpModelViewPropertyOfVwSerializable) #> = (<#= GetModelPropertyNameWithSufix(dtlModelViewUIFormPropertySerializable, Model, ComboSufix) #>  as <#= GetInterfaceName(detailView) #>).<#= GetModelPropertyName(frgnKpModelViewPropertyOfVwSerializable, detailView) #>;
                 }
 <#
                                             } else if (GetInputTypeWhenXXX(dtlModelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.Typeahead) {
 #>
-                if(<#= GetModelPropertyNameWithSufix(dtlModelViewUIFormPropertySerializable, Model, TypeaheadSufix) #> != null) {
-                        <#= GetPrimKeyVarName(primKpModelViewPropertyOfVwSerializable) #> = <#= GetModelPropertyNameWithSufix(dtlModelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>.<#= GetModelPropertyName(frgnKpModelViewPropertyOfVwSerializable, detailView) #>;
+                if((<#= GetModelPropertyNameWithSufix(dtlModelViewUIFormPropertySerializable, Model, TypeaheadSufix) #> as <#= GetInterfaceName(detailView) #>) != null) {
+                        <#= GetPrimKeyVarName(primKpModelViewPropertyOfVwSerializable) #> = (<#= GetModelPropertyNameWithSufix(dtlModelViewUIFormPropertySerializable, Model, TypeaheadSufix) #> as <#= GetInterfaceName(detailView) #>).<#= GetModelPropertyName(frgnKpModelViewPropertyOfVwSerializable, detailView) #>;
                 }
 <#
                                             }  else if (GetInputTypeWhenXXX(dtlModelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.SearchDialog) {
 #>
-                if(this.<#= GetModelPropertyNameWithSufix(dtlModelViewUIFormPropertySerializable, Model, ButtonSufix) #> != null) {
-                        <#= GetPrimKeyVarName(primKpModelViewPropertyOfVwSerializable) #> = <#= GetModelPropertyNameWithSufix(dtlModelViewUIFormPropertySerializable, Model, ButtonSufix) #>.<#= GetModelPropertyName(frgnKpModelViewPropertyOfVwSerializable, detailView) #>;
+                if((this.<#= GetModelPropertyNameWithSufix(dtlModelViewUIFormPropertySerializable, Model, ButtonSufix) #> as <#= GetInterfaceName(detailView) #>) != null) {
+                        <#= GetPrimKeyVarName(primKpModelViewPropertyOfVwSerializable) #> = (<#= GetModelPropertyNameWithSufix(dtlModelViewUIFormPropertySerializable, Model, ButtonSufix) #> as <#= GetInterfaceName(detailView) #>).<#= GetModelPropertyName(frgnKpModelViewPropertyOfVwSerializable, detailView) #>;
                 }
 <#                                    
                                             }                                                   
@@ -1102,36 +1102,38 @@ if (ModelHasDoInitMethod) {
                                         i++;
                                     }} #> );
                     if (data != null) {
+                        <#= GetInterfaceNameEx(Context, viewName) #> dataN = <#= servisPropNm #>.<#= CopyToModelNotifyMethodName #>(data);
 <#
                             if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.Combo) {
 #>
+                        
                         <#= UIDispatcherInvokePropertyName #>(() => {
-                                _<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #> = null;
+                                _<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #> = dataN;
                                 OnPropertyChanged("<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #>");
-                                ValidateObjectFiled(null, "<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #>");
+                                ValidateObjectFiled(dataN, "<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #>");
                         });
 <#
                             }  else if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.Typeahead) {
 #>
                         <#= UIDispatcherInvokePropertyName #>(() => {
-                                _<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #> = null;
+                                _<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #> = dataN;
                                 OnPropertyChanged("<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>");
-                                ValidateObjectFiled(null, "<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>");
+                                ValidateObjectFiled(dataN, "<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>");
                         });
 <#
                             }  else if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.SearchDialog) {
 #>
                         <#= UIDispatcherInvokePropertyName #>(() => {
-                                _<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ButtonSufix) #>  = null;
+                                _<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ButtonSufix) #>  = dataN;
                                 OnPropertyChanged("<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ButtonSufix) #>");
-                                ValidateObjectFiled(null, "<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ButtonSufix) #>");
+                                ValidateObjectFiled(dataN, "<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ButtonSufix) #>");
                         });
 <#
                             }
                             if(directMasters.Count < 1) {
                                 if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.Combo) {
 #>
-                        await <#= GetExpressionForOnValChangedMethod(modelViewUIFormPropertySerializable, Model) #>(<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #> false);
+                        await <#= GetExpressionForOnValChangedMethod(modelViewUIFormPropertySerializable, Model) #>(<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #>, false);
                         await <#= GetExpressionForOnUpdateComboControlListMethod(modelViewUIFormPropertySerializable, Model, ComboSufix) #>();
 <#
                                 }  else if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.Typeahead) {
@@ -1232,29 +1234,30 @@ if (ModelHasDoInitMethod) {
                                         i++;
                                     }} #> );
                     if(data != null) {
+                        <#= GetInterfaceNameEx(Context, viewName) #>  dataN = <#= servisPropNm #>.<#= CopyToModelNotifyMethodName #>(data);
 <#
                             if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.Combo) {
 #>
                         <#= UIDispatcherInvokePropertyName #>(() => {
-                                _<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #> = data;
+                                _<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #> = dataN;
                                 OnPropertyChanged("<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #>");
-                                ValidateObjectFiled(data, "<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #>");
+                                ValidateObjectFiled(dataN, "<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #>");
                         });
 <#
                             }  else if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.Typeahead) {
 #>
                         <#= UIDispatcherInvokePropertyName #>(() => {
-                                _<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #> = data;
+                                _<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #> = dataN;
                                 OnPropertyChanged("<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>");
-                                ValidateObjectFiled(data, "<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>");
+                                ValidateObjectFiled(dataN, "<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>");
                         });
 <#
                             }  else if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.SearchDialog) {
 #>
                         <#= UIDispatcherInvokePropertyName #>(() => {
-                                _<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ButtonSufix) #> = data;
+                                _<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ButtonSufix) #> = dataN;
                                 OnPropertyChanged("<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ButtonSufix) #>");
-                                ValidateObjectFiled(data, "<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ButtonSufix) #>");
+                                ValidateObjectFiled(dataN, "<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ButtonSufix) #>");
                         });
 <#
                             }
@@ -1415,10 +1418,10 @@ if (ModelHasDoInitMethod) {
                             } else {
                                 List<ModelViewPropertyOfVwSerializable> allForeignKeyProps = GetAllForeignKeyProps(locView);
 #>
-            bool hasNoVal = <#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #> == null;
+            bool hasNoVal = (<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #> as <#= GetInterfaceNameEx(Context, viewName) #>) == null;
             <#= GetFilterInterfaceNameEx(Context, viewName) #> flt = <#= FormServicePrefix #><#= viewName #>.GetFilter();
             if (! hasNoVal) {
-                <#= GetInterfaceNameEx(Context, viewName) #> lfc = <#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #>;
+                <#= GetInterfaceNameEx(Context, viewName) #> lfc = <#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #> as <#= GetInterfaceNameEx(Context, viewName) #>;
 <#
                             foreach(ModelViewUIFormPropertySerializable directMasterProp in directMasters) {
                                 ModelViewSerializable masterView = GetViewForControlList(directMasterProp, Model, Context, inptTp);
@@ -1439,15 +1442,17 @@ if (ModelHasDoInitMethod) {
                                     for(int i = 0; i < detailForeignKeyProps.Count; i++) {
                                         if(!IsPropertyNullable(detailForeignKeyProps[i])) continue;
                                         if(setOr) {
-#> || (lfc.<#= GetModelPropertyName(detailForeignKeyProps[i], locView) #> == null) <#
+#>                                            || (lfc.<#= GetModelPropertyName(detailForeignKeyProps[i], locView) #> == null) 
+<#
                                         } else {
-#> 
-                hasNoVal = hasNoVal ? hasNoVal : ((lfc.<#= GetModelPropertyName(detailForeignKeyProps[i], locView) #> == null)
+#>                hasNoVal = hasNoVal ? hasNoVal : ((lfc.<#= GetModelPropertyName(detailForeignKeyProps[i], locView) #> == null)
 <#
                                             setOr = true;
                                         }
                                     }
-                                    if(setOr) { #> ;<# }
+                                    if(setOr) { 
+#>                                            );<# 
+                                    }
                                 }
 
 
@@ -1493,15 +1498,15 @@ if (ModelHasDoInitMethod) {
                                     List<ModelViewPropertyOfVwSerializable> masterPrimKeyProps      = GetModelPrimaryKeyProps(masterView);
                                     if (GetInputTypeWhenXXX(directMasterProp, inptTp) == InputTypeEnum.Combo) {
 #>
-                hasNoVal = hasNoVal ? hasNoVal : (<#= GetModelPropertyNameWithSufix(directMasterProp, Model, ComboSufix) #> == null);
+                hasNoVal = hasNoVal ? hasNoVal : ((<#= GetModelPropertyNameWithSufix(directMasterProp, Model, ComboSufix) #> as <#= GetInterfaceName(masterView) #>) == null);
 <#
                                     }  else if (GetInputTypeWhenXXX(directMasterProp, inptTp) == InputTypeEnum.Typeahead) {
 #>
-                hasNoVal = hasNoVal ? hasNoVal : (<#= GetModelPropertyNameWithSufix(directMasterProp, Model, TypeaheadSufix) #> == null);
+                hasNoVal = hasNoVal ? hasNoVal : ((<#= GetModelPropertyNameWithSufix(directMasterProp, Model, TypeaheadSufix) #> as <#= GetInterfaceName(masterView) #>) == null);
 <#
                                     }  else if (GetInputTypeWhenXXX(directMasterProp, inptTp) == InputTypeEnum.SearchDialog) {
 #>
-                hasNoVal = hasNoVal ? hasNoVal : (<#= GetModelPropertyNameWithSufix(directMasterProp, Model, ButtonSufix) #> == null);
+                hasNoVal = hasNoVal ? hasNoVal : ((<#= GetModelPropertyNameWithSufix(directMasterProp, Model, ButtonSufix) #> as <#= GetInterfaceName(masterView) #>) == null);
 <#
                                     }
 #>          
@@ -1511,15 +1516,15 @@ if (ModelHasDoInitMethod) {
                                         if(!IsPropertyNullable(masterProp)) continue;
                                         if (GetInputTypeWhenXXX(directMasterProp, inptTp) == InputTypeEnum.Combo) {
 #>
-                    hasNoVal = hasNoVal ? hasNoVal : (<#= GetModelPropertyNameWithSufix(directMasterProp, Model, ComboSufix) #>.<#= GetModelPropertyName(masterProp, masterView) #> == null);
+                    hasNoVal = hasNoVal ? hasNoVal : ((<#= GetModelPropertyNameWithSufix(directMasterProp, Model, ComboSufix) #> as <#= GetInterfaceName(masterView) #>).<#= GetModelPropertyName(masterProp, masterView) #> == null);
 <#
                                         }  else if (GetInputTypeWhenXXX(directMasterProp, inptTp) == InputTypeEnum.Typeahead) {
 #>
-                    hasNoVal = hasNoVal ? hasNoVal : (<#= GetModelPropertyNameWithSufix(directMasterProp, Model, TypeaheadSufix) #>.<#= GetModelPropertyName(masterProp, masterView) #> == null);
+                    hasNoVal = hasNoVal ? hasNoVal : ((<#= GetModelPropertyNameWithSufix(directMasterProp, Model, TypeaheadSufix) #> as <#= GetInterfaceName(masterView) #>).<#= GetModelPropertyName(masterProp, masterView) #> == null);
 <#
                                         }  else if (GetInputTypeWhenXXX(directMasterProp, inptTp) == InputTypeEnum.SearchDialog) {
 #>
-                    hasNoVal = hasNoVal ? hasNoVal : (<#= GetModelPropertyNameWithSufix(directMasterProp, Model, ButtonSufix) #>.<#= GetModelPropertyName(masterProp, masterView) #> == null);
+                    hasNoVal = hasNoVal ? hasNoVal : ((<#= GetModelPropertyNameWithSufix(directMasterProp, Model, ButtonSufix) #> as <#= GetInterfaceName(masterView) #>).<#= GetModelPropertyName(masterProp, masterView) #> == null);
 <#
                                         }
                                     }
@@ -1549,17 +1554,17 @@ if (ModelHasDoInitMethod) {
                                         if (GetInputTypeWhenXXX(directMasterProp, inptTp) == InputTypeEnum.Combo) {
 #>
                     if (flt.<#= GetModelPropertyName(detailForeignKeyProps[loci], locView) #> == null) flt.<#= GetModelPropertyName(detailForeignKeyProps[loci], locView) #> = new List<<#= GetPropertyTypeName(detailForeignKeyProps[loci]) #>>();
-                    flt.<#= GetModelPropertyName(detailForeignKeyProps[loci], locView) #>.Add(<#= GetModelPropertyNameWithSufix(directMasterProp, Model, ComboSufix) #>.<#= GetModelPropertyName(masterPrimKeyProps[loci], masterView) #>);
+                    flt.<#= GetModelPropertyName(detailForeignKeyProps[loci], locView) #>.Add((<#= GetModelPropertyNameWithSufix(directMasterProp, Model, ComboSufix) #> as <#= GetInterfaceName(masterView) #>).<#= GetModelPropertyName(masterPrimKeyProps[loci], masterView) #>);
 <#
                                         }  else if (GetInputTypeWhenXXX(directMasterProp, inptTp) == InputTypeEnum.Typeahead) {
 #>
                     if (flt.<#= GetModelPropertyName(detailForeignKeyProps[loci], locView) #> == null) flt.<#= GetModelPropertyName(detailForeignKeyProps[loci], locView) #> = new List<<#= GetPropertyTypeName(detailForeignKeyProps[loci]) #>>();
-                    flt.<#= GetModelPropertyName(detailForeignKeyProps[loci], locView) #>.Add(<#= GetModelPropertyNameWithSufix(directMasterProp, Model, TypeaheadSufix) #>.<#= GetModelPropertyName(masterPrimKeyProps[loci], masterView) #>);
+                    flt.<#= GetModelPropertyName(detailForeignKeyProps[loci], locView) #>.Add((<#= GetModelPropertyNameWithSufix(directMasterProp, Model, TypeaheadSufix) #> as <#= GetInterfaceName(masterView) #>).<#= GetModelPropertyName(masterPrimKeyProps[loci], masterView) #>);
 <#
                                         }  else if (GetInputTypeWhenXXX(directMasterProp, inptTp) == InputTypeEnum.SearchDialog) {
 #>
                     if (flt.<#= GetModelPropertyName(detailForeignKeyProps[loci], locView) #> == null) flt.<#= GetModelPropertyName(detailForeignKeyProps[loci], locView) #> = new List<<#= GetPropertyTypeName(detailForeignKeyProps[loci]) #>>();
-                    flt.<#= GetModelPropertyName(detailForeignKeyProps[loci], locView) #>.Add(<#= GetModelPropertyNameWithSufix(directMasterProp, Model, ButtonSufix) #>.<#= GetModelPropertyName(masterPrimKeyProps[loci], masterView) #>);
+                    flt.<#= GetModelPropertyName(detailForeignKeyProps[loci], locView) #>.Add((<#= GetModelPropertyNameWithSufix(directMasterProp, Model, ButtonSufix) #> as <#= GetInterfaceName(masterView) #>).<#= GetModelPropertyName(masterPrimKeyProps[loci], masterView) #>);
 <#
                                         }
                                     }
@@ -1605,6 +1610,7 @@ if (ModelHasDoInitMethod) {
                     });
                     await <#= GetExpressionForOnValChangedMethod(modelViewUIFormPropertySerializable, Model) #>(null, true);
                 }
+            }
 <#
                         } 
 #>
@@ -1702,15 +1708,15 @@ if (ModelHasDoInitMethod) {
                                     List<ModelViewPropertyOfVwSerializable> masterPrimKeyProps      = GetModelPrimaryKeyProps(masterView);
                                     if (GetInputTypeWhenXXX(directMasterProp, inptTp) == InputTypeEnum.Combo) {
 #>
-            hasNoVal = hasNoVal ? hasNoVal : (<#= GetModelPropertyNameWithSufix(directMasterProp, Model, ComboSufix) #> == null);
+            hasNoVal = hasNoVal ? hasNoVal : ((<#= GetModelPropertyNameWithSufix(directMasterProp, Model, ComboSufix) #> as <#= GetInterfaceName(masterView) #>) == null);
 <#
                                     }  else if (GetInputTypeWhenXXX(directMasterProp, inptTp) == InputTypeEnum.Typeahead) {
 #>
-            hasNoVal = hasNoVal ? hasNoVal : (<#= GetModelPropertyNameWithSufix(directMasterProp, Model, TypeaheadSufix) #> == null);
+            hasNoVal = hasNoVal ? hasNoVal : ((<#= GetModelPropertyNameWithSufix(directMasterProp, Model, TypeaheadSufix) #> as <#= GetInterfaceName(masterView) #>) == null);
 <#
                                     }  else if (GetInputTypeWhenXXX(directMasterProp, inptTp) == InputTypeEnum.SearchDialog) {
 #>
-            hasNoVal = hasNoVal ? hasNoVal : (<#= GetModelPropertyNameWithSufix(directMasterProp, Model, ButtonSufix) #> == null);
+            hasNoVal = hasNoVal ? hasNoVal : ((<#= GetModelPropertyNameWithSufix(directMasterProp, Model, ButtonSufix) #> as <#= GetInterfaceName(masterView) #>) == null);
 <#
                                     }
 #>                    
@@ -1719,15 +1725,15 @@ if (ModelHasDoInitMethod) {
                                     foreach(ModelViewPropertyOfVwSerializable masterProp in masterPrimKeyProps) {
                                         if (GetInputTypeWhenXXX(directMasterProp, inptTp) == InputTypeEnum.Combo) {
 #>
-                hasNoVal = hasNoVal ? hasNoVal : (this.<#= GetModelPropertyNameWithSufix(directMasterProp, Model, ComboSufix) #>.<#= GetModelPropertyName(masterProp, masterView) #> == null);
+                hasNoVal = hasNoVal ? hasNoVal : ((<#= GetModelPropertyNameWithSufix(directMasterProp, Model, ComboSufix) #> as <#= GetInterfaceName(masterView) #>).<#= GetModelPropertyName(masterProp, masterView) #> == null);
 <#
                                         }  else if (GetInputTypeWhenXXX(directMasterProp, inptTp) == InputTypeEnum.Typeahead) {
 #>
-                hasNoVal = hasNoVal ? hasNoVal : (this.<#= GetModelPropertyNameWithSufix(directMasterProp, Model, TypeaheadSufix) #>.<#= GetModelPropertyName(masterProp, masterView) #> == null);
+                hasNoVal = hasNoVal ? hasNoVal : ((<#= GetModelPropertyNameWithSufix(directMasterProp, Model, TypeaheadSufix) #> as <#= GetInterfaceName(masterView) #>).<#= GetModelPropertyName(masterProp, masterView) #> == null);
 <#
                                         }  else if (GetInputTypeWhenXXX(directMasterProp, inptTp) == InputTypeEnum.SearchDialog) {
 #>
-                hasNoVal = hasNoVal ? hasNoVal : (this.<#= GetModelPropertyNameWithSufix(directMasterProp, Model, ButtonSufix) #>.<#= GetModelPropertyName(masterProp, masterView) #> == null);
+                hasNoVal = hasNoVal ? hasNoVal : ((<#= GetModelPropertyNameWithSufix(directMasterProp, Model, ButtonSufix) #> as <#= GetInterfaceName(masterView) #>).<#= GetModelPropertyName(masterProp, masterView) #> == null);
 <#
                                         }
                                     }
@@ -1759,17 +1765,17 @@ if (ModelHasDoInitMethod) {
                                             if (GetInputTypeWhenXXX(directMasterProp, inptTp) == InputTypeEnum.Combo) {
 #>
             if (flt.<#= GetModelPropertyName(detailForeignKeyProps[loci], locView) #> == null) flt.<#= GetModelPropertyName(detailForeignKeyProps[loci], locView) #> = new List<<#= GetPropertyTypeName(detailForeignKeyProps[loci]) #>>();
-            flt.<#= GetModelPropertyName(detailForeignKeyProps[loci], locView) #>.Add(<#= GetModelPropertyNameWithSufix(directMasterProp, Model, ComboSufix) #>.<#= GetModelPropertyName(masterPrimKeyProps[loci], masterView) #>);
+            flt.<#= GetModelPropertyName(detailForeignKeyProps[loci], locView) #>.Add((<#= GetModelPropertyNameWithSufix(directMasterProp, Model, ComboSufix) #> as <#= GetInterfaceName(masterView) #>).<#= GetModelPropertyName(masterPrimKeyProps[loci], masterView) #>);
 <#
                                             }  else if (GetInputTypeWhenXXX(directMasterProp, inptTp) == InputTypeEnum.Typeahead) {
 #>
             if (flt.<#= GetModelPropertyName(detailForeignKeyProps[loci], locView) #> == null) flt.<#= GetModelPropertyName(detailForeignKeyProps[loci], locView) #> = new List<<#= GetPropertyTypeName(detailForeignKeyProps[loci]) #>>();
-            flt.<#= GetModelPropertyName(detailForeignKeyProps[loci], locView) #>.Add(<#= GetModelPropertyNameWithSufix(directMasterProp, Model, TypeaheadSufix) #>.<#= GetModelPropertyName(masterPrimKeyProps[loci], masterView) #>);
+            flt.<#= GetModelPropertyName(detailForeignKeyProps[loci], locView) #>.Add((<#= GetModelPropertyNameWithSufix(directMasterProp, Model, TypeaheadSufix) #> as <#= GetInterfaceName(masterView) #>).<#= GetModelPropertyName(masterPrimKeyProps[loci], masterView) #>);
 <#
                                             }  else if (GetInputTypeWhenXXX(directMasterProp, inptTp) == InputTypeEnum.SearchDialog) {
 #>
             if (flt.<#= GetModelPropertyName(detailForeignKeyProps[loci], locView) #> == null) flt.<#= GetModelPropertyName(detailForeignKeyProps[loci], locView) #> = new List<<#= GetPropertyTypeName(detailForeignKeyProps[loci]) #>>();
-            flt.<#= GetModelPropertyName(detailForeignKeyProps[loci], locView) #>.Add(<#= GetModelPropertyNameWithSufix(directMasterProp, Model, ButtonSufix) #>.<#= GetModelPropertyName(masterPrimKeyProps[loci], masterView) #>);
+            flt.<#= GetModelPropertyName(detailForeignKeyProps[loci], locView) #>.Add((<#= GetModelPropertyNameWithSufix(directMasterProp, Model, ButtonSufix) #> as <#= GetInterfaceName(masterView) #>).<#= GetModelPropertyName(masterPrimKeyProps[loci], masterView) #>);
 <#
                                             }
                                         }
@@ -2289,15 +2295,15 @@ if (ModelHasDoInitMethod) {
                                     List<ModelViewPropertyOfVwSerializable> masterPrimKeyProps      = GetModelPrimaryKeyProps(masterView);
                                     if (GetInputTypeWhenXXX(directMasterProp, inptTp) == InputTypeEnum.Combo) {
 #>
-            hasNoVal = hasNoVal ? hasNoVal : (this.<#= GetModelPropertyNameWithSufix(directMasterProp, Model, ComboSufix) #>.value == null);
+            hasNoVal = hasNoVal ? hasNoVal : ((<#= GetModelPropertyNameWithSufix(directMasterProp, Model, ComboSufix) #> as <#= GetInterfaceName(masterView) #>) == null);
 <#
                                     }  else if (GetInputTypeWhenXXX(directMasterProp, inptTp) == InputTypeEnum.Typeahead) {
 #>
-            hasNoVal = hasNoVal ? hasNoVal : (this.<#= GetModelPropertyNameWithSufix(directMasterProp, Model, TypeaheadSufix) #>.value == null);
+            hasNoVal = hasNoVal ? hasNoVal : ((<#= GetModelPropertyNameWithSufix(directMasterProp, Model, TypeaheadSufix) #> as <#= GetInterfaceName(masterView) #>) == null);
 <#
                                     }  else if (GetInputTypeWhenXXX(directMasterProp, inptTp) == InputTypeEnum.SearchDialog) {
 #>
-            hasNoVal = hasNoVal ? hasNoVal : (this.<#= GetModelPropertyNameWithSufix(directMasterProp, Model, ButtonSufix) #> == null);
+            hasNoVal = hasNoVal ? hasNoVal : ((<#= GetModelPropertyNameWithSufix(directMasterProp, Model, ButtonSufix) #> as <#= GetInterfaceName(masterView) #>) == null);
 <#
                                     }
 #>                    
@@ -2307,19 +2313,19 @@ if (ModelHasDoInitMethod) {
                                         if (GetInputTypeWhenXXX(directMasterProp, inptTp) == InputTypeEnum.Combo) {
                                             if(IsPropertyNullable(masterProp)) {
 #>
-                hasNoVal = hasNoVal ? hasNoVal : (this.<#= GetModelPropertyNameWithSufix(directMasterProp, Model, ComboSufix) #>.<#= GetModelPropertyName(masterProp, masterView) #> == null);
+                hasNoVal = hasNoVal ? hasNoVal : ((<#= GetModelPropertyNameWithSufix(directMasterProp, Model, ComboSufix) #> as <#= GetInterfaceName(masterView) #>).<#= GetModelPropertyName(masterProp, masterView) #> == null);
 <#
                                             }
                                         }  else if (GetInputTypeWhenXXX(directMasterProp, inptTp) == InputTypeEnum.Typeahead) {
                                             if(IsPropertyNullable(masterProp)) {
 #>
-                hasNoVal = hasNoVal ? hasNoVal : (this.<#= GetModelPropertyNameWithSufix(directMasterProp, Model, TypeaheadSufix) #>.<#= GetModelPropertyName(masterProp, masterView) #> == null);
+                hasNoVal = hasNoVal ? hasNoVal : ((<#= GetModelPropertyNameWithSufix(directMasterProp, Model, TypeaheadSufix) #> as <#= GetInterfaceName(masterView) #>).<#= GetModelPropertyName(masterProp, masterView) #> == null);
 <#
                                             }
                                         }  else if (GetInputTypeWhenXXX(directMasterProp, inptTp) == InputTypeEnum.SearchDialog) {
                                             if(IsPropertyNullable(masterProp)) {
 #>
-                hasNoVal = hasNoVal ? hasNoVal : (this.<#= GetModelPropertyNameWithSufix(directMasterProp, Model, ButtonSufix) #>.<#= GetModelPropertyName(masterProp, masterView) #> == null);
+                hasNoVal = hasNoVal ? hasNoVal : ((<#= GetModelPropertyNameWithSufix(directMasterProp, Model, ButtonSufix) #> as <#= GetInterfaceName(masterView) #>).<#= GetModelPropertyName(masterProp, masterView) #> == null);
 <#
                                             }
                                         }
@@ -2356,27 +2362,27 @@ if (ModelHasDoInitMethod) {
             
             hddnFltrs.Add( new <#= WebServiceFilterRsltViewModelClassName #>() {
                 fltrName = "<#= GetModelPropertyName(detailForeignKeyProps[loci], locView) #>",
-                fltrDataType: "<#= GetCCharpDatatype(detailForeignKeyProps[loci], Model) #>",
-                fltrOperator: "eq",
-                fltrValue: this.<#= GetModelPropertyNameWithSufix(directMasterProp, Model, ComboSufix) #>.<#= GetModelPropertyName(masterPrimKeyProps[loci], masterView) #>
+                fltrDataType = "<#= GetCCharpDatatype(detailForeignKeyProps[loci], Model) #>",
+                fltrOperator = "eq",
+                fltrValue = (<#= GetModelPropertyNameWithSufix(directMasterProp, Model, ComboSufix) #> as <#= GetInterfaceName(masterView) #>).<#= GetModelPropertyName(masterPrimKeyProps[loci], masterView) #>
             });
 <#
                                             }  else if (GetInputTypeWhenXXX(directMasterProp, inptTp) == InputTypeEnum.Typeahead) {
 #>
             hddnFltrs.Add( new <#= WebServiceFilterRsltViewModelClassName #>() {
-                fltrName: "<#= GetModelPropertyName(detailForeignKeyProps[loci], locView) #>",
-                fltrDataType: "<#= GetCCharpDatatype(detailForeignKeyProps[loci], Model) #>",
-                fltrOperator: "eq",
-                fltrValue: <#= GetModelPropertyNameWithSufix(directMasterProp, Model, TypeaheadSufix) #>.<#= GetModelPropertyName(masterPrimKeyProps[loci], masterView) #>
+                fltrName = "<#= GetModelPropertyName(detailForeignKeyProps[loci], locView) #>",
+                fltrDataType = "<#= GetCCharpDatatype(detailForeignKeyProps[loci], Model) #>",
+                fltrOperator = "eq",
+                fltrValue = (<#= GetModelPropertyNameWithSufix(directMasterProp, Model, TypeaheadSufix) #> as <#= GetInterfaceName(masterView) #>).<#= GetModelPropertyName(masterPrimKeyProps[loci], masterView) #>
             });
 <#
                                             }  else if (GetInputTypeWhenXXX(directMasterProp, inptTp) == InputTypeEnum.SearchDialog) {
 #>
             hddnFltrs.Add( new <#= WebServiceFilterRsltViewModelClassName #>() {
-                fltrName: "<#= GetModelPropertyName(detailForeignKeyProps[loci], locView) #>",
-                fltrDataType: "<#= GetCCharpDatatype(detailForeignKeyProps[loci], Model) #>",
-                fltrOperator: "eq",
-                fltrValue: <#= GetModelPropertyNameWithSufix(directMasterProp, Model, ButtonSufix) #>.<#= GetModelPropertyName(masterPrimKeyProps[loci], masterView) #>
+                fltrName = "<#= GetModelPropertyName(detailForeignKeyProps[loci], locView) #>",
+                fltrDataType = "<#= GetCCharpDatatype(detailForeignKeyProps[loci], Model) #>",
+                fltrOperator = "eq",
+                fltrValue = (<#= GetModelPropertyNameWithSufix(directMasterProp, Model, ButtonSufix) #> as <#= GetInterfaceName(masterView) #>).<#= GetModelPropertyName(masterPrimKeyProps[loci], masterView) #>
             });
 <#
                                             }
