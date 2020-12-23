@@ -108,16 +108,24 @@ namespace <#= SformUserControlNameSpace #> {
         }
         #endregion
         #region <#= FilterHeightPropertyName #>
+        private static void <#= FilterHeightPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            <#= SformUserControlClassName #> inst = d as <#= SformUserControlClassName #>;
+            if (inst != null)
+            {
+                inst.<#= FilterHeightPropertyName #> = (e.NewValue is double) ? (double)e.NewValue : double.MaxValue;
+            }
+        }
         public static readonly DependencyProperty <#= FilterHeightPropertyName #>Property =
                 DependencyProperty.Register(
-                "<#= FilterHeightPropertyName #>", typeof(Nullable<double>),
+                "<#= FilterHeightPropertyName #>", typeof(double),
                 typeof(<#= SformUserControlClassName #>),
-                new PropertyMetadata(null));
-        public Nullable<double> FilterHeight
+                new PropertyMetadata(double.MaxValue, <#= FilterHeightPropertyName #>Changed));
+        public double <#= FilterHeightPropertyName #>
         {
             get
             {
-                return (Nullable<double>)GetValue(<#= FilterHeightPropertyName #>Property);
+                return (double)GetValue(<#= FilterHeightPropertyName #>Property);
             }
             set
             {
@@ -126,16 +134,24 @@ namespace <#= SformUserControlNameSpace #> {
         }
         #endregion
         #region <#= ShowFilterPropertyName #>
+        private static void <#= ShowFilterPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e) {
+            <#= SformUserControlClassName #> inst = d as <#= SformUserControlClassName #>;
+            if (inst != null) 
+            {
+                
+                inst.<#= ShowFilterPropertyName #> = (e.NewValue is bool) ? (bool)e.NewValue : false;
+            }
+        }
         public static readonly DependencyProperty <#= ShowFilterPropertyName #>Property =
                 DependencyProperty.Register(
-                "<#= ShowFilterPropertyName #>", typeof(Nullable<bool>),
+                "<#= ShowFilterPropertyName #>", typeof(bool),
                 typeof(<#= SformUserControlClassName #>),
-                new PropertyMetadata(true));
-        public Nullable<bool> <#= ShowFilterPropertyName #>
+                new PropertyMetadata(true, <#= ShowFilterPropertyName #>Changed));
+        public bool <#= ShowFilterPropertyName #>
         {
             get
             {
-                return (Nullable<bool>)GetValue(<#= ShowFilterPropertyName #>Property);
+                return (bool)GetValue(<#= ShowFilterPropertyName #>Property);
             }
             set
             {
@@ -144,16 +160,23 @@ namespace <#= SformUserControlNameSpace #> {
         }
         #endregion
         #region <#= ShowAddFilterBtnPropertyName #>
+        private static void <#= ShowAddFilterBtnPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e) {
+            <#= SformUserControlClassName #> inst = d as <#= SformUserControlClassName #>;
+            if (inst != null) 
+            {
+                inst.<#= ShowAddFilterBtnPropertyName #> = (e.NewValue is bool) ? (bool)e.NewValue : false;
+            }
+        }
         public static readonly DependencyProperty <#= ShowAddFilterBtnPropertyName #>Property =
                 DependencyProperty.Register(
-                "<#= ShowAddFilterBtnPropertyName #>", typeof(Nullable<bool>),
+                "<#= ShowAddFilterBtnPropertyName #>", typeof(bool),
                 typeof(<#= SformUserControlClassName #>),
-                new PropertyMetadata(null));
-        public Nullable<bool> <#= ShowAddFilterBtnPropertyName #>
+                new PropertyMetadata(true, <#= ShowAddFilterBtnPropertyName #>Changed));
+        public bool <#= ShowAddFilterBtnPropertyName #>
         {
             get
             {
-                return (Nullable<bool>)GetValue(<#= ShowAddFilterBtnPropertyName #>Property);
+                return (bool)GetValue(<#= ShowAddFilterBtnPropertyName #>Property);
             }
             set
             {
@@ -162,16 +185,23 @@ namespace <#= SformUserControlNameSpace #> {
         }
         #endregion
         #region <#= ShowBackBtnPropertyName #>
+        private static void <#= ShowBackBtnPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e) {
+            <#= SformUserControlClassName #> inst = d as <#= SformUserControlClassName #>;
+            if (inst != null) 
+            {
+                inst.<#= ShowBackBtnPropertyName #> = (e.NewValue is bool) ? (bool)e.NewValue : false;
+            }
+        }
         public static readonly DependencyProperty <#= ShowBackBtnPropertyName #>Property =
                 DependencyProperty.Register(
-                "<#= ShowBackBtnPropertyName #>", typeof(Nullable<bool>),
+                "<#= ShowBackBtnPropertyName #>", typeof(bool),
                 typeof(<#= SformUserControlClassName #>),
-                new PropertyMetadata(null));
-        public Nullable<bool> <#= ShowBackBtnPropertyName #>
+                new PropertyMetadata(false, <#= ShowBackBtnPropertyName #>Changed));
+        public bool <#= ShowBackBtnPropertyName #>
         {
             get
             {
-                return (Nullable<bool>)GetValue(<#= ShowBackBtnPropertyName #>Property);
+                return (bool)GetValue(<#= ShowBackBtnPropertyName #>Property);
             }
             set
             {
@@ -180,16 +210,24 @@ namespace <#= SformUserControlNameSpace #> {
         }
         #endregion
         #region <#= GridHeightPropertyName #>
+        private static void <#= GridHeightPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            <#= SformUserControlClassName #> inst = d as <#= SformUserControlClassName #>;
+            if (inst != null)
+            {
+                inst.<#= GridHeightPropertyName #> = (e.NewValue is double) ? (double)e.NewValue : double.MaxValue;
+            }
+        }
         public static readonly DependencyProperty <#= GridHeightPropertyName #>Property =
                 DependencyProperty.Register(
-                "<#= GridHeightPropertyName #>", typeof(Nullable<double>),
+                "<#= GridHeightPropertyName #>", typeof(double),
                 typeof(<#= SformUserControlClassName #>),
-                new PropertyMetadata(null));
-        public Nullable<double> <#= GridHeightPropertyName #>
+                new PropertyMetadata(double.MaxValue, <#= GridHeightPropertyName #>Changed));
+        public double <#= GridHeightPropertyName #>
         {
             get
             {
-                return (Nullable<double>)GetValue(<#= GridHeightPropertyName #>Property);
+                return (double)GetValue(<#= GridHeightPropertyName #>Property);
             }
             set
             {

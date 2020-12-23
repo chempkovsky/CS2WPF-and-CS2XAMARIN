@@ -82,6 +82,7 @@
 
     string EformModePropertyName                    = "EformMode";
 
+    string IsLoadingPropertyName                    = "IsLoading";
 
     string CaptionPropertyName = "Caption";
     string ContainerMenuItemsPropertyName = "ContainerMenuItems";
@@ -179,6 +180,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
@@ -209,12 +211,25 @@
             </ItemsControl>
         </Grid>
 
+        <ProgressBar Grid.Row="1" Height="10" Margin="8 4 8 4" IsIndeterminate="{Binding <#= IsLoadingPropertyName #>, Mode=OneWay}">
+            <ProgressBar.Resources>
+                <Style TargetType="{x:Type ProgressBar}">
+                    <Setter Property="Visibility" Value="Hidden" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding <#= IsLoadingPropertyName #>}" Value="True">
+                            <Setter Property="Visibility" Value="Visible" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </ProgressBar.Resources>
+        </ProgressBar>
+
 
 
 <#
     for (int InputTypeId = 1; InputTypeId <= 3; InputTypeId++) {
 #>
-        <StackPanel Orientation="Vertical"  Grid.Row="1">
+        <StackPanel Orientation="Vertical"  Grid.Row="2">
             <StackPanel.Resources>
                 <Style TargetType="{x:Type StackPanel}">
                     <Setter Property="Visibility" Value="Collapsed" />
@@ -666,7 +681,7 @@
     }
 #>
 
-        <StackPanel Orientation="Horizontal" Grid.Row="2"  Margin="8" Visibility="{Binding Path=<#= ShowSubmitPropertyName #>, Mode=OneWay,  Converter={StaticResource BooleanToVisibilityConverter}, ElementName=EformUsrCntrlRootNode }">
+        <StackPanel Orientation="Horizontal" Grid.Row="3"  Margin="8" Visibility="{Binding Path=<#= ShowSubmitPropertyName #>, Mode=OneWay,  Converter={StaticResource BooleanToVisibilityConverter}, ElementName=EformUsrCntrlRootNode }">
             <Button Content="Submit" MinWidth="64" Command="{x:Static crtcmd:<#= RoutedCommandExtClassName #>.<#= OkCommandPropertyName #>}" />
             <Button Content="Cancel" MinWidth="64" Margin="8 0 0 0" Command="{x:Static crtcmd:<#= RoutedCommandExtClassName #>.<#= CancelCommandPropertyName #>}" />
         </StackPanel>

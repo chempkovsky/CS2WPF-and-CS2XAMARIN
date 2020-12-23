@@ -11,39 +11,25 @@
 <#@ import namespace="CS2WPF.Model.Serializable" #>
 <#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
-using System;
-using System.Collections.Generic;
-using System.Net.Http;
+
 <#
 
-    string IAppGlblSettingsServiceFolder      = "00080-IAppGlblSettingsService.cs";
-    string IAppGlblSettingsServiceClassName   = GetModelClassName(Model, IAppGlblSettingsServiceFolder);
-    string IAppGlblSettingsServiceNameSpace   = GetModelNameSpace(Model, IAppGlblSettingsServiceFolder);
+    string IO2mListItemInterfaceFolder      = "00600-IO2mListItemInterface.cs";
+    string IO2mListItemInterfaceClassName   = GetModelClassName(Model, IO2mListItemInterfaceFolder);
+    string IO2mListItemInterfaceNameSpace   = GetModelNameSpace(Model, IO2mListItemInterfaceFolder);
     
-    string ShowErrorMethodName                  = "ShowErrorMessage";
+    string CaptionPropertyName                  = "Caption";
+    string RegionPropertyName                   = "Region";
+    string ForeignKeyDetailsName                = "ForeignKeyDetails";
 
 #>
 
-namespace <#= IAppGlblSettingsServiceNameSpace #> {
-    public interface  <#= IAppGlblSettingsServiceClassName #>
+namespace <#= IO2mListItemInterfaceNameSpace #> {
+    public interface <#= IO2mListItemInterfaceClassName #>
     {
-        double FilterHeightAddition { get; set; }
-        double FilterHeightFactor { get; set; }
-        double TableHeightAddition { get; set; }
-        double TableHeightFactor { get; set; }
-        event Action<object, string> OnMessageNotification;
-        event Action<object, string> OnUserChangedNotification;
-        string GetWebApiPrefix(string ViewName);
-        string GetSecurityWebApiPrefix();
-        double getDialogWidth(string ViewName);
-        string UserName { get; set; }
-        dynamic AuthInfo { get; set; }
-        List<KeyValuePair<string, string>> GetAuthInfoHeader();
-        int[] Permissions { get; set; }
-        int GetViewModelMask(string vwModel);
-        int GetDashBrdMask(string dshBrd);
-        HttpClient Client  { get; }
-        void <#= ShowErrorMethodName #>(string errorType, string errorMsg);
+        string  <#= CaptionPropertyName #> { get; set; }
+        string  <#= RegionPropertyName #> { get; set; }
+        string  <#= ForeignKeyDetailsName #> { get; set; }
     }
 }
 

@@ -33,7 +33,7 @@ using System.Collections;
     string EformModeEnumClassName                   = GetContextModelClassName(Context, EformModeEnumFolder);
     string EformModeEnumNameSpace                   = GetContextModelNameSpace(Context, EformModeEnumFolder);
 
-    string IAppGlblSettingsServiceFolder            = "00080-IAppGlblSettingsService";
+    string IAppGlblSettingsServiceFolder            = "00080-IAppGlblSettingsService.cs";
     string IAppGlblSettingsServiceClassName         = GetContextModelClassName(Context, IAppGlblSettingsServiceFolder);
     string IAppGlblSettingsServiceNameSpace         = GetContextModelNameSpace(Context, IAppGlblSettingsServiceFolder);
 
@@ -108,6 +108,7 @@ using System.Collections;
     string HiddenFiltersPropertyChangedPropertyName = "HiddenFiltersPropertyChanged";
 
     string IsOnLoadedCalledPropertyName             = "IsOnLoadedCalled";
+    string IsLoadingPropertyName                    = "IsLoading";
     string RoutedEventHandlersPropertyName          = "RoutedEventHandlers";
     string RoutedCommandHandlersPropertyName        = "RoutedCommandHandlers";
 
@@ -399,21 +400,34 @@ namespace <#= EformViewModelNameSpace #> {
     }
 #>
         {
-            <#= IsOnLoadedCalledPropertyName #> = true;
-            DoClearControls();
-            RunEformModeChanged();
-            InputToControls();
+            
+            try {
+                <#= IsLoadingPropertyName #> = true;
+                <#= IsOnLoadedCalledPropertyName #> = true;
+                DoClearControls();
+                RunEformModeChanged();
+                InputToControls();
 <#  
     if (ModelHasDoInitMethod) {
 #>
 
-            await DoInit();
+                await DoInit();
 <#  
     }
 #>
-            ClearValidationMessages();
+                ClearValidationMessages();
+            } finally
+            {
+                <#= IsLoadingPropertyName #> = false;
+            }
         }
         protected bool <#= IsOnLoadedCalledPropertyName #> = false;
+        protected bool _<#= IsLoadingPropertyName #> = true;
+        public bool <#= IsLoadingPropertyName #>
+        {
+            get { return _<#= IsLoadingPropertyName #>; }
+            set { if(_<#= IsLoadingPropertyName #> != value) { _<#= IsLoadingPropertyName #> = value; OnPropertyChanged(); } }
+        }
 
         #region <#= RoutedEventHandlersPropertyName #>
         protected IEnumerable<ValueTuple<RoutedEvent, Delegate, bool>> _<#= RoutedEventHandlersPropertyName #> = null;
@@ -569,17 +583,23 @@ namespace <#= EformViewModelNameSpace #> {
                         OnPropertyChanged("<#= EformModePropertyName #>");
                     });
                     if(<#= IsOnLoadedCalledPropertyName #>) {
-                        DoClearControls();
-                        RunEformModeChanged();
-                        InputToControls();
+                        try {
+                            <#= IsLoadingPropertyName #> = true;
+                            DoClearControls();
+                            RunEformModeChanged();
+                            InputToControls();
 <#  
     if (ModelHasDoInitMethod) {
 #>
-                        await DoInit();
+                            await DoInit();
 <#  
     }
 #>
-                        ClearValidationMessages();
+                            ClearValidationMessages();
+                        } finally
+                        {
+                            <#= IsLoadingPropertyName #> = false;
+                        }
                     }
                 }
             }
@@ -621,16 +641,22 @@ namespace <#= EformViewModelNameSpace #> {
                 });
 
                 if(<#= IsOnLoadedCalledPropertyName #>) {
-                    DoClearControls();
-                    InputToControls();
+                    try {
+                        <#= IsLoadingPropertyName #> = true;
+                        DoClearControls();
+                        InputToControls();
 <#  
     if (ModelHasDoInitMethod) {
 #>
-                    await DoInit();
+                        await DoInit();
 <#  
     }
 #>
-                    ClearValidationMessages();
+                        ClearValidationMessages();
+                    } finally
+                    {
+                        <#= IsLoadingPropertyName #> = false;
+                    }
                 }
             }
         }
@@ -677,16 +703,22 @@ namespace <#= EformViewModelNameSpace #> {
                     OnPropertyChanged("<#= HiddenFiltersPropertyName #>");
                 });
                     if(<#= IsOnLoadedCalledPropertyName #>) {
-                        DoClearControls();
-                        InputToControls();
+                        try {
+                            <#= IsLoadingPropertyName #> = true;
+                            DoClearControls();
+                            InputToControls();
 <#  
     if (ModelHasDoInitMethod) {
 #>
-                        await DoInit();
+                            await DoInit();
 <#  
     }
 #>
-                        ClearValidationMessages();
+                            ClearValidationMessages();
+                        } finally
+                        {
+                            <#= IsLoadingPropertyName #> = false;
+                        }
                     }
             }
         }
@@ -2594,6 +2626,7 @@ if (ModelHasDoInitMethod) {
                 ErrorsChanged(this, new DataErrorsChangedEventArgs(propertyName));
         }
         public void ValidateFiled(object value, [CallerMemberName] string filedName = null) {
+            if(<#= IsLoadingPropertyName #>) return;
             if (string.IsNullOrEmpty(filedName)) return;
             PropertyInfo propertyInfo = typeof(<#= GetInterfaceName(Model) #>).GetProperty(filedName);
             if(propertyInfo == null) return;
@@ -2614,6 +2647,7 @@ if (ModelHasDoInitMethod) {
             }
         }
         public void ValidateObjectFiled(object value, [CallerMemberName] string filedName = null) {
+            if(<#= IsLoadingPropertyName #>) return;
             if (string.IsNullOrEmpty(filedName)) return;
             if (value != null) {
                 if(ValidationDataErrors.ContainsKey(filedName))  {

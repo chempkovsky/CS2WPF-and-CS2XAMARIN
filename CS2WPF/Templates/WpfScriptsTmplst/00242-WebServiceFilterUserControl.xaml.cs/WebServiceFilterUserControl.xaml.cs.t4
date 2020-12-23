@@ -155,16 +155,24 @@ namespace <#= WebServiceFilterUserControlNameSpace #> {
         }
         #endregion
         #region <#= FilterHeightPropertyName #>
+        private static void <#= FilterHeightPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            <#= WebServiceFilterUserControlClassName #> inst = d as <#= WebServiceFilterUserControlClassName #>;
+            if (inst != null)
+            {
+                inst.<#= FilterHeightPropertyName #> = (e.NewValue is double) ? (double)e.NewValue : double.MaxValue;
+            }
+        }
         public static readonly DependencyProperty <#= FilterHeightPropertyName #>Property =
                 DependencyProperty.Register(
-                "<#= FilterHeightPropertyName #>", typeof(Nullable<double>),
+                "<#= FilterHeightPropertyName #>", typeof(double),
                 typeof(<#= WebServiceFilterUserControlClassName #>),
-                new PropertyMetadata(null));
-        public Nullable<double> <#= FilterHeightPropertyName #>
+                new PropertyMetadata(double.MaxValue, <#= FilterHeightPropertyName #>Changed));
+        public double <#= FilterHeightPropertyName #>
         {
             get
             {
-                return (Nullable<double>)GetValue(<#= FilterHeightPropertyName #>Property);
+                return (double)GetValue(<#= FilterHeightPropertyName #>Property);
             }
             set
             {
@@ -258,9 +266,9 @@ namespace <#= WebServiceFilterUserControlNameSpace #> {
         #region <#= ShowBackBtnPropertyName #>
         private static void <#= ShowBackBtnPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e) {
             <#= WebServiceFilterUserControlClassName #> inst = d as <#= WebServiceFilterUserControlClassName #>;
-            if ((inst != null) && (e.NewValue is bool))
+            if (inst != null) 
             {
-                inst.<#= ShowBackBtnPropertyName #> = (bool)e.NewValue;
+                inst.<#= ShowBackBtnPropertyName #> = (e.NewValue is bool) ? (bool)e.NewValue : false;
             }
         }
         public static readonly DependencyProperty <#= ShowBackBtnPropertyName #>Property =
@@ -283,9 +291,9 @@ namespace <#= WebServiceFilterUserControlNameSpace #> {
         #region <#= ShowAddFilterBtnPropertyName #>
         private static void <#= ShowAddFilterBtnPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e) {
             <#= WebServiceFilterUserControlClassName #> inst = d as <#= WebServiceFilterUserControlClassName #>;
-            if ((inst != null) && (e.NewValue is bool))
+            if (inst != null)
             {
-                inst.<#= ShowAddFilterBtnPropertyName #> = (bool)e.NewValue;
+                inst.<#= ShowAddFilterBtnPropertyName #> = (e.NewValue is bool) ? (bool)e.NewValue : false;
             }
         }
         public static readonly DependencyProperty <#= ShowAddFilterBtnPropertyName #>Property =

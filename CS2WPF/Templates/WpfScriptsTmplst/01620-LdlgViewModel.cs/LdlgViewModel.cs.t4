@@ -76,7 +76,7 @@ using System.Windows.Controls;
     string modelInterfaceClassName      = GetInterfaceName(Model);
     string modelInterfaceNameSpace      = GetModelNameSpace(Model, modelInterfaceFolder);
 
-    string IAppGlblSettingsServiceFolder      = "00080-IAppGlblSettingsService";
+    string IAppGlblSettingsServiceFolder      = "00080-IAppGlblSettingsService.cs";
     string IAppGlblSettingsServiceClassName   = GetContextModelClassName(Context, IAppGlblSettingsServiceFolder);
     string IAppGlblSettingsServiceNameSpace   = GetContextModelNameSpace(Context, IAppGlblSettingsServiceFolder);
 
@@ -261,11 +261,11 @@ namespace <#= LdlgViewModelNameSpace #> {
             }
             if (parameters.ContainsKey("<#= FilterHeightPropertyName #>"))
             {
-                <#= FilterHeightPropertyName #> = parameters.GetValue<Nullable<double>>("<#= FilterHeightPropertyName #>");
+                <#= FilterHeightPropertyName #> = parameters.GetValue<double>("<#= FilterHeightPropertyName #>");
             }
             if (parameters.ContainsKey("<#= GridHeightPropertyName #>"))
             {
-                <#= GridHeightPropertyName #> = parameters.GetValue<Nullable<double>>("<#= GridHeightPropertyName #>");
+                <#= GridHeightPropertyName #> = parameters.GetValue<double>("<#= GridHeightPropertyName #>");
             }
             if (parameters.ContainsKey("<#= CanAddPropertyName #>"))
             {
@@ -326,8 +326,8 @@ namespace <#= LdlgViewModelNameSpace #> {
 
 
         #region <#= GridHeightPropertyName #>
-        Nullable<double> _<#= GridHeightPropertyName #> = null;
-        public Nullable<double> <#= GridHeightPropertyName #>
+        double _<#= GridHeightPropertyName #> = double.MaxValue;
+        public double <#= GridHeightPropertyName #>
         {
             get
             {
@@ -345,8 +345,8 @@ namespace <#= LdlgViewModelNameSpace #> {
         #endregion
 
         #region <#= FilterHeightPropertyName #>
-        Nullable<double> _<#= FilterHeightPropertyName #> = null;
-        public Nullable<double> <#= FilterHeightPropertyName #>
+        double _<#= FilterHeightPropertyName #> = double.MaxValue;
+        public double <#= FilterHeightPropertyName #>
         {
             get
             {

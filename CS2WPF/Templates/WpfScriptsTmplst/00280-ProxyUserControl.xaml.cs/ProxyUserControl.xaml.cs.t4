@@ -53,6 +53,18 @@ using System.Windows.Controls;
     string CanUpdPropertyName = "CanUpdate";
     string CanDelPropertyName = "CanDelete";
 
+    string FilterHeightDetailPropertyName = "FilterHeightDetail"; 
+    string ShowFilterDetailPropertyName = "ShowFilterDetail"; 
+    string ShowAddFilterBtnDetailPropertyName = "ShowAddFilterBtnDetail"; 
+    string GridHeightDetailPropertyName = "GridHeightDetail"; 
+    string HiddenFiltersDetailPropertyName = "HiddenFiltersDetail"; 
+    string TableMenuItemsDetailPropertyName = "TableMenuItemsDetail"; 
+    string RowMenuItemsDetailPropertyName = "RowMenuItemsDetail"; 
+    string CanAddDetailPropertyName = "CanAddDetail"; 
+    string CanUpdDetailPropertyName = "CanUpdateDetail"; 
+    string CanDelDetailPropertyName = "CanDeleteDetail"; 
+
+
 
     List<string> nmSpaces = new List<string>();
     if ((ProxyUserControlNameSpace != IWebServiceFilterMenuInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterMenuInterfaceNameSpace) < 0)) 
@@ -100,16 +112,24 @@ namespace <#= ProxyUserControlNameSpace #> {
         }
         #endregion
         #region <#= FilterHeightPropertyName #>
+        private static void <#= FilterHeightPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            <#= ProxyUserControlClassName #> inst = d as <#= ProxyUserControlClassName #>;
+            if (inst != null)
+            {
+                inst.<#= FilterHeightPropertyName #> = (e.NewValue is double) ? (double)e.NewValue : double.MaxValue;
+            }
+        }
         public static readonly DependencyProperty <#= FilterHeightPropertyName #>Property =
                 DependencyProperty.Register(
-                "<#= FilterHeightPropertyName #>", typeof(Nullable<double>),
+                "<#= FilterHeightPropertyName #>", typeof(double),
                 typeof(<#= ProxyUserControlClassName #>),
-                new PropertyMetadata(null));
-        public Nullable<double> <#= FilterHeightPropertyName #>
+                new PropertyMetadata(double.MaxValue, <#= FilterHeightPropertyName #>Changed));
+        public double <#= FilterHeightPropertyName #>
         {
             get
             {
-                return (Nullable<double>)GetValue(<#= FilterHeightPropertyName #>Property);
+                return (double)GetValue(<#= FilterHeightPropertyName #>Property);
             }
             set
             {
@@ -136,16 +156,24 @@ namespace <#= ProxyUserControlNameSpace #> {
         }
         #endregion
         #region <#= ShowFilterPropertyName #>
+        private static void <#= ShowFilterPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e) {
+            <#= ProxyUserControlClassName #> inst = d as <#= ProxyUserControlClassName #>;
+            if (inst != null) 
+            {
+                
+                inst.<#= ShowFilterPropertyName #> = (e.NewValue is bool) ? (bool)e.NewValue : false;
+            }
+        }
         public static readonly DependencyProperty <#= ShowFilterPropertyName #>Property =
                 DependencyProperty.Register(
-                "<#= ShowFilterPropertyName #>", typeof(Nullable<bool>),
+                "<#= ShowFilterPropertyName #>", typeof(bool),
                 typeof(<#= ProxyUserControlClassName #>),
-                new PropertyMetadata(true));
-        public Nullable<bool> <#= ShowFilterPropertyName #>
+                new PropertyMetadata(true, <#= ShowFilterPropertyName #>Changed));
+        public bool <#= ShowFilterPropertyName #>
         {
             get
             {
-                return (Nullable<bool>)GetValue(<#= ShowFilterPropertyName #>Property);
+                return (bool)GetValue(<#= ShowFilterPropertyName #>Property);
             }
             set
             {
@@ -156,9 +184,10 @@ namespace <#= ProxyUserControlNameSpace #> {
         #region <#= ShowBackBtnPropertyName #>
         private static void <#= ShowBackBtnPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e) {
             <#= ProxyUserControlClassName #> inst = d as <#= ProxyUserControlClassName #>;
-            if ((inst != null) && (e.NewValue is bool))
+            if (inst != null) 
             {
-                inst.<#= ShowBackBtnPropertyName #> = (bool)e.NewValue;
+                
+                inst.<#= ShowBackBtnPropertyName #> = (e.NewValue is bool) ? (bool)e.NewValue : false;
             }
         }
         public static readonly DependencyProperty <#= ShowBackBtnPropertyName #>Property =
@@ -181,9 +210,9 @@ namespace <#= ProxyUserControlNameSpace #> {
         #region <#= ShowAddFilterBtnPropertyName #>
         private static void <#= ShowAddFilterBtnPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e) {
             <#= ProxyUserControlClassName #> inst = d as <#= ProxyUserControlClassName #>;
-            if ((inst != null) && (e.NewValue is bool))
+            if (inst != null) 
             {
-                inst.<#= ShowAddFilterBtnPropertyName #> = (bool)e.NewValue;
+                inst.<#= ShowAddFilterBtnPropertyName #> = (e.NewValue is bool) ? (bool)e.NewValue : false;
             }
         }
         public static readonly DependencyProperty <#= ShowAddFilterBtnPropertyName #>Property =
@@ -222,16 +251,24 @@ namespace <#= ProxyUserControlNameSpace #> {
         }
         #endregion
         #region <#= GridHeightPropertyName #>
+        private static void <#= GridHeightPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            <#= ProxyUserControlClassName #> inst = d as <#= ProxyUserControlClassName #>;
+            if (inst != null)
+            {
+                inst.<#= GridHeightPropertyName #> = (e.NewValue is double) ? (double)e.NewValue : double.MaxValue;
+            }
+        }
         public static readonly DependencyProperty <#= GridHeightPropertyName #>Property =
                 DependencyProperty.Register(
-                "<#= GridHeightPropertyName #>", typeof(Nullable<double>),
+                "<#= GridHeightPropertyName #>", typeof(double),
                 typeof(<#= ProxyUserControlClassName #>),
-                new PropertyMetadata(null));
-        public Nullable<double> <#= GridHeightPropertyName #>
+                new PropertyMetadata(double.MaxValue, <#= GridHeightPropertyName #>Changed));
+        public double <#= GridHeightPropertyName #>
         {
             get
             {
-                return (Nullable<double>)GetValue(<#= GridHeightPropertyName #>Property);
+                return (double)GetValue(<#= GridHeightPropertyName #>Property);
             }
             set
             {
@@ -333,9 +370,9 @@ namespace <#= ProxyUserControlNameSpace #> {
         #region <#= CanAddPropertyName #>
         private static void <#= CanAddPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e) {
             <#= ProxyUserControlClassName #> inst = d as <#= ProxyUserControlClassName #>;
-            if ((inst != null) && (e.NewValue is bool))
+            if (inst != null) 
             {
-                inst.<#= CanAddPropertyName #> = (bool)e.NewValue;
+                inst.<#= CanAddPropertyName #> = (e.NewValue is bool) ? (bool)e.NewValue : false;
             }
         }
         public static readonly DependencyProperty <#= CanAddPropertyName #>Property =
@@ -358,9 +395,9 @@ namespace <#= ProxyUserControlNameSpace #> {
         #region <#= CanUpdPropertyName #>
         private static void <#= CanUpdPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e) {
             <#= ProxyUserControlClassName #> inst = d as <#= ProxyUserControlClassName #>;
-            if ((inst != null) && (e.NewValue is bool))
+            if (inst != null) 
             {
-                inst.<#= CanUpdPropertyName #> = (bool)e.NewValue;
+                inst.<#= CanUpdPropertyName #> = (e.NewValue is bool) ? (bool)e.NewValue : false;
             }
         }
         public static readonly DependencyProperty <#= CanUpdPropertyName #>Property =
@@ -383,9 +420,9 @@ namespace <#= ProxyUserControlNameSpace #> {
         #region <#= CanDelPropertyName #>
         private static void <#= CanDelPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e) {
             <#= ProxyUserControlClassName #> inst = d as <#= ProxyUserControlClassName #>;
-            if ((inst != null) && (e.NewValue is bool))
+            if (inst != null)
             {
-                inst.<#= CanDelPropertyName #> = (bool)e.NewValue;
+                inst.<#= CanDelPropertyName #> = (e.NewValue is bool) ? (bool)e.NewValue : false;
             }
         }
         public static readonly DependencyProperty <#= CanDelPropertyName #>Property =
@@ -406,7 +443,251 @@ namespace <#= ProxyUserControlNameSpace #> {
         }
         #endregion
 
+        #region <#= CanAddDetailPropertyName #>
+        private static void <#= CanAddDetailPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            <#= ProxyUserControlClassName #> inst = d as <#= ProxyUserControlClassName #>;
+            if (inst != null) 
+            {
+                inst.<#= CanAddDetailPropertyName #> = (e.NewValue is bool) ? (bool)e.NewValue : false;
+            }
+        }
+        public static readonly DependencyProperty <#= CanAddDetailPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= CanAddDetailPropertyName #>", typeof(bool),
+                typeof(<#= ProxyUserControlClassName #>),
+                new PropertyMetadata(false, <#= CanAddDetailPropertyName #>Changed));
+        public bool <#= CanAddDetailPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= CanAddDetailPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= CanAddDetailPropertyName #>Property, value);
+            }
+        }
+        #endregion
 
+        #region <#= CanUpdDetailPropertyName #>
+        private static void <#= CanUpdDetailPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            <#= ProxyUserControlClassName #> inst = d as <#= ProxyUserControlClassName #>;
+            if (inst != null)
+            {
+                inst.<#= CanUpdDetailPropertyName #> = (e.NewValue is bool) ? (bool)e.NewValue : false;
+            }
+        }
+        public static readonly DependencyProperty <#= CanUpdDetailPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= CanUpdDetailPropertyName #>", typeof(bool),
+                typeof(<#= ProxyUserControlClassName #>),
+                new PropertyMetadata(false, <#= CanUpdDetailPropertyName #>Changed));
+        public bool <#= CanUpdDetailPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= CanUpdDetailPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= CanUpdDetailPropertyName #>Property, value);
+            }
+        }
+        #endregion
+
+        #region <#= CanDelDetailPropertyName #>
+        private static void <#= CanDelDetailPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            <#= ProxyUserControlClassName #> inst = d as <#= ProxyUserControlClassName #>;
+            if ((inst != null) && (e.NewValue is bool))
+            {
+                inst.<#= CanDelDetailPropertyName #> = (e.NewValue is bool) ? (bool)e.NewValue : false;
+            }
+        }
+        public static readonly DependencyProperty <#= CanDelDetailPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= CanDelDetailPropertyName #>", typeof(bool),
+                typeof(<#= ProxyUserControlClassName #>),
+                new PropertyMetadata(false, <#= CanDelDetailPropertyName #>Changed));
+        public bool <#= CanDelDetailPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= CanDelDetailPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= CanDelDetailPropertyName #>Property, value);
+            }
+        }
+        #endregion
+
+        #region <#= FilterHeightDetailPropertyName #>
+        private static void <#= FilterHeightDetailPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            <#= ProxyUserControlClassName #> inst = d as <#= ProxyUserControlClassName #>;
+            if (inst != null)
+            {
+                inst.<#= FilterHeightDetailPropertyName #> = (e.NewValue is double) ? (double)e.NewValue : double.MaxValue;
+            }
+        }
+        public static readonly DependencyProperty <#= FilterHeightDetailPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= FilterHeightDetailPropertyName #>", typeof(double),
+                typeof(<#= ProxyUserControlClassName #>),
+                new PropertyMetadata(double.MaxValue, <#= FilterHeightDetailPropertyName #>Changed));
+        public double <#= FilterHeightDetailPropertyName #>
+        {
+            get
+            {
+                return (double)GetValue(<#= FilterHeightDetailPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= FilterHeightDetailPropertyName #>Property, value);
+            }
+        }
+        #endregion
+
+        #region <#= ShowFilterDetailPropertyName #>
+        private static void <#= ShowFilterDetailPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e) {
+            <#= ProxyUserControlClassName #> inst = d as <#= ProxyUserControlClassName #>;
+            if (inst != null) 
+            {
+                
+                inst.<#= ShowFilterDetailPropertyName #> = (e.NewValue is bool) ? (bool)e.NewValue : false;
+            }
+        }
+        public static readonly DependencyProperty <#= ShowFilterDetailPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= ShowFilterDetailPropertyName #>", typeof(bool),
+                typeof(<#= ProxyUserControlClassName #>),
+                new PropertyMetadata(true, <#= ShowFilterDetailPropertyName #>Changed));
+        public bool <#= ShowFilterDetailPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= ShowFilterDetailPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= ShowFilterDetailPropertyName #>Property, value);
+            }
+        }
+        #endregion
+
+        #region <#= ShowAddFilterBtnDetailPropertyName #>
+        private static void <#= ShowAddFilterBtnDetailPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e) {
+            <#= ProxyUserControlClassName #> inst = d as <#= ProxyUserControlClassName #>;
+            if (inst != null) 
+            {
+                
+                inst.<#= ShowAddFilterBtnDetailPropertyName #> = (e.NewValue is bool) ? (bool)e.NewValue : false;
+            }
+        }
+        public static readonly DependencyProperty <#= ShowAddFilterBtnDetailPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= ShowAddFilterBtnDetailPropertyName #>", typeof(bool),
+                typeof(<#= ProxyUserControlClassName #>),
+                new PropertyMetadata(true, <#= ShowAddFilterBtnDetailPropertyName #>Changed));
+        public bool <#= ShowAddFilterBtnDetailPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= ShowAddFilterBtnDetailPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= ShowAddFilterBtnDetailPropertyName #>Property, value);
+            }
+        }
+        #endregion
+
+        #region <#= GridHeightDetailPropertyName #>
+        private static void <#= GridHeightDetailPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            <#= ProxyUserControlClassName #> inst = d as <#= ProxyUserControlClassName #>;
+            if (inst != null)
+            {
+                inst.<#= GridHeightDetailPropertyName #> = (e.NewValue is double) ? (double)e.NewValue : double.MaxValue;
+            }
+        }
+        public static readonly DependencyProperty <#= GridHeightDetailPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= GridHeightDetailPropertyName #>", typeof(double),
+                typeof(<#= ProxyUserControlClassName #>),
+                new PropertyMetadata(double.MaxValue, <#= GridHeightDetailPropertyName #>Changed));
+        public double <#= GridHeightDetailPropertyName #>
+        {
+            get
+            {
+                return (double)GetValue(<#= GridHeightDetailPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= GridHeightDetailPropertyName #>Property, value);
+            }
+        }
+        #endregion
+
+        #region <#= HiddenFiltersDetailPropertyName #>
+        public static readonly DependencyProperty <#= HiddenFiltersDetailPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= HiddenFiltersDetailPropertyName #>", typeof(IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>),
+                typeof(<#= ProxyUserControlClassName #>),
+                new PropertyMetadata(null));
+        public IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>> <#= HiddenFiltersDetailPropertyName #>
+        {
+            get
+            {
+                return (IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>)GetValue(<#= HiddenFiltersDetailPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= HiddenFiltersDetailPropertyName #>Property, value);
+            }
+        }
+        #endregion
+
+        #region <#= RowMenuItemsDetailPropertyName #>
+        public static readonly DependencyProperty <#= RowMenuItemsDetailPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= RowMenuItemsDetailPropertyName #>", typeof(IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>),
+                typeof(<#= ProxyUserControlClassName #>),
+                new PropertyMetadata(null));
+        public IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> <#= RowMenuItemsDetailPropertyName #>
+        {
+            get
+            {
+                return (IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>)GetValue(<#= RowMenuItemsDetailPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= RowMenuItemsDetailPropertyName #>Property, value);
+            }
+        }
+        #endregion
+
+        #region <#= TableMenuItemsDetailPropertyName #>
+        public static readonly DependencyProperty <#= TableMenuItemsDetailPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= TableMenuItemsDetailPropertyName #>", typeof(IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>),
+                typeof(<#= ProxyUserControlClassName #>),
+                new PropertyMetadata(null));
+        public IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> <#= TableMenuItemsDetailPropertyName #>
+        {
+            get
+            {
+                return (IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>)GetValue(<#= TableMenuItemsDetailPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= TableMenuItemsDetailPropertyName #>Property, value);
+            }
+        }
+        #endregion
 
     }
 }

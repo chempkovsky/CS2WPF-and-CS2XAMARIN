@@ -24,22 +24,22 @@
     string ProxyUserControlNameSpace        = GetContextModelNameSpace(Context, ProxyUserControlFolder);
     string ProxyUserControlProject          = GetContextModelProjectName(Context, ProxyUserControlFolder);
 
+    string LformUserControlFolder          = "01596-LformUserControl.xaml.cs";
+    string LformUserControlClassName       = GetModelClassName(Model, LformUserControlFolder);
+    string LformUserControlNameSpace       = GetModelNameSpace(Model, LformUserControlFolder);
 
-    string SformUserControlFolder           = "01420-SformUserControl.xaml.cs";
-    string SformUserControlClassName        = GetModelClassName(Model, SformUserControlFolder);
-    string SformUserControlNameSpace        = GetModelNameSpace(Model, SformUserControlFolder);
+    string O2mUserControlFolder           = "01696-O2mUserControl.xaml.cs";
+    string O2mUserControlClassName        = GetModelClassName(Model, O2mUserControlFolder);
+    string O2mUserControlNameSpace        = GetModelNameSpace(Model, O2mUserControlFolder);
+    string O2mUserControlProject          = GetModelProjectName(Model, O2mUserControlFolder);
 
-    string SdlgUserControlFolder           = "01436-SdlgUserControl.xaml.cs";
-    string SdlgUserControlClassName        = GetModelClassName(Model, SdlgUserControlFolder);
-    string SdlgUserControlNameSpace        = GetModelNameSpace(Model, SdlgUserControlFolder);
-    string SdlgUserControlProject          = GetModelProjectName(Model, SdlgUserControlFolder);
-
-    string SdlgUserControlXamlFolder      = "01438-SdlgUserControl.xaml";
-    string SdlgUserControlXamlClassName   = GetModelClassName(Model, SdlgUserControlXamlFolder);
-    string SdlgUserControlXamlNameSpace   = GetModelNameSpace(Model, SdlgUserControlXamlFolder);
-    string SdlgUserControlXamlProject     = GetModelProjectName(Model, SdlgUserControlXamlFolder);
-
+    string O2mUserControlXamlFolder      = "01698-O2mUserControl.xaml";
+    string O2mUserControlXamlClassName   = GetModelClassName(Model, O2mUserControlXamlFolder);
+    string O2mUserControlXamlNameSpace   = GetModelNameSpace(Model, O2mUserControlXamlFolder);
+    string O2mUserControlXamlProject     = GetModelProjectName(Model, O2mUserControlXamlFolder);
     
+
+
 
     string CaptionPropertyName = "Caption";
     string FilterHeightPropertyName = "FilterHeight";
@@ -51,6 +51,22 @@
     string RowMenuItemsPropertyName = "RowMenuItems";
     string ContainerMenuItemsPropertyName = "ContainerMenuItems";
     string HiddenFiltersPropertyName = "HiddenFilters";
+    string CanAddPropertyName                   = "CanAdd";
+    string CanUpdPropertyName                   = "CanUpdate";
+    string CanDelPropertyName                   = "CanDelete";
+
+
+    string CurrentHiddenFiltersDetailPropertyName     = "CurrentHiddenFiltersDetail"; 
+    string FilterHeightDetailPropertyName = "FilterHeightDetail"; //
+    string ShowFilterDetailPropertyName = "ShowFilterDetail"; //
+    string ShowAddFilterBtnDetailPropertyName = "ShowAddFilterBtnDetail"; //
+    string GridHeightDetailPropertyName = "GridHeightDetail"; //
+    string HiddenFiltersDetailPropertyName = "HiddenFiltersDetail"; //
+    string TableMenuItemsDetailPropertyName = "TableMenuItemsDetail"; //
+    string RowMenuItemsDetailPropertyName = "RowMenuItemsDetail"; //
+    string CanAddDetailPropertyName                   = "CanAddDetail"; //
+    string CanUpdDetailPropertyName                   = "CanUpdateDetail"; //
+    string CanDelDetailPropertyName                   = "CanDeleteDetail"; //
 
 
     string RegisterRoutedCommandBindingsPropertyName = "RegisterRoutedCommandBindings";
@@ -59,24 +75,27 @@
     string RoutedEventHandlersPropertyName = "RoutedEventHandlers";
     string RoutedCommandHandlersPropertyName = "RoutedCommandHandlers";
 
+    string DetailsListPropertyName                    = "DetailsList"; 
+    string SelectedDetailsListItemPropertyName        = "SelectedDetailsListItem"; 
+    string IsDetailVisiblePropertyName                = "IsDetailVisible"; 
 
-    string OkCommandPropertyName = "OkCommand";
-    string CancelCommandPropertyName = "CancelCommand";
+
     string RegionPropertyName = "Region";
+    string ForO2mSuffixPropertyName             = "ForO2m";
 
 
     string proxyPrefix = "clr-namespace:" + ProxyUserControlNameSpace;
-    if(ProxyUserControlProject != SdlgUserControlXamlProject) {
+    if(ProxyUserControlProject != O2mUserControlXamlFolder) {
         proxyPrefix = proxyPrefix + ";assembly=" + ProxyUserControlProject;
     }
     string attachedPrefix = "clr-namespace:" + AttachedPropertiesExtNameSpace;
-    if(AttachedPropertiesExtProject != SdlgUserControlXamlProject) {
+    if(AttachedPropertiesExtProject != O2mUserControlXamlFolder) {
         attachedPrefix = attachedPrefix + ";assembly=" + AttachedPropertiesExtProject;
     }
 
 #>
 
-<UserControl x:Class="<#= SdlgUserControlNameSpace #>.<#= SdlgUserControlClassName #>"
+<UserControl x:Class="<#= O2mUserControlNameSpace #>.<#= O2mUserControlClassName #>"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -88,32 +107,88 @@
              xmlns:prx="<#= proxyPrefix #>" 
 
              xmlns:atch="<#= attachedPrefix #>" 
+             atch:<#= AttachedPropertiesExtClassName #>.<#= RegisterRoutedEventBindingsPropertyName #>="{Binding <#= RoutedEventHandlersPropertyName #>}"
              atch:<#= AttachedPropertiesExtClassName #>.<#= RegisterRoutedCommandBindingsPropertyName #>="{Binding <#= RoutedCommandHandlersPropertyName #>}"
 
+             x:Name="O2mRootControl"
              mc:Ignorable="d" 
              d:DesignHeight="150" d:DesignWidth="400" >
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <prx:<#= ProxyUserControlClassName #> Grid.Row="0"
 
-            prism:RegionManager.RegionName="<#= SformUserControlClassName #><#= RegionPropertyName #>"
+            prism:RegionManager.RegionName="<#= LformUserControlClassName #><#= RegionPropertyName #>"
 
-            <#= CaptionPropertyName #>="{Binding <#= CaptionPropertyName #>}" 
-            <#= FilterHeightPropertyName #>="{Binding <#= FilterHeightPropertyName #>}" 
-            <#= ShowFilterPropertyName #>="True" 
-            <#= ShowAddFilterBtnPropertyName #>="True" 
-            <#= GridHeightPropertyName #>="{Binding <#= GridHeightPropertyName #>}" 
-            <#= ShowBackBtnPropertyName #>="False" 
-            <#= HiddenFiltersPropertyName #>="{Binding <#= HiddenFiltersPropertyName #>}" 
+            <#= CaptionPropertyName #>="{Binding <#= CaptionPropertyName #>, Mode=OneWay, ElementName=O2mRootControl}" 
+            <#= FilterHeightPropertyName #>="{Binding <#= FilterHeightPropertyName #>, Mode=OneWay, ElementName=O2mRootControl}" 
+            <#= ShowFilterPropertyName #>="{Binding <#= ShowFilterPropertyName #>, Mode=OneWay, ElementName=O2mRootControl}" 
+            <#= ShowAddFilterBtnPropertyName #>="{Binding <#= ShowAddFilterBtnPropertyName #>, Mode=OneWay, ElementName=O2mRootControl}" 
+            <#= GridHeightPropertyName #>="{Binding <#= GridHeightPropertyName #>, Mode=OneWay, ElementName=O2mRootControl}" 
+            <#= ShowBackBtnPropertyName #>="{Binding <#= ShowBackBtnPropertyName #>, Mode=OneWay, ElementName=O2mRootControl}" 
+            <#= HiddenFiltersPropertyName #>="{Binding <#= HiddenFiltersPropertyName #>, Mode=OneWay}" 
+            <#= TableMenuItemsPropertyName #>="{Binding <#= TableMenuItemsPropertyName #>, Mode=OneWay}" 
+            <#= RowMenuItemsPropertyName #>="{Binding <#= RowMenuItemsPropertyName #>, Mode=OneWay}" 
+
+            <#= CanAddPropertyName #>="{Binding <#= CanAddPropertyName #>, Mode=OneWay}" 
+            <#= CanUpdPropertyName #>="{Binding <#= CanUpdPropertyName #>, Mode=OneWay}" 
+            <#= CanDelPropertyName #>="{Binding <#= CanDelPropertyName #>, Mode=OneWay}" 
             >
         </prx:<#= ProxyUserControlClassName #>>
-        <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="8">
-                <Button Content=" Ok " MinWidth="80" Command="{Binding <#= OkCommandPropertyName #>}"/>
-                <Button Content=" Cancel " MinWidth="80" Margin="8 0 0 0" Command="{Binding <#= CancelCommandPropertyName #>}"/>
+
+        <StackPanel Grid.Row="1" Margin="8">
+            <Label FontWeight="Bold" Content="Selected detail"/>
+            <ComboBox 
+                        ItemsSource="{Binding <#= DetailsListPropertyName #>}" 
+                        IsEditable="False" 
+                        DisplayMemberPath="<#= CaptionPropertyName #>" 
+                        SelectedItem="{Binding <#= SelectedDetailsListItemPropertyName #> }">
+            </ComboBox>
         </StackPanel>
+
+
+        <Label FontWeight="Bold" Content="No master row is selected" Grid.Row="2" Margin="8">
+            <Label.Resources>
+                <Style TargetType="{x:Type Label}">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding <#= IsDetailVisiblePropertyName #>}" Value="False">
+                            <Setter Property="Visibility" Value="Visible" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Label.Resources>
+        </Label>
+
+        <StackPanel Grid.Row="2" Visibility="{Binding <#= IsDetailVisiblePropertyName #>, Mode=OneWay,  Converter={StaticResource BooleanToVisibilityConverter}}">
+
+            <prx:<#= ProxyUserControlClassName #> 
+
+                prism:RegionManager.RegionName="<#= O2mUserControlClassName #><#= ForO2mSuffixPropertyName #>"
+
+                <#= CaptionPropertyName #>="{Binding <#= SelectedDetailsListItemPropertyName #>.<#= CaptionPropertyName #>, Mode=OneWay}" 
+                <#= FilterHeightPropertyName #>="{Binding <#= FilterHeightDetailPropertyName #>, Mode=OneWay, ElementName=O2mRootControl}" 
+                <#= ShowFilterPropertyName #>="{Binding <#= ShowFilterDetailPropertyName #>, Mode=OneWay, ElementName=O2mRootControl}" 
+                <#= ShowAddFilterBtnPropertyName #>="{Binding <#= ShowAddFilterBtnDetailPropertyName #>, Mode=OneWay, ElementName=O2mRootControl}" 
+                <#= GridHeightPropertyName #>="{Binding <#= GridHeightDetailPropertyName #>, Mode=OneWay, ElementName=O2mRootControl}" 
+                <#= ShowBackBtnPropertyName #>="False" 
+                <#= HiddenFiltersPropertyName #>="{Binding <#= CurrentHiddenFiltersDetailPropertyName #>, Mode=OneWay}" 
+                <#= TableMenuItemsPropertyName #>="{Binding <#= TableMenuItemsDetailPropertyName #>, Mode=OneWay}" 
+                <#= RowMenuItemsPropertyName #>="{Binding <#= RowMenuItemsDetailPropertyName #>, Mode=OneWay}" 
+
+                <#= CanAddPropertyName #>="{Binding <#= CanAddDetailPropertyName #>, Mode=OneWay}" 
+                <#= CanUpdPropertyName #>="{Binding <#= CanUpdDetailPropertyName #>, Mode=OneWay}" 
+                <#= CanDelPropertyName #>="{Binding <#= CanDelDetailPropertyName #>, Mode=OneWay}" 
+                >
+            </prx:<#= ProxyUserControlClassName #>>
+        </StackPanel>
+
     </Grid>
 </UserControl>
 

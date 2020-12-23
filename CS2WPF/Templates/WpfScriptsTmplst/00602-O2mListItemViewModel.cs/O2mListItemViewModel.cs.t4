@@ -11,39 +11,73 @@
 <#@ import namespace="CS2WPF.Model.Serializable" #>
 <#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
-using System;
-using System.Collections.Generic;
-using System.Net.Http;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+
 <#
 
-    string IAppGlblSettingsServiceFolder      = "00080-IAppGlblSettingsService.cs";
-    string IAppGlblSettingsServiceClassName   = GetModelClassName(Model, IAppGlblSettingsServiceFolder);
-    string IAppGlblSettingsServiceNameSpace   = GetModelNameSpace(Model, IAppGlblSettingsServiceFolder);
+    string IO2mListItemInterfaceFolder      = "00600-IO2mListItemInterface.cs";
+    string IO2mListItemInterfaceClassName   = GetModelClassName(Model, IO2mListItemInterfaceFolder);
+    string IO2mListItemInterfaceNameSpace   = GetModelNameSpace(Model, IO2mListItemInterfaceFolder);
+
+    string O2mListItemViewModelFolder       = "00602-O2mListItemViewModel.cs";
+    string O2mListItemViewModelClassName    = GetModelClassName(Model, O2mListItemViewModelFolder);
+    string O2mListItemViewModelNameSpace    = GetModelNameSpace(Model, O2mListItemViewModelFolder);
     
-    string ShowErrorMethodName                  = "ShowErrorMessage";
+
+
+    string CaptionPropertyName                  = "Caption";
+    string RegionPropertyName                   = "Region";
+    string ForeignKeyDetailsName                = "ForeignKeyDetails";
+
+    List<string> nmSpaces = new List<string>();
+    if ((O2mListItemViewModelNameSpace != IO2mListItemInterfaceNameSpace) && (nmSpaces.IndexOf(IO2mListItemInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IO2mListItemInterfaceNameSpace);
 
 #>
+<# 
+    foreach(string ns in nmSpaces) {
+#>
+using <#= ns #>;
+<#
+    }
+#>
 
-namespace <#= IAppGlblSettingsServiceNameSpace #> {
-    public interface  <#= IAppGlblSettingsServiceClassName #>
+namespace <#= O2mListItemViewModelNameSpace #> {
+    public class <#= O2mListItemViewModelClassName #>: <#= IO2mListItemInterfaceClassName #>, INotifyPropertyChanged
     {
-        double FilterHeightAddition { get; set; }
-        double FilterHeightFactor { get; set; }
-        double TableHeightAddition { get; set; }
-        double TableHeightFactor { get; set; }
-        event Action<object, string> OnMessageNotification;
-        event Action<object, string> OnUserChangedNotification;
-        string GetWebApiPrefix(string ViewName);
-        string GetSecurityWebApiPrefix();
-        double getDialogWidth(string ViewName);
-        string UserName { get; set; }
-        dynamic AuthInfo { get; set; }
-        List<KeyValuePair<string, string>> GetAuthInfoHeader();
-        int[] Permissions { get; set; }
-        int GetViewModelMask(string vwModel);
-        int GetDashBrdMask(string dshBrd);
-        HttpClient Client  { get; }
-        void <#= ShowErrorMethodName #>(string errorType, string errorMsg);
+        #region INotifyPropertyChanged
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string name = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+        #endregion
+
+        protected string  _<#= CaptionPropertyName #> = null;
+        public string  <#= CaptionPropertyName #> 
+        { 
+            get { return _<#= CaptionPropertyName #>; }
+
+            set { if(_<#= CaptionPropertyName #> != value) {_<#= CaptionPropertyName #> = value; OnPropertyChanged(); } }
+        }
+
+        string  _<#= RegionPropertyName #> = null;
+        public string  <#= RegionPropertyName #>
+        { 
+            get { return _<#= RegionPropertyName #>; }
+
+            set { if(_<#= RegionPropertyName #> != value) {_<#= RegionPropertyName #> = value; OnPropertyChanged(); } }
+        }
+
+        string  _<#= ForeignKeyDetailsName #> = null;
+        public string  <#= ForeignKeyDetailsName #>
+        { 
+            get { return _<#= ForeignKeyDetailsName #>; }
+
+            set { if(_<#= ForeignKeyDetailsName #> != value) {_<#= ForeignKeyDetailsName #> = value; OnPropertyChanged(); } }
+        }
+
     }
 }
 
