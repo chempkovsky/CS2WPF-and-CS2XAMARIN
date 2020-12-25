@@ -39,6 +39,21 @@
     string InverseBooleanConverterNameSpace   = GetContextModelNameSpace(Context, InverseBooleanConverterFolder);
     string InverseBooleanConverterProject     = GetContextModelProjectName(Context, FillHelperModelFolder);
 
+    string AddEformModeEnumToVisibilityConverterFolder      = "00172-AddEformModeEnumToVisibilityConverter.cs";
+    string AddEformModeEnumToVisibilityConverterClassName   = GetContextModelClassName(Context, AddEformModeEnumToVisibilityConverterFolder);
+    string AddEformModeEnumToVisibilityConverterNameSpace   = GetContextModelNameSpace(Context, AddEformModeEnumToVisibilityConverterFolder);
+    string AddEformModeEnumToVisibilityConverterProject     = GetContextModelProjectName(Context, AddEformModeEnumToVisibilityConverterFolder);
+
+    string UpdEformModeEnumToVisibilityConverterFolder      = "00174-UpdEformModeEnumToVisibilityConverter.cs";
+    string UpdEformModeEnumToVisibilityConverterClassName   = GetContextModelClassName(Context, UpdEformModeEnumToVisibilityConverterFolder);
+    string UpdEformModeEnumToVisibilityConverterNameSpace   = GetContextModelNameSpace(Context, UpdEformModeEnumToVisibilityConverterFolder);
+    string UpdEformModeEnumToVisibilityConverterProject     = GetContextModelProjectName(Context, UpdEformModeEnumToVisibilityConverterFolder);
+
+    string DelEformModeEnumToVisibilityConverterFolder      = "00176-DelEformModeEnumToVisibilityConverter.cs";
+    string DelEformModeEnumToVisibilityConverterClassName   = GetContextModelClassName(Context, DelEformModeEnumToVisibilityConverterFolder);
+    string DelEformModeEnumToVisibilityConverterNameSpace   = GetContextModelNameSpace(Context, DelEformModeEnumToVisibilityConverterFolder);
+    string DelEformModeEnumToVisibilityConverterProject     = GetContextModelProjectName(Context, DelEformModeEnumToVisibilityConverterFolder);
+
 
     string RoutedCommandExtFolder           = "00224-RoutedCommandExt.cs";
     string RoutedCommandExtClassName        = GetContextModelClassName(Context, RoutedCommandExtFolder);
@@ -128,6 +143,18 @@
     if(EformUserControlXamlProject != InverseBooleanConverterProject) {
         invboolconvPrefix = invboolconvPrefix + ";assembly=" + InverseBooleanConverterProject;
     }
+    string addeformconvPrefix = "clr-namespace:" + AddEformModeEnumToVisibilityConverterNameSpace;
+    if(EformUserControlXamlProject != AddEformModeEnumToVisibilityConverterProject) {
+        addeformconvPrefix = addeformconvPrefix + ";assembly=" + AddEformModeEnumToVisibilityConverterProject;
+    }
+    string updeformconvPrefix = "clr-namespace:" + UpdEformModeEnumToVisibilityConverterNameSpace;
+    if(EformUserControlXamlProject != UpdEformModeEnumToVisibilityConverterProject) {
+        updeformconvPrefix = updeformconvPrefix + ";assembly=" + UpdEformModeEnumToVisibilityConverterProject;
+    }
+    string deleformconvPrefix = "clr-namespace:" + DelEformModeEnumToVisibilityConverterNameSpace;
+    if(EformUserControlXamlProject != DelEformModeEnumToVisibilityConverterProject) {
+        deleformconvPrefix = deleformconvPrefix + ";assembly=" + DelEformModeEnumToVisibilityConverterProject;
+    }
 
     bool ModelHasAutoCompleteTextBox = false;
     foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) {
@@ -163,6 +190,10 @@
 <# 
     }
 #>
+            xmlns:addeformconv="<#= addeformconvPrefix #>"
+            xmlns:updeformconv="<#= updeformconvPrefix #>"
+            xmlns:deleformconv="<#= deleformconvPrefix #>"
+
 
              x:Name="EformUsrCntrlRootNode"
              mc:Ignorable="d" 
@@ -174,6 +205,11 @@
         <frzp:<#= FreezableProxyClassName #> x:Key="userControlContext" Data="{Binding}"/>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
         <invboolconv:<#= InverseBooleanConverterClassName #> x:Key="InverseBooleanConverter"/>
+        <addeformconv:<#= AddEformModeEnumToVisibilityConverterClassName #> x:Key="<#= AddEformModeEnumToVisibilityConverterClassName #>"/>
+        <updeformconv:<#= UpdEformModeEnumToVisibilityConverterClassName #> x:Key="<#= UpdEformModeEnumToVisibilityConverterClassName #>"/>
+        <deleformconv:<#= DelEformModeEnumToVisibilityConverterClassName #> x:Key="<#= DelEformModeEnumToVisibilityConverterClassName #>"/>
+
+
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -228,9 +264,13 @@
 
 <#
     for (int InputTypeId = 1; InputTypeId <= 3; InputTypeId++) {
+        string convName= AddEformModeEnumToVisibilityConverterClassName;
+        if(InputTypeId == 2) { convName= UpdEformModeEnumToVisibilityConverterClassName; }
+        if(InputTypeId == 3) { convName= DelEformModeEnumToVisibilityConverterClassName; }
 #>
-        <StackPanel Orientation="Vertical"  Grid.Row="2">
-            <StackPanel.Resources>
+        <StackPanel Orientation="Vertical"  Grid.Row="2"
+            Visibility="{Binding <#= EformModePropertyName #>, Mode=OneWay, Converter={StaticResource <#= convName #>}}">
+            <!-- <StackPanel.Resources>
                 <Style TargetType="{x:Type StackPanel}">
                     <Setter Property="Visibility" Value="Collapsed" />
                     <Style.Triggers>
@@ -239,7 +279,7 @@
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>
-            </StackPanel.Resources>
+            </StackPanel.Resources> -->
 <#
 
         bool isNewLine = false;

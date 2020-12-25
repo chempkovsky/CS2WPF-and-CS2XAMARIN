@@ -290,10 +290,13 @@ namespace <#= LformViewModelNameSpace #> {
         //protected bool <#= IsOnLoadedCalledPropertyName #> = false;
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
-            if (<#= DetailsListPropertyName #>.Count > 0)
-                SelectedDetailsListItem = <#= DetailsListPropertyName #>[0];
-            else 
-                DefineHiddenDetailFilter();
+            if (!e.Handled) {
+                e.Handled = true;
+                if (<#= DetailsListPropertyName #>.Count > 0)
+                    SelectedDetailsListItem = <#= DetailsListPropertyName #>[0];
+                else 
+                    DefineHiddenDetailFilter();
+            }
         }
 
 

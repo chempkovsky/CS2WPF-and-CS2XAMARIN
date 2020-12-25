@@ -400,25 +400,27 @@ namespace <#= EformViewModelNameSpace #> {
     }
 #>
         {
-            
-            try {
-                <#= IsLoadingPropertyName #> = true;
-                <#= IsOnLoadedCalledPropertyName #> = true;
-                DoClearControls();
-                RunEformModeChanged();
-                InputToControls();
+            if (!e.Handled) {
+                e.Handled = true;
+                try {
+                    <#= IsLoadingPropertyName #> = true;
+                    <#= IsOnLoadedCalledPropertyName #> = true;
+                    DoClearControls();
+                    RunEformModeChanged();
+                    InputToControls();
 <#  
     if (ModelHasDoInitMethod) {
 #>
 
-                await DoInit();
+                    await DoInit();
 <#  
     }
 #>
-                ClearValidationMessages();
-            } finally
-            {
-                <#= IsLoadingPropertyName #> = false;
+                    ClearValidationMessages();
+                } finally
+                {
+                    <#= IsLoadingPropertyName #> = false;
+                }
             }
         }
         protected bool <#= IsOnLoadedCalledPropertyName #> = false;

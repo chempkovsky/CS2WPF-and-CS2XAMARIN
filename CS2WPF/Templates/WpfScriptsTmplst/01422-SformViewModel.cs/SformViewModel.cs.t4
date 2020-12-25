@@ -295,17 +295,23 @@ namespace <#= SformViewModelNameSpace #> {
         #endregion
 
         public void OnSelectionChanged(object sender, SelectionChangedEventArgs e) {
-            if ((e.OriginalSource is DataGrid) && (sender is UIElement))
-            {
-                // (sender as UIElement).RaiseEvent(new SelectionChangedEventArgs(<#= RoutedEventExtClassName #>.<#= SformSelectionChangedPropertyName #>Event, e.RemovedItems, e.AddedItems));
-                Tuple<string, System.Collections.IList, System.Collections.IList> itm = new Tuple<string, System.Collections.IList, System.Collections.IList>("<#= modelInterfaceClassName #>", e.RemovedItems, e.AddedItems);
-                <#= RoutedCommandExtClassName #>.<#= SformSelectionChangedCommandPropertyName  #>.Execute(itm, (sender as UIElement));
+            if (!e.Handled) {
+                if ((e.OriginalSource is DataGrid) && (sender is UIElement))
+                {
+                    e.Handled = true;
+                    // (sender as UIElement).RaiseEvent(new SelectionChangedEventArgs(<#= RoutedEventExtClassName #>.<#= SformSelectionChangedPropertyName #>Event, e.RemovedItems, e.AddedItems));
+                    Tuple<string, System.Collections.IList, System.Collections.IList> itm = new Tuple<string, System.Collections.IList, System.Collections.IList>("<#= modelInterfaceClassName #>", e.RemovedItems, e.AddedItems);
+                    <#= RoutedCommandExtClassName #>.<#= SformSelectionChangedCommandPropertyName  #>.Execute(itm, (sender as UIElement));
+                }
             }
         }
         private async void OnLoaded(object sender, RoutedEventArgs e)
         {
-            <#= IsOnLoadedCalledPropertyName #> = true;
-            await onFilter();
+            if (!e.Handled) {
+                e.Handled = true;
+                <#= IsOnLoadedCalledPropertyName #> = true;
+                await onFilter();
+            }
         }
         protected bool <#= IsOnLoadedCalledPropertyName #> = false;
         protected IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>> <#= CurrentFilterPropertyName #> = null;

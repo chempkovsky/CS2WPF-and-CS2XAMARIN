@@ -179,7 +179,7 @@ using <#= ns #>;
         {
             ...
             ViewModelLocationProvider.Register<<#= LformUserControlClassName #>, <#= LformViewModelClassName #>>();
-            containerRegistry.RegisterForNavigation<<#= LformUserControlClassName #>>("<#= LformUserControlClassName #><#= ForO2mSuffixPropertyName #>");
+            containerRegistry.RegisterForNavigation<<#= LformUserControlClassName #>, <#= LformViewModelClassName #>>("<#= LformUserControlClassName #><#= ForO2mSuffixPropertyName #>");
             ...
         }
 */
@@ -207,8 +207,8 @@ namespace <#= LformViewModelNameSpace #> {
             rehs.Add((<#= RoutedEventExtClassName #>.<#= CanDelPropertyChangedPropertyName #>Event, 
                 new RoutedPropertyChangedEventHandler<bool>(this.<#= OnCanDelPropertyChangedPropertyName #>), false));
 
-            //rehs.Add((FrameworkElement.LoadedEvent, 
-            //    new RoutedEventHandler(this.OnLoaded), false));
+            rehs.Add((FrameworkElement.LoadedEvent, 
+                new RoutedEventHandler(this.OnLoaded), false));
             _<#= RoutedEventHandlersPropertyName #> = rehs;
 
             CommandBindingCollection cbsc = new CommandBindingCollection();
@@ -236,10 +236,12 @@ namespace <#= LformViewModelNameSpace #> {
 
 
         //protected bool <#= IsOnLoadedCalledPropertyName #> = false;
-        //private void OnLoaded(object sender, RoutedEventArgs e)
-        //{
-        //    <#= IsOnLoadedCalledPropertyName #> = true;
-        //}
+        private void OnLoaded(object sender, RoutedEventArgs e)
+        {
+            if (!e.Handled) {
+                e.Handled = true;
+            }
+        }
 
 
         #region <#= RoutedEventHandlersPropertyName #>
@@ -473,6 +475,7 @@ namespace <#= LformViewModelNameSpace #> {
         #region <#= SformAddItemCommandPropertyName #>
         public void Executed<#= SformAddItemCommandPropertyName #>(object sender, ExecutedRoutedEventArgs e) {
             e.Handled = true;
+            if (!<#= CanAddPropertyName #>) return;
             UIElement dest = e.OriginalSource as UIElement;
             if (dest == null) return;
             IDialogParameters prms = new DialogParameters();
@@ -495,7 +498,7 @@ namespace <#= LformViewModelNameSpace #> {
         }
         public void CanExecute<#= SformAddItemCommandPropertyName #>(object sender, CanExecuteRoutedEventArgs e) {
             e.Handled = true;
-            e.CanExecute = <#= CanAddPropertyName #>;
+            e.CanExecute = <#= CanAddPropertyName #> ;
         }
         #endregion
 
@@ -505,6 +508,7 @@ namespace <#= LformViewModelNameSpace #> {
             UIElement dest = e.OriginalSource as UIElement;
             if (dest == null) return;
             <#= modelInterfaceClassName #> selected = e.Parameter as  <#= modelInterfaceClassName #>;
+            if ((!<#= CanUpdPropertyName #>) || (selected == null)) return;
             IDialogParameters prms = new DialogParameters();
             prms.Add("<#= CaptionPropertyName #>", "Update Item");
             prms.Add("<#= HiddenFiltersPropertyName #>", <#= HiddenFiltersPropertyName #>);
@@ -525,7 +529,8 @@ namespace <#= LformViewModelNameSpace #> {
         }
         public void CanExecute<#= SformUpdItemCommandPropertyName #>(object sender, CanExecuteRoutedEventArgs e) {
             e.Handled = true;
-            e.CanExecute = <#= CanUpdPropertyName #>;
+            <#= modelInterfaceClassName #> prm = e.Parameter as  <#= modelInterfaceClassName #>;
+            e.CanExecute = (prm != null) && <#= CanUpdPropertyName #>;
         }
         #endregion
 
@@ -535,6 +540,7 @@ namespace <#= LformViewModelNameSpace #> {
             UIElement dest = e.OriginalSource as UIElement;
             if (dest == null) return;
             <#= modelInterfaceClassName #> selected = e.Parameter as  <#= modelInterfaceClassName #>;
+            if ((!<#= CanDelPropertyName #>) || (selected == null)) return;
             IDialogParameters prms = new DialogParameters();
             prms.Add("<#= CaptionPropertyName #>", "Delete Item");
             prms.Add("<#= HiddenFiltersPropertyName #>", <#= HiddenFiltersPropertyName #>);
@@ -555,11 +561,14 @@ namespace <#= LformViewModelNameSpace #> {
         }
         public void CanExecute<#= SformDelItemCommandPropertyName #>(object sender, CanExecuteRoutedEventArgs e) {
             e.Handled = true;
-            e.CanExecute = <#= CanDelPropertyName #>;
+           <#= modelInterfaceClassName #> prm = e.Parameter as  <#= modelInterfaceClassName #>;
+            e.CanExecute = (prm != null) && <#= CanDelPropertyName #>;
         }
         #endregion
     }
 }
+
+
 
 <#+
     string GetFilterPropertyOperatorName(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model, string operatorSufix) {

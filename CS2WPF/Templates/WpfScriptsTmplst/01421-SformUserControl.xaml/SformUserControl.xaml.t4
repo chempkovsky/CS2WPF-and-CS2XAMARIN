@@ -24,6 +24,12 @@
     string FillHelperModelNameSpace   = GetContextModelNameSpace(Context, FillHelperModelFolder);
     string FillHelperModelProject     = GetContextModelProjectName(Context, FillHelperModelFolder);
 
+    string InverseBooleanConverterFolder      = "00170-InverseBooleanConverter.cs";
+    string InverseBooleanConverterClassName   = GetContextModelClassName(Context, InverseBooleanConverterFolder);
+    string InverseBooleanConverterNameSpace   = GetContextModelNameSpace(Context, InverseBooleanConverterFolder);
+    string InverseBooleanConverterProject     = GetContextModelProjectName(Context, InverseBooleanConverterFolder);
+
+
     string AttachedPropertiesExtFolder      = "00226-AttachedPropertiesExt.cs";
     string AttachedPropertiesExtClassName   = GetContextModelClassName(Context, AttachedPropertiesExtFolder);
     string AttachedPropertiesExtNameSpace   = GetContextModelNameSpace(Context, AttachedPropertiesExtFolder);
@@ -112,6 +118,10 @@
     if(SformUserControlXamlProject != FillHelperModelProject) {
         fillPrefix = fillPrefix + ";assembly=" + FillHelperModelProject;
     }
+    string invboolcnvPrefix = "clr-namespace:" + InverseBooleanConverterNameSpace;
+    if(SformUserControlXamlProject != InverseBooleanConverterProject) {
+        invboolcnvPrefix = invboolcnvPrefix + ";assembly=" + InverseBooleanConverterProject;
+    }
 
 
 
@@ -132,6 +142,7 @@
              xmlns:pth="<#= pathPrefix #>" 
              xmlns:fill="<#= fillPrefix #>" 
              xmlns:frzp="<#= freezablePrefix #>" 
+             xmlns:invboolcnv="<#= invboolcnvPrefix #>" 
 
 
              x:Name="SformUsrCntrlRootNode"
@@ -143,6 +154,7 @@
     <UserControl.Resources>
         <frzp:<#= FreezableProxyClassName #> x:Key="userControlContext" Data="{Binding}"/>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <invboolcnv:<#= InverseBooleanConverterClassName #> x:Key="<#= InverseBooleanConverterClassName #>"/>
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -159,8 +171,10 @@
             <#= HiddenFiltersPropertyName #>="{Binding <#= HiddenFiltersPropertyName #>, Mode=OneWay}"
             <#= FilterDefinitionsPropertyName #>="{Binding <#= FilterDefinitionsPropertyName #>, Mode=OneWay}"
             <#= ContainerMenuItemsPropertyName #>="{Binding <#= ContainerMenuItemsPropertyName #>, Mode=OneWay, ElementName=SformUsrCntrlRootNode}"
-            <#= FilterHeightPropertyName #>="{Binding <#= FilterHeightPropertyName #>, Mode=OneWay, ElementName=SformUsrCntrlRootNode}">
-            <wsfuc:<#= WebServiceFilterUserControlClassName #>.Resources>
+            <#= FilterHeightPropertyName #>="{Binding <#= FilterHeightPropertyName #>, Mode=OneWay, ElementName=SformUsrCntrlRootNode}"
+            IsEnabled="{Binding <#= IsInQueryPropertyName #>, Mode=OneWay, Converter={StaticResource <#= InverseBooleanConverterClassName #>}}"
+            Visibility="{Binding <#= ShowFilterPropertyName #>, Mode=OneWay, ElementName=SformUsrCntrlRootNode,  Converter={StaticResource BooleanToVisibilityConverter}}">
+            <!-- <wsfuc:<#= WebServiceFilterUserControlClassName #>.Resources>
                 <Style TargetType="{x:Type wsfuc:<#= WebServiceFilterUserControlClassName #>}">
                     <Setter Property="Visibility" Value="Visible"/>
                     <Setter Property="IsEnabled" Value="False"/>
@@ -172,25 +186,26 @@
                             <Setter Property="IsEnabled" Value="True" />
                         </DataTrigger>
                     </Style.Triggers>
-
                 </Style>
-            </wsfuc:<#= WebServiceFilterUserControlClassName #>.Resources>
+            </wsfuc:<#= WebServiceFilterUserControlClassName #>.Resources> -->
         </wsfuc:<#= WebServiceFilterUserControlClassName #>>
         <ProgressBar Grid.Row="1" Height="10" IsIndeterminate="{Binding <#= IsInQueryPropertyName #>, Mode=OneWay}"/>
 
          <DataGrid Grid.Row="2" ItemsSource="{Binding <#= DataSourcePropertyName #>}" MaxHeight="{Binding GridHeight, ElementName=SformUsrCntrlRootNode}"
             atch:<#= AttachedPropertiesExtClassName #>.<#= DataGridServerSortingPropertyName #>="True"
+            IsEnabled="{Binding <#= IsInQueryPropertyName #>, Mode=OneWay,  Converter={StaticResource <#= InverseBooleanConverterClassName #>}}"
             AutoGenerateColumns="False" FrozenColumnCount ="1" SelectionMode="Single" IsReadOnly="True" SelectionUnit="FullRow">
             <DataGrid.Resources>
                <frzp:<#= FreezableProxyClassName #> x:Key="gridCurrentItem" Data="{Binding CurrentItem, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}"/>
-               <Style TargetType="{x:Type DataGrid}">
+               <frzp:FreezableProxy x:Key="gridControl" Data="{Binding Path=., RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}"/>
+               <!-- <Style TargetType="{x:Type DataGrid}">
                     <Setter Property="IsEnabled" Value="False"/>
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding <#= IsInQueryPropertyName #>}" Value="False">
                             <Setter Property="IsEnabled" Value="True" />
                         </DataTrigger>
                     </Style.Triggers>
-                </Style>
+                </Style> -->
             </DataGrid.Resources>
             <DataGrid.ContextMenu >
                 <ContextMenu ItemsSource="{Binding Data.<#= RowMenuItemsPropertyName #>, Source={StaticResource userControlContext}}">
@@ -199,6 +214,7 @@
                             <Setter Property="MenuItem.Header" Value="{Binding Caption}"/>
                             <Setter Property="MenuItem.Command" Value="{Binding Command}"/>
                             <Setter Property="MenuItem.CommandParameter" Value="{Binding Data, Source={StaticResource gridCurrentItem}}" />
+                            <Setter Property="MenuItem.CommandTarget" Value="{Binding Data, Source={StaticResource gridControl}}" />
                             <!-- <Setter Property="MenuItem.Icon">
                                 <Setter.Value>
                                     <Viewbox   Height="16" Width="16">
@@ -239,6 +255,7 @@
                                         </Setter> -->
                                         <Setter Property="MenuItem.Command" Value="{Binding Command}"/>
                                         <Setter Property="MenuItem.CommandParameter" Value="{Binding}"/>
+                                        <Setter Property="MenuItem.CommandTarget" Value="{Binding Data, Source={StaticResource gridControl}}" />
                                     </Style>
                                 </MenuItem.ItemContainerStyle>
                             </MenuItem>
@@ -279,8 +296,9 @@
             <#= TotalCountPropertyName #>="{Binding <#= TotalCountPropertyName #>, Mode=OneWay}"
             <#= CurrentPagePropertyName #>="{Binding <#= CurrentPagePropertyName #>, Mode=TwoWay}"
             <#= RowsPerPagePropertyName #>="{Binding <#= RowsPerPagePropertyName #>, Mode=TwoWay}"
+            IsEnabled="{Binding <#= IsInQueryPropertyName #>, Mode=OneWay,  Converter={StaticResource <#= InverseBooleanConverterClassName #>}}"
             <#= RowsPerPageOptionsPropertyName #>="{Binding <#= RowsPerPageOptionsPropertyName #>, Mode=OneWay}">
-            <tpgnuc:<#= TablePaginationUserControlClassName #>.Resources>
+            <!-- <tpgnuc:<#= TablePaginationUserControlClassName #>.Resources>
                 <Style TargetType="{x:Type tpgnuc:<#= TablePaginationUserControlClassName #>}">
                     <Setter Property="IsEnabled" Value="False"/>
                     <Style.Triggers>
@@ -289,7 +307,7 @@
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>
-            </tpgnuc:<#= TablePaginationUserControlClassName #>.Resources>    
+            </tpgnuc:<#= TablePaginationUserControlClassName #>.Resources>  -->
        </tpgnuc:<#= TablePaginationUserControlClassName #>>
     </Grid>
 </UserControl>

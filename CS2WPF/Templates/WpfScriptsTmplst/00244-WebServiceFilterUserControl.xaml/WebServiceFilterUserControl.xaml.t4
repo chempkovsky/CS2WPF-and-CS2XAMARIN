@@ -119,6 +119,9 @@
     <!-- <UserControl.Resources>
         <ResourceDictionary Source="pack://application:,,,/CommonWpfControlLibrary;component/Themes/BasicResourceDictionary.xaml"/>
     </UserControl.Resources> -->
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    </UserControl.Resources>
     <UserControl.CommandBindings>
         <CommandBinding Command="{x:Static crtcmd:<#= RoutedCommandExtClassName #>.<#= RemoveWebServiceFilterItemCommandPropertyName #>}" 
                         Executed="Executed<#= RemoveWebServiceFilterItemCommandPropertyName #>"
@@ -160,8 +163,9 @@
             <Label FontWeight="Bold" Grid.Column="0" Margin="24 0 0 0" Content="{Binding <#= CaptionPropertyName #>, ElementName=FltrUsrCntrlRootNode}"/>
             <Button Grid.Column="2" Margin="0 0 24 0" BorderBrush="{x:Null}" Background="{x:Null}"
                         Foreground="{DynamicResource Primary}"  KeyboardNavigation.TabNavigation ="None" ToolTip="Navigate back"
-                        Command="{x:Static crtcmd:<#= RoutedCommandExtClassName #>.<#= NavigationBackCommandPropertyName #>}">
-                <Button.Resources>
+                        Command="{x:Static crtcmd:<#= RoutedCommandExtClassName #>.<#= NavigationBackCommandPropertyName #>}"
+                        Visibility="{Binding <#= ShowBackBtnPropertyName #>, Mode=OneWay, ElementName=FltrUsrCntrlRootNode,  Converter={StaticResource BooleanToVisibilityConverter}}">
+                <!-- <Button.Resources>
                     <Style TargetType="{x:Type Button}">
                         <Setter Property="Visibility" Value="Collapsed" />
                         <Style.Triggers>
@@ -170,7 +174,7 @@
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>
-                </Button.Resources>
+                </Button.Resources> -->
                 <Viewbox   Height="16" Width="16" FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Button}}}" HorizontalAlignment="Center" VerticalAlignment="Center" >
                     <Canvas  Height="24" Width="24" >
                         <Path  Data="{DynamicResource ArrowLeftCircle}" Fill="{Binding Foreground, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Button}}}" />
@@ -182,8 +186,9 @@
             <StackPanel Grid.Column="3" Orientation="Horizontal" Margin="0 0 8 0">
                 <Button BorderBrush="{x:Null}" Background="{x:Null}"
                         Foreground="{DynamicResource Primary}"  KeyboardNavigation.TabNavigation ="None" ToolTip="Add Filter Item"
-                        Command="{x:Static crtcmd:<#= RoutedCommandExtClassName #>.<#= AddWebServiceFilterItemCommandPropertyName #>}">
-                    <Button.Resources>
+                        Command="{x:Static crtcmd:<#= RoutedCommandExtClassName #>.<#= AddWebServiceFilterItemCommandPropertyName #>}"
+                        Visibility="{Binding <#= ShowAddFilterBtnPropertyName #>, Mode=OneWay, ElementName=FltrUsrCntrlRootNode,  Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <!-- <Button.Resources>
                         <Style TargetType="{x:Type Button}">
                             <Setter Property="Visibility" Value="Collapsed" />
                             <Style.Triggers>
@@ -192,7 +197,7 @@
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
-                    </Button.Resources>
+                    </Button.Resources> -->
                     <Viewbox   Height="16" Width="16" FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Button}}}" HorizontalAlignment="Center" VerticalAlignment="Center" >
                         <Canvas  Height="24" Width="24" >
                             <Path  Data="{DynamicResource FilterPlus}" Fill="{Binding Foreground, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Button}}}" />
@@ -201,8 +206,9 @@
                 </Button>
                 <Button BorderBrush="{x:Null}" Background="{x:Null}"
                         Foreground="{DynamicResource Danger}"  KeyboardNavigation.TabNavigation ="None" ToolTip="Remove All Filter Items"
-                        Command="{x:Static crtcmd:<#= RoutedCommandExtClassName #>.<#= RemoveAllWebServiceFilterItemCommandPropertyName #>}">
-                    <Button.Resources>
+                        Command="{x:Static crtcmd:<#= RoutedCommandExtClassName #>.<#= RemoveAllWebServiceFilterItemCommandPropertyName #>}"
+                        Visibility="{Binding <#= ShowAddFilterBtnPropertyName #>, Mode=OneWay, ElementName=FltrUsrCntrlRootNode,  Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <!--<Button.Resources>
                         <Style TargetType="{x:Type Button}">
                             <Setter Property="Visibility" Value="Collapsed" />
                             <Style.Triggers>
@@ -211,7 +217,7 @@
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
-                    </Button.Resources>
+                    </Button.Resources> -->
                     <Viewbox   Height="16" Width="16" FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Button}}}" HorizontalAlignment="Center" VerticalAlignment="Center" >
                         <Canvas  Height="24" Width="24" >
                             <Path  Data="{DynamicResource FilterRemove}" Fill="{Binding Foreground, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Button}}}" />
