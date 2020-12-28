@@ -57,6 +57,7 @@
 
 
     string CurrentHiddenFiltersDetailPropertyName     = "CurrentHiddenFiltersDetail"; 
+    string CurrentHiddenFiltersForPropertyName        = "CurrentHiddenFilterFor"; 
     string FilterHeightDetailPropertyName = "FilterHeightDetail"; //
     string ShowFilterDetailPropertyName = "ShowFilterDetail"; //
     string ShowAddFilterBtnDetailPropertyName = "ShowAddFilterBtnDetail"; //
@@ -83,6 +84,8 @@
     string RegionPropertyName = "Region";
     string ForO2mSuffixPropertyName                   = "ForO2m";
     string HostSuffixPropertyName                     = "Host";
+
+    List<string> detailViews = GetDetailViews(Model, Context, null);
 
 
     string proxyPrefix = "clr-namespace:" + ProxyUserControlNameSpace;
@@ -168,10 +171,21 @@
         </Label>
 
         <StackPanel Grid.Row="2" Visibility="{Binding <#= IsDetailVisiblePropertyName #>, Mode=OneWay,  Converter={StaticResource BooleanToVisibilityConverter}}">
+<#
+        foreach(string detailViewName in detailViews) {
+            ModelViewSerializable detailView = GetModelViewByName(Context, detailViewName);
+            string detailViewClassName = GetModelClassName(detailView, LformUserControlFolder);
+            if(detailView == null) {
+#>
+<!--  can not find the view by Name <#= detailViewName #> -->
+<#
+                continue;
+            }
 
-            <prx:<#= ProxyUserControlClassName #> x:Name="<#= O2mUserControlClassName #><#= HostSuffixPropertyName #>"
-
-                prism:RegionManager.RegionName="<#= O2mUserControlClassName #><#= ForO2mSuffixPropertyName #>"
+#>
+            <prx:<#= ProxyUserControlClassName #> 
+                Visibility="{Binding <#= IsDetailVisiblePropertyName #><#= detailViewClassName #>, Mode=OneWay,  Converter={StaticResource BooleanToVisibilityConverter}}"
+                prism:RegionManager.RegionName="<#= detailViewClassName #><#= RegionPropertyName #>"
 
                 <#= CaptionPropertyName #>="{Binding <#= SelectedDetailsListItemPropertyName #>.<#= CaptionPropertyName #>, Mode=OneWay}" 
                 <#= FilterHeightPropertyName #>="{Binding <#= FilterHeightDetailPropertyName #>, Mode=OneWay, ElementName=O2mRootControl}" 
@@ -179,7 +193,7 @@
                 <#= ShowAddFilterBtnPropertyName #>="{Binding <#= ShowAddFilterBtnDetailPropertyName #>, Mode=OneWay, ElementName=O2mRootControl}" 
                 <#= GridHeightPropertyName #>="{Binding <#= GridHeightDetailPropertyName #>, Mode=OneWay, ElementName=O2mRootControl}" 
                 <#= ShowBackBtnPropertyName #>="False" 
-                <#= HiddenFiltersPropertyName #>="{Binding <#= CurrentHiddenFiltersDetailPropertyName #>, Mode=OneWay}" 
+                <#= HiddenFiltersPropertyName #>="{Binding <#= CurrentHiddenFiltersForPropertyName #><#= detailViewClassName #>, Mode=OneWay}" 
                 <#= TableMenuItemsPropertyName #>="{Binding <#= TableMenuItemsDetailPropertyName #>, Mode=OneWay}" 
                 <#= RowMenuItemsPropertyName #>="{Binding <#= RowMenuItemsDetailPropertyName #>, Mode=OneWay}" 
 
@@ -188,8 +202,10 @@
                 <#= CanDelPropertyName #>="{Binding <#= CanDelDetailPropertyName #>, Mode=OneWay}" 
                 >
             </prx:<#= ProxyUserControlClassName #>>
+<#
+        }
+#>
         </StackPanel>
-
     </Grid>
 </UserControl>
 
@@ -448,6 +464,144 @@
     string GetModelPropertyNameEx2(ModelViewUIListPropertySerializable prop, ModelViewSerializable model) {
         ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
         return GetModelPropertyName(sclrProp, model);
+    }
+    List<ModelViewPropertyOfVwSerializable> GetModelPrimaryKeyProps(ModelViewSerializable model) {
+        List<ModelViewPropertyOfVwSerializable> result = new List<ModelViewPropertyOfVwSerializable>();
+        if (model == null)
+        {
+            return result;
+        }
+        if ((model.PrimaryKeyProperties == null) || (model.ScalarProperties == null)) {
+            return result;
+        }
+        foreach(ModelViewKeyPropertySerializable modelViewKeyPropertySerializable in model.PrimaryKeyProperties) {
+            ModelViewPropertyOfVwSerializable prop =
+                model.ScalarProperties.Where(p => p.ViewPropertyName == modelViewKeyPropertySerializable.ViewPropertyName).FirstOrDefault();
+            if(prop != null) {
+                result.Add(prop);
+            } else {
+                if(model.ForeignKeys != null) {
+                    foreach(ModelViewForeignKeySerializable modelViewForeignKeySerializable in model.ForeignKeys) {
+                        if ((modelViewForeignKeySerializable.PrincipalKeyProps != null) && (modelViewForeignKeySerializable.ForeignKeyProps != null)) {
+                            for(int i = 0; i < modelViewForeignKeySerializable.ForeignKeyProps.Count; i++) {
+                                if(modelViewForeignKeySerializable.ForeignKeyProps[i].OriginalPropertyName == modelViewKeyPropertySerializable.OriginalPropertyName ) {
+                                    if(i < modelViewForeignKeySerializable.PrincipalKeyProps.Count) {
+                                        prop =
+                                        model.ScalarProperties.Where(p => 
+                                            (p.OriginalPropertyName == modelViewForeignKeySerializable.PrincipalKeyProps[i].OriginalPropertyName)
+                                            &&
+                                            (p.ForeignKeyName == modelViewForeignKeySerializable.NavigationName)
+                                        ).FirstOrDefault();
+                                    }
+                                }
+                                if(prop != null) break;
+                            }
+                        }
+                        if(prop != null) break;
+                    }
+                    if(prop != null) {
+                        result.Add(prop);
+                    }
+                }
+            }
+        }
+        return result;
+    }
+    List<string> GetDetailViews(ModelViewSerializable model, DbContextSerializable context, List<string> result)
+    {
+        if (result == null)
+        {
+            result = new List<string>();
+        }
+        if ((model == null) || (context == null))
+        {
+            return result;
+        }
+        if ((model.ScalarProperties == null) || (model.PrimaryKeyProperties == null) || (context.ModelViews == null)) {
+            return result;
+        }
+        if ((model.PrimaryKeyProperties.Count < 1) || (model.ScalarProperties.Count < 1))
+        {
+            return result;
+        }
+        List<ModelViewPropertyOfVwSerializable> primKeys = GetModelPrimaryKeyProps(model);
+        if(primKeys == null)
+        {
+            return result;
+        }
+        if (primKeys.Count != model.PrimaryKeyProperties.Count)
+        {
+            return result;
+        }
+        string RootEntityFullClassName = model.RootEntityFullClassName;
+        string RootEntityUniqueProjectName = model.RootEntityUniqueProjectName;
+        List<ModelViewSerializable> details =
+            context.ModelViews.Where(m => m.ForeignKeys.Any(f => (f.NavigationEntityFullName == RootEntityFullClassName) && (f.NavigationEntityUniqueProjectName == RootEntityUniqueProjectName))).ToList();
+        if(details.Count < 1)
+        {
+            return result;
+        }
+        foreach(ModelViewSerializable detail in details)
+        {
+            if (detail.ScalarProperties == null) continue;
+            if (detail.ForeignKeys == null) continue;
+            if (detail.ForeignKeys.Count < 1) continue;
+            List<ModelViewForeignKeySerializable> ForeignKeys =
+                detail.ForeignKeys.Where(f => (f.NavigationEntityFullName == RootEntityFullClassName) && (f.NavigationEntityUniqueProjectName == RootEntityUniqueProjectName)).ToList();
+            if (ForeignKeys.Count < 1) continue;
+            bool canBeUsed = false;
+            foreach(ModelViewForeignKeySerializable ForeignKey in ForeignKeys)
+            {
+                bool hasForeignKeyProps = true;
+                if (ForeignKey.ForeignKeyProps != null)
+                {
+                    for(int i = 0; i < ForeignKey.ForeignKeyProps.Count; i++)
+                    {
+                        ModelViewKeyPropertySerializable ForeignKeyProp = ForeignKey.ForeignKeyProps[i];
+                        if (!(detail.ScalarProperties.Any(s => (s.OriginalPropertyName == ForeignKeyProp.OriginalPropertyName) && (string.IsNullOrEmpty(s.ForeignKeyNameChain)))))
+                        {
+                            hasForeignKeyProps = false;
+                        }
+                        if(!hasForeignKeyProps)
+                        {
+                            ModelViewKeyPropertySerializable PrincipalKeyProp = ForeignKey.PrincipalKeyProps[i];
+                            if (detail.ScalarProperties.Any(s => (s.OriginalPropertyName == PrincipalKeyProp.OriginalPropertyName) && (s.ForeignKeyNameChain == ForeignKey.NavigationName)))
+                            {
+                                hasForeignKeyProps = true;
+                            } else
+                            {
+                                break;
+                            }
+                        }
+                    }
+                } else
+                {
+                    hasForeignKeyProps = false;
+                }
+                if (hasForeignKeyProps)
+                {
+                    canBeUsed = true;
+                    break;
+                }
+            }
+            if(canBeUsed)
+            {
+                if(!result.Contains(detail.ViewName))
+                {
+                    result.Add(detail.ViewName);
+                }
+            }
+        }
+        return result;
+    }
+    ModelViewSerializable GetModelViewByName(DbContextSerializable context, string viewName) {
+        if ((context == null) || (string.IsNullOrEmpty(viewName))) {
+            return null;
+        }
+        if (context.ModelViews == null) {
+            return null;
+        }
+        return context.ModelViews.Where(v => v.ViewName == viewName).FirstOrDefault();
     }
 
 #>

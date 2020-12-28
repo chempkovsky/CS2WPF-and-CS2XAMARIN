@@ -186,6 +186,7 @@ namespace <#= ScopedRegionViewModelNameSpace #> {
             if(evarg != null) {
                 evarg.Handled = true;
                 <#= ScopedRegionManagerPropertyName #> = evarg.NewValue as IRegionManager;
+                RequestNavigate();
             }
         }
         #endregion
@@ -196,6 +197,7 @@ namespace <#= ScopedRegionViewModelNameSpace #> {
             if(evarg != null) {
                 evarg.Handled = true;
                 <#= RequestNavigateSourcePropertyName #> = evarg.NewValue as string;
+                RequestNavigate();
             }
         }
         #endregion
@@ -206,12 +208,13 @@ namespace <#= ScopedRegionViewModelNameSpace #> {
             if(evarg != null) {
                 evarg.Handled = true;
                 <#= ScopedRegionNamePropertyName #> = evarg.NewValue as string;
+                RequestNavigate();
             }
         }
         #endregion
 
         #region OnLoaded
-//        protected bool <#= IsOnLoadedCalledPropertyName #> = false;
+        protected bool <#= IsOnLoadedCalledPropertyName #> = false;
         protected void OnLoaded(object sender, RoutedEventArgs e)
         {
             e.Handled = true;
@@ -219,11 +222,21 @@ namespace <#= ScopedRegionViewModelNameSpace #> {
             <#= ScopedRegionManagerPropertyName #> = uc.<#= ScopedRegionManagerPropertyName #> as IRegionManager;
             <#= RequestNavigateSourcePropertyName #> = uc.<#= RequestNavigateSourcePropertyName #>;
             <#= ScopedRegionNamePropertyName #> = uc.<#= ScopedRegionNamePropertyName #>;
-//            if(!<#= IsOnLoadedCalledPropertyName #>) { 
-//                <#= IsOnLoadedCalledPropertyName #> = true;
-//            }
+            if(!<#= IsOnLoadedCalledPropertyName #>) { 
+                <#= IsOnLoadedCalledPropertyName #> = true;
+                RequestNavigate();
+            }
         }
         #endregion
+        protected void RequestNavigate() {
+            if ( (!<#= IsOnLoadedCalledPropertyName #>) ||
+                  string.IsNullOrEmpty(<#= ScopedRegionNamePropertyName #>) ||
+                  string.IsNullOrEmpty(<#= RequestNavigateSourcePropertyName #>) ||
+                  (<#= ScopedRegionManagerPropertyName #> == null)
+                )
+            return;
+            <#= ScopedRegionManagerPropertyName #>.RequestNavigate(<#= ScopedRegionNamePropertyName #>, <#= RequestNavigateSourcePropertyName #>);
+        }
 
    }
 }

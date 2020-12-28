@@ -15,8 +15,8 @@ using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
-using Prism.Common;
-using Prism.Regions;
+// using Prism.Common;
+// using Prism.Regions;
 
 <#
 
@@ -115,17 +115,6 @@ namespace <#= O2mUserControlNameSpace #> {
         public <#= O2mUserControlClassName #>()
         {
             InitializeComponent();
-            ObservableObject<IRegion> observableRegion = RegionManager.GetObservableRegion(this.<#= O2mUserControlClassName #><#= HostSuffixPropertyName #>);
-            observableRegion.PropertyChanged += (sender, args) =>
-            {
-                IRegion region = ((ObservableObject<IRegion>)sender).Value;
-                RoutedPropertyChangedEventArgs<object> eventArgs =
-                    new RoutedPropertyChangedEventArgs<object>(
-                        region,
-                        region,
-                        <#= RoutedEventExtClassName #>.<#= ScopedRegionChangedPropertyName #>Event);
-                this.RaiseEvent(eventArgs);
-            };
         }
 
         #region <#= CaptionPropertyName #>

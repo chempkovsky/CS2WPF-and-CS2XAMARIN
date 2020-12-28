@@ -150,6 +150,7 @@ using System.Linq;
     string OnCanDelDetailPropertyChangedPropertyName  = "OnCanDeleteDetailPropertyChanged"; 
 
     string CurrentHiddenFiltersDetailPropertyName     = "CurrentHiddenFiltersDetail"; 
+    string CurrentHiddenFiltersForPropertyName        = "CurrentHiddenFilterFor"; 
     string DetailsListPropertyName                    = "DetailsList"; 
     string SelectedDetailsListItemPropertyName        = "SelectedDetailsListItem"; 
     string IsDetailVisiblePropertyName                = "IsDetailVisible"; 
@@ -169,6 +170,7 @@ using System.Linq;
 
     string UIDispatcherInvokePropertyName           = "Application.Current.Dispatcher.Invoke";
 
+    string ScopedRegionPropertyName                 = "ForScopedRegion";
 
     List<string> detailViews = GetDetailViews(Model, Context, null);
     List<ModelViewPropertyOfVwSerializable> primKeys = GetModelPrimaryKeyProps(Model);
@@ -219,6 +221,7 @@ using <#= ns #>;
             if (regionManager != null)
             {
                 ...
+                // to be used with "00280-ProxyUserControl.xaml.cs" the following line must be added:
                 regionManager.RegisterViewWithRegion("<#= O2mUserControlClassName #><#= RegionPropertyName #>", typeof(<#= O2mUserControlClassName #>));
                 ...
             }
@@ -230,6 +233,8 @@ using <#= ns #>;
         {
             ...
             ViewModelLocationProvider.Register<<#= O2mUserControlClassName #>, <#= O2mViewModelClassName #>>();
+            // to be used with "00632-ScopedRegionUserControl.xaml.cs" insert additional line of declaration:
+            containerRegistry.RegisterForNavigation<<#= O2mUserControlClassName #>, <#= O2mViewModelClassName #>>("<#= O2mUserControlClassName #><#= ScopedRegionPropertyName #>");
             ...
         }
 */
@@ -269,8 +274,6 @@ namespace <#= LformViewModelNameSpace #> {
                 new RoutedPropertyChangedEventHandler<bool>(this.<#= OnCanUpdDetailPropertyChangedPropertyName #>), false));
             rehs.Add((<#= RoutedEventExtClassName #>.<#= CanDelDetailPropertyChangedPropertyName #>Event, 
                 new RoutedPropertyChangedEventHandler<bool>(this.<#= OnCanDelDetailPropertyChangedPropertyName #>), false));
-            rehs.Add((<#= RoutedEventExtClassName #>.<#= ScopedRegionChangedPropertyName #>Event, 
-                new RoutedPropertyChangedEventHandler<object>(this.<#= OnScopedRegionChangedPropertyName #>), false));
 
             rehs.Add((FrameworkElement.LoadedEvent, 
                 new RoutedEventHandler(this.OnLoaded), false));
@@ -599,36 +602,6 @@ namespace <#= LformViewModelNameSpace #> {
         }
         #endregion
 
-
-
-        #region <#= OnScopedRegionChangedPropertyName #>
-        protected void <#= OnScopedRegionChangedPropertyName #>(object sender, RoutedPropertyChangedEventArgs<object> evarg) {
-            object newVal = null;
-            if(evarg != null) {
-                evarg.Handled = true;
-                newVal = evarg.NewValue;
-            }
-            <#= DetailRegionPropertyName #> = newVal as IRegion;
-        }
-        protected IRegion _<#= DetailRegionPropertyName #> = null;
-        public IRegion <#= DetailRegionPropertyName #>
-        { 
-            get
-            {
-                return _<#= DetailRegionPropertyName #>;
-            }
-            set
-            {
-                if (_<#= DetailRegionPropertyName #> != value)
-                {
-                    _<#= DetailRegionPropertyName #> = value;
-                    OnPropertyChanged();
-                    On<#= SelectedDetailsListItemPropertyName #>Changed();
-                }
-            }
-        }
-        #endregion
-
         #region <#= RowMenuItemsDetailPropertyName #>
         protected void <#= OnRowMenuItemsDetailPropertyChangedPropertyName #>(object sender, RoutedPropertyChangedEventArgs<IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>> evarg) {
             ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>> tmis = new ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>>();
@@ -753,24 +726,54 @@ namespace <#= LformViewModelNameSpace #> {
         }
         #endregion
 
-        #region <#= CurrentHiddenFiltersDetailPropertyName #>
-        IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>> _<#= CurrentHiddenFiltersDetailPropertyName #> = new ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>();
-        public IEnumerable<IWebServiceFilterRsltInterface> <#= CurrentHiddenFiltersDetailPropertyName #>
+
+<#
+        foreach(string detailViewName in detailViews) {
+            ModelViewSerializable detailView = GetModelViewByName(Context, detailViewName);
+            if(detailView == null) {
+#>
+///// can not find the view by Name <#= detailViewName #>
+<#
+                continue;
+            }
+            string detailViewClassName = GetModelClassName(detailView, LformUserControlFolder);
+#>
+        public bool <#= IsDetailVisiblePropertyName #><#= detailViewClassName #> { 
+            get {
+                return ((<#= SelectedDetailsListItemPropertyName #> == null) ? false : <#= SelectedDetailsListItemPropertyName #>.<#= RegionPropertyName #> == "<#= detailViewClassName #><#= RegionPropertyName #>") &&
+                       ((<#= CurrentHiddenFiltersForPropertyName #><#= detailViewClassName #> as ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>).Count > 0);
+            }
+        }
+        IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>> _<#= CurrentHiddenFiltersForPropertyName #><#= detailViewClassName #> = new ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>();
+        public IEnumerable<IWebServiceFilterRsltInterface> <#= CurrentHiddenFiltersForPropertyName #><#= detailViewClassName #>
         {
             get
             {
-                return _<#= CurrentHiddenFiltersDetailPropertyName #>;
+                return _<#= CurrentHiddenFiltersForPropertyName #><#= detailViewClassName #>;
             }
             set
             {
-                if (_<#= CurrentHiddenFiltersDetailPropertyName #> != value)
+                if (_<#= CurrentHiddenFiltersForPropertyName #><#= detailViewClassName #> != value)
                 {
-                    _<#= CurrentHiddenFiltersDetailPropertyName #> = value;
+                    _<#= CurrentHiddenFiltersForPropertyName #><#= detailViewClassName #> = value;
                     OnPropertyChanged();
+<#
+                foreach(string dViewName in detailViews) {
+                    ModelViewSerializable dView = GetModelViewByName(Context, dViewName);
+                    if(dView != null) {
+#>
+                    OnPropertyChanged("<#= IsDetailVisiblePropertyName #><#= GetModelClassName(dView, LformUserControlFolder) #>");
+<#
+                    }
+                }
+#>
+                    OnPropertyChanged("<#= IsDetailVisiblePropertyName #>");
                 }
             }
         }
-        #endregion
+<#
+        }
+#>
 
         ObservableCollection<<#= IO2mListItemInterfaceClassName #>> _<#= DetailsListPropertyName #> = new ObservableCollection<<#= IO2mListItemInterfaceClassName #>>() {
 <#
@@ -788,7 +791,7 @@ namespace <#= LformViewModelNameSpace #> {
             if (foreignKeys.Count < 1) continue;
             foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
 #>
-            new <#= O2mListItemViewModelClassName #>() {<#= CaptionPropertyName #> = "<#= detailViewName #>: <#= foreignKey.NavigationName #>", <#= ForeignKeyDetailsName #> = "<#= detailViewClassName #>:<#= foreignKey.NavigationName #>",  <#= RegionPropertyName #> = "<#= detailViewClassName #><#= ForO2mSuffixPropertyName #>" },
+            new <#= O2mListItemViewModelClassName #>() {<#= CaptionPropertyName #> = "<#= detailViewName #>: <#= foreignKey.NavigationName #>", <#= ForeignKeyDetailsName #> = "<#= detailViewClassName #>:<#= foreignKey.NavigationName #>",  <#= RegionPropertyName #> = "<#= detailViewClassName #><#= RegionPropertyName #>" },
 <#
             }
         }
@@ -806,16 +809,7 @@ namespace <#= LformViewModelNameSpace #> {
         }
 
 
-        protected void On<#= SelectedDetailsListItemPropertyName #>Changed(bool callDeHDF = true) {
-            if(<#= DetailRegionPropertyName #> != null) if(<#= DetailRegionPropertyName #>.RegionManager!= null) <#= DetailRegionPropertyName #>.RemoveAll();
-            if(_<#= SelectedDetailsListItemPropertyName #> != null) {
-                (<#= CurrentHiddenFiltersDetailPropertyName #> as ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>).Clear();
-                OnPropertyChanged("<#= IsDetailVisiblePropertyName #>");
-                if(<#= DetailRegionPropertyName #> != null) if(<#= DetailRegionPropertyName #>.RegionManager!= null)  <#= DetailRegionPropertyName #>.RequestNavigate(_<#= SelectedDetailsListItemPropertyName #>.Region);
-            }
-            OnPropertyChanged("<#= SelectedDetailsListItemPropertyName #>");
-            if (callDeHDF) DefineHiddenDetailFilter();
-        }
+
         protected <#= IO2mListItemInterfaceClassName #> _<#= SelectedDetailsListItemPropertyName #> = null;
         public <#= IO2mListItemInterfaceClassName #> <#= SelectedDetailsListItemPropertyName #> 
         {
@@ -823,30 +817,31 @@ namespace <#= LformViewModelNameSpace #> {
             set {
                 if(_<#= SelectedDetailsListItemPropertyName #> != value) {
                     _<#= SelectedDetailsListItemPropertyName #> = value;
-                    On<#= SelectedDetailsListItemPropertyName #>Changed();
+                    OnPropertyChanged();
+                    DefineHiddenDetailFilter();
                 }
             }
         }
         public bool <#= IsDetailVisiblePropertyName #> {
             get {
-                return (((<#= CurrentHiddenFiltersDetailPropertyName #> as ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>).Count > 0) && (<#= SelectedDetailsListItemPropertyName #> != null));
+                bool rslt = false 
+<#
+        foreach(string detailViewName in detailViews) {
+            ModelViewSerializable detailView = GetModelViewByName(Context, detailViewName);
+            if(detailView != null) {
+                string detailViewClassName = GetModelClassName(detailView, LformUserControlFolder);
+#>
+                    || <#= IsDetailVisiblePropertyName #><#= detailViewClassName #>
+<#
+            }
+        }
+#>
+                    ;
+                return rslt;
             }
         }
         protected void DefineHiddenDetailFilter() {
-            (<#= CurrentHiddenFiltersDetailPropertyName #> as ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>).Clear();
-            OnPropertyChanged("<#= IsDetailVisiblePropertyName #>");
             if((<#= SelectedDetailsListItemPropertyName #> == null) || (_<#= SelectedItemPropertyName #> == null))return;
-            if (<#= DetailRegionPropertyName #> !=null)
-            {
-                if(<#= DetailRegionPropertyName #>.RegionManager != null)
-                {
-                    if(!<#= DetailRegionPropertyName #>.Views.Any())
-                    {
-                        On<#= SelectedDetailsListItemPropertyName #>Changed(false);
-                    }
-                }
-            }
-
             ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>> chfd = new ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>();
             switch(<#= SelectedDetailsListItemPropertyName #>.<#= ForeignKeyDetailsName #>) {
 <#
@@ -885,6 +880,16 @@ namespace <#= LformViewModelNameSpace #> {
                         }
                     }
 #>
+                    if(chfd.Count < 1)  {
+                        <#= CurrentHiddenFiltersForPropertyName #><#= detailViewClassName #> = chfd;
+                        return;
+                    }
+                    if (<#= HiddenFiltersDetailPropertyName #> != null) {
+                        foreach(<#= IWebServiceFilterRsltInterfaceClassName #> itm in <#= HiddenFiltersDetailPropertyName #>) {
+                            chfd.Add(itm);
+                        }
+                    }
+                    <#= CurrentHiddenFiltersForPropertyName #><#= detailViewClassName #> = chfd;
                     break;
 <#
             }
@@ -893,14 +898,6 @@ namespace <#= LformViewModelNameSpace #> {
                 default:
                     break;
             }
-            if(chfd.Count < 1) return;
-            if (<#= HiddenFiltersDetailPropertyName #> != null) {
-                foreach(<#= IWebServiceFilterRsltInterfaceClassName #> itm in <#= HiddenFiltersDetailPropertyName #>) {
-                    chfd.Add(itm);
-                }
-            }
-            <#= CurrentHiddenFiltersDetailPropertyName #> = chfd;
-            OnPropertyChanged("<#= IsDetailVisiblePropertyName #>");
         }
 
     }
