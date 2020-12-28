@@ -403,20 +403,21 @@ namespace <#= EformViewModelNameSpace #> {
             if (!e.Handled) {
                 e.Handled = true;
                 try {
-                    <#= IsLoadingPropertyName #> = true;
-                    <#= IsOnLoadedCalledPropertyName #> = true;
-                    DoClearControls();
-                    RunEformModeChanged();
-                    InputToControls();
+                    if (!<#= IsLoadingPropertyName #>) {
+                        <#= IsLoadingPropertyName #> = true;
+                        <#= IsOnLoadedCalledPropertyName #> = true;
+                        DoClearControls();
+                        RunEformModeChanged();
+                        InputToControls();
 <#  
     if (ModelHasDoInitMethod) {
 #>
-
-                    await DoInit();
+                        await DoInit();
 <#  
     }
 #>
-                    ClearValidationMessages();
+                        ClearValidationMessages();
+                    }
                 } finally
                 {
                     <#= IsLoadingPropertyName #> = false;

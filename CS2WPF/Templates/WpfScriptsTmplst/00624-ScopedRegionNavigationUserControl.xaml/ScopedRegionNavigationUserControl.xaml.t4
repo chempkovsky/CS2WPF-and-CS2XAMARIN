@@ -1,0 +1,209 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="xaml" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+
+<#
+
+    string AttachedPropertiesExtFolder      = "00226-AttachedPropertiesExt.cs";
+    string AttachedPropertiesExtClassName   = GetModelClassName(Model, AttachedPropertiesExtFolder);
+    string AttachedPropertiesExtNameSpace   = GetModelNameSpace(Model, AttachedPropertiesExtFolder);
+    string AttachedPropertiesExtProject     = GetModelProjectName(Model, AttachedPropertiesExtFolder);
+
+    string NavigationProxyUserControlFolder     = "00286-NavigationProxyUserControl.xaml.cs";
+    string NavigationProxyUserControlClassName  = GetModelClassName(Model, NavigationProxyUserControlFolder);
+    string NavigationProxyUserControlNameSpace  = GetModelNameSpace(Model, NavigationProxyUserControlFolder);
+    string NavigationProxyUserControlProject    = GetModelProjectName(Model, NavigationProxyUserControlFolder);
+
+
+    string ScopedRegionNavigationUserControlFolder     = "00622-ScopedRegionNavigationUserControl.xaml.cs";
+    string ScopedRegionNavigationUserControlClassName  = GetModelClassName(Model, ScopedRegionNavigationUserControlFolder);
+    string ScopedRegionNavigationUserControlNameSpace  = GetModelNameSpace(Model, ScopedRegionNavigationUserControlFolder);
+    string ScopedRegionNavigationUserControlProject    = GetModelProjectName(Model, ScopedRegionNavigationUserControlFolder);
+
+    string ScopedRegionNavigationUserControlXamlFolder      = "00624-ScopedRegionNavigationUserControl.xaml";
+    string ScopedRegionNavigationUserControlXamlClassName   = GetModelClassName(Model, ScopedRegionNavigationUserControlXamlFolder);
+    string ScopedRegionNavigationUserControlXamlNameSpace   = GetModelNameSpace(Model, ScopedRegionNavigationUserControlXamlFolder);
+    string ScopedRegionNavigationUserControlXamlProject     = GetModelProjectName(Model, ScopedRegionNavigationUserControlXamlFolder);
+
+    string FilterHeightPropertyName = "FilterHeight";
+    string ShowFilterPropertyName = "ShowFilter";
+    string ShowAddFilterBtnPropertyName = "ShowAddFilterBtn";
+    string GridHeightPropertyName = "GridHeight";
+    string TableMenuItemsPropertyName = "TableMenuItems";
+    string RowMenuItemsPropertyName = "RowMenuItems";
+    string ContainerMenuItemsPropertyName = "ContainerMenuItems";
+    string ShowSubmitPropertyName = "ShowSubmit";
+    string CanAddPropertyName = "CanAdd";
+    string CanUpdPropertyName = "CanUpdate";
+    string CanDelPropertyName = "CanDelete";
+
+    string DataContextPropertyName = "DataContext"; 
+  
+    string ScopedRegionManagerPropertyName                      = "ScopedRegionManager"; 
+    string ScopedRegionManagerPropertyChangedPropertyName       = "ScopedRegionManagerPropertyChanged"; 
+
+    string RequestNavigateSourcePropertyName                    = "RequestNavigateSource";  
+    string RequestNavigateSourcePropertyChangedPropertyName     = "RequestNavigateSourcePropertyChanged"; 
+ 
+    string ScopedRegionNamePropertyName                         = "ScopedRegionName";   
+    string ScopedRegionNamePropertyChangedPropertyName          = "ScopedRegionNamePropertyChanged"; 
+
+    string RegisterRoutedCommandBindingsPropertyName = "RegisterRoutedCommandBindings";
+    string RegisterRoutedEventBindingsPropertyName = "RegisterRoutedEventBindings";
+    string RoutedEventHandlersPropertyName = "RoutedEventHandlers";
+    string RoutedCommandHandlersPropertyName = "RoutedCommandHandlers";
+
+
+    string navproxyPrefix = "clr-namespace:" + NavigationProxyUserControlNameSpace;
+    if(NavigationProxyUserControlProject != ScopedRegionNavigationUserControlXamlProject) {
+        navproxyPrefix = navproxyPrefix + ";assembly=" + NavigationProxyUserControlProject;
+    }
+    string attachedPrefix = "clr-namespace:" + AttachedPropertiesExtNameSpace;
+    if(AttachedPropertiesExtProject != ScopedRegionNavigationUserControlXamlProject) {
+        attachedPrefix = attachedPrefix + ";assembly=" + AttachedPropertiesExtProject;
+    }
+
+#>
+
+<UserControl x:Class="<#= ScopedRegionNavigationUserControlNameSpace #>.<#= ScopedRegionNavigationUserControlClassName #>"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+
+             xmlns:nprx="<#= navproxyPrefix #>" 
+
+             xmlns:prism="http://prismlibrary.com/" 
+             prism:ViewModelLocator.AutoWireViewModel="True"
+
+             x:Name="ScopedRegionNavigationUsrCntrlRootNode"
+
+             xmlns:atch="<#= attachedPrefix #>" 
+             atch:<#= AttachedPropertiesExtClassName #>.<#= RegisterRoutedEventBindingsPropertyName #>="{Binding <#= RoutedEventHandlersPropertyName #>}"
+
+
+             mc:Ignorable="d" 
+             d:DesignHeight="150" d:DesignWidth="400">
+
+        <nprx:<#= NavigationProxyUserControlClassName #>
+                prism:RegionManager.RegionName="{Binding <#= ScopedRegionNamePropertyName #>, Mode=OneWay, ElementName=ScopedRegionNavigationUsrCntrlRootNode}"
+
+                <#= FilterHeightPropertyName #>="{Binding <#= FilterHeightPropertyName #>, Mode=OneWay, ElementName=ScopedRegionNavigationUsrCntrlRootNode}"
+                <#= ShowFilterPropertyName #>="{Binding <#= ShowFilterPropertyName #>, Mode=OneWay, ElementName=ScopedRegionNavigationUsrCntrlRootNode}"
+
+                <#= ShowAddFilterBtnPropertyName #>="{Binding <#= ShowAddFilterBtnPropertyName #>, Mode=OneWay, ElementName=ScopedRegionNavigationUsrCntrlRootNode}"
+                <#= GridHeightPropertyName #>="{Binding <#= GridHeightPropertyName #>, Mode=OneWay, ElementName=ScopedRegionNavigationUsrCntrlRootNode}"
+                <#= TableMenuItemsPropertyName #>="{Binding <#= TableMenuItemsPropertyName #>, Mode=OneWay, ElementName=ScopedRegionNavigationUsrCntrlRootNode}"
+                <#= RowMenuItemsPropertyName #>="{Binding <#= RowMenuItemsPropertyName #>, Mode=OneWay, ElementName=ScopedRegionNavigationUsrCntrlRootNode}"
+
+                <#= ContainerMenuItemsPropertyName #>="{Binding <#= ContainerMenuItemsPropertyName #>, Mode=OneWay, ElementName=ScopedRegionNavigationUsrCntrlRootNode}"
+                <#= CanAddPropertyName #>="{Binding <#= CanAddPropertyName #>, Mode=OneWay, ElementName=ScopedRegionNavigationUsrCntrlRootNode}"
+                <#= CanUpdPropertyName #>="{Binding <#= CanUpdPropertyName #>, Mode=OneWay, ElementName=ScopedRegionNavigationUsrCntrlRootNode}"
+                <#= CanDelPropertyName #>="{Binding <#= CanDelPropertyName #>, Mode=OneWay, ElementName=ScopedRegionNavigationUsrCntrlRootNode}"
+                />
+</UserControl>
+
+
+<#+
+
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+    string GetModelProjectName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileProject)) {
+            return result;
+        }
+        string[] fnArr = refItem.FileProject.Split(new char[] {'\\'}, 100, System.StringSplitOptions.None); 
+        string fn = fnArr[fnArr.Length - 1];
+
+        return fn.Replace(".csproj","");
+    }
+
+#>

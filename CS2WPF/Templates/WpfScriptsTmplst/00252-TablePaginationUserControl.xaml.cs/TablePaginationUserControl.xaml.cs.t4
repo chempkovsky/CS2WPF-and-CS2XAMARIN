@@ -401,6 +401,7 @@ namespace <#= TablePaginationUserControlNameSpace #> {
         #region <#= NextPageCommandPropertyName #>
         private void Executed<#= NextPageCommandPropertyName #>(object sender, ExecutedRoutedEventArgs e)
         {
+            e.Handled = true;
             if (CurrentPage.HasValue && CountTo.HasValue && TotalCount.HasValue ? CountTo.Value < TotalCount.Value : false)
             {
                 CurrentPage = CurrentPage.Value + 1;
@@ -408,13 +409,14 @@ namespace <#= TablePaginationUserControlNameSpace #> {
         }
         private void CanExecute<#= NextPageCommandPropertyName #>(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = (CountTo.HasValue && TotalCount.HasValue ? CountTo.Value < TotalCount.Value : false);
             e.Handled = true;
+            e.CanExecute = (CountTo.HasValue && TotalCount.HasValue ? CountTo.Value < TotalCount.Value : false);
         }
         #endregion
         #region <#= PreviousPageCommandPropertyName #>
         private void Executed<#= PreviousPageCommandPropertyName #>(object sender, ExecutedRoutedEventArgs e)
         {
+            e.Handled = true;
             if (CurrentPage.HasValue ? CurrentPage.Value > 0 : false)
             {
                 CurrentPage = CurrentPage.Value - 1;
@@ -422,8 +424,8 @@ namespace <#= TablePaginationUserControlNameSpace #> {
         }
         private void CanExecute<#= PreviousPageCommandPropertyName #>(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = (CurrentPage.HasValue ? CurrentPage.Value > 0 : false);
             e.Handled = true;
+            e.CanExecute = (CurrentPage.HasValue ? CurrentPage.Value > 0 : false);
         }
         #endregion
 

@@ -19,6 +19,12 @@
     string gridFlexModelNameSpace   = GetModelNameSpace(Model, gridFlexModelFolder);
     string gridFlexModelProject     = GetModelProjectName(Model, gridFlexModelFolder);
 
+    string InverseBooleanConverterFolder      = "00170-InverseBooleanConverter.cs";
+    string InverseBooleanConverterClassName   = GetModelClassName(Model, InverseBooleanConverterFolder);
+    string InverseBooleanConverterNameSpace   = GetModelNameSpace(Model, InverseBooleanConverterFolder);
+    string InverseBooleanConverterProject     = GetModelProjectName(Model, InverseBooleanConverterFolder);
+
+
     string RoutedCommandExtFolder      = "00224-RoutedCommandExt.cs";
     string RoutedCommandExtClassName   = GetModelClassName(Model, RoutedCommandExtFolder);
     string RoutedCommandExtNameSpace   = GetModelNameSpace(Model, RoutedCommandExtFolder);
@@ -62,6 +68,10 @@
     if(RoutedCommandExtProject != WebServiceFilterItemUserControlXamlProject) {
         routedCommandPrefix = routedCommandPrefix + ";assembly=" + RoutedCommandExtProject;
     }
+    string invboolcnvPrefix = "clr-namespace:" + InverseBooleanConverterNameSpace;
+    if(InverseBooleanConverterProject != WebServiceFilterItemUserControlXamlProject) {
+        invboolcnvPrefix = invboolcnvPrefix + ";assembly=" + InverseBooleanConverterProject;
+    }
 
 
 #>
@@ -75,9 +85,15 @@
              xmlns:crtcmd="<#= routedCommandPrefix #>"
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
              xmlns:gridflex="<#= gridflexPrefix #>"
+             xmlns:invboolcnv="<#= invboolcnvPrefix #>" 
+
              x:Name="FltrItmUsrCntrlRootNode"
              mc:Ignorable="d" 
              d:DesignHeight="150" d:DesignWidth="600">
+    <UserControl.Resources>
+        <invboolcnv:<#= InverseBooleanConverterClassName #> x:Key="<#= InverseBooleanConverterClassName #>"/>
+    </UserControl.Resources>
+
     <!--<UserControl.Resources>
         <ResourceDictionary Source="pack://application:,,,/CommonWpfControlLibrary;component/Themes/BasicResourceDictionary.xaml"/>
     </UserControl.Resources> -->
@@ -109,8 +125,8 @@
                     <ContentPresenter Grid.Column="0" HorizontalAlignment="Stretch">
                         <ContentPresenter.Resources>
                             <DataTemplate x:Key="TextboxPresenter">
-                                <TextBox HorizontalAlignment="Stretch" Text="{Binding <#= FilterValuePropertyName #>, ElementName=FltrItmUsrCntrlRootNode, UpdateSourceTrigger=PropertyChanged}">
-                                    <TextBox.Resources>
+                                <TextBox HorizontalAlignment="Stretch"  IsReadOnly="{Binding <#= IsFilterValueReadOnlyPropertyName #>, Mode=OneWay, ElementName=FltrItmUsrCntrlRootNode}"  Text="{Binding <#= FilterValuePropertyName #>, ElementName=FltrItmUsrCntrlRootNode, UpdateSourceTrigger=PropertyChanged}">
+                                    <!--<TextBox.Resources>
                                         <Style TargetType="{x:Type TextBox}">
                                             <Setter Property="IsReadOnly" Value="true" />
                                             <Style.Triggers>
@@ -119,12 +135,12 @@
                                                 </DataTrigger>
                                             </Style.Triggers>
                                         </Style>
-                                    </TextBox.Resources>
+                                    </TextBox.Resources> -->
                                 </TextBox>
                             </DataTemplate>
                             <DataTemplate x:Key="DatePickerPresenter">
-                                <DatePicker HorizontalAlignment="Stretch" SelectedDate="{Binding <#= FilterValuePropertyName #>, ElementName=FltrItmUsrCntrlRootNode, UpdateSourceTrigger=PropertyChanged}"   >
-                                    <DatePicker.Resources>
+                                <DatePicker HorizontalAlignment="Stretch" IsEnabled="{Binding <#= IsFilterValueReadOnlyPropertyName #>, ElementName=FltrItmUsrCntrlRootNode, Mode=OneWay, Converter={StaticResource <#= InverseBooleanConverterClassName #>}}"  SelectedDate="{Binding <#= FilterValuePropertyName #>, ElementName=FltrItmUsrCntrlRootNode, UpdateSourceTrigger=PropertyChanged}">
+                                    <!-- <DatePicker.Resources>
                                         <Style TargetType="{x:Type DatePicker}">
                                             <Setter Property="IsEnabled" Value="False" />
                                             <Style.Triggers>
@@ -133,7 +149,7 @@
                                                 </DataTrigger>
                                             </Style.Triggers>
                                         </Style>
-                                    </DatePicker.Resources>
+                                    </DatePicker.Resources> -->
                                 </DatePicker>
                             </DataTemplate>
                         </ContentPresenter.Resources>

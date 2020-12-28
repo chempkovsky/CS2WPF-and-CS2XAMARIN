@@ -1,0 +1,305 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+using System;
+using System.Windows;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using System.Windows.Input;
+using System.Collections;
+using System.Collections.ObjectModel;
+using System.Collections.Generic;
+using System.Windows.Controls;
+using Prism.Regions;
+
+<#
+
+
+
+    string RoutedEventExtFolder                     = "00222-RoutedEventExt.cs";
+    string RoutedEventExtClassName                  = GetModelClassName(Model, RoutedEventExtFolder);
+    string RoutedEventExtNameSpace                  = GetModelNameSpace(Model, RoutedEventExtFolder);
+
+    string IAppGlblSettingsServiceFolder            = "00080-IAppGlblSettingsService.cs";
+    string IAppGlblSettingsServiceClassName         = GetModelClassName(Model, IAppGlblSettingsServiceFolder);
+    string IAppGlblSettingsServiceNameSpace         = GetModelNameSpace(Model, IAppGlblSettingsServiceFolder);
+
+    string IScopedRegionNavigationUserControlInterfaceFolder      = "00620-IScopedRegionNavigationUserControlInterface.cs";
+    string IScopedRegionNavigationUserControlInterfaceClassName   = GetModelClassName(Model, IScopedRegionNavigationUserControlInterfaceFolder);
+    string IScopedRegionNavigationUserControlInterfaceNameSpace   = GetModelNameSpace(Model, IScopedRegionNavigationUserControlInterfaceFolder);
+
+    string ScopedRegionNavigationUserControlFolder      = "00622-ScopedRegionNavigationUserControl.xaml.cs";
+    string ScopedRegionNavigationUserControlClassName   = GetModelClassName(Model, ScopedRegionNavigationUserControlFolder);
+    string ScopedRegionNavigationUserControlNameSpace   = GetModelNameSpace(Model, ScopedRegionNavigationUserControlFolder);
+
+    string ScopedRegionNavigationViewModelFolder      = "00626-ScopedRegionNavigationViewModel.cs";
+    string ScopedRegionNavigationViewModelClassName   = GetModelClassName(Model, ScopedRegionNavigationViewModelFolder);
+    string ScopedRegionNavigationViewModelNameSpace   = GetModelNameSpace(Model, ScopedRegionNavigationViewModelFolder);
+
+    string AppSettingServicePropertyName    = "GlblSettingsSrv";
+    string RoutedEventHandlersPropertyName  = "RoutedEventHandlers";
+    string IsOnLoadedCalledPropertyName     = "IsOnLoadedCalled";
+
+    string ScopedRegionManagerPropertyName                      = "ScopedRegionManager"; 
+    string ScopedRegionManagerPropertyChangedPropertyName       = "ScopedRegionManagerPropertyChanged"; 
+
+    string RequestNavigateSourcePropertyName                    = "RequestNavigateSource";  
+    string RequestNavigateSourcePropertyChangedPropertyName     = "RequestNavigateSourcePropertyChanged"; 
+ 
+    string ScopedRegionNamePropertyName                         = "ScopedRegionName";   
+    string ScopedRegionNamePropertyChangedPropertyName          = "ScopedRegionNamePropertyChanged"; 
+
+
+
+
+    List<string> nmSpaces = new List<string>();
+    if ((ScopedRegionNavigationViewModelNameSpace != IAppGlblSettingsServiceNameSpace) && (nmSpaces.IndexOf(IAppGlblSettingsServiceNameSpace) < 0)) 
+        nmSpaces.Add(IAppGlblSettingsServiceNameSpace);
+    if ((ScopedRegionNavigationViewModelNameSpace != RoutedEventExtNameSpace) && (nmSpaces.IndexOf(RoutedEventExtNameSpace) < 0)) 
+        nmSpaces.Add(RoutedEventExtNameSpace);
+    if ((ScopedRegionNavigationViewModelNameSpace != IScopedRegionNavigationUserControlInterfaceNameSpace) && (nmSpaces.IndexOf(IScopedRegionNavigationUserControlInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IScopedRegionNavigationUserControlInterfaceNameSpace);
+
+#>
+<# 
+    foreach(string ns in nmSpaces) {
+#>
+using <#= ns #>;
+<#
+    }
+#>
+
+/*
+    In the file of IModule-class the following line of code must be inserted:
+
+        public void RegisterTypes(IContainerRegistry containerRegistry)
+        {
+            ...
+            containerRegistry.Register<<#= IScopedRegionNavigationUserControlInterfaceClassName #>, <#= ScopedRegionNavigationUserControlClassName #>>();
+            ViewModelLocationProvider.Register<<#= ScopedRegionNavigationUserControlClassName #>, <#= ScopedRegionNavigationViewModelClassName #>>();
+            ...
+        }
+    
+    How to use it:
+        1. In xaml of your View:
+            <proxyControl:NavigationProxyUserControl prism:RegionManager.RegionName="MyRegionName" 
+                                       ShowAddFilterBtn="True" ShowFilter="True"
+                                       FilterHeight="100"
+                                       GridHeight="300"
+                                       CanAdd="True" CanDelete="True" CanUpdate="True"
+                                       />
+        2. In your ViewModel:
+            Inject 
+                IContainerProvider containerProvider 
+                IRegionManager regionManager
+            Write in "OnLoad"-Method:
+                IScopedRegionUserControlInterface uc = containerProvider.Resolve<IScopedRegionUserControlInterface>();
+                uc.ScopedRegionManager = regionManager.Regions["MyRegionName"].Add(uc, null, true);
+                uc.RequestNavigateSource = "LitGenreViewRdlistUserControlForRd";
+                regionManager.Regions["MyRegionName"].Activate(uc);
+
+        3. Where
+            "LitGenreViewRdlistUserControlForRd" is defined as follows:
+
+            public void RegisterTypes(IContainerRegistry containerRegistry) {
+                ...
+                ViewModelLocationProvider.Register<LitGenreViewRdlistUserControl, LitGenreViewRdlistViewModel>();
+                containerRegistry.RegisterForNavigation<LitGenreViewRdlistUserControl, LitGenreViewRdlistViewModel>("LitGenreViewRdlistUserControlForRd");
+                ...
+            }
+            
+            LitGenreViewRdlistUserControl and LitGenreViewRdlistViewModel are generated by "02020-Rdlist.json"-batch
+*/
+
+namespace <#= ScopedRegionNavigationViewModelNameSpace #> {
+    public class <#= ScopedRegionNavigationViewModelClassName #> : INotifyPropertyChanged
+    {
+        protected <#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName #>=null;
+        public <#= ScopedRegionNavigationViewModelClassName #>(<#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName  #>) {
+
+            this.<#= AppSettingServicePropertyName #> = <#= AppSettingServicePropertyName #>;
+
+            ObservableCollection<ValueTuple<RoutedEvent, Delegate, bool>> rehs = new ObservableCollection<ValueTuple<RoutedEvent, Delegate, bool>>();
+
+            rehs.Add((<#= RoutedEventExtClassName #>.<#= ScopedRegionManagerPropertyChangedPropertyName #>Event, 
+                new RoutedPropertyChangedEventHandler<object>(this.On<#= ScopedRegionManagerPropertyChangedPropertyName #>), false));
+            rehs.Add((<#= RoutedEventExtClassName #>.<#= RequestNavigateSourcePropertyChangedPropertyName #>Event, 
+                new RoutedPropertyChangedEventHandler<string>(this.On<#= RequestNavigateSourcePropertyChangedPropertyName #>), false));
+            rehs.Add((<#= RoutedEventExtClassName #>.<#= ScopedRegionNamePropertyChangedPropertyName #>Event, 
+                new RoutedPropertyChangedEventHandler<string>(this.On<#= ScopedRegionNamePropertyChangedPropertyName #>), false));
+            rehs.Add((FrameworkElement.LoadedEvent, 
+                new RoutedEventHandler(this.OnLoaded), false));
+
+            _<#= RoutedEventHandlersPropertyName #> = rehs;
+            
+
+
+        }
+        #region INotifyPropertyChanged
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string name = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+        #endregion
+
+        #region <#= RoutedEventHandlersPropertyName #>
+        protected IEnumerable<ValueTuple<RoutedEvent, Delegate, bool>> _<#= RoutedEventHandlersPropertyName #> = null;
+        public IEnumerable<ValueTuple<RoutedEvent, Delegate, bool>> <#= RoutedEventHandlersPropertyName #>
+        { 
+            get
+            {
+                return _<#= RoutedEventHandlersPropertyName #>;
+            }
+            set
+            {
+                if (_<#= RoutedEventHandlersPropertyName #> != value)
+                {
+                    _<#= RoutedEventHandlersPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+
+        #region <#= ScopedRegionManagerPropertyChangedPropertyName #>
+        protected IRegionManager <#= ScopedRegionManagerPropertyName #> = null;
+        protected void On<#= ScopedRegionManagerPropertyChangedPropertyName #>(object sender, RoutedPropertyChangedEventArgs<object> evarg) {
+            if(evarg != null) {
+                evarg.Handled = true;
+                <#= ScopedRegionManagerPropertyName #> = evarg.NewValue as IRegionManager;
+                RequestNavigate();
+            }
+        }
+        #endregion
+
+        #region <#= RequestNavigateSourcePropertyChangedPropertyName #>
+        protected string <#= RequestNavigateSourcePropertyName #> = null;
+        protected void On<#= RequestNavigateSourcePropertyChangedPropertyName #>(object sender, RoutedPropertyChangedEventArgs<string> evarg) {
+            if(evarg != null) {
+                evarg.Handled = true;
+                <#= RequestNavigateSourcePropertyName #> = evarg.NewValue as string;
+                RequestNavigate();
+            }
+        }
+        #endregion
+
+        #region <#= ScopedRegionNamePropertyChangedPropertyName #>
+        protected string <#= ScopedRegionNamePropertyName #> = null;
+        protected void On<#= ScopedRegionNamePropertyChangedPropertyName #>(object sender, RoutedPropertyChangedEventArgs<string> evarg) {
+            if(evarg != null) {
+                evarg.Handled = true;
+                <#= ScopedRegionNamePropertyName #> = evarg.NewValue as string;
+                RequestNavigate();
+            }
+        }
+        #endregion
+
+        #region OnLoaded
+        protected bool <#= IsOnLoadedCalledPropertyName #> = false;
+        protected void OnLoaded(object sender, RoutedEventArgs e)
+        {
+            e.Handled = true;
+            <#= IScopedRegionNavigationUserControlInterfaceClassName #> uc = sender as <#= IScopedRegionNavigationUserControlInterfaceClassName #>;
+            <#= ScopedRegionManagerPropertyName #> = uc.<#= ScopedRegionManagerPropertyName #> as IRegionManager;
+            <#= RequestNavigateSourcePropertyName #> = uc.<#= RequestNavigateSourcePropertyName #>;
+            <#= ScopedRegionNamePropertyName #> = uc.<#= ScopedRegionNamePropertyName #>;
+            if(!<#= IsOnLoadedCalledPropertyName #>) { 
+                <#= IsOnLoadedCalledPropertyName #> = true;
+                RequestNavigate();
+            }
+        }
+        #endregion
+
+        protected void RequestNavigate() {
+            if ( (!<#= IsOnLoadedCalledPropertyName #>) ||
+                  string.IsNullOrEmpty(<#= ScopedRegionNamePropertyName #>) ||
+                  string.IsNullOrEmpty(<#= RequestNavigateSourcePropertyName #>) ||
+                  (<#= ScopedRegionManagerPropertyName #> == null)
+                )
+            return;
+            <#= ScopedRegionManagerPropertyName #>.RequestNavigate(<#= ScopedRegionNamePropertyName #>, <#= RequestNavigateSourcePropertyName #>);
+        }
+    }
+}
+
+<#+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+
+#>

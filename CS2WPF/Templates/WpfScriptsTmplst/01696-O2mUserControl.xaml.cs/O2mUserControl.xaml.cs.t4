@@ -15,6 +15,9 @@ using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
+using Prism.Common;
+using Prism.Regions;
+
 <#
 
     string IWebServiceFilterRsltInterfaceFolder     = "00204-IWebServiceFilterRsltInterface.cs";
@@ -50,6 +53,8 @@ using System.Windows.Controls;
     string RowMenuItemsPropertyName = "RowMenuItems"; //
     string RowMenuItemsPropertyChangedPropertyName = "RowMenuItemsPropertyChanged"; //
 
+    string ScopedRegionChangedPropertyName      = "ScopedRegionChanged";
+
     string CanAddPropertyName                   = "CanAdd"; //
     string CanAddPropertyChangedPropertyName    = "CanAddPropertyChanged"; //
     string CanUpdPropertyName                   = "CanUpdate"; //
@@ -80,6 +85,9 @@ using System.Windows.Controls;
     string CanDelDetailPropertyName                   = "CanDeleteDetail"; //
     string CanDelDetailPropertyChangedPropertyName    = "CanDeleteDetailPropertyChanged"; //
 
+    string HostSuffixPropertyName                     = "Host";
+
+
     List<string> nmSpaces = new List<string>();
     if ((O2mUserControlNameSpace != IWebServiceFilterMenuInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterMenuInterfaceNameSpace) < 0)) 
         nmSpaces.Add(IWebServiceFilterMenuInterfaceNameSpace);
@@ -107,6 +115,17 @@ namespace <#= O2mUserControlNameSpace #> {
         public <#= O2mUserControlClassName #>()
         {
             InitializeComponent();
+            ObservableObject<IRegion> observableRegion = RegionManager.GetObservableRegion(this.<#= O2mUserControlClassName #><#= HostSuffixPropertyName #>);
+            observableRegion.PropertyChanged += (sender, args) =>
+            {
+                IRegion region = ((ObservableObject<IRegion>)sender).Value;
+                RoutedPropertyChangedEventArgs<object> eventArgs =
+                    new RoutedPropertyChangedEventArgs<object>(
+                        region,
+                        region,
+                        <#= RoutedEventExtClassName #>.<#= ScopedRegionChangedPropertyName #>Event);
+                this.RaiseEvent(eventArgs);
+            };
         }
 
         #region <#= CaptionPropertyName #>
@@ -180,19 +199,11 @@ namespace <#= O2mUserControlNameSpace #> {
         #endregion
 
         #region <#= FilterHeightPropertyName #>
-        private static void <#= FilterHeightPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            <#= O2mUserControlClassName #> inst = d as <#= O2mUserControlClassName #>;
-            if (inst != null)
-            {
-                inst.<#= FilterHeightPropertyName #> = (e.NewValue is double) ? (double)e.NewValue : double.MaxValue;
-            }
-        }
         public static readonly DependencyProperty <#= FilterHeightPropertyName #>Property =
                 DependencyProperty.Register(
                 "<#= FilterHeightPropertyName #>", typeof(double),
                 typeof(<#= O2mUserControlClassName #>),
-                new PropertyMetadata(double.MaxValue, <#= FilterHeightPropertyName #>Changed));
+                new PropertyMetadata(double.MaxValue));
         public double <#= FilterHeightPropertyName #>
         {
             get
@@ -207,19 +218,11 @@ namespace <#= O2mUserControlNameSpace #> {
         #endregion
 
         #region <#= ShowFilterPropertyName #>
-        private static void <#= ShowFilterPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e) {
-            <#= O2mUserControlClassName #> inst = d as <#= O2mUserControlClassName #>;
-            if (inst != null) 
-            {
-                
-                inst.<#= ShowFilterPropertyName #> = (e.NewValue is bool) ? (bool)e.NewValue : false;
-            }
-        }
         public static readonly DependencyProperty <#= ShowFilterPropertyName #>Property =
                 DependencyProperty.Register(
                 "<#= ShowFilterPropertyName #>", typeof(bool),
                 typeof(<#= O2mUserControlClassName #>),
-                new PropertyMetadata(true, <#= ShowFilterPropertyName #>Changed));
+                new PropertyMetadata(true));
         public bool <#= ShowFilterPropertyName #>
         {
             get
@@ -234,18 +237,11 @@ namespace <#= O2mUserControlNameSpace #> {
         #endregion
 
         #region <#= ShowAddFilterBtnPropertyName #>
-        private static void <#= ShowAddFilterBtnPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e) {
-            <#= O2mUserControlClassName #> inst = d as <#= O2mUserControlClassName #>;
-            if (inst != null) 
-            {
-                inst.<#= ShowAddFilterBtnPropertyName #> = (e.NewValue is bool) ? (bool)e.NewValue : false;
-            }
-        }
         public static readonly DependencyProperty <#= ShowAddFilterBtnPropertyName #>Property =
                 DependencyProperty.Register(
                 "<#= ShowAddFilterBtnPropertyName #>", typeof(bool),
                 typeof(<#= O2mUserControlClassName #>),
-                new PropertyMetadata(true, <#= ShowAddFilterBtnPropertyName #>Changed));
+                new PropertyMetadata(true));
         public bool <#= ShowAddFilterBtnPropertyName #>
         {
             get
@@ -260,18 +256,11 @@ namespace <#= O2mUserControlNameSpace #> {
         #endregion
 
         #region <#= ShowBackBtnPropertyName #>
-        private static void <#= ShowBackBtnPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e) {
-            <#= O2mUserControlClassName #> inst = d as <#= O2mUserControlClassName #>;
-            if (inst != null) 
-            {
-                inst.<#= ShowBackBtnPropertyName #> = (e.NewValue is bool) ? (bool)e.NewValue : false;
-            }
-        }
         public static readonly DependencyProperty <#= ShowBackBtnPropertyName #>Property =
                 DependencyProperty.Register(
                 "<#= ShowBackBtnPropertyName #>", typeof(bool),
                 typeof(<#= O2mUserControlClassName #>),
-                new PropertyMetadata(false, <#= ShowBackBtnPropertyName #>Changed));
+                new PropertyMetadata(false));
         public bool <#= ShowBackBtnPropertyName #>
         {
             get
@@ -286,19 +275,11 @@ namespace <#= O2mUserControlNameSpace #> {
         #endregion
 
         #region <#= GridHeightPropertyName #>
-        private static void <#= GridHeightPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            <#= O2mUserControlClassName #> inst = d as <#= O2mUserControlClassName #>;
-            if (inst != null)
-            {
-                inst.<#= GridHeightPropertyName #> = (e.NewValue is double) ? (double)e.NewValue : double.MaxValue;
-            }
-        }
         public static readonly DependencyProperty <#= GridHeightPropertyName #>Property =
                 DependencyProperty.Register(
                 "<#= GridHeightPropertyName #>", typeof(double),
                 typeof(<#= O2mUserControlClassName #>),
-                new PropertyMetadata(double.MaxValue, <#= GridHeightPropertyName #>Changed));
+                new PropertyMetadata(double.MaxValue));
         public double <#= GridHeightPropertyName #>
         {
             get
@@ -606,19 +587,11 @@ namespace <#= O2mUserControlNameSpace #> {
         #endregion
 
         #region <#= FilterHeightDetailPropertyName #>
-        private static void <#= FilterHeightDetailPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            <#= O2mUserControlClassName #> inst = d as <#= O2mUserControlClassName #>;
-            if (inst != null)
-            {
-                inst.<#= FilterHeightDetailPropertyName #> = (e.NewValue is double) ? (double)e.NewValue : double.MaxValue;
-            }
-        }
         public static readonly DependencyProperty <#= FilterHeightDetailPropertyName #>Property =
                 DependencyProperty.Register(
                 "<#= FilterHeightDetailPropertyName #>", typeof(double),
                 typeof(<#= O2mUserControlClassName #>),
-                new PropertyMetadata(double.MaxValue, <#= FilterHeightDetailPropertyName #>Changed));
+                new PropertyMetadata(double.MaxValue));
         public double <#= FilterHeightDetailPropertyName #>
         {
             get
@@ -633,19 +606,11 @@ namespace <#= O2mUserControlNameSpace #> {
         #endregion
 
         #region <#= ShowFilterDetailPropertyName #>
-        private static void <#= ShowFilterDetailPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e) {
-            <#= O2mUserControlClassName #> inst = d as <#= O2mUserControlClassName #>;
-            if (inst != null) 
-            {
-                
-                inst.<#= ShowFilterDetailPropertyName #> = (e.NewValue is bool) ? (bool)e.NewValue : false;
-            }
-        }
         public static readonly DependencyProperty <#= ShowFilterDetailPropertyName #>Property =
                 DependencyProperty.Register(
                 "<#= ShowFilterDetailPropertyName #>", typeof(bool),
                 typeof(<#= O2mUserControlClassName #>),
-                new PropertyMetadata(true, <#= ShowFilterDetailPropertyName #>Changed));
+                new PropertyMetadata(true));
         public bool <#= ShowFilterDetailPropertyName #>
         {
             get
@@ -660,19 +625,11 @@ namespace <#= O2mUserControlNameSpace #> {
         #endregion
 
         #region <#= ShowAddFilterBtnDetailPropertyName #>
-        private static void <#= ShowAddFilterBtnDetailPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e) {
-            <#= O2mUserControlClassName #> inst = d as <#= O2mUserControlClassName #>;
-            if (inst != null) 
-            {
-                
-                inst.<#= ShowAddFilterBtnDetailPropertyName #> = (e.NewValue is bool) ? (bool)e.NewValue : false;
-            }
-        }
         public static readonly DependencyProperty <#= ShowAddFilterBtnDetailPropertyName #>Property =
                 DependencyProperty.Register(
                 "<#= ShowAddFilterBtnDetailPropertyName #>", typeof(bool),
                 typeof(<#= O2mUserControlClassName #>),
-                new PropertyMetadata(true, <#= ShowAddFilterBtnDetailPropertyName #>Changed));
+                new PropertyMetadata(true));
         public bool <#= ShowAddFilterBtnDetailPropertyName #>
         {
             get
@@ -687,19 +644,11 @@ namespace <#= O2mUserControlNameSpace #> {
         #endregion
 
         #region <#= GridHeightDetailPropertyName #>
-        private static void <#= GridHeightDetailPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            <#= O2mUserControlClassName #> inst = d as <#= O2mUserControlClassName #>;
-            if (inst != null)
-            {
-                inst.<#= GridHeightDetailPropertyName #> = (e.NewValue is double) ? (double)e.NewValue : double.MaxValue;
-            }
-        }
         public static readonly DependencyProperty <#= GridHeightDetailPropertyName #>Property =
                 DependencyProperty.Register(
                 "<#= GridHeightDetailPropertyName #>", typeof(double),
                 typeof(<#= O2mUserControlClassName #>),
-                new PropertyMetadata(double.MaxValue, <#= GridHeightDetailPropertyName #>Changed));
+                new PropertyMetadata(double.MaxValue));
         public double <#= GridHeightDetailPropertyName #>
         {
             get

@@ -1,0 +1,247 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="xaml" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+
+<#
+
+    string AttachedPropertiesExtFolder      = "00226-AttachedPropertiesExt.cs";
+    string AttachedPropertiesExtClassName   = GetModelClassName(Model, AttachedPropertiesExtFolder);
+    string AttachedPropertiesExtNameSpace   = GetModelNameSpace(Model, AttachedPropertiesExtFolder);
+    string AttachedPropertiesExtProject     = GetModelProjectName(Model, AttachedPropertiesExtFolder);
+
+    string ProxyUserControlFolder     = "00280-ProxyUserControl.xaml.cs";
+    string ProxyUserControlClassName  = GetModelClassName(Model, ProxyUserControlFolder);
+    string ProxyUserControlNameSpace  = GetModelNameSpace(Model, ProxyUserControlFolder);
+    string ProxyUserControlProject    = GetModelProjectName(Model, ProxyUserControlFolder);
+
+    string ScopedRegionUserControlFolder                = "00632-ScopedRegionUserControl.xaml.cs";
+    string ScopedRegionUserControlClassName             = GetModelClassName(Model, ScopedRegionUserControlFolder);
+    string ScopedRegionUserControlNameSpace             = GetModelNameSpace(Model, ScopedRegionUserControlFolder);
+    string ScopedRegionUserControlProject               = GetModelProjectName(Model, ScopedRegionUserControlFolder);
+
+    string ScopedRegionUserControlXamlFolder      = "00634-ScopedRegionUserControl.xaml";
+    string ScopedRegionUserControlXamlClassName   = GetModelClassName(Model, ScopedRegionUserControlXamlFolder);
+    string ScopedRegionUserControlXamlNameSpace   = GetModelNameSpace(Model, ScopedRegionUserControlXamlFolder);
+    string ScopedRegionUserControlXamlProject     = GetModelProjectName(Model, ScopedRegionUserControlXamlFolder);
+
+    string CaptionPropertyName = "Caption";
+    string ShowBackBtnPropertyName = "ShowBackBtn";
+    string HiddenFiltersPropertyName = "HiddenFilters";
+    string FormControlModelPropertyName = "FormControlModel";
+    string EformModePropertyName = "EformMode";
+
+
+    string FilterHeightPropertyName = "FilterHeight";
+    string ShowFilterPropertyName = "ShowFilter";
+    string ShowAddFilterBtnPropertyName = "ShowAddFilterBtn";
+    string GridHeightPropertyName = "GridHeight";
+    string TableMenuItemsPropertyName = "TableMenuItems";
+    string RowMenuItemsPropertyName = "RowMenuItems";
+    string ContainerMenuItemsPropertyName = "ContainerMenuItems";
+    string ShowSubmitPropertyName = "ShowSubmit";
+    string CanAddPropertyName = "CanAdd";
+    string CanUpdPropertyName = "CanUpdate";
+    string CanDelPropertyName = "CanDelete";
+
+    string FilterHeightDetailPropertyName = "FilterHeightDetail"; 
+    string ShowFilterDetailPropertyName = "ShowFilterDetail"; 
+    string ShowAddFilterBtnDetailPropertyName = "ShowAddFilterBtnDetail"; 
+    string GridHeightDetailPropertyName = "GridHeightDetail"; 
+    string HiddenFiltersDetailPropertyName = "HiddenFiltersDetail"; 
+    string TableMenuItemsDetailPropertyName = "TableMenuItemsDetail"; 
+    string RowMenuItemsDetailPropertyName = "RowMenuItemsDetail"; 
+    string CanAddDetailPropertyName = "CanAddDetail"; 
+    string CanUpdDetailPropertyName = "CanUpdateDetail"; 
+    string CanDelDetailPropertyName = "CanDeleteDetail"; 
+
+    string DataContextPropertyName = "DataContext"; 
+  
+    string ScopedRegionManagerPropertyName                      = "ScopedRegionManager"; 
+    string ScopedRegionManagerPropertyChangedPropertyName       = "ScopedRegionManagerPropertyChanged"; 
+
+    string RequestNavigateSourcePropertyName                    = "RequestNavigateSource";  
+    string RequestNavigateSourcePropertyChangedPropertyName     = "RequestNavigateSourcePropertyChanged"; 
+ 
+    string ScopedRegionNamePropertyName                         = "ScopedRegionName";   
+    string ScopedRegionNamePropertyChangedPropertyName          = "ScopedRegionNamePropertyChanged"; 
+
+    string RegisterRoutedCommandBindingsPropertyName = "RegisterRoutedCommandBindings";
+    string RegisterRoutedEventBindingsPropertyName = "RegisterRoutedEventBindings";
+    string RoutedEventHandlersPropertyName = "RoutedEventHandlers";
+    string RoutedCommandHandlersPropertyName = "RoutedCommandHandlers";
+
+
+    string proxyPrefix = "clr-namespace:" + ProxyUserControlNameSpace;
+    if(ProxyUserControlProject != ScopedRegionUserControlXamlProject) {
+        proxyPrefix = proxyPrefix + ";assembly=" + ProxyUserControlProject;
+    }
+    string attachedPrefix = "clr-namespace:" + AttachedPropertiesExtNameSpace;
+    if(AttachedPropertiesExtProject != ScopedRegionUserControlXamlProject) {
+        attachedPrefix = attachedPrefix + ";assembly=" + AttachedPropertiesExtProject;
+    }
+
+#>
+
+<UserControl x:Class="<#= ScopedRegionUserControlXamlNameSpace #>.<#= ScopedRegionUserControlClassName #>"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+
+             xmlns:prx="<#= proxyPrefix #>" 
+
+             xmlns:prism="http://prismlibrary.com/" 
+             prism:ViewModelLocator.AutoWireViewModel="True"
+
+             x:Name="ScopedRegionUsrCntrlRootNode"
+
+             xmlns:atch="<#= attachedPrefix #>" 
+             atch:<#= AttachedPropertiesExtClassName #>.<#= RegisterRoutedEventBindingsPropertyName #>="{Binding <#= RoutedEventHandlersPropertyName #>}"
+
+
+             mc:Ignorable="d" 
+             d:DesignHeight="150" d:DesignWidth="400">
+        <ContentControl prism:RegionManager.RegionName="{Binding <#= ScopedRegionNamePropertyName #>, Mode=OneWay, ElementName=ScopedRegionUsrCntrlRootNode}">
+            <prx:<#= ProxyUserControlClassName #>
+                    prism:RegionManager.RegionName="{Binding <#= RequestNavigateSourcePropertyName #>, Mode=OneWay, ElementName=ScopedRegionUsrCntrlRootNode}"
+
+                    <#= CaptionPropertyName #>="{Binding <#= CaptionPropertyName #>, Mode=OneWay, ElementName=ScopedRegionUsrCntrlRootNode}"
+                    <#= ShowBackBtnPropertyName #>="{Binding <#= ShowBackBtnPropertyName #>, Mode=OneWay, ElementName=ScopedRegionUsrCntrlRootNode}"
+                    <#= HiddenFiltersPropertyName #>="{Binding <#= HiddenFiltersPropertyName #>, Mode=OneWay, ElementName=ScopedRegionUsrCntrlRootNode}"
+                    <#= FormControlModelPropertyName #>="{Binding <#= FormControlModelPropertyName #>, Mode=OneWay, ElementName=ScopedRegionUsrCntrlRootNode}"
+                    <#= EformModePropertyName #>="{Binding <#= EformModePropertyName #>, Mode=OneWay, ElementName=ScopedRegionUsrCntrlRootNode}"
+
+
+                    <#= FilterHeightPropertyName #>="{Binding <#= FilterHeightPropertyName #>, Mode=OneWay, ElementName=ScopedRegionUsrCntrlRootNode}"
+                    <#= ShowFilterPropertyName #>="{Binding <#= ShowFilterPropertyName #>, Mode=OneWay, ElementName=ScopedRegionUsrCntrlRootNode}"
+
+                    <#= ShowAddFilterBtnPropertyName #>="{Binding <#= ShowAddFilterBtnPropertyName #>, Mode=OneWay, ElementName=ScopedRegionUsrCntrlRootNode}"
+                    <#= GridHeightPropertyName #>="{Binding <#= GridHeightPropertyName #>, Mode=OneWay, ElementName=ScopedRegionUsrCntrlRootNode}"
+                    <#= TableMenuItemsPropertyName #>="{Binding <#= TableMenuItemsPropertyName #>, Mode=OneWay, ElementName=ScopedRegionUsrCntrlRootNode}"
+                    <#= RowMenuItemsPropertyName #>="{Binding <#= RowMenuItemsPropertyName #>, Mode=OneWay, ElementName=ScopedRegionUsrCntrlRootNode}"
+
+                    <#= ContainerMenuItemsPropertyName #>="{Binding <#= ContainerMenuItemsPropertyName #>, Mode=OneWay, ElementName=ScopedRegionUsrCntrlRootNode}"
+                    <#= CanAddPropertyName #>="{Binding <#= CanAddPropertyName #>, Mode=OneWay, ElementName=ScopedRegionUsrCntrlRootNode}"
+                    <#= CanUpdPropertyName #>="{Binding <#= CanUpdPropertyName #>, Mode=OneWay, ElementName=ScopedRegionUsrCntrlRootNode}"
+                    <#= CanDelPropertyName #>="{Binding <#= CanDelPropertyName #>, Mode=OneWay, ElementName=ScopedRegionUsrCntrlRootNode}"
+
+
+                    <#= FilterHeightDetailPropertyName #>="{Binding <#= FilterHeightDetailPropertyName #>, Mode=OneWay, ElementName=ScopedRegionUsrCntrlRootNode}"
+                    <#= ShowFilterDetailPropertyName #>="{Binding <#= ShowFilterDetailPropertyName #>, Mode=OneWay, ElementName=ScopedRegionUsrCntrlRootNode}"
+                    <#= ShowAddFilterBtnDetailPropertyName #>="{Binding <#= ShowAddFilterBtnDetailPropertyName #>, Mode=OneWay, ElementName=ScopedRegionUsrCntrlRootNode}"
+                    <#= GridHeightDetailPropertyName #>="{Binding <#= GridHeightDetailPropertyName #>, Mode=OneWay, ElementName=ScopedRegionUsrCntrlRootNode}"
+                    <#= HiddenFiltersDetailPropertyName #>="{Binding <#= HiddenFiltersDetailPropertyName #>, Mode=OneWay, ElementName=ScopedRegionUsrCntrlRootNode}"
+
+                    <#= TableMenuItemsDetailPropertyName #>="{Binding <#= TableMenuItemsDetailPropertyName #>, Mode=OneWay, ElementName=ScopedRegionUsrCntrlRootNode}"
+                    <#= RowMenuItemsDetailPropertyName #>="{Binding <#= RowMenuItemsDetailPropertyName #>, Mode=OneWay, ElementName=ScopedRegionUsrCntrlRootNode}"
+                    <#= CanAddDetailPropertyName #>="{Binding <#= CanAddDetailPropertyName #>, Mode=OneWay, ElementName=ScopedRegionUsrCntrlRootNode}"
+                    <#= CanUpdDetailPropertyName #>="{Binding <#= CanUpdDetailPropertyName #>, Mode=OneWay, ElementName=ScopedRegionUsrCntrlRootNode}"
+                    <#= CanDelDetailPropertyName #>="{Binding <#= CanDelDetailPropertyName #>, Mode=OneWay, ElementName=ScopedRegionUsrCntrlRootNode}"
+                    />
+        </ContentControl>
+</UserControl>
+
+
+<#+
+
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+    string GetModelProjectName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileProject)) {
+            return result;
+        }
+        string[] fnArr = refItem.FileProject.Split(new char[] {'\\'}, 100, System.StringSplitOptions.None); 
+        string fn = fnArr[fnArr.Length - 1];
+
+        return fn.Replace(".csproj","");
+    }
+
+#>

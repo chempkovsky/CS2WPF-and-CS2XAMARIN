@@ -1,0 +1,470 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+using System;
+using System.Collections.Generic;
+using System.Windows;
+using System.Windows.Controls;
+using Prism.Regions;
+
+<#
+
+
+    string RoutedEventExtFolder      = "00222-RoutedEventExt.cs";
+    string RoutedEventExtClassName   = GetModelClassName(Model, RoutedEventExtFolder);
+    string RoutedEventExtNameSpace   = GetModelNameSpace(Model, RoutedEventExtFolder);
+
+    string IWebServiceFilterMenuInterfaceFolder      = "00206-IWebServiceFilterMenuInterface.cs";
+    string IWebServiceFilterMenuInterfaceClassName   = GetModelClassName(Model, IWebServiceFilterMenuInterfaceFolder);
+    string IWebServiceFilterMenuInterfaceNameSpace   = GetModelNameSpace(Model, IWebServiceFilterMenuInterfaceFolder);
+
+
+    string IWebServiceFilterRsltInterfaceFolder      = "00204-IWebServiceFilterRsltInterface.cs";
+    string IWebServiceFilterRsltInterfaceClassName   = GetModelClassName(Model, IWebServiceFilterRsltInterfaceFolder);
+    string IWebServiceFilterRsltInterfaceNameSpace   = GetModelNameSpace(Model, IWebServiceFilterRsltInterfaceFolder);
+
+    string IScopedRegionNavigationUserControlInterfaceFolder      = "00620-IScopedRegionNavigationUserControlInterface.cs";
+    string IScopedRegionNavigationUserControlInterfaceClassName   = GetModelClassName(Model, IScopedRegionNavigationUserControlInterfaceFolder);
+    string IScopedRegionNavigationUserControlInterfaceNameSpace   = GetModelNameSpace(Model, IScopedRegionNavigationUserControlInterfaceFolder);
+
+    string ScopedRegionNavigationUserControlFolder     = "00622-ScopedRegionNavigationUserControl.xaml.cs";
+    string ScopedRegionNavigationUserControlClassName  = GetModelClassName(Model, ScopedRegionNavigationUserControlFolder);
+    string ScopedRegionNavigationUserControlNameSpace  = GetModelNameSpace(Model, ScopedRegionNavigationUserControlFolder);
+
+
+    string FilterHeightPropertyName = "FilterHeight";
+    string ShowFilterPropertyName = "ShowFilter";
+    string ShowAddFilterBtnPropertyName = "ShowAddFilterBtn";
+    string GridHeightPropertyName = "GridHeight";
+    string TableMenuItemsPropertyName = "TableMenuItems";
+    string RowMenuItemsPropertyName = "RowMenuItems";
+    string ContainerMenuItemsPropertyName = "ContainerMenuItems";
+    string ShowSubmitPropertyName = "ShowSubmit";
+    string CanAddPropertyName = "CanAdd";
+    string CanUpdPropertyName = "CanUpdate";
+    string CanDelPropertyName = "CanDelete";
+
+    string DataContextPropertyName = "DataContext"; 
+  
+    string ScopedRegionManagerPropertyName                      = "ScopedRegionManager"; 
+    string ScopedRegionManagerPropertyChangedPropertyName       = "ScopedRegionManagerPropertyChanged"; 
+
+    string RequestNavigateSourcePropertyName                    = "RequestNavigateSource";  
+    string RequestNavigateSourcePropertyChangedPropertyName     = "RequestNavigateSourcePropertyChanged"; 
+ 
+    string ScopedRegionNamePropertyName                         = "ScopedRegionName";   
+    string ScopedRegionNamePropertyChangedPropertyName          = "ScopedRegionNamePropertyChanged"; 
+
+
+    List<string> nmSpaces = new List<string>();
+    if ((ScopedRegionNavigationUserControlNameSpace != IWebServiceFilterMenuInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterMenuInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IWebServiceFilterMenuInterfaceNameSpace);
+    if ((ScopedRegionNavigationUserControlNameSpace != IWebServiceFilterRsltInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IWebServiceFilterRsltInterfaceNameSpace);
+    if ((ScopedRegionNavigationUserControlNameSpace != RoutedEventExtNameSpace) && (nmSpaces.IndexOf(RoutedEventExtNameSpace) < 0)) 
+        nmSpaces.Add(RoutedEventExtNameSpace);
+    if ((ScopedRegionNavigationUserControlNameSpace != IScopedRegionNavigationUserControlInterfaceNameSpace) && (nmSpaces.IndexOf(IScopedRegionNavigationUserControlInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IScopedRegionNavigationUserControlInterfaceNameSpace);
+
+
+#>
+<# 
+    foreach(string ns in nmSpaces) {
+#>
+using <#= ns #>;
+<#
+    }
+#>
+
+namespace <#= ScopedRegionNavigationUserControlNameSpace #> {
+    /// <summary>
+    /// Interaction logic for <#= ScopedRegionNavigationUserControlClassName #>.xaml
+    /// </summary>
+    public partial class <#= ScopedRegionNavigationUserControlClassName #>: UserControl, <#= IScopedRegionNavigationUserControlInterfaceClassName #>
+    {
+        public <#= ScopedRegionNavigationUserControlClassName #>()
+        {
+            InitializeComponent();
+            <#= ScopedRegionNamePropertyName #> = Guid.NewGuid().ToString("N");
+        }
+
+        #region <#= ScopedRegionNamePropertyName #>
+        private static void <#= ScopedRegionNamePropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            <#= ScopedRegionNavigationUserControlClassName #> inst = d as <#= ScopedRegionNavigationUserControlClassName #>;
+            if (inst != null)
+            {
+                RoutedPropertyChangedEventArgs<string> eventArgs =
+                    new RoutedPropertyChangedEventArgs<string>(
+                        e.OldValue as string,
+                        e.NewValue as string,
+                        <#= RoutedEventExtClassName #>.<#= ScopedRegionNamePropertyChangedPropertyName #>Event);
+                inst.RaiseEvent(eventArgs);
+            }
+        }
+        public static readonly DependencyProperty <#= ScopedRegionNamePropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= ScopedRegionNamePropertyName #>", typeof(string),
+                typeof(<#= ScopedRegionNavigationUserControlClassName #>),
+                new PropertyMetadata(null, <#= ScopedRegionNamePropertyName #>Changed));
+        public string <#= ScopedRegionNamePropertyName #>
+        {
+            get
+            {
+                return (string)GetValue(<#= ScopedRegionNamePropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= ScopedRegionNamePropertyName #>Property, value);
+            }
+        }
+        #endregion
+
+        #region <#= RequestNavigateSourcePropertyName #>
+        private static void <#= RequestNavigateSourcePropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            <#= ScopedRegionNavigationUserControlClassName #> inst = d as <#= ScopedRegionNavigationUserControlClassName #>;
+            if (inst != null)
+            {
+                RoutedPropertyChangedEventArgs<string> eventArgs =
+                    new RoutedPropertyChangedEventArgs<string>(
+                        e.OldValue as string,
+                        e.NewValue as string,
+                        <#= RoutedEventExtClassName #>.<#= RequestNavigateSourcePropertyChangedPropertyName #>Event);
+                inst.RaiseEvent(eventArgs);
+            }
+        }
+        public static readonly DependencyProperty <#= RequestNavigateSourcePropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= RequestNavigateSourcePropertyName #>", typeof(string),
+                typeof(<#= ScopedRegionNavigationUserControlClassName #>),
+                new PropertyMetadata(null, <#= RequestNavigateSourcePropertyName #>Changed));
+        public string <#= RequestNavigateSourcePropertyName #>
+        {
+            get
+            {
+                return (string)GetValue(<#= RequestNavigateSourcePropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= RequestNavigateSourcePropertyName #>Property, value);
+            }
+        }
+        #endregion
+
+        #region <#= ScopedRegionManagerPropertyName #>
+        private static void <#= ScopedRegionManagerPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            <#= ScopedRegionNavigationUserControlClassName #> inst = d as <#= ScopedRegionNavigationUserControlClassName #>;
+            if (inst != null)
+            {
+                RoutedPropertyChangedEventArgs<object> eventArgs =
+                    new RoutedPropertyChangedEventArgs<object>(
+                        e.OldValue as IRegionManager,
+                        e.NewValue as IRegionManager,
+                        <#= RoutedEventExtClassName #>.<#= ScopedRegionManagerPropertyChangedPropertyName #>Event);
+                inst.RaiseEvent(eventArgs);
+            }
+        }
+        public static readonly DependencyProperty <#= ScopedRegionManagerPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= ScopedRegionManagerPropertyName #>", typeof(IRegionManager),
+                typeof(<#= ScopedRegionNavigationUserControlClassName #>),
+                new PropertyMetadata(null, <#= ScopedRegionManagerPropertyName #>Changed));
+        public object <#= ScopedRegionManagerPropertyName #>
+        {
+            get
+            {
+                return (IRegionManager)GetValue(<#= ScopedRegionManagerPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= ScopedRegionManagerPropertyName #>Property, value as IRegionManager);
+            }
+        }
+        #endregion
+
+        #region <#= FilterHeightPropertyName #>
+        public static readonly DependencyProperty <#= FilterHeightPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= FilterHeightPropertyName #>", typeof(double),
+                typeof(<#= ScopedRegionNavigationUserControlClassName #>),
+                new PropertyMetadata(double.MaxValue));
+        public double <#= FilterHeightPropertyName #>
+        {
+            get
+            {
+                return (double)GetValue(<#= FilterHeightPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= FilterHeightPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= ShowFilterPropertyName #>
+        public static readonly DependencyProperty <#= ShowFilterPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= ShowFilterPropertyName #>", typeof(bool),
+                typeof(<#= ScopedRegionNavigationUserControlClassName #>),
+                new PropertyMetadata(true));
+        public bool <#= ShowFilterPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= ShowFilterPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= ShowFilterPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= ShowAddFilterBtnPropertyName #>
+        public static readonly DependencyProperty <#= ShowAddFilterBtnPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= ShowAddFilterBtnPropertyName #>", typeof(bool),
+                typeof(<#= ScopedRegionNavigationUserControlClassName #>),
+                new PropertyMetadata(true));
+        public bool <#= ShowAddFilterBtnPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= ShowAddFilterBtnPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= ShowAddFilterBtnPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= ContainerMenuItemsPropertyName #>
+        public static readonly DependencyProperty <#= ContainerMenuItemsPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= ContainerMenuItemsPropertyName #>", typeof(IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>),
+                typeof(<#= ScopedRegionNavigationUserControlClassName #>),
+                new PropertyMetadata(null));
+        public IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> <#= ContainerMenuItemsPropertyName #>
+        {
+            get
+            {
+                return (IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>)GetValue(<#= ContainerMenuItemsPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= ContainerMenuItemsPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= GridHeightPropertyName #>
+        public static readonly DependencyProperty <#= GridHeightPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= GridHeightPropertyName #>", typeof(double),
+                typeof(<#= ScopedRegionNavigationUserControlClassName #>),
+                new PropertyMetadata(double.MaxValue));
+        public double <#= GridHeightPropertyName #>
+        {
+            get
+            {
+                return (double)GetValue(<#= GridHeightPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= GridHeightPropertyName #>Property, value);
+            }
+        }
+        #endregion
+
+        #region <#= TableMenuItemsPropertyName #>
+        public static readonly DependencyProperty <#= TableMenuItemsPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= TableMenuItemsPropertyName #>", typeof(IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>),
+                typeof(<#= ScopedRegionNavigationUserControlClassName #>),
+                new PropertyMetadata(null));
+        public IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> <#= TableMenuItemsPropertyName #>
+        {
+            get
+            {
+                return (IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>)GetValue(<#= TableMenuItemsPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= TableMenuItemsPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= RowMenuItemsPropertyName #>
+        public static readonly DependencyProperty <#= RowMenuItemsPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= RowMenuItemsPropertyName #>", typeof(IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>),
+                typeof(<#= ScopedRegionNavigationUserControlClassName #>),
+                new PropertyMetadata(null));
+        public IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> <#= RowMenuItemsPropertyName #>
+        {
+            get
+            {
+                return (IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>)GetValue(<#= RowMenuItemsPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= RowMenuItemsPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= ShowSubmitPropertyName #>
+        public static readonly DependencyProperty <#= ShowSubmitPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= ShowSubmitPropertyName #>", typeof(bool),
+                typeof(<#= ScopedRegionNavigationUserControlClassName #>),
+                new PropertyMetadata(true));
+        public bool <#= ShowSubmitPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= ShowSubmitPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= ShowSubmitPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= CanAddPropertyName #>
+        public static readonly DependencyProperty <#= CanAddPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= CanAddPropertyName #>", typeof(bool),
+                typeof(<#= ScopedRegionNavigationUserControlClassName #>),
+                new PropertyMetadata(false));
+        public bool <#= CanAddPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= CanAddPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= CanAddPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= CanUpdPropertyName #>
+        public static readonly DependencyProperty <#= CanUpdPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= CanUpdPropertyName #>", typeof(bool),
+                typeof(<#= ScopedRegionNavigationUserControlClassName #>),
+                new PropertyMetadata(false));
+        public bool <#= CanUpdPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= CanUpdPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= CanUpdPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= CanDelPropertyName #>
+        public static readonly DependencyProperty <#= CanDelPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= CanDelPropertyName #>", typeof(bool),
+                typeof(<#= ScopedRegionNavigationUserControlClassName #>),
+                new PropertyMetadata(false));
+        public bool <#= CanDelPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= CanDelPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= CanDelPropertyName #>Property, value);
+            }
+        }
+        #endregion
+    }
+}
+
+<#+
+
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+
+#>

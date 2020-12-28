@@ -1,4 +1,5 @@
 ﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ template language="C#" HostSpecific="True" Debug="True" #>
 <#@ output extension="cs" #>
 <#@ assembly name="System.Core" #>
 <#@ import namespace="System" #>
@@ -18,11 +19,15 @@ using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using System.Collections.ObjectModel;
 using System.Collections.Generic;
-using Prism.Regions;
 using System.Linq;
+using Prism.Regions;
+
 
 <#
 
+    string EformModeEnumFolder                      = "00026-EformModeEnum.cs";
+    string EformModeEnumClassName                   = GetContextModelClassName(Context, EformModeEnumFolder);
+    string EformModeEnumNameSpace                   = GetContextModelNameSpace(Context, EformModeEnumFolder);
 
     string IAppGlblSettingsServiceFolder            = "00080-IAppGlblSettingsService.cs";
     string IAppGlblSettingsServiceClassName         = GetContextModelClassName(Context, IAppGlblSettingsServiceFolder);
@@ -52,18 +57,13 @@ using System.Linq;
     string RoutedCommandExtClassName                = GetContextModelClassName(Context, RoutedCommandExtFolder);
     string RoutedCommandExtNameSpace                = GetContextModelNameSpace(Context, RoutedCommandExtFolder);
 
-    string IO2mListItemInterfaceFolder          = "00600-IO2mListItemInterface.cs";
-    string IO2mListItemInterfaceClassName       = GetContextModelClassName(Context, IO2mListItemInterfaceFolder);
-    string IO2mListItemInterfaceNameSpace       = GetContextModelNameSpace(Context, IO2mListItemInterfaceFolder);
-
-    string O2mListItemViewModelFolder           = "00602-O2mListItemViewModel.cs";
-    string O2mListItemViewModelClassName        = GetContextModelClassName(Context, O2mListItemViewModelFolder);
-    string O2mListItemViewModelNameSpace        = GetContextModelNameSpace(Context, O2mListItemViewModelFolder);
-
-
     string modelInterfaceFolder             = "01100-Interface.cs";
     string modelInterfaceClassName          = GetInterfaceName(Model);
     string modelInterfaceNameSpace          = GetModelNameSpace(Model, modelInterfaceFolder);
+
+    string EdlgViewModelFolder              = "01520-EdlgViewModel.cs";
+    string EdlgViewModelClassName           = GetModelClassName(Model, EdlgViewModelFolder);
+    string EdlgViewModelNameSpace           = GetModelNameSpace(Model, EdlgViewModelFolder);
 
     string LformUserControlFolder           = "01596-LformUserControl.xaml.cs";
     string LformUserControlClassName        = GetModelClassName(Model, LformUserControlFolder);
@@ -74,19 +74,18 @@ using System.Linq;
     string LformViewModelNameSpace          = GetModelNameSpace(Model, LformViewModelFolder);
 
 
-    string O2mUserControlFolder             = "01696-O2mUserControl.xaml.cs";
-    string O2mUserControlClassName          = GetModelClassName(Model, O2mUserControlFolder);
-    string O2mUserControlNameSpace          = GetModelNameSpace(Model, O2mUserControlFolder);
 
-    string O2mViewModelFolder               = "01700-O2mViewModel.cs";
-    string O2mViewModelClassName            = GetModelClassName(Model, O2mViewModelFolder);
-    string O2mViewModelNameSpace            = GetModelNameSpace(Model, O2mViewModelFolder);
+    string RdlistUserControlFolder          = "02016-RdlistUserControl.xaml.cs";
+    string RdlistUserControlClassName       = GetModelClassName(Model, RdlistUserControlFolder);
+    string RdlistUserControlNameSpace       = GetModelNameSpace(Model, RdlistUserControlFolder);
+
+    string RdlistViewModelFolder            = "02020-RdlistViewModel.cs";
+    string RdlistViewModelClassName         = GetModelClassName(Model, RdlistViewModelFolder);
+    string RdlistViewModelNameSpace         = GetModelNameSpace(Model, RdlistViewModelFolder);
 
 
-
-
-    string HiddenFiltersPropertyName                = "HiddenFilters";
-    string OnHiddenFiltersChangedPropertyName       = "OnHiddenFiltersChanged";
+    string HiddenFiltersPropertyName            = "HiddenFilters";
+    string OnHiddenFiltersChangedPropertyName   = "OnHiddenFiltersChanged";
     string HiddenFiltersPropertyChangedPropertyName = "HiddenFiltersPropertyChanged";
 
     string TableMenuItemsPropertyName = "TableMenuItems";
@@ -102,8 +101,6 @@ using System.Linq;
     string RoutedEventHandlersPropertyName = "RoutedEventHandlers";
     string RoutedCommandHandlersPropertyName = "RoutedCommandHandlers";
     string RegionPropertyName = "Region";
-    string ForeignKeyDetailsName = "ForeignKeyDetails";
-
 
     string DisplayLabelProperty     = "Name";
     string DisplayHintProperty      = "Prompt";
@@ -125,78 +122,51 @@ using System.Linq;
     string CanDelPropertyChangedPropertyName    = "CanDeletePropertyChanged";
     string OnCanDelPropertyChangedPropertyName  = "OnCanDeletePropertyChanged";
 
-    string HiddenFiltersDetailPropertyName                  = "HiddenFiltersDetail"; 
-    string HiddenFiltersDetailPropertyChangedPropertyName   = "HiddenFiltersDetailPropertyChanged"; 
-    string OnHiddenFiltersDetailPropertyChangedPropertyName = "OnHiddenFiltersDetailPropertyChanged"; 
-
-    string RowMenuItemsDetailPropertyName                   = "RowMenuItemsDetail"; 
-    string RowMenuItemsDetailPropertyChangedPropertyName    = "RowMenuItemsDetailPropertyChanged"; 
-    string OnRowMenuItemsDetailPropertyChangedPropertyName  = "OnRowMenuItemsDetailPropertyChanged"; 
-
-    string TableMenuItemsDetailPropertyName                   = "TableMenuItemsDetail"; 
-    string TableMenuItemsDetailPropertyChangedPropertyName    = "TableMenuItemsDetailPropertyChanged"; 
-    string OnTableMenuItemsDetailPropertyChangedPropertyName  = "OnTableMenuItemsDetailPropertyChanged"; 
-
-    string CanAddDetailPropertyName                   = "CanAddDetail"; 
-    string CanAddDetailPropertyChangedPropertyName    = "CanAddDetailPropertyChanged"; 
-    string OnCanAddDetailPropertyChangedPropertyName  = "OnCanAddDetailPropertyChanged"; 
-
-    string CanUpdDetailPropertyName                   = "CanUpdateDetail"; 
-    string CanUpdDetailPropertyChangedPropertyName    = "CanUpdateDetailPropertyChanged"; 
-    string OnCanUpdDetailPropertyChangedPropertyName  = "OnCanUpdateDetailPropertyChanged"; 
-
-    string CanDelDetailPropertyName                   = "CanDeleteDetail"; 
-    string CanDelDetailPropertyChangedPropertyName    = "CanDeleteDetailPropertyChanged"; 
-    string OnCanDelDetailPropertyChangedPropertyName  = "OnCanDeleteDetailPropertyChanged"; 
-
-    string CurrentHiddenFiltersDetailPropertyName     = "CurrentHiddenFiltersDetail"; 
-    string DetailsListPropertyName                    = "DetailsList"; 
-    string SelectedDetailsListItemPropertyName        = "SelectedDetailsListItem"; 
-    string IsDetailVisiblePropertyName                = "IsDetailVisible"; 
-
-    string ScopedRegionChangedPropertyName          = "ScopedRegionChanged";
-    string OnScopedRegionChangedPropertyName        = "OnScopedRegionChanged";
-    string DetailRegionPropertyName                 = "DetailRegion";
+    string CanAddInternalPropertyName           = "CanAddInternal";
+    string CanUpdInternalPropertyName           = "CanUpdateInternal";
+    string CanDelInternalPropertyName           = "CanDeleteInternal";
 
     string FormControlModelPropertyName         = "FormControlModel";
     string CaptionPropertyName                  = "Caption";
     string EformModePropertyName                = "EformMode";
     string ShowSubmitPropertyName               = "ShowSubmit";
     string ForO2mSuffixPropertyName             = "ForO2m";
+    string ForRfSuffixPropertyName              = "ForRd";
 
-    string SelectedItemPropertyName                 = "SelectedItem";
-    string SformSelectionChangedCommandPropertyName = "SformSelectionChangedCommand";
+    string RowMIPrefixPropertyName              = "RowMI";
+    string CurrentNavigationContextPropertyName = "CurrentNavigationContext";
+    string NavigationBackCommandPropertyName    = "NavigationBackCommand";
+    string ShowBackBtnPropertyName              = "ShowBackBtn";
 
-    string UIDispatcherInvokePropertyName           = "Application.Current.Dispatcher.Invoke";
 
+    string UIDispatcherInvokePropertyName   = "Application.Current.Dispatcher.Invoke";
+    
 
     List<string> detailViews = GetDetailViews(Model, Context, null);
     List<ModelViewPropertyOfVwSerializable> primKeys = GetModelPrimaryKeyProps(Model);
 
 
     List<string> nmSpaces = new List<string>();
-    if ((O2mViewModelNameSpace != IWebServiceFilterRsltInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace) < 0)) 
+    if ((RdlistViewModelNameSpace != IWebServiceFilterRsltInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace) < 0)) 
         nmSpaces.Add(IWebServiceFilterRsltInterfaceNameSpace);
-    if ((O2mViewModelNameSpace != WebServiceFilterRsltViewModelNameSpace) && (nmSpaces.IndexOf(WebServiceFilterRsltViewModelNameSpace) < 0)) 
+    if ((RdlistViewModelNameSpace != WebServiceFilterRsltViewModelNameSpace) && (nmSpaces.IndexOf(WebServiceFilterRsltViewModelNameSpace) < 0)) 
         nmSpaces.Add(WebServiceFilterRsltViewModelNameSpace);
-    if ((O2mViewModelNameSpace != IAppGlblSettingsServiceNameSpace) && (nmSpaces.IndexOf(IAppGlblSettingsServiceNameSpace) < 0)) 
+    if ((RdlistViewModelNameSpace != IAppGlblSettingsServiceNameSpace) && (nmSpaces.IndexOf(IAppGlblSettingsServiceNameSpace) < 0)) 
         nmSpaces.Add(IAppGlblSettingsServiceNameSpace);
-    if ((O2mViewModelNameSpace != RoutedEventExtNameSpace) && (nmSpaces.IndexOf(RoutedEventExtNameSpace) < 0)) 
+    if ((RdlistViewModelNameSpace != RoutedEventExtNameSpace) && (nmSpaces.IndexOf(RoutedEventExtNameSpace) < 0)) 
         nmSpaces.Add(RoutedEventExtNameSpace);
-    if ((O2mViewModelNameSpace != WebServiceFilterMenuViewModelNameSpace) && (nmSpaces.IndexOf(WebServiceFilterMenuViewModelNameSpace) < 0)) 
+    if ((RdlistViewModelNameSpace != WebServiceFilterMenuViewModelNameSpace) && (nmSpaces.IndexOf(WebServiceFilterMenuViewModelNameSpace) < 0)) 
         nmSpaces.Add(WebServiceFilterMenuViewModelNameSpace);
-    if ((O2mViewModelNameSpace != IWebServiceFilterMenuInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterMenuInterfaceNameSpace) < 0)) 
+    if ((RdlistViewModelNameSpace != IWebServiceFilterMenuInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterMenuInterfaceNameSpace) < 0)) 
         nmSpaces.Add(IWebServiceFilterMenuInterfaceNameSpace);
-    if ((O2mViewModelNameSpace != IWebServiceFilterMenuInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterMenuInterfaceNameSpace) < 0)) 
+    if ((RdlistViewModelNameSpace != IWebServiceFilterMenuInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterMenuInterfaceNameSpace) < 0)) 
         nmSpaces.Add(IWebServiceFilterMenuInterfaceNameSpace);
-    if ((O2mViewModelNameSpace != RoutedCommandExtNameSpace) && (nmSpaces.IndexOf(RoutedCommandExtNameSpace) < 0)) 
+    if ((RdlistViewModelNameSpace != RoutedCommandExtNameSpace) && (nmSpaces.IndexOf(RoutedCommandExtNameSpace) < 0)) 
         nmSpaces.Add(RoutedCommandExtNameSpace);
-    if ((O2mViewModelNameSpace != modelInterfaceNameSpace) && (nmSpaces.IndexOf(modelInterfaceNameSpace) < 0)) 
+    if ((RdlistViewModelNameSpace != EformModeEnumNameSpace) && (nmSpaces.IndexOf(EformModeEnumNameSpace) < 0)) 
+        nmSpaces.Add(EformModeEnumNameSpace);
+    if ((RdlistViewModelNameSpace != modelInterfaceNameSpace) && (nmSpaces.IndexOf(modelInterfaceNameSpace) < 0)) 
         nmSpaces.Add(modelInterfaceNameSpace);
-    if ((O2mViewModelNameSpace != O2mListItemViewModelNameSpace) && (nmSpaces.IndexOf(O2mListItemViewModelNameSpace) < 0)) 
-        nmSpaces.Add(O2mListItemViewModelNameSpace);
-    if ((O2mViewModelNameSpace != IO2mListItemInterfaceNameSpace) && (nmSpaces.IndexOf(IO2mListItemInterfaceNameSpace) < 0)) 
-        nmSpaces.Add(IO2mListItemInterfaceNameSpace);
 
     
     
@@ -219,7 +189,8 @@ using <#= ns #>;
             if (regionManager != null)
             {
                 ...
-                regionManager.RegisterViewWithRegion("<#= O2mUserControlClassName #><#= RegionPropertyName #>", typeof(<#= O2mUserControlClassName #>));
+                regionManager.RegisterViewWithRegion("<#= RdlistUserControlClassName #><#= RegionPropertyName #>", typeof(<#= RdlistUserControlClassName #>));
+                
                 ...
             }
             ...
@@ -229,24 +200,52 @@ using <#= ns #>;
         public void RegisterTypes(IContainerRegistry containerRegistry)
         {
             ...
-            ViewModelLocationProvider.Register<<#= O2mUserControlClassName #>, <#= O2mViewModelClassName #>>();
+            ViewModelLocationProvider.Register<<#= RdlistUserControlClassName #>, <#= RdlistViewModelClassName #>>();
+            containerRegistry.RegisterForNavigation<<#= RdlistUserControlClassName #>, <#= RdlistViewModelClassName #>>("<#= RdlistUserControlClassName #><#= ForRfSuffixPropertyName #>");
             ...
         }
 */
 
-namespace <#= LformViewModelNameSpace #> {
-    public class <#= O2mViewModelClassName #>: INotifyPropertyChanged
+namespace <#= RdlistViewModelNameSpace #> {
+<#
+    if(detailViews.Count > 0) {
+#>
+    public static class <#= RdlistViewModelClassName #>Commands
+    {
+
+<#
+        foreach(string detailViewName in detailViews) {
+            ModelViewSerializable detailView = GetModelViewByName(Context, detailViewName);
+            if(detailView == null) {
+#>
+///// can not find the view by Name <#= detailViewName #>
+<#
+                continue;
+            }
+            string detailViewClassName = GetModelClassName(detailView, RdlistUserControlFolder);
+            List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detailView, null);
+            if (foreignKeys == null) continue;
+            if (foreignKeys.Count < 1) continue;
+            foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
+#>
+              public static RoutedCommand <#= detailViewClassName #><#= foreignKey.NavigationName #>Command = new RoutedCommand("<#= detailViewClassName #><#= foreignKey.NavigationName #>Command", typeof(<#= RdlistViewModelClassName #>Commands));
+<#
+            }
+        }
+#>
+    }
+<#
+    }
+#>
+
+    public class <#= RdlistViewModelClassName #>: INotifyPropertyChanged, INavigationAware // , IRegionMemberLifetime
     {
         protected <#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName #>=null;
-        
-        public <#= O2mViewModelClassName #>(<#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName  #>) {
+
+        public <#= RdlistViewModelClassName #>(<#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName  #>) {
             this.<#= AppSettingServicePropertyName #> = <#= AppSettingServicePropertyName #>;
 
             ObservableCollection<ValueTuple<RoutedEvent, Delegate, bool>> rehs = new ObservableCollection<ValueTuple<RoutedEvent, Delegate, bool>>();
-            rehs.Add((<#= RoutedEventExtClassName #>.<#= HiddenFiltersPropertyChangedPropertyName #>Event, 
-                new RoutedPropertyChangedEventHandler<IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>>(this.<#= OnHiddenFiltersChangedPropertyName #>), false));
-            rehs.Add((<#= RoutedEventExtClassName #>.<#= TableMenuItemsPropertyChangedPropertyName #>Event, 
-                new RoutedPropertyChangedEventHandler<IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>>(this.<#= OnTableMenuItemsChangedPropertyName #>), false));
             rehs.Add((<#= RoutedEventExtClassName #>.<#= RowMenuItemsPropertyChangedPropertyName #>Event, 
                 new RoutedPropertyChangedEventHandler<IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>>(this.<#= OnRowMenuItemsChangedPropertyName #>), false));
             rehs.Add((<#= RoutedEventExtClassName #>.<#= CanAddPropertyChangedPropertyName #>Event, 
@@ -256,32 +255,43 @@ namespace <#= LformViewModelNameSpace #> {
             rehs.Add((<#= RoutedEventExtClassName #>.<#= CanDelPropertyChangedPropertyName #>Event, 
                 new RoutedPropertyChangedEventHandler<bool>(this.<#= OnCanDelPropertyChangedPropertyName #>), false));
 
-            rehs.Add((<#= RoutedEventExtClassName #>.<#= HiddenFiltersDetailPropertyChangedPropertyName #>Event, 
-                new RoutedPropertyChangedEventHandler<IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>>(this.<#= OnHiddenFiltersDetailPropertyChangedPropertyName #>), false));
-            rehs.Add((<#= RoutedEventExtClassName #>.<#= RowMenuItemsDetailPropertyChangedPropertyName #>Event, 
-                new RoutedPropertyChangedEventHandler<IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>>(this.<#= OnRowMenuItemsDetailPropertyChangedPropertyName #>), false));
-            rehs.Add((<#= RoutedEventExtClassName #>.<#= TableMenuItemsDetailPropertyChangedPropertyName #>Event, 
-                new RoutedPropertyChangedEventHandler<IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>>(this.<#= OnTableMenuItemsDetailPropertyChangedPropertyName #>), false));
-
-            rehs.Add((<#= RoutedEventExtClassName #>.<#= CanAddDetailPropertyChangedPropertyName #>Event, 
-                new RoutedPropertyChangedEventHandler<bool>(this.<#= OnCanAddDetailPropertyChangedPropertyName #>), false));
-            rehs.Add((<#= RoutedEventExtClassName #>.<#= CanUpdDetailPropertyChangedPropertyName #>Event, 
-                new RoutedPropertyChangedEventHandler<bool>(this.<#= OnCanUpdDetailPropertyChangedPropertyName #>), false));
-            rehs.Add((<#= RoutedEventExtClassName #>.<#= CanDelDetailPropertyChangedPropertyName #>Event, 
-                new RoutedPropertyChangedEventHandler<bool>(this.<#= OnCanDelDetailPropertyChangedPropertyName #>), false));
-            rehs.Add((<#= RoutedEventExtClassName #>.<#= ScopedRegionChangedPropertyName #>Event, 
-                new RoutedPropertyChangedEventHandler<object>(this.<#= OnScopedRegionChangedPropertyName #>), false));
-
             rehs.Add((FrameworkElement.LoadedEvent, 
                 new RoutedEventHandler(this.OnLoaded), false));
             _<#= RoutedEventHandlersPropertyName #> = rehs;
 
+            CommandBinding cb = null;
             CommandBindingCollection cbsc = new CommandBindingCollection();
-            CommandBinding cb = new CommandBinding(<#= RoutedCommandExtClassName #>.<#= SformSelectionChangedCommandPropertyName #>, new ExecutedRoutedEventHandler(this.Executed<#= SformSelectionChangedCommandPropertyName #>), new CanExecuteRoutedEventHandler(CanExecute<#= SformSelectionChangedCommandPropertyName #>));
+<#
+    if(detailViews.Count > 0) {
+        foreach(string detailViewName in detailViews) {
+            ModelViewSerializable detailView = GetModelViewByName(Context, detailViewName);
+            if(detailView == null) {
+#>
+///// can not find the view by Name <#= detailViewName #>
+<#
+                continue;
+            }
+            string detailViewClassName = GetModelClassName(detailView, RdlistUserControlFolder);
+            List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detailView, null);
+            if (foreignKeys == null) continue;
+            if (foreignKeys.Count < 1) continue;
+            foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
+#>
+            cb = new CommandBinding(<#= RdlistViewModelClassName #>Commands.<#= detailViewClassName #><#= foreignKey.NavigationName #>Command, new ExecutedRoutedEventHandler(this.Executed<#= detailViewClassName #><#= foreignKey.NavigationName #>Command), new CanExecuteRoutedEventHandler(CanExecute<#= detailViewClassName #><#= foreignKey.NavigationName #>Command));
             cbsc.Add(cb);
+<#
+            }
+        }
+    }
+#>
+            cb = new CommandBinding(<#= RoutedCommandExtClassName #>.<#= NavigationBackCommandPropertyName #>, new ExecutedRoutedEventHandler(this.Executed<#= NavigationBackCommandPropertyName #>), new CanExecuteRoutedEventHandler(CanExecute<#= NavigationBackCommandPropertyName #>));
+            cbsc.Add(cb);
+
+            PermissionMask = <#= AppSettingServicePropertyName #>.GetViewModelMask("<#= Model.ViewName #>");
 
             _<#= RoutedCommandHandlersPropertyName #> = cbsc;
 
+            _<#= RowMenuItemsPropertyName #> = GetDefault<#= RowMenuItemsPropertyName #>();
         }
         #region INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;
@@ -291,16 +301,19 @@ namespace <#= LformViewModelNameSpace #> {
         }
         #endregion
 
+
+        protected NavigationContext <#= CurrentNavigationContextPropertyName #> = null;
+
+        protected int PermissionMask = 0; 
+
+
         //protected bool <#= IsOnLoadedCalledPropertyName #> = false;
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
-            e.Handled = true;
-            if (<#= DetailsListPropertyName #>.Count > 0)
-                SelectedDetailsListItem = <#= DetailsListPropertyName #>[0];
-            else 
-                DefineHiddenDetailFilter();
+            if (!e.Handled) {
+                e.Handled = true;
+            }
         }
-
 
         #region <#= RoutedEventHandlersPropertyName #>
         protected IEnumerable<ValueTuple<RoutedEvent, Delegate, bool>> _<#= RoutedEventHandlersPropertyName #> = null;
@@ -339,6 +352,35 @@ namespace <#= LformViewModelNameSpace #> {
             }
         }
         #endregion
+
+        #region <#= ShowBackBtnPropertyName #>
+        public bool <#= ShowBackBtnPropertyName #> {
+            get {
+                return (<#= CurrentNavigationContextPropertyName #> == null) ?  false : <#= CurrentNavigationContextPropertyName #>.NavigationService.Journal.CanGoBack;
+            }
+        }
+        #endregion
+
+        #region <#= CaptionPropertyName #>
+        public string <#= CaptionPropertyName #>
+        { 
+            get
+            {
+                return "<#= Model.ViewName #>";
+            }
+        }
+        #endregion
+
+
+        #region <#= CanAddInternalPropertyName #>
+        public bool <#= CanAddInternalPropertyName #>
+        { 
+            get
+            {
+                return <#= CanAddPropertyName #> && ((PermissionMask & 8) == 8);
+            }
+        }
+        #endregion
         #region <#= CanAddPropertyName #>
         protected void <#= OnCanAddPropertyChangedPropertyName #>(object sender, RoutedPropertyChangedEventArgs<bool> evarg) {
             bool newVal = false;
@@ -361,7 +403,17 @@ namespace <#= LformViewModelNameSpace #> {
                 {
                     _<#= CanAddPropertyName #> = value;
                     OnPropertyChanged();
+                    OnPropertyChanged("<#= CanAddInternalPropertyName #>");
                 }
+            }
+        }
+        #endregion
+        #region <#= CanUpdInternalPropertyName #>
+        public bool <#= CanUpdInternalPropertyName #>
+        { 
+            get
+            {
+                return <#= CanUpdPropertyName #> && ((PermissionMask & 4) == 4);
             }
         }
         #endregion
@@ -387,7 +439,17 @@ namespace <#= LformViewModelNameSpace #> {
                 {
                     _<#= CanUpdPropertyName #> = value;
                     OnPropertyChanged();
+                    OnPropertyChanged("<#= CanUpdInternalPropertyName #>");
                 }
+            }
+        }
+        #endregion
+        #region <#= CanDelInternalPropertyName #>
+        public bool <#= CanDelInternalPropertyName #>
+        { 
+            get
+            {
+                return <#= CanDelPropertyName #> && ((PermissionMask & 2) == 2);
             }
         }
         #endregion
@@ -413,13 +475,38 @@ namespace <#= LformViewModelNameSpace #> {
                 {
                     _<#= CanDelPropertyName #> = value;
                     OnPropertyChanged();
+                    OnPropertyChanged("<#= CanDelInternalPropertyName #>");
                 }
             }
         }
         #endregion
         #region <#= RowMenuItemsPropertyName #>
+        protected ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>> GetDefault<#= RowMenuItemsPropertyName #>() {
+            return new ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>>()  {
+<#
+        foreach(string detailViewName in detailViews) {
+            ModelViewSerializable detailView = GetModelViewByName(Context, detailViewName);
+            if(detailView == null) {
+#>
+///// can not find the view by Name <#= detailViewName #>
+<#
+                continue;
+            }
+            string detailViewClassName = GetModelClassName(detailView, RdlistUserControlFolder);
+            List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detailView, null);
+            if (foreignKeys == null) continue;
+            if (foreignKeys.Count < 1) continue;
+            foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
+#>
+              new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "<#= RowMIPrefixPropertyName #><#= detailViewClassName #><#= foreignKey.NavigationName #>", <#= CaptionPropertyName #>="<#= detailViewName #>: <#= foreignKey.NavigationName #>", IconName="ArrowRightBold", IconColor="Primary", Enabled=true, Data=null, Command=<#= RdlistViewModelClassName #>Commands.<#= detailViewClassName #><#= foreignKey.NavigationName #>Command},
+<#
+            }
+        }
+#>
+            };
+        }
         protected void <#= OnRowMenuItemsChangedPropertyName #>(object sender, RoutedPropertyChangedEventArgs<IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>> evarg) {
-            ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>> tmis = new ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>>();
+            ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>> tmis = GetDefault<#= RowMenuItemsPropertyName #>();
             IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> intmis = null;
             if(evarg != null) {
                 evarg.Handled = true;
@@ -449,55 +536,7 @@ namespace <#= LformViewModelNameSpace #> {
             }
         }
         #endregion
-        #region <#= TableMenuItemsPropertyName #>
-        protected void <#= OnTableMenuItemsChangedPropertyName #>(object sender, RoutedPropertyChangedEventArgs<IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>> evarg) {
-            ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>> tmis = new ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>>();
-            IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> intmis = null;
-            if(evarg != null) {
-                evarg.Handled = true;
-                intmis = evarg.NewValue as IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>;
-            }
-            if(intmis != null) {
-                foreach(<#= IWebServiceFilterMenuInterfaceClassName #> tmi  in intmis) {
-                    tmis.Add( new <#= WebServiceFilterMenuViewModelClassName #>() {Id = tmi.Id, Caption=tmi.Caption,  IconName=tmi.IconName, IconColor=tmi.IconColor, Enabled=tmi.Enabled, Data=tmi.Data, Command=tmi.Command });
-                }
-            }
-            <#= TableMenuItemsPropertyName #> = tmis;
-        }
-        protected IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> _<#= TableMenuItemsPropertyName #> = null;
-        public IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> <#= TableMenuItemsPropertyName #>
-        { 
-            get
-            {
-                return _<#= TableMenuItemsPropertyName #>;
-            }
-            set
-            {
-                if (_<#= TableMenuItemsPropertyName #> != value)
-                {
-                    _<#= TableMenuItemsPropertyName #> = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-        #endregion
-
         #region <#= HiddenFiltersPropertyName #>
-        protected void <#= OnHiddenFiltersChangedPropertyName #>(object sender, RoutedPropertyChangedEventArgs<IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>> evarg)
-        {
-            IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>> hfs = null;
-            if(evarg != null) {
-                evarg.Handled = true;
-                hfs = evarg.NewValue as IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>;
-            }
-            ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>> newhfs = new ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>();
-            if(hfs != null) {
-                foreach(<#= IWebServiceFilterRsltInterfaceClassName #> hf  in hfs) {
-                    newhfs.Add( new <#= WebServiceFilterRsltViewModelClassName #>() {fltrName=hf.fltrName, fltrDataType=hf.fltrDataType,  fltrOperator=hf.fltrOperator, fltrValue=hf.fltrValue, fltrError=hf.fltrError });
-                }
-            }
-            <#= HiddenFiltersPropertyName #> = newhfs;
-        }
         IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>> _<#= HiddenFiltersPropertyName #> = new ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>();
         public IEnumerable<IWebServiceFilterRsltInterface> <#= HiddenFiltersPropertyName #>
         {
@@ -511,268 +550,14 @@ namespace <#= LformViewModelNameSpace #> {
                 {
                     _<#= HiddenFiltersPropertyName #> = value;
                     OnPropertyChanged();
+                    OnPropertyChanged("<#= ShowBackBtnPropertyName #>");
                 }
             }
         }
         #endregion
 
 
-
-        #region <#= CanAddDetailPropertyName #>
-        protected void <#= OnCanAddDetailPropertyChangedPropertyName #>(object sender, RoutedPropertyChangedEventArgs<bool> evarg) {
-            bool newVal = false;
-            if(evarg != null) {
-                evarg.Handled = true;
-                newVal = evarg.NewValue;
-            }
-            <#= CanAddDetailPropertyName #> = newVal;
-        }
-        protected bool _<#= CanAddDetailPropertyName #> = false;
-        public bool <#= CanAddDetailPropertyName #>
-        { 
-            get
-            {
-                return _<#= CanAddDetailPropertyName #>;
-            }
-            set
-            {
-                if (_<#= CanAddDetailPropertyName #> != value)
-                {
-                    _<#= CanAddDetailPropertyName #> = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-        #endregion
-
-        #region <#= CanUpdDetailPropertyName #>
-        protected void <#= OnCanUpdDetailPropertyChangedPropertyName #>(object sender, RoutedPropertyChangedEventArgs<bool> evarg) {
-            bool newVal = false;
-            if(evarg != null) {
-                evarg.Handled = true;
-                newVal = evarg.NewValue;
-            }
-            <#= CanUpdDetailPropertyName #> = newVal;
-        }
-        protected bool _<#= CanUpdDetailPropertyName #> = false;
-        public bool <#= CanUpdDetailPropertyName #>
-        { 
-            get
-            {
-                return _<#= CanUpdDetailPropertyName #>;
-            }
-            set
-            {
-                if (_<#= CanUpdDetailPropertyName #> != value)
-                {
-                    _<#= CanUpdDetailPropertyName #> = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-        #endregion
-
-        #region <#= CanDelDetailPropertyName #>
-        protected void <#= OnCanDelDetailPropertyChangedPropertyName #>(object sender, RoutedPropertyChangedEventArgs<bool> evarg) {
-            bool newVal = false;
-            if(evarg != null) {
-                evarg.Handled = true;
-                newVal = evarg.NewValue;
-            }
-            <#= CanDelDetailPropertyName #> = newVal;
-        }
-        protected bool _<#= CanDelDetailPropertyName #> = false;
-        public bool <#= CanDelDetailPropertyName #>
-        { 
-            get
-            {
-                return _<#= CanDelDetailPropertyName #>;
-            }
-            set
-            {
-                if (_<#= CanDelDetailPropertyName #> != value)
-                {
-                    _<#= CanDelDetailPropertyName #> = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-        #endregion
-
-
-
-        #region <#= OnScopedRegionChangedPropertyName #>
-        protected void <#= OnScopedRegionChangedPropertyName #>(object sender, RoutedPropertyChangedEventArgs<object> evarg) {
-            object newVal = null;
-            if(evarg != null) {
-                evarg.Handled = true;
-                newVal = evarg.NewValue;
-            }
-            <#= DetailRegionPropertyName #> = newVal as IRegion;
-        }
-        protected IRegion _<#= DetailRegionPropertyName #> = null;
-        public IRegion <#= DetailRegionPropertyName #>
-        { 
-            get
-            {
-                return _<#= DetailRegionPropertyName #>;
-            }
-            set
-            {
-                if (_<#= DetailRegionPropertyName #> != value)
-                {
-                    _<#= DetailRegionPropertyName #> = value;
-                    OnPropertyChanged();
-                    On<#= SelectedDetailsListItemPropertyName #>Changed();
-                }
-            }
-        }
-        #endregion
-
-        #region <#= RowMenuItemsDetailPropertyName #>
-        protected void <#= OnRowMenuItemsDetailPropertyChangedPropertyName #>(object sender, RoutedPropertyChangedEventArgs<IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>> evarg) {
-            ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>> tmis = new ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>>();
-            IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> intmis = null;
-            if(evarg != null) {
-                evarg.Handled = true;
-                intmis = evarg.NewValue as IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>;
-            }
-            if(intmis != null) {
-                foreach(<#= IWebServiceFilterMenuInterfaceClassName #> tmi  in intmis) {
-                    tmis.Add( new <#= WebServiceFilterMenuViewModelClassName #>() {Id = tmi.Id, Caption=tmi.Caption,  IconName=tmi.IconName, IconColor=tmi.IconColor, Enabled=tmi.Enabled, Data=tmi.Data, Command=tmi.Command });
-                }
-            }
-            <#= RowMenuItemsDetailPropertyName #> = tmis;
-        }
-        protected IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> _<#= RowMenuItemsDetailPropertyName #> = null;
-        public IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> <#= RowMenuItemsDetailPropertyName #>
-        { 
-            get
-            {
-                return _<#= RowMenuItemsDetailPropertyName #>;
-            }
-            set
-            {
-                if (_<#= RowMenuItemsDetailPropertyName #> != value)
-                {
-                    _<#= RowMenuItemsDetailPropertyName #> = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-        #endregion
-
-        #region <#= TableMenuItemsDetailPropertyName #>
-        protected void <#= OnTableMenuItemsDetailPropertyChangedPropertyName #>(object sender, RoutedPropertyChangedEventArgs<IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>> evarg) {
-            ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>> tmis = new ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>>();
-            IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> intmis = null;
-            if(evarg != null) {
-                evarg.Handled = true;
-                intmis = evarg.NewValue as IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>;
-            }
-            if(intmis != null) {
-                foreach(<#= IWebServiceFilterMenuInterfaceClassName #> tmi  in intmis) {
-                    tmis.Add( new <#= WebServiceFilterMenuViewModelClassName #>() {Id = tmi.Id, Caption=tmi.Caption,  IconName=tmi.IconName, IconColor=tmi.IconColor, Enabled=tmi.Enabled, Data=tmi.Data, Command=tmi.Command });
-                }
-            }
-            <#= TableMenuItemsDetailPropertyName #> = tmis;
-        }
-        protected IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> _<#= TableMenuItemsDetailPropertyName #> = null;
-        public IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> <#= TableMenuItemsDetailPropertyName #>
-        { 
-            get
-            {
-                return _<#= TableMenuItemsDetailPropertyName #>;
-            }
-            set
-            {
-                if (_<#= TableMenuItemsDetailPropertyName #> != value)
-                {
-                    _<#= TableMenuItemsDetailPropertyName #> = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-        #endregion
-
-        #region <#= HiddenFiltersDetailPropertyName #>
-        protected void <#= OnHiddenFiltersDetailPropertyChangedPropertyName #>(object sender, RoutedPropertyChangedEventArgs<IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>> evarg)
-        {
-            IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>> hfs = null;
-            if(evarg != null) {
-                evarg.Handled = true;
-                hfs = evarg.NewValue as IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>;
-            }
-            ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>> newhfs = new ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>();
-            if(hfs != null) {
-                foreach(<#= IWebServiceFilterRsltInterfaceClassName #> hf  in hfs) {
-                    newhfs.Add( new <#= WebServiceFilterRsltViewModelClassName #>() {fltrName=hf.fltrName, fltrDataType=hf.fltrDataType,  fltrOperator=hf.fltrOperator, fltrValue=hf.fltrValue, fltrError=hf.fltrError });
-                }
-            }
-            <#= HiddenFiltersDetailPropertyName #> = newhfs;
-        }
-        IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>> _<#= HiddenFiltersDetailPropertyName #> = new ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>();
-        public IEnumerable<IWebServiceFilterRsltInterface> <#= HiddenFiltersDetailPropertyName #>
-        {
-            get
-            {
-                return _<#= HiddenFiltersDetailPropertyName #>;
-            }
-            set
-            {
-                if (_<#= HiddenFiltersDetailPropertyName #> != value)
-                {
-                    _<#= HiddenFiltersDetailPropertyName #> = value;
-                    OnPropertyChanged();
-                    DefineHiddenDetailFilter();
-                }
-            }
-        }
-        #endregion
-
-        #region <#= SelectedItemPropertyName #>
-        protected <#= modelInterfaceClassName #> _<#= SelectedItemPropertyName #> = null;
-        public void Executed<#= SformSelectionChangedCommandPropertyName #>(object sender, ExecutedRoutedEventArgs e) { 
-            e.Handled = true;
-            Tuple<string, System.Collections.IList, System.Collections.IList> prm = e.Parameter as  Tuple<string, System.Collections.IList, System.Collections.IList>;
-            if(prm != null) {
-                if("<#= modelInterfaceClassName #>" == prm.Item1) {
-                    _<#= SelectedItemPropertyName #> = null;
-                    if (prm.Item3 != null) {
-                        if(prm.Item3.Count > 0) {
-                            _<#= SelectedItemPropertyName #> = prm.Item3[0] as <#= modelInterfaceClassName #>;
-                        }
-                    }
-                    DefineHiddenDetailFilter();
-                }
-            }
-        }
-        public void CanExecute<#= SformSelectionChangedCommandPropertyName #>(object sender, CanExecuteRoutedEventArgs e) {
-            e.Handled = true;
-            e.CanExecute = true;
-        }
-        #endregion
-
-        #region <#= CurrentHiddenFiltersDetailPropertyName #>
-        IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>> _<#= CurrentHiddenFiltersDetailPropertyName #> = new ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>();
-        public IEnumerable<IWebServiceFilterRsltInterface> <#= CurrentHiddenFiltersDetailPropertyName #>
-        {
-            get
-            {
-                return _<#= CurrentHiddenFiltersDetailPropertyName #>;
-            }
-            set
-            {
-                if (_<#= CurrentHiddenFiltersDetailPropertyName #> != value)
-                {
-                    _<#= CurrentHiddenFiltersDetailPropertyName #> = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-        #endregion
-
-        ObservableCollection<<#= IO2mListItemInterfaceClassName #>> _<#= DetailsListPropertyName #> = new ObservableCollection<<#= IO2mListItemInterfaceClassName #>>() {
+        
 <#
         foreach(string detailViewName in detailViews) {
             ModelViewSerializable detailView = GetModelViewByName(Context, detailViewName);
@@ -782,129 +567,118 @@ namespace <#= LformViewModelNameSpace #> {
 <#
                 continue;
             }
-            string detailViewClassName = GetModelClassName(detailView, LformUserControlFolder);
+            string detailViewClassName = GetModelClassName(detailView, RdlistUserControlFolder);
             List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detailView, null);
             if (foreignKeys == null) continue;
             if (foreignKeys.Count < 1) continue;
             foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
 #>
-            new <#= O2mListItemViewModelClassName #>() {<#= CaptionPropertyName #> = "<#= detailViewName #>: <#= foreignKey.NavigationName #>", <#= ForeignKeyDetailsName #> = "<#= detailViewClassName #>:<#= foreignKey.NavigationName #>",  <#= RegionPropertyName #> = "<#= detailViewClassName #><#= ForO2mSuffixPropertyName #>" },
-<#
-            }
-        }
-#>
-        };
-        public ObservableCollection<<#= IO2mListItemInterfaceClassName #>> <#= DetailsListPropertyName #> 
-        {
-            get { return _<#= DetailsListPropertyName #>; }
-            set {
-                if(_<#= DetailsListPropertyName #> != value) {
-                    _<#= DetailsListPropertyName #> = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-
-        protected void On<#= SelectedDetailsListItemPropertyName #>Changed(bool callDeHDF = true) {
-            if(<#= DetailRegionPropertyName #> != null) if(<#= DetailRegionPropertyName #>.RegionManager!= null) <#= DetailRegionPropertyName #>.RemoveAll();
-            if(_<#= SelectedDetailsListItemPropertyName #> != null) {
-                (<#= CurrentHiddenFiltersDetailPropertyName #> as ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>).Clear();
-                OnPropertyChanged("<#= IsDetailVisiblePropertyName #>");
-                if(<#= DetailRegionPropertyName #> != null) if(<#= DetailRegionPropertyName #>.RegionManager!= null)  <#= DetailRegionPropertyName #>.RequestNavigate(_<#= SelectedDetailsListItemPropertyName #>.Region);
-            }
-            OnPropertyChanged("<#= SelectedDetailsListItemPropertyName #>");
-            if (callDeHDF) DefineHiddenDetailFilter();
-        }
-        protected <#= IO2mListItemInterfaceClassName #> _<#= SelectedDetailsListItemPropertyName #> = null;
-        public <#= IO2mListItemInterfaceClassName #> <#= SelectedDetailsListItemPropertyName #> 
-        {
-            get { return _<#= SelectedDetailsListItemPropertyName #>; }
-            set {
-                if(_<#= SelectedDetailsListItemPropertyName #> != value) {
-                    _<#= SelectedDetailsListItemPropertyName #> = value;
-                    On<#= SelectedDetailsListItemPropertyName #>Changed();
-                }
-            }
-        }
-        public bool <#= IsDetailVisiblePropertyName #> {
-            get {
-                return (((<#= CurrentHiddenFiltersDetailPropertyName #> as ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>).Count > 0) && (<#= SelectedDetailsListItemPropertyName #> != null));
-            }
-        }
-        protected void DefineHiddenDetailFilter() {
-            (<#= CurrentHiddenFiltersDetailPropertyName #> as ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>).Clear();
-            OnPropertyChanged("<#= IsDetailVisiblePropertyName #>");
-            if((<#= SelectedDetailsListItemPropertyName #> == null) || (_<#= SelectedItemPropertyName #> == null))return;
-            if (<#= DetailRegionPropertyName #> !=null)
-            {
-                if(<#= DetailRegionPropertyName #>.RegionManager != null)
-                {
-                    if(!<#= DetailRegionPropertyName #>.Views.Any())
-                    {
-                        On<#= SelectedDetailsListItemPropertyName #>Changed(false);
-                    }
-                }
-            }
-
-            ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>> chfd = new ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>();
-            switch(<#= SelectedDetailsListItemPropertyName #>.<#= ForeignKeyDetailsName #>) {
-<#
-        foreach(string detailViewName in detailViews) {
-            ModelViewSerializable detailView = GetModelViewByName(Context, detailViewName);
-            if(detailView == null) {
-#>
-///// can not find the view by Name <#= detailViewName #>
-<#
-                continue;
-            }
-            List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detailView, null);
-            if (foreignKeys == null) {
-                continue;
-            }
-            if (foreignKeys.Count < 1) {
-                continue;
-            }
-            string detailViewClassName = GetModelClassName(detailView, LformUserControlFolder);
-            foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
-#>
-                case "<#= detailViewClassName #>:<#= foreignKey.NavigationName #>":
+        #region <#= detailViewClassName #><#= foreignKey.NavigationName #>Command
+        public void Executed<#= detailViewClassName #><#= foreignKey.NavigationName #>Command(object sender, ExecutedRoutedEventArgs e) { 
+            e.Handled = true;
+            <#= modelInterfaceClassName #> selected = e.Parameter as <#= modelInterfaceClassName #>;
+            if((selected == null) || (<#= CurrentNavigationContextPropertyName #> == null)) return;
+            NavigationParameters navigationParameters = new NavigationParameters();
 <#
                     foreach(ModelViewPropertyOfVwSerializable primKey in primKeys) {
                         List<ModelViewPropertyOfVwSerializable> detailProps = GetDetailViewForeignKeyProps(Model, primKey, detailView, foreignKey, null);
                         foreach(ModelViewPropertyOfVwSerializable detailProp in detailProps) {
 #>
-                    chfd.Add(new <#= WebServiceFilterRsltViewModelClassName #>() {
-                        fltrName = "<#= GetModelPropertyName(detailProp, detailView) #>",
-                        fltrDataType = "<#= GetCCharpDatatype(detailProp, detailView) #>",
-                        fltrOperator = "eq",
-                        fltrValue = _<#= SelectedItemPropertyName #>.<#= GetModelPropertyName(primKey, Model) #>,
-                        fltrError = null
-                    });
+            
+            navigationParameters.Add("<#= GetModelPropertyName(detailProp, detailView) #>", selected.<#= GetModelPropertyName(primKey, Model) #>);
 <#
                         }
                     }
 #>
-                    break;
+//          KeepAlive = true;
+            <#= CurrentNavigationContextPropertyName #>.NavigationService.RequestNavigate(new Uri("<#= detailViewClassName #><#= ForRfSuffixPropertyName #>", UriKind.Relative), navigationParameters);
+        }
+        public void CanExecute<#= detailViewClassName #><#= foreignKey.NavigationName #>Command(object sender, CanExecuteRoutedEventArgs e) {
+            e.Handled = true;
+            e.CanExecute = (e.Parameter as <#= modelInterfaceClassName #>) != null;
+            e.CanExecute = e.CanExecute ? ((<#= AppSettingServicePropertyName #>.GetViewModelMask("<#= detailView.ViewName #>") & 1)==1)  : false;
+        }
+        #endregion
 <#
             }
         }
 #>
-                default:
-                    break;
-            }
-            if(chfd.Count < 1) return;
-            if (<#= HiddenFiltersDetailPropertyName #> != null) {
-                foreach(<#= IWebServiceFilterRsltInterfaceClassName #> itm in <#= HiddenFiltersDetailPropertyName #>) {
-                    chfd.Add(itm);
-                }
-            }
-            <#= CurrentHiddenFiltersDetailPropertyName #> = chfd;
-            OnPropertyChanged("<#= IsDetailVisiblePropertyName #>");
-        }
 
+
+        #region IRegionMemberLifetime
+//        protected bool _KeepAlive = false;
+//        public bool KeepAlive
+//        {
+//            get { return _KeepAlive; }
+//            set { if(_KeepAlive != value) _KeepAlive=value; OnPropertyChanged();}
+//        }        
+        #endregion
+        #region INavigationAware
+        public bool IsNavigationTarget(NavigationContext navigationContext) {
+            return true;
+        }
+        public void OnNavigatedFrom(NavigationContext navigationContext) {
+            <#= CurrentNavigationContextPropertyName #> = navigationContext;
+            OnPropertyChanged("<#= ShowBackBtnPropertyName #>");
+        }
+        public void OnNavigatedTo(NavigationContext navigationContext) {
+            <#= CurrentNavigationContextPropertyName #> = navigationContext;
+            OnPropertyChanged("<#= ShowBackBtnPropertyName #>");
+            ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>> hf = new ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>();
+            NavigationParameters prms = navigationContext.Parameters;
+<#
+            foreach(ModelViewPropertyOfVwSerializable sclrProp in Model.ScalarProperties) {
+#>          
+            if(prms.ContainsKey("<#= GetModelPropertyName(sclrProp, Model) #>")) {
+                    hf.Add(new <#= WebServiceFilterRsltViewModelClassName #>() {
+                        fltrName = "<#= GetModelPropertyName(sclrProp, Model) #>",
+                        fltrDataType = "<#= GetCCharpDatatype(sclrProp, Model) #>",
+                        fltrOperator = "eq",
+                        fltrValue = prms.GetValue<<#= GetPropertyTypeName(sclrProp) #>>("<#= GetModelPropertyName(sclrProp, Model) #>"),
+                        fltrError = null
+                    });
+            }
+<#
+            }
+#>          
+            ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>> chf = <#= HiddenFiltersPropertyName #> as ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>;
+            bool resetHF = chf.Count != hf.Count;
+            if ((!resetHF) && (hf.Count > 0)) {
+                foreach(<#= IWebServiceFilterRsltInterfaceClassName #> citm in chf) {
+                    <#= IWebServiceFilterRsltInterfaceClassName #> itm = hf.Where(h => h.fltrName == citm.fltrName).FirstOrDefault();
+                    if(itm == null)
+                    {
+                        resetHF = true;
+                        break;
+                    }
+                    if (!(itm.fltrValue == citm.fltrValue))
+                    {
+                        resetHF = true;
+                        break;
+                    }
+                }
+            } 
+
+            if (resetHF) { <#= HiddenFiltersPropertyName #> = hf; }
+        }
+        #endregion
+
+        #region NavigationBackCommandPropertyName
+        public void Executed<#= NavigationBackCommandPropertyName #>(object sender, ExecutedRoutedEventArgs e) { 
+            if(<#= CurrentNavigationContextPropertyName #> == null) return;
+            if(!<#= CurrentNavigationContextPropertyName #>.NavigationService.Journal.CanGoBack) return;
+//            KeepAlive = false;
+            <#= CurrentNavigationContextPropertyName #>.NavigationService.Journal.GoBack();
+        } 
+        public void CanExecute<#= NavigationBackCommandPropertyName #>(object sender, CanExecuteRoutedEventArgs e) {
+            e.Handled = true;
+            e.CanExecute = (<#= CurrentNavigationContextPropertyName #> == null) ? false : <#= CurrentNavigationContextPropertyName #>.NavigationService.Journal.CanGoBack;
+        }
+        #endregion
     }
 }
+
+
 
 <#+
     string GetFilterPropertyOperatorName(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model, string operatorSufix) {

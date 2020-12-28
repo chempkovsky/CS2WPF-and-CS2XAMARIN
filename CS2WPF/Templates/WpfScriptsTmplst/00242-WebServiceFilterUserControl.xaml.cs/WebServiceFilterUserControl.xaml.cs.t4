@@ -155,19 +155,11 @@ namespace <#= WebServiceFilterUserControlNameSpace #> {
         }
         #endregion
         #region <#= FilterHeightPropertyName #>
-        private static void <#= FilterHeightPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            <#= WebServiceFilterUserControlClassName #> inst = d as <#= WebServiceFilterUserControlClassName #>;
-            if (inst != null)
-            {
-                inst.<#= FilterHeightPropertyName #> = (e.NewValue is double) ? (double)e.NewValue : double.MaxValue;
-            }
-        }
         public static readonly DependencyProperty <#= FilterHeightPropertyName #>Property =
                 DependencyProperty.Register(
                 "<#= FilterHeightPropertyName #>", typeof(double),
                 typeof(<#= WebServiceFilterUserControlClassName #>),
-                new PropertyMetadata(double.MaxValue, <#= FilterHeightPropertyName #>Changed));
+                new PropertyMetadata(double.MaxValue));
         public double <#= FilterHeightPropertyName #>
         {
             get
@@ -264,18 +256,11 @@ namespace <#= WebServiceFilterUserControlNameSpace #> {
         }
         #endregion
         #region <#= ShowBackBtnPropertyName #>
-        private static void <#= ShowBackBtnPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e) {
-            <#= WebServiceFilterUserControlClassName #> inst = d as <#= WebServiceFilterUserControlClassName #>;
-            if (inst != null) 
-            {
-                inst.<#= ShowBackBtnPropertyName #> = (e.NewValue is bool) ? (bool)e.NewValue : false;
-            }
-        }
         public static readonly DependencyProperty <#= ShowBackBtnPropertyName #>Property =
                 DependencyProperty.Register(
                 "<#= ShowBackBtnPropertyName #>", typeof(bool),
                 typeof(<#= WebServiceFilterUserControlClassName #>),
-                new PropertyMetadata(false, <#= ShowBackBtnPropertyName #>Changed));
+                new PropertyMetadata(false));
         public bool <#= ShowBackBtnPropertyName #>
         {
             get
@@ -289,18 +274,11 @@ namespace <#= WebServiceFilterUserControlNameSpace #> {
         }
         #endregion
         #region <#= ShowAddFilterBtnPropertyName #>
-        private static void <#= ShowAddFilterBtnPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e) {
-            <#= WebServiceFilterUserControlClassName #> inst = d as <#= WebServiceFilterUserControlClassName #>;
-            if (inst != null)
-            {
-                inst.<#= ShowAddFilterBtnPropertyName #> = (e.NewValue is bool) ? (bool)e.NewValue : false;
-            }
-        }
         public static readonly DependencyProperty <#= ShowAddFilterBtnPropertyName #>Property =
                 DependencyProperty.Register(
                 "<#= ShowAddFilterBtnPropertyName #>", typeof(bool),
                 typeof(<#= WebServiceFilterUserControlClassName #>),
-                new PropertyMetadata(true, <#= ShowAddFilterBtnPropertyName #>Changed));
+                new PropertyMetadata(true));
         public bool <#= ShowAddFilterBtnPropertyName #>
         {
             get
@@ -385,9 +363,11 @@ namespace <#= WebServiceFilterUserControlNameSpace #> {
         #region <#= AddWebServiceFilterItemCommandPropertyName #>
         private void Executed<#= AddWebServiceFilterItemCommandPropertyName #>(object sender, ExecutedRoutedEventArgs e)
         {
+            e.Handled = true;
             <#= FiltersPropertyName #>.Add(new <#= WebServiceFilterRsltViewModelClassName #>());
         }
         private void CanExecute<#= AddWebServiceFilterItemCommandPropertyName #>(object sender, CanExecuteRoutedEventArgs e) {
+            e.Handled = true;
             e.CanExecute =  <#= ShowAddFilterBtnPropertyName #>;
         }
         #endregion
@@ -410,16 +390,19 @@ namespace <#= WebServiceFilterUserControlNameSpace #> {
             }
         }
         private void CanExecute<#= RemoveWebServiceFilterItemCommandPropertyName #>(object sender, CanExecuteRoutedEventArgs e) {
+            e.Handled = true;
             e.CanExecute =  (e.Parameter as <#= IWebServiceFilterRsltInterfaceClassName #>) != null;
         }
         #endregion
         #region <#= RemoveAllWebServiceFilterItemCommandPropertyName #>
         private void Executed<#= RemoveAllWebServiceFilterItemCommandPropertyName #>(object sender, ExecutedRoutedEventArgs e)
         {
+            e.Handled = true;
             <#= FiltersPropertyName #>.Clear();
             <#= FiltersPropertyName #>.Add(new <#= WebServiceFilterRsltViewModelClassName #>());
         }
         private void CanExecute<#= RemoveAllWebServiceFilterItemCommandPropertyName #>(object sender, CanExecuteRoutedEventArgs e) {
+            e.Handled = true;
             e.CanExecute =  true;
         }
         #endregion

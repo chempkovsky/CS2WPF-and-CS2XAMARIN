@@ -15,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
+using Prism.Regions;
 
 <#
 
@@ -22,33 +23,42 @@ using System.Windows.Controls;
     string EformModeEnumClassName   = GetModelClassName(Model, EformModeEnumFolder);
     string EformModeEnumNameSpace   = GetModelNameSpace(Model, EformModeEnumFolder);
 
+    string RoutedEventExtFolder      = "00222-RoutedEventExt.cs";
+    string RoutedEventExtClassName   = GetModelClassName(Model, RoutedEventExtFolder);
+    string RoutedEventExtNameSpace   = GetModelNameSpace(Model, RoutedEventExtFolder);
+
     string IWebServiceFilterMenuInterfaceFolder      = "00206-IWebServiceFilterMenuInterface.cs";
     string IWebServiceFilterMenuInterfaceClassName   = GetModelClassName(Model, IWebServiceFilterMenuInterfaceFolder);
     string IWebServiceFilterMenuInterfaceNameSpace   = GetModelNameSpace(Model, IWebServiceFilterMenuInterfaceFolder);
-
 
     string IWebServiceFilterRsltInterfaceFolder      = "00204-IWebServiceFilterRsltInterface.cs";
     string IWebServiceFilterRsltInterfaceClassName   = GetModelClassName(Model, IWebServiceFilterRsltInterfaceFolder);
     string IWebServiceFilterRsltInterfaceNameSpace   = GetModelNameSpace(Model, IWebServiceFilterRsltInterfaceFolder);
 
+    string IScopedRegionUserControlInterfaceFolder      = "00630-IScopedRegionUserControlInterface.cs";
+    string IScopedRegionUserControlInterfaceClassName   = GetModelClassName(Model, IScopedRegionUserControlInterfaceFolder);
+    string IScopedRegionUserControlInterfaceNameSpace   = GetModelNameSpace(Model, IScopedRegionUserControlInterfaceFolder);
 
-    string ProxyUserControlFolder     = "00280-ProxyUserControl.xaml.cs";
-    string ProxyUserControlClassName  = GetModelClassName(Model, ProxyUserControlFolder);
-    string ProxyUserControlNameSpace  = GetModelNameSpace(Model, ProxyUserControlFolder);
+    string ScopedRegionUserControlFolder                = "00632-ScopedRegionUserControl.xaml.cs";
+    string ScopedRegionUserControlClassName             = GetModelClassName(Model, ScopedRegionUserControlFolder);
+    string ScopedRegionUserControlNameSpace             = GetModelNameSpace(Model, ScopedRegionUserControlFolder);
+
 
     string CaptionPropertyName = "Caption";
+    string ShowBackBtnPropertyName = "ShowBackBtn";
+    string HiddenFiltersPropertyName = "HiddenFilters";
+    string FormControlModelPropertyName = "FormControlModel";
+    string EformModePropertyName = "EformMode";
+
+
     string FilterHeightPropertyName = "FilterHeight";
     string ShowFilterPropertyName = "ShowFilter";
     string ShowAddFilterBtnPropertyName = "ShowAddFilterBtn";
-    string ShowBackBtnPropertyName = "ShowBackBtn";
     string GridHeightPropertyName = "GridHeight";
     string TableMenuItemsPropertyName = "TableMenuItems";
     string RowMenuItemsPropertyName = "RowMenuItems";
     string ContainerMenuItemsPropertyName = "ContainerMenuItems";
-    string HiddenFiltersPropertyName = "HiddenFilters";
     string ShowSubmitPropertyName = "ShowSubmit";
-    string FormControlModelPropertyName = "FormControlModel";
-    string EformModePropertyName = "EformMode";
     string CanAddPropertyName = "CanAdd";
     string CanUpdPropertyName = "CanUpdate";
     string CanDelPropertyName = "CanDelete";
@@ -65,14 +75,30 @@ using System.Windows.Controls;
     string CanDelDetailPropertyName = "CanDeleteDetail"; 
 
 
+    string DataContextPropertyName = "DataContext"; 
+  
+    string ScopedRegionManagerPropertyName                      = "ScopedRegionManager"; 
+    string ScopedRegionManagerPropertyChangedPropertyName       = "ScopedRegionManagerPropertyChanged"; 
+
+    string RequestNavigateSourcePropertyName                    = "RequestNavigateSource";  
+    string RequestNavigateSourcePropertyChangedPropertyName     = "RequestNavigateSourcePropertyChanged"; 
+ 
+    string ScopedRegionNamePropertyName                         = "ScopedRegionName";   
+    string ScopedRegionNamePropertyChangedPropertyName          = "ScopedRegionNamePropertyChanged"; 
+
 
     List<string> nmSpaces = new List<string>();
-    if ((ProxyUserControlNameSpace != IWebServiceFilterMenuInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterMenuInterfaceNameSpace) < 0)) 
+    if ((ScopedRegionUserControlNameSpace != IWebServiceFilterMenuInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterMenuInterfaceNameSpace) < 0)) 
         nmSpaces.Add(IWebServiceFilterMenuInterfaceNameSpace);
-    if ((ProxyUserControlNameSpace != IWebServiceFilterRsltInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace) < 0)) 
+    if ((ScopedRegionUserControlNameSpace != IWebServiceFilterRsltInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace) < 0)) 
         nmSpaces.Add(IWebServiceFilterRsltInterfaceNameSpace);
-    if ((ProxyUserControlNameSpace != EformModeEnumNameSpace) && (nmSpaces.IndexOf(EformModeEnumNameSpace) < 0)) 
+    if ((ScopedRegionUserControlNameSpace != RoutedEventExtNameSpace) && (nmSpaces.IndexOf(RoutedEventExtNameSpace) < 0)) 
+        nmSpaces.Add(RoutedEventExtNameSpace);
+    if ((ScopedRegionUserControlNameSpace != IScopedRegionUserControlInterfaceNameSpace) && (nmSpaces.IndexOf(IScopedRegionUserControlInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IScopedRegionUserControlInterfaceNameSpace);
+    if ((ScopedRegionUserControlNameSpace != EformModeEnumNameSpace) && (nmSpaces.IndexOf(EformModeEnumNameSpace) < 0)) 
         nmSpaces.Add(EformModeEnumNameSpace);
+
 
 #>
 <# 
@@ -83,21 +109,23 @@ using <#= ns #>;
     }
 #>
 
-namespace <#= ProxyUserControlNameSpace #> {
+namespace <#= ScopedRegionUserControlNameSpace #> {
     /// <summary>
-    /// Interaction logic for <#= ProxyUserControlClassName #>.xaml
+    /// Interaction logic for <#= ScopedRegionUserControlClassName #>.xaml
     /// </summary>
-    public partial class <#= ProxyUserControlClassName #>: UserControl
+    public partial class <#= ScopedRegionUserControlClassName #>: UserControl, <#= IScopedRegionUserControlInterfaceClassName #>
     {
-        public <#= ProxyUserControlClassName #>()
+        public <#= ScopedRegionUserControlClassName #>()
         {
             InitializeComponent();
+            <#= ScopedRegionNamePropertyName #> = Guid.NewGuid().ToString("N");
         }
+
         #region <#= CaptionPropertyName #>
         public static readonly DependencyProperty <#= CaptionPropertyName #>Property =
                 DependencyProperty.Register(
                 "<#= CaptionPropertyName #>", typeof(string),
-                typeof(<#= ProxyUserControlClassName #>),
+                typeof(<#= ScopedRegionUserControlClassName #>),
                 new PropertyMetadata(null));
         public string <#= CaptionPropertyName #>
         {
@@ -111,65 +139,11 @@ namespace <#= ProxyUserControlNameSpace #> {
             }
         }
         #endregion
-        #region <#= FilterHeightPropertyName #>
-        public static readonly DependencyProperty <#= FilterHeightPropertyName #>Property =
-                DependencyProperty.Register(
-                "<#= FilterHeightPropertyName #>", typeof(double),
-                typeof(<#= ProxyUserControlClassName #>),
-                new PropertyMetadata(double.MaxValue));
-        public double <#= FilterHeightPropertyName #>
-        {
-            get
-            {
-                return (double)GetValue(<#= FilterHeightPropertyName #>Property);
-            }
-            set
-            {
-                SetValue(<#= FilterHeightPropertyName #>Property, value);
-            }
-        }
-        #endregion
-        #region <#= HiddenFiltersPropertyName #>
-        public static readonly DependencyProperty <#= HiddenFiltersPropertyName #>Property =
-                DependencyProperty.Register(
-                "<#= HiddenFiltersPropertyName #>", typeof(IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>),
-                typeof(<#= ProxyUserControlClassName #>),
-                new PropertyMetadata(null));
-        public IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>> <#= HiddenFiltersPropertyName #>
-        {
-            get
-            {
-                return (IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>)GetValue(<#= HiddenFiltersPropertyName #>Property);
-            }
-            set
-            {
-                SetValue(<#= HiddenFiltersPropertyName #>Property, value);
-            }
-        }
-        #endregion
-        #region <#= ShowFilterPropertyName #>
-        public static readonly DependencyProperty <#= ShowFilterPropertyName #>Property =
-                DependencyProperty.Register(
-                "<#= ShowFilterPropertyName #>", typeof(bool),
-                typeof(<#= ProxyUserControlClassName #>),
-                new PropertyMetadata(true));
-        public bool <#= ShowFilterPropertyName #>
-        {
-            get
-            {
-                return (bool)GetValue(<#= ShowFilterPropertyName #>Property);
-            }
-            set
-            {
-                SetValue(<#= ShowFilterPropertyName #>Property, value);
-            }
-        }
-        #endregion
         #region <#= ShowBackBtnPropertyName #>
         public static readonly DependencyProperty <#= ShowBackBtnPropertyName #>Property =
                 DependencyProperty.Register(
                 "<#= ShowBackBtnPropertyName #>", typeof(bool),
-                typeof(<#= ProxyUserControlClassName #>),
+                typeof(<#= ScopedRegionUserControlClassName #>),
                 new PropertyMetadata(false));
         public bool <#= ShowBackBtnPropertyName #>
         {
@@ -183,11 +157,198 @@ namespace <#= ProxyUserControlNameSpace #> {
             }
         }
         #endregion
+        #region <#= HiddenFiltersPropertyName #>
+        public static readonly DependencyProperty <#= HiddenFiltersPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= HiddenFiltersPropertyName #>", typeof(IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>),
+                typeof(<#= ScopedRegionUserControlClassName #>),
+                new PropertyMetadata(null));
+        public IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>> <#= HiddenFiltersPropertyName #>
+        {
+            get
+            {
+                return (IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>)GetValue(<#= HiddenFiltersPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= HiddenFiltersPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= FormControlModelPropertyName #>
+        public static readonly DependencyProperty <#= FormControlModelPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= FormControlModelPropertyName #>", typeof(object),
+                typeof(<#= ScopedRegionUserControlClassName #>),
+                new PropertyMetadata(null));
+        public object <#= FormControlModelPropertyName #>
+        {
+            get
+            {
+                return (object)GetValue(<#= FormControlModelPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= FormControlModelPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= EformModePropertyName #>
+        public static readonly DependencyProperty <#= EformModePropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= EformModePropertyName #>", typeof(<#= EformModeEnumClassName #>),
+                typeof(<#= ScopedRegionUserControlClassName #>),
+                new PropertyMetadata(<#= EformModeEnumClassName #>.DeleteMode));
+        public <#= EformModeEnumClassName #> <#= EformModePropertyName #>
+        {
+            get
+            {
+                return (<#= EformModeEnumClassName #>)GetValue(<#= EformModePropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= EformModePropertyName #>Property, value);
+            }
+        }
+        #endregion
+
+        #region <#= ScopedRegionNamePropertyName #>
+        private static void <#= ScopedRegionNamePropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            <#= ScopedRegionUserControlClassName #> inst = d as <#= ScopedRegionUserControlClassName #>;
+            if (inst != null)
+            {
+                RoutedPropertyChangedEventArgs<string> eventArgs =
+                    new RoutedPropertyChangedEventArgs<string>(
+                        e.OldValue as string,
+                        e.NewValue as string,
+                        <#= RoutedEventExtClassName #>.<#= ScopedRegionNamePropertyChangedPropertyName #>Event);
+                inst.RaiseEvent(eventArgs);
+            }
+        }
+        public static readonly DependencyProperty <#= ScopedRegionNamePropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= ScopedRegionNamePropertyName #>", typeof(string),
+                typeof(<#= ScopedRegionUserControlClassName #>),
+                new PropertyMetadata(null, <#= ScopedRegionNamePropertyName #>Changed));
+        public string <#= ScopedRegionNamePropertyName #>
+        {
+            get
+            {
+                return (string)GetValue(<#= ScopedRegionNamePropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= ScopedRegionNamePropertyName #>Property, value);
+            }
+        }
+        #endregion
+
+        #region <#= RequestNavigateSourcePropertyName #>
+        private static void <#= RequestNavigateSourcePropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            <#= ScopedRegionUserControlClassName #> inst = d as <#= ScopedRegionUserControlClassName #>;
+            if (inst != null)
+            {
+                RoutedPropertyChangedEventArgs<string> eventArgs =
+                    new RoutedPropertyChangedEventArgs<string>(
+                        e.OldValue as string,
+                        e.NewValue as string,
+                        <#= RoutedEventExtClassName #>.<#= RequestNavigateSourcePropertyChangedPropertyName #>Event);
+                inst.RaiseEvent(eventArgs);
+            }
+        }
+        public static readonly DependencyProperty <#= RequestNavigateSourcePropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= RequestNavigateSourcePropertyName #>", typeof(string),
+                typeof(<#= ScopedRegionUserControlClassName #>),
+                new PropertyMetadata(null, <#= RequestNavigateSourcePropertyName #>Changed));
+        public string <#= RequestNavigateSourcePropertyName #>
+        {
+            get
+            {
+                return (string)GetValue(<#= RequestNavigateSourcePropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= RequestNavigateSourcePropertyName #>Property, value);
+            }
+        }
+        #endregion
+
+        #region <#= ScopedRegionManagerPropertyName #>
+        private static void <#= ScopedRegionManagerPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            <#= ScopedRegionUserControlClassName #> inst = d as <#= ScopedRegionUserControlClassName #>;
+            if (inst != null)
+            {
+                RoutedPropertyChangedEventArgs<object> eventArgs =
+                    new RoutedPropertyChangedEventArgs<object>(
+                        e.OldValue as IRegionManager,
+                        e.NewValue as IRegionManager,
+                        <#= RoutedEventExtClassName #>.<#= ScopedRegionManagerPropertyChangedPropertyName #>Event);
+                inst.RaiseEvent(eventArgs);
+            }
+        }
+        public static readonly DependencyProperty <#= ScopedRegionManagerPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= ScopedRegionManagerPropertyName #>", typeof(IRegionManager),
+                typeof(<#= ScopedRegionUserControlClassName #>),
+                new PropertyMetadata(null, <#= ScopedRegionManagerPropertyName #>Changed));
+        public object <#= ScopedRegionManagerPropertyName #>
+        {
+            get
+            {
+                return (IRegionManager)GetValue(<#= ScopedRegionManagerPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= ScopedRegionManagerPropertyName #>Property, value as IRegionManager);
+            }
+        }
+        #endregion
+
+        #region <#= FilterHeightPropertyName #>
+        public static readonly DependencyProperty <#= FilterHeightPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= FilterHeightPropertyName #>", typeof(double),
+                typeof(<#= ScopedRegionUserControlClassName #>),
+                new PropertyMetadata(double.MaxValue));
+        public double <#= FilterHeightPropertyName #>
+        {
+            get
+            {
+                return (double)GetValue(<#= FilterHeightPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= FilterHeightPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= ShowFilterPropertyName #>
+        public static readonly DependencyProperty <#= ShowFilterPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= ShowFilterPropertyName #>", typeof(bool),
+                typeof(<#= ScopedRegionUserControlClassName #>),
+                new PropertyMetadata(true));
+        public bool <#= ShowFilterPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= ShowFilterPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= ShowFilterPropertyName #>Property, value);
+            }
+        }
+        #endregion
         #region <#= ShowAddFilterBtnPropertyName #>
         public static readonly DependencyProperty <#= ShowAddFilterBtnPropertyName #>Property =
                 DependencyProperty.Register(
                 "<#= ShowAddFilterBtnPropertyName #>", typeof(bool),
-                typeof(<#= ProxyUserControlClassName #>),
+                typeof(<#= ScopedRegionUserControlClassName #>),
                 new PropertyMetadata(true));
         public bool <#= ShowAddFilterBtnPropertyName #>
         {
@@ -205,7 +366,7 @@ namespace <#= ProxyUserControlNameSpace #> {
         public static readonly DependencyProperty <#= ContainerMenuItemsPropertyName #>Property =
                 DependencyProperty.Register(
                 "<#= ContainerMenuItemsPropertyName #>", typeof(IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>),
-                typeof(<#= ProxyUserControlClassName #>),
+                typeof(<#= ScopedRegionUserControlClassName #>),
                 new PropertyMetadata(null));
         public IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> <#= ContainerMenuItemsPropertyName #>
         {
@@ -223,7 +384,7 @@ namespace <#= ProxyUserControlNameSpace #> {
         public static readonly DependencyProperty <#= GridHeightPropertyName #>Property =
                 DependencyProperty.Register(
                 "<#= GridHeightPropertyName #>", typeof(double),
-                typeof(<#= ProxyUserControlClassName #>),
+                typeof(<#= ScopedRegionUserControlClassName #>),
                 new PropertyMetadata(double.MaxValue));
         public double <#= GridHeightPropertyName #>
         {
@@ -242,7 +403,7 @@ namespace <#= ProxyUserControlNameSpace #> {
         public static readonly DependencyProperty <#= TableMenuItemsPropertyName #>Property =
                 DependencyProperty.Register(
                 "<#= TableMenuItemsPropertyName #>", typeof(IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>),
-                typeof(<#= ProxyUserControlClassName #>),
+                typeof(<#= ScopedRegionUserControlClassName #>),
                 new PropertyMetadata(null));
         public IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> <#= TableMenuItemsPropertyName #>
         {
@@ -260,7 +421,7 @@ namespace <#= ProxyUserControlNameSpace #> {
         public static readonly DependencyProperty <#= RowMenuItemsPropertyName #>Property =
                 DependencyProperty.Register(
                 "<#= RowMenuItemsPropertyName #>", typeof(IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>),
-                typeof(<#= ProxyUserControlClassName #>),
+                typeof(<#= ScopedRegionUserControlClassName #>),
                 new PropertyMetadata(null));
         public IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> <#= RowMenuItemsPropertyName #>
         {
@@ -278,7 +439,7 @@ namespace <#= ProxyUserControlNameSpace #> {
         public static readonly DependencyProperty <#= ShowSubmitPropertyName #>Property =
                 DependencyProperty.Register(
                 "<#= ShowSubmitPropertyName #>", typeof(bool),
-                typeof(<#= ProxyUserControlClassName #>),
+                typeof(<#= ScopedRegionUserControlClassName #>),
                 new PropertyMetadata(true));
         public bool <#= ShowSubmitPropertyName #>
         {
@@ -292,47 +453,11 @@ namespace <#= ProxyUserControlNameSpace #> {
             }
         }
         #endregion
-        #region <#= FormControlModelPropertyName #>
-        public static readonly DependencyProperty <#= FormControlModelPropertyName #>Property =
-                DependencyProperty.Register(
-                "<#= FormControlModelPropertyName #>", typeof(object),
-                typeof(<#= ProxyUserControlClassName #>),
-                new PropertyMetadata(null));
-        public object <#= FormControlModelPropertyName #>
-        {
-            get
-            {
-                return (object)GetValue(<#= FormControlModelPropertyName #>Property);
-            }
-            set
-            {
-                SetValue(<#= FormControlModelPropertyName #>Property, value);
-            }
-        }
-        #endregion
-        #region <#= EformModePropertyName #>
-        public static readonly DependencyProperty <#= EformModePropertyName #>Property =
-                DependencyProperty.Register(
-                "<#= EformModePropertyName #>", typeof(<#= EformModeEnumClassName #>),
-                typeof(<#= ProxyUserControlClassName #>),
-                new PropertyMetadata(<#= EformModeEnumClassName #>.DeleteMode));
-        public <#= EformModeEnumClassName #> <#= EformModePropertyName #>
-        {
-            get
-            {
-                return (<#= EformModeEnumClassName #>)GetValue(<#= EformModePropertyName #>Property);
-            }
-            set
-            {
-                SetValue(<#= EformModePropertyName #>Property, value);
-            }
-        }
-        #endregion
         #region <#= CanAddPropertyName #>
         public static readonly DependencyProperty <#= CanAddPropertyName #>Property =
                 DependencyProperty.Register(
                 "<#= CanAddPropertyName #>", typeof(bool),
-                typeof(<#= ProxyUserControlClassName #>),
+                typeof(<#= ScopedRegionUserControlClassName #>),
                 new PropertyMetadata(false));
         public bool <#= CanAddPropertyName #>
         {
@@ -350,7 +475,7 @@ namespace <#= ProxyUserControlNameSpace #> {
         public static readonly DependencyProperty <#= CanUpdPropertyName #>Property =
                 DependencyProperty.Register(
                 "<#= CanUpdPropertyName #>", typeof(bool),
-                typeof(<#= ProxyUserControlClassName #>),
+                typeof(<#= ScopedRegionUserControlClassName #>),
                 new PropertyMetadata(false));
         public bool <#= CanUpdPropertyName #>
         {
@@ -368,7 +493,7 @@ namespace <#= ProxyUserControlNameSpace #> {
         public static readonly DependencyProperty <#= CanDelPropertyName #>Property =
                 DependencyProperty.Register(
                 "<#= CanDelPropertyName #>", typeof(bool),
-                typeof(<#= ProxyUserControlClassName #>),
+                typeof(<#= ScopedRegionUserControlClassName #>),
                 new PropertyMetadata(false));
         public bool <#= CanDelPropertyName #>
         {
@@ -383,11 +508,12 @@ namespace <#= ProxyUserControlNameSpace #> {
         }
         #endregion
 
+
         #region <#= CanAddDetailPropertyName #>
         public static readonly DependencyProperty <#= CanAddDetailPropertyName #>Property =
                 DependencyProperty.Register(
                 "<#= CanAddDetailPropertyName #>", typeof(bool),
-                typeof(<#= ProxyUserControlClassName #>),
+                typeof(<#= ScopedRegionUserControlClassName #>),
                 new PropertyMetadata(false));
         public bool <#= CanAddDetailPropertyName #>
         {
@@ -406,7 +532,7 @@ namespace <#= ProxyUserControlNameSpace #> {
         public static readonly DependencyProperty <#= CanUpdDetailPropertyName #>Property =
                 DependencyProperty.Register(
                 "<#= CanUpdDetailPropertyName #>", typeof(bool),
-                typeof(<#= ProxyUserControlClassName #>),
+                typeof(<#= ScopedRegionUserControlClassName #>),
                 new PropertyMetadata(false));
         public bool <#= CanUpdDetailPropertyName #>
         {
@@ -425,7 +551,7 @@ namespace <#= ProxyUserControlNameSpace #> {
         public static readonly DependencyProperty <#= CanDelDetailPropertyName #>Property =
                 DependencyProperty.Register(
                 "<#= CanDelDetailPropertyName #>", typeof(bool),
-                typeof(<#= ProxyUserControlClassName #>),
+                typeof(<#= ScopedRegionUserControlClassName #>),
                 new PropertyMetadata(false));
         public bool <#= CanDelDetailPropertyName #>
         {
@@ -444,7 +570,7 @@ namespace <#= ProxyUserControlNameSpace #> {
         public static readonly DependencyProperty <#= FilterHeightDetailPropertyName #>Property =
                 DependencyProperty.Register(
                 "<#= FilterHeightDetailPropertyName #>", typeof(double),
-                typeof(<#= ProxyUserControlClassName #>),
+                typeof(<#= ScopedRegionUserControlClassName #>),
                 new PropertyMetadata(double.MaxValue));
         public double <#= FilterHeightDetailPropertyName #>
         {
@@ -463,7 +589,7 @@ namespace <#= ProxyUserControlNameSpace #> {
         public static readonly DependencyProperty <#= ShowFilterDetailPropertyName #>Property =
                 DependencyProperty.Register(
                 "<#= ShowFilterDetailPropertyName #>", typeof(bool),
-                typeof(<#= ProxyUserControlClassName #>),
+                typeof(<#= ScopedRegionUserControlClassName #>),
                 new PropertyMetadata(true));
         public bool <#= ShowFilterDetailPropertyName #>
         {
@@ -482,7 +608,7 @@ namespace <#= ProxyUserControlNameSpace #> {
         public static readonly DependencyProperty <#= ShowAddFilterBtnDetailPropertyName #>Property =
                 DependencyProperty.Register(
                 "<#= ShowAddFilterBtnDetailPropertyName #>", typeof(bool),
-                typeof(<#= ProxyUserControlClassName #>),
+                typeof(<#= ScopedRegionUserControlClassName #>),
                 new PropertyMetadata(true));
         public bool <#= ShowAddFilterBtnDetailPropertyName #>
         {
@@ -501,7 +627,7 @@ namespace <#= ProxyUserControlNameSpace #> {
         public static readonly DependencyProperty <#= GridHeightDetailPropertyName #>Property =
                 DependencyProperty.Register(
                 "<#= GridHeightDetailPropertyName #>", typeof(double),
-                typeof(<#= ProxyUserControlClassName #>),
+                typeof(<#= ScopedRegionUserControlClassName #>),
                 new PropertyMetadata(double.MaxValue));
         public double <#= GridHeightDetailPropertyName #>
         {
@@ -520,7 +646,7 @@ namespace <#= ProxyUserControlNameSpace #> {
         public static readonly DependencyProperty <#= HiddenFiltersDetailPropertyName #>Property =
                 DependencyProperty.Register(
                 "<#= HiddenFiltersDetailPropertyName #>", typeof(IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>),
-                typeof(<#= ProxyUserControlClassName #>),
+                typeof(<#= ScopedRegionUserControlClassName #>),
                 new PropertyMetadata(null));
         public IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>> <#= HiddenFiltersDetailPropertyName #>
         {
@@ -539,7 +665,7 @@ namespace <#= ProxyUserControlNameSpace #> {
         public static readonly DependencyProperty <#= RowMenuItemsDetailPropertyName #>Property =
                 DependencyProperty.Register(
                 "<#= RowMenuItemsDetailPropertyName #>", typeof(IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>),
-                typeof(<#= ProxyUserControlClassName #>),
+                typeof(<#= ScopedRegionUserControlClassName #>),
                 new PropertyMetadata(null));
         public IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> <#= RowMenuItemsDetailPropertyName #>
         {
@@ -558,7 +684,7 @@ namespace <#= ProxyUserControlNameSpace #> {
         public static readonly DependencyProperty <#= TableMenuItemsDetailPropertyName #>Property =
                 DependencyProperty.Register(
                 "<#= TableMenuItemsDetailPropertyName #>", typeof(IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>),
-                typeof(<#= ProxyUserControlClassName #>),
+                typeof(<#= ScopedRegionUserControlClassName #>),
                 new PropertyMetadata(null));
         public IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> <#= TableMenuItemsDetailPropertyName #>
         {
@@ -572,6 +698,7 @@ namespace <#= ProxyUserControlNameSpace #> {
             }
         }
         #endregion
+
 
     }
 }

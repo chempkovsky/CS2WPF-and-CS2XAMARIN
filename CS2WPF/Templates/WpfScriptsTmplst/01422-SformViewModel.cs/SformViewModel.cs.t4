@@ -295,20 +295,18 @@ namespace <#= SformViewModelNameSpace #> {
         #endregion
 
         public void OnSelectionChanged(object sender, SelectionChangedEventArgs e) {
-            if (!e.Handled) {
-                if ((e.OriginalSource is DataGrid) && (sender is UIElement))
-                {
-                    e.Handled = true;
-                    // (sender as UIElement).RaiseEvent(new SelectionChangedEventArgs(<#= RoutedEventExtClassName #>.<#= SformSelectionChangedPropertyName #>Event, e.RemovedItems, e.AddedItems));
-                    Tuple<string, System.Collections.IList, System.Collections.IList> itm = new Tuple<string, System.Collections.IList, System.Collections.IList>("<#= modelInterfaceClassName #>", e.RemovedItems, e.AddedItems);
-                    <#= RoutedCommandExtClassName #>.<#= SformSelectionChangedCommandPropertyName  #>.Execute(itm, (sender as UIElement));
-                }
+            if ((e.OriginalSource is DataGrid) && (sender is UIElement))
+            {
+                e.Handled = true;
+                // (sender as UIElement).RaiseEvent(new SelectionChangedEventArgs(<#= RoutedEventExtClassName #>.<#= SformSelectionChangedPropertyName #>Event, e.RemovedItems, e.AddedItems));
+                Tuple<string, System.Collections.IList, System.Collections.IList> itm = new Tuple<string, System.Collections.IList, System.Collections.IList>("<#= modelInterfaceClassName #>", e.RemovedItems, e.AddedItems);
+                <#= RoutedCommandExtClassName #>.<#= SformSelectionChangedCommandPropertyName  #>.Execute(itm, (sender as UIElement));
             }
         }
         private async void OnLoaded(object sender, RoutedEventArgs e)
         {
-            if (!e.Handled) {
-                e.Handled = true;
+            e.Handled = true;
+            if(!<#= IsOnLoadedCalledPropertyName #>) {
                 <#= IsOnLoadedCalledPropertyName #> = true;
                 await onFilter();
             }
@@ -468,6 +466,7 @@ namespace <#= SformViewModelNameSpace #> {
 
         #region <#= RowMenuItemsPropertyName #>
         protected void <#= OnRowMenuItemsChangedPropertyName #>(object sender, RoutedPropertyChangedEventArgs<IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>> evarg) {
+            evarg.Handled = true;
             ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>> tmis = new ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>>();
             IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> intmis = null;
             if(evarg != null) {
@@ -647,9 +646,6 @@ namespace <#= SformViewModelNameSpace #> {
                 }
             }
         }
-        protected void <#= HiddenFiltersPropertyName #>Changed(object sender, RoutedPropertyChangedEventArgs<IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>> e) {
-            IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>> hfs = e.NewValue as IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>;
-        }
         #endregion
 
         #region <#= FilterDefinitionsPropertyName #>
@@ -732,6 +728,7 @@ namespace <#= SformViewModelNameSpace #> {
         }
         protected async void On<#= CurrentPagePropertyName #>Changed(object sender, RoutedPropertyChangedEventArgs<Nullable<int>> evarg)
         {
+            evarg.Handled = true;
             if (evarg.NewValue.HasValue)
             {
                 if (Actual<#= CurrentPagePropertyName #> != evarg.NewValue.Value)
@@ -771,6 +768,7 @@ namespace <#= SformViewModelNameSpace #> {
         }
         protected async void On<#= RowsPerPagePropertyName #>Changed(object sender, RoutedPropertyChangedEventArgs<Nullable<int>> evarg)
         {
+            evarg.Handled = true;
             if (evarg.NewValue.HasValue)
             {
                 if(Actual<#= RowsPerPagePropertyName #> != evarg.NewValue.Value)
@@ -792,6 +790,7 @@ namespace <#= SformViewModelNameSpace #> {
                 CurrentSortdirection  = "";
             } else
             {
+                evarg.Handled = true;
                 Nullable<SortDescription> nv = evarg.NewValue as Nullable<SortDescription>;
                 if (nv.HasValue)
                 {
