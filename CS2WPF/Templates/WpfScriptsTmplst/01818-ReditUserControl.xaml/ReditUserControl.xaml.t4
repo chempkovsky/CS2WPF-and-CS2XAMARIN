@@ -28,7 +28,15 @@
     string LformUserControlClassName       = GetModelClassName(Model, LformUserControlFolder);
     string LformUserControlNameSpace       = GetModelNameSpace(Model, LformUserControlFolder);
 
+    string LdlgUserControlFolder           = "01616-LdlgUserControl.xaml.cs";
+    string LdlgUserControlClassName        = GetModelClassName(Model, LdlgUserControlFolder);
+    string LdlgUserControlNameSpace        = GetModelNameSpace(Model, LdlgUserControlFolder);
+    string LdlgUserControlProject          = GetModelProjectName(Model, LdlgUserControlFolder);
 
+    string LdlgUserControlXamlFolder      = "01618-LdlgUserControl.xaml";
+    string LdlgUserControlXamlClassName   = GetModelClassName(Model, LdlgUserControlXamlFolder);
+    string LdlgUserControlXamlNameSpace   = GetModelNameSpace(Model, LdlgUserControlXamlFolder);
+    string LdlgUserControlXamlProject     = GetModelProjectName(Model, LdlgUserControlXamlFolder);
     
 
 
@@ -40,30 +48,29 @@
     string RdlistUserControlNameSpace        = GetModelNameSpace(Model, RdlistUserControlFolder);
     string RdlistUserControlProject          = GetModelProjectName(Model, RdlistUserControlFolder);
     
-    string RdlistUserControlXamlFolder       = "02018-RdlistUserControl.xaml";
-    string RdlistUserControlXamlClassName    = GetModelClassName(Model, RdlistUserControlXamlFolder);
-    string RdlistUserControlXamlNameSpace    = GetModelNameSpace(Model, RdlistUserControlXamlFolder);
-    string RdlistUserControlXamlProject      = GetModelProjectName(Model, RdlistUserControlXamlFolder);
+    string EformUserControlFolder           = "01496-EformUserControl.xaml.cs";
+    string EformUserControlClassName        = GetModelClassName(Model, EformUserControlFolder);
+    string EformUserControlNameSpace        = GetModelNameSpace(Model, EformUserControlFolder);
 
+
+
+    string ReditUserControlFolder           = "01816-ReditUserControl.xaml.cs";
+    string ReditUserControlClassName        = GetModelClassName(Model, ReditUserControlFolder);
+    string ReditUserControlNameSpace        = GetModelNameSpace(Model, ReditUserControlFolder);
+
+    string ReditUserControlXamlFolder       = "01818-ReditUserControl.xaml";
+    string ReditUserControlXamlClassName    = GetModelClassName(Model, ReditUserControlXamlFolder);
+    string ReditUserControlXamlNameSpace    = GetModelNameSpace(Model, ReditUserControlXamlFolder);
+    string ReditUserControlXamlProject      = GetModelProjectName(Model, ReditUserControlXamlFolder);
 
     string CaptionPropertyName = "Caption";
-    string FilterHeightPropertyName = "FilterHeight";
-    string ShowFilterPropertyName = "ShowFilter";
-    string ShowAddFilterBtnPropertyName = "ShowAddFilterBtn";
-    string ShowBackBtnPropertyName = "ShowBackBtn";
-    string GridHeightPropertyName = "GridHeight";
-    string TableMenuItemsPropertyName = "TableMenuItems";
-    string RowMenuItemsPropertyName = "RowMenuItems";
-    string ContainerMenuItemsPropertyName = "ContainerMenuItems";
     string HiddenFiltersPropertyName = "HiddenFilters";
+    string ContainerMenuItemsPropertyName = "ContainerMenuItems";
+    string FormControlModelPropertyName         = "FormControlModel";
+    string EformModePropertyName                = "EformMode";
+    string ShowSubmitPropertyName = "ShowSubmit";
 
-    string CanAddPropertyName                   = "CanAdd";
-    string CanUpdPropertyName                   = "CanUpdate";
-    string CanDelPropertyName                   = "CanDelete";
 
-    string CanAddInternalPropertyName           = "CanAddInternal";
-    string CanUpdInternalPropertyName           = "CanUpdateInternal";
-    string CanDelInternalPropertyName           = "CanDeleteInternal";
 
 
     string RegisterRoutedCommandBindingsPropertyName = "RegisterRoutedCommandBindings";
@@ -77,17 +84,17 @@
 
 
     string proxyPrefix = "clr-namespace:" + ProxyUserControlNameSpace;
-    if(ProxyUserControlProject != RdlistUserControlXamlProject) {
+    if(ProxyUserControlProject != ReditUserControlXamlProject) {
         proxyPrefix = proxyPrefix + ";assembly=" + ProxyUserControlProject;
     }
     string attachedPrefix = "clr-namespace:" + AttachedPropertiesExtNameSpace;
-    if(AttachedPropertiesExtProject != RdlistUserControlXamlProject) {
+    if(AttachedPropertiesExtProject != ReditUserControlXamlProject) {
         attachedPrefix = attachedPrefix + ";assembly=" + AttachedPropertiesExtProject;
     }
 
 #>
 
-<UserControl x:Class="<#= RdlistUserControlNameSpace #>.<#= RdlistUserControlClassName #>"
+<UserControl x:Class="<#= ReditUserControlNameSpace #>.<#= ReditUserControlClassName #>"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -103,32 +110,24 @@
              atch:<#= AttachedPropertiesExtClassName #>.<#= RegisterRoutedEventBindingsPropertyName #>="{Binding <#= RoutedEventHandlersPropertyName #>}"
 
 
-
-             x:Name="RdlistUsrCntrlRootNode"
+             x:Name="ReditUsrCntrlRootNode"
 
              mc:Ignorable="d" 
              d:DesignHeight="150" d:DesignWidth="400" >
         <prx:<#= ProxyUserControlClassName #> 
 
-            prism:RegionManager.RegionName="<#= LformUserControlClassName #><#= RegionPropertyName #>"
+            prism:RegionManager.RegionName="<#= EformUserControlClassName #><#= RegionPropertyName #>"
+
+            <#= ContainerMenuItemsPropertyName #>="{Binding <#= ContainerMenuItemsPropertyName #>, Mode=OneWay, ElementName=ReditUsrCntrlRootNode}" 
 
             <#= CaptionPropertyName #>="{Binding <#= CaptionPropertyName #>, Mode=OneWay}" 
-            <#= FilterHeightPropertyName #>="{Binding <#= FilterHeightPropertyName #>, Mode=OneWay, ElementName=RdlistUsrCntrlRootNode}" 
-            <#= ShowFilterPropertyName #>="{Binding <#= ShowFilterPropertyName #>, Mode=OneWay, ElementName=RdlistUsrCntrlRootNode}" 
-            <#= ShowAddFilterBtnPropertyName #>="{Binding <#= ShowAddFilterBtnPropertyName #>, Mode=OneWay, ElementName=RdlistUsrCntrlRootNode}" 
-            <#= GridHeightPropertyName #>="{Binding <#= GridHeightPropertyName #>, Mode=OneWay, ElementName=RdlistUsrCntrlRootNode}" 
-            <#= ShowBackBtnPropertyName #>="{Binding <#= ShowBackBtnPropertyName #>, Mode=OneWay}" 
+            <#= FormControlModelPropertyName #>="{Binding <#= FormControlModelPropertyName #>, Mode=OneWay}" 
+            <#= EformModePropertyName #>="{Binding <#= EformModePropertyName #>, Mode=OneWay}" 
 
             <#= HiddenFiltersPropertyName #>="{Binding <#= HiddenFiltersPropertyName #>, Mode=OneWay}" 
-            <#= TableMenuItemsPropertyName #>="{Binding <#= TableMenuItemsPropertyName #>, Mode=OneWay, ElementName=RdlistUsrCntrlRootNode}" 
-            <#= RowMenuItemsPropertyName #>="{Binding <#= RowMenuItemsPropertyName #>, Mode=OneWay}" 
 
-
-            <#= CanAddPropertyName #>="{Binding <#= CanAddInternalPropertyName #>, Mode=OneWay}" 
-            <#= CanUpdPropertyName #>="{Binding <#= CanUpdInternalPropertyName #>, Mode=OneWay}" 
-            <#= CanDelPropertyName #>="{Binding <#= CanDelInternalPropertyName #>, Mode=OneWay}" 
-            >
-        </prx:<#= ProxyUserControlClassName #>>
+            <#= ShowSubmitPropertyName #>="True" 
+            />
 </UserControl>
 
 
