@@ -115,6 +115,7 @@ using Prism.Regions;
     string SformAfterAddItemCommandPropertyName = "SformAfterAddItemCommand";
     string SformAfterUpdItemCommandPropertyName = "SformAfterUpdItemCommand";
     string SformAfterDelItemCommandPropertyName = "SformAfterDelItemCommand";
+    string SformLoadedCommandPropertyName       = "SformLoadedCommand";
 
     string FormControlModelPropertyName         = "FormControlModel";
     string CaptionPropertyName                  = "Caption";
@@ -181,7 +182,8 @@ using <#= ns #>;
         {
             ...
             ViewModelLocationProvider.Register<<#= LformUserControlClassName #>, <#= LformViewModelClassName #>>();
-            containerRegistry.RegisterForNavigation<<#= LformUserControlClassName #>, <#= LformViewModelClassName #>>("<#= LformUserControlClassName #><#= ForO2mSuffixPropertyName #>");
+            // to be used with "00632-ScopedRegionUserControl.xaml.cs" insert additional line of declaration:
+            containerRegistry.RegisterForNavigation<<#= LformUserControlClassName #>, <#= LformViewModelClassName #>>("<#= LformUserControlClassName #><#= RegionPropertyName #>");
             ...
         }
 */
@@ -219,6 +221,8 @@ namespace <#= LformViewModelNameSpace #> {
                            cb = new CommandBinding(<#= RoutedCommandExtClassName #>.<#= SformUpdItemCommandPropertyName #>, new ExecutedRoutedEventHandler(this.Executed<#= SformUpdItemCommandPropertyName #>), new CanExecuteRoutedEventHandler(CanExecute<#= SformUpdItemCommandPropertyName #>));
             cbsc.Add(cb);
                            cb = new CommandBinding(<#= RoutedCommandExtClassName #>.<#= SformDelItemCommandPropertyName #>, new ExecutedRoutedEventHandler(this.Executed<#= SformDelItemCommandPropertyName #>), new CanExecuteRoutedEventHandler(CanExecute<#= SformDelItemCommandPropertyName #>));
+            cbsc.Add(cb);
+                           cb = new CommandBinding(<#= RoutedCommandExtClassName #>.<#= SformLoadedCommandPropertyName #>, new ExecutedRoutedEventHandler(this.Executed<#= SformLoadedCommandPropertyName #>), new CanExecuteRoutedEventHandler(CanExecute<#= SformLoadedCommandPropertyName #>));
             cbsc.Add(cb);
             _<#= RoutedCommandHandlersPropertyName #> = cbsc;
 
@@ -567,6 +571,16 @@ namespace <#= LformViewModelNameSpace #> {
             e.Handled = true;
            <#= modelInterfaceClassName #> prm = e.Parameter as  <#= modelInterfaceClassName #>;
             e.CanExecute = (prm != null) && <#= CanDelPropertyName #>;
+        }
+        #endregion
+
+        #region <#= SformLoadedCommandPropertyName #>
+        public void Executed<#= SformLoadedCommandPropertyName #>(object sender, ExecutedRoutedEventArgs e) {
+            e.Handled = true;
+        }
+        public void CanExecute<#= SformLoadedCommandPropertyName #>(object sender, CanExecuteRoutedEventArgs e) {
+            e.Handled = true;
+            e.CanExecute = true;
         }
         #endregion
     }

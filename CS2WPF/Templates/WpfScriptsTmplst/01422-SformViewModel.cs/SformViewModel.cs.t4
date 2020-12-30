@@ -34,6 +34,10 @@ using System.Windows.Controls;
     string commandHelperModelClassName   = GetContextModelClassName(Context, commandHelperModelFolder);
     string commandHelperModelNameSpace   = GetContextModelNameSpace(Context, commandHelperModelFolder);
 
+    string ISformViewModelInterfaceFolder      = "00198-ISformViewModelInterface.cs";
+    string ISformViewModelInterfaceClassName   = GetContextModelClassName(Context, ISformViewModelInterfaceFolder);
+    string ISformViewModelInterfaceNameSpace   = GetContextModelNameSpace(Context, ISformViewModelInterfaceFolder);
+
     string IWebServiceFilterDefInterfaceFolder      = "00200-IWebServiceFilterDefInterface.cs";
     string IWebServiceFilterDefInterfaceClassName   = GetContextModelClassName(Context, IWebServiceFilterDefInterfaceFolder);
     string IWebServiceFilterDefInterfaceNameSpace   = GetContextModelNameSpace(Context, IWebServiceFilterDefInterfaceFolder);
@@ -160,7 +164,8 @@ using System.Windows.Controls;
     string SformAfterAddItemCommandPropertyName = "SformAfterAddItemCommand";
     string SformAfterUpdItemCommandPropertyName = "SformAfterUpdItemCommand";
     string SformAfterDelItemCommandPropertyName = "SformAfterDelItemCommand";
-
+    string SformLoadedCommandPropertyName       = "SformLoadedCommand";
+    string UIDispatcherInvokePropertyName   = "Application.Current.Dispatcher.Invoke";
 
 
     List<string> nmSpaces = new List<string>();
@@ -194,6 +199,8 @@ using System.Windows.Controls;
         nmSpaces.Add(ColumnSelectorItemDefViewModelNameSpace);
     if ((SformViewModelNameSpace != TablePaginationUserControlNameSpace) && (nmSpaces.IndexOf(TablePaginationUserControlNameSpace) < 0)) 
         nmSpaces.Add(TablePaginationUserControlNameSpace);
+    if ((SformViewModelNameSpace != ISformViewModelInterfaceNameSpace) && (nmSpaces.IndexOf(ISformViewModelInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(ISformViewModelInterfaceNameSpace);
 
     
     
@@ -228,12 +235,14 @@ using <#= ns #>;
         {
             ...
             ViewModelLocationProvider.Register<<#= SformUserControlClassName #>, <#= SformViewModelClassName #>>();
+            // to be used with "00632-ScopedRegionUserControl.xaml.cs" insert additional line of declaration:
+            containerRegistry.RegisterForNavigation<<#= SformUserControlClassName #>, <#= SformViewModelClassName #>>("<#= SformUserControlClassName #><#= RegionPropertyName #>");
             ...
         }
 */
 
 namespace <#= SformViewModelNameSpace #> {
-    public class <#= SformViewModelClassName #>: INotifyPropertyChanged
+    public class <#= SformViewModelClassName #>: INotifyPropertyChanged, <#= ISformViewModelInterfaceClassName #>
     {
         protected <#= modelServiceInterfaceClassName #> <#= FormRootServicePropertyName #>=null;
         protected <#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName #>=null;
@@ -303,11 +312,15 @@ namespace <#= SformViewModelNameSpace #> {
                 Tuple<string, System.Collections.IList, System.Collections.IList> itm = new Tuple<string, System.Collections.IList, System.Collections.IList>("<#= modelInterfaceClassName #>", e.RemovedItems, e.AddedItems);
                 <#= RoutedCommandExtClassName #>.<#= SformSelectionChangedCommandPropertyName  #>.Execute(itm, (sender as UIElement));
             }
-        }
+        }    
+
         private async void OnLoaded(object sender, RoutedEventArgs e)
         {
             e.Handled = true;
             if(!<#= IsOnLoadedCalledPropertyName #>) {
+                <#= UIDispatcherInvokePropertyName #>(() => {
+                    <#= RoutedCommandExtClassName #>.<#= SformLoadedCommandPropertyName  #>.Execute(this, sender as IInputElement);
+                });
                 <#= IsOnLoadedCalledPropertyName #> = true;
                 await onFilter();
             }
@@ -870,12 +883,15 @@ namespace <#= SformViewModelNameSpace #> {
         #endregion
 
         #region <#= SformAfterAddItemCommandPropertyName #>
-        public void Executed<#= SformAfterAddItemCommandPropertyName #>(object sender, ExecutedRoutedEventArgs e) {
-            e.Handled = true;
-            <#= modelInterfaceClassName #> prm = e.Parameter as  <#= modelInterfaceClassName #>;
+        public void <#= SformAfterAddItemCommandPropertyName #>(object item) {
+            <#= modelInterfaceClassName #> prm = item as  <#= modelInterfaceClassName #>;
             if(prm == null) return;
             ObservableCollection<<#= modelInterfaceClassName #>> ds = <#= DataSourcePropertyName #> as ObservableCollection<<#= modelInterfaceClassName #>>;
             ds.Add(<#= FormRootServicePropertyName #>.<#= CopyToModelNotifyMethodName #>(prm, null));
+        }
+        public void Executed<#= SformAfterAddItemCommandPropertyName #>(object sender, ExecutedRoutedEventArgs e) {
+            e.Handled = true;
+            <#= SformAfterAddItemCommandPropertyName #>( e.Parameter );
         }
         public void CanExecute<#= SformAfterAddItemCommandPropertyName #>(object sender, CanExecuteRoutedEventArgs e) {
             e.Handled = true;
@@ -884,9 +900,8 @@ namespace <#= SformViewModelNameSpace #> {
         #endregion
 
         #region <#= SformAfterUpdItemCommandPropertyName #>
-        public void Executed<#= SformAfterUpdItemCommandPropertyName #>(object sender, ExecutedRoutedEventArgs e) {
-            e.Handled = true;
-            <#= modelInterfaceClassName #> prm = e.Parameter as  <#= modelInterfaceClassName #>;
+        public void <#= SformAfterUpdItemCommandPropertyName #>(object item) {
+            <#= modelInterfaceClassName #> prm = item as  <#= modelInterfaceClassName #>;
             if(prm == null) return;
             ObservableCollection<<#= modelInterfaceClassName #>> ds = <#= DataSourcePropertyName #> as ObservableCollection<<#= modelInterfaceClassName #>>;
             if (ds.IndexOf(prm) > -1) {
@@ -922,6 +937,10 @@ namespace <#= SformViewModelNameSpace #> {
                 ds.Add(<#= FormRootServicePropertyName #>.<#= CopyToModelNotifyMethodName #>(prm, null));
             }
         }
+        public void Executed<#= SformAfterUpdItemCommandPropertyName #>(object sender, ExecutedRoutedEventArgs e) {
+            e.Handled = true;
+            <#= SformAfterUpdItemCommandPropertyName #>(e.Parameter);
+        }
         public void CanExecute<#= SformAfterUpdItemCommandPropertyName #>(object sender, CanExecuteRoutedEventArgs e) {
             e.Handled = true;
             e.CanExecute = !<#= IsInQueryPropertyName #>;
@@ -930,9 +949,8 @@ namespace <#= SformViewModelNameSpace #> {
 
 
         #region <#= SformAfterDelItemCommandPropertyName #>
-        public void Executed<#= SformAfterDelItemCommandPropertyName #>(object sender, ExecutedRoutedEventArgs e) {
-            e.Handled = true;
-            <#= modelInterfaceClassName #> prm = e.Parameter as  <#= modelInterfaceClassName #>;
+        public void <#= SformAfterDelItemCommandPropertyName #>(object item) {
+            <#= modelInterfaceClassName #> prm = item as  <#= modelInterfaceClassName #>;
             if(prm == null) return;
             ObservableCollection<<#= modelInterfaceClassName #>> ds = <#= DataSourcePropertyName #> as ObservableCollection<<#= modelInterfaceClassName #>>;
             int indx = ds.IndexOf(prm);
@@ -965,12 +983,16 @@ namespace <#= SformViewModelNameSpace #> {
     }
 #>
             if (rw != null) {
-                indx = ds.IndexOf(prm);
+                indx = ds.IndexOf(rw);
                 if (indx > -1) {
                     ds.RemoveAt(indx);
                     return;
                 }
             }
+        }
+        public void Executed<#= SformAfterDelItemCommandPropertyName #>(object sender, ExecutedRoutedEventArgs e) {
+            e.Handled = true;
+            <#= SformAfterDelItemCommandPropertyName #>(e.Parameter as  <#= modelInterfaceClassName #>);
         }
         public void CanExecute<#= SformAfterDelItemCommandPropertyName #>(object sender, CanExecuteRoutedEventArgs e) {
             e.Handled = true;

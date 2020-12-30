@@ -202,11 +202,24 @@ namespace <#= RlistUserControlNameSpace #> {
         }
         #endregion
         #region <#= TableMenuItemsPropertyName #>
+        private static void <#= TableMenuItemsPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            <#= RlistUserControlClassName #> inst = d as <#= RlistUserControlClassName #>;
+            if (inst != null)
+            {
+                RoutedPropertyChangedEventArgs<IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>> eventArgs =
+                    new RoutedPropertyChangedEventArgs<IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>>(
+                        e.OldValue as IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>,
+                        e.NewValue as IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>,
+                        <#= RoutedEventExtClassName #>.<#= TableMenuItemsPropertyChangedPropertyName #>Event);
+                inst.RaiseEvent(eventArgs);
+            }
+        }
         public static readonly DependencyProperty <#= TableMenuItemsPropertyName #>Property =
                 DependencyProperty.Register(
                 "<#= TableMenuItemsPropertyName #>", typeof(IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>),
                 typeof(<#= RlistUserControlClassName #>),
-                new PropertyMetadata(null));
+                new PropertyMetadata(null, <#= TableMenuItemsPropertyName #>Changed));
         public IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> <#= TableMenuItemsPropertyName #>
         {
             get

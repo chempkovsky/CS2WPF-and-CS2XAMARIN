@@ -397,53 +397,64 @@ namespace <#= ReditViewModelNameSpace #> {
                 }
             } 
 
-            if (resetHF) { <#= HiddenFiltersPropertyName #> = hf; }
-
-            
             if(prms.ContainsKey("<#= EformModeEnumClassName #>")) {
-                <#= EformModePropertyName #> = prms.GetValue<<#= EformModeEnumClassName #>>("<#= EformModeEnumClassName #>");
-            }
-            if (<#= EformModePropertyName #> != <#= EformModeEnumClassName #>.AddMode) {
-                <#= CaptionPropertyName #> = "Add item for <#= Model.ViewName #>";
+                string locCaption = null;
+                <#= EformModeEnumClassName #> locmode = prms.GetValue<<#= EformModeEnumClassName #>>("<#= EformModeEnumClassName #>");
+                if (locmode != <#= EformModeEnumClassName #>.AddMode) {
+                    if (locmode == <#= EformModeEnumClassName #>.DeleteMode) {
+                        locCaption = "Delete item for <#= Model.ViewName #>";
+                    } else {
+                        locCaption = "Update item for <#= Model.ViewName #>";
+                    }
 <#
             foreach(ModelViewPropertyOfVwSerializable pk in primKeys) {
 #>
-                <#= GetPropertyTypeName(pk) #> <#= GetPrimKeyVarName(pk) #> = default(<#= GetPropertyTypeName(pk) #>);
-                if(prms.ContainsKey("<#= GetPrimKeyVarName(pk) #>")) {
-                    <#= GetPrimKeyVarName(pk) #> = prms.GetValue<<#= GetPropertyTypeName(pk) #>>("<#= GetPrimKeyVarName(pk) #>");
-                }
+                    <#= GetPropertyTypeName(pk) #> <#= GetPrimKeyVarName(pk) #> = default(<#= GetPropertyTypeName(pk) #>);
+                    if(prms.ContainsKey("<#= GetPrimKeyVarName(pk) #>")) {
+                        <#= GetPrimKeyVarName(pk) #> = prms.GetValue<<#= GetPropertyTypeName(pk) #>>("<#= GetPrimKeyVarName(pk) #>");
+                    }
 <#
             }
 #>
-                Task<<#= GetInterfaceName(Model) #>> data = <#= FormServicePrefix #><#= Model.ViewName #>.<#= GetOneMethodName #>(
+                    Task<<#= GetInterfaceName(Model) #>> data = <#= FormServicePrefix #><#= Model.ViewName #>.<#= GetOneMethodName #>(
 <#
             {
                 bool isFirst= true;
                 foreach(ModelViewPropertyOfVwSerializable pk in primKeys) {
                     if (isFirst) {
 #>
-                        <#= GetPrimKeyVarName(pk) #>
+                            <#= GetPrimKeyVarName(pk) #>
 <#
                     } else {
 #>
-                      , <#= GetPrimKeyVarName(pk) #>
+                          , <#= GetPrimKeyVarName(pk) #>
 <#
                     }
                 }
             }
 #>
-                    );
-                data.Wait();
-                if(data.Result != null) {
-                    <#= FormControlModelPropertyName #> = <#= FormServicePrefix #><#= Model.ViewName #>.<#= CopyToModelNotifyMethodName #>(data.Result, null);
+                        );
+
+                    data.Await(
+                        () => {
+                            <#= UIDispatcherInvokePropertyName #>(() =>
+                            {
+                                <#= CaptionPropertyName #> = locCaption;
+                                <#= EformModePropertyName #> = locmode;
+                                if (resetHF) { <#= HiddenFiltersPropertyName #> = hf; }
+                                <#= FormControlModelPropertyName #> = <#= FormServicePrefix #><#= Model.ViewName #>.<#= CopyToModelNotifyMethodName #>(data.Result, null);
+                            });
+                        },
+                        (e) => { }
+                     );
+                } else {
+                    <#= EformModePropertyName #> = <#= EformModeEnumClassName #>.AddMode;
+                    <#= CaptionPropertyName #> = "Add item for <#= Model.ViewName #>";
+                    <#= FormControlModelPropertyName #> = <#= FormServicePrefix #><#= Model.ViewName #>.<#= CopyToModelNotifyMethodName #>(null,null);
+                    if (resetHF) { <#= HiddenFiltersPropertyName #> = hf; }
                 }
             } else {
-                if (<#= EformModePropertyName #> != <#= EformModeEnumClassName #>.DeleteMode) {
-                    <#= CaptionPropertyName #> = "Delete item for <#= Model.ViewName #>";
-                } else {
-                    <#= CaptionPropertyName #> = "Update item for <#= Model.ViewName #>";
-                }
-                <#= FormControlModelPropertyName #> = <#= FormServicePrefix #><#= Model.ViewName #>.<#= CopyToModelNotifyMethodName #>(null,null);
+                if (resetHF) { <#= HiddenFiltersPropertyName #> = hf; }
             }
         }
         #endregion
