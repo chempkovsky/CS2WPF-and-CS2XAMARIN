@@ -505,7 +505,6 @@ namespace <#= EformViewModelNameSpace #> {
 <#   
                     if (HasOnValChangedMethod(Context, Model, modelViewUIFormPropertySerializable)) {
 #>
-                    
                         Task.Run( async () => { <#=  GetExpressionForOnValChangedMethod(modelViewUIFormPropertySerializable, Model) #>(value, true); });
 <#    
                     }
@@ -553,7 +552,7 @@ namespace <#= EformViewModelNameSpace #> {
             set { if(_<#=  GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #> != value) { 
                     _<#=  GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #> = value; 
                     OnPropertyChanged(); 
-                    if (!<#= IsLoadingPropertyName #>)
+                    if (!<#= IsLoadingPropertyName #>) {
                         ValidateObjectField(value);
 <#    
                     if (HasOnValChangedMethod(Context, Model, modelViewUIFormPropertySerializable)) {
