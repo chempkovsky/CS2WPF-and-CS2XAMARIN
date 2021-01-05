@@ -68,6 +68,7 @@ using Prism.Regions;
     string LformUserControlFolder           = "01596-LformUserControl.xaml.cs";
     string LformUserControlClassName        = GetModelClassName(Model, LformUserControlFolder);
     string LformUserControlNameSpace        = GetModelNameSpace(Model, LformUserControlFolder);
+    string LformUserControlProject          = GetModelProjectName(Model, LformUserControlFolder);
 
     string LformViewModelFolder             = "01600-LformViewModel.cs";
     string LformViewModelClassName          = GetModelClassName(Model, LformViewModelFolder);
@@ -78,21 +79,26 @@ using Prism.Regions;
     string RdlistUserControlFolder          = "02016-RdlistUserControl.xaml.cs";
     string RdlistUserControlClassName       = GetModelClassName(Model, RdlistUserControlFolder);
     string RdlistUserControlNameSpace       = GetModelNameSpace(Model, RdlistUserControlFolder);
+    string RdlistUserControlProject         = GetModelProjectName(Model, RdlistUserControlFolder);
 
     string RdlistViewModelFolder            = "02020-RdlistViewModel.cs";
     string RdlistViewModelClassName         = GetModelClassName(Model, RdlistViewModelFolder);
     string RdlistViewModelNameSpace         = GetModelNameSpace(Model, RdlistViewModelFolder);
+    string RdlistViewModelProject           = GetModelProjectName(Model, RdlistViewModelFolder);
 
 
     string HiddenFiltersPropertyName            = "HiddenFilters";
+    string HiddenFiltersVMPropertyName          = "HiddenFiltersVM";
     string OnHiddenFiltersChangedPropertyName   = "OnHiddenFiltersChanged";
     string HiddenFiltersPropertyChangedPropertyName = "HiddenFiltersPropertyChanged";
 
     string TableMenuItemsPropertyName = "TableMenuItems";
+    string TableMenuItemsVMPropertyName = "TableMenuItemsVM";
     string OnTableMenuItemsChangedPropertyName   = "OnTableMenuItemsChanged";
     string TableMenuItemsPropertyChangedPropertyName = "TableMenuItemsPropertyChanged";
 
     string RowMenuItemsPropertyName = "RowMenuItems";
+    string RowMenuItemsVMPropertyName = "RowMenuItemsVM";
     string OnRowMenuItemsChangedPropertyName   = "OnRowMenuItemsChanged";
     string RowMenuItemsPropertyChangedPropertyName = "RowMenuItemsPropertyChanged";
 
@@ -101,6 +107,7 @@ using Prism.Regions;
     string RoutedEventHandlersPropertyName = "RoutedEventHandlers";
     string RoutedCommandHandlersPropertyName = "RoutedCommandHandlers";
     string RegionPropertyName = "Region";
+    string RdlistRegionPropertyName = "RdlistRegion";
 
     string DisplayLabelProperty     = "Name";
     string DisplayHintProperty      = "Prompt";
@@ -111,14 +118,17 @@ using Prism.Regions;
     string ColumnSelectorDlgPropertyName        = "ColumnSelectorDlg";
 
     string CanAddPropertyName                   = "CanAdd";
+    string CanAddVMPropertyName                 = "CanAddVM";
     string CanAddPropertyChangedPropertyName    = "CanAddPropertyChanged";
     string OnCanAddPropertyChangedPropertyName  = "OnCanAddPropertyChanged";
 
     string CanUpdPropertyName                   = "CanUpdate";
+    string CanUpdVMPropertyName                 = "CanUpdateVM";
     string CanUpdPropertyChangedPropertyName    = "CanUpdatePropertyChanged";
     string OnCanUpdPropertyChangedPropertyName  = "OnCanUpdatePropertyChanged";
 
     string CanDelPropertyName                   = "CanDelete";
+    string CanDelVMPropertyName                 = "CanDeleteVM";
     string CanDelPropertyChangedPropertyName    = "CanDeletePropertyChanged";
     string OnCanDelPropertyChangedPropertyName  = "OnCanDeletePropertyChanged";
 
@@ -140,7 +150,7 @@ using Prism.Regions;
     string SformLoadedCommandPropertyName       = "SformLoadedCommand";
 
 
-    string UIDispatcherInvokePropertyName   = "Application.Current.Dispatcher.Invoke";
+    string UIDispatcherInvokePropertyName       = "Application.Current.Dispatcher.Invoke";
     
 
     List<string> detailViews = GetDetailViews(Model, Context, null);
@@ -169,6 +179,7 @@ using Prism.Regions;
     if ((RdlistViewModelNameSpace != modelInterfaceNameSpace) && (nmSpaces.IndexOf(modelInterfaceNameSpace) < 0)) 
         nmSpaces.Add(modelInterfaceNameSpace);
 
+    bool IsInTheSameModule = (LformUserControlProject == RdlistUserControlProject) && false;
     
     
 #>
@@ -180,14 +191,42 @@ using <#= ns #>;
     }
 #>
 /*
-    In the file of IModule-class the following lines of code must be inserted:
 
+<#
+    if(!IsInTheSameModule) {
+#>
+    "<#= LformUserControlClassName #>"-UserControl is defined in the "<#= LformUserControlProject #>"-project.
+    In the file of IModule-class of "<#= LformUserControlProject #>"-project the following line of code must be inserted:
+
+        public void OnInitialized(IContainerProvider containerProvider)
+        {
+            ...
+            IRegionManager regionManager = containerProvider.Resolve(typeof(IRegionManager)) as IRegionManager;
+            if (regionManager != null)
+            {
+                ...
+                // According to requirements of the "<#= RdlistViewModelClassName #>.cs"-file of "<#= RdlistViewModelProject #>"-project. 
+                regionManager.RegisterViewWithRegion("<#= LformUserControlClassName #><#= RdlistRegionPropertyName #>", typeof(<#= LformUserControlClassName #>));
+                ...
+            }
+            ...
+        }
+<#       
+    }
+#>
+
+    "<#= RdlistUserControlClassName #>" UserControl is defined in the "<#= RdlistUserControlProject #>"-project.
+    In the file of IModule-class of "<#= RdlistUserControlProject #>"-project the following line of code must be inserted:
 
         public void RegisterTypes(IContainerRegistry containerRegistry)
         {
             ...
+            // According to requirements of the "<#= RdlistViewModelClassName #>.cs"-file of "<#= RdlistViewModelProject #>"-project. 
             ViewModelLocationProvider.Register<<#= RdlistUserControlClassName #>, <#= RdlistViewModelClassName #>>();
+            // According to requirements of the "<#= RdlistViewModelClassName #>.cs"-file of "<#= RdlistViewModelProject #>"-project. 
             containerRegistry.RegisterForNavigation<<#= RdlistUserControlClassName #>, <#= RdlistViewModelClassName #>>("<#= RdlistUserControlClassName #><#= ForRdSuffixPropertyName #>");
+            // According to requirements of the "<#= RdlistViewModelClassName #>.cs"-file of "<#= RdlistViewModelProject #>"-project. 
+            containerRegistry.Register<UserControl, <#= RdlistUserControlClassName #>>("<#= RdlistUserControlClassName #>");
             ...
         }
 */
@@ -209,6 +248,11 @@ namespace <#= RdlistViewModelNameSpace #> {
                 continue;
             }
             string detailViewClassName = GetModelClassName(detailView, RdlistUserControlFolder);
+            if (string.IsNullOrEmpty(detailViewClassName)) {
+#>
+///// Error: <#= RdlistUserControlFolder #>-script has not been generated for <#= detailView.ViewName #>
+<#
+            }
             List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detailView, null);
             if (foreignKeys == null) continue;
             if (foreignKeys.Count < 1) continue;
@@ -279,7 +323,7 @@ namespace <#= RdlistViewModelNameSpace #> {
 
             _<#= RoutedCommandHandlersPropertyName #> = cbsc;
 
-            _<#= RowMenuItemsPropertyName #> = GetDefault<#= RowMenuItemsPropertyName #>();
+            _<#= RowMenuItemsVMPropertyName #> = GetDefault<#= RowMenuItemsVMPropertyName #>();
         }
         #region INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;
@@ -375,31 +419,31 @@ namespace <#= RdlistViewModelNameSpace #> {
         { 
             get
             {
-                return <#= CanAddPropertyName #> && ((PermissionMask & 8) == 8);
+                return <#= CanAddVMPropertyName #> && ((PermissionMask & 8) == 8);
             }
         }
         #endregion
-        #region <#= CanAddPropertyName #>
+        #region <#= CanAddVMPropertyName #>
         protected void <#= OnCanAddPropertyChangedPropertyName #>(object sender, RoutedPropertyChangedEventArgs<bool> evarg) {
             bool newVal = false;
             if(evarg != null) {
                 evarg.Handled = true;
                 newVal = evarg.NewValue;
             }
-            <#= CanAddPropertyName #> = newVal;
+            <#= CanAddVMPropertyName #> = newVal;
         }
-        protected bool _<#= CanAddPropertyName #> = false;
-        public bool <#= CanAddPropertyName #>
+        protected bool _<#= CanAddVMPropertyName #> = false;
+        public bool <#= CanAddVMPropertyName #>
         { 
             get
             {
-                return _<#= CanAddPropertyName #>;
+                return _<#= CanAddVMPropertyName #>;
             }
             set
             {
-                if (_<#= CanAddPropertyName #> != value)
+                if (_<#= CanAddVMPropertyName #> != value)
                 {
-                    _<#= CanAddPropertyName #> = value;
+                    _<#= CanAddVMPropertyName #> = value;
                     OnPropertyChanged();
                     OnPropertyChanged("<#= CanAddInternalPropertyName #>");
                 }
@@ -411,31 +455,31 @@ namespace <#= RdlistViewModelNameSpace #> {
         { 
             get
             {
-                return <#= CanUpdPropertyName #> && ((PermissionMask & 4) == 4);
+                return <#= CanUpdVMPropertyName #> && ((PermissionMask & 4) == 4);
             }
         }
         #endregion
-        #region <#= CanUpdPropertyName #>
+        #region <#= CanUpdVMPropertyName #>
         protected void <#= OnCanUpdPropertyChangedPropertyName #>(object sender, RoutedPropertyChangedEventArgs<bool> evarg) {
             bool newVal = false;
             if(evarg != null) {
                 evarg.Handled = true;
                 newVal = evarg.NewValue;
             }
-            <#= CanUpdPropertyName #> = newVal;
+            <#= CanUpdVMPropertyName #> = newVal;
         }
-        protected bool _<#= CanUpdPropertyName #> = false;
-        public bool <#= CanUpdPropertyName #>
+        protected bool _<#= CanUpdVMPropertyName #> = false;
+        public bool <#= CanUpdVMPropertyName #>
         { 
             get
             {
-                return _<#= CanUpdPropertyName #>;
+                return _<#= CanUpdVMPropertyName #>;
             }
             set
             {
-                if (_<#= CanUpdPropertyName #> != value)
+                if (_<#= CanUpdVMPropertyName #> != value)
                 {
-                    _<#= CanUpdPropertyName #> = value;
+                    _<#= CanUpdVMPropertyName #> = value;
                     OnPropertyChanged();
                     OnPropertyChanged("<#= CanUpdInternalPropertyName #>");
                 }
@@ -447,39 +491,39 @@ namespace <#= RdlistViewModelNameSpace #> {
         { 
             get
             {
-                return <#= CanDelPropertyName #> && ((PermissionMask & 2) == 2);
+                return <#= CanDelVMPropertyName #> && ((PermissionMask & 2) == 2);
             }
         }
         #endregion
-        #region <#= CanDelPropertyName #>
+        #region <#= CanDelVMPropertyName #>
         protected void <#= OnCanDelPropertyChangedPropertyName #>(object sender, RoutedPropertyChangedEventArgs<bool> evarg) {
             bool newVal = false;
             if(evarg != null) {
                 evarg.Handled = true;
                 newVal = evarg.NewValue;
             }
-            <#= CanDelPropertyName #> = newVal;
+            <#= CanDelVMPropertyName #> = newVal;
         }
-        protected bool _<#= CanDelPropertyName #> = false;
-        public bool <#= CanDelPropertyName #>
+        protected bool _<#= CanDelVMPropertyName #> = false;
+        public bool <#= CanDelVMPropertyName #>
         { 
             get
             {
-                return _<#= CanDelPropertyName #>;
+                return _<#= CanDelVMPropertyName #>;
             }
             set
             {
-                if (_<#= CanDelPropertyName #> != value)
+                if (_<#= CanDelVMPropertyName #> != value)
                 {
-                    _<#= CanDelPropertyName #> = value;
+                    _<#= CanDelVMPropertyName #> = value;
                     OnPropertyChanged();
                     OnPropertyChanged("<#= CanDelInternalPropertyName #>");
                 }
             }
         }
         #endregion
-        #region <#= RowMenuItemsPropertyName #>
-        protected ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>> GetDefault<#= RowMenuItemsPropertyName #>() {
+        #region <#= RowMenuItemsVMPropertyName #>
+        protected ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>> GetDefault<#= RowMenuItemsVMPropertyName #>() {
             return new ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>>()  {
 <#
         foreach(string detailViewName in detailViews) {
@@ -504,7 +548,7 @@ namespace <#= RdlistViewModelNameSpace #> {
             };
         }
         protected void <#= OnRowMenuItemsChangedPropertyName #>(object sender, RoutedPropertyChangedEventArgs<IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>> evarg) {
-            ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>> tmis = GetDefault<#= RowMenuItemsPropertyName #>();
+            ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>> tmis = GetDefault<#= RowMenuItemsVMPropertyName #>();
             IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> intmis = null;
             if(evarg != null) {
                 evarg.Handled = true;
@@ -515,38 +559,38 @@ namespace <#= RdlistViewModelNameSpace #> {
                     tmis.Add( new <#= WebServiceFilterMenuViewModelClassName #>() {Id = tmi.Id, Caption=tmi.Caption,  IconName=tmi.IconName, IconColor=tmi.IconColor, Enabled=tmi.Enabled, Data=tmi.Data, Command=tmi.Command });
                 }
             }
-            <#= RowMenuItemsPropertyName #> = tmis;
+            <#= RowMenuItemsVMPropertyName #> = tmis;
         }
-        protected IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> _<#= RowMenuItemsPropertyName #> = null;
-        public IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> <#= RowMenuItemsPropertyName #>
+        protected IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> _<#= RowMenuItemsVMPropertyName #> = null;
+        public IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> <#= RowMenuItemsVMPropertyName #>
         { 
             get
             {
-                return _<#= RowMenuItemsPropertyName #>;
+                return _<#= RowMenuItemsVMPropertyName #>;
             }
             set
             {
-                if (_<#= RowMenuItemsPropertyName #> != value)
+                if (_<#= RowMenuItemsVMPropertyName #> != value)
                 {
-                    _<#= RowMenuItemsPropertyName #> = value;
+                    _<#= RowMenuItemsVMPropertyName #> = value;
                     OnPropertyChanged();
                 }
             }
         }
         #endregion
-        #region <#= HiddenFiltersPropertyName #>
-        IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>> _<#= HiddenFiltersPropertyName #> = new ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>();
-        public IEnumerable<IWebServiceFilterRsltInterface> <#= HiddenFiltersPropertyName #>
+        #region <#= HiddenFiltersVMPropertyName #>
+        IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>> _<#= HiddenFiltersVMPropertyName #> = new ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>();
+        public IEnumerable<IWebServiceFilterRsltInterface> <#= HiddenFiltersVMPropertyName #>
         {
             get
             {
-                return _<#= HiddenFiltersPropertyName #>;
+                return _<#= HiddenFiltersVMPropertyName #>;
             }
             set
             {
-                if (_<#= HiddenFiltersPropertyName #> != value)
+                if (_<#= HiddenFiltersVMPropertyName #> != value)
                 {
-                    _<#= HiddenFiltersPropertyName #> = value;
+                    _<#= HiddenFiltersVMPropertyName #> = value;
                     OnPropertyChanged();
                     OnPropertyChanged("<#= ShowBackBtnPropertyName #>");
                 }
@@ -639,7 +683,7 @@ namespace <#= RdlistViewModelNameSpace #> {
 <#
             }
 #>          
-            ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>> chf = <#= HiddenFiltersPropertyName #> as ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>;
+            ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>> chf = <#= HiddenFiltersVMPropertyName #> as ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>;
             bool resetHF = chf.Count != hf.Count;
             if ((!resetHF) && (hf.Count > 0)) {
                 foreach(<#= IWebServiceFilterRsltInterfaceClassName #> citm in chf) {
@@ -657,7 +701,7 @@ namespace <#= RdlistViewModelNameSpace #> {
                 }
             } 
 
-            if (resetHF) { <#= HiddenFiltersPropertyName #> = hf; }
+            if (resetHF) { <#= HiddenFiltersVMPropertyName #> = hf; }
         }
         #endregion
 
@@ -1408,6 +1452,27 @@ namespace <#= RdlistViewModelNameSpace #> {
             }
         }
         return result;
+    }
+    string GetModelProjectName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileProject)) {
+            return result;
+        }
+        string[] fnArr = refItem.FileProject.Split(new char[] {'\\'}, 100, System.StringSplitOptions.None); 
+        string fn = fnArr[fnArr.Length - 1];
+
+        return fn.Replace(".csproj","");
     }
 
 #>

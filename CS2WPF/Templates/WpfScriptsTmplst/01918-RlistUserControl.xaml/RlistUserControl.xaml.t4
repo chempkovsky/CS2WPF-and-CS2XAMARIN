@@ -27,6 +27,7 @@
     string SformUserControlFolder           = "01420-SformUserControl.xaml.cs";
     string SformUserControlClassName        = GetModelClassName(Model, SformUserControlFolder);
     string SformUserControlNameSpace        = GetModelNameSpace(Model, SformUserControlFolder);
+    string SformUserControlProject          = GetModelProjectName(Model, SformUserControlFolder);
     
 
     string RlistUserControlFolder           = "01916-RlistUserControl.xaml.cs";
@@ -47,9 +48,12 @@
     string ShowBackBtnPropertyName = "ShowBackBtn";
     string GridHeightPropertyName = "GridHeight";
     string TableMenuItemsPropertyName = "TableMenuItems";
+    string TableMenuItemsVMPropertyName = "TableMenuItemsVM";
     string RowMenuItemsPropertyName = "RowMenuItems";
+    string RowMenuItemsVMPropertyName = "RowMenuItemsVM";
     string ContainerMenuItemsPropertyName = "ContainerMenuItems";
     string HiddenFiltersPropertyName = "HiddenFilters";
+    string HiddenFiltersVMPropertyName = "HiddenFiltersVM";
 
 
 
@@ -61,6 +65,7 @@
 
 
     string RegionPropertyName = "Region";
+    string RlistRegionPropertyName = "RlistRegion";
 
 
     string proxyPrefix = "clr-namespace:" + ProxyUserControlNameSpace;
@@ -71,6 +76,12 @@
     if(AttachedPropertiesExtProject != RlistUserControlXamlProject) {
         attachedPrefix = attachedPrefix + ";assembly=" + AttachedPropertiesExtProject;
     }
+    string sformPrefix = "clr-namespace:" + SformUserControlNameSpace;
+    if(SformUserControlProject != RlistUserControlXamlProject) {
+        sformPrefix = sformPrefix + ";assembly=" + SformUserControlProject;
+    }
+
+    bool IsInTheSameModule = (SformUserControlProject == RlistUserControlProject) && false;
 
 #>
 
@@ -83,7 +94,18 @@
              xmlns:prism="http://prismlibrary.com/" 
              prism:ViewModelLocator.AutoWireViewModel="True"                          
 
+
+<#
+    if(IsInTheSameModule) {
+#>
+             xmlns:sfrm="<#= sformPrefix #>" 
+<#
+    } else {
+#>
              xmlns:prx="<#= proxyPrefix #>" 
+<#
+    }
+#>
 
              xmlns:atch="<#= attachedPrefix #>" 
              atch:<#= AttachedPropertiesExtClassName #>.<#= RegisterRoutedCommandBindingsPropertyName #>="{Binding <#= RoutedCommandHandlersPropertyName #>}"
@@ -93,9 +115,18 @@
 
              mc:Ignorable="d" 
              d:DesignHeight="150" d:DesignWidth="400" >
+<#
+    if(IsInTheSameModule) {
+#>
+        <sfrm:<#= SformUserControlClassName #>  
+<#
+    } else {
+#>
         <prx:<#= ProxyUserControlClassName #> 
-
-            prism:RegionManager.RegionName="<#= SformUserControlClassName #><#= RegionPropertyName #>"
+            prism:RegionManager.RegionName="<#= SformUserControlClassName #><#= RlistRegionPropertyName #>"
+<#
+    }
+#>
 
             <#= CaptionPropertyName #>="{Binding <#= CaptionPropertyName #>, Mode=OneWay}" 
             <#= FilterHeightPropertyName #>="{Binding <#= FilterHeightPropertyName #>, Mode=OneWay, ElementName=RlistUsrCntrlRootNode}" 
@@ -104,9 +135,9 @@
             <#= GridHeightPropertyName #>="{Binding <#= GridHeightPropertyName #>, Mode=OneWay, ElementName=RlistUsrCntrlRootNode}" 
             <#= ShowBackBtnPropertyName #>="{Binding <#= ShowBackBtnPropertyName #>, Mode=OneWay}" 
 
-            <#= HiddenFiltersPropertyName #>="{Binding <#= HiddenFiltersPropertyName #>, Mode=OneWay}" 
-            <#= TableMenuItemsPropertyName #>="{Binding <#= TableMenuItemsPropertyName #>, Mode=OneWay}" 
-            <#= RowMenuItemsPropertyName #>="{Binding <#= RowMenuItemsPropertyName #>, Mode=OneWay}" 
+            <#= HiddenFiltersPropertyName #>="{Binding <#= HiddenFiltersVMPropertyName #>, Mode=OneWay}" 
+            <#= TableMenuItemsPropertyName #>="{Binding <#= TableMenuItemsVMPropertyName #>, Mode=OneWay}" 
+            <#= RowMenuItemsPropertyName #>="{Binding <#= RowMenuItemsVMPropertyName #>, Mode=OneWay}" 
             />
 </UserControl>
 

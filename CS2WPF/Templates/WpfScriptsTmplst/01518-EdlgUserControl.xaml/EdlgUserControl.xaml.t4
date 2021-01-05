@@ -28,6 +28,7 @@
     string EformUserControlFolder           = "01496-EformUserControl.xaml.cs";
     string EformUserControlClassName        = GetModelClassName(Model, EformUserControlFolder);
     string EformUserControlNameSpace        = GetModelNameSpace(Model, EformUserControlFolder);
+    string EformUserControlProject          = GetModelProjectName(Model, EformUserControlFolder);
 
     string EdlgUserControlFolder           = "01516-EdlgUserControl.xaml.cs";
     string EdlgUserControlClassName        = GetModelClassName(Model, EdlgUserControlFolder);
@@ -51,6 +52,7 @@
     string RoutedCommandHandlersPropertyName    = "RoutedCommandHandlers";
 
     string RegionPropertyName = "Region";
+    string DialogRegionPropertyName = "DialogRegion";
 
     string proxyPrefix = "clr-namespace:" + ProxyUserControlNameSpace;
     if(ProxyUserControlProject != EdlgUserControlXamlProject) {
@@ -60,6 +62,12 @@
     if(AttachedPropertiesExtProject != EdlgUserControlXamlProject) {
         attachedPrefix = attachedPrefix + ";assembly=" + AttachedPropertiesExtProject;
     }
+    string eformPrefix = "clr-namespace:" + EformUserControlNameSpace;
+    if(EformUserControlProject != EdlgUserControlXamlProject) {
+        eformPrefix = eformPrefix + ";assembly=" + EformUserControlProject;
+    }
+
+    bool IsInTheSameModule = (EformUserControlProject == EdlgUserControlProject) && false;
 
 #>
 
@@ -72,7 +80,19 @@
              xmlns:prism="http://prismlibrary.com/" 
              prism:ViewModelLocator.AutoWireViewModel="True"                          
 
+
+<#
+    if(IsInTheSameModule) {
+#>
+             xmlns:efrm="<#= eformPrefix #>" 
+<#
+    } else {
+#>
              xmlns:prx="<#= proxyPrefix #>" 
+<#
+    }
+#>
+
 
              xmlns:atch="<#= attachedPrefix #>" 
              atch:<#= AttachedPropertiesExtClassName #>.<#= RegisterRoutedCommandBindingsPropertyName #>="{Binding <#= RoutedCommandHandlersPropertyName #>}"
@@ -83,17 +103,27 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <prx:<#= ProxyUserControlClassName #> Grid.Row="0"
 
-            prism:RegionManager.RegionName="<#= EformUserControlClassName #><#= RegionPropertyName #>"
+<#
+    if(IsInTheSameModule) {
+#>
+        <efrm:<#= EformUserControlClassName #>  Grid.Row="0"
+<#
+    } else {
+#>
+        <prx:<#= ProxyUserControlClassName #> Grid.Row="0"
+            prism:RegionManager.RegionName="<#= EformUserControlClassName #><#= DialogRegionPropertyName #>"
+<#
+    }
+#>
 
             <#= CaptionPropertyName #>="{Binding <#= CaptionPropertyName #>}" 
             <#= HiddenFiltersPropertyName #>="{Binding <#= HiddenFiltersPropertyName #>}" 
             <#= ShowSubmitPropertyName #>="{Binding <#= ShowSubmitPropertyName #>}" 
             <#= FormControlModelPropertyName #>="{Binding <#= FormControlModelPropertyName #>}" 
             <#= EformModePropertyName #>="{Binding <#= EformModePropertyName #>}" 
-            >
-        </prx:<#= ProxyUserControlClassName #>>
+            />
+
     </Grid>
 </UserControl>
 

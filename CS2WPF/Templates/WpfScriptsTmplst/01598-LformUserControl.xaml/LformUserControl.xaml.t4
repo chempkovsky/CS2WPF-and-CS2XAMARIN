@@ -28,16 +28,17 @@
     string SformUserControlFolder           = "01420-SformUserControl.xaml.cs";
     string SformUserControlClassName        = GetModelClassName(Model, SformUserControlFolder);
     string SformUserControlNameSpace        = GetModelNameSpace(Model, SformUserControlFolder);
+    string SformUserControlProject          = GetModelProjectName(Model, SformUserControlFolder);
 
     string SdlgUserControlFolder           = "01436-SdlgUserControl.xaml.cs";
     string SdlgUserControlClassName        = GetModelClassName(Model, SdlgUserControlFolder);
     string SdlgUserControlNameSpace        = GetModelNameSpace(Model, SdlgUserControlFolder);
     string SdlgUserControlProject          = GetModelProjectName(Model, SdlgUserControlFolder);
 
-    string LformUserControlFolder                   = "01596-LformUserControl.xaml.cs";
-    string LformUserControlClassName                = GetModelClassName(Model, LformUserControlFolder);
-    string LformUserControlNameSpace                = GetModelNameSpace(Model, LformUserControlFolder);
-
+    string LformUserControlFolder          = "01596-LformUserControl.xaml.cs";
+    string LformUserControlClassName       = GetModelClassName(Model, LformUserControlFolder);
+    string LformUserControlNameSpace       = GetModelNameSpace(Model, LformUserControlFolder);
+    string LformUserControlProject         = GetModelProjectName(Model, LformUserControlFolder);
 
     
     string LformUserControlXamlFolder      = "01598-LformUserControl.xaml";
@@ -55,13 +56,19 @@
     string ShowAddFilterBtnPropertyName = "ShowAddFilterBtn";
     string GridHeightPropertyName = "GridHeight";
     string TableMenuItemsPropertyName = "TableMenuItems";
+    string TableMenuItemsVMPropertyName = "TableMenuItemsVM";
     string RowMenuItemsPropertyName = "RowMenuItems";
+    string RowMenuItemsVMPropertyName = "RowMenuItemsVM";
     string ContainerMenuItemsPropertyName = "ContainerMenuItems";
 
-    string HiddenFiltersPropertyName = "HiddenFilters";
+    string HiddenFiltersPropertyName            = "HiddenFilters";
+    string HiddenFiltersVMPropertyName          = "HiddenFiltersVM";
     string CanAddPropertyName                   = "CanAdd";
     string CanUpdPropertyName                   = "CanUpdate";
     string CanDelPropertyName                   = "CanDelete";
+    string CanAddVMPropertyName                 = "CanAddVM";
+    string CanUpdVMPropertyName                 = "CanUpdateVM";
+    string CanDelVMPropertyName                 = "CanDeleteVM";
 
 
     string RegisterRoutedCommandBindingsPropertyName = "RegisterRoutedCommandBindings";
@@ -70,6 +77,8 @@
     string RoutedCommandHandlersPropertyName = "RoutedCommandHandlers";
 
     string RegionPropertyName = "Region";
+    string LformRegionPropertyName = "LformRegion";
+    string ProxyPropertyName = "Proxy";
 
 
     string proxyPrefix = "clr-namespace:" + ProxyUserControlNameSpace;
@@ -80,6 +89,12 @@
     if(AttachedPropertiesExtProject != LformUserControlXamlProject) {
         attachedPrefix = attachedPrefix + ";assembly=" + AttachedPropertiesExtProject;
     }
+    string sformPrefix = "clr-namespace:" + SformUserControlNameSpace;
+    if(SformUserControlProject != LformUserControlXamlProject) {
+        sformPrefix = sformPrefix + ";assembly=" + SformUserControlProject;
+    }
+
+    bool IsInTheSameModule = (SformUserControlProject == LformUserControlProject) && false;
 
 #>
 
@@ -92,9 +107,20 @@
              xmlns:prism="http://prismlibrary.com/" 
              prism:ViewModelLocator.AutoWireViewModel="True"                          
 
+<#
+    if(IsInTheSameModule) {
+#>
+             xmlns:sfrm="<#= sformPrefix #>" 
+<#
+    } else {
+#>
+             xmlns:prx="<#= proxyPrefix #>" 
+<#
+    }
+#>
+
              x:Name="LformUsrCntrlRootNode"
 
-             xmlns:prx="<#= proxyPrefix #>" 
              xmlns:atch="<#= attachedPrefix #>" 
              atch:<#= AttachedPropertiesExtClassName #>.<#= RegisterRoutedCommandBindingsPropertyName #>="{Binding <#= RoutedCommandHandlersPropertyName #>}"
              atch:<#= AttachedPropertiesExtClassName #>.<#= RegisterRoutedEventBindingsPropertyName #>="{Binding <#= RoutedEventHandlersPropertyName #>}"
@@ -105,9 +131,20 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <prx:<#= ProxyUserControlClassName #> Grid.Row="0"
 
-            prism:RegionManager.RegionName="<#= SformUserControlClassName #><#= RegionPropertyName #>"
+<#
+    if(IsInTheSameModule) {
+#>
+        <sfrm:<#= SformUserControlClassName #>  Grid.Row="0"
+<#
+    } else {
+#>
+        <prx:<#= ProxyUserControlClassName #> Grid.Row="0" 
+            x:Name="<#= SformUserControlClassName #><#= ProxyPropertyName #>"
+            prism:RegionManager.RegionName="<#= SformUserControlClassName #><#= LformRegionPropertyName #>"
+<#
+    }
+#>
 
             <#= CaptionPropertyName #>="{Binding <#= CaptionPropertyName #>, Mode=OneWay, ElementName=LformUsrCntrlRootNode}" 
             <#= ShowBackBtnPropertyName #>="{Binding <#= ShowBackBtnPropertyName #>, Mode=OneWay, ElementName=LformUsrCntrlRootNode}" 
@@ -117,15 +154,14 @@
             <#= GridHeightPropertyName #>="{Binding <#= GridHeightPropertyName #>, Mode=OneWay, ElementName=LformUsrCntrlRootNode}" 
             <#= ContainerMenuItemsPropertyName #>="{Binding <#= ContainerMenuItemsPropertyName #>, Mode=OneWay, ElementName=LformUsrCntrlRootNode}" 
 
-            <#= HiddenFiltersPropertyName #>="{Binding <#= HiddenFiltersPropertyName #>, Mode=OneWay}" 
-            <#= TableMenuItemsPropertyName #>="{Binding <#= TableMenuItemsPropertyName #>, Mode=OneWay}" 
-            <#= RowMenuItemsPropertyName #>="{Binding <#= RowMenuItemsPropertyName #>, Mode=OneWay}" 
+            <#= HiddenFiltersPropertyName #>="{Binding <#= HiddenFiltersVMPropertyName #>, Mode=OneWay}" 
+            <#= TableMenuItemsPropertyName #>="{Binding <#= TableMenuItemsVMPropertyName #>, Mode=OneWay}" 
+            <#= RowMenuItemsPropertyName #>="{Binding <#= RowMenuItemsVMPropertyName #>, Mode=OneWay}" 
 
-            <#= CanAddPropertyName #>="{Binding <#= CanAddPropertyName #>, Mode=OneWay}" 
-            <#= CanUpdPropertyName #>="{Binding <#= CanUpdPropertyName #>, Mode=OneWay}" 
-            <#= CanDelPropertyName #>="{Binding <#= CanDelPropertyName #>, Mode=OneWay}" 
-            >
-        </prx:<#= ProxyUserControlClassName #>>
+            <#= CanAddPropertyName #>="{Binding <#= CanAddVMPropertyName #>, Mode=OneWay}" 
+            <#= CanUpdPropertyName #>="{Binding <#= CanUpdVMPropertyName #>, Mode=OneWay}" 
+            <#= CanDelPropertyName #>="{Binding <#= CanDelVMPropertyName #>, Mode=OneWay}" 
+            />
     </Grid>
 </UserControl>
 

@@ -106,26 +106,26 @@ using System.Windows.Controls;
     string SformUserControlFolder           = "01420-SformUserControl.xaml.cs";
     string SformUserControlClassName        = GetModelClassName(Model, SformUserControlFolder);
     string SformUserControlNameSpace        = GetModelNameSpace(Model, SformUserControlFolder);
-
+    string SformUserControlProject          = GetModelProjectName(Model, SformUserControlFolder);
 
     string SformViewModelFolder      = "01422-SformViewModel.cs";
     string SformViewModelClassName   = GetModelClassName(Model, SformViewModelFolder);
     string SformViewModelNameSpace   = GetModelNameSpace(Model, SformViewModelFolder);
 
-    string CurrentFilterPropertyName            = "CurrentFilter";
-    string FilterDefinitionsPropertyName        = "FilterDefinitions";
+    string CurrentFilterPropertyName                    = "CurrentFilter";
+    string FilterDefinitionsPropertyName                = "FilterDefinitions";
 
-    string HiddenFiltersPropertyName            = "HiddenFilters";
-    string OnHiddenFiltersChangedPropertyName   = "OnHiddenFiltersChanged";
-    string HiddenFiltersPropertyChangedPropertyName = "HiddenFiltersPropertyChanged";
+    string HiddenFiltersVMPropertyName                  = "HiddenFiltersVM"; // correct:  to exclude HResult=0x800703E9 System.StackOverflowException
+    string OnHiddenFiltersChangedPropertyName           = "OnHiddenFiltersChanged";
+    string HiddenFiltersPropertyChangedPropertyName     = "HiddenFiltersPropertyChanged";
 
-    string TableMenuItemsPropertyName = "TableMenuItems";
-    string OnTableMenuItemsChangedPropertyName   = "OnTableMenuItemsChanged";
-    string TableMenuItemsPropertyChangedPropertyName = "TableMenuItemsPropertyChanged";
+    string TableMenuItemsVMPropertyName                 = "TableMenuItemsVM"; // correct:  to exclude HResult=0x800703E9 System.StackOverflowException
+    string OnTableMenuItemsChangedPropertyName          = "OnTableMenuItemsChanged";
+    string TableMenuItemsPropertyChangedPropertyName    = "TableMenuItemsPropertyChanged";
 
-    string RowMenuItemsPropertyName = "RowMenuItems";
-    string OnRowMenuItemsChangedPropertyName   = "OnRowMenuItemsChanged";
-    string RowMenuItemsPropertyChangedPropertyName = "RowMenuItemsPropertyChanged";
+    string RowMenuItemsPropertyName                     = "RowMenuItemsVM";   // correct:  to exclude HResult=0x800703E9 System.StackOverflowException
+    string OnRowMenuItemsChangedPropertyName            = "OnRowMenuItemsChanged";
+    string RowMenuItemsPropertyChangedPropertyName      = "RowMenuItemsPropertyChanged";
 
     string ApplyFilterCommandPropertyName = "ApplyFilterCommand";
 
@@ -213,32 +213,20 @@ using <#= ns #>;
     }
 #>
 /*
-    In the file of IModule-class the following lines of code must be inserted:
 
-
-        public void OnInitialized(IContainerProvider containerProvider)
-        {
-            ...
-            IRegionManager regionManager = containerProvider.Resolve(typeof(IRegionManager)) as IRegionManager;
-            if (regionManager != null)
-            {
-                ...
-                // to be used with "00280-ProxyUserControl.xaml.cs" the following line must be added:
-                regionManager.RegisterViewWithRegion("<#= SformUserControlClassName #><#= RegionPropertyName #>", typeof(<#= SformUserControlClassName #>));
-                ...
-            }
-            ...
-        }
-
+    "<#= SformUserControlClassName #>" UserControl is defined in the "<#= SformUserControlProject #>"-project.
+    In the file of IModule-class of "<#= SformUserControlProject #>"-project the following line of code must be inserted:
 
         public void RegisterTypes(IContainerRegistry containerRegistry)
         {
             ...
+            // According to requirements of the "<#= SformViewModelClassName #>.cs"-file of "<#= SformUserControlProject #>"-project. 
             ViewModelLocationProvider.Register<<#= SformUserControlClassName #>, <#= SformViewModelClassName #>>();
-            // to be used with "00632-ScopedRegionUserControl.xaml.cs" insert additional line of declaration:
-            containerRegistry.RegisterForNavigation<<#= SformUserControlClassName #>, <#= SformViewModelClassName #>>("<#= SformUserControlClassName #><#= RegionPropertyName #>");
+            // According to requirements of the "<#= SformViewModelClassName #>.cs"-file of "<#= SformUserControlProject #>"-project. 
+            containerRegistry.Register<UserControl, <#= SformUserControlClassName #>>("<#= SformUserControlClassName #>");
             ...
         }
+
 */
 
 namespace <#= SformViewModelNameSpace #> {
@@ -294,7 +282,7 @@ namespace <#= SformViewModelNameSpace #> {
             cbsc.Add(cb);
 
             _<#= RoutedCommandHandlersPropertyName #> = cbsc;
-            _<#= TableMenuItemsPropertyName #> = GetDefault<#= TableMenuItemsPropertyName #>();
+            _<#= TableMenuItemsVMPropertyName #> = GetDefault<#= TableMenuItemsVMPropertyName #>();
         }
         #region INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;
@@ -512,15 +500,15 @@ namespace <#= SformViewModelNameSpace #> {
         }
         #endregion
 
-        #region <#= TableMenuItemsPropertyName #>
-        protected ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>> GetDefault<#= TableMenuItemsPropertyName #>() {
+        #region <#= TableMenuItemsVMPropertyName #>
+        protected ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>> GetDefault<#= TableMenuItemsVMPropertyName #>() {
             return new ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>>()  {
                 new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "TableRefreshMI", Caption="Refresh table", IconName="TableRefresh", IconColor="Primary", Enabled=true, Data=null, Command=<#= RoutedCommandExtClassName #>.<#= RefreshSformCommandPropertyName #>},
                 new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "TableSettingsMI", Caption="Table columns", IconName="TableCog", IconColor="Primary", Enabled=true, Data=null, Command=<#= RoutedCommandExtClassName #>.<#= SelectColumnsCommandPropertyName #>},
             };
         }
         protected void <#= OnTableMenuItemsChangedPropertyName #>(object sender, RoutedPropertyChangedEventArgs<IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>> evarg) {
-            ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>> tmis = GetDefault<#= TableMenuItemsPropertyName #>();
+            ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>> tmis = GetDefault<#= TableMenuItemsVMPropertyName #>();
             IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> intmis = null;
             if(evarg != null) {
                 evarg.Handled = true;
@@ -531,27 +519,27 @@ namespace <#= SformViewModelNameSpace #> {
                     tmis.Add( new <#= WebServiceFilterMenuViewModelClassName #>() {Id = tmi.Id, Caption=tmi.Caption,  IconName=tmi.IconName, IconColor=tmi.IconColor, Enabled=tmi.Enabled, Data=tmi.Data, Command=tmi.Command });
                 }
             }
-            <#= TableMenuItemsPropertyName #> = tmis;
+            <#= TableMenuItemsVMPropertyName #> = tmis;
         }
-        protected IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> _<#= TableMenuItemsPropertyName #> = null;
-        public IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> <#= TableMenuItemsPropertyName #>
+        protected IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> _<#= TableMenuItemsVMPropertyName #> = null;
+        public IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> <#= TableMenuItemsVMPropertyName #>
         { 
             get
             {
-                return _<#= TableMenuItemsPropertyName #>;
+                return _<#= TableMenuItemsVMPropertyName #>;
             }
             set
             {
-                if (_<#= TableMenuItemsPropertyName #> != value)
+                if (_<#= TableMenuItemsVMPropertyName #> != value)
                 {
-                    _<#= TableMenuItemsPropertyName #> = value;
+                    _<#= TableMenuItemsVMPropertyName #> = value;
                     OnPropertyChanged();
                 }
             }
         }
         #endregion
 
-        #region <#= HiddenFiltersPropertyName #>
+        #region <#= HiddenFiltersVMPropertyName #>
         protected async void <#= OnHiddenFiltersChangedPropertyName #>(object sender, RoutedPropertyChangedEventArgs<IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>> evarg)
         {
             IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>> hfs = null;
@@ -565,7 +553,7 @@ namespace <#= SformViewModelNameSpace #> {
                     newhfs.Add( new <#= WebServiceFilterRsltViewModelClassName #>() {fltrName=hf.fltrName, fltrDataType=hf.fltrDataType,  fltrOperator=hf.fltrOperator, fltrValue=hf.fltrValue, fltrError=hf.fltrError });
                 }
             }
-            <#= HiddenFiltersPropertyName #> = newhfs;
+            <#= HiddenFiltersVMPropertyName #> = newhfs;
             <#= CurrentFilterPropertyName #> = newhfs;
 
             ObservableCollection<<#= IWebServiceFilterDefInterfaceClassName #>> fltDf = 
@@ -614,8 +602,8 @@ namespace <#= SformViewModelNameSpace #> {
                     }
                     foreach(ModelViewPropertyOfVwSerializable fKprop in fKprops) {
 #>
-            if (this.<#= HiddenFiltersPropertyName #> != null) {
-                isDsbl = isDsbl && this.<#= HiddenFiltersPropertyName #>.Any(v => v.fltrName == "<#= GetModelPropertyName(fKprop, Model) #>");
+            if (this.<#= HiddenFiltersVMPropertyName #> != null) {
+                isDsbl = isDsbl && this.<#= HiddenFiltersVMPropertyName #>.Any(v => v.fltrName == "<#= GetModelPropertyName(fKprop, Model) #>");
             } else isDsbl = false;
 <#
                     }
@@ -644,18 +632,18 @@ namespace <#= SformViewModelNameSpace #> {
             Actual<#= CurrentPagePropertyName #> = 0;
             await onFilter();
         }
-        IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>> _<#= HiddenFiltersPropertyName #> = new ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>();
-        public IEnumerable<IWebServiceFilterRsltInterface> <#= HiddenFiltersPropertyName #>
+        IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>> _<#= HiddenFiltersVMPropertyName #> = new ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>();
+        public IEnumerable<IWebServiceFilterRsltInterface> <#= HiddenFiltersVMPropertyName #>
         {
             get
             {
-                return _<#= HiddenFiltersPropertyName #>;
+                return _<#= HiddenFiltersVMPropertyName #>;
             }
             set
             {
-                if (_<#= HiddenFiltersPropertyName #> != value)
+                if (_<#= HiddenFiltersVMPropertyName #> != value)
                 {
-                    _<#= HiddenFiltersPropertyName #> = value;
+                    _<#= HiddenFiltersVMPropertyName #> = value;
                     OnPropertyChanged();
                 }
             }
@@ -1508,6 +1496,27 @@ namespace <#= SformViewModelNameSpace #> {
             }
         }
         return result;
+    }
+    string GetModelProjectName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileProject)) {
+            return result;
+        }
+        string[] fnArr = refItem.FileProject.Split(new char[] {'\\'}, 100, System.StringSplitOptions.None); 
+        string fn = fnArr[fnArr.Length - 1];
+
+        return fn.Replace(".csproj","");
     }
 
 #>

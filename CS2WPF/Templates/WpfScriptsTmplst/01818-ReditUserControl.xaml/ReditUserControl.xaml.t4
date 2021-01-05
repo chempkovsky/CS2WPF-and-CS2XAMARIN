@@ -24,39 +24,16 @@
     string ProxyUserControlNameSpace        = GetContextModelNameSpace(Context, ProxyUserControlFolder);
     string ProxyUserControlProject          = GetContextModelProjectName(Context, ProxyUserControlFolder);
 
-    string LformUserControlFolder          = "01596-LformUserControl.xaml.cs";
-    string LformUserControlClassName       = GetModelClassName(Model, LformUserControlFolder);
-    string LformUserControlNameSpace       = GetModelNameSpace(Model, LformUserControlFolder);
-
-    string LdlgUserControlFolder           = "01616-LdlgUserControl.xaml.cs";
-    string LdlgUserControlClassName        = GetModelClassName(Model, LdlgUserControlFolder);
-    string LdlgUserControlNameSpace        = GetModelNameSpace(Model, LdlgUserControlFolder);
-    string LdlgUserControlProject          = GetModelProjectName(Model, LdlgUserControlFolder);
-
-    string LdlgUserControlXamlFolder      = "01618-LdlgUserControl.xaml";
-    string LdlgUserControlXamlClassName   = GetModelClassName(Model, LdlgUserControlXamlFolder);
-    string LdlgUserControlXamlNameSpace   = GetModelNameSpace(Model, LdlgUserControlXamlFolder);
-    string LdlgUserControlXamlProject     = GetModelProjectName(Model, LdlgUserControlXamlFolder);
-    
-
-
-
-
-
-    string RdlistUserControlFolder           = "02016-RdlistUserControl.xaml.cs";
-    string RdlistUserControlClassName        = GetModelClassName(Model, RdlistUserControlFolder);
-    string RdlistUserControlNameSpace        = GetModelNameSpace(Model, RdlistUserControlFolder);
-    string RdlistUserControlProject          = GetModelProjectName(Model, RdlistUserControlFolder);
     
     string EformUserControlFolder           = "01496-EformUserControl.xaml.cs";
     string EformUserControlClassName        = GetModelClassName(Model, EformUserControlFolder);
     string EformUserControlNameSpace        = GetModelNameSpace(Model, EformUserControlFolder);
-
-
+    string EformUserControlProject          = GetModelProjectName(Model, EformUserControlFolder);
 
     string ReditUserControlFolder           = "01816-ReditUserControl.xaml.cs";
     string ReditUserControlClassName        = GetModelClassName(Model, ReditUserControlFolder);
     string ReditUserControlNameSpace        = GetModelNameSpace(Model, ReditUserControlFolder);
+    string ReditUserControlProject          = GetModelProjectName(Model, ReditUserControlFolder);
 
     string ReditUserControlXamlFolder       = "01818-ReditUserControl.xaml";
     string ReditUserControlXamlClassName    = GetModelClassName(Model, ReditUserControlXamlFolder);
@@ -81,6 +58,7 @@
 
 
     string RegionPropertyName = "Region";
+    string ReditRegionPropertyName = "ReditRegion";
 
 
     string proxyPrefix = "clr-namespace:" + ProxyUserControlNameSpace;
@@ -91,6 +69,13 @@
     if(AttachedPropertiesExtProject != ReditUserControlXamlProject) {
         attachedPrefix = attachedPrefix + ";assembly=" + AttachedPropertiesExtProject;
     }
+    string eformPrefix = "clr-namespace:" + EformUserControlNameSpace;
+    if(EformUserControlProject != ReditUserControlXamlProject) {
+        eformPrefix = eformPrefix + ";assembly=" + EformUserControlProject;
+    }
+
+    bool IsInTheSameModule = (EformUserControlProject == ReditUserControlProject) && false;
+
 
 #>
 
@@ -103,7 +88,18 @@
              xmlns:prism="http://prismlibrary.com/" 
              prism:ViewModelLocator.AutoWireViewModel="True"                          
 
+<#
+    if(IsInTheSameModule) {
+#>
+             xmlns:efrm="<#= eformPrefix #>" 
+<#
+    } else {
+#>
              xmlns:prx="<#= proxyPrefix #>" 
+<#
+    }
+#>
+
 
              xmlns:atch="<#= attachedPrefix #>" 
              atch:<#= AttachedPropertiesExtClassName #>.<#= RegisterRoutedCommandBindingsPropertyName #>="{Binding <#= RoutedCommandHandlersPropertyName #>}"
@@ -114,9 +110,18 @@
 
              mc:Ignorable="d" 
              d:DesignHeight="150" d:DesignWidth="400" >
+<#
+    if(IsInTheSameModule) {
+#>
+        <efrm:<#= EformUserControlClassName #>  
+<#
+    } else {
+#>
         <prx:<#= ProxyUserControlClassName #> 
-
-            prism:RegionManager.RegionName="<#= EformUserControlClassName #><#= RegionPropertyName #>"
+            prism:RegionManager.RegionName="<#= EformUserControlClassName #><#= ReditRegionPropertyName #>"
+<#
+    }
+#>
 
             <#= ContainerMenuItemsPropertyName #>="{Binding <#= ContainerMenuItemsPropertyName #>, Mode=OneWay, ElementName=ReditUsrCntrlRootNode}" 
 

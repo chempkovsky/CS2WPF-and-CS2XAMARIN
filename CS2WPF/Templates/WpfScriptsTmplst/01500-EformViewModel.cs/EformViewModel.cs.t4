@@ -88,22 +88,26 @@ using System.Collections;
     string EformUserControlFolder                   = "01496-EformUserControl.xaml.cs";
     string EformUserControlClassName                = GetModelClassName(Model, EformUserControlFolder);
     string EformUserControlNameSpace                = GetModelNameSpace(Model, EformUserControlFolder);
+    string EformUserControlProject                  = GetModelProjectName(Model, EformUserControlFolder);
 
     string EformViewModelFolder                     = "01500-EformViewModel.cs";
     string EformViewModelClassName                  = GetModelClassName(Model, EformViewModelFolder);
     string EformViewModelNameSpace                  = GetModelNameSpace(Model, EformViewModelFolder);
-
+    string EformViewModelProject                    = GetModelProjectName(Model, EformViewModelFolder);
 
 
     string EformModePropertyName                    = "EformMode";
+    string EformModeVMPropertyName                  = "EformModeVM";
     string OnEformModeChangedPropertyName           = "OnEformModeChanged";
     string EformModeChangedPropertyName             = "EformModeChanged";
 
     string FormControlModelPropertyName             = "FormControlModel";
+    string FormControlModelVMPropertyName           = "FormControlModelVM";
     string OnFormControlModelChangedPropertyName    = "OnFormControlModelChanged";
     string FormControlModelChangedPropertyName      = "FormControlModelChanged";
 
     string HiddenFiltersPropertyName                = "HiddenFilters";
+    string HiddenFiltersVMPropertyName              = "HiddenFiltersVM";
     string OnHiddenFiltersChangedPropertyName       = "OnHiddenFiltersChanged";
     string HiddenFiltersPropertyChangedPropertyName = "HiddenFiltersPropertyChanged";
 
@@ -300,32 +304,64 @@ using <#= ns #>;
     }
 #>
 /*
-    In the file of IModule-class the following lines of code must be inserted:
 
+<#
+    {
+        List<string> searchViewNames= new List<string>();
+        foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) {
+            for(int inptTp = 1; inptTp < 4; inptTp++) {
+                if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.SearchDialog) {
+                    string viewName = GetViewNameForControlList(modelViewUIFormPropertySerializable, Model, Context, inptTp);
+                    if (!string.IsNullOrEmpty(viewName)) {
+                        if(searchViewNames.IndexOf(viewName) < 0) searchViewNames.Add(viewName);
+                    }
+                }
+            }
+        }
+        foreach(string searchViewName in searchViewNames) {
+            ModelViewSerializable searchView = GetModelByName(Context, searchViewName);
+            string localSdlgUserControlFolder       = "01436-SdlgUserControl.xaml.cs";
+            string localSdlgUserControlClassName    = GetModelClassName(searchView, localSdlgUserControlFolder);
+            string localSdlgUserControlNameSpace     = GetModelNameSpace(searchView, localSdlgUserControlFolder);
+            string localSdlgUserControlProject      = GetModelProjectName(searchView, localSdlgUserControlFolder);
+            string localSdlgViewModelFolder         = "01440-SdlgViewModel.cs";
+            string localSdlgViewModelClassName      = GetModelClassName(searchView, localSdlgViewModelFolder);
+            string localSdlgViewModelNameSpace      = GetModelNameSpace(searchView, localSdlgViewModelFolder);
+            string localSdlgViewModelProject        = GetModelProjectName(searchView, localSdlgViewModelFolder);
 
-        public void OnInitialized(IContainerProvider containerProvider)
-        {
-            ...
-            IRegionManager regionManager = containerProvider.Resolve(typeof(IRegionManager)) as IRegionManager;
-            if (regionManager != null)
+#>
+
+        Reminder:
+        "<#= localSdlgUserControlClassName #>" UserControl is defined in the "<#= localSdlgUserControlProject #>"-project.
+        In the file of IModule-class of "<#= localSdlgUserControlProject #>"-project the following line of code must be inserted:
+
+            public void RegisterTypes(IContainerRegistry containerRegistry)
             {
                 ...
-                // to be used with "00280-ProxyUserControl.xaml.cs" the following line must be added:
-                regionManager.RegisterViewWithRegion("<#= EformUserControlClassName #><#= RegionPropertyName #>", typeof(<#= EformUserControlClassName #>));
+                // According to requirements of the "<#= localSdlgViewModelClassName #>.cs"-file of "<#= localSdlgViewModelProject #>"-project. 
+                containerRegistry.RegisterDialog<<#= localSdlgUserControlClassName #>, <#= localSdlgViewModelClassName #>>("<#= localSdlgViewModelClassName #>");
                 ...
             }
-            ...
+<#
         }
+    }
+#>
 
+
+
+    "<#= EformUserControlClassName #>" UserControl is defined in the "<#= EformUserControlProject #>"-project.
+    In the file of IModule-class of "<#= EformUserControlProject #>"-project the following line of code must be inserted:
 
         public void RegisterTypes(IContainerRegistry containerRegistry)
         {
             ...
+            // According to requirements of the "<#= EformViewModelClassName #>.cs"-file of "<#= EformViewModelProject #>"-project. 
             ViewModelLocationProvider.Register<<#= EformUserControlClassName #>, <#= EformViewModelClassName #>>();
-            // to be used with "00632-ScopedRegionUserControl.xaml.cs" insert additional line of declaration:
-            containerRegistry.RegisterForNavigation<<#= EformUserControlClassName #>, <#= EformViewModelClassName #>>("<#= EformUserControlClassName #><#= RegionPropertyName #>");
+            // According to requirements of the "<#= EformViewModelClassName #>.cs"-file of "<#= EformViewModelProject #>"-project. 
+            containerRegistry.Register<UserControl, <#= EformUserControlClassName #>>("<#= EformUserControlClassName #>");
             ...
         }
+
 */
 
 namespace <#= EformViewModelNameSpace #> {
@@ -572,7 +608,7 @@ namespace <#= EformViewModelNameSpace #> {
 #>
         #endregion
 
-        #region <#= EformModePropertyName #>    
+        #region <#= EformModeVMPropertyName #>    
 
 <#  
     if (ModelHasDoInitMethod) {
@@ -588,10 +624,10 @@ namespace <#= EformViewModelNameSpace #> {
             if(evarg != null) {
                 evarg.Handled = true;
                 <#= EformModeEnumClassName #> nwval = (<#= EformModeEnumClassName #>)evarg.NewValue; 
-                if(nwval != <#= EformModePropertyName #>) {
+                if(nwval != <#= EformModeVMPropertyName #>) {
                     <#= UIDispatcherInvokePropertyName #>(() => {
-                        _<#= EformModePropertyName #> = nwval;
-                        OnPropertyChanged("<#= EformModePropertyName #>");
+                        _<#= EformModeVMPropertyName #> = nwval;
+                        OnPropertyChanged("<#= EformModeVMPropertyName #>");
                     });
                     if(<#= IsOnLoadedCalledPropertyName #>) {
                         try {
@@ -615,24 +651,24 @@ namespace <#= EformViewModelNameSpace #> {
                 }
             }
         }
-        protected <#= EformModeEnumClassName #> _<#= EformModePropertyName #> = <#= EformModeEnumClassName #>.DeleteMode;
-        public <#= EformModeEnumClassName #> <#= EformModePropertyName #>
+        protected <#= EformModeEnumClassName #> _<#= EformModeVMPropertyName #> = <#= EformModeEnumClassName #>.DeleteMode;
+        public <#= EformModeEnumClassName #> <#= EformModeVMPropertyName #>
         {
             get
             {
-                return _<#= EformModePropertyName #>;
+                return _<#= EformModeVMPropertyName #>;
             }
             set
             {
-                if (_<#= EformModePropertyName #> != value) {
-                    _<#= EformModePropertyName #> = value;
+                if (_<#= EformModeVMPropertyName #> != value) {
+                    _<#= EformModeVMPropertyName #> = value;
                     OnPropertyChanged();
                 }
             }
         }
         #endregion
 
-        #region <#= FormControlModelPropertyName #>
+        #region <#= FormControlModelVMPropertyName #>
 <#  
     if (ModelHasDoInitMethod) {
 #>
@@ -647,8 +683,8 @@ namespace <#= EformViewModelNameSpace #> {
             if(evarg != null) {
                 evarg.Handled = true;
                 <#= UIDispatcherInvokePropertyName #>(() => {
-                    _<#= FormControlModelPropertyName #> =  evarg.NewValue as <#= modelInterfaceClassName #>;
-                    OnPropertyChanged("<#= FormControlModelPropertyName #>");
+                    _<#= FormControlModelVMPropertyName #> =  evarg.NewValue as <#= modelInterfaceClassName #>;
+                    OnPropertyChanged("<#= FormControlModelVMPropertyName #>");
                 });
 
                 if(<#= IsOnLoadedCalledPropertyName #>) {
@@ -671,24 +707,24 @@ namespace <#= EformViewModelNameSpace #> {
                 }
             }
         }
-        protected <#= modelInterfaceClassName #> _<#= FormControlModelPropertyName #> = null;
-        public <#= modelInterfaceClassName #> <#= FormControlModelPropertyName #>
+        protected <#= modelInterfaceClassName #> _<#= FormControlModelVMPropertyName #> = null;
+        public <#= modelInterfaceClassName #> <#= FormControlModelVMPropertyName #>
         {
             get
             {
-                return _<#= FormControlModelPropertyName #>;
+                return _<#= FormControlModelVMPropertyName #>;
             }
             set
             {
-                if (_<#= FormControlModelPropertyName #> != value) {
-                    _<#= FormControlModelPropertyName #> = value;
+                if (_<#= FormControlModelVMPropertyName #> != value) {
+                    _<#= FormControlModelVMPropertyName #> = value;
                     OnPropertyChanged();
                 }
             }
         }
         #endregion
 
-        #region <#= HiddenFiltersPropertyName #>
+        #region <#= HiddenFiltersVMPropertyName #>
 <#  
     if (ModelHasDoInitMethod) {
 #>
@@ -704,14 +740,14 @@ namespace <#= EformViewModelNameSpace #> {
                 evarg.Handled = true;
                 IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>> nwval = evarg.NewValue as IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>;
                 ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>> curVal = new ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>();
-                if(nwval != <#= HiddenFiltersPropertyName #>) {
+                if(nwval != <#= HiddenFiltersVMPropertyName #>) {
                     foreach(<#= IWebServiceFilterRsltInterfaceClassName #> hf  in nwval) {
                         curVal.Add( new <#= WebServiceFilterRsltViewModelClassName #>() {fltrName=hf.fltrName, fltrDataType=hf.fltrDataType,  fltrOperator=hf.fltrOperator, fltrValue=hf.fltrValue, fltrError=hf.fltrError });
                     }
                 }
                 <#= UIDispatcherInvokePropertyName #>(() => {
-                    _<#= HiddenFiltersPropertyName #> = curVal;
-                    OnPropertyChanged("<#= HiddenFiltersPropertyName #>");
+                    _<#= HiddenFiltersVMPropertyName #> = curVal;
+                    OnPropertyChanged("<#= HiddenFiltersVMPropertyName #>");
                 });
                     if(<#= IsOnLoadedCalledPropertyName #>) {
                         try {
@@ -733,17 +769,17 @@ namespace <#= EformViewModelNameSpace #> {
                     }
             }
         }
-        protected IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>> _<#= HiddenFiltersPropertyName #> = new ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>();
-        public IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>> <#= HiddenFiltersPropertyName #>
+        protected IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>> _<#= HiddenFiltersVMPropertyName #> = new ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>();
+        public IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>> <#= HiddenFiltersVMPropertyName #>
         {
             get
             {
-                return _<#= HiddenFiltersPropertyName #>;
+                return _<#= HiddenFiltersVMPropertyName #>;
             }
             set
             {
-                if (_<#= HiddenFiltersPropertyName #> != value) {
-                    _<#= HiddenFiltersPropertyName #> = value;
+                if (_<#= HiddenFiltersVMPropertyName #> != value) {
+                    _<#= HiddenFiltersVMPropertyName #> = value;
                     OnPropertyChanged();
                 }
             }
@@ -761,18 +797,18 @@ namespace <#= EformViewModelNameSpace #> {
         if ((inptTp ==3) && (ModeAddEqualDelete || ModeUpdateEqualDelete)) continue;
         if (inptTp ==1) {
 #>
-                if ((this.<#=  EformModePropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp) #>) <# 
-                    if(ModeAddEqualUpdate) {#> || (this.<#=  EformModePropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp+1)#>) <# } 
-                    if(ModeAddEqualDelete) {#> || (this.<#=  EformModePropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp+2)#>) <# } #>) {
+                if ((this.<#=  EformModeVMPropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp) #>) <# 
+                    if(ModeAddEqualUpdate) {#> || (this.<#=  EformModeVMPropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp+1)#>) <# } 
+                    if(ModeAddEqualDelete) {#> || (this.<#=  EformModeVMPropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp+2)#>) <# } #>) {
 <#
         } else if (inptTp == 2) {
 #>
-                if ((this.<#=  EformModePropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp) #>) <# 
-                    if(ModeAddEqualDelete) {#> || (this.<#=  EformModePropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp+1)#>) <# } #>) {
+                if ((this.<#=  EformModeVMPropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp) #>) <# 
+                    if(ModeAddEqualDelete) {#> || (this.<#=  EformModeVMPropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp+1)#>) <# } #>) {
 <#
         } else {
 #>
-                if (this.<#=  EformModePropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp) #>) {
+                if (this.<#=  EformModeVMPropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp) #>) {
 <#
         }
         foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) {
@@ -845,18 +881,18 @@ namespace <#= EformViewModelNameSpace #> {
             if ((inptTp ==3) && (ModeAddEqualDelete || ModeUpdateEqualDelete)) continue;
             if (inptTp ==1) {
 #>
-                if ((this.<#=  EformModePropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp) #>) <# 
-                      if(ModeAddEqualUpdate) {#> || (this.<#=  EformModePropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp+1)#>) <# } 
-                      if(ModeAddEqualDelete) {#> || (this.<#=  EformModePropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp+2)#>) <# } #>) {
+                if ((this.<#=  EformModeVMPropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp) #>) <# 
+                      if(ModeAddEqualUpdate) {#> || (this.<#=  EformModeVMPropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp+1)#>) <# } 
+                      if(ModeAddEqualDelete) {#> || (this.<#=  EformModeVMPropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp+2)#>) <# } #>) {
 <#
             } else if (inptTp == 2) {
 #>
-                else if ((this.<#=  EformModePropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp) #>) <# 
-                      if(ModeAddEqualDelete) {#> || (this.<#=  EformModePropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp+1)#>) <# } #>) {
+                else if ((this.<#=  EformModeVMPropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp) #>) <# 
+                      if(ModeAddEqualDelete) {#> || (this.<#=  EformModeVMPropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp+1)#>) <# } #>) {
 <#
             } else {
 #>
-                else if (this.<#=  EformModePropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp) #>) {
+                else if (this.<#=  EformModeVMPropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp) #>) {
 <#
             }
             foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) {
@@ -913,18 +949,18 @@ if (ModelHasDoInitMethod) {
             if ((inptTp ==3) && (ModeAddEqualDelete || ModeUpdateEqualDelete)) continue;
             if (inptTp ==1) {
 #>
-        <# if (genElse) {#> else <# } else { genElse = true; } #>if ((this.<#= EformModePropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp) #>) <# 
-              if(ModeAddEqualUpdate) {#> || (this.<#= EformModePropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp+1)#>) <# } 
-              if(ModeAddEqualDelete) {#> || (this.<#= EformModePropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp+2)#>) <# } #>) {
+        <# if (genElse) {#> else <# } else { genElse = true; } #>if ((this.<#= EformModeVMPropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp) #>) <# 
+              if(ModeAddEqualUpdate) {#> || (this.<#= EformModeVMPropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp+1)#>) <# } 
+              if(ModeAddEqualDelete) {#> || (this.<#= EformModeVMPropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp+2)#>) <# } #>) {
 <#
             } else if (inptTp == 2) {
 #>
-        <# if (genElse) {#> else <# } else { genElse = true; } #>if ((this.<#= EformModePropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp) #>) <# 
-              if(ModeAddEqualDelete) {#> || (this.<#= EformModePropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp+1)#>) <# } #>) {
+        <# if (genElse) {#> else <# } else { genElse = true; } #>if ((this.<#= EformModeVMPropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp) #>) <# 
+              if(ModeAddEqualDelete) {#> || (this.<#= EformModeVMPropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp+1)#>) <# } #>) {
 <#
             } else {
 #>
-        <# if (genElse) {#> else <# } else { genElse = true; } #>if (this.<#= EformModePropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp) #>) {
+        <# if (genElse) {#> else <# } else { genElse = true; } #>if (this.<#= EformModeVMPropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp) #>) {
 <#
             }
                 foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) {
@@ -956,13 +992,13 @@ if (ModelHasDoInitMethod) {
         public void InputToControls() {
             <#= UIDispatcherInvokePropertyName #>(() => {
                 bool isNotDefByHdnfltr = true;
-                if(<#= FormControlModelPropertyName #> != null) {
+                if(<#= FormControlModelVMPropertyName #> != null) {
 <#
     foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) {
 #>
                     isNotDefByHdnfltr = true;
-                    if(<#= HiddenFiltersPropertyName #> != null) {
-                        <#= IWebServiceFilterRsltInterfaceClassName #> hf = <#= HiddenFiltersPropertyName #>.Where(h=>h.fltrName == "<#= GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>").FirstOrDefault();
+                    if(<#= HiddenFiltersVMPropertyName #> != null) {
+                        <#= IWebServiceFilterRsltInterfaceClassName #> hf = <#= HiddenFiltersVMPropertyName #>.Where(h=>h.fltrName == "<#= GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>").FirstOrDefault();
                         if (hf != null) {
                             if (string.IsNullOrEmpty(hf.fltrError)) {
                                 <#= GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #> = hf.fltrValue;
@@ -970,7 +1006,7 @@ if (ModelHasDoInitMethod) {
                             }
                         }
                     }
-                    if(isNotDefByHdnfltr) { <#= GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #> = <#= FormControlModelPropertyName #>.<#= GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>; }
+                    if(isNotDefByHdnfltr) { <#= GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #> = <#= FormControlModelVMPropertyName #>.<#= GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>; }
 <#
     }
 #>
@@ -979,8 +1015,8 @@ if (ModelHasDoInitMethod) {
     foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) {
 #>
                     isNotDefByHdnfltr = true;
-                    if(<#= HiddenFiltersPropertyName #> != null) {
-                        <#= IWebServiceFilterRsltInterfaceClassName #> hf = <#= HiddenFiltersPropertyName #>.Where(h=>h.fltrName == "<#= GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>").FirstOrDefault();
+                    if(<#= HiddenFiltersVMPropertyName #> != null) {
+                        <#= IWebServiceFilterRsltInterfaceClassName #> hf = <#= HiddenFiltersVMPropertyName #>.Where(h=>h.fltrName == "<#= GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>").FirstOrDefault();
                         if (hf != null) {
                             if (string.IsNullOrEmpty(hf.fltrError)) {
                                 <#= GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #> = hf.fltrValue;
@@ -1049,18 +1085,18 @@ if (ModelHasDoInitMethod) {
 
         if (inptTp ==1) {
 #>
-        <# if (genElse) {#> else <# } else { genElse = true; } #>if ((this.<#=  EformModePropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp) #>) <# 
-              if(ModeAddEqualUpdate) {#> || (this.<#=  EformModePropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp+1)#>) <# } 
-              if(ModeAddEqualDelete) {#> || (this.<#=  EformModePropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp+2)#>) <# } #>) {
+        <# if (genElse) {#> else <# } else { genElse = true; } #>if ((this.<#=  EformModeVMPropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp) #>) <# 
+              if(ModeAddEqualUpdate) {#> || (this.<#=  EformModeVMPropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp+1)#>) <# } 
+              if(ModeAddEqualDelete) {#> || (this.<#=  EformModeVMPropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp+2)#>) <# } #>) {
 <#
         } else if (inptTp == 2) {
 #>
-        <# if (genElse) {#> else <# } else { genElse = true; } #>if ((this.<#=  EformModePropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp) #>) <# 
-              if(ModeAddEqualDelete) {#> || (this.<#=  EformModePropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp+1)#>) <# } #>) {
+        <# if (genElse) {#> else <# } else { genElse = true; } #>if ((this.<#=  EformModeVMPropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp) #>) <# 
+              if(ModeAddEqualDelete) {#> || (this.<#=  EformModeVMPropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp+1)#>) <# } #>) {
 <#
         } else {
 #>
-        <# if (genElse) {#> else <# } else { genElse = true; } #>if (this.<#=  EformModePropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp) #>) {
+        <# if (genElse) {#> else <# } else { genElse = true; } #>if (this.<#=  EformModeVMPropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp) #>) {
 <#
         }
                             if (primKeyProps.Count > 0) {
@@ -1401,18 +1437,18 @@ if (ModelHasDoInitMethod) {
 
         if (inptTp ==1) {
 #>
-        <# if (genElse) {#> else <# } else { genElse = true; } #>if ((this.<#=  EformModePropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp) #>) <# 
-              if(ModeAddEqualUpdate) {#> || (this.<#=  EformModePropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp+1)#>) <# } 
-              if(ModeAddEqualDelete) {#> || (this.<#=  EformModePropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp+2)#>) <# } #>) {
+        <# if (genElse) {#> else <# } else { genElse = true; } #>if ((this.<#=  EformModeVMPropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp) #>) <# 
+              if(ModeAddEqualUpdate) {#> || (this.<#=  EformModeVMPropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp+1)#>) <# } 
+              if(ModeAddEqualDelete) {#> || (this.<#=  EformModeVMPropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp+2)#>) <# } #>) {
 <#
         } else if (inptTp == 2) {
 #>
-        <# if (genElse) {#> else <# } else { genElse = true; } #>if ((this.<#=  EformModePropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp) #>) <# 
-              if(ModeAddEqualDelete) {#> || (this.<#=  EformModePropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp+1)#>) <# } #>) {
+        <# if (genElse) {#> else <# } else { genElse = true; } #>if ((this.<#=  EformModeVMPropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp) #>) <# 
+              if(ModeAddEqualDelete) {#> || (this.<#=  EformModeVMPropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp+1)#>) <# } #>) {
 <#
         } else {
 #>
-        <# if (genElse) {#> else <# } else { genElse = true; } #>if (this.<#=  EformModePropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp) #>) {
+        <# if (genElse) {#> else <# } else { genElse = true; } #>if (this.<#=  EformModeVMPropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp) #>) {
 <#
         }
                             if (directMasters.Count < 1) {
@@ -1722,18 +1758,18 @@ if (ModelHasDoInitMethod) {
 
         if (inptTp ==1) {
 #>
-        <# if (genElse) {#> else <# } else { genElse = true; } #>if ((this.<#=  EformModePropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp) #>) <# 
-              if(ModeAddEqualUpdate) {#> || (this.<#=  EformModePropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp+1)#>) <# } 
-              if(ModeAddEqualDelete) {#> || (this.<#=  EformModePropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp+2)#>) <# } #>) {
+        <# if (genElse) {#> else <# } else { genElse = true; } #>if ((this.<#=  EformModeVMPropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp) #>) <# 
+              if(ModeAddEqualUpdate) {#> || (this.<#=  EformModeVMPropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp+1)#>) <# } 
+              if(ModeAddEqualDelete) {#> || (this.<#=  EformModeVMPropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp+2)#>) <# } #>) {
 <#
         } else if (inptTp == 2) {
 #>
-        <# if (genElse) {#> else <# } else { genElse = true; } #>if ((this.<#=  EformModePropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp) #>) <# 
-              if(ModeAddEqualDelete) {#> || (this.<#=  EformModePropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp+1)#>) <# } #>) {
+        <# if (genElse) {#> else <# } else { genElse = true; } #>if ((this.<#=  EformModeVMPropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp) #>) <# 
+              if(ModeAddEqualDelete) {#> || (this.<#=  EformModeVMPropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp+1)#>) <# } #>) {
 <#
         } else {
 #>
-        <# if (genElse) {#> else <# } else { genElse = true; } #>if (this.<#=  EformModePropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp) #>) {
+        <# if (genElse) {#> else <# } else { genElse = true; } #>if (this.<#=  EformModeVMPropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp) #>) {
 <#
         }
 #>
@@ -1944,18 +1980,18 @@ if (ModelHasDoInitMethod) {
 
         if (inptTp ==1) {
 #>
-        <# if (genElse) {#> else <# } else { genElse = true; } #>if ((this.<#=  EformModePropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp) #>) <# 
-              if(ModeAddEqualUpdate) {#> || (this.<#=  EformModePropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp+1)#>) <# } 
-              if(ModeAddEqualDelete) {#> || (this.<#=  EformModePropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp+2)#>) <# } #>) {
+        <# if (genElse) {#> else <# } else { genElse = true; } #>if ((this.<#=  EformModeVMPropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp) #>) <# 
+              if(ModeAddEqualUpdate) {#> || (this.<#=  EformModeVMPropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp+1)#>) <# } 
+              if(ModeAddEqualDelete) {#> || (this.<#=  EformModeVMPropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp+2)#>) <# } #>) {
 <#
         } else if (inptTp == 2) {
 #>
-        <# if (genElse) {#> else <# } else { genElse = true; } #>if ((this.<#=  EformModePropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp) #>) <# 
-              if(ModeAddEqualDelete) {#> || (this.<#=  EformModePropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp+1)#>) <# } #>) {
+        <# if (genElse) {#> else <# } else { genElse = true; } #>if ((this.<#=  EformModeVMPropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp) #>) <# 
+              if(ModeAddEqualDelete) {#> || (this.<#=  EformModeVMPropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp+1)#>) <# } #>) {
 <#
         } else {
 #>
-        <# if (genElse) {#> else <# } else { genElse = true; } #>if (this.<#=  EformModePropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp) #>) {
+        <# if (genElse) {#> else <# } else { genElse = true; } #>if (this.<#=  EformModeVMPropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp) #>) {
 <#
         }
 
@@ -2011,7 +2047,7 @@ if (ModelHasDoInitMethod) {
 <#
                                         foreach(string fltFld in fltFlds) {
 #>
-            isDsbl = isDsbl ? isDsbl : <#= HiddenFiltersPropertyName #>.Any(v => v.fltrName == "<#= fltFld #>");
+            isDsbl = isDsbl ? isDsbl : <#= HiddenFiltersVMPropertyName #>.Any(v => v.fltrName == "<#= fltFld #>");
 <#
                                         }
                                     }
@@ -2070,7 +2106,7 @@ if (ModelHasDoInitMethod) {
 <#
                                         foreach(string fltFld in fltFlds) {
 #>
-                isDsbl = isDsbl ? isDsbl : <#= HiddenFiltersPropertyName #>.Any(v => v.fltrName == "<#= fltFld #>");
+                isDsbl = isDsbl ? isDsbl : <#= HiddenFiltersVMPropertyName #>.Any(v => v.fltrName == "<#= fltFld #>");
 <#
                                         }
 #>
@@ -2268,7 +2304,7 @@ if (ModelHasDoInitMethod) {
 <# //////////////////////////// start SearchButtonClick()-generator
 #>
 
-    #region OkCommand
+    #region <#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, SearchClickSufix) #>Command
     private ICommand _<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, SearchClickSufix) #>Command;
     public ICommand <#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, SearchClickSufix) #>Command
     {
@@ -2308,18 +2344,18 @@ if (ModelHasDoInitMethod) {
 
         if (inptTp ==1) {
 #>
-        <# if (genElse) {#> else <# } else { genElse = true; } #>if ((this.<#=  EformModePropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp) #>) <# 
-              if(ModeAddEqualUpdate) {#> || (this.<#=  EformModePropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp+1)#>) <# } 
-              if(ModeAddEqualDelete) {#> || (this.<#=  EformModePropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp+2)#>) <# } #>) {
+        <# if (genElse) {#> else <# } else { genElse = true; } #>if ((this.<#=  EformModeVMPropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp) #>) <# 
+              if(ModeAddEqualUpdate) {#> || (this.<#=  EformModeVMPropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp+1)#>) <# } 
+              if(ModeAddEqualDelete) {#> || (this.<#=  EformModeVMPropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp+2)#>) <# } #>) {
 <#
         } else if (inptTp == 2) {
 #>
-        <# if (genElse) {#> else <# } else { genElse = true; } #>if ((this.<#=  EformModePropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp) #>) <# 
-              if(ModeAddEqualDelete) {#> || (this.<#=  EformModePropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp+1)#>) <# } #>) {
+        <# if (genElse) {#> else <# } else { genElse = true; } #>if ((this.<#=  EformModeVMPropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp) #>) <# 
+              if(ModeAddEqualDelete) {#> || (this.<#=  EformModeVMPropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp+1)#>) <# } #>) {
 <#
         } else {
 #>
-        <# if (genElse) {#> else <# } else { genElse = true; } #>if (this.<#=  EformModePropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp) #>) {
+        <# if (genElse) {#> else <# } else { genElse = true; } #>if (this.<#=  EformModeVMPropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp) #>) {
 <#
         }
 #>
@@ -2500,23 +2536,23 @@ if (ModelHasDoInitMethod) {
             if(HasErrors) return;
 
             <#= GetInterfaceName(Model) #> itm = ControlsToObject();
-            if (<#= EformModePropertyName #> == <#= EformModeEnumClassName #>.<#=GetInputTypeToEnumName(1) #>) { 
+            if (<#= EformModeVMPropertyName #> == <#= EformModeEnumClassName #>.<#=GetInputTypeToEnumName(1) #>) { 
                 <#= GetInterfaceName(Model) #> data = await <#= FormServicePrefix + Model.ViewName #>.<#= AddOneMethodName #>(itm);
                 if(data == null) {
                     <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("Http Error", "Could not update data on the server side.");
                     return;
                 } else {
-                    itm = <#= FormServicePrefix + Model.ViewName #>.<#= CopyToModelMethodName #>(data, <#= FormControlModelPropertyName #>);
+                    itm = <#= FormServicePrefix + Model.ViewName #>.<#= CopyToModelMethodName #>(data, <#= FormControlModelVMPropertyName #>);
                 }
-            } else if (this.<#= EformModePropertyName #> == <#= EformModeEnumClassName #>.<#=GetInputTypeToEnumName(2) #>) { 
+            } else if (this.<#= EformModeVMPropertyName #> == <#= EformModeEnumClassName #>.<#=GetInputTypeToEnumName(2) #>) { 
                 <#= GetInterfaceName(Model) #> data = await <#= FormServicePrefix + Model.ViewName #>.<#= UpdateOneMethodName #>(itm);
                 if(data == null) {
                     <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("Http Error", "Could not update data on the server side.");
                     return;
                 } else {
-                    itm  = <#= FormServicePrefix + Model.ViewName #>.<#= CopyToModelMethodName #>(data, <#= FormControlModelPropertyName #>);
+                    itm  = <#= FormServicePrefix + Model.ViewName #>.<#= CopyToModelMethodName #>(data, <#= FormControlModelVMPropertyName #>);
                 }
-            } else if (<#= EformModePropertyName #> == <#= EformModeEnumClassName #>.<#=GetInputTypeToEnumName(3) #>) { 
+            } else if (<#= EformModeVMPropertyName #> == <#= EformModeEnumClassName #>.<#=GetInputTypeToEnumName(3) #>) { 
                 <#= GetInterfaceName(Model) #> data = await <#= FormServicePrefix + Model.ViewName #>.<#= DeleteOneMethodName #>(<# 
                 {
                     int counter = 0;
@@ -2531,10 +2567,10 @@ if (ModelHasDoInitMethod) {
                     <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("Http Error", "Could not update data on the server side.");
                     return;
                 } else {
-                    itm = <#= FormServicePrefix + Model.ViewName #>.<#= CopyToModelMethodName #>(data, <#= FormControlModelPropertyName #>);
+                    itm = <#= FormServicePrefix + Model.ViewName #>.<#= CopyToModelMethodName #>(data, <#= FormControlModelVMPropertyName #>);
                 }
             }
-            // send routed command here and return itm and <#= EformModePropertyName #>
+            // send routed command here and return itm and <#= EformModeVMPropertyName #>
             <#= UIDispatcherInvokePropertyName #>(() => {
                 <#= RoutedCommandExtClassName #>.<#= EformOkCommandPropertyName #>.Execute(itm, sender as IInputElement);
             });
@@ -2554,7 +2590,7 @@ if (ModelHasDoInitMethod) {
         }
         public void Executed<#= CancelCommandPropertyName #>(object sender, ExecutedRoutedEventArgs e) {
             e.Handled = true;
-            <#= RoutedCommandExtClassName #>.<#= EformCancelCommandPropertyName #>.Execute(<#= FormControlModelPropertyName #>, sender as IInputElement);
+            <#= RoutedCommandExtClassName #>.<#= EformCancelCommandPropertyName #>.Execute(<#= FormControlModelVMPropertyName #>, sender as IInputElement);
         }
         public void CanExecute<#= CancelCommandPropertyName #>(object sender, CanExecuteRoutedEventArgs e) {
             e.Handled = true;
@@ -2727,7 +2763,7 @@ if (ModelHasDoInitMethod) {
         InputTypeEnum InputTypeWhenXXX ;
         for (int InputTypeId = 1; InputTypeId <= 3; InputTypeId++) {
 #>
-            if (<#= EformModePropertyName #> == <#= EformModeEnumClassName #>.<#= GetInputTypeToEnumName(InputTypeId) #>) {
+            if (<#= EformModeVMPropertyName #> == <#= EformModeEnumClassName #>.<#= GetInputTypeToEnumName(InputTypeId) #>) {
 <#
             foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) {
                 switch(InputTypeId) {
@@ -2779,7 +2815,7 @@ if (ModelHasDoInitMethod) {
         InputTypeEnum InputTypeWhenXXX ;
         for (int InputTypeId = 1; InputTypeId <= 3; InputTypeId++) {
 #>
-            if (<#= EformModePropertyName #> == <#= EformModeEnumClassName #>.<#= GetInputTypeToEnumName(InputTypeId) #>) {
+            if (<#= EformModeVMPropertyName #> == <#= EformModeEnumClassName #>.<#= GetInputTypeToEnumName(InputTypeId) #>) {
 <#
             foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) {
                 switch(InputTypeId) {
@@ -4476,6 +4512,27 @@ if (ModelHasDoInitMethod) {
             return false;
         }
         return IsIdentityProperty(sclrProp, model);
+    }
+    string GetModelProjectName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileProject)) {
+            return result;
+        }
+        string[] fnArr = refItem.FileProject.Split(new char[] {'\\'}, 100, System.StringSplitOptions.None); 
+        string fn = fnArr[fnArr.Length - 1];
+
+        return fn.Replace(".csproj","");
     }
 
 #>

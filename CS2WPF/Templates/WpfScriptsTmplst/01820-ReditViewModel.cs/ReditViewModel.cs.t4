@@ -62,28 +62,25 @@ using System.Threading.Tasks;
     string modelInterfaceClassName          = GetInterfaceName(Model);
     string modelInterfaceNameSpace          = GetModelNameSpace(Model, modelInterfaceFolder);
 
-    string EdlgViewModelFolder              = "01520-EdlgViewModel.cs";
-    string EdlgViewModelClassName           = GetModelClassName(Model, EdlgViewModelFolder);
-    string EdlgViewModelNameSpace           = GetModelNameSpace(Model, EdlgViewModelFolder);
 
-    string LformUserControlFolder           = "01596-LformUserControl.xaml.cs";
-    string LformUserControlClassName        = GetModelClassName(Model, LformUserControlFolder);
-    string LformUserControlNameSpace        = GetModelNameSpace(Model, LformUserControlFolder);
 
-    string LformViewModelFolder             = "01600-LformViewModel.cs";
-    string LformViewModelClassName          = GetModelClassName(Model, LformViewModelFolder);
-    string LformViewModelNameSpace          = GetModelNameSpace(Model, LformViewModelFolder);
 
+    string EformUserControlFolder           = "01496-EformUserControl.xaml.cs";
+    string EformUserControlClassName        = GetModelClassName(Model, EformUserControlFolder);
+    string EformUserControlNameSpace        = GetModelNameSpace(Model, EformUserControlFolder);
+    string EformUserControlProject          = GetModelProjectName(Model, EformUserControlFolder);
 
 
 
     string ReditUserControlFolder           = "01816-ReditUserControl.xaml.cs";
     string ReditUserControlClassName        = GetModelClassName(Model, ReditUserControlFolder);
     string ReditUserControlNameSpace        = GetModelNameSpace(Model, ReditUserControlFolder);
+    string ReditUserControlProject          = GetModelProjectName(Model, ReditUserControlFolder);
 
     string ReditViewModelFolder             = "01820-ReditViewModel.cs";
     string ReditViewModelClassName          = GetModelClassName(Model, ReditViewModelFolder);
     string ReditViewModelNameSpace          = GetModelNameSpace(Model, ReditViewModelFolder);
+    string ReditViewModelProject            = GetModelProjectName(Model, ReditViewModelFolder);
 
 
 
@@ -98,7 +95,9 @@ using System.Threading.Tasks;
 
     string RoutedEventHandlersPropertyName = "RoutedEventHandlers";
     string RoutedCommandHandlersPropertyName = "RoutedCommandHandlers";
+
     string RegionPropertyName = "Region";
+    string ReditRegionPropertyName = "ReditRegion";
 
     string DisplayLabelProperty     = "Name";
     string DisplayHintProperty      = "Prompt";
@@ -113,7 +112,6 @@ using System.Threading.Tasks;
     string CaptionPropertyName                  = "Caption";
     string EformModePropertyName                = "EformMode";
     string ShowSubmitPropertyName               = "ShowSubmit";
-    string ForO2mSuffixPropertyName             = "ForO2m";
     string ForRSuffixPropertyName               = "ForR";
     string FormServicePrefix                    = "FrmSrv";
 
@@ -122,9 +120,9 @@ using System.Threading.Tasks;
     string NavigationBackCommandPropertyName    = "NavigationBackCommand";
 
 
-    string UIDispatcherInvokePropertyName   = "Application.Current.Dispatcher.Invoke";
-    string GetOneMethodName                 = "getone";
-    string CopyToModelNotifyMethodName      = "CopyToModelNotify";
+    string UIDispatcherInvokePropertyName       = "Application.Current.Dispatcher.Invoke";
+    string GetOneMethodName                     = "getone";
+    string CopyToModelNotifyMethodName          = "CopyToModelNotify";
 
     string EformOkCommandPropertyName           = "EformOkCommand";
     string EformCancelCommandPropertyName       = "EformCancelCommand";
@@ -156,6 +154,7 @@ using System.Threading.Tasks;
     if ((ReditViewModelNameSpace != modelInterfaceNameSpace) && (nmSpaces.IndexOf(modelInterfaceNameSpace) < 0)) 
         nmSpaces.Add(modelInterfaceNameSpace);
 
+    bool IsInTheSameModule = (EformUserControlProject == ReditUserControlProject) && false;
     
     
 #>
@@ -167,14 +166,43 @@ using <#= ns #>;
     }
 #>
 /*
-    In the file of IModule-class the following lines of code must be inserted:
 
+<#
+    if(!IsInTheSameModule) {
+#>
+    "<#= EformUserControlClassName #>"-UserControl is defined in the "<#= EformUserControlProject #>"-project.
+    In the file of IModule-class of "<#= EformUserControlProject #>"-project the following line of code must be inserted:
+
+        public void OnInitialized(IContainerProvider containerProvider)
+        {
+            ...
+            IRegionManager regionManager = containerProvider.Resolve(typeof(IRegionManager)) as IRegionManager;
+            if (regionManager != null)
+            {
+                ...
+                // According to requirements of the "<#= ReditViewModelClassName #>.cs"-file of "<#= ReditViewModelProject #>"-project. 
+                regionManager.RegisterViewWithRegion("<#= EformUserControlClassName #><#= ReditRegionPropertyName #>", typeof(<#= EformUserControlClassName #>));
+                ...
+            }
+            ...
+        }
+<#       
+    }
+#>
+
+
+    "<#= ReditUserControlClassName #>" UserControl is defined in the "<#= ReditUserControlProject #>"-project.
+    In the file of IModule-class of "<#= ReditUserControlProject #>"-project the following line of code must be inserted:
 
         public void RegisterTypes(IContainerRegistry containerRegistry)
         {
             ...
+            // According to requirements of the "<#= ReditViewModelClassName #>.cs"-file of "<#= ReditViewModelProject #>"-project. 
             ViewModelLocationProvider.Register<<#= ReditUserControlClassName #>, <#= ReditViewModelClassName #>>();
+            // According to requirements of the "<#= ReditViewModelClassName #>.cs"-file of "<#= ReditViewModelProject #>"-project. 
             containerRegistry.RegisterForNavigation<<#= ReditUserControlClassName #>, <#= ReditViewModelClassName #>>("<#= ReditUserControlClassName #><#= ForRSuffixPropertyName #>");
+            // According to requirements of the "<#= ReditViewModelClassName #>.cs"-file of "<#= ReditViewModelProject #>"-project. 
+            containerRegistry.Register<UserControl, <#= ReditUserControlClassName #>>("<#= ReditUserControlClassName #>");
             ...
         }
 */
@@ -422,6 +450,7 @@ namespace <#= ReditViewModelNameSpace #> {
                 bool isFirst= true;
                 foreach(ModelViewPropertyOfVwSerializable pk in primKeys) {
                     if (isFirst) {
+                        isFirst = false;
 #>
                             <#= GetPrimKeyVarName(pk) #>
 <#
@@ -1226,6 +1255,27 @@ namespace <#= ReditViewModelNameSpace #> {
     }
     string GetPrimKeyVarName(ModelViewPropertyOfVwSerializable pkpModelViewUIFormPropertySerializable) {
         return "pkp" + pkpModelViewUIFormPropertySerializable.ViewPropertyName;
+    }
+    string GetModelProjectName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileProject)) {
+            return result;
+        }
+        string[] fnArr = refItem.FileProject.Split(new char[] {'\\'}, 100, System.StringSplitOptions.None); 
+        string fn = fnArr[fnArr.Length - 1];
+
+        return fn.Replace(".csproj","");
     }
 
 #>

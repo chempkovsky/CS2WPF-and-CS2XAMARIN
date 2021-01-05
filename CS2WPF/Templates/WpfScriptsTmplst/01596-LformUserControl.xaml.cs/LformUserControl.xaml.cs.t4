@@ -24,6 +24,10 @@ using System.Windows.Input;
     string EformModeEnumClassName   = GetContextModelClassName(Context, EformModeEnumFolder);
     string EformModeEnumNameSpace   = GetContextModelNameSpace(Context, EformModeEnumFolder);
 
+    string IRegionManagerReferenceInterfaceFolder      = "00196-IRegionManagerReferenceInterface.cs";
+    string IRegionManagerReferenceInterfaceClassName   = GetContextModelClassName(Context, IRegionManagerReferenceInterfaceFolder);
+    string IRegionManagerReferenceInterfaceNameSpace   = GetContextModelNameSpace(Context, IRegionManagerReferenceInterfaceFolder);
+
     string IWebServiceFilterRsltInterfaceFolder      = "00204-IWebServiceFilterRsltInterface.cs";
     string IWebServiceFilterRsltInterfaceClassName   = GetContextModelClassName(Context, IWebServiceFilterRsltInterfaceFolder);
     string IWebServiceFilterRsltInterfaceNameSpace   = GetContextModelNameSpace(Context, IWebServiceFilterRsltInterfaceFolder);
@@ -41,10 +45,16 @@ using System.Windows.Input;
     string modelInterfaceClassName                  = GetInterfaceName(Model);
     string modelInterfaceNameSpace                  = GetModelNameSpace(Model, modelInterfaceFolder);
 
+    string SformUserControlFolder                   = "01420-SformUserControl.xaml.cs";
+    string SformUserControlClassName                = GetModelClassName(Model, SformUserControlFolder);
+    string SformUserControlNameSpace                = GetModelNameSpace(Model, SformUserControlFolder);
+    string SformUserControlProject                  = GetModelProjectName(Model, SformUserControlFolder);
+
 
     string LformUserControlFolder                   = "01596-LformUserControl.xaml.cs";
     string LformUserControlClassName                = GetModelClassName(Model, LformUserControlFolder);
     string LformUserControlNameSpace                = GetModelNameSpace(Model, LformUserControlFolder);
+    string LformUserControlProject                  = GetModelProjectName(Model, LformUserControlFolder);
 
 
     string CaptionPropertyName = "Caption";
@@ -72,6 +82,10 @@ using System.Windows.Input;
     string CanDelPropertyName                   = "CanDelete";
     string CanDelPropertyChangedPropertyName    = "CanDeletePropertyChanged";
 
+    string RegionPropertyName = "Region";
+    string LformRegionPropertyName = "LformRegion";
+    string ProxyPropertyName = "Proxy";
+    string CurrentRegionManagerPropertyName = "CurrentRegionManager";
 
 
     List<string> nmSpaces = new List<string>();
@@ -83,7 +97,19 @@ using System.Windows.Input;
         nmSpaces.Add(RoutedEventExtNameSpace);
     if ((LformUserControlNameSpace != modelInterfaceNameSpace) && (nmSpaces.IndexOf(modelInterfaceNameSpace) < 0)) 
         nmSpaces.Add(modelInterfaceNameSpace);
+//    if ((LformUserControlNameSpace != IRegionManagerReferenceInterfaceNameSpace) && (nmSpaces.IndexOf(IRegionManagerReferenceInterfaceNameSpace) < 0)) 
+//        nmSpaces.Add(IRegionManagerReferenceInterfaceNameSpace);
     
+    bool IsInTheSameModule = (SformUserControlProject == LformUserControlProject) && false;
+#>
+<#
+    if (!IsInTheSameModule) {
+#>
+// using Prism.Regions;
+// using Prism.Common;
+// using Prism.Ioc;
+<#
+    }
 #>
 <# 
     foreach(string ns in nmSpaces) {
@@ -98,12 +124,81 @@ namespace <#= LformUserControlNameSpace #> {
     /// <summary>
     /// Interaction logic for <#= LformUserControlClassName #>.xaml
     /// </summary>
-    public partial class <#= LformUserControlClassName #>: UserControl
+    public partial class <#= LformUserControlClassName #>: UserControl //, <#= IRegionManagerReferenceInterfaceClassName #>
     {
+//        IContainerProvider _containerProvider;
+//        public <#= LformUserControlClassName #>(IContainerProvider containerProvider)
         public <#= LformUserControlClassName #>()
         {
+//            _containerProvider = containerProvider;
             InitializeComponent();
+<#
+    if (!IsInTheSameModule) {
+#>
+//            ObservableObject<IRegion> <#= SformUserControlClassName #>Observable = RegionManager.GetObservableRegion(this.<#= SformUserControlClassName #><#= ProxyPropertyName #>);
+//            <#= SformUserControlClassName #>Observable.PropertyChanged += (s, a) =>
+//            {
+//                On<#= SformUserControlClassName #>Observable(((ObservableObject<IRegion>)s).Value);
+//            };
+<#
+    }
+#>
         }
+
+<#
+    if (!IsInTheSameModule) {
+#>
+//        #region On<#= SformUserControlClassName #>Observable 
+//        public void On<#= SformUserControlClassName #>Observable(IRegion region) {
+//            if (region != null) {
+//                region.RemoveAll();
+//                if (region.RegionManager != null) {
+//                    UserControl userControl = _containerProvider.Resolve<UserControl>("<#= SformUserControlClassName #>");
+//                    region.Add(userControl, null, true);
+//                    region.Activate(userControl);
+//                }
+//            }
+//        }
+//        #endregion
+<#
+    }
+#>
+        
+
+//        #region <#= CurrentRegionManagerPropertyName #>
+//        private static void <#= CurrentRegionManagerPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e) {
+<#
+    if (!IsInTheSameModule) {
+#>
+//            <#= LformUserControlClassName #> inst = d as <#= LformUserControlClassName #>;
+//            if (inst != null)
+//            {
+//                IRegionManager crm = e.NewValue as IRegionManager;
+//                ObservableObject<IRegion> <#= SformUserControlClassName #>Observable = RegionManager.GetObservableRegion(inst.<#= SformUserControlClassName #><#= ProxyPropertyName #>);
+//                <#= SformUserControlClassName #>Observable.Value.RegionManager = crm;
+//                inst.On<#= SformUserControlClassName #>Observable(<#= SformUserControlClassName #>Observable.Value);
+//            }
+<#
+    }
+#>
+//        }
+//        public static readonly DependencyProperty <#= CurrentRegionManagerPropertyName #>Property =
+//                DependencyProperty.Register(
+//                "<#= CurrentRegionManagerPropertyName #>", typeof(object),
+//                typeof(<#= LformUserControlClassName #>),
+//                new PropertyMetadata(null, <#= CurrentRegionManagerPropertyName #>Changed));
+//        public object <#= CurrentRegionManagerPropertyName #>
+//        {
+//            get
+//            {
+//                return (object)GetValue(<#= CurrentRegionManagerPropertyName #>Property);
+//            }
+//            set
+//            {
+//                SetValue(<#= CurrentRegionManagerPropertyName #>Property, value);
+//            }
+//        }
+//        #endregion
 
         #region <#= CaptionPropertyName #>
         public static readonly DependencyProperty <#= CaptionPropertyName #>Property =

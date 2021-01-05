@@ -65,6 +65,7 @@
     string ShowFilterPropertyName = "ShowFilter";
     string FilterHeightPropertyName = "FilterHeight";
     string HiddenFiltersPropertyName = "HiddenFilters";
+    string HiddenFiltersVMPropertyName = "HiddenFiltersVM"; // correct:  to exclude HResult=0x800703E9 System.StackOverflowException
     string FiltersPropertyName = "Filters";
     string FilterOperatorsPropertyName = "FilterOperators";
     string FilterDefinitionsPropertyName = "FilterDefinitions";
@@ -92,7 +93,9 @@
     string DataSourcePropertyName = "DataSource";
     string ShortNameLabelProperty   = "ShortName";
     string RowMenuItemsPropertyName = "RowMenuItems";
+    string RowMenuItemsVMPropertyName = "RowMenuItemsVM";
     string TableMenuItemsPropertyName = "TableMenuItems";
+    string TableMenuItemsVMPropertyName = "TableMenuItemsVM";
 
     string wsfucPrefix = "clr-namespace:" + WebServiceFilterUserControlNameSpace;
     if(SformUserControlXamlProject != WebServiceFilterUserControlProject) {
@@ -168,7 +171,7 @@
             <#= CaptionPropertyName #>="{Binding <#= CaptionPropertyName #>, Mode=OneWay, ElementName=SformUsrCntrlRootNode}"
             <#= ShowBackBtnPropertyName #>="{Binding <#= ShowBackBtnPropertyName #>, Mode=OneWay, ElementName=SformUsrCntrlRootNode}"
             <#= ShowAddFilterBtnPropertyName #>="{Binding <#= ShowAddFilterBtnPropertyName #>, Mode=OneWay, ElementName=SformUsrCntrlRootNode}"
-            <#= HiddenFiltersPropertyName #>="{Binding <#= HiddenFiltersPropertyName #>, Mode=OneWay}"
+            <#= HiddenFiltersPropertyName #>="{Binding <#= HiddenFiltersVMPropertyName #>, Mode=OneWay}"
             <#= FilterDefinitionsPropertyName #>="{Binding <#= FilterDefinitionsPropertyName #>, Mode=OneWay}"
             <#= ContainerMenuItemsPropertyName #>="{Binding <#= ContainerMenuItemsPropertyName #>, Mode=OneWay, ElementName=SformUsrCntrlRootNode}"
             <#= FilterHeightPropertyName #>="{Binding <#= FilterHeightPropertyName #>, Mode=OneWay, ElementName=SformUsrCntrlRootNode}"
@@ -208,7 +211,7 @@
                 </Style> -->
             </DataGrid.Resources>
             <DataGrid.ContextMenu >
-                <ContextMenu ItemsSource="{Binding Data.<#= RowMenuItemsPropertyName #>, Source={StaticResource userControlContext}}">
+                <ContextMenu ItemsSource="{Binding Data.<#= RowMenuItemsVMPropertyName #>, Source={StaticResource userControlContext}}">
                     <ContextMenu.ItemContainerStyle>
                         <Style TargetType="{x:Type MenuItem}">
                             <Setter Property="MenuItem.Header" Value="{Binding Caption}"/>
@@ -233,7 +236,7 @@
                 <DataGridTemplateColumn CanUserReorder="False" CanUserSort="False" CanUserResize="False" >
                     <DataGridTemplateColumn.Header>
                         <Menu BorderBrush="{x:Null}" Background="{x:Null}">
-                            <MenuItem  ItemsSource="{Binding Data.<#= TableMenuItemsPropertyName #>, Source={StaticResource userControlContext}}" >
+                            <MenuItem  ItemsSource="{Binding Data.<#= TableMenuItemsVMPropertyName #>, Source={StaticResource userControlContext}}" >
                                 <MenuItem.Header>
                                     <Viewbox   Height="16" Width="16" FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type MenuItem}}}" HorizontalAlignment="Center" VerticalAlignment="Center" >
                                         <Canvas  Height="24" Width="24" >

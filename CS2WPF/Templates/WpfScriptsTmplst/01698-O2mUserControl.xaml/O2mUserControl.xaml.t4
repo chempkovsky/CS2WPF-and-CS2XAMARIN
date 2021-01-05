@@ -27,6 +27,7 @@
     string LformUserControlFolder          = "01596-LformUserControl.xaml.cs";
     string LformUserControlClassName       = GetModelClassName(Model, LformUserControlFolder);
     string LformUserControlNameSpace       = GetModelNameSpace(Model, LformUserControlFolder);
+    string LformUserControlProject         = GetModelProjectName(Model, LformUserControlFolder);
 
     string O2mUserControlFolder           = "01696-O2mUserControl.xaml.cs";
     string O2mUserControlClassName        = GetModelClassName(Model, O2mUserControlFolder);
@@ -48,12 +49,22 @@
     string ShowBackBtnPropertyName = "ShowBackBtn";
     string GridHeightPropertyName = "GridHeight";
     string TableMenuItemsPropertyName = "TableMenuItems";
+    string TableMenuItemsVMPropertyName = "TableMenuItemsVM";
+
     string RowMenuItemsPropertyName = "RowMenuItems";
+    string RowMenuItemsVMPropertyName = "RowMenuItemsVM";
+
     string ContainerMenuItemsPropertyName = "ContainerMenuItems";
-    string HiddenFiltersPropertyName = "HiddenFilters";
+
+    string HiddenFiltersPropertyName    = "HiddenFilters";
+    string HiddenFiltersVMPropertyName  = "HiddenFiltersVM";
+
     string CanAddPropertyName                   = "CanAdd";
+    string CanAddVMPropertyName                 = "CanAddVM";
     string CanUpdPropertyName                   = "CanUpdate";
+    string CanUpdVMPropertyName                 = "CanUpdateVM";
     string CanDelPropertyName                   = "CanDelete";
+    string CanDelVMPropertyName                 = "CanDeleteVM";
 
 
     string CurrentHiddenFiltersDetailPropertyName     = "CurrentHiddenFiltersDetail"; 
@@ -62,12 +73,24 @@
     string ShowFilterDetailPropertyName = "ShowFilterDetail"; //
     string ShowAddFilterBtnDetailPropertyName = "ShowAddFilterBtnDetail"; //
     string GridHeightDetailPropertyName = "GridHeightDetail"; //
+
     string HiddenFiltersDetailPropertyName = "HiddenFiltersDetail"; //
+    string HiddenFiltersDetailVMPropertyName = "HiddenFiltersDetailVM"; //
+
     string TableMenuItemsDetailPropertyName = "TableMenuItemsDetail"; //
+    string TableMenuItemsDetailVMPropertyName = "TableMenuItemsDetailVM"; //
+
     string RowMenuItemsDetailPropertyName = "RowMenuItemsDetail"; //
+    string RowMenuItemsDetailVMPropertyName = "RowMenuItemsDetailVM"; //
+
     string CanAddDetailPropertyName                   = "CanAddDetail"; //
+    string CanAddDetailVMPropertyName                 = "CanAddDetailVM"; //
+
     string CanUpdDetailPropertyName                   = "CanUpdateDetail"; //
+    string CanUpdDetailVMPropertyName                 = "CanUpdateDetailVM"; //
+
     string CanDelDetailPropertyName                   = "CanDeleteDetail"; //
+    string CanDelDetailVMPropertyName                 = "CanDeleteDetailVM"; //
 
 
     string RegisterRoutedCommandBindingsPropertyName = "RegisterRoutedCommandBindings";
@@ -76,25 +99,31 @@
     string RoutedEventHandlersPropertyName = "RoutedEventHandlers";
     string RoutedCommandHandlersPropertyName = "RoutedCommandHandlers";
 
-    string DetailsListPropertyName                    = "DetailsList"; 
-    string SelectedDetailsListItemPropertyName        = "SelectedDetailsListItem"; 
-    string IsDetailVisiblePropertyName                = "IsDetailVisible"; 
+    string DetailsListPropertyName                  = "DetailsList"; 
+    string SelectedDetailsListItemPropertyName      = "SelectedDetailsListItem"; 
+    string IsDetailVisiblePropertyName              = "IsDetailVisible"; 
 
 
-    string RegionPropertyName = "Region";
-    string ForO2mSuffixPropertyName                   = "ForO2m";
-    string HostSuffixPropertyName                     = "Host";
+    string RegionPropertyName                       = "Region";
+    string MasterRegionPropertyName                 = "MasterRegion";
+    string DetailRegionPropertyName                 = "DetailRegion";
+    string ForO2mSuffixPropertyName                 = "ForO2m";
+    string HostSuffixPropertyName                   = "Host";
 
     List<string> detailViews = GetDetailViews(Model, Context, null);
 
 
     string proxyPrefix = "clr-namespace:" + ProxyUserControlNameSpace;
-    if(ProxyUserControlProject != O2mUserControlXamlFolder) {
+    if(ProxyUserControlProject != O2mUserControlXamlProject) {
         proxyPrefix = proxyPrefix + ";assembly=" + ProxyUserControlProject;
     }
     string attachedPrefix = "clr-namespace:" + AttachedPropertiesExtNameSpace;
-    if(AttachedPropertiesExtProject != O2mUserControlXamlFolder) {
+    if(AttachedPropertiesExtProject != O2mUserControlXamlProject) {
         attachedPrefix = attachedPrefix + ";assembly=" + AttachedPropertiesExtProject;
+    }
+    string lformPrefix = "clr-namespace:" + LformUserControlNameSpace;
+    if(LformUserControlProject != O2mUserControlXamlProject) {
+        lformPrefix = lformPrefix + ";assembly=" + LformUserControlProject;
     }
 
 #>
@@ -109,6 +138,39 @@
              prism:ViewModelLocator.AutoWireViewModel="True"                          
 
              xmlns:prx="<#= proxyPrefix #>" 
+
+<#
+    if (LformUserControlProject == O2mUserControlProject) {
+#>
+             xmlns:lfrm="<#= lformPrefix #>" 
+<#
+    }
+#>
+
+<#
+    {
+        int id = -1;
+        foreach(string detailViewName in detailViews) {
+            id++;
+            ModelViewSerializable detailView = GetModelViewByName(Context, detailViewName);
+            string detailViewClassName = GetModelClassName(detailView, LformUserControlFolder);
+            if(detailView == null) {
+#>
+<!--  can not find the view by Name <#= detailViewName #> -->
+<#
+                continue;
+            }
+            string localLformUserControlProject  = GetModelProjectName(detailView, LformUserControlFolder);
+            if ((localLformUserControlProject == O2mUserControlProject) && false)
+            {
+                string locallformPrefix = "clr-namespace:" + GetModelNameSpace(detailView, LformUserControlFolder);
+#>
+             xmlns:lfrm<#= id #>="<#= locallformPrefix #>" 
+<#
+            }
+        }
+    }
+#>
 
              xmlns:atch="<#= attachedPrefix #>" 
              atch:<#= AttachedPropertiesExtClassName #>.<#= RegisterRoutedEventBindingsPropertyName #>="{Binding <#= RoutedEventHandlersPropertyName #>}"
@@ -126,9 +188,19 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
+<#
+    if ((LformUserControlProject == O2mUserControlProject) && false)
+    {
+#>
+        <lfrm:<#= LformUserControlClassName #> Grid.Row="0"
+<#
+    } else {
+#>
         <prx:<#= ProxyUserControlClassName #> Grid.Row="0"
-
-            prism:RegionManager.RegionName="<#= LformUserControlClassName #><#= RegionPropertyName #>"
+            prism:RegionManager.RegionName="<#= LformUserControlClassName #><#= MasterRegionPropertyName #>"
+<#
+    }
+#>
 
             <#= CaptionPropertyName #>="{Binding <#= CaptionPropertyName #>, Mode=OneWay, ElementName=O2mRootControl}" 
             <#= FilterHeightPropertyName #>="{Binding <#= FilterHeightPropertyName #>, Mode=OneWay, ElementName=O2mRootControl}" 
@@ -136,15 +208,15 @@
             <#= ShowAddFilterBtnPropertyName #>="{Binding <#= ShowAddFilterBtnPropertyName #>, Mode=OneWay, ElementName=O2mRootControl}" 
             <#= GridHeightPropertyName #>="{Binding <#= GridHeightPropertyName #>, Mode=OneWay, ElementName=O2mRootControl}" 
             <#= ShowBackBtnPropertyName #>="{Binding <#= ShowBackBtnPropertyName #>, Mode=OneWay, ElementName=O2mRootControl}" 
-            <#= HiddenFiltersPropertyName #>="{Binding <#= HiddenFiltersPropertyName #>, Mode=OneWay}" 
-            <#= TableMenuItemsPropertyName #>="{Binding <#= TableMenuItemsPropertyName #>, Mode=OneWay}" 
-            <#= RowMenuItemsPropertyName #>="{Binding <#= RowMenuItemsPropertyName #>, Mode=OneWay}" 
+            <#= HiddenFiltersPropertyName #>="{Binding <#= HiddenFiltersVMPropertyName #>, Mode=OneWay}" 
+            <#= TableMenuItemsPropertyName #>="{Binding <#= TableMenuItemsVMPropertyName #>, Mode=OneWay}" 
+            <#= RowMenuItemsPropertyName #>="{Binding <#= RowMenuItemsVMPropertyName #>, Mode=OneWay}" 
 
-            <#= CanAddPropertyName #>="{Binding <#= CanAddPropertyName #>, Mode=OneWay}" 
-            <#= CanUpdPropertyName #>="{Binding <#= CanUpdPropertyName #>, Mode=OneWay}" 
-            <#= CanDelPropertyName #>="{Binding <#= CanDelPropertyName #>, Mode=OneWay}" 
-            >
-        </prx:<#= ProxyUserControlClassName #>>
+            <#= CanAddPropertyName #>="{Binding <#= CanAddVMPropertyName #>, Mode=OneWay}" 
+            <#= CanUpdPropertyName #>="{Binding <#= CanUpdVMPropertyName #>, Mode=OneWay}" 
+            <#= CanDelPropertyName #>="{Binding <#= CanDelVMPropertyName #>, Mode=OneWay}" 
+            />
+        
 
         <StackPanel Grid.Row="1" Margin="8">
             <Label FontWeight="Bold" Content="Selected detail"/>
@@ -172,7 +244,10 @@
 
         <StackPanel Grid.Row="2" Visibility="{Binding <#= IsDetailVisiblePropertyName #>, Mode=OneWay,  Converter={StaticResource BooleanToVisibilityConverter}}">
 <#
+    {
+        int id = -1;
         foreach(string detailViewName in detailViews) {
+            id++;
             ModelViewSerializable detailView = GetModelViewByName(Context, detailViewName);
             string detailViewClassName = GetModelClassName(detailView, LformUserControlFolder);
             if(detailView == null) {
@@ -181,12 +256,23 @@
 <#
                 continue;
             }
+            string localLformUserControlProject  = GetModelProjectName(detailView, LformUserControlFolder);
 
+            if ((localLformUserControlProject == O2mUserControlProject) && false)
+            {
+#>
+            <lfrm<#= id #>:<#= GetModelClassName(detailView, LformUserControlFolder) #> 
+<#
+            } else {
+            // reset RegionPropertyName
 #>
             <prx:<#= ProxyUserControlClassName #> 
-                Visibility="{Binding <#= IsDetailVisiblePropertyName #><#= detailViewClassName #>, Mode=OneWay,  Converter={StaticResource BooleanToVisibilityConverter}}"
-                prism:RegionManager.RegionName="<#= detailViewClassName #><#= RegionPropertyName #>"
+                prism:RegionManager.RegionName="<#= detailViewClassName #><#= DetailRegionPropertyName #>"
+<#
+            }
+#>
 
+                Visibility="{Binding <#= IsDetailVisiblePropertyName #><#= detailViewClassName #>, Mode=OneWay,  Converter={StaticResource BooleanToVisibilityConverter}}"
                 <#= CaptionPropertyName #>="{Binding <#= SelectedDetailsListItemPropertyName #>.<#= CaptionPropertyName #>, Mode=OneWay}" 
                 <#= FilterHeightPropertyName #>="{Binding <#= FilterHeightDetailPropertyName #>, Mode=OneWay, ElementName=O2mRootControl}" 
                 <#= ShowFilterPropertyName #>="{Binding <#= ShowFilterDetailPropertyName #>, Mode=OneWay, ElementName=O2mRootControl}" 
@@ -194,16 +280,16 @@
                 <#= GridHeightPropertyName #>="{Binding <#= GridHeightDetailPropertyName #>, Mode=OneWay, ElementName=O2mRootControl}" 
                 <#= ShowBackBtnPropertyName #>="False" 
                 <#= HiddenFiltersPropertyName #>="{Binding <#= CurrentHiddenFiltersForPropertyName #><#= detailViewClassName #>, Mode=OneWay}" 
-                <#= TableMenuItemsPropertyName #>="{Binding <#= TableMenuItemsDetailPropertyName #>, Mode=OneWay}" 
-                <#= RowMenuItemsPropertyName #>="{Binding <#= RowMenuItemsDetailPropertyName #>, Mode=OneWay}" 
+                <#= TableMenuItemsPropertyName #>="{Binding <#= TableMenuItemsDetailVMPropertyName #>, Mode=OneWay}" 
+                <#= RowMenuItemsPropertyName #>="{Binding <#= RowMenuItemsDetailVMPropertyName #>, Mode=OneWay}" 
 
-                <#= CanAddPropertyName #>="{Binding <#= CanAddDetailPropertyName #>, Mode=OneWay}" 
-                <#= CanUpdPropertyName #>="{Binding <#= CanUpdDetailPropertyName #>, Mode=OneWay}" 
-                <#= CanDelPropertyName #>="{Binding <#= CanDelDetailPropertyName #>, Mode=OneWay}" 
-                >
-            </prx:<#= ProxyUserControlClassName #>>
+                <#= CanAddPropertyName #>="{Binding <#= CanAddDetailVMPropertyName #>, Mode=OneWay}" 
+                <#= CanUpdPropertyName #>="{Binding <#= CanUpdDetailVMPropertyName #>, Mode=OneWay}" 
+                <#= CanDelPropertyName #>="{Binding <#= CanDelDetailVMPropertyName #>, Mode=OneWay}" 
+                />
 <#
         }
+    }
 #>
         </StackPanel>
     </Grid>

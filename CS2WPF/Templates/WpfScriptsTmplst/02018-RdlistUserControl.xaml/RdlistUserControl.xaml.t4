@@ -24,16 +24,10 @@
     string ProxyUserControlNameSpace        = GetContextModelNameSpace(Context, ProxyUserControlFolder);
     string ProxyUserControlProject          = GetContextModelProjectName(Context, ProxyUserControlFolder);
 
-    string LformUserControlFolder          = "01596-LformUserControl.xaml.cs";
-    string LformUserControlClassName       = GetModelClassName(Model, LformUserControlFolder);
-    string LformUserControlNameSpace       = GetModelNameSpace(Model, LformUserControlFolder);
-
-
-    
-
-
-
-
+    string LformUserControlFolder           = "01596-LformUserControl.xaml.cs";
+    string LformUserControlClassName        = GetModelClassName(Model, LformUserControlFolder);
+    string LformUserControlNameSpace        = GetModelNameSpace(Model, LformUserControlFolder);
+    string LformUserControlProject          = GetModelProjectName(Model, LformUserControlFolder);
 
     string RdlistUserControlFolder           = "02016-RdlistUserControl.xaml.cs";
     string RdlistUserControlClassName        = GetModelClassName(Model, RdlistUserControlFolder);
@@ -54,8 +48,10 @@
     string GridHeightPropertyName = "GridHeight";
     string TableMenuItemsPropertyName = "TableMenuItems";
     string RowMenuItemsPropertyName = "RowMenuItems";
+    string RowMenuItemsVMPropertyName = "RowMenuItemsVM";
     string ContainerMenuItemsPropertyName = "ContainerMenuItems";
     string HiddenFiltersPropertyName = "HiddenFilters";
+    string HiddenFiltersVMPropertyName = "HiddenFiltersVM";
 
     string CanAddPropertyName                   = "CanAdd";
     string CanUpdPropertyName                   = "CanUpdate";
@@ -74,6 +70,7 @@
 
 
     string RegionPropertyName = "Region";
+    string RdlistRegionPropertyName = "RdlistRegion";
 
 
     string proxyPrefix = "clr-namespace:" + ProxyUserControlNameSpace;
@@ -84,7 +81,14 @@
     if(AttachedPropertiesExtProject != RdlistUserControlXamlProject) {
         attachedPrefix = attachedPrefix + ";assembly=" + AttachedPropertiesExtProject;
     }
+    string lformPrefix = "clr-namespace:" + LformUserControlNameSpace;
+    if(LformUserControlNameSpace != RdlistUserControlXamlProject) {
+        lformPrefix = lformPrefix + ";assembly=" + LformUserControlProject;
+    }
 
+    bool IsInTheSameModule = (LformUserControlProject == RdlistUserControlProject) && false;
+
+    
 #>
 
 <UserControl x:Class="<#= RdlistUserControlNameSpace #>.<#= RdlistUserControlClassName #>"
@@ -96,7 +100,18 @@
              xmlns:prism="http://prismlibrary.com/" 
              prism:ViewModelLocator.AutoWireViewModel="True"                          
 
+<#
+    if(IsInTheSameModule) {
+#>
+             xmlns:lfrm="<#= lformPrefix #>" 
+<#
+    } else {
+#>
              xmlns:prx="<#= proxyPrefix #>" 
+<#
+    }
+#>
+
 
              xmlns:atch="<#= attachedPrefix #>" 
              atch:<#= AttachedPropertiesExtClassName #>.<#= RegisterRoutedCommandBindingsPropertyName #>="{Binding <#= RoutedCommandHandlersPropertyName #>}"
@@ -108,9 +123,18 @@
 
              mc:Ignorable="d" 
              d:DesignHeight="150" d:DesignWidth="400" >
+<#
+    if(IsInTheSameModule) {
+#>
+        <lfrm:<#= LformUserControlClassName #>  
+<#
+    } else {
+#>
         <prx:<#= ProxyUserControlClassName #> 
-
-            prism:RegionManager.RegionName="<#= LformUserControlClassName #><#= RegionPropertyName #>"
+            prism:RegionManager.RegionName="<#= LformUserControlClassName #><#= RdlistRegionPropertyName #>"
+<#
+    }
+#>
 
             <#= CaptionPropertyName #>="{Binding <#= CaptionPropertyName #>, Mode=OneWay}" 
             <#= FilterHeightPropertyName #>="{Binding <#= FilterHeightPropertyName #>, Mode=OneWay, ElementName=RdlistUsrCntrlRootNode}" 
@@ -119,16 +143,15 @@
             <#= GridHeightPropertyName #>="{Binding <#= GridHeightPropertyName #>, Mode=OneWay, ElementName=RdlistUsrCntrlRootNode}" 
             <#= ShowBackBtnPropertyName #>="{Binding <#= ShowBackBtnPropertyName #>, Mode=OneWay}" 
 
-            <#= HiddenFiltersPropertyName #>="{Binding <#= HiddenFiltersPropertyName #>, Mode=OneWay}" 
+            <#= HiddenFiltersPropertyName #>="{Binding <#= HiddenFiltersVMPropertyName #>, Mode=OneWay}" 
             <#= TableMenuItemsPropertyName #>="{Binding <#= TableMenuItemsPropertyName #>, Mode=OneWay, ElementName=RdlistUsrCntrlRootNode}" 
-            <#= RowMenuItemsPropertyName #>="{Binding <#= RowMenuItemsPropertyName #>, Mode=OneWay}" 
+            <#= RowMenuItemsPropertyName #>="{Binding <#= RowMenuItemsVMPropertyName #>, Mode=OneWay}" 
 
 
             <#= CanAddPropertyName #>="{Binding <#= CanAddInternalPropertyName #>, Mode=OneWay}" 
             <#= CanUpdPropertyName #>="{Binding <#= CanUpdInternalPropertyName #>, Mode=OneWay}" 
             <#= CanDelPropertyName #>="{Binding <#= CanDelInternalPropertyName #>, Mode=OneWay}" 
-            >
-        </prx:<#= ProxyUserControlClassName #>>
+            />
 </UserControl>
 
 

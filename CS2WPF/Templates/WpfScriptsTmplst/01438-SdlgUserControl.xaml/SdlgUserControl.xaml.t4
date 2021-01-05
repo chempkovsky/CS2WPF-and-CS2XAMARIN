@@ -24,10 +24,10 @@
     string ProxyUserControlNameSpace        = GetContextModelNameSpace(Context, ProxyUserControlFolder);
     string ProxyUserControlProject          = GetContextModelProjectName(Context, ProxyUserControlFolder);
 
-
     string SformUserControlFolder           = "01420-SformUserControl.xaml.cs";
     string SformUserControlClassName        = GetModelClassName(Model, SformUserControlFolder);
     string SformUserControlNameSpace        = GetModelNameSpace(Model, SformUserControlFolder);
+    string SformUserControlProject          = GetModelProjectName(Model, SformUserControlFolder);
 
     string SdlgUserControlFolder           = "01436-SdlgUserControl.xaml.cs";
     string SdlgUserControlClassName        = GetModelClassName(Model, SdlgUserControlFolder);
@@ -63,6 +63,7 @@
     string OkCommandPropertyName = "OkCommand";
     string CancelCommandPropertyName = "CancelCommand";
     string RegionPropertyName = "Region";
+    string DialogRegionPropertyName = "DialogRegion";
 
 
     string proxyPrefix = "clr-namespace:" + ProxyUserControlNameSpace;
@@ -73,6 +74,12 @@
     if(AttachedPropertiesExtProject != SdlgUserControlXamlProject) {
         attachedPrefix = attachedPrefix + ";assembly=" + AttachedPropertiesExtProject;
     }
+    string sformPrefix = "clr-namespace:" + SformUserControlNameSpace;
+    if(SformUserControlProject != SdlgUserControlXamlProject) {
+        sformPrefix = sformPrefix + ";assembly=" + SformUserControlProject;
+    }
+
+    bool IsInTheSameModule = (SformUserControlProject == SdlgUserControlProject) && false;
 
 #>
 
@@ -84,11 +91,21 @@
 
              xmlns:prism="http://prismlibrary.com/" 
              prism:ViewModelLocator.AutoWireViewModel="True"                          
-
+<#
+    if(IsInTheSameModule) {
+#>
+             xmlns:sfrm="<#= sformPrefix #>" 
+<#
+    } else {
+#>
              xmlns:prx="<#= proxyPrefix #>" 
+<#
+    }
+#>
 
              xmlns:atch="<#= attachedPrefix #>" 
              atch:<#= AttachedPropertiesExtClassName #>.<#= RegisterRoutedCommandBindingsPropertyName #>="{Binding <#= RoutedCommandHandlersPropertyName #>}"
+             atch:<#= AttachedPropertiesExtClassName #>.<#= RegisterRoutedEventBindingsPropertyName #>="{Binding <#= RoutedEventHandlersPropertyName #>}"
 
              mc:Ignorable="d" 
              d:DesignHeight="150" d:DesignWidth="400" >
@@ -97,10 +114,18 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
+<#
+    if(IsInTheSameModule) {
+#>
+        <sfrm:<#= SformUserControlClassName #> Grid.Row="0"
+<#
+    } else {
+#>
         <prx:<#= ProxyUserControlClassName #> Grid.Row="0"
-
-            prism:RegionManager.RegionName="<#= SformUserControlClassName #><#= RegionPropertyName #>"
-
+            prism:RegionManager.RegionName="<#= SformUserControlClassName #><#= DialogRegionPropertyName #>"
+<#
+    }
+#>
             <#= CaptionPropertyName #>="{Binding <#= CaptionPropertyName #>}" 
             <#= FilterHeightPropertyName #>="{Binding <#= FilterHeightPropertyName #>}" 
             <#= ShowFilterPropertyName #>="True" 
@@ -108,8 +133,7 @@
             <#= GridHeightPropertyName #>="{Binding <#= GridHeightPropertyName #>}" 
             <#= ShowBackBtnPropertyName #>="False" 
             <#= HiddenFiltersPropertyName #>="{Binding <#= HiddenFiltersPropertyName #>}" 
-            >
-        </prx:<#= ProxyUserControlClassName #>>
+            />
         <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="8">
                 <Button Content=" Ok " MinWidth="80" Command="{Binding <#= OkCommandPropertyName #>}"/>
                 <Button Content=" Cancel " MinWidth="80" Margin="8 0 0 0" Command="{Binding <#= CancelCommandPropertyName #>}"/>

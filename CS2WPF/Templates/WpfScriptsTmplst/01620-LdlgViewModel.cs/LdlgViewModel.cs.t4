@@ -92,14 +92,18 @@ using System.Windows.Controls;
     string LformUserControlFolder           = "01596-LformUserControl.xaml.cs";
     string LformUserControlClassName        = GetModelClassName(Model, LformUserControlFolder);
     string LformUserControlNameSpace        = GetModelNameSpace(Model, LformUserControlFolder);
+    string LformUserControlProject          = GetModelProjectName(Model, LformUserControlFolder);
 
     string LdlgUserControlFolder           = "01616-LdlgUserControl.xaml.cs";
     string LdlgUserControlClassName        = GetModelClassName(Model, LdlgUserControlFolder);
     string LdlgUserControlNameSpace        = GetModelNameSpace(Model, LdlgUserControlFolder);
+    string LdlgUserControlProject          = GetModelProjectName(Model, LdlgUserControlFolder);
+
 
     string LdlgViewModelFolder             = "01620-LdlgViewModel.cs";
     string LdlgViewModelClassName          = GetModelClassName(Model, LdlgViewModelFolder);
     string LdlgViewModelNameSpace          = GetModelNameSpace(Model, LdlgViewModelFolder);
+    string LdlgViewModelProject            = GetModelProjectName(Model, LdlgViewModelFolder);
 
 
     string CaptionPropertyName                  = "Caption";
@@ -118,6 +122,8 @@ using System.Windows.Controls;
     string SformSelectionChangedCommandPropertyName = "SformSelectionChangedCommand";
     string RoutedCommandHandlersPropertyName = "RoutedCommandHandlers";
 
+    string RegionPropertyName                   = "Region";
+    string DialogRegionPropertyName             = "DialogRegion";
 
     string OkCommandPropertyName = "OkCommand";
     string CancelCommandPropertyName = "CancelCommand";
@@ -140,6 +146,7 @@ using System.Windows.Controls;
         nmSpaces.Add(commandHelperModelNameSpace);
 
 
+    bool IsInTheSameModule = (LformUserControlProject == LdlgUserControlProject) && false;
     
     
 #>
@@ -152,11 +159,39 @@ using <#= ns #>;
 #>
 
 /*
-    In the file of IModule-class the following line of code must be inserted:
+
+<#
+    if(!IsInTheSameModule) {
+#>
+    "<#= LformUserControlClassName #>"-UserControl is defined in the "<#= LformUserControlProject #>"-project.
+    In the file of IModule-class of "<#= LformUserControlProject #>"-project the following line of code must be inserted:
+
+        public void OnInitialized(IContainerProvider containerProvider)
+        {
+            ...
+            IRegionManager regionManager = containerProvider.Resolve(typeof(IRegionManager)) as IRegionManager;
+            if (regionManager != null)
+            {
+                ...
+                // According to requirements of the "<#= LdlgViewModelClassName #>.cs"-file of "<#= LdlgViewModelProject #>"-project. 
+                regionManager.RegisterViewWithRegion("<#= LformUserControlClassName #><#= DialogRegionPropertyName #>", typeof(<#= LformUserControlClassName #>));
+                ...
+            }
+            ...
+        }
+
+<#       
+    }
+#>
+
+
+    "<#= LdlgUserControlClassName #>" UserControl is defined in the "<#= LdlgUserControlProject #>"-project.
+    In the file of IModule-class of "<#= LdlgUserControlProject #>"-project the following line of code must be inserted:
 
         public void RegisterTypes(IContainerRegistry containerRegistry)
         {
             ...
+            // According to requirements of the "<#= LdlgViewModelClassName #>.cs"-file of "<#= LdlgViewModelProject #>"-project. 
             containerRegistry.RegisterDialog<<#= LdlgUserControlClassName #>, <#= LdlgViewModelClassName #>>("<#= LdlgViewModelClassName #>");
             ...
         }
@@ -973,6 +1008,27 @@ namespace <#= LdlgViewModelNameSpace #> {
     string GetModelPropertyNameEx2(ModelViewUIListPropertySerializable prop, ModelViewSerializable model) {
         ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
         return GetModelPropertyName(sclrProp, model);
+    }
+    string GetModelProjectName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileProject)) {
+            return result;
+        }
+        string[] fnArr = refItem.FileProject.Split(new char[] {'\\'}, 100, System.StringSplitOptions.None); 
+        string fn = fnArr[fnArr.Length - 1];
+
+        return fn.Replace(".csproj","");
     }
 
 #>

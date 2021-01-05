@@ -50,6 +50,10 @@ using System.Windows.Controls;
     string RoutedCommandExtClassName   = GetContextModelClassName(Context, RoutedCommandExtFolder);
     string RoutedCommandExtNameSpace   = GetContextModelNameSpace(Context, RoutedCommandExtFolder);
 
+    string IScopedRegionUserControlInterfaceFolder      = "00630-IScopedRegionUserControlInterface.cs";
+    string IScopedRegionUserControlInterfaceClassName   = GetContextModelClassName(Context, IScopedRegionUserControlInterfaceFolder);
+    string IScopedRegionUserControlInterfaceNameSpace   = GetContextModelNameSpace(Context, IScopedRegionUserControlInterfaceFolder);
+
     string modelPageInterfaceFolder         = "01200-Page.interface.cs";
     string modelPageInterfaceClassName      = GetPageInterfaceName(Model);
     string modelPageInterfaceNameSpace      = GetModelNameSpace(Model, modelPageInterfaceFolder);
@@ -94,27 +98,33 @@ using System.Windows.Controls;
     string SformUserControlFolder           = "01420-SformUserControl.xaml.cs";
     string SformUserControlClassName        = GetModelClassName(Model, SformUserControlFolder);
     string SformUserControlNameSpace        = GetModelNameSpace(Model, SformUserControlFolder);
+    string SformUserControlProject          = GetModelProjectName(Model, SformUserControlFolder);
 
     string SdlgUserControlFolder           = "01436-SdlgUserControl.xaml.cs";
     string SdlgUserControlClassName        = GetModelClassName(Model, SdlgUserControlFolder);
     string SdlgUserControlNameSpace        = GetModelNameSpace(Model, SdlgUserControlFolder);
+    string SdlgUserControlProject          = GetModelProjectName(Model, SdlgUserControlFolder);
 
     string SdlgViewModelFolder      = "01440-SdlgViewModel.cs";
     string SdlgViewModelClassName   = GetModelClassName(Model, SdlgViewModelFolder);
     string SdlgViewModelNameSpace   = GetModelNameSpace(Model, SdlgViewModelFolder);
-
+    string SdlgViewModelProject     = GetModelProjectName(Model, SdlgViewModelFolder);
 
     string CaptionPropertyName                  = "Caption";
     string FilterHeightPropertyName             = "FilterHeight";
     string GridHeightPropertyName               = "GridHeight";
     string HiddenFiltersPropertyName            = "HiddenFilters";
 
-    string AppSettingServicePropertyName    = "GlblSettingsSrv";
-    string SformSelectionChangedPropertyName = "SformSelectionChanged";
-    string RoutedEventHandlersPropertyName = "RoutedEventHandlers";
+    string AppSettingServicePropertyName            = "GlblSettingsSrv";
+    string SformSelectionChangedPropertyName        = "SformSelectionChanged";
+    string RoutedEventHandlersPropertyName          = "RoutedEventHandlers";
     string SformSelectionChangedCommandPropertyName = "SformSelectionChangedCommand";
-    string RoutedCommandHandlersPropertyName = "RoutedCommandHandlers";
-    string SformLoadedCommandPropertyName  = "SformLoadedCommand";
+    string RoutedCommandHandlersPropertyName        = "RoutedCommandHandlers";
+    string SformLoadedCommandPropertyName           = "SformLoadedCommand";
+    string IsOnLoadedCalledPropertyName             = "IsOnLoadedCalled";
+
+    string RegionPropertyName = "Region";
+    string DialogRegionPropertyName = "DialogRegion";
 
 
     string OkCommandPropertyName = "OkCommand";
@@ -130,16 +140,28 @@ using System.Windows.Controls;
         nmSpaces.Add(IAppGlblSettingsServiceNameSpace);
     if ((SdlgViewModelNameSpace != RoutedEventExtNameSpace) && (nmSpaces.IndexOf(RoutedEventExtNameSpace) < 0)) 
         nmSpaces.Add(RoutedEventExtNameSpace);
-//    if ((SdlgViewModelNameSpace != SformUserControlNameSpace) && (nmSpaces.IndexOf(SformUserControlNameSpace) < 0)) 
-//        nmSpaces.Add(SformUserControlNameSpace);
     if ((SdlgViewModelNameSpace != modelInterfaceNameSpace) && (nmSpaces.IndexOf(modelInterfaceNameSpace) < 0)) 
         nmSpaces.Add(modelInterfaceNameSpace);
     if ((SdlgViewModelNameSpace != commandHelperModelNameSpace) && (nmSpaces.IndexOf(commandHelperModelNameSpace) < 0)) 
         nmSpaces.Add(commandHelperModelNameSpace);
 
 
+    bool IsInTheSameModule = (SformUserControlProject == SdlgUserControlProject) && false;
     
     
+#>
+<#    
+        if (!IsInTheSameModule) {
+
+
+    if ((SdlgViewModelNameSpace != IScopedRegionUserControlInterfaceNameSpace) && (nmSpaces.IndexOf(IScopedRegionUserControlInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IScopedRegionUserControlInterfaceNameSpace);
+
+#>
+using Prism.Ioc;
+using Prism.Regions;
+<#
+        }
 #>
 <# 
     foreach(string ns in nmSpaces) {
@@ -150,14 +172,42 @@ using <#= ns #>;
 #>
 
 /*
-    In the file of IModule-class the following line of code must be inserted:
+
+<#
+    if(!IsInTheSameModule) {
+#>
+    "<#= SformUserControlClassName #>"-UserControl is defined in the "<#= SformUserControlProject #>"-project.
+    In the file of IModule-class of "<#= SformUserControlProject #>"-project the following line of code must be inserted:
+
+        public void OnInitialized(IContainerProvider containerProvider)
+        {
+            ...
+            IRegionManager regionManager = containerProvider.Resolve(typeof(IRegionManager)) as IRegionManager;
+            if (regionManager != null)
+            {
+                ...
+                // According to requirements of the "<#= SdlgViewModelClassName #>.cs"-file of "<#= SdlgViewModelProject #>"-project. 
+                regionManager.RegisterViewWithRegion("<#= SformUserControlClassName #><#= DialogRegionPropertyName #>", typeof(<#= SformUserControlClassName #>));
+                ...
+            }
+            ...
+        }
+
+<#       
+    }
+#>
+
+    "<#= SdlgUserControlClassName #>" UserControl is defined in the "<#= SdlgUserControlProject #>"-project.
+    In the file of IModule-class of "<#= SdlgUserControlProject #>"-project the following line of code must be inserted:
 
         public void RegisterTypes(IContainerRegistry containerRegistry)
         {
             ...
+            // According to requirements of the "<#= SdlgViewModelClassName #>.cs"-file of "<#= SdlgViewModelProject #>"-project. 
             containerRegistry.RegisterDialog<<#= SdlgUserControlClassName #>, <#= SdlgViewModelClassName #>>("<#= SdlgViewModelClassName #>");
             ...
         }
+
 */
 
 namespace <#= SdlgViewModelNameSpace #> {
@@ -165,15 +215,29 @@ namespace <#= SdlgViewModelNameSpace #> {
     {
         protected <#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName #>=null;
         protected IDialogService _dialogService=null;
+<#
+    if(IsInTheSameModule) {
+#>
         public <#= SdlgViewModelClassName #>(<#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName  #>, IDialogService dialogService) {
+<#
+    } else {
+#>
+        protected IContainerProvider _containerProvider = null;
+        protected IRegionManager _regionManager = null;
+        public <#= SdlgViewModelClassName #>(<#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName  #>, IDialogService dialogService, IContainerProvider containerProvider, IRegionManager regionManager) {
+            _containerProvider = containerProvider;
+            _regionManager = regionManager;
+<#
+    }
+#>
 
             this.<#= AppSettingServicePropertyName #> = <#= AppSettingServicePropertyName #>;
             this._dialogService = dialogService;
 
-//            ObservableCollection<ValueTuple<RoutedEvent, Delegate, bool>> rehs = new ObservableCollection<ValueTuple<RoutedEvent, Delegate, bool>>();
-//            rehs.Add((<#= RoutedEventExtClassName #>.<#= SformSelectionChangedPropertyName #>Event, 
-//                new SelectionChangedEventHandler(this.On<#= SformSelectionChangedPropertyName #>), false));
-//            _<#= RoutedEventHandlersPropertyName #> = rehs;
+            ObservableCollection<ValueTuple<RoutedEvent, Delegate, bool>> rehs = new ObservableCollection<ValueTuple<RoutedEvent, Delegate, bool>>();
+            rehs.Add((FrameworkElement.LoadedEvent, 
+                new RoutedEventHandler(this.OnLoaded), false));
+            _<#= RoutedEventHandlersPropertyName #> = rehs;
             
             CommandBindingCollection cbsc = new CommandBindingCollection();
             CommandBinding cb = new CommandBinding(<#= RoutedCommandExtClassName #>.<#= SformSelectionChangedCommandPropertyName #>, new ExecutedRoutedEventHandler(this.Executed<#= SformSelectionChangedCommandPropertyName #>), new CanExecuteRoutedEventHandler(CanExecute<#= SformSelectionChangedCommandPropertyName #>));
@@ -196,20 +260,24 @@ namespace <#= SdlgViewModelNameSpace #> {
         }
         #endregion
 
+        #region OnLoaded
+        protected bool <#= IsOnLoadedCalledPropertyName #> = false;
+        private void OnLoaded(object sender, RoutedEventArgs e)
+        {
+            e.Handled = true;
+            if(!<#= IsOnLoadedCalledPropertyName #>) {
+                <#= IsOnLoadedCalledPropertyName #> = true;
+<#
+    if(!IsInTheSameModule) {
+       
+    }
+#>
+            }
+        }
+        #endregion
+
         #region <#= SelectedItemPropertyName #>
         protected <#= modelInterfaceClassName #> _<#= SelectedItemPropertyName #> = null;
-
-//        protected void On<#= SformSelectionChangedPropertyName #>(object sender, SelectionChangedEventArgs e) {
-//            if (e.OriginalSource is <#= SformUserControlClassName #>) 
-//            {
-//                _<#= SelectedItemPropertyName #> = null;
-//                if(e.AddedItems != null) {
-//                    if (e.AddedItems.Count > 0) {
-//                        _<#= SelectedItemPropertyName #> = e.AddedItems[0] as <#= modelInterfaceClassName #>;
-//                    }
-//                }
-//            }
-//        }
         public void Executed<#= SformSelectionChangedCommandPropertyName #>(object sender, ExecutedRoutedEventArgs e) { 
             e.Handled = true;
             Tuple<string, System.Collections.IList, System.Collections.IList> prm = e.Parameter as  Tuple<string, System.Collections.IList, System.Collections.IList>;
@@ -294,22 +362,22 @@ namespace <#= SdlgViewModelNameSpace #> {
         #endregion
 
         #region <#= RoutedEventHandlersPropertyName #>
-//        protected IEnumerable<ValueTuple<RoutedEvent, Delegate, bool>> _<#= RoutedEventHandlersPropertyName #> = null;
-//        public IEnumerable<ValueTuple<RoutedEvent, Delegate, bool>> <#= RoutedEventHandlersPropertyName #>
-//        { 
-//            get
-//            {
-//                return _<#= RoutedEventHandlersPropertyName #>;
-//            }
-//            set
-//            {
-//                if (_<#= RoutedEventHandlersPropertyName #> != value)
-//                {
-//                    _<#= RoutedEventHandlersPropertyName #> = value;
-//                    OnPropertyChanged();
-//                }
-//            }
-//        }
+        protected IEnumerable<ValueTuple<RoutedEvent, Delegate, bool>> _<#= RoutedEventHandlersPropertyName #> = null;
+        public IEnumerable<ValueTuple<RoutedEvent, Delegate, bool>> <#= RoutedEventHandlersPropertyName #>
+        { 
+            get
+            {
+                return _<#= RoutedEventHandlersPropertyName #>;
+            }
+            set
+            {
+                if (_<#= RoutedEventHandlersPropertyName #> != value)
+                {
+                    _<#= RoutedEventHandlersPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
         #endregion
 
 
@@ -541,6 +609,28 @@ namespace <#= SdlgViewModelNameSpace #> {
         }
         return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
     }
+    string GetModelProjectName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileProject)) {
+            return result;
+        }
+        string[] fnArr = refItem.FileProject.Split(new char[] {'\\'}, 100, System.StringSplitOptions.None); 
+        string fn = fnArr[fnArr.Length - 1];
+
+        return fn.Replace(".csproj","");
+    }
+
     string GetContextModelNameSpace(DbContextSerializable context, string fileType) {
         string result="";
         if ((context == null) || string.IsNullOrEmpty(fileType)) {
