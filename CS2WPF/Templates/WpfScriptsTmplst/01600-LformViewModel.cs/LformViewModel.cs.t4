@@ -135,7 +135,6 @@ using Prism.Regions;
     string CaptionPropertyName                  = "Caption";
     string EformModePropertyName                = "EformMode";
     string ShowSubmitPropertyName               = "ShowSubmit";
-    string ForO2mSuffixPropertyName             = "ForO2m";
 
     string UIDispatcherInvokePropertyName       = "Application.Current.Dispatcher.Invoke";
 
@@ -215,7 +214,7 @@ using <#= ns #>;
 */
 
 namespace <#= LformViewModelNameSpace #> {
-    public class <#= LformViewModelClassName #>: INotifyPropertyChanged, IRegionMemberLifetime
+    public class <#= LformViewModelClassName #>: INotifyPropertyChanged
     {
         protected <#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName #>=null;
         protected IDialogService _dialogService=null;
@@ -262,15 +261,6 @@ namespace <#= LformViewModelNameSpace #> {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
         #endregion
-
-        #region IRegionMemberLifetime
-        public bool KeepAlive
-        {
-            get { return false; }
-        }        
-        #endregion
-
-
 
         //protected bool <#= IsOnLoadedCalledPropertyName #> = false;
         private void OnLoaded(object sender, RoutedEventArgs e)

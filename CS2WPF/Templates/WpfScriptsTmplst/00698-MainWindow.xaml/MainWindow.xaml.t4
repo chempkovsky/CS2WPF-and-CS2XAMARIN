@@ -1,0 +1,304 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="xaml" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+
+<#
+
+    string FillHelperModelFolder      = "00160-FillHelper.cs";
+    string FillHelperModelClassName   = GetModelClassName(Model, FillHelperModelFolder);
+    string FillHelperModelNameSpace   = GetModelNameSpace(Model, FillHelperModelFolder);
+    string FillHelperModelProject     = GetModelProjectName(Model, FillHelperModelFolder);
+
+
+    string pathHelperModelFolder      = "00120-PathHelper.cs";
+    string pathHelperModelClassName   = GetModelClassName(Model, pathHelperModelFolder);
+    string pathHelperModelNameSpace   = GetModelNameSpace(Model, pathHelperModelFolder);
+    string pathHelperModelProject     = GetModelProjectName(Model, pathHelperModelFolder);
+
+    string RoutedCommandExtFolder      = "00224-RoutedCommandExt.cs";
+    string RoutedCommandExtClassName   = GetModelClassName(Model, RoutedCommandExtFolder);
+    string RoutedCommandExtNameSpace   = GetModelNameSpace(Model, RoutedCommandExtFolder);
+    string RoutedCommandExtProject     = GetModelProjectName(Model, RoutedCommandExtFolder);
+
+    string AttachedPropertiesExtFolder      = "00226-AttachedPropertiesExt.cs";
+    string AttachedPropertiesExtClassName   = GetModelClassName(Model, AttachedPropertiesExtFolder);
+    string AttachedPropertiesExtNameSpace   = GetModelNameSpace(Model, AttachedPropertiesExtFolder);
+    string AttachedPropertiesExtProject     = GetModelProjectName(Model, AttachedPropertiesExtFolder);
+
+    string ProxyUserControlFolder           = "00280-ProxyUserControl.xaml.cs";
+    string ProxyUserControlClassName        = GetModelClassName(Model, ProxyUserControlFolder);
+    string ProxyUserControlNameSpace        = GetModelNameSpace(Model, ProxyUserControlFolder);
+    string ProxyUserControlProject          = GetModelProjectName(Model, ProxyUserControlFolder);
+
+
+    string MainWindowFolder         = "00696-MainWindow.xaml.cs";
+    string MainWindowClassName      = GetModelClassName(Model, MainWindowFolder);
+    string MainWindowNameSpace      = GetModelNameSpace(Model, MainWindowFolder);
+    string MainWindowNameProject    = GetModelProjectName(Model, MainWindowFolder);
+
+    string MainWindowXamlFolder      = "00698-MainWindow.xaml";
+    string MainWindowXamlClassName   = GetModelClassName(Model, MainWindowXamlFolder);
+    string MainWindowXamlNameSpace   = GetModelNameSpace(Model, MainWindowXamlFolder);
+    string MainWindowXamlProject     = GetModelProjectName(Model, MainWindowXamlFolder);
+    
+
+    string TitlePropertyName                 = "Title";
+    string MainMenuPropertyName              = "MainMenu";
+    string MainContentRegionPropertyName     = "MainContentRegion";
+
+    string RegisterRoutedCommandBindingsPropertyName    = "RegisterRoutedCommandBindings";
+    string RegisterRoutedEventBindingsPropertyName      = "RegisterRoutedEventBindings";
+    string RoutedCommandHandlersPropertyName            = "RoutedCommandHandlers";
+    string RoutedEventHandlersPropertyName              = "RoutedEventHandlers";
+    string CloseNotificationWindowCommandPropertyName   = "CloseNotificationWindowCommand";
+    string NotificationMessageStringPropertyName        = "NotificationMessageString";
+    string NotificationIsOpenPropertyName               = "NotificationIsOpen";
+
+    string pthPrefix = "clr-namespace:" + pathHelperModelNameSpace;
+    if(pathHelperModelProject != MainWindowXamlProject) {
+        pthPrefix = pthPrefix + ";assembly=" + pathHelperModelProject;
+    }
+    string fllPrefix = "clr-namespace:" + FillHelperModelNameSpace;
+    if(FillHelperModelProject != MainWindowXamlProject) {
+        fllPrefix = fllPrefix + ";assembly=" + FillHelperModelProject;
+    }
+    string proxyPrefix = "clr-namespace:" + ProxyUserControlNameSpace;
+    if(ProxyUserControlProject != MainWindowXamlProject) {
+        proxyPrefix = proxyPrefix + ";assembly=" + ProxyUserControlProject;
+    }
+    string attachedPrefix = "clr-namespace:" + AttachedPropertiesExtNameSpace;
+    if(AttachedPropertiesExtProject != MainWindowXamlProject) {
+        attachedPrefix = attachedPrefix + ";assembly=" + AttachedPropertiesExtProject;
+    }
+    string routedCommandPrefix = "clr-namespace:" + RoutedCommandExtNameSpace;
+    if(RoutedCommandExtProject != MainWindowXamlProject) {
+        routedCommandPrefix = routedCommandPrefix + ";assembly=" + RoutedCommandExtProject;
+    }
+
+    
+
+#>
+
+<Window x:Class="<#= MainWindowNameSpace #>.<#= MainWindowClassName #>"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+
+        xmlns:prism="http://prismlibrary.com/" 
+        prism:ViewModelLocator.AutoWireViewModel="True"
+
+        xmlns:pth="<#= pthPrefix #>"
+        xmlns:fill="<#= fllPrefix #>"
+        xmlns:prx="<#= proxyPrefix #>" 
+
+        xmlns:atch="<#= attachedPrefix #>" 
+        atch:<#= AttachedPropertiesExtClassName #>.<#= RegisterRoutedCommandBindingsPropertyName #>="{Binding <#= RoutedCommandHandlersPropertyName #>}"
+        atch:<#= AttachedPropertiesExtClassName #>.<#= RegisterRoutedEventBindingsPropertyName #>="{Binding <#= RoutedEventHandlersPropertyName #>}"
+        
+        xmlns:rcmd="<#= routedCommandPrefix #>" 
+
+        Title="{Binding <#= TitlePropertyName #>}"
+        x:Name="MainWindowRoot"
+        WindowStartupLocation="CenterScreen">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="40" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid  Grid.Row="0"  Background="{DynamicResource Primary}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Label Grid.Column="0" Foreground="{DynamicResource PrimaryForeground}" Margin="24 4 0 0" FontWeight="Bold" FontSize="16" Content="{Binding <#= TitlePropertyName #>}"/>
+            <StackPanel Grid.Column="2" Margin="0 4 24 0" Orientation="Horizontal">
+                <Button  Foreground="{DynamicResource PrimaryForeground}" 
+                                    BorderBrush="{x:Null}" Background="{x:Null}"
+                                    KeyboardNavigation.TabNavigation ="None" ToolTip="Settings">
+                    <Viewbox   Height="24" Width="24" FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Button}}}" HorizontalAlignment="Center" VerticalAlignment="Center" >
+                        <Canvas  Height="24" Width="24" >
+                        <Path  Data="{DynamicResource Cog}" Fill="{Binding Foreground, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Button}}}" />
+                        </Canvas>
+                    </Viewbox>
+                </Button>
+            </StackPanel>
+        </Grid>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="4*" />
+            </Grid.ColumnDefinitions>
+            <ScrollViewer Grid.Column="0" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Margin="4 8 4 8" >
+                <ItemsControl ItemsSource="{Binding <#= MainMenuPropertyName #>}" >
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel>
+                                <Button Command="{Binding Command}" CommandParameter="{Binding Data}" CommandTarget="{Binding ElementName=MainWindowRoot}" HorizontalContentAlignment="Left" Background="{x:Null}" BorderThickness="0" FontSize="16">
+                                    <Grid >
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="36"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Viewbox   Height="24" Width="24" Grid.Column="0">
+                                            <Canvas  Height="24" Width="24" >
+                                                <Path  pth:<#= pathHelperModelClassName #>.DataResourceKey="{Binding IconName}" fill:<#= FillHelperModelClassName #>.FillResourceKey="{Binding IconColor}" />
+                                            </Canvas>
+                                        </Viewbox>
+                                        <TextBlock Text="{Binding Caption}" Grid.Column="1"/>
+                                    </Grid>
+                                </Button>
+                                <Separator/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+
+            <GridSplitter Grid.Column="1" ShowsPreview="False" Width="4" HorizontalAlignment="Center" VerticalAlignment="Stretch" />
+            <ScrollViewer Grid.Column="2" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Margin="4 8 4 8" >
+                <prx:<#= ProxyUserControlClassName #> Grid.Column="1" 
+                                           prism:RegionManager.RegionName="<#= MainContentRegionPropertyName #>" 
+                                           ShowAddFilterBtn="True" ShowFilter="True"
+                                           FilterHeight="400"
+                                           GridHeight="300"
+                                           CanAdd="True" CanDelete="True" CanUpdate="True"
+                                           />
+            </ScrollViewer>
+            <Grid Grid.Column="2" >
+                <Popup StaysOpen="True" Placement="Center"  IsOpen="{Binding <#= NotificationIsOpenPropertyName #>}">
+                    <Border Background="{DynamicResource NotificationBackground}" >
+                        <Grid Margin="12 4 4 12" >
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Column="0" Grid.Row="1" TextWrapping="Wrap" Text="{Binding <#= NotificationMessageStringPropertyName #>}" Foreground="{DynamicResource NotificationForeground}"  Width="450"/>
+                            <Button Grid.Row="0" Grid.Column="1"
+                                    Command="{x:Static rcmd:<#= RoutedCommandExtClassName #>.<#= CloseNotificationWindowCommandPropertyName #>}"
+                                    Foreground="{DynamicResource NotificationForeground}"  
+                                    BorderBrush="{x:Null}" Background="{x:Null}"
+                                    KeyboardNavigation.TabNavigation ="None" ToolTip="Close message">
+                                <Viewbox   Height="16" Width="16" FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Button}}}" HorizontalAlignment="Center" VerticalAlignment="Center" >
+                                    <Canvas  Height="24" Width="24" >
+                                        <Path  Data="{DynamicResource CloseThick}" Fill="{Binding Foreground, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Button}}}" />
+                                    </Canvas>
+                                </Viewbox>
+                            </Button>
+                        </Grid>
+                    </Border>
+                </Popup>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>
+
+
+<#+
+
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+    string GetModelProjectName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileProject)) {
+            return result;
+        }
+        string[] fnArr = refItem.FileProject.Split(new char[] {'\\'}, 100, System.StringSplitOptions.None); 
+        string fn = fnArr[fnArr.Length - 1];
+
+        return fn.Replace(".csproj","");
+    }
+
+#>

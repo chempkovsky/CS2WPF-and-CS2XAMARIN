@@ -1,0 +1,366 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+using System;
+using System.Windows;
+using System.Windows.Threading;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using System.Windows.Input;
+using System.Collections.ObjectModel;
+using System.Collections.Generic;
+using Prism.Regions;
+using Prism.Ioc;
+
+<#
+
+
+
+
+    string IAppGlblSettingsServiceFolder            = "00080-IAppGlblSettingsService.cs";
+    string IAppGlblSettingsServiceClassName         = GetModelClassName(Model, IAppGlblSettingsServiceFolder);
+    string IAppGlblSettingsServiceNameSpace         = GetModelNameSpace(Model, IAppGlblSettingsServiceFolder);
+
+    string IWebServiceFilterMenuInterfaceFolder      = "00206-IWebServiceFilterMenuInterface.cs";
+    string IWebServiceFilterMenuInterfaceClassName   = GetModelClassName(Model, IWebServiceFilterMenuInterfaceFolder);
+    string IWebServiceFilterMenuInterfaceNameSpace   = GetModelNameSpace(Model, IWebServiceFilterMenuInterfaceFolder);
+
+    string WebServiceFilterMenuFolder               = "00216-WebServiceFilterMenu.cs";
+    string WebServiceFilterMenuClassName            = GetModelClassName(Model, WebServiceFilterMenuFolder);
+    string WebServiceFilterMenuNameSpace            = GetModelNameSpace(Model, WebServiceFilterMenuFolder);
+
+    string RoutedCommandExtFolder                   = "00224-RoutedCommandExt.cs";
+    string RoutedCommandExtClassName                = GetModelClassName(Model, RoutedCommandExtFolder);
+    string RoutedCommandExtNameSpace                = GetModelNameSpace(Model, RoutedCommandExtFolder);
+
+    string AccessDeniedUserControlFolder     = "00678-AccessDeniedUserControl.xaml.cs";
+    string AccessDeniedUserControlClassName  = GetModelClassName(Model, AccessDeniedUserControlFolder);
+    string AccessDeniedUserControlNameSpace  = GetModelNameSpace(Model, AccessDeniedUserControlFolder);
+
+    string PageNotFoundUserControlFolder     = "00684-PageNotFoundUserControl.xaml.cs";
+    string PageNotFoundUserControlClassName  = GetModelClassName(Model, PageNotFoundUserControlFolder);
+    string PageNotFoundUserControlNameSpace  = GetModelNameSpace(Model, PageNotFoundUserControlFolder);
+
+    string MainWindowViewModelFolder      = "00700-MainWindowViewModel.cs";
+    string MainWindowViewModelClassName   = GetModelClassName(Model, MainWindowViewModelFolder);
+    string MainWindowViewModelNameSpace   = GetModelNameSpace(Model, MainWindowViewModelFolder);
+
+    string AppSettingServicePropertyName    = "GlblSettingsSrv";
+    string IsOnLoadedCalledPropertyName     = "IsOnLoadedCalled";
+
+    string TitlePropertyName                    = "Title";
+    string MainMenuPropertyName                 = "MainMenu";
+    string MainContentRegionPropertyName        = "MainContentRegion";
+    string RoutedCommandHandlersPropertyName    = "RoutedCommandHandlers";
+    string RoutedEventHandlersPropertyName      = "RoutedEventHandlers";
+    string MainMenuCommandPropertyName          = "MainMenuCommand";
+    string HomeUserControlPropertyName          = "HomeUserControl";
+
+    string NotificationMessageStringPropertyName        = "NotificationMessageString";
+    string NotificationTimerPropertyName                = "NotificationTimer";
+    string NotificationIsOpenPropertyName               = "NotificationIsOpen";
+    string CloseNotificationWindowCommandPropertyName   = "CloseNotificationWindowCommand";
+    string OnMessageNotificationPropertyName            = "OnMessageNotification";
+
+    List<string> nmSpaces = new List<string>();
+    if ((MainWindowViewModelNameSpace != IAppGlblSettingsServiceNameSpace) && (nmSpaces.IndexOf(IAppGlblSettingsServiceNameSpace) < 0)) 
+        nmSpaces.Add(IAppGlblSettingsServiceNameSpace);
+    if ((MainWindowViewModelNameSpace != RoutedCommandExtNameSpace) && (nmSpaces.IndexOf(RoutedCommandExtNameSpace) < 0)) 
+        nmSpaces.Add(RoutedCommandExtNameSpace);
+    if ((MainWindowViewModelNameSpace != IWebServiceFilterMenuInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterMenuInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IWebServiceFilterMenuInterfaceNameSpace);
+    if ((MainWindowViewModelNameSpace != WebServiceFilterMenuNameSpace) && (nmSpaces.IndexOf(WebServiceFilterMenuNameSpace) < 0)) 
+        nmSpaces.Add(WebServiceFilterMenuNameSpace);
+
+#>
+<# 
+    foreach(string ns in nmSpaces) {
+#>
+using <#= ns #>;
+<#
+    }
+#>
+
+
+namespace <#= MainWindowViewModelNameSpace #> {
+    public class <#= MainWindowViewModelClassName #> : INotifyPropertyChanged
+    {
+        protected <#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName #>;
+        protected IRegionManager _regionManager;
+        protected IContainerProvider _containerProvider;
+        public <#= MainWindowViewModelClassName #>(IRegionManager regionManager, IContainerProvider containerProvider) {
+
+            // this.<#= AppSettingServicePropertyName #> = <#= AppSettingServicePropertyName #>;
+            this._regionManager = regionManager;
+            this._containerProvider = containerProvider;
+
+            ObservableCollection<ValueTuple<RoutedEvent, Delegate, bool>> rehs = new ObservableCollection<ValueTuple<RoutedEvent, Delegate, bool>>();
+            rehs.Add((FrameworkElement.LoadedEvent,
+                new RoutedEventHandler(this.OnLoaded), false));
+            _<#= RoutedEventHandlersPropertyName #> = rehs;
+
+
+            CommandBinding cb = null;
+            CommandBindingCollection cbsc = new CommandBindingCollection();
+            cb = new CommandBinding(<#= RoutedCommandExtClassName #>.<#= MainMenuCommandPropertyName #>, new ExecutedRoutedEventHandler(this.Executed<#= MainMenuCommandPropertyName #>), new CanExecuteRoutedEventHandler(CanExecute<#= MainMenuCommandPropertyName #>));
+            cbsc.Add(cb);
+            cb = new CommandBinding(<#= RoutedCommandExtClassName #>.<#= CloseNotificationWindowCommandPropertyName #>, new ExecutedRoutedEventHandler(this.Executed<#= CloseNotificationWindowCommandPropertyName #>), new CanExecuteRoutedEventHandler(CanExecute<#= CloseNotificationWindowCommandPropertyName #>));
+            cbsc.Add(cb);
+
+            _<#= RoutedCommandHandlersPropertyName #> = cbsc;
+
+            <#= NotificationTimerPropertyName #> = new DispatcherTimer { Interval = TimeSpan.FromSeconds(3) };
+            <#= NotificationTimerPropertyName #>.Tick += (sender, args) =>
+            {
+                <#= NotificationTimerPropertyName #>.Stop();
+                <#= NotificationIsOpenPropertyName #> = false;
+            };
+
+        }
+        #region INotifyPropertyChanged
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string name = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+        #endregion
+
+        #region <#= RoutedCommandHandlersPropertyName #>
+        protected CommandBindingCollection _<#= RoutedCommandHandlersPropertyName #> = null;
+        public CommandBindingCollection <#= RoutedCommandHandlersPropertyName #>
+        { 
+            get
+            {
+                return _<#= RoutedCommandHandlersPropertyName #>;
+            }
+            set
+            {
+                if (_<#= RoutedCommandHandlersPropertyName #> != value)
+                {
+                    _<#= RoutedCommandHandlersPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+
+        #region <#= RoutedEventHandlersPropertyName #>
+        protected IEnumerable<ValueTuple<RoutedEvent, Delegate, bool>> _<#= RoutedEventHandlersPropertyName #> = null;
+        public IEnumerable<ValueTuple<RoutedEvent, Delegate, bool>> <#= RoutedEventHandlersPropertyName #>
+        {
+            get
+            {
+                return _<#= RoutedEventHandlersPropertyName #>;
+            }
+            set
+            {
+                if (_RoutedEventHandlers != value)
+                {
+                    _<#= RoutedEventHandlersPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+
+        #region OnLoaded
+        protected bool <#= IsOnLoadedCalledPropertyName #> = false;
+        private void OnLoaded(object sender, RoutedEventArgs e)
+        {
+            e.Handled = true;
+            if (!<#= IsOnLoadedCalledPropertyName #>) {
+                <#= IsOnLoadedCalledPropertyName #> = true;
+                <#= AppSettingServicePropertyName #> = _containerProvider.Resolve<<#= IAppGlblSettingsServiceClassName #>>();
+                <#= AppSettingServicePropertyName #>.<#= OnMessageNotificationPropertyName #> += <#= OnMessageNotificationPropertyName #>;
+                _regionManager.Regions["<#= MainContentRegionPropertyName #>"].NavigationService.Journal.Clear();
+                _regionManager.RequestNavigate("<#= MainContentRegionPropertyName #>", "<#= HomeUserControlPropertyName #>");
+            }
+        }
+        #endregion
+
+        #region <#= TitlePropertyName #>
+        public string <#= TitlePropertyName #>
+        {
+            get { return "Prism App"; }
+        }
+        #endregion
+
+        #region <#= MainMenuPropertyName #>
+        IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> _<#= MainMenuPropertyName #> = new ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>>()
+        {
+            new <#= WebServiceFilterMenuClassName #>() { Id = "002", Caption="Country (Rt)", IconName="TableCog",  IconColor="Primary", Data="LitCountryViewRlistUserControl", Command=<#= RoutedCommandExtClassName #>.<#= MainMenuCommandPropertyName #>},
+            
+        };
+        public IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> <#= MainMenuPropertyName #>
+        {
+            get { return _<#= MainMenuPropertyName #>; }
+        }
+        #endregion
+
+        #region <#= MainMenuCommandPropertyName #>
+        public void Executed<#= MainMenuCommandPropertyName #>(object sender, ExecutedRoutedEventArgs e) {
+            e.Handled = true;
+            string navPath = e.Parameter as string;
+            if (string.IsNullOrEmpty(navPath)) return;
+
+            _regionManager.Regions["<#= MainContentRegionPropertyName #>"].NavigationService.Journal.Clear();
+            _regionManager.RequestNavigate("<#= MainContentRegionPropertyName #>", navPath,
+                (navResult) => {
+                    if (navResult.Result.HasValue ? navResult.Result.Value : false) return;
+                    string navErrorMsg = "Unknown Navigation Error";
+                    if (navResult.Error != null)
+                    {
+                        navErrorMsg = navResult.Error.Message;
+                        Exception inner = navResult.Error.InnerException;
+                        while (inner != null)
+                        {
+                            navErrorMsg = navErrorMsg + ": " + inner.Message;
+                            inner = inner.InnerException;
+                        }
+                    }
+                    if (_regionManager.Regions["<#= MainContentRegionPropertyName #>"].NavigationService.Journal.CanGoBack) _regionManager.Regions["<#= MainContentRegionPropertyName #>"].NavigationService.Journal.GoBack();
+                    _regionManager.RequestNavigate("<#= MainContentRegionPropertyName #>", "<#= PageNotFoundUserControlClassName #>");
+                    GlblSettingsSrv.ShowErrorMessage("Navigation Exception", navErrorMsg);
+                });
+
+        } 
+        public void CanExecute<#= MainMenuCommandPropertyName #>(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.Handled = true;
+            e.CanExecute = true;
+        }
+        #endregion
+
+        #region Notifications
+        protected DispatcherTimer <#= NotificationTimerPropertyName #> = null;
+        protected string _<#= NotificationMessageStringPropertyName #> = null;
+        public string <#= NotificationMessageStringPropertyName #>
+        {
+            get { return _<#= NotificationMessageStringPropertyName #>; }
+            set
+            {
+                if (_<#= NotificationMessageStringPropertyName #> != value)
+                {
+                    _<#= NotificationMessageStringPropertyName #> = value;
+                    OnPropertyChanged();
+                    <#= NotificationTimerPropertyName #>.Stop();
+                    <#= NotificationIsOpenPropertyName #> = true;
+                    <#= NotificationTimerPropertyName #>.Start();
+                }
+            }
+        }
+        protected Boolean _<#= NotificationIsOpenPropertyName #> = false;
+        public Boolean <#= NotificationIsOpenPropertyName #>
+        {
+            get { return _<#= NotificationIsOpenPropertyName #>; }
+            set 
+            {
+                if (_<#= NotificationIsOpenPropertyName #> != value)
+                {
+                    _<#= NotificationIsOpenPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        public void Executed<#= CloseNotificationWindowCommandPropertyName #>(object sender, ExecutedRoutedEventArgs e)
+        {
+            e.Handled = true;
+            <#= NotificationTimerPropertyName #>.Stop();
+            <#= NotificationIsOpenPropertyName #> = false;
+        } 
+        public void CanExecute<#= CloseNotificationWindowCommandPropertyName #>(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.Handled = true;
+            e.CanExecute = true;
+        }
+        protected void <#= OnMessageNotificationPropertyName #>(object sender, string message)
+        {
+            _NotificationMessageString = null;
+            NotificationMessageString = message;
+        }
+
+        #endregion
+
+    }
+}
+
+<#+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+
+#>

@@ -61,6 +61,14 @@ using System.Threading.Tasks;
     string RoutedCommandExtClassName                = GetContextModelClassName(Context, RoutedCommandExtFolder);
     string RoutedCommandExtNameSpace                = GetContextModelNameSpace(Context, RoutedCommandExtFolder);
 
+    string AccessDeniedUserControlFolder     = "00678-AccessDeniedUserControl.xaml.cs";
+    string AccessDeniedUserControlClassName  = GetContextModelClassName(Context, AccessDeniedUserControlFolder);
+    string AccessDeniedUserControlNameSpace  = GetContextModelNameSpace(Context, AccessDeniedUserControlFolder);
+
+    string PageNotFoundUserControlFolder     = "00684-PageNotFoundUserControl.xaml.cs";
+    string PageNotFoundUserControlClassName  = GetContextModelClassName(Context, PageNotFoundUserControlFolder);
+    string PageNotFoundUserControlNameSpace  = GetContextModelNameSpace(Context, PageNotFoundUserControlFolder);
+
     string modelInterfaceFolder             = "01100-Interface.cs";
     string modelInterfaceClassName          = GetInterfaceName(Model);
     string modelInterfaceNameSpace          = GetModelNameSpace(Model, modelInterfaceFolder);
@@ -141,10 +149,8 @@ using System.Threading.Tasks;
     string CaptionPropertyName                  = "Caption";
     string EformModePropertyName                = "EformMode";
     string ShowSubmitPropertyName               = "ShowSubmit";
-    string ForO2mSuffixPropertyName             = "ForO2m";
     string NavigationBackCommandPropertyName    = "NavigationBackCommand";
     string ShowBackBtnPropertyName              = "ShowBackBtn";
-    string ForRSuffixPropertyName               = "ForR";
     string FormServicePrefix                    = "FrmSrv";
     string RowMIPrefixPropertyName              = "RowMI";
 
@@ -227,7 +233,7 @@ using <#= ns #>;
             // According to requirements of the "<#= RlistViewModelClassName #>.cs"-file of "<#= RlistUserControlProject #>"-project. 
             ViewModelLocationProvider.Register<<#= RlistUserControlClassName #>, <#= RlistViewModelClassName #>>();
             // According to requirements of the "<#= RlistViewModelClassName #>.cs"-file of "<#= RlistUserControlProject #>"-project. 
-            containerRegistry.RegisterForNavigation<<#= RlistUserControlClassName #>, <#= RlistViewModelClassName #>>("<#= RlistUserControlClassName #><#= ForRSuffixPropertyName #>");
+            containerRegistry.RegisterForNavigation<<#= RlistUserControlClassName #>, <#= RlistViewModelClassName #>>("<#= RlistUserControlClassName #>");
             // According to requirements of the "<#= RlistViewModelClassName #>.cs"-file of "<#= RlistUserControlProject #>"-project. 
             containerRegistry.Register<UserControl, <#= RlistUserControlClassName #>>("<#= RlistUserControlClassName #>");
             ...
@@ -630,6 +636,23 @@ namespace <#= RlistViewModelNameSpace #> {
         }
         #endregion
 
+        protected void OnNavigationResult(NavigationResult navResult) {
+            if (navResult.Result.HasValue ? navResult.Result.Value : false) return;
+            string navErrorMsg = "Unknown Navigation Error";
+            if (navResult.Error != null)
+            {
+                navErrorMsg = navResult.Error.Message;
+                Exception inner = navResult.Error.InnerException;
+                while (inner != null)
+                {
+                    navErrorMsg = navErrorMsg + ": " + inner.Message;
+                    inner = inner.InnerException;
+                }
+            }
+            if (<#= CurrentNavigationContextPropertyName #>.NavigationService.Journal.CanGoBack) <#= CurrentNavigationContextPropertyName #>.NavigationService.Journal.GoBack();
+            <#= CurrentNavigationContextPropertyName #>.NavigationService.RequestNavigate(new Uri("<#= PageNotFoundUserControlClassName #>", UriKind.Relative));
+            <#= AppSettingServicePropertyName #>.ShowErrorMessage("Navigation Exception", navErrorMsg);
+        }
 <#
         foreach(string detailViewName in detailViews) {
             ModelViewSerializable detailView = GetModelViewByName(Context, detailViewName);
@@ -648,6 +671,10 @@ namespace <#= RlistViewModelNameSpace #> {
         #region <#= detailViewClassName #><#= foreignKey.NavigationName #>Command
         public void Executed<#= detailViewClassName #><#= foreignKey.NavigationName #>Command(object sender, ExecutedRoutedEventArgs e) { 
             e.Handled = true;
+            if (((<#= AppSettingServicePropertyName #>.GetViewModelMask("<#= detailView.ViewName #>") & 1) != 1 )) {
+                <#= CurrentNavigationContextPropertyName #>.NavigationService.RequestNavigate(new Uri("<#= AccessDeniedUserControlClassName #>", UriKind.Relative));
+                return;
+            }
             <#= modelInterfaceClassName #> selected = e.Parameter as <#= modelInterfaceClassName #>;
             if((selected == null) || (<#= CurrentNavigationContextPropertyName #> == null)) return;
             NavigationParameters navigationParameters = new NavigationParameters();
@@ -662,8 +689,9 @@ namespace <#= RlistViewModelNameSpace #> {
                         }
                     }
 #>
-//          KeepAlive = true;
-            <#= CurrentNavigationContextPropertyName #>.NavigationService.RequestNavigate(new Uri("<#= detailViewClassName #><#= ForRSuffixPropertyName #>", UriKind.Relative), navigationParameters);
+            <#= CurrentNavigationContextPropertyName #>.NavigationService.RequestNavigate(new Uri("<#= detailViewClassName #>", UriKind.Relative),
+                OnNavigationResult, 
+                navigationParameters);
         }
         public void CanExecute<#= detailViewClassName #><#= foreignKey.NavigationName #>Command(object sender, CanExecuteRoutedEventArgs e) {
             e.Handled = true;
@@ -682,13 +710,20 @@ namespace <#= RlistViewModelNameSpace #> {
             e.Handled = true;
             UIElement dest = e.OriginalSource as UIElement;
             if (dest == null) return;
-            if ((!<#= CanDelPropertyName #>) || (<#= CurrentNavigationContextPropertyName #> == null) || ((PermissionMask & 4) != 4)) return;
+            if ((!<#= CanAddPropertyName #>) || (<#= CurrentNavigationContextPropertyName #> == null)) return;
+            if ((PermissionMask & 8) != 8) {
+                <#= CurrentNavigationContextPropertyName #>.NavigationService.RequestNavigate(new Uri("<#= AccessDeniedUserControlClassName #>", UriKind.Relative));
+                return;
+            }
+
             NavigationParameters navigationParameters = new NavigationParameters();
             foreach(<#= IWebServiceFilterRsltInterfaceClassName #> hf in <#= HiddenFiltersVMPropertyName #>) {
                 navigationParameters.Add(hf.fltrName, hf.fltrValue);
             }
             navigationParameters.Add("<#= EformModeEnumClassName #>", <#= EformModeEnumClassName #>.AddMode);
-            <#= CurrentNavigationContextPropertyName #>.NavigationService.RequestNavigate(new Uri("<#= ReditUserControlClassName #><#= ForRSuffixPropertyName #>", UriKind.Relative), navigationParameters);
+            <#= CurrentNavigationContextPropertyName #>.NavigationService.RequestNavigate(new Uri("<#= ReditUserControlClassName #>", UriKind.Relative), 
+                OnNavigationResult, 
+                navigationParameters);
         }
         public void CanExecute<#= SformAddItemCommandPropertyName #>(object sender, CanExecuteRoutedEventArgs e) {
             e.Handled = true;
@@ -702,7 +737,12 @@ namespace <#= RlistViewModelNameSpace #> {
             UIElement dest = e.OriginalSource as UIElement;
             if (dest == null) return;
             <#= modelInterfaceClassName #> selected = e.Parameter as  <#= modelInterfaceClassName #>;
-            if ((!<#= CanDelPropertyName #>) || (selected == null) || (<#= CurrentNavigationContextPropertyName #> == null) || ((PermissionMask & 4) != 4)) return;
+            if ((!<#= CanUpdPropertyName #>) || (selected == null) || (<#= CurrentNavigationContextPropertyName #> == null) ) return;
+            if ((PermissionMask & 4) != 4) {
+                <#= CurrentNavigationContextPropertyName #>.NavigationService.RequestNavigate(new Uri("<#= AccessDeniedUserControlClassName #>", UriKind.Relative));
+                return;
+            }
+
             NavigationParameters navigationParameters = new NavigationParameters();
             foreach(<#= IWebServiceFilterRsltInterfaceClassName #> hf in <#= HiddenFiltersVMPropertyName #>) {
                 navigationParameters.Add(hf.fltrName, hf.fltrValue);
@@ -715,7 +755,9 @@ namespace <#= RlistViewModelNameSpace #> {
 <#
             }
 #>
-            <#= CurrentNavigationContextPropertyName #>.NavigationService.RequestNavigate(new Uri("<#= ReditUserControlClassName #><#= ForRSuffixPropertyName #>", UriKind.Relative), navigationParameters);
+            <#= CurrentNavigationContextPropertyName #>.NavigationService.RequestNavigate(new Uri("<#= ReditUserControlClassName #>", UriKind.Relative), 
+                OnNavigationResult, 
+                navigationParameters);
         }
         public void CanExecute<#= SformUpdItemCommandPropertyName #>(object sender, CanExecuteRoutedEventArgs e) {
             e.Handled = true;
@@ -730,7 +772,12 @@ namespace <#= RlistViewModelNameSpace #> {
             UIElement dest = e.OriginalSource as UIElement;
             if (dest == null) return;
             <#= modelInterfaceClassName #> selected = e.Parameter as  <#= modelInterfaceClassName #>;
-            if ((!<#= CanDelPropertyName #>) || (selected == null) || (<#= CurrentNavigationContextPropertyName #> == null) || ((PermissionMask & 2) != 2)) return;
+            if ((!<#= CanDelPropertyName #>) || (selected == null) || (<#= CurrentNavigationContextPropertyName #> == null) ) return;
+            if((PermissionMask & 2) != 2) {
+                <#= CurrentNavigationContextPropertyName #>.NavigationService.RequestNavigate(new Uri("<#= AccessDeniedUserControlClassName #>", UriKind.Relative));
+                return;
+            }
+
             NavigationParameters navigationParameters = new NavigationParameters();
             foreach(<#= IWebServiceFilterRsltInterfaceClassName #> hf in <#= HiddenFiltersVMPropertyName #>) {
                 navigationParameters.Add(hf.fltrName, hf.fltrValue);
@@ -743,7 +790,9 @@ namespace <#= RlistViewModelNameSpace #> {
 <#
             }
 #>
-            <#= CurrentNavigationContextPropertyName #>.NavigationService.RequestNavigate(new Uri("<#= ReditUserControlClassName #><#= ForRSuffixPropertyName #>", UriKind.Relative), navigationParameters);
+            <#= CurrentNavigationContextPropertyName #>.NavigationService.RequestNavigate(new Uri("<#= ReditUserControlClassName #>", UriKind.Relative), 
+                OnNavigationResult, 
+                navigationParameters);
         }
         public void CanExecute<#= SformDelItemCommandPropertyName #>(object sender, CanExecuteRoutedEventArgs e) {
             e.Handled = true;
@@ -771,6 +820,9 @@ namespace <#= RlistViewModelNameSpace #> {
        public void OnNavigatedTo(NavigationContext navigationContext) {
             <#= CurrentNavigationContextPropertyName #> = navigationContext;
             OnPropertyChanged("<#= ShowBackBtnPropertyName #>");
+            if ((<#= AppSettingServicePropertyName #>.GetViewModelMask("<#= Model.ViewName #>") & 1) != 1) {
+                throw new Exception("Access Denied to navigate <#= Model.ViewName #>");
+            }
             ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>> hf = new ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>();
             NavigationParameters prms = navigationContext.Parameters;
 <#

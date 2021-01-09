@@ -112,7 +112,6 @@ using System.Threading.Tasks;
     string CaptionPropertyName                  = "Caption";
     string EformModePropertyName                = "EformMode";
     string ShowSubmitPropertyName               = "ShowSubmit";
-    string ForRSuffixPropertyName               = "ForR";
     string FormServicePrefix                    = "FrmSrv";
 
     string RowMIPrefixPropertyName              = "RowMI";
@@ -200,7 +199,7 @@ using <#= ns #>;
             // According to requirements of the "<#= ReditViewModelClassName #>.cs"-file of "<#= ReditViewModelProject #>"-project. 
             ViewModelLocationProvider.Register<<#= ReditUserControlClassName #>, <#= ReditViewModelClassName #>>();
             // According to requirements of the "<#= ReditViewModelClassName #>.cs"-file of "<#= ReditViewModelProject #>"-project. 
-            containerRegistry.RegisterForNavigation<<#= ReditUserControlClassName #>, <#= ReditViewModelClassName #>>("<#= ReditUserControlClassName #><#= ForRSuffixPropertyName #>");
+            containerRegistry.RegisterForNavigation<<#= ReditUserControlClassName #>, <#= ReditViewModelClassName #>>("<#= ReditUserControlClassName #>");
             // According to requirements of the "<#= ReditViewModelClassName #>.cs"-file of "<#= ReditViewModelProject #>"-project. 
             containerRegistry.Register<UserControl, <#= ReditUserControlClassName #>>("<#= ReditUserControlClassName #>");
             ...
@@ -390,8 +389,19 @@ namespace <#= ReditViewModelNameSpace #> {
         public void OnNavigatedTo(NavigationContext navigationContext) {
             <#= IsCanceledPropertyName #> = true;
             <#= CurrentNavigationContextPropertyName #> = navigationContext;
-            ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>> hf = new ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>();
             NavigationParameters prms = navigationContext.Parameters;
+            <#= EformModeEnumClassName #> modeToCheck = <#= EformModeEnumClassName #>.DeleteMode;
+            if(prms.ContainsKey("<#= EformModeEnumClassName #>")) {
+                modeToCheck = prms.GetValue<<#= EformModeEnumClassName #>>("<#= EformModeEnumClassName #>");
+            }
+            if ((modeToCheck == <#= EformModeEnumClassName #>.DeleteMode) && ((<#= AppSettingServicePropertyName #>.GetViewModelMask("<#= Model.ViewName #>") & 2) != 2 )) {
+                throw new Exception("Access denied to delete <#= Model.ViewName #>");
+            } else if ((modeToCheck == <#= EformModeEnumClassName #>.UpdateMode) && ((<#= AppSettingServicePropertyName #>.GetViewModelMask("<#= Model.ViewName #>") & 4) != 4 )) {
+                throw new Exception("Access denied to update <#= Model.ViewName #>");
+            } else if ((modeToCheck == <#= EformModeEnumClassName #>.AddMode) && ((<#= AppSettingServicePropertyName #>.GetViewModelMask("<#= Model.ViewName #>") & 8) != 8 )) {
+                throw new Exception("Access denied to add <#= Model.ViewName #>");
+            }
+            ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>> hf = new ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>();
 <#
             foreach(ModelViewPropertyOfVwSerializable sclrProp in Model.ScalarProperties) {
 #>          
@@ -469,18 +479,19 @@ namespace <#= ReditViewModelNameSpace #> {
                             <#= UIDispatcherInvokePropertyName #>(() =>
                             {
                                 <#= CaptionPropertyName #> = locCaption;
-                                <#= EformModePropertyName #> = locmode;
                                 if (resetHF) { <#= HiddenFiltersPropertyName #> = hf; }
+                                <#= EformModePropertyName #> = locmode;
                                 <#= FormControlModelPropertyName #> = <#= FormServicePrefix #><#= Model.ViewName #>.<#= CopyToModelNotifyMethodName #>(data.Result, null);
                             });
                         },
                         (e) => { }
                      );
                 } else {
-                    <#= EformModePropertyName #> = <#= EformModeEnumClassName #>.AddMode;
                     <#= CaptionPropertyName #> = "Add item for <#= Model.ViewName #>";
-                    <#= FormControlModelPropertyName #> = <#= FormServicePrefix #><#= Model.ViewName #>.<#= CopyToModelNotifyMethodName #>(null,null);
                     if (resetHF) { <#= HiddenFiltersPropertyName #> = hf; }
+                    <#= FormControlModelPropertyName #> = <#= FormServicePrefix #><#= Model.ViewName #>.<#= CopyToModelNotifyMethodName #>(null,null); // this is correct: cleanup twice
+                    <#= EformModePropertyName #> = <#= EformModeEnumClassName #>.AddMode;
+                    <#= FormControlModelPropertyName #> = null; // since DateTime-issue this is correct: <#= FormServicePrefix #><#= Model.ViewName #>.<#= CopyToModelNotifyMethodName #>(null,null);
                 }
             } else {
                 if (resetHF) { <#= HiddenFiltersPropertyName #> = hf; }

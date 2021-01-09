@@ -60,6 +60,7 @@ namespace <#= gridFlexModelNameSpace #> {
                 } else
                 {
                     grd.SizeChanged -= OnSizeChangedEventHandler;
+                    UpdateGridSetting(grd);
                 }
             }
         }
@@ -79,7 +80,11 @@ namespace <#= gridFlexModelNameSpace #> {
             sender.RowDefinitions.Clear();
             sender.ColumnDefinitions.Clear();
             if (ActualWidth < 1) return;
-            int count = sender.Children.Count;
+            int count = 0;// sender.Children.Count;
+            foreach(UIElement ii in sender.Children)
+            {
+                if (ii.Visibility != Visibility.Collapsed) count++;
+            }
             if (count < 1) count = 1;
             int colDefcount = count;
             int rowDefcount = 1;
@@ -103,8 +108,9 @@ namespace <#= gridFlexModelNameSpace #> {
             int curCol = 0;
             int curRow = 0;
             int curId = 0;
-            foreach (var c in sender.Children)
+            foreach (UIElement c in sender.Children)
             {
+                if (c.Visibility == Visibility.Collapsed) continue;
                 if (c is DependencyObject)
                 {
                     var d = c as DependencyObject;

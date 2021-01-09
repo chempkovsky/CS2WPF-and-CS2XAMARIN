@@ -1,0 +1,240 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using System.Windows.Input;
+using Prism.Regions;
+
+
+<#
+
+    string RoutedCommandExtFolder                   = "00224-RoutedCommandExt.cs";
+    string RoutedCommandExtClassName                = GetModelClassName(Model, RoutedCommandExtFolder);
+    string RoutedCommandExtNameSpace                = GetModelNameSpace(Model, RoutedCommandExtFolder);
+
+    string HomeUserControlFolder     = "00690-HomeUserControl.xaml.cs";
+    string HomeUserControlClassName  = GetModelClassName(Model, HomeUserControlFolder);
+    string HomeUserControlNameSpace  = GetModelNameSpace(Model, HomeUserControlFolder);
+
+
+    string HomeViewModelFolder      = "00694-HomeViewModel.cs";
+    string HomeViewModelClassName   = GetModelClassName(Model, HomeViewModelFolder);
+    string HomeViewModelNameSpace   = GetModelNameSpace(Model, HomeViewModelFolder);
+    string HomeViewModelProject     = GetModelProjectName(Model, HomeViewModelFolder);
+
+
+    string CurrentNavigationContextPropertyName = "CurrentNavigationContext";
+    string ShowBackBtnPropertyName              = "ShowBackBtn";
+    string RoutedEventHandlersPropertyName = "RoutedEventHandlers";
+    string RoutedCommandHandlersPropertyName = "RoutedCommandHandlers";
+    string NavigationBackCommandPropertyName    = "NavigationBackCommand";
+
+
+    List<string> nmSpaces = new List<string>();
+    if ((HomeViewModelNameSpace != RoutedCommandExtNameSpace) && (nmSpaces.IndexOf(RoutedCommandExtNameSpace) < 0)) 
+        nmSpaces.Add(RoutedCommandExtNameSpace);
+
+#>
+<# 
+    foreach(string ns in nmSpaces) {
+#>
+using <#= ns #>;
+<#
+    }
+#>
+
+/*
+
+    "<#= HomeViewModelClassName #>" UserControl is defined in the "<#= HomeViewModelProject #>"-project.
+    In the file of IModule-class of "<#= HomeViewModelProject #>"-project the following line of code must be inserted:
+
+
+        public void RegisterTypes(IContainerRegistry containerRegistry)
+        {
+            ...
+
+            ViewModelLocationProvider.Register<<#= HomeUserControlClassName #>, <#= HomeViewModelClassName #>>();
+            containerRegistry.RegisterForNavigation<<#= HomeUserControlClassName #>, <#= HomeViewModelClassName #>>("<#= HomeUserControlClassName #>");
+            ...
+        }
+
+*/
+
+namespace <#= HomeViewModelNameSpace #> {
+    public class <#= HomeViewModelClassName #> : INotifyPropertyChanged, INavigationAware 
+    {
+        public <#= HomeViewModelClassName #>() {
+            CommandBindingCollection cbsc = new CommandBindingCollection();
+            CommandBinding cb = new CommandBinding(<#= RoutedCommandExtClassName #>.<#= NavigationBackCommandPropertyName #>, new ExecutedRoutedEventHandler(this.Executed<#= NavigationBackCommandPropertyName #>), new CanExecuteRoutedEventHandler(CanExecute<#= NavigationBackCommandPropertyName #>));
+            cbsc.Add(cb);
+            _<#= RoutedCommandHandlersPropertyName #> = cbsc;
+        }
+        #region INotifyPropertyChanged
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string name = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+        #endregion
+
+        #region <#= RoutedCommandHandlersPropertyName #>
+        protected CommandBindingCollection _<#= RoutedCommandHandlersPropertyName #> = null;
+        public CommandBindingCollection <#= RoutedCommandHandlersPropertyName #>
+        { 
+            get
+            {
+                return _<#= RoutedCommandHandlersPropertyName #>;
+            }
+            set
+            {
+                if (_<#= RoutedCommandHandlersPropertyName #> != value)
+                {
+                    _<#= RoutedCommandHandlersPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+
+        protected NavigationContext <#= CurrentNavigationContextPropertyName #> = null;
+
+        #region <#= ShowBackBtnPropertyName #>
+        public bool <#= ShowBackBtnPropertyName #> {
+            get {
+                return (<#= CurrentNavigationContextPropertyName #> == null) ?  false : <#= CurrentNavigationContextPropertyName #>.NavigationService.Journal.CanGoBack;
+            }
+        }
+        #endregion
+
+        #region INavigationAware
+        public bool IsNavigationTarget(NavigationContext navigationContext) {
+            return true;
+        }
+        public void OnNavigatedFrom(NavigationContext navigationContext) {
+            <#= CurrentNavigationContextPropertyName #> = navigationContext;
+            OnPropertyChanged("<#= ShowBackBtnPropertyName #>");
+        }
+        public void OnNavigatedTo(NavigationContext navigationContext) {
+            <#= CurrentNavigationContextPropertyName #> = navigationContext;
+            OnPropertyChanged("<#= ShowBackBtnPropertyName #>");
+        }
+        #endregion
+
+        #region <#= NavigationBackCommandPropertyName #>
+        public void Executed<#= NavigationBackCommandPropertyName #>(object sender, ExecutedRoutedEventArgs e) { 
+            e.Handled = true;
+            if(<#= CurrentNavigationContextPropertyName #> == null) return;
+            if(!<#= CurrentNavigationContextPropertyName #>.NavigationService.Journal.CanGoBack) return;
+            <#= CurrentNavigationContextPropertyName #>.NavigationService.Journal.GoBack();
+        } 
+        public void CanExecute<#= NavigationBackCommandPropertyName #>(object sender, CanExecuteRoutedEventArgs e) {
+            e.Handled = true;
+            e.CanExecute = (<#= CurrentNavigationContextPropertyName #> == null) ? false : <#= CurrentNavigationContextPropertyName #>.NavigationService.Journal.CanGoBack;
+        }
+        #endregion
+
+    }
+}
+
+<#+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+    string GetModelProjectName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileProject)) {
+            return result;
+        }
+        string[] fnArr = refItem.FileProject.Split(new char[] {'\\'}, 100, System.StringSplitOptions.None); 
+        string fn = fnArr[fnArr.Length - 1];
+
+        return fn.Replace(".csproj","");
+    }
+
+#>

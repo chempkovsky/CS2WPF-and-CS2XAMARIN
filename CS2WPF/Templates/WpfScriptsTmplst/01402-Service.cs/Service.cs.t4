@@ -194,7 +194,14 @@ namespace <#= modelServiceNameSpace #> {
             } 
             catch(Exception e)
             {
-                <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("http", e.Message);
+                string exceptionMsg = "<#= modelServiceClassName #>.<#= GetAllMethodName #> : " + e.Message;
+                Exception inner = e.InnerException;
+                while (inner != null)
+                {
+                    exceptionMsg = exceptionMsg + ": " + inner.Message;
+                    inner = inner.InnerException;
+                }
+                <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("http", exceptionMsg);
                 return null;
             }
         }
@@ -307,7 +314,14 @@ namespace <#= modelServiceNameSpace #> {
             } 
             catch(Exception e)
             {
-                <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("http", e.Message);
+                string exceptionMsg = "<#= modelServiceClassName #>.<#= GetWithFilterMethodName #> : " + e.Message;
+                Exception inner = e.InnerException;
+                while (inner != null)
+                {
+                    exceptionMsg = exceptionMsg + ": " + inner.Message;
+                    inner = inner.InnerException;
+                }
+                <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("http", exceptionMsg);
                 return null;
             }
         }
@@ -355,9 +369,16 @@ namespace <#= modelServiceNameSpace #> {
                 string responseBody = await response.Content.ReadAsStringAsync();
                 return  JsonConvert.DeserializeObject<<#= modelClassName #>>(responseBody) ;
             } 
-            catch(Exception e)
+            catch(Exception e) 
             {
-                <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("http", e.Message);
+                string exceptionMsg = "<#= modelServiceClassName #>.<#= GetOneMethodName #> : " + e.Message;
+                Exception inner = e.InnerException;
+                while (inner != null)
+                {
+                    exceptionMsg = exceptionMsg + ": " + inner.Message;
+                    inner = inner.InnerException;
+                }
+                <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("http", exceptionMsg);
                 return null;
             }
         }
@@ -378,9 +399,16 @@ namespace <#= modelServiceNameSpace #> {
                 string responseBody = await response.Content.ReadAsStringAsync();
                 return  JsonConvert.DeserializeObject<<#= modelClassName #>>(responseBody) ;
             } 
-            catch(Exception e)
+            catch(Exception e) 
             {
-                <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("http", e.Message);
+                string exceptionMsg = "<#= modelServiceClassName #>.<#= UpdateOneMethodName #> : " + e.Message;
+                Exception inner = e.InnerException;
+                while (inner != null)
+                {
+                    exceptionMsg = exceptionMsg + ": " + inner.Message;
+                    inner = inner.InnerException;
+                }
+                <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("http", exceptionMsg);
                 return null;
             }
         }
@@ -413,9 +441,16 @@ namespace <#= modelServiceNameSpace #> {
                 string responseBody = await response.Content.ReadAsStringAsync();
                 return  JsonConvert.DeserializeObject<<#= modelClassName #>>(responseBody) ;
             } 
-            catch(Exception e)
+            catch(Exception e) 
             {
-                <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("http", e.Message);
+                string exceptionMsg = "<#= modelServiceClassName #>.<#= AddOneMethodName #> : " + e.Message;
+                Exception inner = e.InnerException;
+                while (inner != null)
+                {
+                    exceptionMsg = exceptionMsg + ": " + inner.Message;
+                    inner = inner.InnerException;
+                }
+                <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("http", exceptionMsg);
                 return null;
             }
         }
@@ -463,9 +498,16 @@ namespace <#= modelServiceNameSpace #> {
                 string responseBody = await response.Content.ReadAsStringAsync();
                 return  JsonConvert.DeserializeObject<<#= modelClassName #>>(responseBody) ;
             } 
-            catch(Exception e)
+            catch(Exception e) 
             {
-                <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("http", e.Message);
+                string exceptionMsg = "<#= modelServiceClassName #>.<#= DeleteOneMethodName #> : " + e.Message;
+                Exception inner = e.InnerException;
+                while (inner != null)
+                {
+                    exceptionMsg = exceptionMsg + ": " + inner.Message;
+                    inner = inner.InnerException;
+                }
+                <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("http", exceptionMsg);
                 return null;
             }
         }

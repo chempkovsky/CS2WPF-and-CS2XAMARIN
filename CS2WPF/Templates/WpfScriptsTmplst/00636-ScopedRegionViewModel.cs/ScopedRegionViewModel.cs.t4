@@ -38,6 +38,14 @@ using Prism.Regions;
     string IScopedRegionNavigationUserControlInterfaceClassName   = GetModelClassName(Model, IScopedRegionNavigationUserControlInterfaceFolder);
     string IScopedRegionNavigationUserControlInterfaceNameSpace   = GetModelNameSpace(Model, IScopedRegionNavigationUserControlInterfaceFolder);
 
+    string AccessDeniedUserControlFolder     = "00678-AccessDeniedUserControl.xaml.cs";
+    string AccessDeniedUserControlClassName  = GetModelClassName(Model, AccessDeniedUserControlFolder);
+    string AccessDeniedUserControlNameSpace  = GetModelNameSpace(Model, AccessDeniedUserControlFolder);
+
+    string PageNotFoundUserControlFolder     = "00684-PageNotFoundUserControl.xaml.cs";
+    string PageNotFoundUserControlClassName  = GetModelClassName(Model, PageNotFoundUserControlFolder);
+    string PageNotFoundUserControlNameSpace  = GetModelNameSpace(Model, PageNotFoundUserControlFolder);
+
 
     string IScopedRegionUserControlInterfaceFolder      = "00630-IScopedRegionUserControlInterface.cs";
     string IScopedRegionUserControlInterfaceClassName   = GetModelClassName(Model, IScopedRegionUserControlInterfaceFolder);
@@ -240,7 +248,24 @@ namespace <#= ScopedRegionViewModelNameSpace #> {
                   (<#= ScopedRegionManagerPropertyName #> == null)
                 )
             return;
-            <#= ScopedRegionManagerPropertyName #>.RequestNavigate(<#= ScopedRegionNamePropertyName #>, <#= RequestNavigateSourcePropertyName #>);
+            <#= ScopedRegionManagerPropertyName #>.RequestNavigate(<#= ScopedRegionNamePropertyName #>, <#= RequestNavigateSourcePropertyName #>,
+                (navResult) => {
+                    if (navResult.Result.HasValue ? navResult.Result.Value : false) return;
+                    string navErrorMsg = "Unknown Navigation Error";
+                    if (navResult.Error != null)
+                    {
+                        navErrorMsg = navResult.Error.Message;
+                        Exception inner = navResult.Error.InnerException;
+                        while (inner != null)
+                        {
+                            navErrorMsg = navErrorMsg + ": " + inner.Message;
+                            inner = inner.InnerException;
+                        }
+                    }
+                    if (navResult.Context.NavigationService.Journal.CanGoBack) navResult.Context.NavigationService.Journal.GoBack();
+                    navResult.Context.NavigationService.RequestNavigate(new Uri("<#= PageNotFoundUserControlClassName #>", UriKind.Relative));
+                    <#= AppSettingServicePropertyName #>.ShowErrorMessage("Navigation Exception", navErrorMsg);
+                });
         }
 
    }

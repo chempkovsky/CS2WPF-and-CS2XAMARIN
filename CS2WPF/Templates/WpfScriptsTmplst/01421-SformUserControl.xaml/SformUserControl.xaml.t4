@@ -177,20 +177,6 @@
             <#= FilterHeightPropertyName #>="{Binding <#= FilterHeightPropertyName #>, Mode=OneWay, ElementName=SformUsrCntrlRootNode}"
             IsEnabled="{Binding <#= IsInQueryPropertyName #>, Mode=OneWay, Converter={StaticResource <#= InverseBooleanConverterClassName #>}}"
             Visibility="{Binding <#= ShowFilterPropertyName #>, Mode=OneWay, ElementName=SformUsrCntrlRootNode,  Converter={StaticResource BooleanToVisibilityConverter}}">
-            <!-- <wsfuc:<#= WebServiceFilterUserControlClassName #>.Resources>
-                <Style TargetType="{x:Type wsfuc:<#= WebServiceFilterUserControlClassName #>}">
-                    <Setter Property="Visibility" Value="Visible"/>
-                    <Setter Property="IsEnabled" Value="False"/>
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding <#= ShowFilterPropertyName #>, ElementName=SformUsrCntrlRootNode}" Value="false">
-                            <Setter Property="Visibility" Value="Collapsed" />
-                        </DataTrigger>
-                        <DataTrigger Binding="{Binding <#= IsInQueryPropertyName #>}" Value="False">
-                            <Setter Property="IsEnabled" Value="True" />
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </wsfuc:<#= WebServiceFilterUserControlClassName #>.Resources> -->
         </wsfuc:<#= WebServiceFilterUserControlClassName #>>
         <ProgressBar Grid.Row="1" Height="10" IsIndeterminate="{Binding <#= IsInQueryPropertyName #>, Mode=OneWay}"/>
 
@@ -201,14 +187,6 @@
             <DataGrid.Resources>
                <frzp:<#= FreezableProxyClassName #> x:Key="gridCurrentItem" Data="{Binding CurrentItem, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}"/>
                <frzp:FreezableProxy x:Key="gridControl" Data="{Binding Path=., RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}"/>
-               <!-- <Style TargetType="{x:Type DataGrid}">
-                    <Setter Property="IsEnabled" Value="False"/>
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding <#= IsInQueryPropertyName #>}" Value="False">
-                            <Setter Property="IsEnabled" Value="True" />
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style> -->
             </DataGrid.Resources>
             <DataGrid.ContextMenu >
                 <ContextMenu ItemsSource="{Binding Data.<#= RowMenuItemsVMPropertyName #>, Source={StaticResource userControlContext}}">
@@ -218,15 +196,6 @@
                             <Setter Property="MenuItem.Command" Value="{Binding Command}"/>
                             <Setter Property="MenuItem.CommandParameter" Value="{Binding Data, Source={StaticResource gridCurrentItem}}" />
                             <Setter Property="MenuItem.CommandTarget" Value="{Binding Data, Source={StaticResource gridControl}}" />
-                            <!-- <Setter Property="MenuItem.Icon">
-                                <Setter.Value>
-                                    <Viewbox   Height="16" Width="16">
-                                        <Canvas  Height="24" Width="24" >
-                                            <Path  pth:<#= pathHelperModelClassName #>.DataResourceKey="{Binding IconName}" fill:<#= FillHelperModelClassName #>.FillResourceKey="{Binding IconColor}" />
-                                        </Canvas>
-                                    </Viewbox>
-                                </Setter.Value>
-                            </Setter> -->
                         </Style>
                     </ContextMenu.ItemContainerStyle>
                 </ContextMenu>
@@ -301,16 +270,6 @@
             <#= RowsPerPagePropertyName #>="{Binding <#= RowsPerPagePropertyName #>, Mode=TwoWay}"
             IsEnabled="{Binding <#= IsInQueryPropertyName #>, Mode=OneWay,  Converter={StaticResource <#= InverseBooleanConverterClassName #>}}"
             <#= RowsPerPageOptionsPropertyName #>="{Binding <#= RowsPerPageOptionsPropertyName #>, Mode=OneWay}">
-            <!-- <tpgnuc:<#= TablePaginationUserControlClassName #>.Resources>
-                <Style TargetType="{x:Type tpgnuc:<#= TablePaginationUserControlClassName #>}">
-                    <Setter Property="IsEnabled" Value="False"/>
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding <#= IsInQueryPropertyName #>}" Value="False">
-                            <Setter Property="IsEnabled" Value="True" />
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </tpgnuc:<#= TablePaginationUserControlClassName #>.Resources>  -->
        </tpgnuc:<#= TablePaginationUserControlClassName #>>
     </Grid>
 </UserControl>

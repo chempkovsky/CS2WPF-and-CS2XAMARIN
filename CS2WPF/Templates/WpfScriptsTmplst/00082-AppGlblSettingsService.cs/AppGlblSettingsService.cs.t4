@@ -25,6 +25,7 @@ using System.Net.Http.Headers;
     string AppGlblSettingsServiceFolder      = "00082-AppGlblSettingsService.cs";
     string AppGlblSettingsServiceClassName   = GetModelClassName(Model, AppGlblSettingsServiceFolder);
     string AppGlblSettingsServiceNameSpace   = GetModelNameSpace(Model, AppGlblSettingsServiceFolder);
+    string AppGlblSettingsServiceProject     = GetModelProjectName(Model, AppGlblSettingsServiceFolder);
     
     string getAuthInfoHeaderMethodName          = "GetAuthInfoHeader";
     string ShowErrorMethodName                  = "ShowErrorMessage";
@@ -37,7 +38,18 @@ using <#= IAppGlblSettingsServiceNameSpace #>;
 <#
     }
 #>
+/*
+    "<#= AppGlblSettingsServiceClassName #>"  is defined in the "<#= AppGlblSettingsServiceProject #>"-project.
+    In the file of IModule-class of "<#= AppGlblSettingsServiceProject #>"-project the following line of code must be inserted:
 
+        public void RegisterTypes(IContainerRegistry containerRegistry)
+        {
+            ...
+            <#= IAppGlblSettingsServiceClassName #> s = new <#= AppGlblSettingsServiceClassName #>();
+            containerRegistry.RegisterInstance<<#= IAppGlblSettingsServiceClassName #>>(s);
+            ...
+        }
+*/
 
 namespace <#= AppGlblSettingsServiceNameSpace #> {
     public class <#= AppGlblSettingsServiceClassName #>: <#= IAppGlblSettingsServiceClassName #>
@@ -98,13 +110,13 @@ namespace <#= AppGlblSettingsServiceNameSpace #> {
             string rslt = "";
             if(!string.IsNullOrEmpty(ViewName))
             {
-                rslt = "http://localhost:50819/";
+                rslt = "https://localhost:44314/";
             }
             return rslt;
         }
         public string GetSecurityWebApiPrefix()
         {
-            return "http://localhost:50819/";
+            return "https://localhost:44314/";
         }
         public double getDialogWidth(string ViewName)  {
             double rslt = 90;
@@ -250,6 +262,7 @@ namespace <#= AppGlblSettingsServiceNameSpace #> {
             }
         }
         public void <#= ShowErrorMethodName #>(string errorType, string errorMsg) {
+            OnMessageNotification?.Invoke(this, errorType + ": " + errorMsg);
         }
 
    }
@@ -324,6 +337,27 @@ namespace <#= AppGlblSettingsServiceNameSpace #> {
                 
         }
         return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+    string GetModelProjectName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileProject)) {
+            return result;
+        }
+        string[] fnArr = refItem.FileProject.Split(new char[] {'\\'}, 100, System.StringSplitOptions.None); 
+        string fn = fnArr[fnArr.Length - 1];
+
+        return fn.Replace(".csproj","");
     }
 
 #>

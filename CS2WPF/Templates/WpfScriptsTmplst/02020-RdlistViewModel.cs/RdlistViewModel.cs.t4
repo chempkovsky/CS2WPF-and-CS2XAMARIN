@@ -57,6 +57,14 @@ using Prism.Regions;
     string RoutedCommandExtClassName                = GetContextModelClassName(Context, RoutedCommandExtFolder);
     string RoutedCommandExtNameSpace                = GetContextModelNameSpace(Context, RoutedCommandExtFolder);
 
+    string AccessDeniedUserControlFolder     = "00678-AccessDeniedUserControl.xaml.cs";
+    string AccessDeniedUserControlClassName  = GetContextModelClassName(Context, AccessDeniedUserControlFolder);
+    string AccessDeniedUserControlNameSpace  = GetContextModelNameSpace(Context, AccessDeniedUserControlFolder);
+
+    string PageNotFoundUserControlFolder     = "00684-PageNotFoundUserControl.xaml.cs";
+    string PageNotFoundUserControlClassName  = GetContextModelClassName(Context, PageNotFoundUserControlFolder);
+    string PageNotFoundUserControlNameSpace  = GetContextModelNameSpace(Context, PageNotFoundUserControlFolder);
+
     string modelInterfaceFolder             = "01100-Interface.cs";
     string modelInterfaceClassName          = GetInterfaceName(Model);
     string modelInterfaceNameSpace          = GetModelNameSpace(Model, modelInterfaceFolder);
@@ -140,8 +148,6 @@ using Prism.Regions;
     string CaptionPropertyName                  = "Caption";
     string EformModePropertyName                = "EformMode";
     string ShowSubmitPropertyName               = "ShowSubmit";
-    string ForO2mSuffixPropertyName             = "ForO2m";
-    string ForRdSuffixPropertyName              = "ForRd";
 
     string RowMIPrefixPropertyName              = "RowMI";
     string CurrentNavigationContextPropertyName = "CurrentNavigationContext";
@@ -224,7 +230,7 @@ using <#= ns #>;
             // According to requirements of the "<#= RdlistViewModelClassName #>.cs"-file of "<#= RdlistViewModelProject #>"-project. 
             ViewModelLocationProvider.Register<<#= RdlistUserControlClassName #>, <#= RdlistViewModelClassName #>>();
             // According to requirements of the "<#= RdlistViewModelClassName #>.cs"-file of "<#= RdlistViewModelProject #>"-project. 
-            containerRegistry.RegisterForNavigation<<#= RdlistUserControlClassName #>, <#= RdlistViewModelClassName #>>("<#= RdlistUserControlClassName #><#= ForRdSuffixPropertyName #>");
+            containerRegistry.RegisterForNavigation<<#= RdlistUserControlClassName #>, <#= RdlistViewModelClassName #>>("<#= RdlistUserControlClassName #>");
             // According to requirements of the "<#= RdlistViewModelClassName #>.cs"-file of "<#= RdlistViewModelProject #>"-project. 
             containerRegistry.Register<UserControl, <#= RdlistUserControlClassName #>>("<#= RdlistUserControlClassName #>");
             ...
@@ -268,7 +274,7 @@ namespace <#= RdlistViewModelNameSpace #> {
     }
 #>
 
-    public class <#= RdlistViewModelClassName #>: INotifyPropertyChanged, INavigationAware // , IRegionMemberLifetime
+    public class <#= RdlistViewModelClassName #>: INotifyPropertyChanged, INavigationAware 
     {
         protected <#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName #>=null;
 
@@ -598,7 +604,23 @@ namespace <#= RdlistViewModelNameSpace #> {
         }
         #endregion
 
-
+        protected void OnNavigationResult(NavigationResult navResult) {
+            if (navResult.Result.HasValue ? navResult.Result.Value : false) return;
+            string navErrorMsg = "Unknown Navigation Error";
+            if (navResult.Error != null)
+            {
+                navErrorMsg = navResult.Error.Message;
+                Exception inner = navResult.Error.InnerException;
+                while (inner != null)
+                {
+                    navErrorMsg = navErrorMsg + ": " + inner.Message;
+                    inner = inner.InnerException;
+                }
+            }
+            if (<#= CurrentNavigationContextPropertyName #>.NavigationService.Journal.CanGoBack) <#= CurrentNavigationContextPropertyName #>.NavigationService.Journal.GoBack();
+            <#= CurrentNavigationContextPropertyName #>.NavigationService.RequestNavigate(new Uri("<#= PageNotFoundUserControlClassName #>", UriKind.Relative));
+            <#= AppSettingServicePropertyName #>.ShowErrorMessage("Navigation Exception", navErrorMsg);
+        }
         
 <#
         foreach(string detailViewName in detailViews) {
@@ -618,6 +640,11 @@ namespace <#= RdlistViewModelNameSpace #> {
         #region <#= detailViewClassName #><#= foreignKey.NavigationName #>Command
         public void Executed<#= detailViewClassName #><#= foreignKey.NavigationName #>Command(object sender, ExecutedRoutedEventArgs e) { 
             e.Handled = true;
+            if ((<#= AppSettingServicePropertyName #>.GetViewModelMask("<#= detailView.ViewName #>") & 1) != 1) {
+                <#= CurrentNavigationContextPropertyName #>.NavigationService.RequestNavigate(new Uri("<#= AccessDeniedUserControlClassName #>", UriKind.Relative));
+                return;
+            }
+
             <#= modelInterfaceClassName #> selected = e.Parameter as <#= modelInterfaceClassName #>;
             if((selected == null) || (<#= CurrentNavigationContextPropertyName #> == null)) return;
             NavigationParameters navigationParameters = new NavigationParameters();
@@ -632,8 +659,9 @@ namespace <#= RdlistViewModelNameSpace #> {
                         }
                     }
 #>
-//          KeepAlive = true;
-            <#= CurrentNavigationContextPropertyName #>.NavigationService.RequestNavigate(new Uri("<#= detailViewClassName #><#= ForRdSuffixPropertyName #>", UriKind.Relative), navigationParameters);
+            <#= CurrentNavigationContextPropertyName #>.NavigationService.RequestNavigate(new Uri("<#= detailViewClassName #>", UriKind.Relative), 
+                OnNavigationResult, 
+                navigationParameters);
         }
         public void CanExecute<#= detailViewClassName #><#= foreignKey.NavigationName #>Command(object sender, CanExecuteRoutedEventArgs e) {
             e.Handled = true;
@@ -647,14 +675,6 @@ namespace <#= RdlistViewModelNameSpace #> {
 #>
 
 
-        #region IRegionMemberLifetime
-//        protected bool _KeepAlive = false;
-//        public bool KeepAlive
-//        {
-//            get { return _KeepAlive; }
-//            set { if(_KeepAlive != value) _KeepAlive=value; OnPropertyChanged();}
-//        }        
-        #endregion
         #region INavigationAware
         public bool IsNavigationTarget(NavigationContext navigationContext) {
             return true;
@@ -666,6 +686,9 @@ namespace <#= RdlistViewModelNameSpace #> {
         public void OnNavigatedTo(NavigationContext navigationContext) {
             <#= CurrentNavigationContextPropertyName #> = navigationContext;
             OnPropertyChanged("<#= ShowBackBtnPropertyName #>");
+            if ((<#= AppSettingServicePropertyName #>.GetViewModelMask("<#= Model.ViewName #>") & 1) != 1) {
+                throw new Exception("Access Denied to navigate <#= Model.ViewName #>");
+            }
             ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>> hf = new ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>();
             NavigationParameters prms = navigationContext.Parameters;
 <#
@@ -710,7 +733,6 @@ namespace <#= RdlistViewModelNameSpace #> {
             e.Handled = true;
             if(<#= CurrentNavigationContextPropertyName #> == null) return;
             if(!<#= CurrentNavigationContextPropertyName #>.NavigationService.Journal.CanGoBack) return;
-//            KeepAlive = false;
             <#= CurrentNavigationContextPropertyName #>.NavigationService.Journal.GoBack();
         } 
         public void CanExecute<#= NavigationBackCommandPropertyName #>(object sender, CanExecuteRoutedEventArgs e) {

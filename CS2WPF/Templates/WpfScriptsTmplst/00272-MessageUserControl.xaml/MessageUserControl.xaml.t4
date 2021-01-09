@@ -81,9 +81,6 @@
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
     </UserControl.Resources>
-     <!--<UserControl.Resources>
-        <ResourceDictionary Source="pack://application:,,,/CommonWpfCustomControlLibrary;component/Themes/BasicResourceDictionary.xaml"/>
-    </UserControl.Resources>-->
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -106,29 +103,9 @@
         <StackPanel Orientation="Horizontal" Grid.Row="4" Grid.Column="2" Margin="8">
             <Button Content="Ok" MinWidth="64" Command="{x:Static crtcmd:<#= RoutedCommandExtClassName #>.<#= OkCommandPropertyName #>}"
                 Visibility="{Binding <#= ShowOkBtnPropertyName #>, Mode=OneWay, ElementName=MsgUsrCntrlRootNode,  Converter={StaticResource BooleanToVisibilityConverter}}">
-                <!-- <Button.Resources>
-                    <Style TargetType="{x:Type Button}">
-                        <Setter Property="Visibility" Value="Hidden" />
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding <#= ShowOkBtnPropertyName #>, ElementName=MsgUsrCntrlRootNode}" Value="true">
-                                <Setter Property="Visibility" Value="Visible" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </Button.Resources> -->
             </Button>
             <Button Content="Cancel" MinWidth="64" Margin="8 0 0 0" Command="{x:Static crtcmd:<#= RoutedCommandExtClassName #>.<#= CancelCommandPropertyName #>}"
                 Visibility="{Binding <#= ShowCancelBtnPropertyName #>, Mode=OneWay, ElementName=MsgUsrCntrlRootNode,  Converter={StaticResource BooleanToVisibilityConverter}}">
-                <!-- <Button.Resources>
-                    <Style TargetType="{x:Type Button}">
-                        <Setter Property="Visibility" Value="Hidden" />
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding <#= ShowCancelBtnPropertyName #>, ElementName=MsgUsrCntrlRootNode}" Value="true">
-                                <Setter Property="Visibility" Value="Visible" />
-                            </DataTrigger>
-                        </Style.Triggers> 
-                    </Style>
-                </Button.Resources> -->
             </Button>
         </StackPanel>
     </Grid>

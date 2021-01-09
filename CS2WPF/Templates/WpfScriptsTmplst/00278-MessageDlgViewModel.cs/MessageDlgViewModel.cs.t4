@@ -32,6 +32,7 @@ using Prism.Services.Dialogs;
     string MessageDlgViewModelFolder      = "00278-MessageDlgViewModel.cs";
     string MessageDlgViewModelClassName   = GetModelClassName(Model, MessageDlgViewModelFolder);
     string MessageDlgViewModelNameSpace   = GetModelNameSpace(Model, MessageDlgViewModelFolder);
+    string MessageDlgViewModelProject     = GetModelProjectName(Model, MessageDlgViewModelFolder);
 
     string TitlePropertyName = "Title";
     string MessagePropertyName = "Message";
@@ -57,22 +58,20 @@ using <#= ns #>;
     }
 #>
 
-//////////////////////////
-//   REMINDER :
-//
-//    public class CommonServicesModuleModule : IModule
-//    {
-//        ...
-//        public void RegisterTypes(IContainerRegistry containerRegistry)
-//        {
-//            ...
-//            containerRegistry.RegisterDialog<<#= MessageDlgUserControlClassName #>, <#= MessageDlgViewModelClassName #>>("MessageDlg");
-//            ...
-//        }
-//        ...
-//    }
-//
-//////////////////////////
+/*
+
+    "<#= MessageDlgViewModelClassName #>"  is defined in the "<#= MessageDlgViewModelProject #>"-project.
+    In the file of IModule-class of "<#= MessageDlgViewModelProject #>"-project the following line of code must be inserted:
+
+
+        public void RegisterTypes(IContainerRegistry containerRegistry)
+        {
+            ...
+            containerRegistry.RegisterDialog<<#= MessageDlgUserControlClassName #>, <#= MessageDlgViewModelClassName #>>("MessageDlg");
+            ...
+        }
+
+*/
 
 namespace <#= MessageDlgViewModelNameSpace #> {
     public class <#= MessageDlgViewModelClassName #>: INotifyPropertyChanged, IDialogAware
@@ -366,6 +365,27 @@ namespace <#= MessageDlgViewModelNameSpace #> {
                 
         }
         return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+    string GetModelProjectName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileProject)) {
+            return result;
+        }
+        string[] fnArr = refItem.FileProject.Split(new char[] {'\\'}, 100, System.StringSplitOptions.None); 
+        string fn = fnArr[fnArr.Length - 1];
+
+        return fn.Replace(".csproj","");
     }
 
 #>

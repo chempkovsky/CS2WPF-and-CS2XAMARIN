@@ -1,0 +1,1200 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.AllowedFileTypesSerializable" name="AllowedFileTypes" #>
+<#@ parameter type="CS2WPF.Model.Serializable.FeatureContextSerializable" name="FeatureContext" #>
+<#@ parameter type="CS2WPF.Model.Serializable.FeatureSerializable" name="Feature" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using System.Windows;
+using System.Windows.Controls;
+using Prism.Ioc;
+using Prism.Regions;
+using System.Windows.Input;
+
+<#
+
+    string IAppGlblSettingsServiceFolder             = "00080-IAppGlblSettingsService.cs";
+    string IAppGlblSettingsServiceClassName          = GetContextModelClassName(Context, IAppGlblSettingsServiceFolder);
+    string IAppGlblSettingsServiceNameSpace          = GetContextModelNameSpace(Context, IAppGlblSettingsServiceFolder);
+
+    string IWebServiceFilterMenuInterfaceFolder      = "00206-IWebServiceFilterMenuInterface.cs";
+    string IWebServiceFilterMenuInterfaceClassName   = GetContextModelClassName(Context, IWebServiceFilterMenuInterfaceFolder);
+    string IWebServiceFilterMenuInterfaceNameSpace   = GetContextModelNameSpace(Context, IWebServiceFilterMenuInterfaceFolder);
+
+    string WebServiceFilterMenuFolder                = "00216-WebServiceFilterMenu.cs";
+    string WebServiceFilterMenuClassName             = GetContextModelClassName(Context, WebServiceFilterMenuFolder);
+    string WebServiceFilterMenuNameSpace             = GetContextModelNameSpace(Context, WebServiceFilterMenuFolder);
+
+    string RoutedCommandExtFolder                    = "00224-RoutedCommandExt.cs";
+    string RoutedCommandExtClassName                 = GetContextModelClassName(Context, RoutedCommandExtFolder);
+    string RoutedCommandExtNameSpace                 = GetContextModelNameSpace(Context, RoutedCommandExtFolder);
+
+    string AccessDeniedUserControlFolder            = "00678-AccessDeniedUserControl.xaml.cs";
+    string AccessDeniedUserControlClassName         = GetContextModelClassName(Context, AccessDeniedUserControlFolder);
+    string AccessDeniedUserControlNameSpace         = GetContextModelNameSpace(Context, AccessDeniedUserControlFolder);
+
+    string PageNotFoundUserControlFolder            = "00684-PageNotFoundUserControl.xaml.cs";
+    string PageNotFoundUserControlClassName         = GetContextModelClassName(Context, PageNotFoundUserControlFolder);
+    string PageNotFoundUserControlNameSpace         = GetContextModelNameSpace(Context, PageNotFoundUserControlFolder);
+
+    string IScopedRegionNavigationUserControlInterfaceFolder      = "00620-IScopedRegionNavigationUserControlInterface.cs";
+    string IScopedRegionNavigationUserControlInterfaceClassName   = GetContextModelClassName(Context, IScopedRegionNavigationUserControlInterfaceFolder);
+    string IScopedRegionNavigationUserControlInterfaceNameSpace   = GetContextModelNameSpace(Context, IScopedRegionNavigationUserControlInterfaceFolder);
+
+    string FtrUserControlFolder                      = "30100-FtrUserControl.xaml.cs";
+    string FtrUserControlClassName                   = GetFeatureComponentClassName(Feature, FtrUserControlFolder);
+    string FtrUserControlNameSpace                   = GetFeatureNameSpace(Feature, FtrUserControlFolder);
+
+
+    string FtrViewModelFolder                        = "30104-FtrViewModel.cs";
+    string FtrViewModelClassName                     = GetFeatureComponentClassName(Feature, FtrViewModelFolder);
+    string FtrViewModelNameSpace                     = GetFeatureNameSpace(Feature, FtrViewModelFolder);
+    string FtrViewModelProject                       = GetFeatureProjectName(Feature, FtrViewModelFolder);
+
+
+    string IsOnLoadedCalledPropertyName             = "IsOnLoadedCalled";
+    string RoutedEventHandlersPropertyName          = "RoutedEventHandlers";
+    string RoutedCommandHandlersPropertyName        = "RoutedCommandHandlers";
+    string ExpandCollapseCommandPropertyName        = "ExpandCollapseCommand";
+
+    string ContainerMenuItemsPropertyName           = "ContainerMenuItems";
+    string FlexOnPropertyName                       = "FlexOn";
+    string VisiblePrefixPropertyName                = "Visible";
+    string FilterHeightPropertyName                 = "FilterHeight";
+    string GridHeightPropertyName                   = "GridHeight";
+    string AppSettingServicePropertyName            = "GlblSettingsSrv";
+
+
+    List<string> nmSpaces = new List<string>();
+    if ((FtrViewModelNameSpace != IWebServiceFilterMenuInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterMenuInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IWebServiceFilterMenuInterfaceNameSpace);
+    if ((FtrViewModelNameSpace != WebServiceFilterMenuNameSpace) && (nmSpaces.IndexOf(WebServiceFilterMenuNameSpace) < 0)) 
+        nmSpaces.Add(WebServiceFilterMenuNameSpace);
+    if ((FtrViewModelNameSpace != RoutedCommandExtNameSpace) && (nmSpaces.IndexOf(RoutedCommandExtNameSpace) < 0)) 
+        nmSpaces.Add(RoutedCommandExtNameSpace);
+    if ((FtrViewModelNameSpace != IScopedRegionNavigationUserControlInterfaceNameSpace) && (nmSpaces.IndexOf(IScopedRegionNavigationUserControlInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IScopedRegionNavigationUserControlInterfaceNameSpace);
+    if ((FtrViewModelNameSpace != IAppGlblSettingsServiceNameSpace) && (nmSpaces.IndexOf(IAppGlblSettingsServiceNameSpace) < 0)) 
+        nmSpaces.Add(IAppGlblSettingsServiceNameSpace);
+
+    
+#>
+<# 
+    foreach(string ns in nmSpaces) {
+#>
+using <#= ns #>;
+<#
+    }
+#>
+
+/*
+
+    "<#= FtrViewModelClassName #>" UserControl is defined in the "<#= FtrViewModelProject #>"-project.
+    In the file of IModule-class of "<#= FtrViewModelProject #>"-project the following line of code must be inserted:
+
+        public void RegisterTypes(IContainerRegistry containerRegistry)
+        {
+            ...
+            // According to requirements of the "<#= FtrViewModelClassName #>.cs"-file of "<#= FtrViewModelProject #>"-project. 
+            containerRegistry.RegisterForNavigation<<#= FtrUserControlClassName #>, <#= FtrViewModelClassName #>>("<#= FtrUserControlClassName #>");
+            ...
+        }
+
+*/
+
+namespace <#= FtrViewModelNameSpace #> {
+    public class <#= FtrViewModelClassName #> : INotifyPropertyChanged
+    {
+        IRegionManager _regionManager;
+        IContainerProvider _containerProvider;
+        protected <#= IAppGlblSettingsServiceClassName #> _<#= AppSettingServicePropertyName #>;
+        public <#= FtrViewModelClassName #>(<#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName  #>, IRegionManager regionManager, IContainerProvider containerProvider) {
+            _regionManager = regionManager;
+            _containerProvider = containerProvider;
+            _<#= AppSettingServicePropertyName #> = <#= AppSettingServicePropertyName #>;
+            ObservableCollection<ValueTuple<RoutedEvent, Delegate, bool>> rehs = new ObservableCollection<ValueTuple<RoutedEvent, Delegate, bool>>();
+            rehs.Add((FrameworkElement.LoadedEvent, 
+                new RoutedEventHandler(this.OnLoaded), false));
+            _<#= RoutedEventHandlersPropertyName #> = rehs;
+
+            CommandBinding cb = null;
+            CommandBindingCollection cbsc = new CommandBindingCollection();
+            cb = new CommandBinding(<#= RoutedCommandExtClassName #>.<#= ExpandCollapseCommandPropertyName #>, new ExecutedRoutedEventHandler(this.Executed<#= ExpandCollapseCommandPropertyName #>), new CanExecuteRoutedEventHandler(CanExecute<#= ExpandCollapseCommandPropertyName #>));
+            cbsc.Add(cb);
+            _<#= RoutedCommandHandlersPropertyName #> = cbsc;
+
+<#
+        foreach(FeatureItemSerializable featureItemSerializable in Feature.FeatureItems) {
+            ModelViewSerializable modelViewSerializable = GetModelViewByName(Context, featureItemSerializable.ViewName);
+            if(modelViewSerializable == null) {
+#>
+// Error: Could not find <#= featureItemSerializable.ViewName #> Model-View  by name
+<#
+                continue;
+            }
+            if(!isComponentGenerated(modelViewSerializable, featureItemSerializable.FileType)) {
+#>
+// Error: <#= featureItemSerializable.FileType #> has not been generated yet for the View <#= featureItemSerializable.ViewName #> Model-View  by name 
+<#
+                continue;
+            }
+            AllowedFileTypeSerializable allowedFileTypeSerializable = GetAllowedFileType(AllowedFileTypes, featureItemSerializable.FileType);
+            if (allowedFileTypeSerializable == null) {
+#>
+// Error: Could not find <#= featureItemSerializable.FileType #> Allowed File Type
+<#
+                continue;
+            }
+            string modelClassName = GetModelClassName(modelViewSerializable, featureItemSerializable.FileType);
+#>
+            _<#= FilterHeightPropertyName #><#= modelClassName #> = <#= allowedFileTypeSerializable.DefaultFilterMaxHeight #> * _<#= AppSettingServicePropertyName #>.FilterHeightFactor + _<#= AppSettingServicePropertyName #>.FilterHeightAddition;
+            _<#= GridHeightPropertyName #><#= modelClassName #> = <#= allowedFileTypeSerializable.DefaultMaxHeight #> * _<#= AppSettingServicePropertyName #>.TableHeightFactor + _<#= AppSettingServicePropertyName #>.TableHeightAddition;
+<#
+        }
+#>
+        }
+
+        #region INotifyPropertyChanged
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string name = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+        #endregion
+
+        #region <#= RoutedEventHandlersPropertyName #>
+        protected IEnumerable<ValueTuple<RoutedEvent, Delegate, bool>> _<#= RoutedEventHandlersPropertyName #> = null;
+        public IEnumerable<ValueTuple<RoutedEvent, Delegate, bool>> <#= RoutedEventHandlersPropertyName #>
+        { 
+            get
+            {
+                return _<#= RoutedEventHandlersPropertyName #>;
+            }
+            set
+            {
+                if (_<#= RoutedEventHandlersPropertyName #> != value)
+                {
+                    _<#= RoutedEventHandlersPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+
+        #region <#= RoutedCommandHandlersPropertyName #>
+        protected CommandBindingCollection _<#= RoutedCommandHandlersPropertyName #> = null;
+        public CommandBindingCollection <#= RoutedCommandHandlersPropertyName #>
+        { 
+            get
+            {
+                return _<#= RoutedCommandHandlersPropertyName #>;
+            }
+            set
+            {
+                if (_<#= RoutedCommandHandlersPropertyName #> != value)
+                {
+                    _<#= RoutedCommandHandlersPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+
+        #region OnLoaded
+        protected bool <#= IsOnLoadedCalledPropertyName #> = false;
+        private void OnLoaded(object sender, RoutedEventArgs e)
+        {
+            e.Handled = true;
+            if (!<#= IsOnLoadedCalledPropertyName #>)
+            {
+                <#= IsOnLoadedCalledPropertyName #> = true;
+                <#= IScopedRegionNavigationUserControlInterfaceClassName #> suc = null;
+                UserControl uc = null;
+                IRegionManager rm = null;
+<#
+        foreach(FeatureItemSerializable featureItemSerializable in Feature.FeatureItems) {
+            ModelViewSerializable modelViewSerializable = GetModelViewByName(Context, featureItemSerializable.ViewName);
+            if(modelViewSerializable == null) {
+#>
+// Error: Could not find <#= featureItemSerializable.ViewName #> Model-View  by name
+<#
+                continue;
+            }
+            if(!isComponentGenerated(modelViewSerializable, featureItemSerializable.FileType)) {
+#>
+// Error: <#= featureItemSerializable.FileType #> has not been generated yet for the View <#= featureItemSerializable.ViewName #> Model-View  by name 
+<#
+                continue;
+            }
+            string modelClassName = GetModelClassName(modelViewSerializable, featureItemSerializable.FileType);
+            if (isRoutedItem(AllowedFileTypes, featureItemSerializable.FileType)) {
+#>
+                suc = _containerProvider.Resolve<<#= IScopedRegionNavigationUserControlInterfaceClassName #>>();
+                suc.ScopedRegionManager = _regionManager.Regions["<#= modelClassName #><#= FtrUserControlClassName #>"].Add(suc, null, true);
+                suc.RequestNavigateSource = "<#= modelClassName #>";
+                _regionManager.Regions["<#= modelClassName #><#= FtrUserControlClassName #>"].Activate(suc);
+<#
+            } else {
+#>
+                if ((<#= AppSettingServicePropertyName #>.GetViewModelMask("<#= modelViewSerializable.ViewName #>") & 1) == 1) {
+                    uc = _containerProvider.Resolve<UserControl>("<#= modelClassName #>");
+                    rm = _regionManager.Regions["<#= modelClassName #><#= FtrUserControlClassName #>"].Add(uc, null, true);
+                    _regionManager.Regions["<#= modelClassName #><#= FtrUserControlClassName #>"].Activate(uc);
+                } else {
+                    suc = _containerProvider.Resolve<<#= IScopedRegionNavigationUserControlInterfaceClassName #>>();
+                    suc.ScopedRegionManager = _regionManager.Regions["<#= modelClassName #><#= FtrUserControlClassName #>"].Add(suc, null, true);
+                    suc.RequestNavigateSource = "<#= AccessDeniedUserControlClassName #>";
+                    _regionManager.Regions["<#= modelClassName #><#= FtrUserControlClassName #>"].Activate(suc);
+                }
+<#
+            }
+        }
+#>
+            }
+        }
+        #endregion
+
+        public bool <#= FlexOnPropertyName #> 
+        {
+            get 
+            {
+                return true
+<#
+        foreach(FeatureItemSerializable featureItemSerializable in Feature.FeatureItems) {
+            ModelViewSerializable modelViewSerializable = GetModelViewByName(Context, featureItemSerializable.ViewName);
+            if(modelViewSerializable == null) {
+#>
+// Error: Could not find <#= featureItemSerializable.ViewName #> Model-View  by name
+<#
+                continue;
+            }
+            if(!isComponentGenerated(modelViewSerializable, featureItemSerializable.FileType)) {
+#>
+// Error: <#= featureItemSerializable.FileType #> has not been generated yet for the View <#= featureItemSerializable.ViewName #> Model-View  by name 
+<#
+                continue;
+            }
+            string modelClassName = GetModelClassName(modelViewSerializable, featureItemSerializable.FileType);
+#>
+                  && _<#= VisiblePrefixPropertyName #><#= modelClassName #>
+<#
+        }
+#>
+                ;
+            }
+        }
+<#
+    {
+        int curItem = -1;
+        foreach(FeatureItemSerializable featureItemSerializable in Feature.FeatureItems) {
+            ModelViewSerializable modelViewSerializable = GetModelViewByName(Context, featureItemSerializable.ViewName);
+            if(modelViewSerializable == null) {
+#>
+// Error: Could not find <#= featureItemSerializable.ViewName #> Model-View  by name
+<#
+                continue;
+            }
+            if(!isComponentGenerated(modelViewSerializable, featureItemSerializable.FileType)) {
+#>
+// Error: <#= featureItemSerializable.FileType #> has not been generated yet for the View <#= featureItemSerializable.ViewName #> Model-View  by name 
+<#
+                continue;
+            }
+            bool IsO2m = isO2mItem(AllowedFileTypes, featureItemSerializable.FileType);
+            string modelClassName = GetModelClassName(modelViewSerializable, featureItemSerializable.FileType);
+            curItem++;
+#>
+        protected bool _<#= VisiblePrefixPropertyName #><#= modelClassName #> = true;
+        public bool <#= VisiblePrefixPropertyName #><#= modelClassName #>
+        {
+            get
+            {
+                return _<#= VisiblePrefixPropertyName #><#= modelClassName #>;
+            }
+            set
+            {
+                if (_<#= VisiblePrefixPropertyName #><#= modelClassName #> != value)
+                {
+                    _<#= VisiblePrefixPropertyName #><#= modelClassName #> = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged("<#= FlexOnPropertyName #>");
+                }
+            }
+        }
+
+        protected IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> _<#= ContainerMenuItemsPropertyName #><#= modelClassName #> = 
+            new ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>>() {
+                new <#= WebServiceFilterMenuClassName #>() { Id = "<#= curItem #>", Caption="Expand(Collapse)", IconName="AspectRatio",  IconColor="Primary", Enabled=true, Data="<#= modelClassName #>", Command=<#= RoutedCommandExtClassName #>.<#= ExpandCollapseCommandPropertyName #> },
+            };
+        public IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> <#= ContainerMenuItemsPropertyName #><#= modelClassName #> {
+            get { return _<#= ContainerMenuItemsPropertyName #><#= modelClassName #>; }
+        }
+
+        protected double _<#= FilterHeightPropertyName #><#= modelClassName #> = Double.MaxValue;
+        public  double <#= FilterHeightPropertyName #><#= modelClassName #> 
+        {
+            get { return _<#= FilterHeightPropertyName #><#= modelClassName #>; }
+            set 
+            {
+                if(_<#= FilterHeightPropertyName #><#= modelClassName #> != value) {
+                    _<#= FilterHeightPropertyName #><#= modelClassName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        protected double _<#= GridHeightPropertyName #><#= modelClassName #> = Double.MaxValue;
+        public  double <#= GridHeightPropertyName #><#= modelClassName #> 
+        {
+            get { return _<#= GridHeightPropertyName #><#= modelClassName #>; }
+            set 
+            {
+                if(_<#= GridHeightPropertyName #><#= modelClassName #> != value) {
+                    _<#= GridHeightPropertyName #><#= modelClassName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+<#
+        }
+    }
+#>
+        #region <#= ExpandCollapseCommandPropertyName #>
+        public void Executed<#= ExpandCollapseCommandPropertyName #>(object sender, ExecutedRoutedEventArgs e) {
+            e.Handled = true;
+            <#= IWebServiceFilterMenuInterfaceClassName #> mi = e.Parameter as <#= IWebServiceFilterMenuInterfaceClassName #>;
+            if (mi == null) return;
+            string modelName = mi.Data as string;
+            if (string.IsNullOrEmpty(modelName)) return;
+            bool IsAllCollapsed = <#= FlexOnPropertyName #>;
+<#
+        foreach(FeatureItemSerializable featureItemSerializable in Feature.FeatureItems) {
+            ModelViewSerializable modelViewSerializable = GetModelViewByName(Context, featureItemSerializable.ViewName);
+            if(modelViewSerializable == null) {
+#>
+// Error: Could not find <#= featureItemSerializable.ViewName #> Model-View  by name
+<#
+                continue;
+            }
+            if(!isComponentGenerated(modelViewSerializable, featureItemSerializable.FileType)) {
+#>
+// Error: <#= featureItemSerializable.FileType #> has not been generated yet for the View <#= featureItemSerializable.ViewName #> Model-View  by name 
+<#
+                continue;
+            }
+            AllowedFileTypeSerializable allowedFileTypeSerializable = GetAllowedFileType(AllowedFileTypes, featureItemSerializable.FileType);
+            if (allowedFileTypeSerializable == null) {
+#>
+// Error: Could not find <#= featureItemSerializable.FileType #> Allowed File Type
+<#
+                continue;
+            }
+            string modelClassName = GetModelClassName(modelViewSerializable, featureItemSerializable.FileType);
+#>
+            _<#= VisiblePrefixPropertyName #><#= modelClassName #> = !IsAllCollapsed; OnPropertyChanged("<#= VisiblePrefixPropertyName #><#= modelClassName #>");
+            <#= FilterHeightPropertyName #><#= modelClassName #> = 
+                <#= allowedFileTypeSerializable.DefaultFilterMaxHeight #> * _<#= AppSettingServicePropertyName #>.FilterHeightFactor + _<#= AppSettingServicePropertyName #>.FilterHeightAddition;
+            <#= GridHeightPropertyName #><#= modelClassName #> = 
+                <#= allowedFileTypeSerializable.DefaultMaxHeight #> * _<#= AppSettingServicePropertyName #>.TableHeightFactor + _<#= AppSettingServicePropertyName #>.TableHeightAddition;
+<#
+        }
+#>
+            if (IsAllCollapsed) {
+                switch(modelName) {
+<#
+        foreach(FeatureItemSerializable featureItemSerializable in Feature.FeatureItems) {
+            ModelViewSerializable modelViewSerializable = GetModelViewByName(Context, featureItemSerializable.ViewName);
+            if(modelViewSerializable == null) {
+#>
+// Error: Could not find <#= featureItemSerializable.ViewName #> Model-View  by name
+<#
+                continue;
+            }
+            if(!isComponentGenerated(modelViewSerializable, featureItemSerializable.FileType)) {
+#>
+// Error: <#= featureItemSerializable.FileType #> has not been generated yet for the View <#= featureItemSerializable.ViewName #> Model-View  by name 
+<#
+                continue;
+            }
+            AllowedFileTypeSerializable allowedFileTypeSerializable = GetAllowedFileType(AllowedFileTypes, featureItemSerializable.FileType);
+            if (allowedFileTypeSerializable == null) {
+#>
+// Error: Could not find <#= featureItemSerializable.FileType #> Allowed File Type
+<#
+                continue;
+            }
+            string modelClassName = GetModelClassName(modelViewSerializable, featureItemSerializable.FileType);
+#>
+                    case "<#= modelClassName #>": 
+                        _<#= VisiblePrefixPropertyName #><#= modelClassName #> = true; OnPropertyChanged("<#= VisiblePrefixPropertyName #><#= modelClassName #>");
+                        <#= FilterHeightPropertyName #><#= modelClassName #> = 
+                            <#= allowedFileTypeSerializable.ExpandFilterMaxHeight #> * _<#= AppSettingServicePropertyName #>.FilterHeightFactor + _<#= AppSettingServicePropertyName #>.FilterHeightAddition;
+                        <#= GridHeightPropertyName #><#= modelClassName #> = 
+                            <#= allowedFileTypeSerializable.ExpandMaxHeight #> * _<#= AppSettingServicePropertyName #>.TableHeightFactor + _<#= AppSettingServicePropertyName #>.TableHeightAddition;
+                        break;
+<#
+        }
+#>
+                    default:
+                        break;
+                }
+            }
+            OnPropertyChanged("<#= FlexOnPropertyName #>");
+        } 
+        public void CanExecute<#= ExpandCollapseCommandPropertyName #>(object sender, CanExecuteRoutedEventArgs e) {
+            e.Handled = true;
+            e.CanExecute = true;
+        }
+        #endregion
+
+    }
+}
+
+<#+
+
+    string GetRtOutletName(ModelViewSerializable model) {
+        string result="rtoutlt";
+        if (model == null) {
+            return result;
+        }
+        return result + model.ViewName.ToLower();
+    }
+    string GetRdOutletName(ModelViewSerializable model) {
+        string result="rdoutlt";
+        if (model == null) {
+            return result;
+        }
+        return result + model.ViewName.ToLower();
+    }
+    bool isComponentGenerated(ModelViewSerializable model, string fileType) {
+        if(model == null) {
+            return false;
+        }
+        if (model.CommonStaffs == null) {
+            return false;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        return refItem != null;
+    }
+    string GetModelComponentClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType) ) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".component","-component");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+        }
+        return sb.ToString();
+    }
+    string GetFolderName(ModelViewSerializable model, string refFolder, string currFolder) {
+        string result="./";
+        if ((model == null) || string.IsNullOrEmpty(refFolder) || string.IsNullOrEmpty(currFolder)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == refFolder).FirstOrDefault();
+        CommonStaffSerializable curItem= 
+            model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+        if ((refItem == null) || (curItem == null)) {
+            return result;
+        }
+        string[] refFolders  = new string[] {};
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            refFolders  = refItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+        }
+        string[] currFolders = new string[]{};
+        if(!string.IsNullOrEmpty(curItem.FileFolder)) {
+            currFolders  = curItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+        }
+        int refLen = refFolders.Length;
+        int currLen = currFolders.Length;
+        int minLen = refLen < currLen ? refLen : currLen;
+        int cnt= 0;
+        for(int i = 0; i < minLen; i++) {
+            if ( !refFolders[i].Equals(currFolders[i], StringComparison.OrdinalIgnoreCase) ) break;
+            cnt++;
+        }
+        if(currLen > cnt) {
+            result += string.Join("",Enumerable.Repeat("../", currLen - cnt));
+        }
+        if(refLen > cnt) {
+            result += string.Join("/", refFolders, cnt, refLen - cnt) + "/";
+        }
+        result += refItem.FileName;
+        return result;
+    }
+    string GetContextContextName(DbContextSerializable context, string fileType) {
+        string result="";
+        if ((context == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (context.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            context.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".context","-context");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+        }
+        return sb.ToString();
+    }
+    string GetCommonFolderName(ModelViewSerializable model, DbContextSerializable context,  string refFolder, string currFolder) {
+        string result="./";
+        if ((model == null) || (context == null) || string.IsNullOrEmpty(refFolder) || string.IsNullOrEmpty(currFolder)) {
+            return result;
+        }
+        if ((model.CommonStaffs == null) || (context.CommonStaffs == null)) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            context.CommonStaffs.Where(c => c.FileType == refFolder).FirstOrDefault();
+        CommonStaffSerializable curItem= 
+            model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+        if ((refItem == null) || (curItem == null)) {
+            return result;
+        }
+        string[] refFolders  = new string[] {};
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            refFolders  = refItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+        }
+        string[] currFolders = new string[]{};
+        if(!string.IsNullOrEmpty(curItem.FileFolder)) {
+            currFolders  = curItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+        }
+        int refLen = refFolders.Length;
+        int currLen = currFolders.Length;
+        int minLen = refLen < currLen ? refLen : currLen;
+        int cnt= 0;
+        for(int i = 0; i < minLen; i++) {
+            if ( !refFolders[i].Equals(currFolders[i], StringComparison.OrdinalIgnoreCase) ) break;
+            cnt++;
+        }
+        if(currLen > cnt) {
+            result += string.Join("",Enumerable.Repeat("../", currLen - cnt));
+        }
+        if(refLen > cnt) {
+            result += string.Join("/", refFolders, cnt, refLen - cnt) + "/";
+        }
+        result += refItem.FileName;
+        return result;
+    }
+    string GetContextInterfaceName(DbContextSerializable context, string fileType) {
+        string result="";
+        if ((context == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (context.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            context.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".interface","-interface");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return "I"+sb.ToString();
+    }
+    string GetContextFunctionName(DbContextSerializable context, string fileType) {
+        string result="";
+        if ((context == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (context.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            context.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString();
+    }
+    string GetModelInterfaceName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".interface","-interface");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return "I"+sb.ToString();
+    }
+    ModelViewSerializable GetModelViewByName(DbContextSerializable context, string viewName) {
+        if ((context == null) || (string.IsNullOrEmpty(viewName))) {
+            return null;
+        }
+        if (context.ModelViews == null) {
+            return null;
+        }
+        return context.ModelViews.Where(v => v.ViewName == viewName).FirstOrDefault();
+    }
+    bool isRoutedItem(AllowedFileTypesSerializable allowedFileTypes, string fileType) {
+        if( (allowedFileTypes == null) || string.IsNullOrEmpty(fileType)) {
+            return false;
+        }
+        if(allowedFileTypes.Items == null) {
+            return false;
+        }
+        AllowedFileTypeSerializable rslt= allowedFileTypes.Items.Where(i => i.FileType == fileType).FirstOrDefault();
+        if(rslt == null) {
+            return false;
+        }
+        return rslt.IsRouted;
+    }
+    string GetAllFeatureDefaultIsExp(FeatureSerializable  Feature) {
+        if (Feature == null) return "";
+        if (Feature.FeatureItems == null) return "";
+        string rslt = "false";
+        if(Feature.FeatureItems.Count < 2) return rslt;
+        for(int i = 1; i< Feature.FeatureItems.Count;i++) {
+            rslt += ", false";
+        }
+        return rslt;
+    }
+    AllowedFileTypeSerializable GetAllowedFileType(AllowedFileTypesSerializable allowedFileTypes, string fileType) {
+        if( (allowedFileTypes == null) || string.IsNullOrEmpty(fileType)) {
+            return null;
+        }
+        if(allowedFileTypes.Items == null) {
+            return null;
+        }
+        return allowedFileTypes.Items.Where(i => i.FileType == fileType).FirstOrDefault();
+    }
+    string GetFeatureComponentClassName(FeatureSerializable feature, string fileType) {
+        string result="";
+        if ((feature == null) || string.IsNullOrEmpty(fileType) ) {
+            return result;
+        }
+        if (feature.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            feature.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+    string GetFeatureNameSpace(FeatureSerializable feature, string fileType) {
+        string result="";
+        if ((feature == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (feature.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            feature.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+
+    string GetFeatureFolderName(FeatureSerializable feature, string refFolder, string currFolder) {
+        string result="./";
+        if ((feature == null) || string.IsNullOrEmpty(refFolder) || string.IsNullOrEmpty(currFolder)) {
+            return result;
+        }
+        if (feature.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            feature.CommonStaffs.Where(c => c.FileType == refFolder).FirstOrDefault();
+        CommonStaffSerializable curItem= 
+            feature.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+        if ((refItem == null) || (curItem == null)) {
+            return result;
+        }
+        string[] refFolders  = new string[] {};
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            refFolders  = refItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+        }
+        string[] currFolders = new string[]{};
+        if(!string.IsNullOrEmpty(curItem.FileFolder)) {
+            currFolders  = curItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+        }
+        int refLen = refFolders.Length;
+        int currLen = currFolders.Length;
+        int minLen = refLen < currLen ? refLen : currLen;
+        int cnt= 0;
+        for(int i = 0; i < minLen; i++) {
+            if ( !refFolders[i].Equals(currFolders[i], StringComparison.OrdinalIgnoreCase) ) break;
+            cnt++;
+        }
+        if(currLen > cnt) {
+            result += string.Join("",Enumerable.Repeat("../", currLen - cnt));
+        }
+        if(refLen > cnt) {
+            result += string.Join("/", refFolders, cnt, refLen - cnt) + "/";
+        }
+        result += refItem.FileName;
+        return result;
+    }
+    string GetFeatureCommonFolderName(FeatureSerializable  feature, DbContextSerializable context,  string refFolder, string currFolder) {
+        string result="./";
+        if ((feature == null) || (context == null) || string.IsNullOrEmpty(refFolder) || string.IsNullOrEmpty(currFolder)) {
+            return result;
+        }
+        if ((feature.CommonStaffs == null) || (context.CommonStaffs == null)) {
+            return result;
+        }
+
+        CommonStaffSerializable refItem= 
+            context.CommonStaffs.Where(c => c.FileType == refFolder).FirstOrDefault();
+        CommonStaffSerializable curItem= 
+            feature.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+
+        if ((refItem == null) || (curItem == null)) {
+            return result;
+        }
+        string[] refFolders  = new string[] {};
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            refFolders  = refItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+        }
+        string[] currFolders = new string[]{};
+        if(!string.IsNullOrEmpty(curItem.FileFolder)) {
+            currFolders  = curItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+        }
+        int refLen = refFolders.Length;
+        int currLen = currFolders.Length;
+        int minLen = refLen < currLen ? refLen : currLen;
+        int cnt= 0;
+        for(int i = 0; i < minLen; i++) {
+            if ( !refFolders[i].Equals(currFolders[i], StringComparison.OrdinalIgnoreCase) ) break;
+            cnt++;
+        }
+        if(currLen > cnt) {
+            result += string.Join("",Enumerable.Repeat("../", currLen - cnt));
+        }
+        if(refLen > cnt) {
+            result += string.Join("/", refFolders, cnt, refLen - cnt) + "/";
+        }
+        result += refItem.FileName;
+        return result;
+    }
+    string GetFeatureToModelFolderName(FeatureSerializable  feature, DbContextSerializable context, string refViewName,  string refFolder, string currFolder) {
+        string result="./";
+        if ((feature == null) || (context == null) || string.IsNullOrEmpty(refFolder) || string.IsNullOrEmpty(currFolder) || string.IsNullOrEmpty(refViewName)) {
+            return result;
+        }
+        if ((feature.CommonStaffs == null) || (context.CommonStaffs == null)) {
+            return result;
+        }
+        ModelViewSerializable refModel = context.ModelViews.Where(v => v.ViewName == refViewName).FirstOrDefault();
+        if (refModel == null) {
+            return result;
+        }
+        if (refModel.CommonStaffs == null)  {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            refModel.CommonStaffs.Where(c => c.FileType == refFolder).FirstOrDefault();
+        CommonStaffSerializable curItem= 
+            feature.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+        if ((refItem == null) || (curItem == null)) {
+            return result;
+        }
+        string[] refFolders  = new string[] {};
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            refFolders  = refItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+        }
+        string[] currFolders = new string[]{};
+        if(!string.IsNullOrEmpty(curItem.FileFolder)) {
+            currFolders  = curItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+        }
+        int refLen = refFolders.Length;
+        int currLen = currFolders.Length;
+        int minLen = refLen < currLen ? refLen : currLen;
+        int cnt= 0;
+        for(int i = 0; i < minLen; i++) {
+            if ( !refFolders[i].Equals(currFolders[i], StringComparison.OrdinalIgnoreCase) ) break;
+            cnt++;
+        }
+        if(currLen > cnt) {
+            result += string.Join("",Enumerable.Repeat("../", currLen - cnt));
+        }
+        if(refLen > cnt) {
+            result += string.Join("/", refFolders, cnt, refLen - cnt) + "/";
+        }
+        result += refItem.FileName;
+        return result;
+    }
+    string GetFeatureProjectName(FeatureSerializable feature, string fileType) {
+        string result="";
+        if ((feature == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (feature.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            feature.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileProject)) {
+            return result;
+        }
+        string[] fnArr = refItem.FileProject.Split(new char[] {'\\'}, 100, System.StringSplitOptions.None); 
+        string fn = fnArr[fnArr.Length - 1];
+
+        return fn.Replace(".csproj","");
+    }
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+    string GetContextModelClassName(DbContextSerializable context, string fileType) {
+        string result="";
+        if ((context == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (context.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            context.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+    string GetContextModelProjectName(DbContextSerializable context, string fileType) {
+        string result="";
+        if ((context == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (context.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            context.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileProject)) {
+            return result;
+        }
+        string[] fnArr = refItem.FileProject.Split(new char[] {'\\'}, 100, System.StringSplitOptions.None); 
+        string fn = fnArr[fnArr.Length - 1];
+
+        return fn.Replace(".csproj","");
+    }
+    string GetContextModelNameSpace(DbContextSerializable context, string fileType) {
+        string result="";
+        if ((context == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (context.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            context.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+    bool isO2mItem(AllowedFileTypesSerializable allowedFileTypes, string fileType) {
+        if( (allowedFileTypes == null) || string.IsNullOrEmpty(fileType)) {
+            return false;
+        }
+        if(allowedFileTypes.Items == null) {
+            return false;
+        }
+        AllowedFileTypeSerializable rslt= allowedFileTypes.Items.Where(i => i.FileType == fileType).FirstOrDefault();
+        if(rslt == null) {
+            return false;
+        }
+        return rslt.IsO2m;
+    }
+
+#>
