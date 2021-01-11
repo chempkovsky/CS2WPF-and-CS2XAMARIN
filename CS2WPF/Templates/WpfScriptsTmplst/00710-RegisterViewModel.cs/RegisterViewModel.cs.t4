@@ -1,0 +1,548 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+using System;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using System.Windows.Input;
+using System.Collections.ObjectModel;
+using System.Windows;
+using System.Windows.Controls;
+using System.Collections.Generic;
+using System.Linq;
+using Prism.Regions;
+using System.Threading.Tasks;
+
+<#
+
+    string RoutedEventExtFolder                     = "00222-RoutedEventExt.cs";
+    string RoutedEventExtClassName                  = GetModelClassName(Model, RoutedEventExtFolder);
+    string RoutedEventExtNameSpace                  = GetModelNameSpace(Model, RoutedEventExtFolder);
+
+    string RoutedCommandExtFolder                   = "00224-RoutedCommandExt.cs";
+    string RoutedCommandExtClassName                = GetModelClassName(Model, RoutedCommandExtFolder);
+    string RoutedCommandExtNameSpace                = GetModelNameSpace(Model, RoutedCommandExtFolder);
+
+    string HomeUserControlFolder                    = "00690-HomeUserControl.xaml.cs";
+    string HomeUserControlClassName                 = GetModelClassName(Model, HomeUserControlFolder);
+    string HomeUserControlNameSpace                 = GetModelNameSpace(Model, HomeUserControlFolder);
+
+    string IRegisterModelFolder      = "00500-IRegisterModel.cs";
+    string IRegisterModelClassName   = GetModelClassName(Model, IRegisterModelFolder);
+    string IRegisterModelNameSpace   = GetModelNameSpace(Model, IRegisterModelFolder);
+
+    string IAppGlblLoginServiceFolder      = "00508-IAppGlblLoginService.cs";
+    string IAppGlblLoginServiceClassName   = GetModelClassName(Model, IAppGlblLoginServiceFolder);
+    string IAppGlblLoginServiceNameSpace   = GetModelNameSpace(Model, IAppGlblLoginServiceFolder);
+    string IAppGlblLoginServiceProject     = GetModelProjectName(Model, IAppGlblLoginServiceFolder);
+
+    string RegisterUserControlFolder     = "00706-RegisterUserControl.xaml.cs";
+    string RegisterUserControlClassName  = GetModelClassName(Model, RegisterUserControlFolder);
+    string RegisterUserControlNameSpace  = GetModelNameSpace(Model, RegisterUserControlFolder);
+
+
+    string RegisterViewModelFolder      = "00710-RegisterViewModel.cs";
+    string RegisterViewModelClassName   = GetModelClassName(Model, RegisterViewModelFolder);
+    string RegisterViewModelNameSpace   = GetModelNameSpace(Model, RegisterViewModelFolder);
+    string RegisterViewModelProject     = GetModelProjectName(Model, RegisterViewModelFolder);
+
+
+
+    string CurrentNavigationContextPropertyName = "CurrentNavigationContext";
+    string ShowBackBtnPropertyName              = "ShowBackBtn";
+    string RoutedEventHandlersPropertyName      = "RoutedEventHandlers";
+    string RoutedCommandHandlersPropertyName    = "RoutedCommandHandlers";
+    string NavigationBackCommandPropertyName    = "NavigationBackCommand";
+
+
+    string UserNamePropertyName                 = "UserName";
+    string UserNameCaptionPropertyName          = "UserNameCaption";
+    string UserNamePropmptPropertyName          = "UserNamePropmpt";
+
+    string PassWordPropertyName                 = "PassWord";
+    string PassWordCaptionPropertyName          = "PassWordCaption";
+    string PassWordPropmptPropertyName          = "PassWordPropmpt";
+    string PassWordErrorPropertyName            = "PassWordError";
+
+    string ConfirmPassWordPropertyName          = "ConfirmPassWord";
+    string ConfirmPassWordCaptionPropertyName   = "ConfirmPassWordCaption";
+    string ConfirmPassWordPropmptPropertyName   = "ConfirmPassWordPropmpt";
+
+
+    string OkCommandPropertyName                = "OkCommand";
+    string CancelCommandPropertyName            = "CancelCommand";
+
+    string AppLoginServicePropertyName          = "GlblLoginSrv";
+    string LoginMethodName                      = "Login";
+    string ChangePasswordMethodName             = "ChangePassword";
+    string LogoutMethodName                     = "Logout";
+    string RegisterMethodName                   = "Register";
+
+    string UIDispatcherInvokePropertyName   = "Application.Current.Dispatcher.Invoke";
+
+    List<string> nmSpaces = new List<string>();
+    if ((RegisterViewModelNameSpace != RoutedCommandExtNameSpace) && (nmSpaces.IndexOf(RoutedCommandExtNameSpace) < 0)) 
+        nmSpaces.Add(RoutedCommandExtNameSpace);
+    if ((RegisterViewModelNameSpace != RoutedEventExtNameSpace) && (nmSpaces.IndexOf(RoutedEventExtNameSpace) < 0)) 
+        nmSpaces.Add(RoutedEventExtNameSpace);
+    if ((RegisterViewModelNameSpace != IAppGlblLoginServiceNameSpace) && (nmSpaces.IndexOf(IAppGlblLoginServiceNameSpace) < 0)) 
+        nmSpaces.Add(IAppGlblLoginServiceNameSpace);
+    if ((RegisterViewModelNameSpace != IRegisterModelNameSpace) && (nmSpaces.IndexOf(IRegisterModelNameSpace) < 0)) 
+        nmSpaces.Add(IRegisterModelNameSpace);
+
+#>
+<# 
+    foreach(string ns in nmSpaces) {
+#>
+using <#= ns #>;
+<#
+    }
+#>
+
+/*
+
+    "<#= RegisterViewModelClassName #>" UserControl is defined in the "<#= RegisterViewModelProject #>"-project.
+    In the file of IModule-class of "<#= RegisterViewModelProject #>"-project the following line of code must be inserted:
+
+
+        public void RegisterTypes(IContainerRegistry containerRegistry)
+        {
+            ...
+
+            ViewModelLocationProvider.Register<<#= RegisterUserControlClassName #>, <#= RegisterViewModelClassName #>>();
+            containerRegistry.RegisterForNavigation<<#= RegisterUserControlClassName #>, <#= RegisterViewModelClassName #>>("<#= RegisterUserControlClassName #>");
+            ...
+        }
+
+*/
+
+namespace <#= RegisterViewModelNameSpace #> {
+    public class <#= RegisterViewModelClassName #> : INotifyPropertyChanged, INavigationAware, INotifyDataErrorInfo 
+    {
+        <#= IAppGlblLoginServiceClassName #> _<#= AppLoginServicePropertyName #>;
+        public <#= RegisterViewModelClassName #>(<#= IAppGlblLoginServiceClassName #> <#= AppLoginServicePropertyName #>) {
+            _<#= AppLoginServicePropertyName #> = <#= AppLoginServicePropertyName #>;
+            ObservableCollection<ValueTuple<RoutedEvent, Delegate, bool>> rehs = new ObservableCollection<ValueTuple<RoutedEvent, Delegate, bool>>();
+            rehs.Add((PasswordBox.PasswordChangedEvent,
+                new RoutedEventHandler(this.OnPasswordChangedEvent), false));
+            _<#= RoutedEventHandlersPropertyName #> = rehs;
+
+            CommandBindingCollection cbsc = new CommandBindingCollection();
+            CommandBinding cb = new CommandBinding(<#= RoutedCommandExtClassName #>.<#= NavigationBackCommandPropertyName #>, new ExecutedRoutedEventHandler(this.Executed<#= NavigationBackCommandPropertyName #>), new CanExecuteRoutedEventHandler(CanExecute<#= NavigationBackCommandPropertyName #>));
+            cbsc.Add(cb);
+            cb = new CommandBinding(<#= RoutedCommandExtClassName #>.<#= CancelCommandPropertyName #>, new ExecutedRoutedEventHandler(this.Executed<#= CancelCommandPropertyName #>), new CanExecuteRoutedEventHandler(CanExecute<#= CancelCommandPropertyName #>));
+            cbsc.Add(cb);
+            cb = new CommandBinding(<#= RoutedCommandExtClassName #>.<#= OkCommandPropertyName #>, new ExecutedRoutedEventHandler(this.Executed<#= OkCommandPropertyName #>), new CanExecuteRoutedEventHandler(CanExecute<#= OkCommandPropertyName #>));
+            cbsc.Add(cb);
+
+            _<#= RoutedCommandHandlersPropertyName #> = cbsc;
+        }
+        #region INotifyPropertyChanged
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string name = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+        #endregion
+
+        #region <#= RoutedCommandHandlersPropertyName #>
+        protected CommandBindingCollection _<#= RoutedCommandHandlersPropertyName #> = null;
+        public CommandBindingCollection <#= RoutedCommandHandlersPropertyName #>
+        { 
+            get
+            {
+                return _<#= RoutedCommandHandlersPropertyName #>;
+            }
+            set
+            {
+                if (_<#= RoutedCommandHandlersPropertyName #> != value)
+                {
+                    _<#= RoutedCommandHandlersPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+
+        #region <#= RoutedEventHandlersPropertyName #>
+        protected IEnumerable<ValueTuple<RoutedEvent, Delegate, bool>> _<#= RoutedEventHandlersPropertyName #> = null;
+        public IEnumerable<ValueTuple<RoutedEvent, Delegate, bool>> <#= RoutedEventHandlersPropertyName #>
+        { 
+            get
+            {
+                return _<#= RoutedEventHandlersPropertyName #>;
+            }
+            set
+            {
+                if (_<#= RoutedEventHandlersPropertyName #> != value)
+                {
+                    _<#= RoutedEventHandlersPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+
+        protected NavigationContext <#= CurrentNavigationContextPropertyName #> = null;
+
+        #region <#= ShowBackBtnPropertyName #>
+        public bool <#= ShowBackBtnPropertyName #> {
+            get {
+                return (<#= CurrentNavigationContextPropertyName #> == null) ?  false : <#= CurrentNavigationContextPropertyName #>.NavigationService.Journal.CanGoBack;
+            }
+        }
+        #endregion
+
+        #region INavigationAware
+        public bool IsNavigationTarget(NavigationContext navigationContext) {
+            return true;
+        }
+        public void OnNavigatedFrom(NavigationContext navigationContext) {
+            <#= CurrentNavigationContextPropertyName #> = navigationContext;
+            OnPropertyChanged("<#= ShowBackBtnPropertyName #>");
+        }
+        public void OnNavigatedTo(NavigationContext navigationContext) {
+            <#= CurrentNavigationContextPropertyName #> = navigationContext;
+            OnPropertyChanged("<#= ShowBackBtnPropertyName #>");
+            _<#= UserNamePropertyName #> = "";
+            _<#= PassWordPropertyName #> = "";
+            _<#= ConfirmPassWordPropertyName #> = "";
+            ValidationErrors.Clear();
+            RaiseErrorsChanged("<#= UserNamePropertyName #>");
+            OnPropertyChanged("<#= PassWordErrorPropertyName #>");
+        }
+        #endregion
+
+        #region <#= NavigationBackCommandPropertyName #>
+        public void Executed<#= NavigationBackCommandPropertyName #>(object sender, ExecutedRoutedEventArgs e) { 
+            e.Handled = true;
+            if(<#= CurrentNavigationContextPropertyName #> == null) return;
+            if(<#= CurrentNavigationContextPropertyName #>.NavigationService.Journal.CanGoBack) 
+                <#= CurrentNavigationContextPropertyName #>.NavigationService.Journal.GoBack();
+        } 
+        public void CanExecute<#= NavigationBackCommandPropertyName #>(object sender, CanExecuteRoutedEventArgs e) {
+            e.Handled = true;
+            e.CanExecute = (<#= CurrentNavigationContextPropertyName #> == null) ? false : <#= CurrentNavigationContextPropertyName #>.NavigationService.Journal.CanGoBack;
+        }
+        #endregion
+
+
+        #region <#= CancelCommandPropertyName #>
+        public void Executed<#= CancelCommandPropertyName #>(object sender, ExecutedRoutedEventArgs e) {
+            e.Handled = true;
+            if(<#= CurrentNavigationContextPropertyName #> == null) return;
+            <#= CurrentNavigationContextPropertyName #>.NavigationService.Journal.Clear();
+            <#= CurrentNavigationContextPropertyName #>.NavigationService.RequestNavigate(new Uri("<#= HomeUserControlClassName #>", UriKind.Relative));
+        }
+        public void CanExecute<#= CancelCommandPropertyName #>(object sender, CanExecuteRoutedEventArgs e) {
+            e.Handled = true;
+            e.CanExecute = true;
+        }
+        #endregion
+
+        #region <#= OkCommandPropertyName #>
+        public void Executed<#= OkCommandPropertyName #>(object sender, ExecutedRoutedEventArgs e) {
+            e.Handled = true;
+            ValidateField(<#= UserNamePropertyName #>, "<#= UserNamePropertyName #>");
+            ValidateField(<#= PassWordPropertyName #>, "<#= PassWordPropertyName #>");
+            ValidateField(<#= ConfirmPassWordPropertyName #>, "<#= ConfirmPassWordPropertyName #>");
+            if (HasErrors) return;
+            Task.Run( async () => {
+                <#= IRegisterModelClassName #> model = await _<#= AppLoginServicePropertyName #>.<#= RegisterMethodName #>(<#= UserNamePropertyName #> , <#= PassWordPropertyName #>, <#= ConfirmPassWordPropertyName #>);
+                if (model == null) return;
+                <#= UIDispatcherInvokePropertyName #>(() => {
+                    if(<#= CurrentNavigationContextPropertyName #> == null) return;
+                    <#= CurrentNavigationContextPropertyName #>.NavigationService.Journal.Clear();
+                    <#= CurrentNavigationContextPropertyName #>.NavigationService.RequestNavigate(new Uri("<#= HomeUserControlClassName #>", UriKind.Relative));
+                });
+
+            });
+        }
+        public void CanExecute<#= OkCommandPropertyName #>(object sender, CanExecuteRoutedEventArgs e) {
+            e.Handled = true;
+            e.CanExecute = !HasErrors; 
+        }
+        #endregion
+
+        #region INotifyDataErrorInfo
+        Dictionary<string, ICollection<string>> ValidationErrors = new Dictionary<string, ICollection<string>>();
+        public bool HasErrors { get { return (ValidationErrors.Count > 0) || (ValidationErrors.Count > 0); } }
+        public System.Collections.IEnumerable GetErrors(string propertyName)
+        {
+            if (string.IsNullOrEmpty(propertyName)) {
+                return null;
+            }
+            if(ValidationErrors.ContainsKey(propertyName)) 
+                return ValidationErrors[propertyName];
+            return null;
+        }
+        public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
+        private void RaiseErrorsChanged(string propertyName)
+        {
+            if (ErrorsChanged != null)
+                ErrorsChanged(this, new DataErrorsChangedEventArgs(propertyName));
+        }
+        public void ValidateField(object value, [CallerMemberName] string filedName = null) {
+            if (string.IsNullOrEmpty(filedName)) return;
+            string stringValue = value as string;
+            string ErrorMsg = null;
+            IList<string> rslt = null;
+            switch(filedName) {
+                case "<#= UserNamePropertyName #>":
+                    if (string.IsNullOrEmpty(stringValue)) {
+                        ErrorMsg = "<#= UserNamePropertyName #> is a required filed";
+                    } else if (stringValue.Length < 3) {
+                        ErrorMsg = "<#= UserNamePropertyName #>.Length must be large than 2";
+                    }
+                    break;
+                case "<#= PassWordPropertyName #>":
+                    if (string.IsNullOrEmpty(stringValue)) {
+                        ErrorMsg = "<#= PassWordPropertyName #> is a required filed";
+                    } else if (stringValue.Length < 6) {
+                        ErrorMsg = "<#= PassWordPropertyName #>.Length must be large than 5";
+                    } else if (<#= PassWordPropertyName #> != <#= ConfirmPassWordPropertyName #>) {
+                        ErrorMsg = "<#= PassWordPropertyName #> and <#= ConfirmPassWordPropertyName #> must be identical";
+                    } else {
+                        if(ValidationErrors.ContainsKey("<#= ConfirmPassWordPropertyName #>"))  ValidationErrors.Remove("<#= ConfirmPassWordPropertyName #>");
+                        if(ValidationErrors.ContainsKey("<#= PassWordPropertyName #>"))  ValidationErrors.Remove("<#= PassWordPropertyName #>");
+                        RaiseErrorsChanged(filedName);
+                        OnPropertyChanged("<#= PassWordErrorPropertyName #>");
+                    }
+                    break;
+                case "<#= ConfirmPassWordPropertyName #>":
+                    if (string.IsNullOrEmpty(stringValue)) {
+                        ErrorMsg = "<#= ConfirmPassWordPropertyName #> is a required filed";
+                    } else if (stringValue.Length < 6) {
+                        ErrorMsg = "<#= ConfirmPassWordPropertyName #>.Length must be large than 5";
+                    } else if (<#= PassWordPropertyName #> != <#= ConfirmPassWordPropertyName #>) {
+                        ErrorMsg = "<#= PassWordPropertyName #> and <#= ConfirmPassWordPropertyName #> must be identical";
+                    } else {
+                        if(ValidationErrors.ContainsKey("<#= ConfirmPassWordPropertyName #>"))  ValidationErrors.Remove("<#= ConfirmPassWordPropertyName #>");
+                        if(ValidationErrors.ContainsKey("<#= PassWordPropertyName #>"))  ValidationErrors.Remove("<#= PassWordPropertyName #>");
+                        RaiseErrorsChanged(filedName);
+                        OnPropertyChanged("<#= PassWordErrorPropertyName #>");
+                    }
+                    break;
+                default:
+                    break;
+            }
+            if (!string.IsNullOrEmpty(ErrorMsg)) {
+                rslt = new List<string>() { ErrorMsg };
+            }
+            bool hasErrors = rslt != null;
+            hasErrors = hasErrors ? (rslt.Count > 0) : false;
+            if(hasErrors) {
+                ValidationErrors[filedName] = rslt;
+                RaiseErrorsChanged(filedName);
+                OnPropertyChanged("<#= PassWordErrorPropertyName #>");
+            } else {
+                if(ValidationErrors.ContainsKey(filedName))  {
+                    ValidationErrors.Remove(filedName);
+                    RaiseErrorsChanged(filedName);
+                    OnPropertyChanged("<#= PassWordErrorPropertyName #>");
+                }
+            }
+        }
+        #endregion
+
+        #region <#= UserNamePropertyName #>
+        protected string _<#= UserNamePropertyName #> = "";
+        public string <#= UserNamePropertyName #> 
+        {
+            get { return _<#= UserNamePropertyName #>; }
+            set
+            {
+                if (<#= UserNamePropertyName #> != value) {
+                    _<#= UserNamePropertyName #> = value;
+                    OnPropertyChanged();
+                    ValidateField(value);
+                }
+            }
+        }
+        public string <#= UserNamePropmptPropertyName #> {
+            get { return "Enter User Name"; }
+        }
+        public string <#= UserNameCaptionPropertyName #> {
+            get { return "User Name"; }
+        }
+        #endregion
+
+        #region <#= PassWordPropertyName #>
+        protected string _<#= PassWordPropertyName #> = "";
+        public string <#= PassWordPropertyName #> 
+        {
+            get { return _<#= PassWordPropertyName #>; }
+            set
+            {
+                if (<#= PassWordPropertyName #> != value) {
+                    _<#= PassWordPropertyName #> = value;
+                    OnPropertyChanged();
+                    ValidateField(value);
+                }
+            }
+        }
+        public string <#= PassWordPropmptPropertyName #> {
+            get { return "Enter Password"; }
+        }
+        public string <#= PassWordCaptionPropertyName #> {
+            get { return "Password"; }
+        }
+        #endregion
+
+        #region <#= ConfirmPassWordPropertyName #>
+        protected string _<#= ConfirmPassWordPropertyName #> = "";
+        public string <#= ConfirmPassWordPropertyName #> 
+        {
+            get { return _<#= ConfirmPassWordPropertyName #>; }
+            set
+            {
+                if (<#= ConfirmPassWordPropertyName #> != value) {
+                    _<#= ConfirmPassWordPropertyName #> = value;
+                    OnPropertyChanged();
+                    ValidateField(value);
+                }
+            }
+        }
+        public string <#= ConfirmPassWordPropmptPropertyName #> {
+            get { return "Repeat Password"; }
+        }
+        public string <#= ConfirmPassWordCaptionPropertyName #> {
+            get { return "Confirm Password"; }
+        }
+        #endregion
+
+        #region <#= PassWordErrorPropertyName #>
+        public string <#= PassWordErrorPropertyName #> {
+            get 
+            {
+                if(ValidationErrors.ContainsKey("<#= PassWordPropertyName #>")) {
+                    if(ValidationErrors["<#= PassWordPropertyName #>"].Count > 0)
+                        return ValidationErrors["<#= PassWordPropertyName #>"].FirstOrDefault();
+                }
+                if(ValidationErrors.ContainsKey("<#= ConfirmPassWordPropertyName #>")) {
+                    if(ValidationErrors["<#= ConfirmPassWordPropertyName #>"].Count > 0)
+                        return ValidationErrors["<#= ConfirmPassWordPropertyName #>"].FirstOrDefault();
+                }
+                return null;
+            }
+        }
+        #endregion
+
+        #region OnPasswordChangedEvent 
+        protected void OnPasswordChangedEvent(object sender, RoutedEventArgs e)
+        {
+            e.Handled = true;
+            PasswordBox pb = e.OriginalSource as PasswordBox;
+            if (pb != null) {
+                if(pb.Uid == "<#= PassWordPropertyName #>") {
+                    <#= PassWordPropertyName #>  = pb.Password;
+                } else if(pb.Uid == "<#= ConfirmPassWordPropertyName #>") {
+                    <#= ConfirmPassWordPropertyName #>  = pb.Password;
+                }
+            }
+        }
+        #endregion
+    }
+}
+
+<#+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+    string GetModelProjectName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileProject)) {
+            return result;
+        }
+        string[] fnArr = refItem.FileProject.Split(new char[] {'\\'}, 100, System.StringSplitOptions.None); 
+        string fn = fnArr[fnArr.Length - 1];
+
+        return fn.Replace(".csproj","");
+    }
+
+#>

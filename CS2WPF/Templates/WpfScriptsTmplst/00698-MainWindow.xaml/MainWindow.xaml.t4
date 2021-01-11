@@ -35,6 +35,11 @@
     string AttachedPropertiesExtNameSpace   = GetModelNameSpace(Model, AttachedPropertiesExtFolder);
     string AttachedPropertiesExtProject     = GetModelProjectName(Model, AttachedPropertiesExtFolder);
 
+    string FreezableProxyFolder      = "00228-FreezableProxy.cs";
+    string FreezableProxyClassName   = GetModelClassName(Model, FreezableProxyFolder);
+    string FreezableProxyNameSpace   = GetModelNameSpace(Model, FreezableProxyFolder);
+    string FreezableProxyProject     = GetModelProjectName(Model, FreezableProxyFolder);
+
     string ProxyUserControlFolder           = "00280-ProxyUserControl.xaml.cs";
     string ProxyUserControlClassName        = GetModelClassName(Model, ProxyUserControlFolder);
     string ProxyUserControlNameSpace        = GetModelNameSpace(Model, ProxyUserControlFolder);
@@ -53,6 +58,8 @@
     
 
     string TitlePropertyName                 = "Title";
+    string UserNamePropertyName              = "UserName";
+    string SettingMenuPropertyName           = "SettingMenu";
     string MainMenuPropertyName              = "MainMenu";
     string MainContentRegionPropertyName     = "MainContentRegion";
 
@@ -84,6 +91,10 @@
     if(RoutedCommandExtProject != MainWindowXamlProject) {
         routedCommandPrefix = routedCommandPrefix + ";assembly=" + RoutedCommandExtProject;
     }
+    string freezablePrefix = "clr-namespace:" + FreezableProxyNameSpace;
+    if(FreezableProxyProject != MainWindowXamlProject) {
+        freezablePrefix = freezablePrefix + ";assembly=" + FreezableProxyProject;
+    }
 
     
 
@@ -99,6 +110,7 @@
         xmlns:pth="<#= pthPrefix #>"
         xmlns:fill="<#= fllPrefix #>"
         xmlns:prx="<#= proxyPrefix #>" 
+        xmlns:frzp="<#= freezablePrefix #>" 
 
         xmlns:atch="<#= attachedPrefix #>" 
         atch:<#= AttachedPropertiesExtClassName #>.<#= RegisterRoutedCommandBindingsPropertyName #>="{Binding <#= RoutedCommandHandlersPropertyName #>}"
@@ -109,6 +121,9 @@
         Title="{Binding <#= TitlePropertyName #>}"
         x:Name="MainWindowRoot"
         WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <frzp:<#= FreezableProxyClassName #> x:Key="windowControlContext" Data="{Binding}"/>
+    </Window.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
@@ -120,18 +135,33 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <Label Grid.Column="0" Foreground="{DynamicResource PrimaryForeground}" Margin="24 4 0 0" FontWeight="Bold" FontSize="16" Content="{Binding <#= TitlePropertyName #>}"/>
-            <StackPanel Grid.Column="2" Margin="0 4 24 0" Orientation="Horizontal">
-                <Button  Foreground="{DynamicResource PrimaryForeground}" 
-                                    BorderBrush="{x:Null}" Background="{x:Null}"
-                                    KeyboardNavigation.TabNavigation ="None" ToolTip="Settings">
-                    <Viewbox   Height="24" Width="24" FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Button}}}" HorizontalAlignment="Center" VerticalAlignment="Center" >
-                        <Canvas  Height="24" Width="24" >
-                        <Path  Data="{DynamicResource Cog}" Fill="{Binding Foreground, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Button}}}" />
-                        </Canvas>
-                    </Viewbox>
-                </Button>
+            <Label Grid.Column="2" Foreground="{DynamicResource PrimaryForeground}" Margin="0 4 8 0" FontWeight="Bold" FontSize="16" Content="{Binding <#= UserNamePropertyName #> }"/>
+            <StackPanel Grid.Column="3" Margin="0 4 24 0" Orientation="Horizontal">
+                <StackPanel.Resources>
+                   <frzp:FreezableProxy x:Key="windowControl" Data="{Binding Path=., RelativeSource={RelativeSource AncestorType={x:Type Window}}}"/>
+                </StackPanel.Resources>
+                <Menu BorderBrush="{x:Null}" Background="{x:Null}">
+                    <MenuItem  ItemsSource="{Binding Data.<#= SettingMenuPropertyName #>, Source={StaticResource windowControlContext}}" >
+                        <MenuItem.Header>
+                            <Viewbox   Height="24" Width="24" FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Button}}}" HorizontalAlignment="Center" VerticalAlignment="Center" >
+                                <Canvas  Height="24" Width="24" >
+                                    <Path  Data="{DynamicResource Cog}" Fill="{DynamicResource PrimaryForeground}" />
+                                </Canvas>
+                            </Viewbox>
+                        </MenuItem.Header>
+                        <MenuItem.ItemContainerStyle>
+                            <Style>
+                                <Setter Property="MenuItem.Header" Value="{Binding Caption}"/>
+                                <Setter Property="MenuItem.Command" Value="{Binding Command}"/>
+                                <Setter Property="MenuItem.CommandParameter" Value="{Binding Data}"/>
+                                <Setter Property="MenuItem.CommandTarget" Value="{Binding Data, Source={StaticResource windowControl}}" />
+                            </Style>
+                        </MenuItem.ItemContainerStyle>
+                    </MenuItem>
+                </Menu>
             </StackPanel>
         </Grid>
         <Grid Grid.Row="1">

@@ -39,9 +39,29 @@ using Prism.Ioc;
     string WebServiceFilterMenuClassName            = GetModelClassName(Model, WebServiceFilterMenuFolder);
     string WebServiceFilterMenuNameSpace            = GetModelNameSpace(Model, WebServiceFilterMenuFolder);
 
+    string WebServiceFilterMenuViewModelFolder      = "00217-WebServiceFilterMenuViewModel.cs";
+    string WebServiceFilterMenuViewModelClassName   = GetModelClassName(Model, WebServiceFilterMenuViewModelFolder);
+    string WebServiceFilterMenuViewModelNameSpace   = GetModelNameSpace(Model, WebServiceFilterMenuViewModelFolder);
+
     string RoutedCommandExtFolder                   = "00224-RoutedCommandExt.cs";
     string RoutedCommandExtClassName                = GetModelClassName(Model, RoutedCommandExtFolder);
     string RoutedCommandExtNameSpace                = GetModelNameSpace(Model, RoutedCommandExtFolder);
+
+    string RegisterUserControlFolder     = "00706-RegisterUserControl.xaml.cs";
+    string RegisterUserControlClassName  = GetModelClassName(Model, RegisterUserControlFolder);
+    string RegisterUserControlNameSpace  = GetModelNameSpace(Model, RegisterUserControlFolder);
+
+    string LoginUserControlFolder     = "00712-LoginUserControl.xaml.cs";
+    string LoginUserControlClassName  = GetModelClassName(Model, LoginUserControlFolder);
+    string LoginUserControlNameSpace  = GetModelNameSpace(Model, LoginUserControlFolder);
+
+    string LogoutUserControlFolder     = "00718-LogoutUserControl.xaml.cs";
+    string LogoutUserControlClassName  = GetModelClassName(Model, LogoutUserControlFolder);
+    string LogoutUserControlNameSpace  = GetModelNameSpace(Model, LogoutUserControlFolder);
+
+    string ChngpswdUserControlFolder     = "00724-ChngpswdUserControl.xaml.cs";
+    string ChngpswdUserControlClassName  = GetModelClassName(Model, ChngpswdUserControlFolder);
+    string ChngpswdUserControlNameSpace  = GetModelNameSpace(Model, ChngpswdUserControlFolder);
 
     string AccessDeniedUserControlFolder     = "00678-AccessDeniedUserControl.xaml.cs";
     string AccessDeniedUserControlClassName  = GetModelClassName(Model, AccessDeniedUserControlFolder);
@@ -59,6 +79,8 @@ using Prism.Ioc;
     string IsOnLoadedCalledPropertyName     = "IsOnLoadedCalled";
 
     string TitlePropertyName                    = "Title";
+    string UserNamePropertyName                 = "UserName";
+    string SettingMenuPropertyName              = "SettingMenu";
     string MainMenuPropertyName                 = "MainMenu";
     string MainContentRegionPropertyName        = "MainContentRegion";
     string RoutedCommandHandlersPropertyName    = "RoutedCommandHandlers";
@@ -71,6 +93,7 @@ using Prism.Ioc;
     string NotificationIsOpenPropertyName               = "NotificationIsOpen";
     string CloseNotificationWindowCommandPropertyName   = "CloseNotificationWindowCommand";
     string OnMessageNotificationPropertyName            = "OnMessageNotification";
+    string OnUserChangedNotificationPropertyName        = "OnUserChangedNotification";
 
     List<string> nmSpaces = new List<string>();
     if ((MainWindowViewModelNameSpace != IAppGlblSettingsServiceNameSpace) && (nmSpaces.IndexOf(IAppGlblSettingsServiceNameSpace) < 0)) 
@@ -79,8 +102,8 @@ using Prism.Ioc;
         nmSpaces.Add(RoutedCommandExtNameSpace);
     if ((MainWindowViewModelNameSpace != IWebServiceFilterMenuInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterMenuInterfaceNameSpace) < 0)) 
         nmSpaces.Add(IWebServiceFilterMenuInterfaceNameSpace);
-    if ((MainWindowViewModelNameSpace != WebServiceFilterMenuNameSpace) && (nmSpaces.IndexOf(WebServiceFilterMenuNameSpace) < 0)) 
-        nmSpaces.Add(WebServiceFilterMenuNameSpace);
+    if ((MainWindowViewModelNameSpace != WebServiceFilterMenuViewModelNameSpace) && (nmSpaces.IndexOf(WebServiceFilterMenuViewModelNameSpace) < 0)) 
+        nmSpaces.Add(WebServiceFilterMenuViewModelNameSpace);
 
 #>
 <# 
@@ -182,6 +205,8 @@ namespace <#= MainWindowViewModelNameSpace #> {
                 <#= IsOnLoadedCalledPropertyName #> = true;
                 <#= AppSettingServicePropertyName #> = _containerProvider.Resolve<<#= IAppGlblSettingsServiceClassName #>>();
                 <#= AppSettingServicePropertyName #>.<#= OnMessageNotificationPropertyName #> += <#= OnMessageNotificationPropertyName #>;
+                <#= AppSettingServicePropertyName #>.<#= OnUserChangedNotificationPropertyName #> += <#= OnUserChangedNotificationPropertyName #>;
+                
                 _regionManager.Regions["<#= MainContentRegionPropertyName #>"].NavigationService.Journal.Clear();
                 _regionManager.RequestNavigate("<#= MainContentRegionPropertyName #>", "<#= HomeUserControlPropertyName #>");
             }
@@ -195,11 +220,45 @@ namespace <#= MainWindowViewModelNameSpace #> {
         }
         #endregion
 
+        #region <#= UserNamePropertyName #>
+        protected string _<#= UserNamePropertyName #>=null;
+        public string <#= UserNamePropertyName #>
+        {
+            get { return _<#= UserNamePropertyName #>; }
+            set 
+            {
+                if(_<#= UserNamePropertyName #> != value) {
+                    _<#= UserNamePropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        protected void <#= OnUserChangedNotificationPropertyName #>(object sender, string uname) {
+            <#= UserNamePropertyName #> = uname;
+        }
+        #endregion
+
+
+
+        #region <#= SettingMenuPropertyName #>
+        IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> _<#= SettingMenuPropertyName #> = new ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>>()
+        {
+            new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "101", Caption="Register", IconName="Home",  IconColor="Primary", Data="<#= RegisterUserControlClassName #>", Command=<#= RoutedCommandExtClassName #>.<#= MainMenuCommandPropertyName #>},
+            new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "102", Caption="Login", IconName="Home",  IconColor="Primary", Data="<#= LoginUserControlClassName #>", Command=<#= RoutedCommandExtClassName #>.<#= MainMenuCommandPropertyName #>},
+            new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "102", Caption="Logout", IconName="Home",  IconColor="Primary", Data="<#= LogoutUserControlClassName #>", Command=<#= RoutedCommandExtClassName #>.<#= MainMenuCommandPropertyName #>},
+            new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "102", Caption="Change Password", IconName="Home",  IconColor="Primary", Data="<#= ChngpswdUserControlClassName #>", Command=<#= RoutedCommandExtClassName #>.<#= MainMenuCommandPropertyName #>},
+        };
+        public IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> <#= SettingMenuPropertyName #>
+        {
+            get { return _<#= SettingMenuPropertyName #>; }
+        }
+        #endregion
+
+
         #region <#= MainMenuPropertyName #>
         IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> _<#= MainMenuPropertyName #> = new ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>>()
         {
-            new <#= WebServiceFilterMenuClassName #>() { Id = "002", Caption="Country (Rt)", IconName="TableCog",  IconColor="Primary", Data="LitCountryViewRlistUserControl", Command=<#= RoutedCommandExtClassName #>.<#= MainMenuCommandPropertyName #>},
-            
+            new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "000", Caption="Home", IconName="Home",  IconColor="Primary", Data="<#= HomeUserControlPropertyName #>", Command=<#= RoutedCommandExtClassName #>.<#= MainMenuCommandPropertyName #>},
         };
         public IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> <#= MainMenuPropertyName #>
         {

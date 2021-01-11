@@ -1,0 +1,175 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+using System.Threading.Tasks;
+<#
+
+    string IAppGlblSettingsServiceFolder      = "00080-IAppGlblSettingsService.cs";
+    string IAppGlblSettingsServiceClassName   = GetModelClassName(Model, IAppGlblSettingsServiceFolder);
+    string IAppGlblSettingsServiceNameSpace   = GetModelNameSpace(Model, IAppGlblSettingsServiceFolder);
+
+    string IBearerTokenModelFolder      = "00496-IBearerTokenModel.cs";
+    string IBearerTokenModelClassName   = GetModelClassName(Model, IBearerTokenModelFolder);
+    string IBearerTokenModelNameSpace   = GetModelNameSpace(Model, IBearerTokenModelFolder);
+
+    string IRegisterModelFolder      = "00500-IRegisterModel.cs";
+    string IRegisterModelClassName   = GetModelClassName(Model, IRegisterModelFolder);
+    string IRegisterModelNameSpace   = GetModelNameSpace(Model, IRegisterModelFolder);
+
+    string IChangePasswordModelFolder      = "00504-IChangePasswordModel.cs";
+    string IChangePasswordModelClassName   = GetModelClassName(Model, IChangePasswordModelFolder);
+    string IChangePasswordModelNameSpace   = GetModelNameSpace(Model, IChangePasswordModelFolder);
+
+
+    string IAppGlblLoginServiceFolder      = "00508-IAppGlblLoginService.cs";
+    string IAppGlblLoginServiceClassName   = GetModelClassName(Model, IAppGlblLoginServiceFolder);
+    string IAppGlblLoginServiceNameSpace   = GetModelNameSpace(Model, IAppGlblLoginServiceFolder);
+    string IAppGlblLoginServiceProject     = GetModelProjectName(Model, IAppGlblLoginServiceFolder);
+
+    string LoginMethodName                      = "Login";
+    string ChangePasswordMethodName             = "ChangePassword";
+    string LogoutMethodName                     = "Logout";
+    string RegisterMethodName                   = "Register";
+
+    string OldPasswordPropertyName              = "OldPassword";
+    string NewPasswordPropertyName              = "NewPassword";
+    string ConfirmPasswordPropertyName          = "ConfirmPassword";
+
+    string EmailPropertyName                    = "Email";
+    string PasswordPropertyName                 = "Password";
+
+    List<string> nmSpaces = new List<string>();
+    if ((IAppGlblLoginServiceNameSpace != IAppGlblSettingsServiceNameSpace) && (nmSpaces.IndexOf(IAppGlblSettingsServiceNameSpace) < 0)) 
+        nmSpaces.Add(IAppGlblSettingsServiceNameSpace);
+    if ((IAppGlblLoginServiceNameSpace != IRegisterModelNameSpace) && (nmSpaces.IndexOf(IRegisterModelNameSpace) < 0)) 
+        nmSpaces.Add(IRegisterModelNameSpace);
+    if ((IAppGlblLoginServiceNameSpace != IChangePasswordModelNameSpace) && (nmSpaces.IndexOf(IChangePasswordModelNameSpace) < 0)) 
+        nmSpaces.Add(IChangePasswordModelNameSpace);
+    if ((IAppGlblLoginServiceNameSpace != IBearerTokenModelNameSpace) && (nmSpaces.IndexOf(IBearerTokenModelNameSpace) < 0)) 
+        nmSpaces.Add(IBearerTokenModelNameSpace);
+
+#>
+<# 
+    foreach(string ns in nmSpaces) {
+#>
+using <#= ns #>;
+<#
+    }
+#>
+
+
+namespace <#= IAppGlblLoginServiceNameSpace #> {
+    public interface <#= IAppGlblLoginServiceClassName #>
+    {
+        Task<<#= IBearerTokenModelClassName #>> <#= LoginMethodName #>(string <#= EmailPropertyName #>, string <#= PasswordPropertyName #>);
+        Task<<#= IRegisterModelClassName #>> <#= RegisterMethodName #>(string <#= EmailPropertyName #>, string <#= PasswordPropertyName #>, string <#= ConfirmPasswordPropertyName #>);
+        Task<bool> <#= LogoutMethodName #>();
+        Task<<#= IChangePasswordModelClassName #>> <#= ChangePasswordMethodName #>(string <#= OldPasswordPropertyName #>, string <#= NewPasswordPropertyName #>, string <#= ConfirmPasswordPropertyName #>);
+        <#= IChangePasswordModelClassName #> GetChangePasswordModel(string <#= OldPasswordPropertyName #>, string <#= NewPasswordPropertyName #>, string <#= ConfirmPasswordPropertyName #>);
+        <#= IRegisterModelClassName #> GetRegisterModel(string <#= EmailPropertyName #>, string <#= PasswordPropertyName #>, string <#= ConfirmPasswordPropertyName #>);
+    }
+}
+
+<#+
+
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+    string GetModelProjectName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileProject)) {
+            return result;
+        }
+        string[] fnArr = refItem.FileProject.Split(new char[] {'\\'}, 100, System.StringSplitOptions.None); 
+        string fn = fnArr[fnArr.Length - 1];
+
+        return fn.Replace(".csproj","");
+    }
+
+#>

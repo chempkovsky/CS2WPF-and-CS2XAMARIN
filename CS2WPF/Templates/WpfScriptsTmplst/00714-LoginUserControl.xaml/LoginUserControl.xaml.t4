@@ -1,0 +1,309 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="xaml" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+
+<#
+
+    string pathHelperModelFolder      = "00120-PathHelper.cs";
+    string pathHelperModelClassName   = GetModelClassName(Model, pathHelperModelFolder);
+    string pathHelperModelNameSpace   = GetModelNameSpace(Model, pathHelperModelFolder);
+    string pathHelperModelProject     = GetModelProjectName(Model, pathHelperModelFolder);
+
+    string foregroundHelperModelFolder      = "00130-ForegroundHelper.cs";
+    string foregroundHelperModelClassName   = GetModelClassName(Model, foregroundHelperModelFolder);
+    string foregroundHelperModelNameSpace   = GetModelNameSpace(Model, foregroundHelperModelFolder);
+    string foregroundHelperModelProject     = GetModelProjectName(Model, foregroundHelperModelFolder);
+
+    string RoutedCommandExtFolder      = "00224-RoutedCommandExt.cs";
+    string RoutedCommandExtClassName   = GetModelClassName(Model, RoutedCommandExtFolder);
+    string RoutedCommandExtNameSpace   = GetModelNameSpace(Model, RoutedCommandExtFolder);
+    string RoutedCommandExtProject     = GetModelProjectName(Model, RoutedCommandExtFolder);
+
+    string AttachedPropertiesExtFolder      = "00226-AttachedPropertiesExt.cs";
+    string AttachedPropertiesExtClassName   = GetModelClassName(Model, AttachedPropertiesExtFolder);
+    string AttachedPropertiesExtNameSpace   = GetModelNameSpace(Model, AttachedPropertiesExtFolder);
+    string AttachedPropertiesExtProject     = GetModelProjectName(Model, AttachedPropertiesExtFolder);
+
+    string LoginUserControlFolder     = "00712-LoginUserControl.xaml.cs";
+    string LoginUserControlClassName  = GetModelClassName(Model, LoginUserControlFolder);
+    string LoginUserControlNameSpace  = GetModelNameSpace(Model, LoginUserControlFolder);
+
+    string LoginUserControlXamlFolder      = "00714-LoginUserControl.xaml";
+    string LoginUserControlXamlClassName   = GetModelClassName(Model, LoginUserControlXamlFolder);
+    string LoginUserControlXamlNameSpace   = GetModelNameSpace(Model, LoginUserControlXamlFolder);
+    string LoginUserControlXamlProject     = GetModelProjectName(Model, LoginUserControlXamlFolder);
+
+
+
+    string ShowBackBtnPropertyName              = "ShowBackBtn";
+    string ContainerMenuItemsPropertyName       = "ContainerMenuItems";
+
+    string OkCommandPropertyName                = "OkCommand";
+    string CancelCommandPropertyName            = "CancelCommand";
+
+    string RegisterRoutedCommandBindingsPropertyName = "RegisterRoutedCommandBindings";
+    string RegisterRoutedEventBindingsPropertyName = "RegisterRoutedEventBindings";
+    string RoutedCommandHandlersPropertyName = "RoutedCommandHandlers";
+    string RoutedEventHandlersPropertyName = "RoutedEventHandlers";
+
+    string UserNamePropertyName = "UserName";
+    string UserNameCaptionPropertyName = "UserNameCaption";
+    string UserNamePropmptPropertyName = "UserNamePropmpt";
+
+    string PassWordPropertyName = "PassWord";
+    string PassWordCaptionPropertyName = "PassWordCaption";
+    string PassWordPropmptPropertyName = "PassWordPropmpt";
+    string PassWordErrorPropertyName = "PassWordError";
+
+
+    string pthPrefix = "clr-namespace:" + pathHelperModelNameSpace;
+    if(pathHelperModelProject != LoginUserControlXamlProject) {
+        pthPrefix = pthPrefix + ";assembly=" + pathHelperModelProject;
+    }
+    string routedCommandPrefix = "clr-namespace:" + RoutedCommandExtNameSpace;
+    if(RoutedCommandExtProject != LoginUserControlXamlProject) {
+        routedCommandPrefix = routedCommandPrefix + ";assembly=" + RoutedCommandExtProject;
+    }
+    string frgrndPrefix = "clr-namespace:" + foregroundHelperModelNameSpace;
+    if(foregroundHelperModelProject != LoginUserControlXamlProject) {
+        frgrndPrefix = frgrndPrefix + ";assembly=" + foregroundHelperModelProject;
+    }
+    string attachedPrefix = "clr-namespace:" + AttachedPropertiesExtNameSpace;
+    if(AttachedPropertiesExtProject != LoginUserControlXamlProject) {
+        attachedPrefix = attachedPrefix + ";assembly=" + AttachedPropertiesExtProject;
+    }
+
+#>
+
+<UserControl x:Class="<#= LoginUserControlNameSpace #>.<#= LoginUserControlClassName #>"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+
+             xmlns:pth="<#= pthPrefix #>"
+             xmlns:crtcmd="<#= routedCommandPrefix #>"
+             xmlns:frgrnd="<#= frgrndPrefix #>"
+             
+             xmlns:atch="<#= attachedPrefix #>" 
+             atch:<#= AttachedPropertiesExtClassName #>.<#= RegisterRoutedCommandBindingsPropertyName #>="{Binding <#= RoutedCommandHandlersPropertyName #>}"
+             atch:<#= AttachedPropertiesExtClassName #>.<#= RegisterRoutedEventBindingsPropertyName #>="{Binding <#= RoutedEventHandlersPropertyName #>}"
+
+             x:Name="RegisterCntrlRootNode"
+            >
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    </UserControl.Resources>
+    <Grid >
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="1" Margin="0 0 24 0" BorderBrush="{x:Null}" Background="{x:Null}"
+                        Foreground="{DynamicResource Primary}"  KeyboardNavigation.TabNavigation ="None" ToolTip="Navigate back"
+                        Command="{x:Static crtcmd:RoutedCommandExt.NavigationBackCommand}"
+                        Visibility="{Binding <#= ShowBackBtnPropertyName #>, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <Viewbox   Height="24" Width="24" FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Button}}}" HorizontalAlignment="Center" VerticalAlignment="Center" >
+                    <Canvas  Height="24" Width="24" >
+                        <Path  Data="{DynamicResource ArrowLeftCircle}" Fill="{Binding Foreground, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Button}}}" />
+                    </Canvas>
+                </Viewbox>
+            </Button>
+            <ItemsControl Grid.Column="2" ItemsSource="{Binding <#= ContainerMenuItemsPropertyName #>, ElementName=RegisterCntrlRootNode}" Margin="0 0 8 0" >
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Button BorderBrush="{x:Null}" Background="{x:Null}"
+                                ToolTip="{Binding Caption}" frgrnd:<#= foregroundHelperModelClassName #>.ForegroundResourceKey="{Binding IconColor}" IsEnabled="{Binding Enabled}"
+                                Command="{Binding Command}"
+                                CommandParameter="{Binding}">
+                            <Viewbox   Height="24" Width="24" FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Button}}}" HorizontalAlignment="Center" VerticalAlignment="Center" >
+                                <Canvas  Height="24" Width="24" >
+                                    <Path  pth:<#= pathHelperModelClassName #>.DataResourceKey="{Binding IconName}" Fill="{Binding Foreground, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Button}}}" />
+                                </Canvas>
+                            </Viewbox>
+                        </Button>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Grid>
+
+        <Grid Grid.Row="1" >
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="4*"/>
+                <ColumnDefinition Width="3*"/>
+            </Grid.ColumnDefinitions>
+                <Label Margin="16" Grid.Row="1" Grid.Column="1"  FontWeight="Bold" FontSize="18" Content="Login"/>
+
+                <StackPanel  Grid.Row="2" Grid.Column="1">
+                    <Label FontWeight="Bold" Content="{Binding <#= UserNameCaptionPropertyName #>, Mode=OneWay}"/>
+                    <TextBox x:Uid="<#= UserNamePropertyName #>"
+                        Text="{Binding <#= UserNamePropertyName #>, Mode=TwoWay,
+                                            TargetNullValue='',
+                                            UpdateSourceTrigger=PropertyChanged, 
+                                            ValidatesOnDataErrors=True, 
+                                            ValidatesOnNotifyDataErrors=True ,
+                                            ValidatesOnExceptions=True,
+                                            NotifyOnValidationError=True}">
+                        <Validation.ErrorTemplate>
+                            <ControlTemplate>
+                                <StackPanel>
+                                    <AdornedElementPlaceholder/>
+                                    <ItemsControl ItemsSource="{Binding}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock HorizontalAlignment="Stretch" Text="{Binding ErrorContent}" Foreground="{DynamicResource ErrorForeground}" Background="{DynamicResource ErrorBackground}"/>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </ControlTemplate>
+                        </Validation.ErrorTemplate>
+                    </TextBox>
+                    <TextBlock Text="{Binding <#= UserNamePropmptPropertyName #>, Mode=OneWay}" Opacity="0.3"/>
+                </StackPanel>
+
+                <StackPanel  Grid.Row="3" Grid.Column="1">
+                    <Label FontWeight="Bold" Content="{Binding <#= PassWordCaptionPropertyName #>, Mode=OneWay}"/>
+                    <PasswordBox x:Uid="<#= PassWordPropertyName #>" />
+                    <TextBlock Text="{Binding <#= PassWordPropmptPropertyName #>, Mode=OneWay}" Opacity="0.3"/>
+                </StackPanel>
+
+                <StackPanel  Grid.Row="4" Grid.Column="1">
+                    <Label FontWeight="Bold" Content="{Binding <#= PassWordErrorPropertyName #>, Mode=OneWay}" Foreground="{DynamicResource ErrorForeground}" Background="{DynamicResource ErrorBackground}"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Grid.Row="5" Grid.Column="1"  Margin="8">
+                    <Button Content="Submit" MinWidth="64" Command="{x:Static crtcmd:<#= RoutedCommandExtClassName #>.<#= OkCommandPropertyName #>}" />
+                    <Button Content="Cancel" MinWidth="64" Margin="8 0 0 0" Command="{x:Static crtcmd:<#= RoutedCommandExtClassName #>.<#= CancelCommandPropertyName #>}" />
+                </StackPanel>
+
+        </Grid>
+    </Grid>
+    
+</UserControl>
+
+
+<#+
+
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+    string GetModelProjectName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileProject)) {
+            return result;
+        }
+        string[] fnArr = refItem.FileProject.Split(new char[] {'\\'}, 100, System.StringSplitOptions.None); 
+        string fn = fnArr[fnArr.Length - 1];
+
+        return fn.Replace(".csproj","");
+    }
+
+#>

@@ -1,0 +1,344 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+using System;
+using System.Text;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
+
+<#
+
+    string IAppGlblSettingsServiceFolder      = "00080-IAppGlblSettingsService.cs";
+    string IAppGlblSettingsServiceClassName   = GetModelClassName(Model, IAppGlblSettingsServiceFolder);
+    string IAppGlblSettingsServiceNameSpace   = GetModelNameSpace(Model, IAppGlblSettingsServiceFolder);
+
+    string IBearerTokenModelFolder      = "00496-IBearerTokenModel.cs";
+    string IBearerTokenModelClassName   = GetModelClassName(Model, IBearerTokenModelFolder);
+    string IBearerTokenModelNameSpace   = GetModelNameSpace(Model, IBearerTokenModelFolder);
+
+    string BearerTokenModelFolder      = "00498-BearerTokenModel.cs";
+    string BearerTokenModelClassName   = GetModelClassName(Model, BearerTokenModelFolder);
+    string BearerTokenModelNameSpace   = GetModelNameSpace(Model, BearerTokenModelFolder);
+
+    string IRegisterModelFolder      = "00500-IRegisterModel.cs";
+    string IRegisterModelClassName   = GetModelClassName(Model, IRegisterModelFolder);
+    string IRegisterModelNameSpace   = GetModelNameSpace(Model, IRegisterModelFolder);
+
+    string RegisterModelFolder      = "00502-RegisterModel.cs";
+    string RegisterModelClassName   = GetModelClassName(Model, RegisterModelFolder);
+    string RegisterModelNameSpace   = GetModelNameSpace(Model, RegisterModelFolder);
+
+
+    string IChangePasswordModelFolder      = "00504-IChangePasswordModel.cs";
+    string IChangePasswordModelClassName   = GetModelClassName(Model, IChangePasswordModelFolder);
+    string IChangePasswordModelNameSpace   = GetModelNameSpace(Model, IChangePasswordModelFolder);
+
+    string ChangePasswordModelFolder      = "00506-ChangePasswordModel.cs";
+    string ChangePasswordModelClassName   = GetModelClassName(Model, ChangePasswordModelFolder);
+    string ChangePasswordModelNameSpace   = GetModelNameSpace(Model, ChangePasswordModelFolder);
+
+
+    string IAppGlblLoginServiceFolder      = "00508-IAppGlblLoginService.cs";
+    string IAppGlblLoginServiceClassName   = GetModelClassName(Model, IAppGlblLoginServiceFolder);
+    string IAppGlblLoginServiceNameSpace   = GetModelNameSpace(Model, IAppGlblLoginServiceFolder);
+    string IAppGlblLoginServiceProject     = GetModelProjectName(Model, IAppGlblLoginServiceFolder);
+
+    string AppGlblLoginServiceFolder      = "00510-AppGlblLoginService.cs";
+    string AppGlblLoginServiceClassName   = GetModelClassName(Model, AppGlblLoginServiceFolder);
+    string AppGlblLoginServiceNameSpace   = GetModelNameSpace(Model, AppGlblLoginServiceFolder);
+    string AppGlblLoginServiceProject     = GetModelProjectName(Model, AppGlblLoginServiceFolder);
+    
+    string getAuthInfoHeaderMethodName          = "GetAuthInfoHeader";
+    string ShowErrorMethodName                  = "ShowErrorMessage";
+
+    string AppSettingServicePropertyName        = "GlblSettingsSrv";
+
+    string LoginMethodName                      = "Login";
+    string ChangePasswordMethodName             = "ChangePassword";
+    string LogoutMethodName                     = "Logout";
+    string RegisterMethodName                   = "Register";
+
+    string OldPasswordPropertyName              = "OldPassword";
+    string NewPasswordPropertyName              = "NewPassword";
+    string ConfirmPasswordPropertyName          = "ConfirmPassword";
+
+    string EmailPropertyName                    = "Email";
+    string PasswordPropertyName                 = "Password";
+
+    List<string> nmSpaces = new List<string>();
+    if ((AppGlblLoginServiceNameSpace != IAppGlblSettingsServiceNameSpace) && (nmSpaces.IndexOf(IAppGlblSettingsServiceNameSpace) < 0)) 
+        nmSpaces.Add(IAppGlblSettingsServiceNameSpace);
+    if ((AppGlblLoginServiceNameSpace != IAppGlblLoginServiceNameSpace) && (nmSpaces.IndexOf(IAppGlblLoginServiceNameSpace) < 0)) 
+        nmSpaces.Add(IAppGlblLoginServiceNameSpace);
+    if ((AppGlblLoginServiceNameSpace != IRegisterModelNameSpace) && (nmSpaces.IndexOf(IRegisterModelNameSpace) < 0)) 
+        nmSpaces.Add(IRegisterModelNameSpace);
+    if ((AppGlblLoginServiceNameSpace != RegisterModelNameSpace) && (nmSpaces.IndexOf(RegisterModelNameSpace) < 0)) 
+        nmSpaces.Add(RegisterModelNameSpace);
+    if ((AppGlblLoginServiceNameSpace != IChangePasswordModelNameSpace) && (nmSpaces.IndexOf(IChangePasswordModelNameSpace) < 0)) 
+        nmSpaces.Add(IChangePasswordModelNameSpace);
+    if ((AppGlblLoginServiceNameSpace != ChangePasswordModelNameSpace) && (nmSpaces.IndexOf(ChangePasswordModelNameSpace) < 0)) 
+        nmSpaces.Add(ChangePasswordModelNameSpace);
+    if ((AppGlblLoginServiceNameSpace != IBearerTokenModelNameSpace) && (nmSpaces.IndexOf(IBearerTokenModelNameSpace) < 0)) 
+        nmSpaces.Add(IBearerTokenModelNameSpace);
+    if ((AppGlblLoginServiceNameSpace != BearerTokenModelNameSpace) && (nmSpaces.IndexOf(BearerTokenModelNameSpace) < 0)) 
+        nmSpaces.Add(BearerTokenModelNameSpace);
+
+#>
+<# 
+    foreach(string ns in nmSpaces) {
+#>
+using <#= ns #>;
+<#
+    }
+#>
+
+/*
+    "<#= AppGlblLoginServiceClassName #>"  is defined in the "<#= AppGlblLoginServiceProject #>"-project.
+    In the file of IModule-class of "<#= AppGlblLoginServiceProject #>"-project the following line of code must be inserted:
+
+        public void RegisterTypes(IContainerRegistry containerRegistry)
+        {
+            ...
+            containerRegistry.Register<<#= IAppGlblLoginServiceClassName #>, <#= AppGlblLoginServiceClassName #>>();
+            ...
+        }
+
+*/
+
+namespace <#= AppGlblLoginServiceNameSpace #> {
+    public class <#= AppGlblLoginServiceClassName #>: <#= IAppGlblLoginServiceClassName #>
+    {
+        protected <#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName #> = null;
+        protected string serviceUrl = null;
+        protected HttpClient client = null;
+        public <#= AppGlblLoginServiceClassName #>(<#= IAppGlblSettingsServiceClassName #> agstt) {
+            this.<#= AppSettingServicePropertyName #> = agstt;
+            this.serviceUrl = this.<#= AppSettingServicePropertyName #>.GetSecurityWebApiPrefix();
+            this.client = this.<#= AppSettingServicePropertyName #>.Client;
+        }
+
+        public async Task<<#= IBearerTokenModelClassName #>> <#= LoginMethodName #>(string <#= EmailPropertyName #>, string <#= PasswordPropertyName #>)
+        {
+            try
+            {
+                var stringContent = new StringContent(
+                    Uri.EscapeDataString("username") + "=" + Uri.EscapeDataString(<#= EmailPropertyName #>) + "&" +
+                    Uri.EscapeDataString("password") + "=" + Uri.EscapeDataString(<#= PasswordPropertyName #>) + "&" +
+                    Uri.EscapeDataString("grant_type") + "=" + Uri.EscapeDataString("password") , 
+                    Encoding.UTF8, "application/json");
+                HttpResponseMessage response = await client.PostAsync(serviceUrl + "token", stringContent);
+                response.EnsureSuccessStatusCode();
+                string responseBody = await response.Content.ReadAsStringAsync();
+                return JsonConvert.DeserializeObject<<#= BearerTokenModelClassName #>>(responseBody) ;
+            } 
+            catch(Exception e) 
+            {
+                string exceptionMsg = "<#= AppGlblLoginServiceClassName #>.<#= LoginMethodName #> : " + e.Message;
+                Exception inner = e.InnerException;
+                while (inner != null)
+                {
+                    exceptionMsg = exceptionMsg + ": " + inner.Message;
+                    inner = inner.InnerException;
+                }
+                <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("http", exceptionMsg);
+                return null;
+            }
+        }
+
+
+        public async Task<<#= IRegisterModelClassName #>> <#= RegisterMethodName #>(string <#= EmailPropertyName #>, string <#= PasswordPropertyName #>, string <#= ConfirmPasswordPropertyName #>) {
+            <#= IRegisterModelClassName #> model = GetRegisterModel(<#= EmailPropertyName #>, <#= PasswordPropertyName #>, <#= ConfirmPasswordPropertyName #>);
+            try
+            {
+                var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                HttpResponseMessage response = await client.PostAsync(serviceUrl + "api/Account/Register",  stringContent);
+                response.EnsureSuccessStatusCode();
+                string responseBody = await response.Content.ReadAsStringAsync();
+                return  model; //JsonConvert.DeserializeObject<<#= RegisterModelClassName #>>(responseBody) ;
+
+            } 
+            catch(Exception e) 
+            {
+                string exceptionMsg = "<#= AppGlblLoginServiceClassName #>.<#= RegisterMethodName #> : " + e.Message;
+                Exception inner = e.InnerException;
+                while (inner != null)
+                {
+                    exceptionMsg = exceptionMsg + ": " + inner.Message;
+                    inner = inner.InnerException;
+                }
+                <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("http", exceptionMsg);
+                return null;
+            }
+        }
+
+        public async Task<bool> <#= LogoutMethodName #>() {
+            try
+            {
+                HttpResponseMessage response = await client.PostAsync(serviceUrl + "api/Account/Logout",  null);
+                response.EnsureSuccessStatusCode();
+                string responseBody = await response.Content.ReadAsStringAsync();
+                return  true; //JsonConvert.DeserializeObject<<#= RegisterModelClassName #>>(responseBody) ;
+            } 
+            catch(Exception e) 
+            {
+                string exceptionMsg = "<#= AppGlblLoginServiceClassName #>.<#= LogoutMethodName #> : " + e.Message;
+                Exception inner = e.InnerException;
+                while (inner != null)
+                {
+                    exceptionMsg = exceptionMsg + ": " + inner.Message;
+                    inner = inner.InnerException;
+                }
+                <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("http", exceptionMsg);
+                return false;
+            }
+        }
+
+        public async Task<<#= IChangePasswordModelClassName #>> <#= ChangePasswordMethodName #>(string <#= OldPasswordPropertyName #>, string <#= NewPasswordPropertyName #>, string <#= ConfirmPasswordPropertyName #>) {
+            <#= IChangePasswordModelClassName #> model = GetChangePasswordModel(<#= OldPasswordPropertyName #>, <#= NewPasswordPropertyName #>, <#= ConfirmPasswordPropertyName #>);
+            try
+            {
+                var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                HttpResponseMessage response = await client.PostAsync(serviceUrl + "api/Account/ChangePassword",  stringContent);
+                response.EnsureSuccessStatusCode();
+                string responseBody = await response.Content.ReadAsStringAsync();
+                return  model; //JsonConvert.DeserializeObject<<#= ChangePasswordModelClassName #>>(responseBody) ;
+
+            } 
+            catch(Exception e) 
+            {
+                string exceptionMsg = "<#= AppGlblLoginServiceClassName #>.<#= ChangePasswordMethodName #> : " + e.Message;
+                Exception inner = e.InnerException;
+                while (inner != null)
+                {
+                    exceptionMsg = exceptionMsg + ": " + inner.Message;
+                    inner = inner.InnerException;
+                }
+                <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("http", exceptionMsg);
+                return null;
+            }
+        }
+
+        public <#= IChangePasswordModelClassName #> GetChangePasswordModel(string <#= OldPasswordPropertyName #>, string <#= NewPasswordPropertyName #>, string <#= ConfirmPasswordPropertyName #>) {
+            return new <#= ChangePasswordModelClassName #>() {
+                <#= OldPasswordPropertyName #> = <#= OldPasswordPropertyName #>,
+                <#= NewPasswordPropertyName #> = <#= NewPasswordPropertyName #>,
+                <#= ConfirmPasswordPropertyName #> = <#= ConfirmPasswordPropertyName #>
+            };
+        }
+
+        public <#= IRegisterModelClassName #> GetRegisterModel(string <#= EmailPropertyName #>, string <#= PasswordPropertyName #>, string <#= ConfirmPasswordPropertyName #>) {
+            return new <#= RegisterModelClassName #>() {
+                <#= EmailPropertyName #> = <#= EmailPropertyName #>,
+                <#= PasswordPropertyName #> = <#= PasswordPropertyName #>,
+                <#= ConfirmPasswordPropertyName #> = <#= ConfirmPasswordPropertyName #>
+            };
+        }
+    }
+}
+
+<#+
+
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+    string GetModelProjectName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileProject)) {
+            return result;
+        }
+        string[] fnArr = refItem.FileProject.Split(new char[] {'\\'}, 100, System.StringSplitOptions.None); 
+        string fn = fnArr[fnArr.Length - 1];
+
+        return fn.Replace(".csproj","");
+    }
+
+#>
