@@ -1,0 +1,758 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="xaml" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+
+<#
+
+    string AttachedPropertiesExtFolder      = "00226-AttachedPropertiesExt.cs";
+    string AttachedPropertiesExtClassName   = GetContextModelClassName(Context, AttachedPropertiesExtFolder);
+    string AttachedPropertiesExtNameSpace   = GetContextModelNameSpace(Context, AttachedPropertiesExtFolder);
+    string AttachedPropertiesExtProject     = GetContextModelProjectName(Context, AttachedPropertiesExtFolder);
+
+    string ProxyUserControlFolder           = "00280-ProxyUserControl.xaml.cs";
+    string ProxyUserControlClassName        = GetContextModelClassName(Context, ProxyUserControlFolder);
+    string ProxyUserControlNameSpace        = GetContextModelNameSpace(Context, ProxyUserControlFolder);
+    string ProxyUserControlProject          = GetContextModelProjectName(Context, ProxyUserControlFolder);
+
+    string LformUserControlFolder          = "01596-LformUserControl.xaml.cs";
+    string LformUserControlClassName       = GetModelClassName(Model, LformUserControlFolder);
+    string LformUserControlNameSpace       = GetModelNameSpace(Model, LformUserControlFolder);
+    string LformUserControlProject         = GetModelProjectName(Model, LformUserControlFolder);
+
+
+    string O2mMaskUserControlFolder                 = "02120-O2mMaskUserControl.xaml.cs";
+    string O2mMaskUserControlClassName              = GetModelClassName(Model, O2mMaskUserControlFolder);
+    string O2mMaskUserControlNameSpace              = GetModelNameSpace(Model, O2mMaskUserControlFolder);
+    string O2mMaskUserControlProject                = GetModelProjectName(Model, O2mMaskUserControlFolder);
+
+    string O2mMaskUserControlXamlFolder             = "02122-O2mRoleUserControl.xaml";
+    string O2mMaskUserControlXamlClassName          = GetModelClassName(Model, O2mMaskUserControlXamlFolder);
+    string O2mMaskUserControlXamlNameSpace          = GetModelNameSpace(Model, O2mMaskUserControlXamlFolder);
+    string O2mMaskUserControlXamlProject            = GetModelProjectName(Model, O2mMaskUserControlXamlFolder);
+
+
+    string CaptionPropertyName = "Caption";
+    string FilterHeightPropertyName = "FilterHeight";
+    string ShowFilterPropertyName = "ShowFilter";
+    string ShowAddFilterBtnPropertyName = "ShowAddFilterBtn";
+    string ShowBackBtnPropertyName = "ShowBackBtn";
+    string GridHeightPropertyName = "GridHeight";
+    string TableMenuItemsPropertyName = "TableMenuItems";
+    string TableMenuItemsVMPropertyName = "TableMenuItemsVM";
+
+    string RowMenuItemsPropertyName = "RowMenuItems";
+    string RowMenuItemsVMPropertyName = "RowMenuItemsVM";
+
+    string ContainerMenuItemsPropertyName = "ContainerMenuItems";
+
+    string HiddenFiltersPropertyName    = "HiddenFilters";
+    string HiddenFiltersVMPropertyName  = "HiddenFiltersVM";
+
+    string CanAddPropertyName                   = "CanAdd";
+    string CanAddVMPropertyName                 = "CanAddVM";
+    string CanUpdPropertyName                   = "CanUpdate";
+    string CanUpdVMPropertyName                 = "CanUpdateVM";
+    string CanDelPropertyName                   = "CanDelete";
+    string CanDelVMPropertyName                 = "CanDeleteVM";
+
+
+    string CurrentHiddenFiltersDetailPropertyName     = "CurrentHiddenFiltersDetail"; 
+    string CurrentHiddenFiltersForPropertyName        = "CurrentHiddenFilterFor"; 
+    string FilterHeightDetailPropertyName = "FilterHeightDetail"; //
+    string ShowFilterDetailPropertyName = "ShowFilterDetail"; //
+    string ShowAddFilterBtnDetailPropertyName = "ShowAddFilterBtnDetail"; //
+    string GridHeightDetailPropertyName = "GridHeightDetail"; //
+
+    string HiddenFiltersDetailPropertyName = "HiddenFiltersDetail"; //
+    string HiddenFiltersDetailVMPropertyName = "HiddenFiltersDetailVM"; //
+
+    string TableMenuItemsDetailPropertyName = "TableMenuItemsDetail"; //
+    string TableMenuItemsDetailVMPropertyName = "TableMenuItemsDetailVM"; //
+
+    string RowMenuItemsDetailPropertyName = "RowMenuItemsDetail"; //
+    string RowMenuItemsDetailVMPropertyName = "RowMenuItemsDetailVM"; //
+
+    string CanAddDetailPropertyName                   = "CanAddDetail"; //
+    string CanAddDetailVMPropertyName                 = "CanAddDetailVM"; //
+
+    string CanUpdDetailPropertyName                   = "CanUpdateDetail"; //
+    string CanUpdDetailVMPropertyName                 = "CanUpdateDetailVM"; //
+
+    string CanDelDetailPropertyName                   = "CanDeleteDetail"; //
+    string CanDelDetailVMPropertyName                 = "CanDeleteDetailVM"; //
+
+
+    string RegisterRoutedCommandBindingsPropertyName = "RegisterRoutedCommandBindings";
+    string RegisterRoutedEventBindingsPropertyName = "RegisterRoutedEventBindings";
+    string DataGridServerSortingPropertyName = "DataGridServerSorting";
+    string RoutedEventHandlersPropertyName = "RoutedEventHandlers";
+    string RoutedCommandHandlersPropertyName = "RoutedCommandHandlers";
+
+    string DetailsListPropertyName                  = "DetailsList"; 
+    string SelectedDetailsListItemPropertyName      = "SelectedDetailsListItem"; 
+
+    string IsDetailVisiblePropertyName              = "IsDetailVisible"; 
+    string IsPermissionEditablePropertyName         = "IsPermissionEditable";
+    string PermissionVectorPropertyName             = "PermissionVector";
+    string ParentIsPermissionEditablePropertyName   = "ParentIsPermissionEditable";
+    string ParentPermissionVectorPropertyName       = "ParentPermissionVector";
+    string ParentContainerMenuItemsPropertyName     = "ParentContainerMenuItems";
+
+    string EformModePropertyName                    = "EformMode";
+    string ShowSubmitPropertyName                   = "ShowSubmit";
+
+    string RegionPropertyName                       = "Region";
+    string MasterRegionPropertyName                 = "MasterRegion";
+    string DetailRegionPropertyName                 = "DetailRegion";
+    string HostSuffixPropertyName                   = "Host";
+    string FormControlModelPropertyName             = "FormControlModel";
+    string PermissionRecordPropertyName             = "PermissionRecord";
+
+    string MaskSuffixPropertyName                   = "mask";
+    string MaskEntityName                           = Model.RootEntityClassName + MaskSuffixPropertyName;
+    ModelViewSerializable  MaskModel                = Context.ModelViews.Where(m => m.RootEntityClassName == MaskEntityName).FirstOrDefault();
+    if(MaskModel == null) {
+        throw new Exception("Could not find MaskModel for selected " + Model.ViewName);
+    }
+    string CheckedModelViewModelFolder          = "02106-CheckedModelViewModel.cs";
+    ModelViewSerializable  CheckedModel         = Context.ModelViews.Where(m => m.CommonStaffs.Any(c => c.FileType == CheckedModelViewModelFolder)).FirstOrDefault();
+    if(CheckedModel == null) {
+        throw new Exception("Could not find Checked Model for selected " + Model.ViewName);
+    }
+    string DshCheckedModelViewModelFolder          = "02116-DshCheckedModelViewModel.cs";
+    ModelViewSerializable  CheckedDashboard        = Context.ModelViews.Where(m => m.CommonStaffs.Any(c => c.FileType == DshCheckedModelViewModelFolder)).FirstOrDefault();
+    if(CheckedDashboard == null) {
+        throw new Exception("Could not find Checked Dashboard for selected " + Model.ViewName);
+    }
+
+    string EformUserControlFolder                   = "01496-EformUserControl.xaml.cs";
+    string EformUserControlClassName                = GetModelClassName(MaskModel, EformUserControlFolder);
+    string EformUserControlNameSpace                = GetModelNameSpace(MaskModel, EformUserControlFolder);
+    string EformUserControlProject                  = GetModelProjectName(MaskModel, EformUserControlFolder);
+
+    string CheckedModelUserControlFolder            = "02102-CheckedModelUserControl.xaml.cs";
+    string CheckedModelUserControlClassName         = GetModelClassName(CheckedModel, CheckedModelUserControlFolder);
+    string CheckedModelUserControlNameSpace         = GetModelNameSpace(CheckedModel, CheckedModelUserControlFolder);
+    string CheckedModelUserControlProject           = GetModelProjectName(CheckedModel, CheckedModelUserControlFolder);
+
+    string DshCheckedModelUserControlFolder         = "02112-DshCheckedModelUserControl.xaml.cs";
+    string DshCheckedModelUserControlClassName      = GetModelClassName(CheckedDashboard, DshCheckedModelUserControlFolder);
+    string DshCheckedModelUserControlNameSpace      = GetModelNameSpace(CheckedDashboard, DshCheckedModelUserControlFolder);
+    string DshCheckedModelUserControlProject        = GetModelProjectName(CheckedDashboard, DshCheckedModelUserControlFolder);
+
+
+
+
+    string proxyPrefix = "clr-namespace:" + ProxyUserControlNameSpace;
+    if(ProxyUserControlProject != O2mMaskUserControlProject) {
+        proxyPrefix = proxyPrefix + ";assembly=" + ProxyUserControlProject;
+    }
+    string attachedPrefix = "clr-namespace:" + AttachedPropertiesExtNameSpace;
+    if(AttachedPropertiesExtProject != O2mMaskUserControlProject) {
+        attachedPrefix = attachedPrefix + ";assembly=" + AttachedPropertiesExtProject;
+    }
+    string lformPrefix = "clr-namespace:" + LformUserControlNameSpace;
+    if(LformUserControlProject != O2mMaskUserControlProject) {
+        lformPrefix = lformPrefix + ";assembly=" + LformUserControlProject;
+    }
+    string eformPrefix = "clr-namespace:" + EformUserControlNameSpace;
+    if(EformUserControlProject != O2mMaskUserControlProject) {
+        eformPrefix = eformPrefix + ";assembly=" + EformUserControlProject;
+    }
+    string chkmdPrefix = "clr-namespace:" + CheckedModelUserControlNameSpace;
+    if(CheckedModelUserControlProject != O2mMaskUserControlProject) {
+        chkmdPrefix = chkmdPrefix + ";assembly=" + CheckedModelUserControlProject;
+    }
+    string chkdshPrefix = "clr-namespace:" + DshCheckedModelUserControlNameSpace;
+    if(DshCheckedModelUserControlProject != O2mMaskUserControlProject) {
+        chkdshPrefix = chkdshPrefix + ";assembly=" + DshCheckedModelUserControlProject;
+    }
+
+#>
+
+<UserControl x:Class="<#= O2mMaskUserControlNameSpace #>.<#= O2mMaskUserControlClassName #>"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+
+             xmlns:prism="http://prismlibrary.com/" 
+             prism:ViewModelLocator.AutoWireViewModel="True"                          
+
+             xmlns:prx="<#= proxyPrefix #>" 
+
+<#
+    if (LformUserControlProject == O2mMaskUserControlProject) {
+#>
+             xmlns:lfrm="<#= lformPrefix #>" 
+<#
+    }
+#>
+<#
+    if (EformUserControlProject == O2mMaskUserControlProject) {
+#>
+             xmlns:efrm="<#= eformPrefix #>" 
+<#
+    }
+#>
+<#
+    if (CheckedModelUserControlProject == O2mMaskUserControlProject) {
+#>
+             xmlns:chkmd="<#= chkmdPrefix #>" 
+<#
+    }
+#>
+<#
+    if (DshCheckedModelUserControlProject == O2mMaskUserControlProject) {
+#>
+             xmlns:chkdsh="<#= chkdshPrefix #>" 
+<#
+    }
+#>
+
+             xmlns:atch="<#= attachedPrefix #>" 
+             atch:<#= AttachedPropertiesExtClassName #>.<#= RegisterRoutedEventBindingsPropertyName #>="{Binding <#= RoutedEventHandlersPropertyName #>}"
+             atch:<#= AttachedPropertiesExtClassName #>.<#= RegisterRoutedCommandBindingsPropertyName #>="{Binding <#= RoutedCommandHandlersPropertyName #>}"
+
+             x:Name="O2mMaskRootControl"
+             mc:Ignorable="d" 
+             d:DesignHeight="150" d:DesignWidth="400" >
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+<#
+    if (LformUserControlProject == O2mMaskUserControlProject)
+    {
+#>
+        <lfrm:<#= LformUserControlClassName #> Grid.Row="0"
+<#
+    } else {
+#>
+        <prx:<#= ProxyUserControlClassName #> Grid.Row="0"
+            prism:RegionManager.RegionName="<#= LformUserControlClassName #><#= MasterRegionPropertyName #>"
+<#
+    }
+#>
+            <#= ContainerMenuItemsPropertyName #>="{Binding <#= ContainerMenuItemsPropertyName #>, Mode=OneWay, ElementName=O2mMaskRootControl}" 
+            <#= CaptionPropertyName #>="{Binding <#= CaptionPropertyName #>, Mode=OneWay, ElementName=O2mMaskRootControl}" 
+            <#= FilterHeightPropertyName #>="{Binding <#= FilterHeightPropertyName #>, Mode=OneWay, ElementName=O2mMaskRootControl}" 
+            <#= ShowFilterPropertyName #>="{Binding <#= ShowFilterPropertyName #>, Mode=OneWay, ElementName=O2mMaskRootControl}" 
+            <#= ShowAddFilterBtnPropertyName #>="{Binding <#= ShowAddFilterBtnPropertyName #>, Mode=OneWay, ElementName=O2mMaskRootControl}" 
+            <#= GridHeightPropertyName #>="{Binding <#= GridHeightPropertyName #>, Mode=OneWay, ElementName=O2mMaskRootControl}" 
+            <#= ShowBackBtnPropertyName #>="{Binding <#= ShowBackBtnPropertyName #>, Mode=OneWay, ElementName=O2mMaskRootControl}" 
+            <#= HiddenFiltersPropertyName #>="{Binding <#= HiddenFiltersVMPropertyName #>, Mode=OneWay}" 
+            <#= TableMenuItemsPropertyName #>="{Binding <#= TableMenuItemsVMPropertyName #>, Mode=OneWay}" 
+            <#= RowMenuItemsPropertyName #>="{Binding <#= RowMenuItemsVMPropertyName #>, Mode=OneWay}" 
+
+            <#= CanAddPropertyName #>="{Binding <#= CanAddVMPropertyName #>, Mode=OneWay}" 
+            <#= CanUpdPropertyName #>="{Binding <#= CanUpdVMPropertyName #>, Mode=OneWay}" 
+            <#= CanDelPropertyName #>="{Binding <#= CanDelVMPropertyName #>, Mode=OneWay}" 
+            />
+        
+
+        <Label Grid.Row="2"  FontWeight="Bold" Content="No master row is selected" Margin="8">
+            <Label.Resources>
+                <Style TargetType="{x:Type Label}">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding <#= IsDetailVisiblePropertyName #>}" Value="False">
+                            <Setter Property="Visibility" Value="Visible" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Label.Resources> 
+        </Label>
+
+        <Expander Grid.Row="2"  Header="Record details"
+            Visibility="{Binding <#= IsDetailVisiblePropertyName #>, Mode=OneWay,  Converter={StaticResource BooleanToVisibilityConverter}}"
+            >
+<#
+    if(EformUserControlProject == O2mMaskUserControlProject) {
+#>
+            <efrm:<#= EformUserControlClassName #>  
+<#
+    } else {
+#>
+            <prx:<#= ProxyUserControlClassName #> 
+                prism:RegionManager.RegionName="<#= EformUserControlClassName #><#= DetailRegionPropertyName #>"
+<#
+    }
+#>
+                <#= FormControlModelPropertyName #>="{Binding <#= PermissionRecordPropertyName #>, Mode=OneWay}" 
+                <#= EformModePropertyName #>="DeleteMode" 
+                <#= ShowSubmitPropertyName #>="False" 
+            />
+        </Expander>
+
+        <TabControl Grid.Row="3"  
+            Visibility="{Binding <#= IsDetailVisiblePropertyName #>, Mode=OneWay,  Converter={StaticResource BooleanToVisibilityConverter}}"
+            >
+
+            <TabItem Header="Models">
+                <TabItem.Content>
+<#
+    if (CheckedModelUserControlProject == O2mMaskUserControlProject) 
+    {
+#>
+                    <chkmd:<#= CheckedModelUserControlClassName #> 
+<#
+    } else {
+#>
+                    <prx:<#= ProxyUserControlClassName #> 
+                        prism:RegionManager.RegionName="<#= CheckedModelUserControlClassName #><#= DetailRegionPropertyName #>"
+<#
+    }
+#>
+                        <#= ContainerMenuItemsPropertyName #>="{Binding <#= ParentContainerMenuItemsPropertyName #>}" 
+                        <#= IsPermissionEditablePropertyName #>="{Binding <#= ParentIsPermissionEditablePropertyName #>, Mode=OneWay}" 
+                        <#= PermissionVectorPropertyName #>="{Binding <#= ParentPermissionVectorPropertyName #>, Mode=OneWay}" 
+                        <#= FilterHeightPropertyName #>="{Binding <#= FilterHeightDetailPropertyName #>, Mode=OneWay, ElementName=O2mMaskRootControl}" 
+                        <#= ShowFilterPropertyName #>="{Binding <#= ShowFilterDetailPropertyName #>, Mode=OneWay, ElementName=O2mMaskRootControl}" 
+                        <#= ShowAddFilterBtnPropertyName #>="{Binding <#= ShowAddFilterBtnDetailPropertyName #>, Mode=OneWay, ElementName=O2mMaskRootControl}" 
+                        <#= GridHeightPropertyName #>="{Binding <#= GridHeightDetailPropertyName #>, Mode=OneWay, ElementName=O2mMaskRootControl}" 
+                    />
+                </TabItem.Content>
+            </TabItem>
+            <TabItem Header="Dashboards">
+                <TabItem.Content>
+<#
+    if (DshCheckedModelUserControlProject == O2mMaskUserControlProject)
+    {
+#>
+                    <chkdsh:<#= DshCheckedModelUserControlClassName #> 
+<#
+    } else {
+#>
+                    <prx:<#= ProxyUserControlClassName #> 
+                        prism:RegionManager.RegionName="<#= DshCheckedModelUserControlClassName #><#= DetailRegionPropertyName #>"
+<#
+    }
+#>
+                        <#= ContainerMenuItemsPropertyName #>="{Binding <#= ParentContainerMenuItemsPropertyName #>}" 
+                        <#= IsPermissionEditablePropertyName #>="{Binding <#= ParentIsPermissionEditablePropertyName #>, Mode=OneWay}" 
+                        <#= PermissionVectorPropertyName #>="{Binding <#= ParentPermissionVectorPropertyName #>, Mode=OneWay}" 
+                        <#= FilterHeightPropertyName #>="{Binding <#= FilterHeightDetailPropertyName #>, Mode=OneWay, ElementName=O2mMaskRootControl}" 
+                        <#= ShowFilterPropertyName #>="{Binding <#= ShowFilterDetailPropertyName #>, Mode=OneWay, ElementName=O2mMaskRootControl}" 
+                        <#= ShowAddFilterBtnPropertyName #>="{Binding <#= ShowAddFilterBtnDetailPropertyName #>, Mode=OneWay, ElementName=O2mMaskRootControl}" 
+                        <#= GridHeightPropertyName #>="{Binding <#= GridHeightDetailPropertyName #>, Mode=OneWay, ElementName=O2mMaskRootControl}" 
+                    />
+                </TabItem.Content>
+            </TabItem>
+        </TabControl>
+
+    </Grid>
+</UserControl>
+
+
+<#+
+
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+    string GetModelProjectName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileProject)) {
+            return result;
+        }
+        string[] fnArr = refItem.FileProject.Split(new char[] {'\\'}, 100, System.StringSplitOptions.None); 
+        string fn = fnArr[fnArr.Length - 1];
+
+        return fn.Replace(".csproj","");
+    }
+    string GetContextModelNameSpace(DbContextSerializable context, string fileType) {
+        string result="";
+        if ((context == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (context.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            context.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+    string GetContextModelClassName(DbContextSerializable context, string fileType) {
+        string result="";
+        if ((context == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (context.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            context.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+    string GetContextModelProjectName(DbContextSerializable context, string fileType) {
+        string result="";
+        if ((context == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (context.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            context.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileProject)) {
+            return result;
+        }
+        string[] fnArr = refItem.FileProject.Split(new char[] {'\\'}, 100, System.StringSplitOptions.None); 
+        string fn = fnArr[fnArr.Length - 1];
+
+        return fn.Replace(".csproj","");
+    }
+    string GetDisplayAttributeValueString2(ModelViewUIListPropertySerializable prop, ModelViewSerializable model, string propName) {
+            ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
+            if (sclrProp == null)
+            {
+                return prop.ViewPropertyName;
+            }
+            if(sclrProp.Attributes == null)
+            {
+                return prop.ViewPropertyName;
+            }
+            ModelViewAttributeSerializable attr =
+                sclrProp.Attributes.Where(a => a.AttrName == "Display").FirstOrDefault();
+            if (attr == null)
+            {
+                return prop.ViewPropertyName;
+            }
+            if (attr.VaueProperties == null)
+            {
+                return prop.ViewPropertyName;
+            }
+            ModelViewAttributePropertySerializable attrProp = 
+                attr.VaueProperties.Where(v => v.PropName == propName).FirstOrDefault();
+            if (attrProp == null)
+            {
+                return prop.ViewPropertyName;
+            }
+            if (string.IsNullOrEmpty( attrProp.PropValue ) )
+            {
+                return prop.ViewPropertyName;
+            } else
+            {
+                char[] charsToTrim = { '"', ' '};
+                return attrProp.PropValue.Trim(charsToTrim);
+            }
+    }
+    public string FirstLetterToLower(string str)
+    {
+        if (str == null)
+            return null;
+        if (str.Length > 1)
+            return char.ToLower(str[0]) + str.Substring(1);
+        return str.ToUpper();
+    }
+    bool IsBooleanInput(ModelViewUIListPropertySerializable prop, ModelViewSerializable model) {
+        if((prop == null) || (model == null)) return false;
+        ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
+        if (sclrProp == null)
+        {
+            return false;
+        }
+        return"System.Boolean".Equals(sclrProp.UnderlyingTypeName) || "Boolean".Equals(sclrProp.UnderlyingTypeName) || "bool".Equals(sclrProp.UnderlyingTypeName);
+    }
+    bool hasSortHeader(ModelViewUIListPropertySerializable modelViewUIListPropertySerializable, ModelViewSerializable model) {
+        if ((model == null) || (modelViewUIListPropertySerializable == null)) {
+            return false;
+        }
+        if ((model.UIListProperties == null) || (model.ScalarProperties == null)) {
+            return false;
+        }
+        return model.ScalarProperties.Any(s => s.ViewPropertyName == modelViewUIListPropertySerializable.ViewPropertyName && s.IsUsedBySorting);
+    }
+    string GetModelPropertyName(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+        if (model.GenerateJSonAttribute) {
+            return prop.ViewPropertyName;
+        } else {
+            return FirstLetterToLower(prop.ViewPropertyName);
+        }
+    }
+    string GetModelPropertyNameEx(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model) {
+        ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
+        return GetModelPropertyName(sclrProp, model);
+    }
+    string GetModelPropertyNameEx2(ModelViewUIListPropertySerializable prop, ModelViewSerializable model) {
+        ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
+        return GetModelPropertyName(sclrProp, model);
+    }
+    List<ModelViewPropertyOfVwSerializable> GetModelPrimaryKeyProps(ModelViewSerializable model) {
+        List<ModelViewPropertyOfVwSerializable> result = new List<ModelViewPropertyOfVwSerializable>();
+        if (model == null)
+        {
+            return result;
+        }
+        if ((model.PrimaryKeyProperties == null) || (model.ScalarProperties == null)) {
+            return result;
+        }
+        foreach(ModelViewKeyPropertySerializable modelViewKeyPropertySerializable in model.PrimaryKeyProperties) {
+            ModelViewPropertyOfVwSerializable prop =
+                model.ScalarProperties.Where(p => p.ViewPropertyName == modelViewKeyPropertySerializable.ViewPropertyName).FirstOrDefault();
+            if(prop != null) {
+                result.Add(prop);
+            } else {
+                if(model.ForeignKeys != null) {
+                    foreach(ModelViewForeignKeySerializable modelViewForeignKeySerializable in model.ForeignKeys) {
+                        if ((modelViewForeignKeySerializable.PrincipalKeyProps != null) && (modelViewForeignKeySerializable.ForeignKeyProps != null)) {
+                            for(int i = 0; i < modelViewForeignKeySerializable.ForeignKeyProps.Count; i++) {
+                                if(modelViewForeignKeySerializable.ForeignKeyProps[i].OriginalPropertyName == modelViewKeyPropertySerializable.OriginalPropertyName ) {
+                                    if(i < modelViewForeignKeySerializable.PrincipalKeyProps.Count) {
+                                        prop =
+                                        model.ScalarProperties.Where(p => 
+                                            (p.OriginalPropertyName == modelViewForeignKeySerializable.PrincipalKeyProps[i].OriginalPropertyName)
+                                            &&
+                                            (p.ForeignKeyName == modelViewForeignKeySerializable.NavigationName)
+                                        ).FirstOrDefault();
+                                    }
+                                }
+                                if(prop != null) break;
+                            }
+                        }
+                        if(prop != null) break;
+                    }
+                    if(prop != null) {
+                        result.Add(prop);
+                    }
+                }
+            }
+        }
+        return result;
+    }
+    List<string> GetDetailViews(ModelViewSerializable model, DbContextSerializable context, List<string> result)
+    {
+        if (result == null)
+        {
+            result = new List<string>();
+        }
+        if ((model == null) || (context == null))
+        {
+            return result;
+        }
+        if ((model.ScalarProperties == null) || (model.PrimaryKeyProperties == null) || (context.ModelViews == null)) {
+            return result;
+        }
+        if ((model.PrimaryKeyProperties.Count < 1) || (model.ScalarProperties.Count < 1))
+        {
+            return result;
+        }
+        List<ModelViewPropertyOfVwSerializable> primKeys = GetModelPrimaryKeyProps(model);
+        if(primKeys == null)
+        {
+            return result;
+        }
+        if (primKeys.Count != model.PrimaryKeyProperties.Count)
+        {
+            return result;
+        }
+        string RootEntityFullClassName = model.RootEntityFullClassName;
+        string RootEntityUniqueProjectName = model.RootEntityUniqueProjectName;
+        List<ModelViewSerializable> details =
+            context.ModelViews.Where(m => m.ForeignKeys.Any(f => (f.NavigationEntityFullName == RootEntityFullClassName) && (f.NavigationEntityUniqueProjectName == RootEntityUniqueProjectName))).ToList();
+        if(details.Count < 1)
+        {
+            return result;
+        }
+        foreach(ModelViewSerializable detail in details)
+        {
+            if (detail.ScalarProperties == null) continue;
+            if (detail.ForeignKeys == null) continue;
+            if (detail.ForeignKeys.Count < 1) continue;
+            List<ModelViewForeignKeySerializable> ForeignKeys =
+                detail.ForeignKeys.Where(f => (f.NavigationEntityFullName == RootEntityFullClassName) && (f.NavigationEntityUniqueProjectName == RootEntityUniqueProjectName)).ToList();
+            if (ForeignKeys.Count < 1) continue;
+            bool canBeUsed = false;
+            foreach(ModelViewForeignKeySerializable ForeignKey in ForeignKeys)
+            {
+                bool hasForeignKeyProps = true;
+                if (ForeignKey.ForeignKeyProps != null)
+                {
+                    for(int i = 0; i < ForeignKey.ForeignKeyProps.Count; i++)
+                    {
+                        ModelViewKeyPropertySerializable ForeignKeyProp = ForeignKey.ForeignKeyProps[i];
+                        if (!(detail.ScalarProperties.Any(s => (s.OriginalPropertyName == ForeignKeyProp.OriginalPropertyName) && (string.IsNullOrEmpty(s.ForeignKeyNameChain)))))
+                        {
+                            hasForeignKeyProps = false;
+                        }
+                        if(!hasForeignKeyProps)
+                        {
+                            ModelViewKeyPropertySerializable PrincipalKeyProp = ForeignKey.PrincipalKeyProps[i];
+                            if (detail.ScalarProperties.Any(s => (s.OriginalPropertyName == PrincipalKeyProp.OriginalPropertyName) && (s.ForeignKeyNameChain == ForeignKey.NavigationName)))
+                            {
+                                hasForeignKeyProps = true;
+                            } else
+                            {
+                                break;
+                            }
+                        }
+                    }
+                } else
+                {
+                    hasForeignKeyProps = false;
+                }
+                if (hasForeignKeyProps)
+                {
+                    canBeUsed = true;
+                    break;
+                }
+            }
+            if(canBeUsed)
+            {
+                if(!result.Contains(detail.ViewName))
+                {
+                    result.Add(detail.ViewName);
+                }
+            }
+        }
+        return result;
+    }
+    ModelViewSerializable GetModelViewByName(DbContextSerializable context, string viewName) {
+        if ((context == null) || (string.IsNullOrEmpty(viewName))) {
+            return null;
+        }
+        if (context.ModelViews == null) {
+            return null;
+        }
+        return context.ModelViews.Where(v => v.ViewName == viewName).FirstOrDefault();
+    }
+
+#>

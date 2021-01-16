@@ -60,16 +60,16 @@ namespace <#= modelFilterNameSpace #> {
         }
     }
     string GetFilterName(ModelViewSerializable model) {
-        return FirstLetterToUpper(model.ViewName) + "Filter";
+        return GetModelName(model) + "Filter";
     }
     string GetFilterInterfaceName(ModelViewSerializable model) {
-        return "I"+model.ViewName + "Filter";
+        return "I" + GetFilterName(model);
     }
     string GetPageInterfaceName(ModelViewSerializable model) {
         return "I"+model.PageViewName;
     }
     string GetInterfaceName(ModelViewSerializable model) {
-        return "I"+model.ViewName;
+        return "I" + GetModelName(model);
     }
     string GetModelName(ModelViewSerializable model) {
         return FirstLetterToUpper(model.ViewName);

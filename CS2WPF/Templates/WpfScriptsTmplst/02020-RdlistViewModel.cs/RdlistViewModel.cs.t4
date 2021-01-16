@@ -185,7 +185,7 @@ using Prism.Regions;
     if ((RdlistViewModelNameSpace != modelInterfaceNameSpace) && (nmSpaces.IndexOf(modelInterfaceNameSpace) < 0)) 
         nmSpaces.Add(modelInterfaceNameSpace);
 
-    bool IsInTheSameModule = (LformUserControlProject == RdlistUserControlProject) && false;
+    bool IsInTheSameModule = (LformUserControlProject == RdlistUserControlProject);
     
     
 #>
@@ -754,20 +754,26 @@ namespace <#= RdlistViewModelNameSpace #> {
         }
     }
     string GetFilterInterfaceName(ModelViewSerializable model) {
-        return "I"+model.ViewName + "Filter";
+        return "I" + GetFilterName(model);
+    }
+    string GetFilterName(ModelViewSerializable model) {
+        return GetModelName(model) + "Filter";
     }
     string GetPageInterfaceName(ModelViewSerializable model) {
         return "I"+model.PageViewName;
     }
 
     string GetModelServiceInterfaceName(ModelViewSerializable model) {
-        return "I" + model.ViewName + "Service";
+        return "I" + GetModelServiceName(model);
+    }
+    string GetModelServiceName(ModelViewSerializable model) {
+        return GetModelName(model) + "Service";
     }
     string GetInterfaceName(ModelViewSerializable model) {
-        return "I"+model.ViewName;
+        return "I"+GetModelName(model);
     }
-    string GetFilterName(ModelViewSerializable model) {
-        return FirstLetterToUpper(model.ViewName) + "Filter";
+    string GetModelName(ModelViewSerializable model) {
+        return FirstLetterToUpper(model.ViewName);
     }
 
     string GetModelNameSpace(ModelViewSerializable model, string fileType) {

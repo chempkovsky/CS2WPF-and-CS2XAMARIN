@@ -166,11 +166,12 @@ namespace <#= modelServiceInterfaceNameSpace #> {
 
 <#+
     string GetModelServiceInterfaceName(ModelViewSerializable model) {
-        return "I" + model.ViewName + "Service";
+        return "I" + GetModelServiceName(model);
     }
     string GetModelServiceName(ModelViewSerializable model) {
-        return FirstLetterToUpper(model.ViewName)+ "Service";
+        return GetModelName(model) + "Service";
     }
+
     string GetFilterPropertyOperatorName(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model, string operatorSufix) {
         if (model.GenerateJSonAttribute) {
             return prop.JsonPropertyName + operatorSufix;
@@ -179,13 +180,16 @@ namespace <#= modelServiceInterfaceNameSpace #> {
         }
     }
     string GetFilterInterfaceName(ModelViewSerializable model) {
-        return "I"+model.ViewName + "Filter";
+        return "I" + GetFilterName(model);
+    }
+    string GetFilterName(ModelViewSerializable model) {
+        return GetModelName(model) + "Filter";
     }
     string GetPageInterfaceName(ModelViewSerializable model) {
         return "I"+model.PageViewName;
     }
     string GetInterfaceName(ModelViewSerializable model) {
-        return "I"+model.ViewName;
+        return "I"+GetModelName(model);
     }
     string GetNotifyInterfaceName(ModelViewSerializable model) {
         return GetInterfaceName(model) + "Notify";

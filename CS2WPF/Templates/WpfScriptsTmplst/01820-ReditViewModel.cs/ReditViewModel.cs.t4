@@ -153,7 +153,7 @@ using System.Threading.Tasks;
     if ((ReditViewModelNameSpace != modelInterfaceNameSpace) && (nmSpaces.IndexOf(modelInterfaceNameSpace) < 0)) 
         nmSpaces.Add(modelInterfaceNameSpace);
 
-    bool IsInTheSameModule = (EformUserControlProject == ReditUserControlProject) && false;
+    bool IsInTheSameModule = (EformUserControlProject == ReditUserControlProject);
     
     
 #>
@@ -543,22 +543,25 @@ namespace <#= ReditViewModelNameSpace #> {
         }
     }
     string GetFilterInterfaceName(ModelViewSerializable model) {
-        return "I"+model.ViewName + "Filter";
+        return "I" + GetFilterName(model);
+    }
+    string GetFilterName(ModelViewSerializable model) {
+        return GetModelName(model) + "Filter";
     }
     string GetPageInterfaceName(ModelViewSerializable model) {
         return "I"+model.PageViewName;
     }
 
     string GetModelServiceInterfaceName(ModelViewSerializable model) {
-        return "I" + model.ViewName + "Service";
+        return "I" + GetModelServiceName(model);
     }
     string GetInterfaceName(ModelViewSerializable model) {
-        return "I"+model.ViewName;
-    }
-    string GetFilterName(ModelViewSerializable model) {
-        return FirstLetterToUpper(model.ViewName) + "Filter";
+        return "I"+GetModelName(model);
     }
 
+    string GetModelName(ModelViewSerializable model) {
+        return FirstLetterToUpper(model.ViewName);
+    }
     string GetModelNameSpace(ModelViewSerializable model, string fileType) {
         string result="";
         if ((model == null) || string.IsNullOrEmpty(fileType)) {

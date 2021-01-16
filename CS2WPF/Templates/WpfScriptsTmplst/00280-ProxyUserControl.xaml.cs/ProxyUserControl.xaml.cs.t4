@@ -63,7 +63,8 @@ using System.Windows.Controls;
     string CanAddDetailPropertyName = "CanAddDetail"; 
     string CanUpdDetailPropertyName = "CanUpdateDetail"; 
     string CanDelDetailPropertyName = "CanDeleteDetail"; 
-
+    string IsPermissionEditablePropertyName  = "IsPermissionEditable";
+    string PermissionVectorPropertyName      = "PermissionVector";
 
 
     List<string> nmSpaces = new List<string>();
@@ -569,6 +570,44 @@ namespace <#= ProxyUserControlNameSpace #> {
             set
             {
                 SetValue(<#= TableMenuItemsDetailPropertyName #>Property, value);
+            }
+        }
+        #endregion
+
+        #region <#= IsPermissionEditablePropertyName #>
+        public static readonly DependencyProperty <#= IsPermissionEditablePropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= IsPermissionEditablePropertyName #>", typeof(bool),
+                typeof(<#= DshCheckedModelUserControlClassName #>),
+                new PropertyMetadata(false));
+        public bool <#= IsPermissionEditablePropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= IsPermissionEditablePropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= IsPermissionEditablePropertyName #>Property, value);
+            }
+        }
+        #endregion
+
+        #region <#= PermissionVectorPropertyName #>
+        public static readonly DependencyProperty <#= PermissionVectorPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= PermissionVectorPropertyName #>", typeof(int[]),
+                typeof(<#= DshCheckedModelUserControlClassName #>),
+                new PropertyMetadata(null));
+        public int[] <#= PermissionVectorPropertyName #>
+        {
+            get
+            {
+                return (int[])GetValue(<#= PermissionVectorPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= PermissionVectorPropertyName #>Property, value);
             }
         }
         #endregion

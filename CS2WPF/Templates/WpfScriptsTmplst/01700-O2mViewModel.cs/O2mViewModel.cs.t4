@@ -225,7 +225,7 @@ using <#= ns #>;
 /*
 
 <#
-    if ((LformUserControlProject != O2mUserControlProject) || true) {
+    if (LformUserControlProject != O2mUserControlProject) {
 #>
     "<#= LformUserControlClassName #>" UserControl is defined in the "<#= LformUserControlProject #>"-project.
     In the file of IModule-class of "<#= LformUserControlProject #>"-project the following line of code must be inserted:
@@ -258,7 +258,7 @@ using <#= ns #>;
                 continue;
             }
             string localLformUserControlProject  = GetModelProjectName(detailView, LformUserControlFolder);
-            if ((localLformUserControlProject != O2mUserControlProject) || true) {
+            if (localLformUserControlProject != O2mUserControlProject) {
 
 #>
     "<#= detailViewClassName #>" UserControl is defined in the "<#= localLformUserControlProject #>"-project.
@@ -314,7 +314,7 @@ using <#= ns #>;
 
 */
 
-namespace <#= LformViewModelNameSpace #> {
+namespace <#= O2mViewModelNameSpace #> {
     public class <#= O2mViewModelClassName #>: INotifyPropertyChanged
     {
         protected <#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName #>=null;
@@ -987,20 +987,29 @@ namespace <#= LformViewModelNameSpace #> {
         }
     }
     string GetFilterInterfaceName(ModelViewSerializable model) {
-        return "I"+model.ViewName + "Filter";
+        return "I" + GetFilterName(model);
+    }
+    string GetFilterName(ModelViewSerializable model) {
+        return GetModelName(model) + "Filter";
     }
     string GetPageInterfaceName(ModelViewSerializable model) {
         return "I"+model.PageViewName;
     }
 
     string GetModelServiceInterfaceName(ModelViewSerializable model) {
-        return "I" + model.ViewName + "Service";
+        return "I" + GetModelServiceName(model);
+    }
+    string GetModelServiceName(ModelViewSerializable model) {
+        return GetModelName(model) + "Service";
     }
     string GetInterfaceName(ModelViewSerializable model) {
-        return "I"+model.ViewName;
+        return "I"+GetModelName(model);
+    }
+    string GetModelName(ModelViewSerializable model) {
+        return FirstLetterToUpper(model.ViewName);
     }
     string GetFilterName(ModelViewSerializable model) {
-        return FirstLetterToUpper(model.ViewName) + "Filter";
+        return GetModelName(model) + "Filter";
     }
 
     string GetModelNameSpace(ModelViewSerializable model, string fileType) {

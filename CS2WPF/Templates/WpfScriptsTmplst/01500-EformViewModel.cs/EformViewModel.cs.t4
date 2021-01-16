@@ -541,7 +541,7 @@ namespace <#= EformViewModelNameSpace #> {
 <#   
                     if (HasOnValChangedMethod(Context, Model, modelViewUIFormPropertySerializable)) {
 #>
-                        Task.Run( async () => { <#=  GetExpressionForOnValChangedMethod(modelViewUIFormPropertySerializable, Model) #>(value, true); });
+                        Task.Run( async () => { await <#=  GetExpressionForOnValChangedMethod(modelViewUIFormPropertySerializable, Model) #>(value, true); });
 <#    
                     }
 #>
@@ -570,7 +570,7 @@ namespace <#= EformViewModelNameSpace #> {
 <#    
                     if (HasOnValChangedMethod(Context, Model, modelViewUIFormPropertySerializable)) {
 #>
-                        Task.Run( async () => { <#= GetExpressionForOnValChangedMethod(modelViewUIFormPropertySerializable, Model) #>(value, true); });
+                        Task.Run( async () => { await <#= GetExpressionForOnValChangedMethod(modelViewUIFormPropertySerializable, Model) #>(value, true); });
 <#
                     }
 #> 
@@ -593,7 +593,7 @@ namespace <#= EformViewModelNameSpace #> {
 <#    
                     if (HasOnValChangedMethod(Context, Model, modelViewUIFormPropertySerializable)) {
 #>
-                        Task.Run( async () => { <#= GetExpressionForOnValChangedMethod(modelViewUIFormPropertySerializable, Model) #>(value, true); });
+                        Task.Run( async () => { await <#= GetExpressionForOnValChangedMethod(modelViewUIFormPropertySerializable, Model) #>(value, true); });
 <#
                     }
 #> 
@@ -1033,14 +1033,14 @@ if (ModelHasDoInitMethod) {
     foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) {
         if(IsIdentityPropertyEx(modelViewUIFormPropertySerializable, Model)) {
 #>
-                if(<#= GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #> == null)  <#= GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #> = 0;
+                if(<#= GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #> == null)  <#= GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #> = <# if(IsStringPropertyEx(modelViewUIFormPropertySerializable, Model)) {#> "0" <# } else { #> 0 <# } #>;
 <#
         }
     }
 #>
             });
         }
-<#  //////////////////////////// start InputToControls()-generator
+<#  //////////////////////////// end InputToControls()-generator
 #>
 
 <#  //////////////////////////// start OnInit...()-generator
@@ -1772,8 +1772,12 @@ if (ModelHasDoInitMethod) {
         <# if (genElse) {#> else <# } else { genElse = true; } #>if (this.<#=  EformModeVMPropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp) #>) {
 <#
         }
+        if (directMasters.Count > 0) {
 #>
             bool hasNoVal = false;
+<#
+        }
+#>
             <#= GetFilterInterfaceName(locView) #> flt = <#= FormServicePrefix #><#= locView.ViewName #>.GetFilter();
 <#
                             if (directMasters.Count > 0) {
@@ -2358,8 +2362,12 @@ if (ModelHasDoInitMethod) {
         <# if (genElse) {#> else <# } else { genElse = true; } #>if (this.<#=  EformModeVMPropertyName #> == <#=  EformModeEnumClassName #>.<#=GetInputTypeToEnumName(inptTp) #>) {
 <#
         }
+        if (directMasters.Count > 0) {
 #>
             bool hasNoVal = false;
+<#
+        }
+#>
             IDialogParameters dlgParams = new DialogParameters();
             dlgParams.Add("Caption", "<#= TitleCaptionVal #>");
 <#
@@ -2537,7 +2545,17 @@ if (ModelHasDoInitMethod) {
 
             <#= GetInterfaceName(Model) #> itm = ControlsToObject();
             if (<#= EformModeVMPropertyName #> == <#= EformModeEnumClassName #>.<#=GetInputTypeToEnumName(1) #>) { 
+<#
+            if(Model.IsWebApiAdd) {
+#>
                 <#= GetInterfaceName(Model) #> data = await <#= FormServicePrefix + Model.ViewName #>.<#= AddOneMethodName #>(itm);
+<#
+            } else {
+#>
+                <#= GetInterfaceName(Model) #> data = null;
+<#
+            }
+#>
                 if(data == null) {
                     <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("Http Error", "Could not update data on the server side.");
                     return;
@@ -2545,7 +2563,17 @@ if (ModelHasDoInitMethod) {
                     itm = <#= FormServicePrefix + Model.ViewName #>.<#= CopyToModelMethodName #>(data, <#= FormControlModelVMPropertyName #>);
                 }
             } else if (this.<#= EformModeVMPropertyName #> == <#= EformModeEnumClassName #>.<#=GetInputTypeToEnumName(2) #>) { 
+<#
+            if(Model.IsWebApiUpdate) {
+#>
                 <#= GetInterfaceName(Model) #> data = await <#= FormServicePrefix + Model.ViewName #>.<#= UpdateOneMethodName #>(itm);
+<#
+            } else {
+#>
+                <#= GetInterfaceName(Model) #> data = null;
+<#
+            }
+#>
                 if(data == null) {
                     <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("Http Error", "Could not update data on the server side.");
                     return;
@@ -2553,6 +2581,9 @@ if (ModelHasDoInitMethod) {
                     itm  = <#= FormServicePrefix + Model.ViewName #>.<#= CopyToModelMethodName #>(data, <#= FormControlModelVMPropertyName #>);
                 }
             } else if (<#= EformModeVMPropertyName #> == <#= EformModeEnumClassName #>.<#=GetInputTypeToEnumName(3) #>) { 
+<#
+            if(Model.IsWebApiDelete) {
+#>
                 <#= GetInterfaceName(Model) #> data = await <#= FormServicePrefix + Model.ViewName #>.<#= DeleteOneMethodName #>(<# 
                 {
                     int counter = 0;
@@ -2563,6 +2594,13 @@ if (ModelHasDoInitMethod) {
                     }
                 }
                 #>);
+<#
+            } else {
+#>
+                <#= GetInterfaceName(Model) #> data = null;
+<#
+            }
+#>
                 if(data == null) {
                     <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("Http Error", "Could not update data on the server side.");
                     return;
@@ -2867,23 +2905,29 @@ if (ModelHasDoInitMethod) {
         }
     }
     string GetFilterInterfaceName(ModelViewSerializable model) {
-        return "I"+model.ViewName + "Filter";
+        return "I" + GetFilterName(model);
     }
     string GetPageInterfaceName(ModelViewSerializable model) {
         return "I"+model.PageViewName;
     }
 
     string GetModelServiceInterfaceName(ModelViewSerializable model) {
-        return "I" + model.ViewName + "Service";
+        return "I" + GetModelServiceName(model);
+    }
+    string GetModelServiceName(ModelViewSerializable model) {
+        return GetModelName(model) + "Service";
     }
     string GetInterfaceName(ModelViewSerializable model) {
-        return "I"+model.ViewName;
+        return "I"+ GetModelName(model);
+    }
+    string GetModelName(ModelViewSerializable model) {
+        return FirstLetterToUpper(model.ViewName);
     }
     string GetNotifyInterfaceName(ModelViewSerializable model) {
         return GetInterfaceName(model) + "Notify";
     }
     string GetFilterName(ModelViewSerializable model) {
-        return FirstLetterToUpper(model.ViewName) + "Filter";
+        return GetModelName(model) + "Filter";
     }
 
     string GetModelNameSpace(ModelViewSerializable model, string fileType) {

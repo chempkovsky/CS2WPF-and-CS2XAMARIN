@@ -75,6 +75,7 @@ using System.Windows.Controls;
     string RequestNavigateSourcePropertyChangedPropertyName    = "RequestNavigateSourcePropertyChanged"; 
     string ScopedRegionNamePropertyChangedPropertyName         = "ScopedRegionNamePropertyChanged"; 
     string ScopedRegionChangedPropertyName                     = "ScopedRegionChanged";
+    string PermissionVectorPropertyChangedPropertyName         = "PermissionVectorPropertyChanged";
 
     List<string> nmSpaces = new List<string>();
     if ((RoutedEventExtNameSpace != IWebServiceFilterRsltInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace) < 0)) 
@@ -583,7 +584,7 @@ namespace <#= RoutedEventExtNameSpace #> {
 
         #region <#= ScopedRegionManagerPropertyChangedPropertyName #>
         public static readonly RoutedEvent <#= ScopedRegionManagerPropertyChangedPropertyName #>Event = EventManager.RegisterRoutedEvent("<#= ScopedRegionManagerPropertyChangedPropertyName #>", RoutingStrategy.Bubble, typeof(RoutedPropertyChangedEventHandler<object>), typeof(<#= RoutedEventExtClassName #>));
-        public static void Add<#= ScopedRegionManagerPropertyChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<bool> handler)
+        public static void Add<#= ScopedRegionManagerPropertyChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<object> handler)
         {
             UIElement uie = d as UIElement;
             if (uie != null)
@@ -591,7 +592,7 @@ namespace <#= RoutedEventExtNameSpace #> {
                 uie.AddHandler(<#= RoutedEventExtClassName #>.<#= ScopedRegionManagerPropertyChangedPropertyName #>Event, handler);
             }
         }
-        public static void Remove<#= ScopedRegionManagerPropertyChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<bool> handler)
+        public static void Remove<#= ScopedRegionManagerPropertyChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<object> handler)
         {
             UIElement uie = d as UIElement;
             if (uie != null)
@@ -604,7 +605,7 @@ namespace <#= RoutedEventExtNameSpace #> {
 
         #region <#= RequestNavigateSourcePropertyChangedPropertyName #>
         public static readonly RoutedEvent <#= RequestNavigateSourcePropertyChangedPropertyName #>Event = EventManager.RegisterRoutedEvent("<#= RequestNavigateSourcePropertyChangedPropertyName #>", RoutingStrategy.Bubble, typeof(RoutedPropertyChangedEventHandler<string>), typeof(<#= RoutedEventExtClassName #>));
-        public static void Add<#= RequestNavigateSourcePropertyChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<bool> handler)
+        public static void Add<#= RequestNavigateSourcePropertyChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<string> handler)
         {
             UIElement uie = d as UIElement;
             if (uie != null)
@@ -612,7 +613,7 @@ namespace <#= RoutedEventExtNameSpace #> {
                 uie.AddHandler(<#= RoutedEventExtClassName #>.<#= RequestNavigateSourcePropertyChangedPropertyName #>Event, handler);
             }
         }
-        public static void Remove<#= RequestNavigateSourcePropertyChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<bool> handler)
+        public static void Remove<#= RequestNavigateSourcePropertyChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<string> handler)
         {
             UIElement uie = d as UIElement;
             if (uie != null)
@@ -625,7 +626,7 @@ namespace <#= RoutedEventExtNameSpace #> {
 
         #region <#= ScopedRegionNamePropertyChangedPropertyName #>
         public static readonly RoutedEvent <#= ScopedRegionNamePropertyChangedPropertyName #>Event = EventManager.RegisterRoutedEvent("<#= ScopedRegionNamePropertyChangedPropertyName #>", RoutingStrategy.Bubble, typeof(RoutedPropertyChangedEventHandler<string>), typeof(<#= RoutedEventExtClassName #>));
-        public static void Add<#= ScopedRegionNamePropertyChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<bool> handler)
+        public static void Add<#= ScopedRegionNamePropertyChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<string> handler)
         {
             UIElement uie = d as UIElement;
             if (uie != null)
@@ -633,7 +634,7 @@ namespace <#= RoutedEventExtNameSpace #> {
                 uie.AddHandler(<#= RoutedEventExtClassName #>.<#= ScopedRegionNamePropertyChangedPropertyName #>Event, handler);
             }
         }
-        public static void Remove<#= ScopedRegionNamePropertyChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<bool> handler)
+        public static void Remove<#= ScopedRegionNamePropertyChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<string> handler)
         {
             UIElement uie = d as UIElement;
             if (uie != null)
@@ -645,7 +646,7 @@ namespace <#= RoutedEventExtNameSpace #> {
 
         #region <#= ScopedRegionChangedPropertyName #>
         public static readonly RoutedEvent <#= ScopedRegionChangedPropertyName #>Event = EventManager.RegisterRoutedEvent("<#= ScopedRegionChangedPropertyName #>", RoutingStrategy.Bubble, typeof(RoutedPropertyChangedEventHandler<object>), typeof(<#= RoutedEventExtClassName #>));
-        public static void Add<#= ScopedRegionChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<bool> handler)
+        public static void Add<#= ScopedRegionChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<object> handler)
         {
             UIElement uie = d as UIElement;
             if (uie != null)
@@ -653,7 +654,7 @@ namespace <#= RoutedEventExtNameSpace #> {
                 uie.AddHandler(<#= RoutedEventExtClassName #>.<#= ScopedRegionChangedPropertyName #>Event, handler);
             }
         }
-        public static void Remove<#= ScopedRegionChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<bool> handler)
+        public static void Remove<#= ScopedRegionChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<object> handler)
         {
             UIElement uie = d as UIElement;
             if (uie != null)
@@ -663,7 +664,25 @@ namespace <#= RoutedEventExtNameSpace #> {
         }
         #endregion
 
-
+        #region <#= PermissionVectorPropertyChangedPropertyName #>
+        public static readonly RoutedEvent <#= PermissionVectorPropertyChangedPropertyName #>Event = EventManager.RegisterRoutedEvent("<#= PermissionVectorPropertyChangedPropertyName #>", RoutingStrategy.Bubble, typeof(RoutedPropertyChangedEventHandler<int[]>), typeof(<#= RoutedEventExtClassName #>));
+        public static void Add<#= PermissionVectorPropertyChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<int[]> handler)
+        {
+            UIElement uie = d as UIElement;
+            if (uie != null)
+            {
+                uie.AddHandler(<#= RoutedEventExtClassName #>.<#= PermissionVectorPropertyChangedPropertyName #>Event, handler);
+            }
+        }
+        public static void Remove<#= PermissionVectorPropertyChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<int[]> handler)
+        {
+            UIElement uie = d as UIElement;
+            if (uie != null)
+            {
+                uie.RemoveHandler(<#= RoutedEventExtClassName #>.<#= PermissionVectorPropertyChangedPropertyName #>Event, handler);
+            }
+        }
+        #endregion
 
     }
 }
