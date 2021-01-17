@@ -3,10 +3,10 @@
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="utf-8" />
-    <title>Readme for 00284-ProxyUserControlRegionAdapter.cs</title>
+    <title>Readme for 00290-NavigationProxyUserControlRegionAdapter.cs</title>
 </head>
 <body>
-    <h3>(Context level) Readme for 00284-ProxyUserControlRegionAdapter.cs</h3>
+    <h3>(Context level) Readme for 00290-NavigationProxyUserControlRegionAdapter.cs</h3>
 
     <table cellspacing="5" border="1">
         <tr>
@@ -14,7 +14,7 @@
                 Type
             </td>
             <td>
-                C# data class
+                Prism Region Adapter
             </td>
         </tr>
         <tr>
@@ -38,12 +38,12 @@
                 Recomended Project
             </td>
             <td>
-                /shared/CommonServicesModule  (prism module)
+                Prism App
             </td>
         </tr>
         <tr>
             <td>
-                Recomended project type
+                Prism application
             </td>
             <td>
                 Class Library
@@ -65,9 +65,18 @@
             <u>Remark</u>
         </strong>
     </h4>
-    
-    Using "prism:RegionManager.RegionName" does not provide the ability to apply XAML-Binding at design time. 
-    Using 00284-ProxyUserControlRegionAdapter.cs and 00280-ProxyUserControl.xaml.cs(00282-ProxyUserControl.xaml) makes this feature to be avalable.
 
+    Using "prism:RegionManager.RegionName" does not provide the ability to apply XAML-Binding at design time. <br>
+    Using 00290-NavigationProxyUserControlRegionAdapter.cs and 00288-NavigationProxyUserControl.xaml.cs(00288-NavigationProxyUserControl.xaml) makes this feature to be avalable.<br>
+    In the App.xaml.cs-file of the Prism application the following code should be added:<br>
+    <pre>
+        <code>
+            protected override void ConfigureRegionAdapterMappings(RegionAdapterMappings regionAdapterMappings)
+            {
+                base.ConfigureRegionAdapterMappings(regionAdapterMappings);
+                regionAdapterMappings.RegisterMapping &#60 NavigationProxyUserControl, NavigationProxyUserControlRegionAdapter &#62 ();
+            }
+        </code>
+    </pre>
 </body>
 </html>
