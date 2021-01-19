@@ -30,7 +30,19 @@
 - Both CS2WPF project files are saved in the root folder of the Microsoft Visual Studio solution.
 - If a developer adds a new Dbcontext to the solution and runs the ModelViews wizard or FeatureScripts wizard, then two additional CS2WPF project files are added to the solution.
 
-## Programming tools used to start the development process
+### Table of content
+#### [Programming tools used to start the development  process](#Programming-tools-used-to-start-the-development-process.)
+#### [Preparing the development  environment](#Preparing-the-development-environment.)
+#### [Creating projects to start back end  development](#Creating-projects-to-start-back-end-development.)
+#### [Creating projects to start front end  development](#Creating-projects-to-start-front-end-development.)
+#### [References of the front end  projects](#References-of-the-front-end-projects.)
+#### [NuGet packages of the front end  projects](#NuGet-packages-of-the-front-end-projects.)
+#### [NuGet packages of the back end  projects](#NuGet-packages-of-the-back-end-projects.)
+#### [First entity and  Dbcontext](#First-entity-and-Dbcontext.)
+#### [First View and Wizard  repository](#First-View-and-Wizard-repository.)
+#### [First Web Api  Service](#First-Web-Api-Service.)
+
+## Programming tools used to start the development process.
 ### The following Programming tools must be used to begin development:
 - Microsoft Visual Studio 2019 (community edition or higher) (https://visualstudio.microsoft.com/vs/)
 - Prism Template Pack (https://github.com/PrismLibrary/Prism)
@@ -41,13 +53,13 @@
     - SQL Server Management Studio 18.5 (Free Studio)
 
 
-## Preparing the development environment
+## Preparing the development environment.
 1. Install and Run Microsoft Visual Studio 2019
 2. With "Extensions/Manage Extensions"-menu run the Visual Studio "Manage Extensions"-Wizard
 3. With Visual Studio "Manage Extensions"-Wizard install Prism Template Pack (https://github.com/PrismLibrary/Prism)
 4. Download CS2WPF-binary (https://github.com/chempkovsky/CS2WPF) and run installation. Later, using the Visual Studio "Manage Extensions" -Wizard, the developer can remove the CS2WPF-Extension.
 
-## Creating projects to start development (Server Side)
+## Creating projects to start back end development.
 1. Run Microsoft Visual Studio 2019
 2. With "File/New/Project"-menu run "Create New Project"-Wizard
 3. Type "solution" in the "Search for templates"-control
@@ -110,7 +122,7 @@
 
 ![picture](img/img00rm14.png) 
 
-## Creating projects to start development (Client Side)
+## Creating projects to start front end development.
 
 25. Right click "ServerProjects"-folder and "Add/New Project"
 
@@ -185,7 +197,7 @@
 ![picture](img/img00rm26.png) 
 
 
-## References of the projects (Client Side)
+## References of the front end projects.
 
 41. For the PrismTestApp-project Add references onto:
 - CommonInterfacesClassLibrary.csproj
@@ -214,7 +226,7 @@
 - CommonWpfUserControlLibrary.csproj
 - ModelInterfacesClassLibrary.csproj
 
-## NuGet packages of the projects (Client Side)
+## NuGet packages of the front end projects.
 
 45. For the CommonWpfUserControlLibrary add references onto Prism.Wpf NuGet package
 
@@ -227,14 +239,14 @@
 47. For the CommonInterfacesClassLibrary add references onto Newtonsoft.json NuGet packages
 48. For the ModelInterfacesClassLibrary add references onto Newtonsoft.json NuGet packages
 
-## NuGet packages of the projects (Server Side)
+## NuGet packages of the back end projects.
 49. For the DbEntitiesClassLibrary add references onto "System.ComponentModel.DataAnnotations"
 50. For the DbContextClassLibrary add references onto "Entity Framework 6 (EF6)"  NuGet package
 51. For the DbModelsClassLibrary add references onto "System.ComponentModel.DataAnnotations" and onto "Newtonsoft.json" NuGet package
 
 ![picture](img/img00rm30.png) 
 
-## First entity and Dbcontext
+## First entity and Dbcontext.
 - Step #1:
     - Run Visual Studio and Open “CS2WPFTestSolution” solution
         - Add "Literature"-folder to DbEntitiesClassLibrary-project
@@ -347,7 +359,7 @@ public class LitGenre {
     ```
     - This gives a hint that GenreId is not an Identity
 
-## First View and Wizard repository
+## First View and Wizard repository.
 - View (or ModelView) is the structure that the Web Api service sends to and receives from the client. For each entity, the developer must create at least one view.
 - To Add a View to the project 
     - Run Visual Studio and Open “CS2WPFTestSolution” solution
@@ -435,7 +447,7 @@ public class LitGenre {
     - Note #2:
         - A separate repo file is created for each DBContext.
 
-## First Web Api Service
+## First Web Api Service.
 - Before generating Web Api service the developer must define the set of View’s properties that will be used for filtering and the set of View’s properties that will be used for sorting.
 - To Generate Web Api service
     - Run Visual Studio and Open “CS2WPFTestSolution” solution
