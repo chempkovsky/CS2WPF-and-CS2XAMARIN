@@ -41,6 +41,13 @@
 #### [First entity and  Dbcontext](#First-entity-and-Dbcontext)
 #### [First View and Wizard  repository](#First-View-and-Wizard-repository)
 #### [First Web Api  Service](#First-Web-Api-Service)
+#### [Adding Cors to  DbWebApplication](#Adding-Cors-to-DbWebApplication)
+#### [Wpf Form Wizard is ready to  run](#Wpf-Form-Wizard-is-ready-to-run)
+#### [Auxiliary interfaces, enums, services and classes of the front end  projects](#Auxiliary-interfaces,-enums,-services-and-classes-of-the-front-end-projects)
+#### [Setup Prism  IMoules for  CommonServicesPrismModule](#Setup-Prism-IMoules-for-CommonServicesPrismModule)
+#### [Setup App.Config and App.xaml.cs for PrismTestApp](#Setup-App.Config-and-App.xaml.cs-for-PrismTestApp)
+#### [Run  PrismTestApp](#Run-PrismTestApp)
+#### [Setup CommonServicesPrismModule and DbWebApplication projects for conversation](#Setup-CommonServicesPrismModule-and-DbWebApplication-projects-for-conversation)
 
 ## Programming tools used to start the development process
 ### The following Programming tools must be used to begin development:
@@ -211,16 +218,19 @@
 
 ![picture](img/img00rm27.png) 
 
-42. For the CommonWpfUserControlLibrary add references onto:
+42. For the CommonWpfCustomControlLibrary add references onto:
+- CommonInterfacesClassLibrary.csproj
+
+43. For the CommonWpfUserControlLibrary add references onto:
 - CommonInterfacesClassLibrary.csproj
 - CommonWpfCustomControlLibrary.csproj
 
-43. For the CommonServicesPrismModule add references onto:
+44. For the CommonServicesPrismModule add references onto:
 - CommonInterfacesClassLibrary.csproj
 - CommonWpfCustomControlLibrary.csproj
 - CommonWpfUserControlLibrary.csproj
 
-44. For the ModelServicesPrismModule add references onto:
+45. For the ModelServicesPrismModule add references onto:
 - CommonInterfacesClassLibrary.csproj
 - CommonWpfCustomControlLibrary.csproj
 - CommonWpfUserControlLibrary.csproj
@@ -228,21 +238,22 @@
 
 ## NuGet packages of the front end projects
 
-45. For the CommonWpfUserControlLibrary add references onto Prism.Wpf NuGet package
+46. For the CommonWpfUserControlLibrary add references onto Prism.Wpf NuGet package
 
 ![picture](img/img00rm28.png) 
 
-46. For the ModelServicesPrismModule add references onto "AutoCompleteTextBox" and  "Newtonsoft.json" NuGet packages
+47. For the ModelServicesPrismModule add references onto "AutoCompleteTextBox" and  "Newtonsoft.json" NuGet packages
 
 ![picture](img/img00rm29.png) 
 
-47. For the CommonInterfacesClassLibrary add references onto Newtonsoft.json NuGet packages
-48. For the ModelInterfacesClassLibrary add references onto Newtonsoft.json NuGet packages
+48. For the CommonInterfacesClassLibrary add reference onto Newtonsoft.json NuGet package
+49. For the ModelInterfacesClassLibrary add reference onto Newtonsoft.json NuGet package, add reference onto "PresentationCore"
+50. For the CommonServicesPrismModule add reference onto Newtonsoft.json NuGet package
 
 ## NuGet packages of the back end projects
-49. For the DbEntitiesClassLibrary add references onto "System.ComponentModel.DataAnnotations"
-50. For the DbContextClassLibrary add references onto "Entity Framework 6 (EF6)"  NuGet package
-51. For the DbModelsClassLibrary add references onto "System.ComponentModel.DataAnnotations" and onto "Newtonsoft.json" NuGet package
+51. For the DbEntitiesClassLibrary add references onto "System.ComponentModel.DataAnnotations"
+52. For the DbContextClassLibrary add references onto "Entity Framework 6 (EF6)"  NuGet package
+53. For the DbModelsClassLibrary add references onto "System.ComponentModel.DataAnnotations" and onto "Newtonsoft.json" NuGet package
 
 ![picture](img/img00rm30.png) 
 
@@ -508,4 +519,255 @@ public class LitGenre {
 
     ![picture](img/img01rm27.png)
 
+## Adding Cors to DbWebApplication
+- Step #1:
+    - Open the "CS2WPFTestSolution" solution
+    - For DbWebApplication project add the following NuGet package:
+        - Microsoft.AspNet.WebApi.Cors
+- Step #2:
+    - Open the “CS2WPFTestSolution” solution
+    - In DbWebApplication project open file:
+        - App_Start\WebApiConfig.cs
+        - Add “using”:
+            - using System.Web.Http.Cors;
+    - In the body of the “Register” method add:
+        - `config.EnableCors(new EnableCorsAttribute("*", headers:"*", methods:"*"));`
 
+## Wpf Form Wizard is ready to run
+As mentioned above, after creating and saving the first view the CS2WPF Forms project file is created. The developer can run Wpf Form Wizard only if CS2WPF Forms project file has been created. 
+
+## Auxiliary interfaces, enums, services and classes of the front end projects
+Before generating the user interface for the very first View, all auxiliary interfaces, enums, helper classes, services, custom user controls must be in place and ready for use.
+The list of auxiliary files includes "Home", "Page not found", "Access Denied", "Paginator" user controls, global settings service, declaration of some global routed events and routed commands and so on.
+
+Note: The order of generated files is important, since some classes may reference others. It means that referenced files must be generated before referencing files. And this is why CS2WPF Forms project file is used by the Wizards. The information about each generated file (file type, file name, file place and so on) is saved into CS2WPF Forms project file.
+
+To Generate Auxiliary files run Visual Studio and Open “CS2WPFTestSolution” solution
+
+### "CommonInterfacesClassLibrary"-project
+- Step 1
+    - Right click "CommonInterfacesClassLibrary"-project node and select "Wpf Form Wizard"-menu
+    - Click "Next"-button
+
+![picture](img/img02rm01.png)
+
+- Step 2
+    - Select "DbContextClassLibrary"-project
+    - Select "LitDbContext"-DbContext
+    - Click "Next"-button
+
+![picture](img/img02rm02.png)
+
+- Step 3
+    - Select "==context==" in the combo
+    - Click "Next"-button
+
+![picture](img/img02rm03.png)
+
+- Step 4
+    - Click "batch processing"-button
+
+![picture](img/img02rm04.png)
+
+- Step 5
+    - Select "00000-ContextLevelCommonInterfacesBatch.json"-item
+    - Click "Start"-button
+    - After generation finished make sure that "Error"-panel is empty
+    - Close Wizard's dialogs
+    - Rebuild "ModelInterfacesClassLibrary"-project
+
+![picture](img/img02rm05.png)
+
+### "CommonServicesPrismModule"-project
+- Repeat steps 1-5 for "CommonServicesPrismModule"-project and "00010-ContextLevelCommonServicesModuleBatch.json"
+
+### "CommonWpfCustomControlLibrary"-project
+- Repeat steps 1-5 for "CommonWpfCustomControlLibrary"-project and "00020-ContextLevelWpfCustomControlLibraryBatch.json"
+
+### "CommonServicesPrismModule"-project again
+- Repeat steps 1-5 for "CommonServicesPrismModule"-project and "00040-ContextLevelCommonServicesModuleBatch.json"
+
+### "PrismTestApp"-project again
+- Repeat steps 1-5 for "PrismTestApp"-project and "00050-ContextLevelPrismAppBatch.json"
+
+## Setup Prism IMoule for CommonServicesPrismModule
+
+Open the "CommonServicesPrismModuleModule.cs"-file of CommonServicesPrismModule-project and modify "RegisterTypes()"-method as follows
+```java
+...
+using CommonInterfacesClassLibrary.AppGlblSettingsSrvc;
+using CommonServicesPrismModule.AppGlblSettingsSrvc;
+using CommonServicesPrismModule.CustomDlgWindows;
+using CommonWpfUserControlLibrary.UserControls;
+using CommonServicesPrismModule.ViewModels;
+using CommonServicesPrismModule.UserControls;
+using CommonInterfacesClassLibrary.AppGlblLoginSrvc;
+using CommonServicesPrismModule.AppGlblLoginSrvc;
+
+namespace CommonServicesPrismModule
+{
+    public class CommonServicesPrismModuleModule : IModule
+    {
+        ...
+        public void RegisterTypes(IContainerRegistry containerRegistry)
+        {
+            IAppGlblSettingsService s = new AppGlblSettingsService();
+            containerRegistry.RegisterInstance<IAppGlblSettingsService>(s);
+
+            containerRegistry.RegisterDialogWindow<CustomDlgMediumWindow>();
+            containerRegistry.RegisterDialogWindow<CustomDlgLargeWindow>("CustomDlgLargeWindow");
+            containerRegistry.RegisterDialogWindow<CustomDlgMediumWindow>("CustomDlgMediumWindow");
+            containerRegistry.RegisterDialogWindow<CustomDlgSmallWindow>("CustomDlgSmallWindow");
+
+            containerRegistry.RegisterDialog<ColumnSelectorDlgUserControl, ColumnSelectorDlgViewModel>("ColumnSelectorDlg");
+            containerRegistry.RegisterDialog<MessageDlgUserControl, MessageDlgViewModel>("MessageDlg");
+
+            containerRegistry.RegisterForNavigation<HomeUserControl, HomeViewModel>("HomeUserControl");
+            containerRegistry.RegisterForNavigation<PageNotFoundUserControl, PageNotFoundViewModel>("PageNotFoundUserControl");
+            containerRegistry.RegisterForNavigation<AccessDeniedUserControl, AccessDeniedViewModel>("AccessDeniedUserControl");
+
+            containerRegistry.Register<IAppGlblLoginService, AppGlblLoginService>();
+            containerRegistry.RegisterForNavigation<RegisterUserControl, RegisterViewModel>("RegisterUserControl");
+            containerRegistry.RegisterForNavigation<LoginUserControl, LoginViewModel>("LoginUserControl");
+            containerRegistry.RegisterForNavigation<ChngpswdUserControl, ChngpswdViewModel>("ChngpswdUserControl");
+            containerRegistry.RegisterForNavigation<LogoutUserControl, LogoutViewModel>("LogoutUserControl");
+            
+        }
+    }
+}
+```
+## Setup App.Config and App.xaml.cs for PrismTestApp
+Open "App.xaml.cs"-file of PrismTestApp-project and add "CreateModuleCatalog()" and "ConfigureRegionAdapterMappings()" methods as follows
+```java
+...
+
+using Prism.Regions;
+using CommonWpfUserControlLibrary.UserControls;
+using PrismTestApp.Classes;
+
+namespace PrismTestApp
+{
+    public partial class App
+    {
+        ...
+        protected override IModuleCatalog CreateModuleCatalog()
+        {
+            return new ConfigurationModuleCatalog();
+        }
+        protected override void ConfigureRegionAdapterMappings(RegionAdapterMappings regionAdapterMappings)
+        {
+            base.ConfigureRegionAdapterMappings(regionAdapterMappings);
+            regionAdapterMappings.RegisterMapping<ProxyUserControl, ProxyUserControlRegionAdapter>();
+            regionAdapterMappings.RegisterMapping<NavigationProxyUserControl, NavigationProxyUserControlRegionAdapter>();
+        }
+    }
+}
+```
+
+Open "App.xaml"-file of PrismTestApp-project and modify as follows
+
+```xml
+<prism:PrismApplication x:Class="PrismTestApp.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	     xmlns:prism="http://prismlibrary.com/"
+             xmlns:local="clr-namespace:PrismTestApp">
+    <Application.Resources>
+        <ResourceDictionary Source="pack://application:,,,/CommonWpfCustomControlLibrary;component/Themes/BasicResourceDictionary.xaml"/>
+    </Application.Resources>
+</prism:PrismApplication>
+```
+
+Add the "App.config"-file to PrismTestApp-project 
+
+![picture](img/img02rm06.png)
+
+Modify "App.config"-file of PrismTestApp-project as follows:
+
+```xml
+<?xml version="1.0" encoding="utf-8" ?>
+<configuration>
+  <configSections>
+    <section name="modules" type="Prism.Modularity.ModulesConfigurationSection, Prism.Wpf"/>
+  </configSections>
+  <modules>
+    <module assemblyFile="CommonServicesPrismModule.dll"
+            moduleType="CommonServicesPrismModule.CommonServicesPrismModuleModule, CommonServicesPrismModule, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"
+            moduleName="CommonServicesPrismModule" startupLoaded="true">
+      <dependencies>
+      </dependencies>
+    </module>
+    <module assemblyFile="ModelServicesPrismModule.dll"
+            moduleType="ModelServicesPrismModule.ModelServicesModuleModule, ModelServicesPrismModuleModule, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"
+            moduleName="ModelServicesPrismModule" startupLoaded="true">
+      <dependencies>
+        <dependency moduleName="CommonServicesPrismModule"/>
+      </dependencies>
+    </module>
+  </modules>
+</configuration>
+```
+## Run PrismTestApp
+Rebuild all front end  projects and run PrismTestApp.
+
+![picture](img/img02rm07.png)
+
+Click "Register"-menu item. Click "Home"-navigation menu again.
+
+![picture](img/img02rm08.png)
+
+## Setup CommonServicesPrismModule and DbWebApplication projects for conversation
+Click DbWebApplication root node to get project properties visible. Copy SSL URL into clipboard.
+
+![picture](img/img02rm09.png)
+
+Open "CommonServicesPrismModule/AppGlblSettingsSrvc/AppGlblSettingsService.cs"-file of the CommonServicesPrismModule-project. Modify GetWebApiPrefix() and GetSecurityWebApiPrefix() by resetting URLs.
+
+```java
+        ...
+        public string GetWebApiPrefix(string ViewName)
+        {
+            string rslt = "";
+            if(!string.IsNullOrEmpty(ViewName))
+            {
+                rslt = "https://localhost:44352/";
+            }
+            return rslt;
+        }
+        public string GetSecurityWebApiPrefix()
+        {
+            return "https://localhost:44352/";
+        }
+        ...
+```
+
+Install MS SQL Server anywhere in your network or virtual environment. Get "sa"-password, network name of the SQL server and the port (if necessary).
+Open Web.config-file of DbWebApplication-project and modify "DefaultConnection"-settings. Here is example:
+
+```xml
+  ... 
+  <connectionStrings>
+    <add name="DefaultConnection" 
+        connectionString="Data Source=SVR2016SQL2017;Initial Catalog=AspNetDbWebApplicationSecurity;Persist Security Info=True;User ID=sa;Password=sa_PASSWORD_HERE" 
+        providerName="System.Data.SqlClient" />
+  </connectionStrings>
+  ... 
+```
+
+The front and back ends are ready to register user, login, logout, change password operations. 
+- Rebuild CommonServicesPrismModule-project
+- Run DbWebApplication 
+- Run PrismTestApp
+
+With PrismTestApp Register new user: "testuser@gmail.com" with a password "Qq?1234". Open MS SQL Management studion and run the script
+
+```java
+SELECT * FROM [AspNetDbWebApplicationSecurity].[dbo].[AspNetUsers]
+```
+The result is on the picture below
+
+![picture](img/img02rm10.png)
+
+For now Login with PrismTestApp and "testuser@gmail.com" and password "Qq?1234". The result is on the picture below
+
+![picture](img/img02rm11.png)
