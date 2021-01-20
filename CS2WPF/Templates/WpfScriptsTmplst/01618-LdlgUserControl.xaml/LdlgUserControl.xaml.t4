@@ -112,6 +112,7 @@
 
              xmlns:atch="<#= attachedPrefix #>" 
              atch:<#= AttachedPropertiesExtClassName #>.<#= RegisterRoutedCommandBindingsPropertyName #>="{Binding <#= RoutedCommandHandlersPropertyName #>}"
+             x:Name="LdlgUserControlRoot"
 
              mc:Ignorable="d" 
              d:DesignHeight="150" d:DesignWidth="400" >
@@ -132,22 +133,20 @@
 <#
     }
 #>
-
-            <#= CaptionPropertyName #>="{Binding <#= CaptionPropertyName #>, Mode=OneWay}" 
-            <#= FilterHeightPropertyName #>="{Binding <#= FilterHeightPropertyName #>, Mode=OneWay}" 
+            <#= CaptionPropertyName #>="{Binding DataContext.<#= CaptionPropertyName #>, Mode=OneWay, ElementName=LdlgUserControlRoot}" 
+            <#= FilterHeightPropertyName #>="{Binding DataContext.<#= FilterHeightPropertyName #>, Mode=OneWay, ElementName=LdlgUserControlRoot}" 
             <#= ShowFilterPropertyName #>="True" 
             <#= ShowAddFilterBtnPropertyName #>="True" 
-            <#= GridHeightPropertyName #>="{Binding <#= GridHeightPropertyName #>, Mode=OneWay}" 
+            <#= GridHeightPropertyName #>="{Binding DataContext.<#= GridHeightPropertyName #>, Mode=OneWay, ElementName=LdlgUserControlRoot}" 
             <#= ShowBackBtnPropertyName #>="False" 
-            <#= HiddenFiltersPropertyName #>="{Binding <#= HiddenFiltersPropertyName #>, Mode=OneWay}" 
-
-            <#= CanAddPropertyName #>="{Binding <#= CanAddPropertyName #>, Mode=OneWay}" 
-            <#= CanUpdPropertyName #>="{Binding <#= CanUpdPropertyName #>, Mode=OneWay}" 
-            <#= CanDelPropertyName #>="{Binding <#= CanDelPropertyName #>, Mode=OneWay}" 
+            <#= HiddenFiltersPropertyName #>="{Binding DataContext.<#= HiddenFiltersPropertyName #>, Mode=OneWay, ElementName=LdlgUserControlRoot}" 
+            <#= CanAddPropertyName #>="{Binding DataContext.<#= CanAddPropertyName #>, Mode=OneWay, ElementName=LdlgUserControlRoot}" 
+            <#= CanUpdPropertyName #>="{Binding DataContext.<#= CanUpdPropertyName #>, Mode=OneWay, ElementName=LdlgUserControlRoot}" 
+            <#= CanDelPropertyName #>="{Binding DataContext.<#= CanDelPropertyName #>, Mode=OneWay, ElementName=LdlgUserControlRoot}" 
             />
         <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="8">
-                <Button Content=" Ok " MinWidth="80" Command="{Binding <#= OkCommandPropertyName #>}"/>
-                <Button Content=" Cancel " MinWidth="80" Margin="8 0 0 0" Command="{Binding <#= CancelCommandPropertyName #>}"/>
+                <Button Content=" Ok " MinWidth="80" Command="{Binding DataContext.<#= OkCommandPropertyName #>, Mode=OneWay, ElementName=LdlgUserControlRoot}"/>
+                <Button Content=" Cancel " MinWidth="80" Margin="8 0 0 0" Command="{Binding DataContext.<#= CancelCommandPropertyName #>, Mode=OneWay, ElementName=LdlgUserControlRoot}"/>
         </StackPanel>
     </Grid>
 </UserControl>

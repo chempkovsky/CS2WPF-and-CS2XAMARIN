@@ -106,7 +106,7 @@
              xmlns:atch="<#= attachedPrefix #>" 
              atch:<#= AttachedPropertiesExtClassName #>.<#= RegisterRoutedCommandBindingsPropertyName #>="{Binding <#= RoutedCommandHandlersPropertyName #>}"
              atch:<#= AttachedPropertiesExtClassName #>.<#= RegisterRoutedEventBindingsPropertyName #>="{Binding <#= RoutedEventHandlersPropertyName #>}"
-
+             x:Name="SdlgUserControlRoot"
              mc:Ignorable="d" 
              d:DesignHeight="150" d:DesignWidth="400" >
     <Grid>
@@ -126,17 +126,17 @@
 <#
     }
 #>
-            <#= CaptionPropertyName #>="{Binding <#= CaptionPropertyName #>}" 
-            <#= FilterHeightPropertyName #>="{Binding <#= FilterHeightPropertyName #>}" 
+            <#= CaptionPropertyName #>="{Binding DataContext.<#= CaptionPropertyName #>, Mode=OneWay, ElementName=SdlgUserControlRoot}" 
+            <#= FilterHeightPropertyName #>="{Binding DataContext.<#= FilterHeightPropertyName #>, Mode=OneWay, ElementName=SdlgUserControlRoot}" 
             <#= ShowFilterPropertyName #>="True" 
             <#= ShowAddFilterBtnPropertyName #>="True" 
-            <#= GridHeightPropertyName #>="{Binding <#= GridHeightPropertyName #>}" 
+            <#= GridHeightPropertyName #>="{Binding DataContext.<#= GridHeightPropertyName #>, Mode=OneWay, ElementName=SdlgUserControlRoot}" 
             <#= ShowBackBtnPropertyName #>="False" 
-            <#= HiddenFiltersPropertyName #>="{Binding <#= HiddenFiltersPropertyName #>}" 
+            <#= HiddenFiltersPropertyName #>="{Binding DataContext.<#= HiddenFiltersPropertyName #>, Mode=OneWay, ElementName=SdlgUserControlRoot}" 
             />
         <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="8">
-                <Button Content=" Ok " MinWidth="80" Command="{Binding <#= OkCommandPropertyName #>}"/>
-                <Button Content=" Cancel " MinWidth="80" Margin="8 0 0 0" Command="{Binding <#= CancelCommandPropertyName #>}"/>
+                <Button Content=" Ok " MinWidth="80" Command="{Binding DataContext.<#= OkCommandPropertyName #>, Mode=OneWay, ElementName=SdlgUserControlRoot}"/>
+                <Button Content=" Cancel " MinWidth="80" Margin="8 0 0 0" Command="{Binding DataContext.<#= CancelCommandPropertyName #>, Mode=OneWay, ElementName=SdlgUserControlRoot}"/>
         </StackPanel>
     </Grid>
 </UserControl>

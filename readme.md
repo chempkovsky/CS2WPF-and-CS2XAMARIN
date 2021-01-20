@@ -47,7 +47,12 @@
 #### [Setup Prism  IMoules for  CommonServicesPrismModule](#Setup-Prism-IMoules-for-CommonServicesPrismModule)
 #### [Setup App.Config and App.xaml.cs for PrismTestApp](#Setup-App.Config-and-App.xaml.cs-for-PrismTestApp)
 #### [Run  PrismTestApp](#Run-PrismTestApp)
-#### [Setup CommonServicesPrismModule and DbWebApplication projects for conversation](#Setup-CommonServicesPrismModule-and-DbWebApplication-projects-for-conversation)
+#### [Setup CommonServicesPrismModule and DbWebApplication projects for  conversation](#Setup-CommonServicesPrismModule-and-DbWebApplication-projects-for-conversation)
+#### [Types of generated Wpf user controls for the given  View](#Types-of-generated-Wpf-user-controls-for-the-given-View)
+#### [Modeling UI and generating Lform Wpf User controls for  LitGenre](#Modeling-UI-and-generating-Lform-Wpf-User-controls-for-LitGenre)
+#### [Creating LiteratureTest Database on the server  side](#Creating-LiteratureTest-Database-on-the-server-side)
+#### [Add LitGenreViewLformUserControl to navigation  list](#Add-LitGenreViewLformUserControl-to-navigation-list)
+#### [Test LitGenreViewLformUserControl  control](#Test-LitGenreViewLformUserControl-control)
 
 ## Programming tools used to start the development process
 ### The following Programming tools must be used to begin development:
@@ -242,12 +247,12 @@
 
 ![picture](img/img00rm28.png) 
 
-47. For the ModelServicesPrismModule add references onto "AutoCompleteTextBox" and  "Newtonsoft.json" NuGet packages
+47. For the ModelServicesPrismModule add references onto "AutoCompleteTextBox" and  "Newtonsoft.json" NuGet packages add reference onto "System.ComponentModel.DataAnnotations"
 
 ![picture](img/img00rm29.png) 
 
 48. For the CommonInterfacesClassLibrary add reference onto Newtonsoft.json NuGet package
-49. For the ModelInterfacesClassLibrary add reference onto Newtonsoft.json NuGet package, add reference onto "PresentationCore"
+49. For the ModelInterfacesClassLibrary add reference onto Newtonsoft.json NuGet package, add reference onto "PresentationCore" and "System.ComponentModel.DataAnnotations"
 50. For the CommonServicesPrismModule add reference onto Newtonsoft.json NuGet package
 
 ## NuGet packages of the back end projects
@@ -433,7 +438,7 @@ public class LitGenre {
     - click Next
 
 - On the seventh page click “Save”. 
-    - Open “C:\Development\Demo\DmLit” which is a root of the solution. 
+    - Open the root folder of the solution. 
 
     ![picture](img/img01rm16.png)
     
@@ -753,6 +758,7 @@ Open Web.config-file of DbWebApplication-project and modify "DefaultConnection"-
   </connectionStrings>
   ... 
 ```
+Note: You will have different "Data Source"-property in your development invoronment.
 
 The front and back ends are ready to register user, login, logout, change password operations. 
 - Rebuild CommonServicesPrismModule-project
@@ -771,3 +777,396 @@ The result is on the picture below
 For now Login with PrismTestApp and "testuser@gmail.com" and password "Qq?1234". The result is on the picture below
 
 ![picture](img/img02rm11.png)
+
+## Types of generated Wpf user controls for the given View
+Here is a list of Wpf custom user controls the developer may generate for the given View
+- Sform
+    - Sform is a search user control. With Sform the user can define filter, sort order and pagination capability. Sorting, filtering and pagination are sent to the Web server. Sform just shows the result.
+- Eform
+    - Eform is an edit user control. With Eform the user can add, update and delete data.
+- Lform
+    - Lform is a user control that combines Sform and Eform together. With Lform the user can search and modify the data for the given View. For add, update, delete operation the modal dialog with Eform as a child is shown.
+- Redit
+    - Redit is a navigation awair Eform
+- Rlist
+    - Rlist is a navigation awair Sform.
+- Rdlist
+    - Rdlist is a navigation awair Lform.
+- O2m
+    - O2m is master-detail or One-to-many form. If the Database Entity of the given View has detail Database Entity then O2m will be useful.
+
+For each type of the wpf user controls three files are generated:
+- xaml of the user control
+- xaml.cs or code behind of the the user control
+- Mvvm ViewModel file
+
+For the Sform, Eform, Lform types of user control CS2WPF Wizard generates Dialog wrappers. 
+It means three additional files will be created:
+- XXXEdlgUserControl.xaml
+- XXXEdlgUserControl.xaml.cs 
+- XXXEdlgViewModel.cs
+
+The developer can remove Dialog wrappers for the Eform and Lform. But do not delete dialog wrapper for the Sform, since dialog wrapper for the Sform is used by Eform user controls. Again if Lform is going to be used by the application then Dialog wrapper for Eform should be generated as well.
+
+All controls above send(receive) data to(from) the Web server with ApiService which should be generated for the given View at the client side of the solution. 
+It's very important to note, that the client side of the solution does not reference any file of the server side of the solution.
+
+- From the structural point of view 
+    - Wpf Lform is a parent of Wpf Sform 
+    - Wpf Redit is a parent of Wpf Eform 
+    - Wpf Rlist is a parent of Wpf Sform
+    - Wpf Rdlist is a parent of Wpf Lform
+    - Wpf O2m is a parent of Wpf Lform for master View and all delail Views
+
+Again it's very important to note, that any pair of parent and child controls can be hosted in separate Prism modules. 
+If the CS2WPF Wizard detects the fact that parent and child user controls reside in separate Prism modules it generates XAML for the parent with "ProxyUserControl" instead of the child user control. 
+Of course it requires additional line of code in the IModule implementation class of the child Prism module.
+This is because "ProxyUserControl" uses Prism View discovery, so child control must be registered with a Prism region.  The name of the Prism region is defined by XAML of the parent user control. 
+
+In any case, the developer shouldn't worry about this fact. After generating any user control the develiper must open the file of the ViewModel and follow the instruction at the begining of the file.
+CS2WPF Wizard writes instruction about what to insert and in which file of IModule implementation class.
+
+Let's talk about "ProxyUserControl" and Prism View discovery. Sometimes you need to show two or more copies of the same user control on the application page or window. For instance, two different O2m user controls has the same detail View. CS2WPF Wizard does not generate unique Prism region names of detail Views for each new O2m user control!!! And not because it's very difficult, but because it will require a big list of the registrations of the same control with different Prism region names. What it means at the end?  It means that we can get region conflicting exceptions at execution time. The question is how to avoid possible conflicting exceptions in the future.
+
+The CS2WPF Feature Wizard solves this problem. CS2WPF Feature Wizard generates the controls which injects each child controls into separate Scoped region. 
+
+```java
+                UserControl uc = _containerProvider.Resolve<UserControl>("LitGenreViewO2mUserControl");
+                IRegionManager rm = _regionManager.Regions["LitGenreViewO2mUserControlGenreFeatureFtrUserControl"].Add(uc, null, true);
+                _regionManager.Regions["LitGenreViewO2mUserControlGenreFeatureFtrUserControl"].Activate(uc);
+                // where _regionManager is injected by the constructor of the Feature ViewModel
+```
+It's very good practice to use Feature wrapper for any generated user control. Note that Feature wrapper can have more than one child user control. Child user control of the Feature wrapper can be navigation awair control (like Rlist) or not (like Lform). Feature wrapper can have any number of navigation awair controls, i.e. the end user can have the form with two or more independent navigation child windows inside.
+
+## Modeling UI and generating Lform Wpf User controls for LitGenre.
+
+In both projects ModelServicesPrismModule and ModelInterfacesClassLibrary create "Literature/LitGenre"-folder.
+
+Right click "Literature/LitGenre"-folder of the ModelInterfacesClassLibrary-project and choose "Wpf Form Wizard"-menu item.
+
+- Step 1: On the first page of the Wizard click "Next"-button. On the second page select "DbContextClassLibrary"-project and "LitDbContext"-DbContext. click "Next"-button.
+
+![picture](img/img02rm12.png)
+
+- Step 2: On the third page choose LitGenreView expand "UI list properties" and check "Shown"-checkboxes
+
+![picture](img/img02rm13.png)
+
+- Step 3: On the third page choose LitGenreView expand "UI Form properties", check "Shown"-checkboxes and set "Input types" as it is shown below. Click Next button.
+
+![picture](img/img02rm14.png)
+
+- Step 4: On the fourth page "batch processing"-button and "Batch actions"-dialog will be shown. Select "0110-Interfaces.json"-script and click "start"-button.
+
+![picture](img/img02rm15.png)
+
+- Step 5: Make sure that "Errors"-panel is empty and you got the following list of files:
+
+![picture](img/img02rm16.png)
+
+
+Right click "Literature/LitGenre"-folder of the ModelServicesPrismModule-project and choose "Wpf Form Wizard"-menu item.
+
+Repeat steps 1-4 for "DbContextClassLibrary"-project and "LitDbContext"-DbContext and "01400-ApiService.json"-batch script. Note: steps 2 and 3 need to be accomplished only very first time. Next time they are ready to be used, since all settings are written into repository file.
+
+Repeat steps 1-4 for "DbContextClassLibrary"-project and "LitDbContext"-DbContext and "01420-SForm.json"-batch script. Note: steps 2 and 3 need to be accomplished only very first time. Next time they are ready to be used, since all settings are written into repository file.
+
+The result should be as shown below
+
+![picture](img/img02rm17.png)
+
+Open "Literature/LitGenre/LitGenreViewService.cs"-file of the ModelServicesPrismModule-project and follow the instruction at the begining of the file
+
+```java
+...
+using CommonInterfacesClassLibrary.AppGlblSettingsSrvc;
+
+/*
+    In the file of IModule-class of the project for the current service the following lines of code must be inserted:
+
+        public void RegisterTypes(IContainerRegistry containerRegistry)
+        {
+            ...
+            containerRegistry.Register<ILitGenreViewService, LitGenreViewService>();
+            ...
+        }
+
+*/
+namespace ModelServicesPrismModule.Literature.LitGenre {
+...    
+```
+According to the requirements above "RegisterTypes()"-method of the ModelServicesPrismModuleModule.cs should have a line of code
+```java
+...
+namespace ModelServicesPrismModule
+{
+    public class ModelServicesPrismModuleModule : IModule
+    {
+        ...
+        public void RegisterTypes(IContainerRegistry containerRegistry)
+        {
+            ...
+            containerRegistry.Register<ILitGenreViewService, LitGenreViewService>();
+            ...
+        }
+        ...    
+    }
+}
+```
+Open "Literature/LitGenre/LitGenreViewSformViewModel.cs"-file of the ModelServicesPrismModule-project and follow the instruction at the begining of the file
+
+```java
+...
+/*
+
+    "LitGenreViewSformUserControl" UserControl is defined in the "ModelServicesPrismModule"-project.
+    In the file of IModule-class of "ModelServicesPrismModule"-project the following line of code must be inserted:
+
+        public void RegisterTypes(IContainerRegistry containerRegistry)
+        {
+            ...
+            // According to requirements of the "LitGenreViewSformViewModel.cs"-file of "ModelServicesPrismModule"-project. 
+            ViewModelLocationProvider.Register<LitGenreViewSformUserControl, LitGenreViewSformViewModel>();
+            // According to requirements of the "LitGenreViewSformViewModel.cs"-file of "ModelServicesPrismModule"-project. 
+            containerRegistry.Register<UserControl, LitGenreViewSformUserControl>("LitGenreViewSformUserControl");
+            ...
+        }
+
+*/
+...
+```
+
+Open "Literature/LitGenre/LitGenreViewSdlgViewModel.cs"-file of the ModelServicesPrismModule-project and follow the instruction at the begining of the file
+
+```java
+...
+/*
+
+    "LitGenreViewSdlgUserControl" UserControl is defined in the "ModelServicesPrismModule"-project.
+    In the file of IModule-class of "ModelServicesPrismModule"-project the following line of code must be inserted:
+
+        public void RegisterTypes(IContainerRegistry containerRegistry)
+        {
+            ...
+            // According to requirements of the "LitGenreViewSdlgViewModel.cs"-file of "ModelServicesPrismModule"-project. 
+            containerRegistry.RegisterDialog<LitGenreViewSdlgUserControl, LitGenreViewSdlgViewModel>("LitGenreViewSdlgViewModel");
+            ...
+        }
+
+*/
+...
+```
+
+According to the requirements above "RegisterTypes()"-method of the ModelServicesPrismModuleModule.cs will be as follows
+
+```java
+...
+namespace ModelServicesPrismModule
+{
+    public class ModelServicesPrismModuleModule : IModule
+    {
+        ...
+        public void RegisterTypes(IContainerRegistry containerRegistry)
+        {
+            ...
+            containerRegistry.Register<ILitGenreViewService, LitGenreViewService>();
+            // According to requirements of the "LitGenreViewSformViewModel.cs"-file of "ModelServicesPrismModule"-project. 
+            ViewModelLocationProvider.Register<LitGenreViewSformUserControl, LitGenreViewSformViewModel>();
+            // According to requirements of the "LitGenreViewSformViewModel.cs"-file of "ModelServicesPrismModule"-project. 
+            containerRegistry.Register<UserControl, LitGenreViewSformUserControl>("LitGenreViewSformUserControl");
+            // According to requirements of the "LitGenreViewSdlgViewModel.cs"-file of "ModelServicesPrismModule"-project. 
+            containerRegistry.RegisterDialog<LitGenreViewSdlgUserControl, LitGenreViewSdlgViewModel>("LitGenreViewSdlgViewModel");
+            ...
+        }
+        ...    
+    }
+}
+```
+
+Repeat steps 1-4 for "DbContextClassLibrary"-project, "LitDbContext"-DbContext, "LitGenre"-View and "01500-Eform.json"-batch script. Note: steps 2 and 3 need to be accomplished only very first time. Next time they are ready to be used, since all settings are written into repository file.
+
+Open "Literature/LitGenre/LitGenreViewEformViewModel.cs"-file of the ModelServicesPrismModule-project and follow the instruction at the begining of the file
+
+```java
+/*
+    "LitGenreViewEformUserControl" UserControl is defined in the "ModelServicesPrismModule"-project.
+    In the file of IModule-class of "ModelServicesPrismModule"-project the following line of code must be inserted:
+
+        public void RegisterTypes(IContainerRegistry containerRegistry)
+        {
+            ...
+            // According to requirements of the "LitGenreViewEformViewModel.cs"-file of "ModelServicesPrismModule"-project. 
+            ViewModelLocationProvider.Register<LitGenreViewEformUserControl, LitGenreViewEformViewModel>();
+            // According to requirements of the "LitGenreViewEformViewModel.cs"-file of "ModelServicesPrismModule"-project. 
+            containerRegistry.Register<UserControl, LitGenreViewEformUserControl>("LitGenreViewEformUserControl");
+            ...
+        }
+*/
+```
+Open "Literature/LitGenre/LitGenreViewEdlgViewModel.cs"-file of the ModelServicesPrismModule-project and follow the instruction at the begining of the file
+```java
+/*
+    "LitGenreViewEdlgUserControl" UserControl is defined in the "ModelServicesPrismModule"-project.
+    In the file of IModule-class of "ModelServicesPrismModule"-project the following line of code must be inserted:
+
+        public void RegisterTypes(IContainerRegistry containerRegistry)
+        {
+            ...
+            // According to requirements of the "LitGenreViewEdlgViewModel.cs"-file of "ModelServicesPrismModule"-project. 
+            containerRegistry.RegisterDialog<LitGenreViewEdlgUserControl, LitGenreViewEdlgViewModel>("LitGenreViewEdlgViewModel");
+            ...
+        }
+*/
+```
+
+Repeat steps 1-4 for "DbContextClassLibrary"-project, "LitDbContext"-DbContext, "LitGenre"-View and "01600-Lform.json"-batch script. Note: steps 2 and 3 need to be accomplished only very first time. Next time they are ready to be used, since all settings are written into repository file.
+
+Open "Literature/LitGenre/LitGenreViewLformViewModel.cs"-file of the ModelServicesPrismModule-project and follow the instruction at the begining of the file
+```java
+/*
+        public void RegisterTypes(IContainerRegistry containerRegistry)
+        {
+            ...
+            // According to requirements of the "LitGenreViewLformViewModel.cs"-file of "ModelServicesPrismModule"-project. 
+            ViewModelLocationProvider.Register<LitGenreViewLformUserControl, LitGenreViewLformViewModel>();
+            // According to requirements of the "LitGenreViewLformViewModel.cs"-file of "ModelServicesPrismModule"-project. 
+            containerRegistry.Register<UserControl, LitGenreViewLformUserControl>("LitGenreViewLformUserControl");
+            ...
+        }
+*/
+```
+
+Open "Literature/LitGenre/LitGenreViewLdlgViewModel.cs"-file of the ModelServicesPrismModule-project and follow the instruction at the begining of the file
+```java
+/*
+    "LitGenreViewLdlgUserControl" UserControl is defined in the "ModelServicesPrismModule"-project.
+    In the file of IModule-class of "ModelServicesPrismModule"-project the following line of code must be inserted:
+
+        public void RegisterTypes(IContainerRegistry containerRegistry)
+        {
+            ...
+            // According to requirements of the "LitGenreViewLdlgViewModel.cs"-file of "ModelServicesPrismModule"-project. 
+            containerRegistry.RegisterDialog<LitGenreViewLdlgUserControl, LitGenreViewLdlgViewModel>("LitGenreViewLdlgViewModel");
+            ...
+        }
+*/
+```
+
+## Creating LiteratureTest Database on the server side.
+- Step 1: Open "Literature\LitDbContext.cs" file of DbContextClassLibrary-project.
+- Step 2: Change the body of thee default contructor
+```java
+        public LitDbContext(): base("name=LiteratureTestConnection")
+        {
+        }
+```
+- Step 3: Open "Web.config"-file of  DbWebApplication-project.
+- Step 4: Change "connectionStrings"-sction
+```xml
+  ... 
+  <connectionStrings>
+    <add name="DefaultConnection" 
+        connectionString="Data Source=SVR2016SQL2017;Initial Catalog=AspNetDbWebApplicationSecurity;Persist Security Info=True;User ID=sa;Password=sa_PASSWORD_HERE" 
+        providerName="System.Data.SqlClient" />
+    <add name="LiteratureTestConnection" 
+        connectionString="Data Source=SVR2016SQL2017;Initial Catalog=LiteratureTestCatalog;Persist Security Info=True;User ID=sa;Password=sa_PASSWORD_HERE"
+        providerName="System.Data.SqlClient" />
+  </connectionStrings>
+  ... 
+```
+Note: You will have different "Data Source"-property in your development invoronment.
+
+- Step 5: Add to solution small Console application (Net Framework).
+- step 6: For the console application add reference to "DbContextClassLibrary"-project, "DbEntitiesClassLibrary"-project and "Entity Framework 6 (EF6)" nuget package
+- Step 7: Open "App.config" file of the Console application
+- Step 8: Add "connectionStrings" sections into "App.config" and save
+```xml
+...
+  <configSections>
+        <!-- For more information on Entity Framework configuration, visit http://go.microsoft.com/fwlink/?LinkID=237468 -->
+        <section name="entityFramework"
+          type="System.Data.Entity.Internal.ConfigFile.EntityFrameworkSection, EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+          requirePermission="false"/>
+  </configSections>
+...  
+  <connectionStrings>
+    <add name="LiteratureTestConnection"
+        connectionString="Data Source=SVR2016SQL2017;Initial Catalog=LiteratureTestCatalog;Persist Security Info=True;User ID=sa;Password=sa_PASSWORD_HERE"
+        providerName="System.Data.SqlClient" />
+  </connectionStrings>
+...  
+  <startup> 
+        <supportedRuntime version="v4.0" sku=".NETFramework,Version=v4.7.2"/>
+    </startup>
+    <entityFramework>
+        <providers>
+            <provider invariantName="System.Data.SqlClient" type="System.Data.Entity.SqlServer.SqlProviderServices, EntityFramework.SqlServer"/>
+        </providers>
+    </entityFramework>
+...  
+```
+Note: You will have different "Data Source"-property in your development invoronment.
+
+- step 9: In the main method of the Console application write the code as below
+```java
+        static void Main(string[] args)
+        {
+            Database.SetInitializer(new DropCreateDatabaseAlways<LitDbContext>());
+            LitDbContext db = new LitDbContext();
+            db.LitGenreDbSet.FirstOrDefault();
+            Database.SetInitializer(new CreateDatabaseIfNotExists<LitDbContext>());
+        }
+```
+- step 9: Save, build and run Console application.
+- step 10: Open MS SQL Management studion and check the list of the databases. "LiteratureTestCatalog"-database should be created with one "dbo.LitGenres"-table.
+
+## Add LitGenreViewLformUserControl to navigation list.
+- Step 1: Open "ModelServicesPrismModuleModule.cs"-file of the ModelServicesPrismModule-project
+- Step 2: Modify RegisterTypes()-method as shown
+```java
+        public void RegisterTypes(IContainerRegistry containerRegistry)
+        {
+            containerRegistry.Register<ILitGenreViewService, LitGenreViewService>();
+            // According to requirements of the "LitGenreViewSformViewModel.cs"-file of "ModelServicesPrismModule"-project. 
+            ViewModelLocationProvider.Register<LitGenreViewSformUserControl, LitGenreViewSformViewModel>();
+            // According to requirements of the "LitGenreViewSformViewModel.cs"-file of "ModelServicesPrismModule"-project. 
+            containerRegistry.Register<UserControl, LitGenreViewSformUserControl>("LitGenreViewSformUserControl");
+            // According to requirements of the "LitGenreViewSdlgViewModel.cs"-file of "ModelServicesPrismModule"-project. 
+            containerRegistry.RegisterDialog<LitGenreViewSdlgUserControl, LitGenreViewSdlgViewModel>("LitGenreViewSdlgViewModel");
+            // According to requirements of the "LitGenreViewEformViewModel.cs"-file of "ModelServicesPrismModule"-project. 
+            ViewModelLocationProvider.Register<LitGenreViewEformUserControl, LitGenreViewEformViewModel>();
+            // According to requirements of the "LitGenreViewEformViewModel.cs"-file of "ModelServicesPrismModule"-project. 
+            containerRegistry.Register<UserControl, LitGenreViewEformUserControl>("LitGenreViewEformUserControl");
+            // According to requirements of the "LitGenreViewEdlgViewModel.cs"-file of "ModelServicesPrismModule"-project. 
+            containerRegistry.RegisterDialog<LitGenreViewEdlgUserControl, LitGenreViewEdlgViewModel>("LitGenreViewEdlgViewModel");
+            // According to requirements of the "LitGenreViewLformViewModel.cs"-file of "ModelServicesPrismModule"-project. 
+            ViewModelLocationProvider.Register<LitGenreViewLformUserControl, LitGenreViewLformViewModel>();
+            // According to requirements of the "LitGenreViewLformViewModel.cs"-file of "ModelServicesPrismModule"-project. 
+            containerRegistry.Register<UserControl, LitGenreViewLformUserControl>("LitGenreViewLformUserControl");
+            // According to requirements of the "LitGenreViewLdlgViewModel.cs"-file of "ModelServicesPrismModule"-project. 
+            containerRegistry.RegisterDialog<LitGenreViewLdlgUserControl, LitGenreViewLdlgViewModel>("LitGenreViewLdlgViewModel");
+
+            // temporaty declaration for test only
+            containerRegistry.RegisterForNavigation<LitGenreViewLformUserControl, LitGenreViewLformViewModel>("LitGenreViewLformUserControl");
+        }
+```
+- Step 3: Save all and rebuild ModelServicesPrismModule-project
+- Step 4: Open "ViewModels\MainWindowViewModel.cs"-file of the PrismTestApp-project
+- Step 5: Modify _MainMenu variable as shown
+```java
+        IEnumerable<IWebServiceFilterMenuInterface> _MainMenu = new ObservableCollection<IWebServiceFilterMenuInterface>()
+        {
+            new WebServiceFilterMenuViewModel() { Id = "000", Caption="Home", IconName="Home",  IconColor="Primary", Data="HomeUserControl", Command=RoutedCommandExt.MainMenuCommand},
+            new WebServiceFilterMenuViewModel() { Id = "001", Caption="LitGenre Lform", IconName="TableRefresh",  IconColor="Primary", Data="LitGenreViewLformUserControl", Command=RoutedCommandExt.MainMenuCommand},
+        };
+```
+## Test LitGenreViewLformUserControl control
+1. Rebuild ModelServicesPrismModule-project 
+2. Run DbWebApplication (server side)
+3. Run PrismTestApp (client side)
+4. Click "LitGenre Lform"-navigation menu
+5. Check if Add, Update and Delete operation are available.
+    - Right click any row and select Update or Delete menu item
+6. Check if sorting and filtering  are available.
+
+![picture](img/img02rm18.png)
