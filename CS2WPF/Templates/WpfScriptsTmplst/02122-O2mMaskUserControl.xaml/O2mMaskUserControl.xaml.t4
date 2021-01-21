@@ -272,7 +272,7 @@
                 <Style TargetType="{x:Type Label}">
                     <Setter Property="Visibility" Value="Collapsed" />
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding <#= IsDetailVisiblePropertyName #>}" Value="False">
+                        <DataTrigger Binding="{Binding DataContext.<#= IsDetailVisiblePropertyName #>, Mode=OneWay, ElementName=O2mMaskRootControl}" Value="False">
                             <Setter Property="Visibility" Value="Visible" />
                         </DataTrigger>
                     </Style.Triggers>
@@ -281,7 +281,7 @@
         </Label>
 
         <Expander Grid.Row="2"  Header="Record details"
-            Visibility="{Binding <#= IsDetailVisiblePropertyName #>, Mode=OneWay,  Converter={StaticResource BooleanToVisibilityConverter}}"
+            Visibility="{Binding DataContext.<#= IsDetailVisiblePropertyName #>, Mode=OneWay,  Converter={StaticResource BooleanToVisibilityConverter}, ElementName=O2mMaskRootControl}"
             >
 <#
     if(EformUserControlProject == O2mMaskUserControlProject) {
@@ -302,7 +302,7 @@
         </Expander>
 
         <TabControl Grid.Row="3"  
-            Visibility="{Binding <#= IsDetailVisiblePropertyName #>, Mode=OneWay,  Converter={StaticResource BooleanToVisibilityConverter}}"
+            Visibility="{Binding DataContext.<#= IsDetailVisiblePropertyName #>, Mode=OneWay,  Converter={StaticResource BooleanToVisibilityConverter}, ElementName=O2mMaskRootControl}"
             >
 
             <TabItem Header="Models">

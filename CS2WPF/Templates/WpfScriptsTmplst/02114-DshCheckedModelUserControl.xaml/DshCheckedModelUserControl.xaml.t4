@@ -190,16 +190,16 @@
             <#= FilterDefinitionsPropertyName #>="{Binding DataContext.<#= FilterDefinitionsPropertyName #>, Mode=OneWay, ElementName=ChckdModelUsrCntrlRootNode}"
             <#= ContainerMenuItemsPropertyName #>="{Binding <#= ContainerMenuItemsPropertyName #>, Mode=OneWay, ElementName=ChckdModelUsrCntrlRootNode}"
             <#= FilterHeightPropertyName #>="{Binding <#= FilterHeightPropertyName #>, Mode=OneWay, ElementName=ChckdModelUsrCntrlRootNode}"
-            IsEnabled="{Binding <#= IsInQueryPropertyName #>, Mode=OneWay, Converter={StaticResource <#= InverseBooleanConverterClassName #>}}"
+            IsEnabled="{Binding DataContext.<#= IsInQueryPropertyName #>, Mode=OneWay, Converter={StaticResource <#= InverseBooleanConverterClassName #>}, ElementName=ChckdModelUsrCntrlRootNode}"
             Visibility="{Binding <#= ShowFilterPropertyName #>, Mode=OneWay, ElementName=ChckdModelUsrCntrlRootNode,  Converter={StaticResource BooleanToVisibilityConverter}}">
         </wsfuc:<#= WebServiceFilterUserControlClassName #>>
-        <ProgressBar Grid.Row="1" Height="10" IsIndeterminate="{Binding <#= IsInQueryPropertyName #>, Mode=OneWay}"/>
+        <ProgressBar Grid.Row="1" Height="10" IsIndeterminate="{Binding DataContext.<#= IsInQueryPropertyName #>, Mode=OneWay, ElementName=ChckdModelUsrCntrlRootNode}"/>
 
-         <DataGrid Grid.Row="2" ItemsSource="{Binding <#= DataSourcePropertyName #>}" 
-            SelectedItem="{Binding <#= SelectedGridItemPropertyName #>, Mode=TwoWay}"
+         <DataGrid Grid.Row="2" ItemsSource="{Binding DataContext.<#= DataSourcePropertyName #>, Mode=OneWay, ElementName=ChckdModelUsrCntrlRootNode}" 
+            SelectedItem="{Binding DataContext.<#= SelectedGridItemPropertyName #>, Mode=TwoWay, ElementName=ChckdModelUsrCntrlRootNode}"
             MaxHeight="{Binding GridHeight, ElementName=ChckdModelUsrCntrlRootNode}"
             atch:<#= AttachedPropertiesExtClassName #>.<#= DataGridServerSortingPropertyName #>="True"
-            IsEnabled="{Binding <#= IsInQueryPropertyName #>, Mode=OneWay,  Converter={StaticResource <#= InverseBooleanConverterClassName #>}}"
+            IsEnabled="{Binding DataContext.<#= IsInQueryPropertyName #>, Mode=OneWay,  Converter={StaticResource <#= InverseBooleanConverterClassName #>}, ElementName=ChckdModelUsrCntrlRootNode}"
             AutoGenerateColumns="False" FrozenColumnCount ="1" SelectionMode="Single" IsReadOnly="True" SelectionUnit="FullRow">
             <DataGrid.Resources>
                <frzp:<#= FreezableProxyClassName #> x:Key="gridCurrentItem" Data="{Binding CurrentItem, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}"/>

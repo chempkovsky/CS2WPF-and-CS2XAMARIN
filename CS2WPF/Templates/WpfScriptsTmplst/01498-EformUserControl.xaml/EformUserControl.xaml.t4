@@ -248,12 +248,12 @@
             </ItemsControl>
         </Grid>
 
-        <ProgressBar Grid.Row="1" Height="10" Margin="8 4 8 4" IsIndeterminate="{Binding <#= IsLoadingPropertyName #>, Mode=OneWay}">
+        <ProgressBar Grid.Row="1" Height="10" Margin="8 4 8 4" IsIndeterminate="{Binding DataContext.<#= IsLoadingPropertyName #>, Mode=OneWay, ElementName=EformUsrCntrlRootNode}">
             <ProgressBar.Resources>
                 <Style TargetType="{x:Type ProgressBar}">
                     <Setter Property="Visibility" Value="Hidden" />
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding <#= IsLoadingPropertyName #>}" Value="True">
+                        <DataTrigger Binding="{Binding DataContext.<#= IsLoadingPropertyName #>, Mode=OneWay, ElementName=EformUsrCntrlRootNode}" Value="True">
                             <Setter Property="Visibility" Value="Visible" />
                         </DataTrigger>
                     </Style.Triggers>
@@ -270,7 +270,7 @@
         if(InputTypeId == 3) { convName= DelEformModeEnumToVisibilityConverterClassName; }
 #>
         <StackPanel Orientation="Vertical"  Grid.Row="2"
-            Visibility="{Binding <#= EformModeVMPropertyName #>, Mode=OneWay, Converter={StaticResource <#= convName #>}}">
+            Visibility="{Binding DataContext.<#= EformModeVMPropertyName #>, Mode=OneWay, Converter={StaticResource <#= convName #>}, ElementName=EformUsrCntrlRootNode}">
 <#
 
         bool isNewLine = false;
@@ -320,12 +320,12 @@
                         <StackPanel Margin="8 0 0 0">
                             <Label FontWeight="Bold" Content="<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty)#>"/>
                             <ComboBox x:Uid="<#=  GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #>"
-                                      ItemsSource="{Binding <#= GetExpressionForControlList(modelViewUIFormPropertySerializable, Model, ComboSufix) #>}" 
+                                      ItemsSource="{Binding DataContext.<#= GetExpressionForControlList(modelViewUIFormPropertySerializable, Model, ComboSufix) #>, Mode=OneWay, ElementName=EformUsrCntrlRootNode}" 
                                       IsEditable="False" 
-                                      IsHitTestVisible="{Binding <#=  GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, EnabledSufix) #>}"
-                                      Focusable="{Binding <#=  GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, EnabledSufix) #>}"
+                                      IsHitTestVisible="{Binding DataContext.<#=  GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, EnabledSufix) #>, Mode=OneWay, ElementName=EformUsrCntrlRootNode}"
+                                      Focusable="{Binding DataContext.<#=  GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, EnabledSufix) #>, Mode=OneWay, ElementName=EformUsrCntrlRootNode}"
                                       DisplayMemberPath="<#= GetComboControlListPropertyName(modelViewUIFormPropertySerializable, Model, Context, InputTypeId) #>" 
-                                      SelectedItem="{Binding <#=  GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #>, Mode=TwoWay,
+                                      SelectedItem="{Binding DataContext.<#=  GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #>, Mode=TwoWay, ElementName=EformUsrCntrlRootNode,
                                                         UpdateSourceTrigger=PropertyChanged, 
                                                         ValidatesOnDataErrors=True, 
                                                         ValidatesOnNotifyDataErrors=True ,
@@ -346,7 +346,7 @@
                                     </ControlTemplate>
                                 </Validation.ErrorTemplate>
                             </ComboBox>
-                            <TextBlock Text="<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayHintProperty)#>" Opacity="0.3"/>
+                            <TextBlock Text="<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayHintProperty) #>" Opacity="0.3"/>
                         </StackPanel>
 <#
                 if(modelViewUIFormPropertySerializable.IsNewLineAfter && gridOpened) {
@@ -369,14 +369,14 @@
                             <Label FontWeight="Bold" Content="<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty)#>"/>
                             <acttb:AutoCompleteTextBox Delay="200"
                                     x:Uid="<#=  GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>"
-                                    Watermark="<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayHintProperty)#>" 
-                                    IsEnabled="{Binding <#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, EnabledSufix) #>}"
+                                    Watermark="<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayHintProperty) #>" 
+                                    IsEnabled="{Binding DataContext.<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, EnabledSufix) #>, Mode=OneWay, ElementName=EformUsrCntrlRootNode}"
 <#
 //                                    Text="{Binding AutoText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
 #>
                                     DisplayMember="<#= GetControlListPropertyName(modelViewUIFormPropertySerializable, Model, Context, InputTypeId) #>" 
-                                    Provider="{Binding <#= GetExpressionForOnFilterTypeaheadControlListMethod(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>Provider, Mode=OneWay}" 
-                                    SelectedItem="{Binding <#=  GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>, Mode=TwoWay, 
+                                    Provider="{Binding DataContext.<#= GetExpressionForOnFilterTypeaheadControlListMethod(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>Provider, Mode=OneWay, ElementName=EformUsrCntrlRootNode}" 
+                                    SelectedItem="{Binding DataContext.<#=  GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>, Mode=TwoWay, ElementName=EformUsrCntrlRootNode,
                                                         UpdateSourceTrigger=PropertyChanged, 
                                                         ValidatesOnDataErrors=True, 
                                                         ValidatesOnNotifyDataErrors=True ,
@@ -385,7 +385,7 @@
                                     LoadingContent="Loading...">
                                     <acttb:AutoCompleteTextBox.ItemTemplate>
                                         <ItemContainerTemplate>
-                                            <TextBlock Text="{Binding <#= GetControlListPropertyName(modelViewUIFormPropertySerializable, Model, Context, InputTypeId) #>}"/>
+                                            <TextBlock Text="{Binding DataContext.<#= GetControlListPropertyName(modelViewUIFormPropertySerializable, Model, Context, InputTypeId) #>, Mode=OneWay, ElementName=EformUsrCntrlRootNode}"/>
                                         </ItemContainerTemplate>
                                     </acttb:AutoCompleteTextBox.ItemTemplate>
                                 <Validation.ErrorTemplate>
@@ -431,7 +431,7 @@
                                 </Grid.ColumnDefinitions>
                                 <TextBox x:Uid="<#=  GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>"
                                     IsReadOnly="True" Grid.Column="0"
-                                    Text="{Binding <#=  GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>, Mode=OneWay,
+                                    Text="{Binding DataContext.<#=  GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>, Mode=OneWay, ElementName=EformUsrCntrlRootNode,
                                                         TargetNullValue='',
                                                         UpdateSourceTrigger=PropertyChanged, 
                                                         ValidatesOnDataErrors=True, 
@@ -455,7 +455,7 @@
                                 </TextBox>
                                 <Button Grid.Column="1" BorderBrush="{x:Null}" Background="{x:Null}" Foreground="{DynamicResource Primary}"
                                         KeyboardNavigation.TabNavigation ="None" ToolTip="Search"
-                                        Command="{Binding <#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, SearchClickSufix) #>Command}">
+                                        Command="{Binding DataContext.<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, SearchClickSufix) #>Command, Mode=OneWay, ElementName=EformUsrCntrlRootNode}">
                                     <Viewbox   Height="16" Width="16" FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Button}}}" HorizontalAlignment="Center" VerticalAlignment="Center" >
                                         <Canvas  Height="24" Width="24" >
                                             <Path  Data="{DynamicResource Magnify}" Fill="{Binding Foreground, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Button}}}" />
@@ -492,12 +492,12 @@
 <#
                 } else {
 #>
-                                IsEnabled="{Binding <#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, EnabledSufix) #>}"
+                                IsEnabled="{Binding DataContext.<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, EnabledSufix) #>, Mode=OneWay, ElementName=EformUsrCntrlRootNode}"
 <#
                 }
 #>
                                 Content="<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty)#>"
-                                IsChecked="{Binding <#= GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>, Mode=TwoWay,
+                                IsChecked="{Binding DataContext.<#= GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>, Mode=TwoWay, ElementName=EformUsrCntrlRootNode,
                                                         TargetNullValue='',
                                                         UpdateSourceTrigger=PropertyChanged, 
                                                         ValidatesOnDataErrors=True, 
@@ -542,7 +542,7 @@
                             <Label FontWeight="Bold" Content="<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty)#>"/>
                             <DatePicker x:Uid="<#= GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>"
                                         HorizontalAlignment="Stretch" 
-                                        SelectedDate="{Binding <#=  GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>, 
+                                        SelectedDate="{Binding DataContext.<#=  GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>, ElementName=EformUsrCntrlRootNode, 
                                                         TargetNullValue='',
                                                         UpdateSourceTrigger=PropertyChanged, 
                                                         ValidatesOnDataErrors=True, 
@@ -563,10 +563,10 @@
                 } else {
 #>
                                     <Style TargetType="DatePickerTextBox">
-                                        <Setter Property="IsReadOnly" Value="{Binding <#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, EnabledSufix) #>, Converter={StaticResource InverseBooleanConverter}}"/>
+                                        <Setter Property="IsReadOnly" Value="{Binding DataContext.<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, EnabledSufix) #>, Converter={StaticResource InverseBooleanConverter}, Mode=OneWay, ElementName=EformUsrCntrlRootNode}"/>
                                     </Style>
                                     <Style TargetType="{x:Type Button}">
-                                        <Setter Property="IsEnabled" Value="{Binding <#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, EnabledSufix) #>}"/>
+                                        <Setter Property="IsEnabled" Value="{Binding DataContext.<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, EnabledSufix) #>, Mode=OneWay, ElementName=EformUsrCntrlRootNode}"/>
                                     </Style>
 <#
                 }
@@ -606,11 +606,11 @@
 <#
                 } else {
 #>
-                                IsReadOnly="{Binding <#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, EnabledSufix) #>, Converter={StaticResource InverseBooleanConverter}}"
+                                IsReadOnly="{Binding DataContext.<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, EnabledSufix) #>, Converter={StaticResource InverseBooleanConverter}, Mode=OneWay, ElementName=EformUsrCntrlRootNode}"
 <#
                 }
 #>
-                                Text="{Binding <#=  GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, 
+                                Text="{Binding DataContext.<#= GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ElementName=EformUsrCntrlRootNode, 
                                         TargetNullValue='',
                                         ValidatesOnDataErrors=True, 
                                         ValidatesOnNotifyDataErrors=True ,
@@ -662,11 +662,11 @@
 <#
                 } else {
 #>
-                                IsReadOnly="{Binding <#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, EnabledSufix) #>, Converter={StaticResource InverseBooleanConverter}}"
+                                IsReadOnly="{Binding DataContext.<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, EnabledSufix) #>, Converter={StaticResource InverseBooleanConverter}, Mode=OneWay, ElementName=EformUsrCntrlRootNode}"
 <#
                 }
 #>
-                                Text="{Binding <#=  GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, TargetNullValue='',
+                                Text="{Binding DataContext.<#=  GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>, Mode=TwoWay, ElementName=EformUsrCntrlRootNode, UpdateSourceTrigger=PropertyChanged, TargetNullValue='',
                                         ValidatesOnDataErrors=True, 
                                         ValidatesOnNotifyDataErrors=True ,
                                         ValidatesOnExceptions=True,

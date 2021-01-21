@@ -175,14 +175,15 @@
             <#= FilterDefinitionsPropertyName #>="{Binding DataContext.<#= FilterDefinitionsPropertyName #>, Mode=OneWay, ElementName=SformUsrCntrlRootNode}"
             <#= ContainerMenuItemsPropertyName #>="{Binding <#= ContainerMenuItemsPropertyName #>, Mode=OneWay, ElementName=SformUsrCntrlRootNode}"
             <#= FilterHeightPropertyName #>="{Binding <#= FilterHeightPropertyName #>, Mode=OneWay, ElementName=SformUsrCntrlRootNode}"
-            IsEnabled="{Binding <#= IsInQueryPropertyName #>, Mode=OneWay, Converter={StaticResource <#= InverseBooleanConverterClassName #>}}"
+            IsEnabled="{Binding DataContext.<#= IsInQueryPropertyName #>, Mode=OneWay, Converter={StaticResource <#= InverseBooleanConverterClassName #>}, ElementName=SformUsrCntrlRootNode}"
             Visibility="{Binding <#= ShowFilterPropertyName #>, Mode=OneWay, ElementName=SformUsrCntrlRootNode,  Converter={StaticResource BooleanToVisibilityConverter}}">
         </wsfuc:<#= WebServiceFilterUserControlClassName #>>
-        <ProgressBar Grid.Row="1" Height="10" IsIndeterminate="{Binding <#= IsInQueryPropertyName #>, Mode=OneWay}"/>
+        <ProgressBar Grid.Row="1" Height="10" IsIndeterminate="{Binding DataContext.<#= IsInQueryPropertyName #>, Mode=OneWay, ElementName=SformUsrCntrlRootNode}"/>
 
-         <DataGrid Grid.Row="2" ItemsSource="{Binding <#= DataSourcePropertyName #>}" MaxHeight="{Binding GridHeight, ElementName=SformUsrCntrlRootNode}"
+         <DataGrid Grid.Row="2" ItemsSource="{Binding DataContext.<#= DataSourcePropertyName #>, Mode=OneWay, ElementName=SformUsrCntrlRootNode}" 
+            MaxHeight="{Binding GridHeight, ElementName=SformUsrCntrlRootNode}"
             atch:<#= AttachedPropertiesExtClassName #>.<#= DataGridServerSortingPropertyName #>="True"
-            IsEnabled="{Binding <#= IsInQueryPropertyName #>, Mode=OneWay,  Converter={StaticResource <#= InverseBooleanConverterClassName #>}}"
+            IsEnabled="{Binding DataContext.<#= IsInQueryPropertyName #>, Mode=OneWay,  Converter={StaticResource <#= InverseBooleanConverterClassName #>}, ElementName=SformUsrCntrlRootNode}"
             AutoGenerateColumns="False" FrozenColumnCount ="1" SelectionMode="Single" IsReadOnly="True" SelectionUnit="FullRow">
             <DataGrid.Resources>
                <frzp:<#= FreezableProxyClassName #> x:Key="gridCurrentItem" Data="{Binding CurrentItem, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}"/>
@@ -265,11 +266,11 @@
 
 
         <tpgnuc:<#= TablePaginationUserControlClassName #> Grid.Row="3"
-            <#= TotalCountPropertyName #>="{Binding <#= TotalCountPropertyName #>, Mode=OneWay}"
-            <#= CurrentPagePropertyName #>="{Binding <#= CurrentPagePropertyName #>, Mode=TwoWay}"
-            <#= RowsPerPagePropertyName #>="{Binding <#= RowsPerPagePropertyName #>, Mode=TwoWay}"
-            IsEnabled="{Binding <#= IsInQueryPropertyName #>, Mode=OneWay,  Converter={StaticResource <#= InverseBooleanConverterClassName #>}}"
-            <#= RowsPerPageOptionsPropertyName #>="{Binding <#= RowsPerPageOptionsPropertyName #>, Mode=OneWay}">
+            <#= TotalCountPropertyName #>="{Binding DataContext.<#= TotalCountPropertyName #>, Mode=OneWay, ElementName=SformUsrCntrlRootNode}"
+            <#= CurrentPagePropertyName #>="{Binding DataContext.<#= CurrentPagePropertyName #>, Mode=TwoWay, ElementName=SformUsrCntrlRootNode}"
+            <#= RowsPerPagePropertyName #>="{Binding DataContext.<#= RowsPerPagePropertyName #>, Mode=TwoWay, ElementName=SformUsrCntrlRootNode}"
+            IsEnabled="{Binding DataContext.<#= IsInQueryPropertyName #>, Mode=OneWay,  Converter={StaticResource <#= InverseBooleanConverterClassName #>}, ElementName=SformUsrCntrlRootNode}"
+            <#= RowsPerPageOptionsPropertyName #>="{Binding DataContext.<#= RowsPerPageOptionsPropertyName #>, Mode=OneWay, ElementName=SformUsrCntrlRootNode}">
        </tpgnuc:<#= TablePaginationUserControlClassName #>>
     </Grid>
 </UserControl>

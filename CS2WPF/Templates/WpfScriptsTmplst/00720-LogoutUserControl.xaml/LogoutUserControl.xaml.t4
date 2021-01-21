@@ -93,7 +93,7 @@
              atch:<#= AttachedPropertiesExtClassName #>.<#= RegisterRoutedCommandBindingsPropertyName #>="{Binding <#= RoutedCommandHandlersPropertyName #>}"
              atch:<#= AttachedPropertiesExtClassName #>.<#= RegisterRoutedEventBindingsPropertyName #>="{Binding <#= RoutedEventHandlersPropertyName #>}"
 
-             x:Name="RegisterCntrlRootNode"
+             x:Name="LogoutCntrlRootNode"
             >
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
@@ -112,14 +112,14 @@
             <Button Grid.Column="1" Margin="0 0 24 0" BorderBrush="{x:Null}" Background="{x:Null}"
                         Foreground="{DynamicResource Primary}"  KeyboardNavigation.TabNavigation ="None" ToolTip="Navigate back"
                         Command="{x:Static crtcmd:RoutedCommandExt.NavigationBackCommand}"
-                        Visibility="{Binding <#= ShowBackBtnPropertyName #>, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        Visibility="{Binding DataContext.<#= ShowBackBtnPropertyName #>, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}, ElementName=LogoutCntrlRootNode}">
                 <Viewbox   Height="24" Width="24" FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Button}}}" HorizontalAlignment="Center" VerticalAlignment="Center" >
                     <Canvas  Height="24" Width="24" >
                         <Path  Data="{DynamicResource ArrowLeftCircle}" Fill="{Binding Foreground, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Button}}}" />
                     </Canvas>
                 </Viewbox>
             </Button>
-            <ItemsControl Grid.Column="2" ItemsSource="{Binding <#= ContainerMenuItemsPropertyName #>, ElementName=RegisterCntrlRootNode}" Margin="0 0 8 0" >
+            <ItemsControl Grid.Column="2" ItemsSource="{Binding <#= ContainerMenuItemsPropertyName #>, ElementName=LogoutCntrlRootNode}" Margin="0 0 8 0" >
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <StackPanel Orientation="Horizontal"/>
@@ -158,7 +158,7 @@
                 <Label Margin="16" Grid.Row="1" Grid.Column="1"  FontWeight="Bold" FontSize="18" Content="Logout"/>
 
                 <StackPanel  Grid.Row="2" Grid.Column="1">
-                    <Label FontWeight="Bold" Content="{Binding <#= LogoutCaptionPropertyName #>, Mode=OneWay}" />
+                    <Label FontWeight="Bold" Content="{Binding DataContext.<#= LogoutCaptionPropertyName #>, Mode=OneWay, ElementName=LogoutCntrlRootNode}" />
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal" Grid.Row="3" Grid.Column="1"  Margin="8">

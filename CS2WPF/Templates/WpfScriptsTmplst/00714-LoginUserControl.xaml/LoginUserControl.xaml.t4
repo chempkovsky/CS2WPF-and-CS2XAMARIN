@@ -99,7 +99,7 @@
              atch:<#= AttachedPropertiesExtClassName #>.<#= RegisterRoutedCommandBindingsPropertyName #>="{Binding <#= RoutedCommandHandlersPropertyName #>}"
              atch:<#= AttachedPropertiesExtClassName #>.<#= RegisterRoutedEventBindingsPropertyName #>="{Binding <#= RoutedEventHandlersPropertyName #>}"
 
-             x:Name="RegisterCntrlRootNode"
+             x:Name="LoginCntrlRootNode"
             >
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
@@ -118,14 +118,14 @@
             <Button Grid.Column="1" Margin="0 0 24 0" BorderBrush="{x:Null}" Background="{x:Null}"
                         Foreground="{DynamicResource Primary}"  KeyboardNavigation.TabNavigation ="None" ToolTip="Navigate back"
                         Command="{x:Static crtcmd:RoutedCommandExt.NavigationBackCommand}"
-                        Visibility="{Binding <#= ShowBackBtnPropertyName #>, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        Visibility="{Binding DataContext.<#= ShowBackBtnPropertyName #>, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}, ElementName=LoginCntrlRootNode}">
                 <Viewbox   Height="24" Width="24" FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Button}}}" HorizontalAlignment="Center" VerticalAlignment="Center" >
                     <Canvas  Height="24" Width="24" >
                         <Path  Data="{DynamicResource ArrowLeftCircle}" Fill="{Binding Foreground, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Button}}}" />
                     </Canvas>
                 </Viewbox>
             </Button>
-            <ItemsControl Grid.Column="2" ItemsSource="{Binding <#= ContainerMenuItemsPropertyName #>, ElementName=RegisterCntrlRootNode}" Margin="0 0 8 0" >
+            <ItemsControl Grid.Column="2" ItemsSource="{Binding <#= ContainerMenuItemsPropertyName #>, ElementName=LoginCntrlRootNode}" Margin="0 0 8 0" >
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <StackPanel Orientation="Horizontal"/>
@@ -166,9 +166,9 @@
                 <Label Margin="16" Grid.Row="1" Grid.Column="1"  FontWeight="Bold" FontSize="18" Content="Login"/>
 
                 <StackPanel  Grid.Row="2" Grid.Column="1">
-                    <Label FontWeight="Bold" Content="{Binding <#= UserNameCaptionPropertyName #>, Mode=OneWay}"/>
+                    <Label FontWeight="Bold" Content="{Binding DataContext.<#= UserNameCaptionPropertyName #>, Mode=OneWay, ElementName=LoginCntrlRootNode}"/>
                     <TextBox x:Uid="<#= UserNamePropertyName #>"
-                        Text="{Binding <#= UserNamePropertyName #>, Mode=TwoWay,
+                        Text="{Binding DataContext.<#= UserNamePropertyName #>, Mode=TwoWay, ElementName=LoginCntrlRootNode,
                                             TargetNullValue='',
                                             UpdateSourceTrigger=PropertyChanged, 
                                             ValidatesOnDataErrors=True, 
@@ -190,17 +190,17 @@
                             </ControlTemplate>
                         </Validation.ErrorTemplate>
                     </TextBox>
-                    <TextBlock Text="{Binding <#= UserNamePropmptPropertyName #>, Mode=OneWay}" Opacity="0.3"/>
+                    <TextBlock Text="{Binding DataContext.<#= UserNamePropmptPropertyName #>, Mode=OneWay, ElementName=LoginCntrlRootNode}" Opacity="0.3"/>
                 </StackPanel>
 
                 <StackPanel  Grid.Row="3" Grid.Column="1">
-                    <Label FontWeight="Bold" Content="{Binding <#= PassWordCaptionPropertyName #>, Mode=OneWay}"/>
+                    <Label FontWeight="Bold" Content="{Binding DataContext.<#= PassWordCaptionPropertyName #>, Mode=OneWay, ElementName=LoginCntrlRootNode}"/>
                     <PasswordBox x:Uid="<#= PassWordPropertyName #>" />
-                    <TextBlock Text="{Binding <#= PassWordPropmptPropertyName #>, Mode=OneWay}" Opacity="0.3"/>
+                    <TextBlock Text="{Binding DataContext.<#= PassWordPropmptPropertyName #>, Mode=OneWay, ElementName=LoginCntrlRootNode}" Opacity="0.3"/>
                 </StackPanel>
 
                 <StackPanel  Grid.Row="4" Grid.Column="1">
-                    <Label FontWeight="Bold" Content="{Binding <#= PassWordErrorPropertyName #>, Mode=OneWay}" Foreground="{DynamicResource ErrorForeground}" Background="{DynamicResource ErrorBackground}"/>
+                    <Label FontWeight="Bold" Content="{Binding DataContext.<#= PassWordErrorPropertyName #>, Mode=OneWay, ElementName=LoginCntrlRootNode}" Foreground="{DynamicResource ErrorForeground}" Background="{DynamicResource ErrorBackground}"/>
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal" Grid.Row="5" Grid.Column="1"  Margin="8">

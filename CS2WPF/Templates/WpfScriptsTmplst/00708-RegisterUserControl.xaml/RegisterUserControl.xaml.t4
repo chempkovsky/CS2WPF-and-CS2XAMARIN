@@ -119,7 +119,7 @@
             <Button Grid.Column="1" Margin="0 0 24 0" BorderBrush="{x:Null}" Background="{x:Null}"
                         Foreground="{DynamicResource Primary}"  KeyboardNavigation.TabNavigation ="None" ToolTip="Navigate back"
                         Command="{x:Static crtcmd:RoutedCommandExt.NavigationBackCommand}"
-                        Visibility="{Binding <#= ShowBackBtnPropertyName #>, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        Visibility="{Binding DataContext.<#= ShowBackBtnPropertyName #>, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}, ElementName=RegisterCntrlRootNode}">
                 <Viewbox   Height="24" Width="24" FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Button}}}" HorizontalAlignment="Center" VerticalAlignment="Center" >
                     <Canvas  Height="24" Width="24" >
                         <Path  Data="{DynamicResource ArrowLeftCircle}" Fill="{Binding Foreground, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Button}}}" />
@@ -168,9 +168,9 @@
                 <Label Margin="16" Grid.Row="1" Grid.Column="1"  FontWeight="Bold" FontSize="18" Content="Register"/>
 
                 <StackPanel  Grid.Row="2" Grid.Column="1">
-                    <Label FontWeight="Bold" Content="{Binding <#= UserNameCaptionPropertyName #>, Mode=OneWay}"/>
+                    <Label FontWeight="Bold" Content="{Binding DataContext.<#= UserNameCaptionPropertyName #>, Mode=OneWay, ElementName=RegisterCntrlRootNode}"/>
                     <TextBox x:Uid="<#= UserNamePropertyName #>"
-                        Text="{Binding <#= UserNamePropertyName #>, Mode=TwoWay,
+                        Text="{Binding DataContext.<#= UserNamePropertyName #>, Mode=TwoWay, ElementName=RegisterCntrlRootNode,
                                             TargetNullValue='',
                                             UpdateSourceTrigger=PropertyChanged, 
                                             ValidatesOnDataErrors=True, 
@@ -192,23 +192,23 @@
                             </ControlTemplate>
                         </Validation.ErrorTemplate>
                     </TextBox>
-                    <TextBlock Text="{Binding <#= UserNamePropmptPropertyName #>, Mode=OneWay}" Opacity="0.3"/>
+                    <TextBlock Text="{Binding DataContext.<#= UserNamePropmptPropertyName #>, Mode=OneWay, ElementName=RegisterCntrlRootNode}" Opacity="0.3"/>
                 </StackPanel>
 
                 <StackPanel  Grid.Row="3" Grid.Column="1">
-                    <Label FontWeight="Bold" Content="{Binding <#= PassWordCaptionPropertyName #>, Mode=OneWay}"/>
+                    <Label FontWeight="Bold" Content="{Binding DataContext.<#= PassWordCaptionPropertyName #>, Mode=OneWay, ElementName=RegisterCntrlRootNode}"/>
                     <PasswordBox x:Uid="<#= PassWordPropertyName #>" />
-                    <TextBlock Text="{Binding <#= PassWordPropmptPropertyName #>, Mode=OneWay}" Opacity="0.3"/>
+                    <TextBlock Text="{Binding DataContext.<#= PassWordPropmptPropertyName #>, Mode=OneWay, ElementName=RegisterCntrlRootNode}" Opacity="0.3"/>
                 </StackPanel>
 
                 <StackPanel  Grid.Row="4" Grid.Column="1">
-                    <Label FontWeight="Bold" Content="{Binding <#= ConfirmPassWordCaptionPropertyName #>, Mode=OneWay}"/>
+                    <Label FontWeight="Bold" Content="{Binding DataContext.<#= ConfirmPassWordCaptionPropertyName #>, Mode=OneWay, ElementName=RegisterCntrlRootNode}"/>
                     <PasswordBox x:Uid="<#= ConfirmPassWordPropertyName #>" />
-                    <TextBlock Text="{Binding <#= ConfirmPassWordPropmptPropertyName #>, Mode=OneWay}" Opacity="0.3"/>
+                    <TextBlock Text="{Binding DataContext.<#= ConfirmPassWordPropmptPropertyName #>, Mode=OneWay, ElementName=RegisterCntrlRootNode}" Opacity="0.3"/>
                 </StackPanel>
 
                 <StackPanel  Grid.Row="5" Grid.Column="1">
-                    <Label FontWeight="Bold" Content="{Binding <#= PassWordErrorPropertyName #>, Mode=OneWay}" Foreground="{DynamicResource ErrorForeground}" Background="{DynamicResource ErrorBackground}"/>
+                    <Label FontWeight="Bold" Content="{Binding DataContext.<#= PassWordErrorPropertyName #>, Mode=OneWay, ElementName=RegisterCntrlRootNode}" Foreground="{DynamicResource ErrorForeground}" Background="{DynamicResource ErrorBackground}"/>
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal" Grid.Row="6" Grid.Column="1"  Margin="8">

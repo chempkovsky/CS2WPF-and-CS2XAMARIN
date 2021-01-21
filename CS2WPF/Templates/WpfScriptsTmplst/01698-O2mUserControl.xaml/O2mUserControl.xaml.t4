@@ -233,7 +233,7 @@
                 <Style TargetType="{x:Type Label}">
                     <Setter Property="Visibility" Value="Collapsed" />
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding <#= IsDetailVisiblePropertyName #>}" Value="False">
+                        <DataTrigger Binding="{Binding DataContext.<#= IsDetailVisiblePropertyName #>, Mode=OneWay, ElementName=O2mRootControl}" Value="False">
                             <Setter Property="Visibility" Value="Visible" />
                         </DataTrigger>
                     </Style.Triggers>
@@ -241,7 +241,7 @@
             </Label.Resources> 
         </Label>
 
-        <StackPanel Grid.Row="2" Visibility="{Binding <#= IsDetailVisiblePropertyName #>, Mode=OneWay,  Converter={StaticResource BooleanToVisibilityConverter}}">
+        <StackPanel Grid.Row="2" Visibility="{Binding DataContext.<#= IsDetailVisiblePropertyName #>, Mode=OneWay,  Converter={StaticResource BooleanToVisibilityConverter}, ElementName=O2mRootControl}">
 <#
     {
         int id = -1;
@@ -271,8 +271,8 @@
             }
 #>
 
-                Visibility="{Binding <#= IsDetailVisiblePropertyName #><#= detailViewClassName #>, Mode=OneWay,  Converter={StaticResource BooleanToVisibilityConverter}}"
-                <#= CaptionPropertyName #>="{Binding <#= SelectedDetailsListItemPropertyName #>.<#= CaptionPropertyName #>, Mode=OneWay}" 
+                Visibility="{Binding DataContext.<#= IsDetailVisiblePropertyName #><#= detailViewClassName #>, Mode=OneWay,  Converter={StaticResource BooleanToVisibilityConverter}, ElementName=O2mRootControl}"
+                <#= CaptionPropertyName #>="{Binding DataContext.<#= SelectedDetailsListItemPropertyName #>.<#= CaptionPropertyName #>, Mode=OneWay, ElementName=O2mRootControl}" 
                 <#= FilterHeightPropertyName #>="{Binding <#= FilterHeightDetailPropertyName #>, Mode=OneWay, ElementName=O2mRootControl}" 
                 <#= ShowFilterPropertyName #>="{Binding <#= ShowFilterDetailPropertyName #>, Mode=OneWay, ElementName=O2mRootControl}" 
                 <#= ShowAddFilterBtnPropertyName #>="{Binding <#= ShowAddFilterBtnDetailPropertyName #>, Mode=OneWay, ElementName=O2mRootControl}" 
