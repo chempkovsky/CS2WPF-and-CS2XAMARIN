@@ -53,6 +53,17 @@
 #### [Creating LiteratureTest Database on the server  side](#Creating-LiteratureTest-Database-on-the-server-side)
 #### [Add LitGenreViewLformUserControl to navigation  list](#Add-LitGenreViewLformUserControl-to-navigation-list)
 #### [Test LitGenreViewLformUserControl  control](#Test-LitGenreViewLformUserControl-control)
+#### [Generating Redit and Rlist Wpf User controls for  LitGenre](#Generating-Redit-and-Rlist-Wpf-User-controls-for-LitGenre)
+#### [Modify Prism IModule  class](#Modify-Prism-IModule-class)
+#### [Modify main menu of MainWindowViewModel and run  app](#Modify-main-menu-of-MainWindowViewModel-and-run-app)
+#### [Generating Rdlist Wpf User control for  LitGenre](#Generating-Rdlist-Wpf-User-control-for-LitGenre)
+#### [Modify Prism IModule class for  Rdlist](#Modify-Prism-IModule-class-for-Rdlist)
+#### [Generating O2m Wpf User control for  LitGenre](#Generating-O2m-Wpf-User-control-for-LitGenre)
+#### [Modify Prism IModule class for  O2m](#Modify-Prism-IModule-class-for-O2m)
+#### [Modify main menu of MainWindowViewModel and run app for  O2m](#Modify-main-menu-of-MainWindowViewModel-and-run-app-for-O2m)
+#### [Creating PrismModule project for Feature  controls](#Creating-PrismModule-project-for-Feature-controls)
+#### [Modify Prism IModule class for  Feature](#Modify-Prism-IModule-class-for-Feature)
+#### [Modify main menu of MainWindowViewModel and run app for  Feature](#Modify-main-menu-of-MainWindowViewModel-and-run-app-for-Feature)
 
 ## Programming tools used to start the development process
 ### The following Programming tools must be used to begin development:
@@ -136,7 +147,7 @@
 
 ## Creating projects to start front end development
 
-25. Right click "ServerProjects"-folder and "Add/New Project"
+25. Right click "ClientProjects"-folder and "Add/New Project"
 
 ![picture](img/img00rm15.png) 
 
@@ -637,6 +648,8 @@ namespace CommonServicesPrismModule
             containerRegistry.RegisterForNavigation<ChngpswdUserControl, ChngpswdViewModel>("ChngpswdUserControl");
             containerRegistry.RegisterForNavigation<LogoutUserControl, LogoutViewModel>("LogoutUserControl");
             
+            ViewModelLocationProvider.Register<ScopedRegionNavigationUserControl, ScopedRegionNavigationViewModel>();
+            containerRegistry.Register<IScopedRegionNavigationUserControlInterface, ScopedRegionNavigationUserControl>();
         }
     }
 }
@@ -848,7 +861,7 @@ Right click "Literature/LitGenre"-folder of the ModelInterfacesClassLibrary-proj
 
 ![picture](img/img02rm12.png)
 
-- Step 2: On the third page choose LitGenreView expand "UI list properties" and check "Shown"-checkboxes
+- Step 2: On the second page choose LitGenreView expand "UI list properties" and check "Shown"-checkboxes
 
 ![picture](img/img02rm13.png)
 
@@ -1170,3 +1183,344 @@ Note: You will have different "Data Source"-property in your development invoron
 6. Check if sorting and filtering  are available.
 
 ![picture](img/img02rm18.png)
+
+## Generating Redit and Rlist Wpf User controls for LitGenre
+
+
+Right click "Literature/LitGenre"-folder of the ModelInterfacesClassLibrary-project and choose "Wpf Form Wizard"-menu item.
+
+- Step 1: On the first page of the Wizard click "Next"-button. On the second page select "DbContextClassLibrary"-project and "LitDbContext"-DbContext. click "Next"-button.
+
+![picture](img/img02rm12.png)
+
+- Step 2: On the second page choose LitGenreView expand "UI list properties" and check "Shown"-checkboxes
+
+![picture](img/img02rm13.png)
+
+- Step 3: On the third page choose LitGenreView expand "UI Form properties", check "Shown"-checkboxes and set "Input types" as it is shown below. Click Next button.
+
+![picture](img/img02rm14.png)
+
+- Step 4: On the fourth page "batch processing"-button and "Batch actions"-dialog will be shown. Select "01820-Redit.json"-script and click "start"-button.
+
+![picture](img/img02rm19.png)
+
+- Step 5: Make sure that "Errors"-panel is empty.
+
+- Step 6: Repeat steps 4 and 5 for 01920-Rlist.json.
+
+## Modify Prism IModule class
+- Step 1: Open "Literature\LitGenre\ViewModels\LitGenreViewReditViewModel.cs" file of "ModelServicesPrismModule" project and follow the instructions
+```java
+/*
+    "LitGenreViewReditUserControl" UserControl is defined in the "ModelServicesPrismModule"-project.
+    In the file of IModule-class of "ModelServicesPrismModule"-project the following line of code must be inserted:
+
+        public void RegisterTypes(IContainerRegistry containerRegistry)
+        {
+            ...
+            // According to requirements of the "LitGenreViewReditViewModel.cs"-file of "ModelServicesPrismModule"-project. 
+            ViewModelLocationProvider.Register<LitGenreViewReditUserControl, LitGenreViewReditViewModel>();
+            // According to requirements of the "LitGenreViewReditViewModel.cs"-file of "ModelServicesPrismModule"-project. 
+            containerRegistry.RegisterForNavigation<LitGenreViewReditUserControl, LitGenreViewReditViewModel>("LitGenreViewReditUserControl");
+            // According to requirements of the "LitGenreViewReditViewModel.cs"-file of "ModelServicesPrismModule"-project. 
+            containerRegistry.Register<UserControl, LitGenreViewReditUserControl>("LitGenreViewReditUserControl");
+            ...
+        }
+*/
+```
+- Step 2: Open "Literature\LitGenre\ViewModels\LitGenreViewRlistViewModel.cs" file of "ModelServicesPrismModule" project and follow the instructions
+```java
+/*
+    "LitGenreViewRlistUserControl" UserControl is defined in the "ModelServicesPrismModule"-project.
+    In the file of IModule-class of "ModelServicesPrismModule"-project the following line of code must be inserted:
+
+        public void RegisterTypes(IContainerRegistry containerRegistry)
+        {
+            ...
+            // According to requirements of the "LitGenreViewRlistViewModel.cs"-file of "ModelServicesPrismModule"-project. 
+            ViewModelLocationProvider.Register<LitGenreViewRlistUserControl, LitGenreViewRlistViewModel>();
+            // According to requirements of the "LitGenreViewRlistViewModel.cs"-file of "ModelServicesPrismModule"-project. 
+            containerRegistry.RegisterForNavigation<LitGenreViewRlistUserControl, LitGenreViewRlistViewModel>("LitGenreViewRlistUserControl");
+            // According to requirements of the "LitGenreViewRlistViewModel.cs"-file of "ModelServicesPrismModule"-project. 
+            containerRegistry.Register<UserControl, LitGenreViewRlistUserControl>("LitGenreViewRlistUserControl");
+            ...
+        }
+*/
+```
+
+- Step 3: Open ModelServicesPrismModuleModule.cs file of ModelServicesPrismModule project and make the modification according to the requirements above.
+
+## Modify main menu of MainWindowViewModel and run app
+- Step 1: Open "ViewModels\MainWindowViewModel.cs" file of "PrismTestApp" project and add "LitGenre RList"-menu item.
+```java
+        IEnumerable<IWebServiceFilterMenuInterface> _MainMenu = new ObservableCollection<IWebServiceFilterMenuInterface>()
+        {
+            new WebServiceFilterMenuViewModel() { Id = "000", Caption="Home", IconName="Home",  IconColor="Primary", Data="HomeUserControl", Command=RoutedCommandExt.MainMenuCommand},
+            new WebServiceFilterMenuViewModel() { Id = "001", Caption="LitGenre Lform", IconName="TableRefresh",  IconColor="Primary", Data="LitGenreViewLformUserControl", Command=RoutedCommandExt.MainMenuCommand},
+            new WebServiceFilterMenuViewModel() { Id = "001", Caption="LitGenre RList", IconName="TableRefresh",  IconColor="Primary", Data="LitGenreViewRlistUserControl", Command=RoutedCommandExt.MainMenuCommand},
+        };
+```
+- Step 2: Rebuild "ModelServicesPrismModule" project, 
+- Step 3: Run DbWebApplication 
+- Step 4: Run PrismTestApp
+- Step 5: Click "LitGenre RList"-navigation menu. Select any row in the grid and right click and choose "Update"-menu item
+
+![picture](img/img02rm20.png)
+
+- Step 6: Click "Submit" or "Cancel" button to navigate back to "Rlist"-form
+
+![picture](img/img02rm21.png)
+
+## Generating Rdlist Wpf User control for LitGenre
+
+Right click "Literature/LitGenre"-folder of the ModelInterfacesClassLibrary-project and choose "Wpf Form Wizard"-menu item.
+
+- Step 1: On the first page of the Wizard click "Next"-button. On the second page select "DbContextClassLibrary"-project and "LitDbContext"-DbContext. click "Next"-button.
+
+![picture](img/img02rm12.png)
+
+- Step 2: On the second page choose LitGenreView expand "UI list properties" and check "Shown"-checkboxes
+
+![picture](img/img02rm13.png)
+
+- Step 3: On the third page choose LitGenreView expand "UI Form properties", check "Shown"-checkboxes and set "Input types" as it is shown below. Click Next button.
+
+![picture](img/img02rm14.png)
+
+- Step 4: On the fourth page "batch processing"-button and "Batch actions"-dialog will be shown. Select "02020-Rdlist.json"-script and click "start"-button.
+
+![picture](img/img02rm22.png)
+
+- Step 5: Make sure that "Errors"-panel is empty.
+
+## Modify Prism IModule class for Rdlist
+- Step 1: Open "Literature\LitGenre\ViewModels\LitGenreViewRdlistViewModel.cs" file of "ModelServicesPrismModule" project and follow the instructions
+```java
+/*
+    "LitGenreViewRdlistUserControl" UserControl is defined in the "ModelServicesPrismModule"-project.
+    In the file of IModule-class of "ModelServicesPrismModule"-project the following line of code must be inserted:
+
+        public void RegisterTypes(IContainerRegistry containerRegistry)
+        {
+            ...
+            // According to requirements of the "LitGenreViewRdlistViewModel.cs"-file of "ModelServicesPrismModule"-project. 
+            ViewModelLocationProvider.Register<LitGenreViewRdlistUserControl, LitGenreViewRdlistViewModel>();
+            // According to requirements of the "LitGenreViewRdlistViewModel.cs"-file of "ModelServicesPrismModule"-project. 
+            containerRegistry.RegisterForNavigation<LitGenreViewRdlistUserControl, LitGenreViewRdlistViewModel>("LitGenreViewRdlistUserControl");
+            // According to requirements of the "LitGenreViewRdlistViewModel.cs"-file of "ModelServicesPrismModule"-project. 
+            containerRegistry.Register<UserControl, LitGenreViewRdlistUserControl>("LitGenreViewRdlistUserControl");
+            ...
+        }
+*/
+```
+
+## Modify main menu of MainWindowViewModel and run app
+- Step 1: Open "ViewModels\MainWindowViewModel.cs" file of "PrismTestApp" project and add "LitGenre RdList"-menu item.
+```java
+        IEnumerable<IWebServiceFilterMenuInterface> _MainMenu = new ObservableCollection<IWebServiceFilterMenuInterface>()
+        {
+            new WebServiceFilterMenuViewModel() { Id = "000", Caption="Home", IconName="Home",  IconColor="Primary", Data="HomeUserControl", Command=RoutedCommandExt.MainMenuCommand},
+            new WebServiceFilterMenuViewModel() { Id = "001", Caption="LitGenre Lform", IconName="TableRefresh",  IconColor="Primary", Data="LitGenreViewLformUserControl", Command=RoutedCommandExt.MainMenuCommand},
+            new WebServiceFilterMenuViewModel() { Id = "001", Caption="LitGenre RList", IconName="TableRefresh",  IconColor="Primary", Data="LitGenreViewRlistUserControl", Command=RoutedCommandExt.MainMenuCommand},
+            new WebServiceFilterMenuViewModel() { Id = "001", Caption="LitGenre RdList", IconName="TableRefresh",  IconColor="Primary", Data="LitGenreViewRdlistUserControl", Command=RoutedCommandExt.MainMenuCommand},
+        };
+```
+- Step 2: Rebuild "ModelServicesPrismModule" project, 
+- Step 3: Run DbWebApplication 
+- Step 4: Run PrismTestApp
+- Step 5: Click "LitGenre RList"-navigation menu. Select any row in the grid, click "DotsVertical"-button and choose "Add item"-menu item
+
+![picture](img/img02rm23.png)
+
+- Step 6: Make sure that add item dialog will be shown
+
+![picture](img/img02rm24.png)
+
+## Generating O2m Wpf User control for LitGenre
+
+Right click "Literature/LitGenre"-folder of the ModelInterfacesClassLibrary-project and choose "Wpf Form Wizard"-menu item.
+
+- Step 1: On the first page of the Wizard click "Next"-button. On the second page select "DbContextClassLibrary"-project and "LitDbContext"-DbContext. click "Next"-button.
+
+![picture](img/img02rm12.png)
+
+- Step 2: On the second page choose LitGenreView expand "UI list properties" and check "Shown"-checkboxes
+
+![picture](img/img02rm13.png)
+
+- Step 3: On the third page choose LitGenreView expand "UI Form properties", check "Shown"-checkboxes and set "Input types" as it is shown below. Click Next button.
+
+![picture](img/img02rm14.png)
+
+- Step 4: On the fourth page "batch processing"-button and "Batch actions"-dialog will be shown. Select "01700-O2m.json"-script and click "start"-button.
+
+![picture](img/img02rm25.png)
+
+- Step 5: Make sure that "Errors"-panel is empty.
+
+## Modify Prism IModule class for O2m
+- Step 1: Open "Literature\LitGenre\ViewModels\LitGenreViewO2mViewModel.cs" file of "ModelServicesPrismModule" project and follow the instructions
+```java
+/*
+    "LitGenreViewRdlistUserControl" UserControl is defined in the "ModelServicesPrismModule"-project.
+    In the file of IModule-class of "ModelServicesPrismModule"-project the following line of code must be inserted:
+
+        public void RegisterTypes(IContainerRegistry containerRegistry)
+        {
+            ...
+            // According to requirements of the "LitGenreViewO2mViewModel.cs"-file of "ModelServicesPrismModule"-project. 
+            ViewModelLocationProvider.Register<LitGenreViewO2mUserControl, LitGenreViewO2mViewModel>();
+            // According to requirements of the "LitGenreViewO2mViewModel.cs"-file of "ModelServicesPrismModule"-project. 
+            containerRegistry.Register<UserControl, LitGenreViewO2mUserControl>("LitGenreViewO2mUserControl");
+            // According to requirements of the "LitGenreViewO2mViewModel.cs"-file of "ModelServicesPrismModule"-project. 
+            containerRegistry.RegisterForNavigation<LitGenreViewO2mUserControl, LitGenreViewO2mViewModel>("LitGenreViewO2mUserControl");
+            ...
+        }
+*/
+```
+
+## Modify main menu of MainWindowViewModel and run app for O2m
+- Step 1: Open "ViewModels\MainWindowViewModel.cs" file of "PrismTestApp" project and add "LitGenre O2m"-menu item.
+```java
+        IEnumerable<IWebServiceFilterMenuInterface> _MainMenu = new ObservableCollection<IWebServiceFilterMenuInterface>()
+        {
+            new WebServiceFilterMenuViewModel() { Id = "000", Caption="Home", IconName="Home",  IconColor="Primary", Data="HomeUserControl", Command=RoutedCommandExt.MainMenuCommand},
+            new WebServiceFilterMenuViewModel() { Id = "001", Caption="LitGenre Lform", IconName="TableRefresh",  IconColor="Primary", Data="LitGenreViewLformUserControl", Command=RoutedCommandExt.MainMenuCommand},
+            new WebServiceFilterMenuViewModel() { Id = "001", Caption="LitGenre RList", IconName="TableRefresh",  IconColor="Primary", Data="LitGenreViewRlistUserControl", Command=RoutedCommandExt.MainMenuCommand},
+            new WebServiceFilterMenuViewModel() { Id = "001", Caption="LitGenre RdList", IconName="TableRefresh",  IconColor="Primary", Data="LitGenreViewRdlistUserControl", Command=RoutedCommandExt.MainMenuCommand},
+            new WebServiceFilterMenuViewModel() { Id = "001", Caption="LitGenre O2m", IconName="TableRefresh",  IconColor="Primary", Data="LitGenreViewO2mUserControl", Command=RoutedCommandExt.MainMenuCommand},
+        };
+```
+- Step 2: Rebuild "ModelServicesPrismModule" project, 
+- Step 3: Run DbWebApplication 
+- Step 4: Run PrismTestApp
+- Step 5: Click "LitGenre O2m"-navigation menu. 
+
+![picture](img/img02rm26.png)
+
+
+
+## Creating PrismModule project for Feature controls
+1. Under "ClientProjects/Models"-folder create "Prism module (Wpf)" project. Name the project FeatureServicesPrismModule.
+
+![picture](img/img00rm24.png) 
+
+2. In the FeatureServicesPrismModule-project delete "ViewModels" and "Views" folders.
+3. In the FeatureServicesPrismModuleModule.cs-file of FeatureServicesPrismModule-project remove "using FeatureServicesPrismModule.Views;"-line of code.
+4. Add references onto CommonInterfacesClassLibrary, CommonWpfCustomControlLibrary, CommonWpfUserControlLibrary,
+
+![picture](img/img02rm27.png) 
+
+5. Add "Literature\UserControls" folder under FeatureServicesPrismModule-project
+6. Add "Literature\ViewModels" folder under FeatureServicesPrismModule-project
+7. Modify App.config file of the PrismTestApp project as shown below
+```xml
+<?xml version="1.0" encoding="utf-8" ?>
+<configuration>
+  <configSections>
+    <section name="modules" type="Prism.Modularity.ModulesConfigurationSection, Prism.Wpf"/>
+  </configSections>
+  <modules>
+    <module assemblyFile="CommonServicesPrismModule.dll"
+            moduleType="CommonServicesPrismModule.CommonServicesPrismModuleModule, CommonServicesPrismModule, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"
+            moduleName="CommonServicesPrismModule" startupLoaded="true">
+      <dependencies>
+      </dependencies>
+    </module>
+    <module assemblyFile="ModelServicesPrismModule.dll"
+            moduleType="ModelServicesPrismModule.ModelServicesPrismModuleModule, ModelServicesPrismModule, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"
+            moduleName="ModelServicesPrismModule" startupLoaded="true">
+      <dependencies>
+        <dependency moduleName="CommonServicesPrismModule"/>
+      </dependencies>
+    </module>
+    <module assemblyFile="FeatureServicesPrismModule.dll"
+            moduleType="FeatureServicesPrismModule.FeatureServicesPrismModuleModule, FeatureServicesPrismModule, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"
+            moduleName="FeatureServicesPrismModule" startupLoaded="true">
+      <dependencies>
+        <dependency moduleName="CommonServicesPrismModule"/>
+        <dependency moduleName="ModelServicesPrismModule"/>
+      </dependencies>
+    </module>
+  </modules>
+</configuration>
+```
+
+## Creating Feature control for LitGenre
+
+1. Right click "Literature\UserControls" folder under FeatureServicesPrismModule-project and select Feature Wizard. On the First page click Next Button
+
+![picture](img/img02rm28.png) 
+
+2. On the second page select "DbContextClassLibrary"-project and "LitDbContext"-DbContext. click "Next"-button.
+
+![picture](img/img02rm29.png) 
+
+3. On the third page click "add"-button
+
+![picture](img/img02rm30.png) 
+
+4. In the dialog type "LitGenreFeature" name and check all four items in the list. Click "save"-button
+
+![picture](img/img02rm31.png) 
+
+5. On the third page select "LitGenreFeature" and click "Next"-button.
+
+![picture](img/img02rm32.png) 
+
+6. On the fourth page select "30100-FtrUserControl.xaml.cs" and click "Next"-button.
+
+![picture](img/img02rm33.png) 
+
+7. On the fifth page select "FtrUserControl.xaml.cs.t4" and click "Next"-button.
+
+![picture](img/img02rm34.png) 
+
+8. On the sixth page click "Save" and click "Next"-button.
+
+![picture](img/img02rm35.png) 
+
+9. For now you are on the third page again. Repeat Steps 5-8 for "30102-FtrUserControl.xaml"-type and "FtrUserControl.xaml.t4"-script
+
+10. Close the Wizard.
+11. Right click "Literature\ViewModels" folder under FeatureServicesPrismModule-project and select Feature Wizard. 
+12. Repeat steps 2-8 for "30104-FtrViewModel.cs"-type and "FtrViewModel.cs.t4"-script. (Do not create Feature again. Just select existing from the combo.)
+
+## Modify Prism IModule class for Feature
+- Step 1: Open "Literature\ViewModels\LitGenreFeatureFtrViewModel.cs" file of "FeatureServicesPrismModule" project and follow the instructions
+```java
+/*
+    "LitGenreFeatureFtrViewModel" UserControl is defined in the "FeatureServicesPrismModule"-project.
+    In the file of IModule-class of "FeatureServicesPrismModule"-project the following line of code must be inserted:
+
+        public void RegisterTypes(IContainerRegistry containerRegistry)
+        {
+            ...
+            // According to requirements of the "LitGenreFeatureFtrViewModel.cs"-file of "FeatureServicesPrismModule"-project. 
+            containerRegistry.RegisterForNavigation<LitGenreFeatureFtrUserControl, LitGenreFeatureFtrViewModel>("LitGenreFeatureFtrUserControl");
+            ...
+        }
+*/
+```
+## Modify main menu of MainWindowViewModel and run app for Feature
+- Step 1: Open "ViewModels\MainWindowViewModel.cs" file of "PrismTestApp" project and add "LitGenre Feature"-menu item.
+```java
+        IEnumerable<IWebServiceFilterMenuInterface> _MainMenu = new ObservableCollection<IWebServiceFilterMenuInterface>()
+        {
+            new WebServiceFilterMenuViewModel() { Id = "000", Caption="Home", IconName="Home",  IconColor="Primary", Data="HomeUserControl", Command=RoutedCommandExt.MainMenuCommand},
+            new WebServiceFilterMenuViewModel() { Id = "001", Caption="LitGenre Lform", IconName="TableRefresh",  IconColor="Primary", Data="LitGenreViewLformUserControl", Command=RoutedCommandExt.MainMenuCommand},
+            new WebServiceFilterMenuViewModel() { Id = "001", Caption="LitGenre RList", IconName="TableRefresh",  IconColor="Primary", Data="LitGenreViewRlistUserControl", Command=RoutedCommandExt.MainMenuCommand},
+            new WebServiceFilterMenuViewModel() { Id = "001", Caption="LitGenre RdList", IconName="TableRefresh",  IconColor="Primary", Data="LitGenreViewRdlistUserControl", Command=RoutedCommandExt.MainMenuCommand},
+            new WebServiceFilterMenuViewModel() { Id = "001", Caption="LitGenre O2m", IconName="TableRefresh",  IconColor="Primary", Data="LitGenreViewO2mUserControl", Command=RoutedCommandExt.MainMenuCommand},
+            new WebServiceFilterMenuViewModel() { Id = "001", Caption="LitGenre Feature", IconName="TableRefresh",  IconColor="Primary", Data="LitGenreFeatureFtrUserControl", Command=RoutedCommandExt.MainMenuCommand},
+        };
+```
+- Step 2: Rebuild "FeatureServicesPrismModule" project, 
+- Step 3: Run DbWebApplication 
+- Step 4: Run PrismTestApp
+- Step 5: Click "LitGenre Feature"-navigation menu. Note, it is possible to expand and collapce any child window.
+
+![picture](img/img02rm36.png)
+
+

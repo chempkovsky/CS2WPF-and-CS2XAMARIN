@@ -282,22 +282,6 @@ using <#= ns #>;
         }
 #>
 
-    "<#= O2mUserControlClassName #>" UserControl is defined in the "<#= O2mUserControlProject #>"-project.
-    In the file of IModule-class of "<#= O2mUserControlProject #>"-project the following line of code must be inserted:
-
-        public void OnInitialized(IContainerProvider containerProvider)
-        {
-            ...
-            IRegionManager regionManager = containerProvider.Resolve(typeof(IRegionManager)) as IRegionManager;
-            if (regionManager != null)
-            {
-                ...
-                // According to requirements of the "<#= O2mViewModelClassName #>.cs"-file of "<#= O2mUserControlProject #>"-project. 
-                regionManager.RegisterViewWithRegion("<#= O2mUserControlClassName #><#= RegionPropertyName #>", typeof(<#= O2mUserControlClassName #>));
-                ...
-            }
-            ...
-        }
 
     "<#= O2mUserControlClassName #>" UserControl is defined in the "<#= O2mUserControlProject #>"-project.
     In the file of IModule-class of "<#= O2mUserControlProject #>"-project the following line of code must be inserted:
@@ -309,6 +293,8 @@ using <#= ns #>;
             ViewModelLocationProvider.Register<<#= O2mUserControlClassName #>, <#= O2mViewModelClassName #>>();
             // According to requirements of the "<#= O2mViewModelClassName #>.cs"-file of "<#= O2mUserControlProject #>"-project. 
             containerRegistry.Register<UserControl, <#= O2mUserControlClassName #>>("<#= O2mUserControlClassName #>");
+            // According to requirements of the "<#= O2mViewModelClassName #>.cs"-file of "<#= O2mUserControlProject #>"-project. 
+            containerRegistry.RegisterForNavigation<<#= O2mUserControlClassName #>, <#= O2mViewModelClassName #>>("<#= O2mUserControlClassName #>");
             ...
         }
 
@@ -1007,9 +993,6 @@ namespace <#= O2mViewModelNameSpace #> {
     }
     string GetModelName(ModelViewSerializable model) {
         return FirstLetterToUpper(model.ViewName);
-    }
-    string GetFilterName(ModelViewSerializable model) {
-        return GetModelName(model) + "Filter";
     }
 
     string GetModelNameSpace(ModelViewSerializable model, string fileType) {
