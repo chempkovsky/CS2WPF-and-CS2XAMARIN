@@ -966,7 +966,8 @@ namespace CS2WPF.ViewModel
             SelectedTreeViewItem = null;
             ModelViews.Clear();
             if (SerializableDbContext == null) return;
-            if ((SerializableDbContext.ModelViews == null) && IsWebServiceEditable) return;
+            // if ((SerializableDbContext.ModelViews == null) && IsWebServiceEditable) return;
+            if (SerializableDbContext.ModelViews == null) return;
 
             if ((SerializableDbContext.ModelViews.Count < 1) && IsWebServiceEditable) return;
 
