@@ -64,6 +64,7 @@
 #### [Creating PrismModule project for Feature  controls](#Creating-PrismModule-project-for-Feature-controls)
 #### [Modify Prism IModule class for  Feature](#Modify-Prism-IModule-class-for-Feature)
 #### [Modify main menu of MainWindowViewModel and run app for  Feature](#Modify-main-menu-of-MainWindowViewModel-and-run-app-for-Feature)
+#### [Note about  Authorization](#Note-about-Authorization)
 
 ## Programming tools used to start the development process
 ### The following Programming tools must be used to begin development:
@@ -1524,3 +1525,66 @@ Right click "Literature/LitGenre"-folder of the ModelInterfacesClassLibrary-proj
 ![picture](img/img02rm36.png)
 
 
+## Note about Authorization
+- Authorization is turned off by default. 
+Open AppGlblSettingsService.cs-file of the CommonServicesPrismModule-project and go to GetViewModelMask() and GetDashBrdMask()-methods. The first line of code turns off the Authorization. 
+```java
+        public int GetViewModelMask(string vwModel) {
+            return 15; // delete this line when vwModels is ready
+            if (Permissions == null) return 0;
+            int pk = 0;
+            if (!Views.TryGetValue(vwModel, out pk)) return 0;
+            int rid = pk / 7;
+            if (rid >= (Permissions.Count() - 3)) return 0;
+            int sft = (pk - rid * 7) * 4;
+            int  rslt = Permissions[rid];
+            if (sft > 0)
+            {
+                rslt >>= sft;
+            }
+            return rslt;
+        }
+        public int GetDashBrdMask(string dshBrd)
+        {
+            return 1; // delete this line when dshBrds is ready
+            if (Dashboards == null) return 0;
+            int pk = 0;
+            if (!Dashboards.TryGetValue(dshBrd, out pk)) return 0;
+            int rid = pk / 31;
+            if (rid >= (Permissions.Count() - 14)) return 0;
+            int sft = (pk - rid * 31);
+            int rslt = Permissions[rid + 14];
+            if (sft > 0)
+            {
+                rslt >>= sft;
+            }
+            return rslt;
+        }
+```
+But to remove the first line in both methods is not enough. 
+At first, "Views" and "Dashboards" variables must be correctly defined in the same AppGlblSettingsService.cs-file of the CommonServicesPrismModule-project. The definition of htese two variables must be the same as in the database security tables.
+```java
+        Dictionary<string, int> Views = new Dictionary<string, int>()
+        {
+            { "LitAuthorView", 0 },
+            { "LitBookView", 1 },
+        };
+        Dictionary<string, int> Dashboards = new Dictionary<string, int>()
+        {
+            { "ManuscriptDFeatureFtrComponent", 0 },
+            { "ManuscriptRFeatureFtrComponent", 1 },
+        };
+```
+At second, AppGlblSettingsService.cs-file defines _Permissions-variable.
+Right after login the _Permissions-variable must be redefined with a permission bitmask for the given user.  
+The "AspnetusermaskViewServicePermission.getcurrusermasks()"-must be called to obtain "Permissions"-vector for the given user.
+Again, immediately after logging out of the system, the Permissions variable should be reset to its original state.
+```java
+        int[] _Permissions = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+```
+        
+Information about how to generate and setup Authorization for the server and client part of the app will be described in the Wiki of CS2WPF-project.
+
+Note 1: the developer should not manually populate datd for Views and Dashboards vars. There is a special generator scripts for SQL-code (to populate Database tables) and C# code to be inserted in AppGlblSettingsService.cs-file. 
+
+Note 2: It is not a good idea to hardcodde Views and Dashboards vars . Instead, OnLoaded()-method of MainWindowViewModel.cs file must be used to get data from the app settings file (it is one of the solution).
