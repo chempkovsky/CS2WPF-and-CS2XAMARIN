@@ -66,10 +66,10 @@ using System.Threading.Tasks;
     string LformViewModelNameSpace          = GetModelNameSpace(Model, LformViewModelFolder);
 
 
-    string O2mUserControlFolder             = "01696-O2mUserControl.xaml.cs";
-    string O2mUserControlClassName          = GetModelClassName(Model, O2mUserControlFolder);
-    string O2mUserControlNameSpace          = GetModelNameSpace(Model, O2mUserControlFolder);
-    string O2mUserControlProject            = GetModelProjectName(Model, O2mUserControlFolder);
+    string O2mMaskUserControlFolder         = "02120-O2mMaskUserControl.xaml.cs";
+    string O2mMaskUserControlClassName      = GetModelClassName(Model, O2mMaskUserControlFolder);
+    string O2mMaskUserControlNameSpace      = GetModelNameSpace(Model, O2mMaskUserControlFolder);
+    string O2mMaskUserControlProject        = GetModelProjectName(Model, O2mMaskUserControlFolder);
 
     string O2mMaskViewModelFolder           = "02124-O2mMaskViewModel.cs";
     string O2mMaskViewModelClassName        = GetModelClassName(Model, O2mMaskViewModelFolder);
@@ -274,8 +274,9 @@ using <#= ns #>;
 /*
 
 <#
-    if (LformUserControlProject != O2mUserControlProject) {
+    if (LformUserControlProject != O2mMaskUserControlProject) {
 #>
+
     "<#= LformUserControlClassName #>" UserControl is defined in the "<#= LformUserControlProject #>"-project.
     In the file of IModule-class of "<#= LformUserControlProject #>"-project the following line of code must be inserted:
 
@@ -286,7 +287,7 @@ using <#= ns #>;
             if (regionManager != null)
             {
                 ...
-                // According to requirements of the "<#= O2mMaskViewModelClassName #>.cs"-file of "<#= O2mUserControlProject #>"-project. 
+                // According to requirements of the "<#= O2mMaskViewModelClassName #>.cs"-file of "<#= O2mMaskUserControlProject #>"-project. 
                 regionManager.RegisterViewWithRegion("<#= LformUserControlClassName #><#= MasterRegionPropertyName #>", typeof(<#= LformUserControlClassName #>));
                 ...
             }
@@ -297,7 +298,7 @@ using <#= ns #>;
 #>
 
 <#
-    if (EformUserControlProject != O2mUserControlProject) {
+    if (EformUserControlProject != O2mMaskUserControlProject) {
 #>
     "<#= EformUserControlClassName #>" UserControl is defined in the "<#= EformUserControlProject #>"-project.
     In the file of IModule-class of "<#= EformUserControlProject #>"-project the following line of code must be inserted:
@@ -309,7 +310,7 @@ using <#= ns #>;
             if (regionManager != null)
             {
                 ...
-                // According to requirements of the "<#= O2mMaskViewModelClassName #>.cs"-file of "<#= O2mUserControlProject #>"-project. 
+                // According to requirements of the "<#= O2mMaskViewModelClassName #>.cs"-file of "<#= O2mMaskUserControlProject #>"-project. 
                 regionManager.RegisterViewWithRegion("<#= EformUserControlClassName #><#= DetailRegionPropertyName #>", typeof(<#= EformUserControlClassName #>));
                 ...
             }
@@ -320,7 +321,7 @@ using <#= ns #>;
 #>
 
 <#
-    if (CheckedModelUserControlProject != O2mUserControlProject) {
+    if (CheckedModelUserControlProject != O2mMaskUserControlProject) {
 #>
     "<#= CheckedModelUserControlClassName #>" UserControl is defined in the "<#= CheckedModelUserControlProject #>"-project.
     In the file of IModule-class of "<#= CheckedModelUserControlProject #>"-project the following line of code must be inserted:
@@ -332,7 +333,7 @@ using <#= ns #>;
             if (regionManager != null)
             {
                 ...
-                // According to requirements of the "<#= O2mMaskViewModelClassName #>.cs"-file of "<#= O2mUserControlProject #>"-project. 
+                // According to requirements of the "<#= O2mMaskViewModelClassName #>.cs"-file of "<#= O2mMaskUserControlProject #>"-project. 
                 regionManager.RegisterViewWithRegion("<#= CheckedModelUserControlClassName #><#= DetailRegionPropertyName #>", typeof(<#= CheckedModelUserControlClassName #>));
                 ...
             }
@@ -343,7 +344,7 @@ using <#= ns #>;
 #>
 
 <#
-    if (DshCheckedModelUserControlProject != O2mUserControlProject) {
+    if (DshCheckedModelUserControlProject != O2mMaskUserControlProject) {
 #>
     "<#= DshCheckedModelUserControlClassName #>" UserControl is defined in the "<#= DshCheckedModelUserControlProject #>"-project.
     In the file of IModule-class of "<#= DshCheckedModelUserControlProject #>"-project the following line of code must be inserted:
@@ -355,7 +356,7 @@ using <#= ns #>;
             if (regionManager != null)
             {
                 ...
-                // According to requirements of the "<#= O2mMaskViewModelClassName #>.cs"-file of "<#= O2mUserControlProject #>"-project. 
+                // According to requirements of the "<#= O2mMaskViewModelClassName #>.cs"-file of "<#= O2mMaskUserControlProject #>"-project. 
                 regionManager.RegisterViewWithRegion("<#= DshCheckedModelUserControlClassName #><#= DetailRegionPropertyName #>", typeof(<#= DshCheckedModelUserControlClassName #>));
                 ...
             }
@@ -365,34 +366,16 @@ using <#= ns #>;
     }
 #>
 
-
-    "<#= O2mUserControlClassName #>" UserControl is defined in the "<#= O2mUserControlProject #>"-project.
-    In the file of IModule-class of "<#= O2mUserControlProject #>"-project the following line of code must be inserted:
-
-        public void OnInitialized(IContainerProvider containerProvider)
-        {
-            ...
-            IRegionManager regionManager = containerProvider.Resolve(typeof(IRegionManager)) as IRegionManager;
-            if (regionManager != null)
-            {
-                ...
-                // According to requirements of the "<#= O2mMaskViewModelClassName #>.cs"-file of "<#= O2mUserControlProject #>"-project. 
-                regionManager.RegisterViewWithRegion("<#= O2mUserControlClassName #><#= RegionPropertyName #>", typeof(<#= O2mUserControlClassName #>));
-                ...
-            }
-            ...
-        }
-
-    "<#= O2mUserControlClassName #>" UserControl is defined in the "<#= O2mUserControlProject #>"-project.
-    In the file of IModule-class of "<#= O2mUserControlProject #>"-project the following line of code must be inserted:
+    "<#= O2mMaskUserControlClassName #>" UserControl is defined in the "<#= O2mMaskUserControlProject #>"-project.
+    In the file of IModule-class of "<#= O2mMaskUserControlProject #>"-project the following line of code must be inserted:
 
         public void RegisterTypes(IContainerRegistry containerRegistry)
         {
             ...
-            // According to requirements of the "<#= O2mMaskViewModelClassName #>.cs"-file of "<#= O2mUserControlProject #>"-project. 
-            ViewModelLocationProvider.Register<<#= O2mUserControlClassName #>, <#= O2mMaskViewModelClassName #>>();
-            // According to requirements of the "<#= O2mMaskViewModelClassName #>.cs"-file of "<#= O2mUserControlProject #>"-project. 
-            containerRegistry.Register<UserControl, <#= O2mUserControlClassName #>>("<#= O2mUserControlClassName #>");
+            // According to requirements of the "<#= O2mMaskViewModelClassName #>.cs"-file of "<#= O2mMaskUserControlProject #>"-project. 
+            ViewModelLocationProvider.Register<<#= O2mMaskUserControlClassName #>, <#= O2mMaskViewModelClassName #>>();
+            // According to requirements of the "<#= O2mMaskViewModelClassName #>.cs"-file of "<#= O2mMaskUserControlProject #>"-project. 
+            containerRegistry.Register<UserControl, <#= O2mMaskUserControlClassName #>>("<#= O2mMaskUserControlClassName #>");
             ...
         }
 

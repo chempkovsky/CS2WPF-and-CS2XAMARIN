@@ -65,6 +65,24 @@
 #### [Modify Prism IModule class for  Feature](#Modify-Prism-IModule-class-for-Feature)
 #### [Modify main menu of MainWindowViewModel and run app for  Feature](#Modify-main-menu-of-MainWindowViewModel-and-run-app-for-Feature)
 #### [Note about  Authorization](#Note-about-Authorization)
+#### [Steps of adding Authorization to the  application](#Steps-of-adding-Authorization-to-the-application)
+#### [Creating folders for Authorization  files](#Creating-folders-for-Authorization-files)
+#### [Creating Entities for  Authorization](#Creating-Entities-for-Authorization)
+#### [Creating Developer Edition of DbContext for  Authorization](#Creating-Developer-Edition-of-DbContext-for-Authorization)
+#### [Creating Views for  Authorization](#Creating-Views-for-Authorization)
+#### [Creating Production Edition of DbContext for  Authorization](#Creating-Production-Edition-of-DbContext-for-Authorization)
+#### [Adding ApplicationRoleManager for  Authorization](#Adding-ApplicationRoleManager-for-Authorization)
+#### [Creating OwinContext for  ApplicationRoleManager](#Creating-OwinContext-for-ApplicationRoleManager)
+#### [Creating WebApi services for  Authorization](#Creating-WebApi-services-for-Authorization)
+#### [Creating tables for  Authorization](#Creating-tables-for-Authorization)
+#### [Creating client interfaces for  Authorization](#Creating-client-interfaces-for-Authorization)
+#### [Creating client Views for  Authorization](#Creating-client-Views-for-Authorization)
+#### [Import Common staff and creating client Services for  Authorization](#Import-Common-staff-and-creating-client-Services-for-Authorization)
+#### [Creating Sforms for  Authorization](#Creating-Sforms-for-Authorization)
+#### [Creating Eforms for  Authorization](#Creating-Eforms-for-Authorization)
+#### [Creating Lforms for  Authorization](#Creating-Lforms-for-Authorization)
+#### [Creating O2m for  Authorization](#Creating-O2m-for-Authorization)
+#### [Creating Feature for  Authorization](#Creating-Feature-for-Authorization)
 
 ## Programming tools used to start the development process
 ### The following Programming tools must be used to begin development:
@@ -263,9 +281,9 @@
 
 ![picture](img/img00rm29.png) 
 
-48. For the CommonInterfacesClassLibrary add reference onto Newtonsoft.json NuGet package
+48. For the CommonInterfacesClassLibrary add reference onto Newtonsoft.json NuGet package and reference onto "System.ComponentModel.DataAnnotations"
 49. For the ModelInterfacesClassLibrary add reference onto Newtonsoft.json NuGet package, add reference onto "PresentationCore" and "System.ComponentModel.DataAnnotations"
-50. For the CommonServicesPrismModule add reference onto Newtonsoft.json NuGet package
+50. For the CommonServicesPrismModule add reference onto Newtonsoft.json NuGet package and reference onto "System.ComponentModel.DataAnnotations"
 
 ## NuGet packages of the back end projects
 51. For the DbEntitiesClassLibrary add references onto "System.ComponentModel.DataAnnotations"
@@ -1588,3 +1606,365 @@ Information about how to generate and setup Authorization for the server and cli
 Note 1: the developer should not manually populate datd for Views and Dashboards vars. There is a special generator scripts for SQL-code (to populate Database tables) and C# code to be inserted in AppGlblSettingsService.cs-file. 
 
 Note 2: It is not a good idea to hardcodde Views and Dashboards vars . Instead, OnLoaded()-method of MainWindowViewModel.cs file must be used to get data from the app settings file (it is one of the solution).
+
+## Steps of adding Authorization to the application
+The steps are the same as for adding regular Entities, Views, WebApi Services, user interface and Features using CS2WPF. 
+An insignificant difference is that some WebApi services and some Entities have already been implemented in AspNet WebApi application. For instance, individual AspNet security includes Users and Roles.
+CS2WPF includes generator scripts to create predefined Entities, Dbcontext. The developer does not need to manually define "UIforms" and "UIlists", but rather import the definition from a custom json file.
+
+### Here's how to find such a json file.
+At first, we have to find the folder of installed CS2WPF files. To do this run File explorer and type "%appdata%" and press Enter.
+
+![picture](img/img03rm01.png)
+
+Then go to "%appdata%\local"
+
+![picture](img/img03rm02.png)
+
+At the end open the folder "%appdata%\Local\Microsoft\VisualStudio\XXX\Extensions\YYY", where "XXX" and "YYY" are the names that were defined during the CS2WPF installation and may differ from those shown in the figure below. This is the folder where CS2WPF was installed.
+
+![picture](img/img03rm03.png)
+
+Inside the folder where CS2WPF  was installed open "Templates\ContextsToImport"-folder and copy "aspnetchckdbcontext.json"-file. Paste "aspnetchckdbcontext.json"-file to your desktop or another place, which will then be easy to navigate. "aspnetchckdbcontext.json"-file will be used to import View definitions.
+
+![picture](img/img03rm04.png)
+
+## Creating folders for Authorization files
+We continue with a projects created above. Of course, you can name the projects as you like. It doesn't matter what the projects are named, the CS2WPF generators will work correctly. 
+
+Create "AspNetMaskSecurity" subfolder inside DbContextClassLibrary, DbEntitiesClassLibrary, DbModelsClassLibrary projects. (Again, you can name subfolder as you like.)
+
+![picture](img/img03rm05.png)
+
+## Creating Entities for Authorization
+- Step 1: Right click "AspNetMaskSecurity"-folder of DbEntitiesClassLibrary-project and select "Wpf form Wizard". 
+
+![picture](img/img03rm06.png)
+
+- Step 2: On the first page (invitation page) click "next"-button.
+- Step 3: On the second page, select "DbContextClassLibrary"-project and "LitDbcontext"-Dbccontext and click next.
+
+![picture](img/img03rm07.png)
+
+- Step 4: On the third page, select "==Context==" and click "Next"-button
+
+![picture](img/img03rm08.png)
+
+- Step 5: On the fourth page, click "patch processing"-button. "Batch action" dialog will be shown.
+
+![picture](img/img03rm09.png)
+
+- Step 6: In "Batch action" dialog, select "00140-AspNetEntities.json"-script and click start-button. Make sure that "Errors"-panel is empty and close the Wizard.
+
+## Creating Developer Edition of DbContext for Authorization
+- Step 1: Right click "AspNetMaskSecurity"-folder of DbContextClassLibrary-project and select "Wpf form Wizard". 
+- Repeat steps 2-5 of the [Creating Entities for  Authorization](#Creating-Entities-for-Authorization) paragraph
+- Step 6: In "Batch action" dialog, select "00150-AspNetDbContextDev.json"-script and click start-button. Make sure that "Errors"-panel is empty and close the Wizard.
+
+## Creating Views for Authorization
+Note: The creation order of Views is important. Master entities first:
+1. aspnetdashboard
+2. aspnetmodel
+3. aspnetrole [dummy(mock) class]
+4. aspnetuser [dummy(mock) class]
+5. aspnetrolemask
+6. aspnetusermask [dummy(mock) class]
+7. aspnetuserroles [dummy(mock) class]
+
+- Step 1: Right click "AspNetMaskSecurity"-folder of DbModelsClassLibrary-project and select "ViewModelViews Wizard". 
+
+![picture](img/img03rm10.png)
+
+- Step 2: On the first page (invitation page) click "next"-button.
+- Step 3: On the second page, select "DbContextClassLibrary"-project and "aspnetchckdbcontext"-Dbccontext and click next.
+
+![picture](img/img03rm11.png)
+
+- Step 4: On the third page, select "DbEntitiesClassLibrary"-project and "aspnetdashboard"-entity and click "Next"-button
+
+![picture](img/img03rm12.png)
+
+- Step 5: On the fifth page, click "Import"-button. "File open" dialog will be shown. Select the "aspnetchckdbcontext.json". 
+How to find aspnetchckdbcontext.json-file was described in ["Steps of adding Authorization to the  application"](#Steps-of-adding-Authorization-to-the-application)-paragraph.
+
+![picture](img/img03rm13.png)
+
+- Step 6: On the same fifth page, select "aspnetdashboardView", check "Select View" and click "Next"-button.
+
+![picture](img/img03rm14.png)
+
+- Step 7: On the sixth page, expand "Properties"-node to make sure that all setting are the same as it is shown below. Click "next"-button.
+
+![picture](img/img03rm15.png)
+
+- Step 8: On the seventh page, select "ViewModel.cs.t4"-script and click "Next"-button.
+
+![picture](img/img03rm16.png)
+
+- Step 8: On the eighth page, click "Save"-button and then click "Next"-button.
+- Step 9: On the nineth page, select "ViewModelPage.cs.t4"-script and click "Next"-button.
+
+![picture](img/img03rm17.png)
+
+- Step 10: On the tenth page, click "Save"-button. Two new files have been created for the DbModelsClassLibrary-project. DO NOT CLOSE THE WIZARD. Click "Next"-button.
+
+![picture](img/img03rm18.png)
+
+- Step 11: We are on the third page again. select "DbEntitiesClassLibrary"-project and "aspnetmodel"-entity and click "Next"-button.
+- Step 12: Repeat steps 5-11 for the "aspnetmodel"-entity. Two new files have been created for the DbModelsClassLibrary-project. DO NOT CLOSE THE WIZARD. Click "Next"-button.
+- Step 13: We are on the third page again. select "DbEntitiesClassLibrary"-project and "aspnetrole"-entity and click "Next"-button.
+- Step 14: Repeat steps 5-11 for the "aspnetrole"-entity. Two new files have been created for the DbModelsClassLibrary-project. DO NOT CLOSE THE WIZARD. Click "Next"-button.
+- Step 15: We are on the third page again. select "DbEntitiesClassLibrary"-project and "aspnetuser"-entity and click "Next"-button.
+- Step 16: Repeat steps 5-11 for the "aspnetuser"-entity. Two new files have been created for the DbModelsClassLibrary-project. DO NOT CLOSE THE WIZARD. Click "Next"-button.
+- Step 17: We are on the third page again. select "DbEntitiesClassLibrary"-project and "aspnetrolemask"-entity and click "Next"-button.
+- Step 18: Repeat steps 5-11 for the "aspnetrolemask"-entity. Two new files have been created for the DbModelsClassLibrary-project. DO NOT CLOSE THE WIZARD. Click "Next"-button.
+- Step 19: We are on the third page again. select "DbEntitiesClassLibrary"-project and "aspnetusermask"-entity and click "Next"-button.
+- Step 20: Repeat steps 5-11 for the "aspnetusermask"-entity. Two new files have been created for the DbModelsClassLibrary-project. DO NOT CLOSE THE WIZARD. Click "Next"-button.
+- Step 21: We are on the third page again. select "DbEntitiesClassLibrary"-project and "aspnetuserroles"-entity and click "Next"-button.
+- Step 22: Repeat steps 5-11 for the "aspnetuserroles"-entity. Two new files have been created for the DbModelsClassLibrary-project. CLOSE THE WIZARD.
+
+## Creating Production Edition of DbContext for Authorization
+Note: The developper edition is required ONLY for generating Views. After the Views are ready the developer should generate production Edition. The production Edition does not include roles, users entities, since they have already been created under AspNet WebApi application.
+- Step 1: Right click "AspNetMaskSecurity"-folder of DbContextClassLibrary-project and select "Wpf form Wizard". 
+- Repeat steps 2-5 of the [Creating Entities for  Authorization](#Creating-Entities-for-Authorization) paragraph
+- Step 6: In "Batch action" dialog, select "00160-AspNetDbContextProd.json"-script and click start-button. Make sure that "Errors"-panel is empty and close the Wizard.
+
+## Adding ApplicationRoleManager for Authorization
+Open the "App_Start\IdentityConfig.cs"-file of DbWebApplication-project. Insert the code below right after definition of the "ApplicationUserManager"-class:
+
+```java
+public class ApplicationRoleManager : RoleManager<IdentityRole>
+{
+        public ApplicationRoleManager(IRoleStore<IdentityRole, string> roleStore) : base(roleStore)
+        {
+        }
+
+        public static ApplicationRoleManager Create(IdentityFactoryOptions<ApplicationRoleManager> options, IOwinContext context)
+        {
+        ///It is based on the same context as the ApplicationUserManager
+            var appRoleManager = 
+                new ApplicationRoleManager(new RoleStore<IdentityRole> (context.Get<ApplicationDbContext> ()));
+            return appRoleManager;
+        }
+}
+```
+
+## Creating OwinContext for ApplicationRoleManager 
+Open the "App_Start\Startup.Auth.cs"-file of DbWebApplication-project. Go to "ConfigureAuth(IAppBuilder app)"-method and insert the line of code as it is shown below:
+```java
+        public void ConfigureAuth(IAppBuilder app)
+        {
+            // Configure the db context and user manager to use a single instance per request
+            app.CreatePerOwinContext(ApplicationDbContext.Create);
+            app.CreatePerOwinContext<ApplicationUserManager>(ApplicationUserManager.Create);
+            ////// begin insertion
+            app.CreatePerOwinContext<ApplicationRoleManager>(ApplicationRoleManager.Create);
+            ////// end insertion
+```
+
+## Creating WebApi services for Authorization
+Note: The developer does not need to generate WebApi services for each Authorization entity. This is because some of these services are already included as part of the Asp Net application.
+- Step 1: Right Click Controllers-folder of the DbWebApplication-project and select "WebApiService Wizard".
+
+![picture](img/img03rm19.png)
+
+- Step 2: On the first (invitation) page click "Next"-button
+- Step 3: On the second page, select "DbContextClassLibrary"-project and "aspnetchckdbcontext"-Dbccontext and click next.
+
+![picture](img/img03rm11.png)
+
+- Step 4: On the third page, select "aspnetdashboardView". Expand "Properties"-node to make sure that all settings are the same as it is shown below. 
+The settings for the Web Api service were imported when the developer imported the definitions for the views. (See [Creating Views for  Authorization](#Creating-Views-for-Authorization)). Click "Next"-button.
+
+![picture](img/img03rm20.png)
+
+- Step 5: On the fourth page, select "DefaultWebApiService.cs.t4"-script and click "Next"-button
+
+![picture](img/img03rm21.png)
+
+- Step 6: On the fifth page, click "save"-button. DO NOT CLOSE THE WIZARD. Click "Next"-button.
+- Step 7: We are on the third page again. select "aspnetmodelView" and repeat steps 5-6. DO NOT CLOSE THE WIZARD. Click "Next"-button.
+- Step 8: We are on the third page again. select "aspnetrolemaskView" and repeat steps 5-6. DO NOT CLOSE THE WIZARD. Click "Next"-button.
+- Step 9: We are on the third page again. select "aspnetroleView" and repeat steps 5-6.  IMPORTANT: select "WebApiAspNetRoleService.cs.t4" in step 5. DO NOT CLOSE THE WIZARD. Click "Next"-button.
+- Step 10: We are on the third page again. select "aspnetuserView" and repeat steps 5-6.  IMPORTANT: select "WebApiAspNetUserService.cs.t4" in step 5. DO NOT CLOSE THE WIZARD. Click "Next"-button.
+- Step 11: We are on the third page again. select "aspnetuserrolesView" and repeat steps 5-6.  IMPORTANT: select "WebApiAspNetUserRoles.cs.t4" in step 5. DO NOT CLOSE THE WIZARD. Click "Next"-button.
+- Step 12: We are on the third page again. select "aspnetusermaskView" and repeat steps 5-6.  IMPORTANT: select "WebApiAspNetUserMasksService.cs.t4" in step 5. CLOSE THE WIZARD.
+
+Note: Compile DbWebApplication-project and add "using"-operator to some of the generated files. Errors of compiler output give the hints.
+
+## Creating tables for Authorization
+Under [Creating LiteratureTest Database on the server  side](#Creating-LiteratureTest-Database-on-the-server-side) we created small console app.
+- Step 1: Add "DefaultConnection" to the "App.config"-file of the console app. Just copy it from Web.config-file of DbWebApplication.
+```xml
+...
+  <configSections>
+        <!-- For more information on Entity Framework configuration, visit http://go.microsoft.com/fwlink/?LinkID=237468 -->
+        <section name="entityFramework"
+          type="System.Data.Entity.Internal.ConfigFile.EntityFrameworkSection, EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+          requirePermission="false"/>
+  </configSections>
+...  
+  <connectionStrings>
+    <add name="LiteratureTestConnection"
+        connectionString="Data Source=SVR2016SQL2017;Initial Catalog=LiteratureTestCatalog;Persist Security Info=True;User ID=sa;Password=sa_PASSWORD_HERE"
+        providerName="System.Data.SqlClient" />
+    <add name="DefaultConnection" 
+        connectionString="Data Source=SVR2016SQL2017;Initial Catalog=AspNetDbWebApplicationSecurity;Persist Security Info=True;User ID=sa;Password=sa_PASSWORD_HERE" 
+        providerName="System.Data.SqlClient" />
+  </connectionStrings>
+...  
+  <startup> 
+        <supportedRuntime version="v4.0" sku=".NETFramework,Version=v4.7.2"/>
+    </startup>
+    <entityFramework>
+        <providers>
+            <provider invariantName="System.Data.SqlClient" type="System.Data.Entity.SqlServer.SqlProviderServices, EntityFramework.SqlServer"/>
+        </providers>
+    </entityFramework>
+...  
+```
+- step 2: In the main method of the Console application write the code as below
+
+        static void Main(string[] args)
+        {
+            Database.SetInitializer(new DropCreateDatabaseAlways<LitDbContext>());
+            aspnetchckdbcontext db = new aspnetchckdbcontext();
+            db.aspnetmodellDbSet.FirstOrDefault();
+            Database.SetInitializer(new CreateDatabaseIfNotExists<LitDbContext>());
+        }
+- step 3: Save, build and run Console application.
+- step 4: Open MS SQL Management studion and check that three tables have been added to "AspNetDbWebApplicationSecurity"-database:
+    - dbo.aspnetdashboards
+    - dbo.aspnetmodels
+    - dbo.aspnetrolemasks
+
+![picture](img/img03rm22.png)
+
+## Creating client interfaces for Authorization
+- Step 1: Create "Interfaces\asp"-folder under "CommonInterfacesClassLibrary"-project.
+- Step 2: Right click "Interfaces\asp"-folder of "CommonInterfacesClassLibrary"-project and select "Wpf form Wizard"-menu item.
+- Step 3: On the first page click "Next"-button
+- Step 4: On the second page, select "DbContextClassLibrary"-project and "aspnetchckdbcontext"-Dbccontext and click next.
+- Step 5: On the third page, select "aspnetdashboardView" and click next.
+- Step 6: On the fourth page, click "batch processing".
+- Step 7:
+    - Select "14210-AspNetAllInterfacesBatch.json"-item
+    - Click "Start"-button
+    - After generation finished make sure that "Error"-panel is empty
+    - Close Wizard's dialogs
+    - Rebuild "CommonInterfacesClassLibrary"-project
+
+## Creating client Views for Authorization
+- Step 1: Right click root node of "CommonServicesPrismModule"-project and select "Wpf form Wizard"-menu item.
+- Step 2: On the first page click "Next"-button
+- Step 3: On the second page, select "DbContextClassLibrary"-project and "aspnetchckdbcontext"-Dbccontext and click next.
+- Step 4: On the third page, select "aspnetdashboardView" and click next.
+- Step 5: On the fourth page, click "batch processing".
+- Step 6:
+    - Select "14220-AspNetAllModelsBatch.json"-item
+    - Click "Start"-button
+    - After generation finished make sure that "Error"-panel is empty
+    - Close Wizard's dialogs
+    - Rebuild "CommonServicesPrismModule"-project
+
+## Import Common staff and creating client Services for Authorization
+- Step 1: Right click root node of "CommonServicesPrismModule"-project and select "Wpf form Wizard"-menu item.
+- Step 2: On the first page click "Next"-button
+- Step 3: On the second page, select "DbContextClassLibrary"-project and "aspnetchckdbcontext"-Dbccontext and click next.
+- Step 4: On the third page, select "aspnetdashboardView" and click next.
+- Step 5: On the fourth page, click "Import common staff"-button.
+- Step 6: With "Open file dialog" select "DbContextClassLibrary.DbContextClassLibrary.csproj.DbContextClassLibrary.Literature.LitDbContext.json".
+- Step 7: On the fourth page, click "batch processing".
+- Step 8:
+    - Select "14230-AspNetAllServicesBatch.json"-item
+    - Click "Start"-button
+    - After generation finished make sure that "Error"-panel is empty
+    - Close Wizard's dialogs
+    - Rebuild "CommonServicesPrismModule"-project
+- Step 9: Open each file in the "services\asp"-folder and follow the instruction at the beginign of this file.
+
+![picture](img/img03rm23.png)
+
+- For instance, aspnetdashboardViewService.cs recommends to insert one line of code into "RegisterTypes()"-method of "CommonServicesPrismModuleModule.cs"-file
+
+![picture](img/img03rm24.png)
+
+- As a result, the following lines of code were added in "RegisterTypes()"-method of "CommonServicesPrismModuleModule.cs"-file
+```java
+            containerRegistry.Register<IAspnetdashboardViewService, AspnetdashboardViewService>();
+            containerRegistry.Register<IAspnetdashboardViewServiceCopyPermission, AspnetdashboardViewServiceCopyPermission>();
+            containerRegistry.Register<IAspnetmodelViewService, AspnetmodelViewService>();
+            containerRegistry.Register<IAspnetmodelViewServiceCopyPermission, AspnetmodelViewServiceCopyPermission>();
+            containerRegistry.Register<IAspnetrolemaskViewService, AspnetrolemaskViewService>();
+            containerRegistry.Register<IAspnetroleViewService, AspnetroleViewService>();
+            containerRegistry.Register<IAspnetusermaskViewService, AspnetusermaskViewService>();
+            containerRegistry.Register<IAspnetusermaskViewServicePermission, AspnetusermaskViewServicePermission>();
+            containerRegistry.Register<IAspnetuserrolesViewService, AspnetuserrolesViewService>();
+            containerRegistry.Register<IAspnetuserViewService, AspnetuserViewService>();
+```
+
+## Creating Sforms for Authorization
+- Step 1: Right click root node of "CommonServicesPrismModule"-project and select "Wpf form Wizard"-menu item.
+- Step 2: On the first page click "Next"-button
+- Step 3: On the second page, select "DbContextClassLibrary"-project and "aspnetchckdbcontext"-Dbccontext and click next.
+- Step 4: On the third page, select "aspnetdashboardView" and click next.
+- Step 5: On the fourth page, click "batch processing".
+- Step 6:
+    - Select "14240-AspNetAllSformsBatch.json"-item
+    - Click "Start"-button
+    - After generation finished make sure that "Error"-panel is empty
+    - Close Wizard's dialogs
+    - Rebuild "CommonServicesPrismModule"-project
+- Step 7: Open each file in the "ViewModels\asp"-folder and follow the instruction at the beginign of this file.
+
+![picture](img/img03rm25.png)
+
+- For instance, aspnetdashboardViewSformViewModel.cs recommends to insert two lines of code into "RegisterTypes()"-method of "CommonServicesPrismModuleModule.cs"-file
+
+![picture](img/img03rm26.png)
+
+- Note: not all recommended registrations should be added to the "CommonServicesPrismModuleModule.cs"-file. Only "RegisterDialog"-lines are required for Sforms-types.
+
+## Creating Eforms for Authorization
+- Step 1: Right click root node of "CommonServicesPrismModule"-project and select "Wpf form Wizard"-menu item.
+- Step 2: On the first page click "Next"-button
+- Step 3: On the second page, select "DbContextClassLibrary"-project and "aspnetchckdbcontext"-Dbccontext and click next.
+- Step 4: On the third page, select "aspnetdashboardView" and click next.
+- Step 5: On the fourth page, click "batch processing".
+- Step 6:
+    - Select "14250-AspNetAllEformsBatch.json"-item
+    - Click "Start"-button
+    - After generation finished make sure that "Error"-panel is empty
+    - Close Wizard's dialogs
+    - Rebuild "CommonServicesPrismModule"-project
+- Step 7: Open each file in the "ViewModels\asp"-folder and follow the instruction at the beginign of this file.
+
+## Creating Lforms for Authorization
+- Step 1: Right click root node of "CommonServicesPrismModule"-project and select "Wpf form Wizard"-menu item.
+- Step 2: On the first page click "Next"-button
+- Step 3: On the second page, select "DbContextClassLibrary"-project and "aspnetchckdbcontext"-Dbccontext and click next.
+- Step 4: On the third page, select "aspnetdashboardView" and click next.
+- Step 5: On the fourth page, click "batch processing".
+- Step 6:
+    - Select "14260-AspNetAllLformsBatch.json"-item
+    - Click "Start"-button
+    - After generation finished make sure that "Error"-panel is empty
+    - Close Wizard's dialogs
+    - Rebuild "CommonServicesPrismModule"-project
+- Step 7: Open each file in the "ViewModels\asp"-folder and follow the instruction at the beginign of this file.
+
+## Creating O2m for Authorization
+- Step 1: Right click root node of "CommonServicesPrismModule"-project and select "Wpf form Wizard"-menu item.
+- Step 2: On the first page click "Next"-button
+- Step 3: On the second page, select "DbContextClassLibrary"-project and "aspnetchckdbcontext"-Dbccontext and click next.
+- Step 4: On the third page, select "aspnetdashboardView" and click next.
+- Step 5: On the fourth page, click "batch processing".
+- Step 6:
+    - Select "14270-AspNetAllO2mMaskBatch.json"-item
+    - Click "Start"-button
+    - After generation finished make sure that "Error"-panel is empty
+    - Close Wizard's dialogs
+    - Rebuild "CommonServicesPrismModule"-project
+- Step 7: Open each file in the "ViewModels\asp"-folder and follow the instruction at the beginign of this file.
+
+## Creating Feature for Authorization
