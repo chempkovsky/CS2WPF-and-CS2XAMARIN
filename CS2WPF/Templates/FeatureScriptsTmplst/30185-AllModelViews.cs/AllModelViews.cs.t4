@@ -1,5 +1,5 @@
 ﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
-<#@ output extension="sql" #>
+<#@ output extension="cs" #>
 <#@ assembly name="System.Core" #>
 <#@ import namespace="System" #>
 <#@ import namespace="System.Linq" #>
@@ -16,40 +16,25 @@
 <#
 //
 // Before you starts:
-// Please reset value for [startFromId]
+// Please reset value for [currentId]
 //
-    int startFromId= 0;
+    int currentId= 0;
 #>
-/*
-USE [SecurityDataBase]
-GO
-*/
-<#
-
-    string insertSql = "insert into [dbo].[securitymodels]([ModelPk], [ModelName], [ModelDescription]) values (";
-    int currentId = startFromId;
+//
+// 0. do not save the generatee code.
+// 1. just copy it to the clipboard
+// 2. Open the file shared/CommonServicesPrismModule/AppGlblSettingsSrvc/AppGlblSettingsService.cs
+// 3. find the definition of the 'Views'-variable
+// Dictionary<string, int> Views = new Dictionary<string, int>()
+//   ....
+// };
+// 4. Paste from clipboard inside curly brackets
+//    
+<#    
     foreach(ModelViewSerializable modelViewSerializable in Context.ModelViews) {
 #>
-    <#= insertSql #> <#= currentId #>, '<#= modelViewSerializable.ViewName #>', 'Description for <#= modelViewSerializable.ViewName #>')
-    go
-
-<#
-        currentId++;
-    }
-#>
-/*
-----------------------------------------------------------------------------------
-USE [AspNetSecurityDataBase]
-GO
-*/
-<#
-    insertSql = "insert into [dbo].[aspnetmodels]([ModelPk], [ModelName], [ModelDescription]) values (";
-    currentId = startFromId;
-    foreach(ModelViewSerializable modelViewSerializable in Context.ModelViews) {
-#>
-    <#= insertSql #> <#= currentId #>, '<#= modelViewSerializable.ViewName #>', 'Description for <#= modelViewSerializable.ViewName #>')
-    go
-
+     {"<#= modelViewSerializable.ViewName #>", <#= currentId #> },
+    
 <#
         currentId++;
     }

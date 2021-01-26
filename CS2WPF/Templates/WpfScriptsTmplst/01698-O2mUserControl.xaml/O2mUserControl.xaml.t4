@@ -152,11 +152,14 @@
         foreach(string detailViewName in detailViews) {
             id++;
             ModelViewSerializable detailView = GetModelViewByName(Context, detailViewName);
-            string detailViewClassName = GetModelClassName(detailView, LformUserControlFolder);
             if(detailView == null) {
 #>
 <!--  can not find the view by Name <#= detailViewName #> -->
 <#
+                continue;
+            }
+            string detailViewClassName = GetModelClassName(detailView, LformUserControlFolder);
+            if (string.IsNullOrEmpty(detailViewClassName)) {
                 continue;
             }
             string localLformUserControlProject  = GetModelProjectName(detailView, LformUserControlFolder);
@@ -178,6 +181,27 @@
              x:Name="O2mRootControl"
              mc:Ignorable="d" 
              d:DesignHeight="150" d:DesignWidth="400" >
+
+<#
+    {
+        int id = -1;
+        foreach(string detailViewName in detailViews) {
+            id++;
+            ModelViewSerializable detailView = GetModelViewByName(Context, detailViewName);
+            if(detailView == null) {
+                continue;
+            }
+            string detailViewClassName = GetModelClassName(detailView, LformUserControlFolder);
+            if (string.IsNullOrEmpty(detailViewClassName)) {
+#>
+<!--  can not find Lform User control for the view which named: <#= detailViewName #> -->
+<#
+                continue;
+            }
+        }
+    }
+#>
+
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
     </UserControl.Resources>
@@ -255,6 +279,14 @@
 <#
                 continue;
             }
+            string localDetailViewClassName = GetModelClassName(detailView, LformUserControlFolder);
+            if (string.IsNullOrEmpty(localDetailViewClassName)) {
+#>
+<!--  can not find Lform User control for the view which named: <#= detailViewName #> -->
+<#
+                continue;
+            }
+
             string localLformUserControlProject  = GetModelProjectName(detailView, LformUserControlFolder);
 
             if (localLformUserControlProject == O2mUserControlProject)

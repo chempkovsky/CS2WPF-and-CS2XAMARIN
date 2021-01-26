@@ -250,10 +250,16 @@ using <#= ns #>;
 <#
         foreach(string detailViewName in detailViews) {
             ModelViewSerializable detailView = GetModelViewByName(Context, detailViewName);
-            string detailViewClassName = GetModelClassName(detailView, LformUserControlFolder);
             if(detailView == null) {
 #>
-<!--  can not find the view by Name <#= detailViewName #> -->
+/////  can not find the view by Name <#= detailViewName #> 
+<#
+                continue;
+            }
+            string detailViewClassName = GetModelClassName(detailView, LformUserControlFolder);
+            if (string.IsNullOrEmpty(detailViewClassName)) {
+#>
+/////  can not find Lform User control for the view which named: <#= detailViewName #> 
 <#
                 continue;
             }
@@ -261,6 +267,7 @@ using <#= ns #>;
             if (localLformUserControlProject != O2mUserControlProject) {
 
 #>
+   
     "<#= detailViewClassName #>" UserControl is defined in the "<#= localLformUserControlProject #>"-project.
     In the file of IModule-class of "<#= localLformUserControlProject #>"-project the following line of code must be inserted:
 
@@ -798,6 +805,13 @@ namespace <#= O2mViewModelNameSpace #> {
                 continue;
             }
             string detailViewClassName = GetModelClassName(detailView, LformUserControlFolder);
+            if (string.IsNullOrEmpty(detailViewClassName)) {
+#>
+/////  can not find Lform User control for the view which named: <#= detailViewName #> 
+<#
+                continue;
+            }
+
 #>
         public bool <#= IsDetailVisiblePropertyName #><#= detailViewClassName #> { 
             get {
@@ -821,11 +835,19 @@ namespace <#= O2mViewModelNameSpace #> {
 <#
                 foreach(string dViewName in detailViews) {
                     ModelViewSerializable dView = GetModelViewByName(Context, dViewName);
-                    if(dView != null) {
+                    if(dView == null) { continue; }
+                    string dViewLformClassName =  GetModelClassName(dView, LformUserControlFolder);
+                    if (string.IsNullOrEmpty(dViewLformClassName)) {
+#>
+/////  can not find Lform User control for the view which named: <#= dViewName #> 
+<#
+                        continue;
+                    }
+                    
 #>
                     OnPropertyChanged("<#= IsDetailVisiblePropertyName #><#= GetModelClassName(dView, LformUserControlFolder) #>");
 <#
-                    }
+
                 }
 #>
                     OnPropertyChanged("<#= IsDetailVisiblePropertyName #>");
@@ -847,6 +869,13 @@ namespace <#= O2mViewModelNameSpace #> {
                 continue;
             }
             string detailViewClassName = GetModelClassName(detailView, LformUserControlFolder);
+            if (string.IsNullOrEmpty(detailViewClassName)) {
+#>
+/////  can not find Lform User control for the view which named: <#= detailViewName #> 
+<#
+                continue;
+            }
+
             List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detailView, null);
             if (foreignKeys == null) continue;
             if (foreignKeys.Count < 1) continue;
@@ -891,9 +920,11 @@ namespace <#= O2mViewModelNameSpace #> {
             ModelViewSerializable detailView = GetModelViewByName(Context, detailViewName);
             if(detailView != null) {
                 string detailViewClassName = GetModelClassName(detailView, LformUserControlFolder);
+                if (!string.IsNullOrEmpty(detailViewClassName)) {
 #>
                     || <#= IsDetailVisiblePropertyName #><#= detailViewClassName #>
 <#
+                }
             }
         }
 #>
@@ -914,6 +945,13 @@ namespace <#= O2mViewModelNameSpace #> {
 <#
                 continue;
             }
+            string detailViewClassName = GetModelClassName(detailView, LformUserControlFolder);
+            if (string.IsNullOrEmpty(detailViewClassName)) {
+#>
+/////  can not find Lform User control for the view which named: <#= detailViewName #> 
+<#
+                continue;
+            }
             List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detailView, null);
             if (foreignKeys == null) {
                 continue;
@@ -921,7 +959,6 @@ namespace <#= O2mViewModelNameSpace #> {
             if (foreignKeys.Count < 1) {
                 continue;
             }
-            string detailViewClassName = GetModelClassName(detailView, LformUserControlFolder);
             foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
 #>
                 case "<#= detailViewClassName #>:<#= foreignKey.NavigationName #>":

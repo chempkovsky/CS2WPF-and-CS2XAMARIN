@@ -1,18 +1,18 @@
 ﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
-<#@ output extension="ts" #>
+<#@ output extension="cs" #>
 <#@ assembly name="System.Core" #>
 <#@ import namespace="System" #>
 <#@ import namespace="System.Linq" #>
 <#@ import namespace="System.Collections" #>
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.Text" #>
-<#@ import namespace="CS2REACTJS" #>
-<#@ import namespace="CS2REACTJS.Model" #>
-<#@ import namespace="CS2REACTJS.Model.Serializable" #>
-<#@ parameter type="CS2REACTJS.Model.Serializable.AllowedFileTypesSerializable" name="AllowedFileTypes" #>
-<#@ parameter type="CS2REACTJS.Model.Serializable.FeatureContextSerializable" name="FeatureContext" #>
-<#@ parameter type="CS2REACTJS.Model.Serializable.FeatureSerializable" name="Feature" #>
-<#@ parameter type="CS2REACTJS.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.AllowedFileTypesSerializable" name="AllowedFileTypes" #>
+<#@ parameter type="CS2WPF.Model.Serializable.FeatureContextSerializable" name="FeatureContext" #>
+<#@ parameter type="CS2WPF.Model.Serializable.FeatureSerializable" name="Feature" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
 <#
 //
 // Before you starts:
@@ -23,19 +23,20 @@
 //
 // 0. do not save the generated code.
 // 1. just copy it to the clipboard.
-// 2. Open the file shared/services/app-glbl-settings.service.tsx
-// 3. find the definition of the 'dshBrds'-variable
-// dshBrds:  { [key: string]: number } = {
+// 2. Open the file shared/CommonServicesPrismModule/AppGlblSettingsSrvc/AppGlblSettingsService.cs
+// 3. find the definition of the 'Dashboards'-variable
+// Dictionary<string, int> Dashboards = new Dictionary<string, int>() 
+// {
 //   ....
 // };
 // 4. Paste from clipboard inside curly brackets
 //    
 <#
-    string ftrFeatureComponentFolder = "30100-.ftr.component.tsx";
+    string ftrFeatureComponentFolder = "30100-FtrUserControl.xaml.cs";
     foreach(FeatureSerializable featureSerializable in FeatureContext.Features) {
         string featureClassName = GetFeatureComponentClassName(featureSerializable, ftrFeatureComponentFolder);
 #>
-    '<#= featureClassName #>': <#= currentId #>,
+    {"<#= featureClassName #>", <#= currentId #>},
 <#
         currentId++;
     }
@@ -60,7 +61,7 @@
         if(string.IsNullOrEmpty(refItem.FileName)) {
             return result;
         }
-        string fn = refItem.FileName.Replace(".component","Component").Replace(".","-");
+        string fn = refItem.FileName;
         StringBuilder sb = new StringBuilder();
         bool toUpper = true;
         foreach (char c in fn)
@@ -80,8 +81,9 @@
                     sb.Append(c);
                 }
             }
+                
         }
-        return sb.ToString();
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
     }
 
 #>

@@ -81,8 +81,12 @@
 #### [Creating Sforms for  Authorization](#Creating-Sforms-for-Authorization)
 #### [Creating Eforms for  Authorization](#Creating-Eforms-for-Authorization)
 #### [Creating Lforms for  Authorization](#Creating-Lforms-for-Authorization)
-#### [Creating O2m for  Authorization](#Creating-O2m-for-Authorization)
+#### [Creating O2m and O2mMask for  Authorization](#Creating-O2m-and-O2mMask-for-Authorization)
 #### [Creating Feature for  Authorization](#Creating-Feature-for-Authorization)
+#### [Modify main menu for Features of  Authorization](#Modify-main-menu-for-Features-of-Authorization)
+#### [Test Features of  Authorization](#Test-Features-of-Authorization)
+#### [Populate data for  Authorization](#Populate-data-for-Authorization)
+
 
 ## Programming tools used to start the development process
 ### The following Programming tools must be used to begin development:
@@ -1603,7 +1607,7 @@ Again, immediately after logging out of the system, the Permissions variable sho
         
 Information about how to generate and setup Authorization for the server and client part of the app will be described in the Wiki of CS2WPF-project.
 
-Note 1: the developer should not manually populate datd for Views and Dashboards vars. There is a special generator scripts for SQL-code (to populate Database tables) and C# code to be inserted in AppGlblSettingsService.cs-file. 
+Note 1: the developer should not manually populate data for Views and Dashboards vars. There is a special generator scripts for SQL-code (to populate Database tables) and C# code to be inserted in AppGlblSettingsService.cs-file. 
 
 Note 2: It is not a good idea to hardcodde Views and Dashboards vars . Instead, OnLoaded()-method of MainWindowViewModel.cs file must be used to get data from the app settings file (it is one of the solution).
 
@@ -1953,7 +1957,7 @@ Under [Creating LiteratureTest Database on the server  side](#Creating-Literatur
     - Rebuild "CommonServicesPrismModule"-project
 - Step 7: Open each file in the "ViewModels\asp"-folder and follow the instruction at the beginign of this file.
 
-## Creating O2m for Authorization
+## Creating O2m and O2mMask for Authorization
 - Step 1: Right click root node of "CommonServicesPrismModule"-project and select "Wpf form Wizard"-menu item.
 - Step 2: On the first page click "Next"-button
 - Step 3: On the second page, select "DbContextClassLibrary"-project and "aspnetchckdbcontext"-Dbccontext and click next.
@@ -1967,4 +1971,214 @@ Under [Creating LiteratureTest Database on the server  side](#Creating-Literatur
     - Rebuild "CommonServicesPrismModule"-project
 - Step 7: Open each file in the "ViewModels\asp"-folder and follow the instruction at the beginign of this file.
 
+
+
+
 ## Creating Feature for Authorization
+- Preliminary Step 1: Create Features-folder under "UserControls\asp"-folder of "CommonServicesPrismModule"-project
+- Preliminary Step 2: Create Features-folder under "ViewModels\asp"-folder of "CommonServicesPrismModule"-project
+
+###  Creating SecurityLformsFeature
+- Step 1: Right click "UserControls\asp\Features"-folder of "CommonServicesPrismModule"-project and select "FeatureScripts Wizard"-menu item
+- Step 2: On the first (invitation) page, click "Next"-button
+- Step 3: On the second page, select "DbContextClassLibrary"-project and "aspnetchckdbcontext"-Dbccontext and click next. 
+- Step 4: On the third page, click "Add"-button. "Feature"-dialog will be shown.
+- Step 5: In the "Feature"-dialog enter "SecurityLformsFeature"-name for the feature and check the following items and click "Save"-button
+    - aspnetdashboardView (01598-LformUserControl.xaml)
+    - aspnetmodelView (01598-LformUserControl.xaml)
+    - aspnetroleView (01598-LformUserControl.xaml)
+    - aspnetuserView (01598-LformUserControl.xaml)
+    - aspnetrolemaskView (01598-LformUserControl.xaml)
+    - aspnetuserrolesView (01598-LformUserControl.xaml)
+
+![picture](img/img03rm27.png)
+
+- Step 6: On the third page, select "SecurityLformsFeature" and click "Next"-button.
+
+![picture](img/img03rm28.png)
+
+- Step 7: On the fourth page, select "30100-FtrUserControl.xaml.cs" and click "Next"-button.
+
+![picture](img/img03rm29.png)
+
+- Step 8: On the fifth page, select "FtrUserControl.xaml.cs.t4" and click "Next"-button.
+
+![picture](img/img03rm30.png)
+
+- Step 9: On the sixth page, click "save"-button and click "Next"-button.
+
+![picture](img/img03rm31.png)
+
+- Step 10: You are on the third page again, click "Next"-button.
+- Step 11: On the fourth page, select "30102-FtrUserControl.xaml" and click "Next"-button.
+- Step 12: On the fifth page, select "FtrUserControl.xaml.t4" and click "Next"-button.
+- Step 13: On the sixth page, click "save"-button and close the Wizard.
+- Step 14: Right click "ViewModels\asp\Features"-folder of "CommonServicesPrismModule"-project and select "FeatureScripts Wizard"-menu item
+- Step 15: On the first (invitation) page, click "Next"-button
+- Step 16: On the second page, select "DbContextClassLibrary"-project and "aspnetchckdbcontext"-Dbccontext and click next. 
+- Step 17: On the third page, select "SecurityLformsFeature" and click "Next"-button.
+- Step 18: On the fourth page, select "30104-FtrViewModel.cs" and click "Next"-button.
+- Step 19: On the fifth page, select "FtrViewModel.cs.t4" and click "Next"-button.
+- Step 20: On the sixth page, click "save"-button and close the Wizard.
+- Step 21: Open "ViewModels\asp\Features\SecurityLformsFeatureFtrViewModel.cs"-file and follow the instructions:
+
+```java
+/*
+    "SecurityLformsFeatureFtrViewModel" UserControl is defined in the "CommonServicesPrismModule"-project.
+    In the file of IModule-class of "CommonServicesPrismModule"-project the following line of code must be inserted:
+        public void RegisterTypes(IContainerRegistry containerRegistry)
+        {
+            ...
+            // According to requirements of the "SecurityLformsFeatureFtrViewModel.cs"-file of "CommonServicesPrismModule"-project. 
+            containerRegistry.RegisterForNavigation<SecurityLformsFeatureFtrUserControl, SecurityLformsFeatureFtrViewModel>("SecurityLformsFeatureFtrUserControl");
+            ...
+        }
+*/        
+```
+
+###  Creating SecurityO2msFeature
+- Repeat steps 1-21 of [Creating  SecurityLformsFeature](#Creating-SecurityLformsFeature)
+- At Step 5: In the "Feature"-dialog enter "SecurityO2msFeature"-name for the feature and check the following items and click "Save"-button
+    - aspnetroleView (01698-O2mUserControl.xaml)
+    - aspnetroleView (02122-O2mMaskUserControl.xaml)
+    - aspnetuserView (01698-O2mUserControl.xaml)
+    - aspnetuserView (02122-O2mMaskUserControl.xaml)
+
+![picture](img/img03rm32.png)
+
+- At Step 6 select "SecurityO2msFeature"
+- At Step 17 select "SecurityO2msFeature"
+- At Step 21 Open "ViewModels\asp\Features\SecurityO2msFeatureFtrViewModel.cs"-file
+
+## Modify main menu for Features of Authorization
+Open "MainWindowViewModel.cs" of "PrismTestApp"-project and modify "_MainMenu". Add two lines:
+```java
+    new WebServiceFilterMenuViewModel() { Id = "001", Caption="Security Lforms Feature", IconName="TableRefresh",  IconColor="Primary", Data="SecurityLformsFeatureFtrUserControl", Command=RoutedCommandExt.MainMenuCommand},
+    new WebServiceFilterMenuViewModel() { Id = "001", Caption="Security O2ms Feature", IconName="TableRefresh",  IconColor="Primary", Data="SecurityO2msFeatureFtrUserControl", Command=RoutedCommandExt.MainMenuCommand},
+```
+
+## Test Features of Authorization
+- Run DbWebApplication
+- Rebuild and Run PrismTestApp
+- Click "Security Lforms Feature"-navigation menu. The result is shown on the slide below
+
+![picture](img/img03rm33.png)
+
+- Click "Security O2ms Feature"-navigation menu. The result is shown on the slide below
+
+![picture](img/img03rm34.png)
+
+
+## Populate data for Authorization
+Open "Shared/CommonServicesPrismModule/AppGlblSettingsSrvc/AppGlblSettingsService.cs"-file of CommonServicesPrismModule-project and find definitions for "Views" and "Dashboards". 
+Both vars should be populated with a correct data. At second, the same data should be inserted into Authorization database tables. 
+It's possible to make it manually with Authorization Features UI and manually define "Views" and "Dashboards" vars. But it's easy to mistype and it's time consuming. 
+Four dedicated scripts can help a developer get the job done.
+
+### Populate Views and Features data for aspnetchckdbcontext
+We have two DbContexts "aspnetchckdbcontext" and “LitDbContext”. Each has its own set of Views and Features. As a result, the developer needs to run scripts for both DbContexts.
+
+We start with "aspnetchckdbcontext"
+- Step 1: Right click any project and select "FeatureScripts Wizard"-menu item
+- Step 2: On the first (invitation) page, click "Next"-button
+- Step 3: On the second page, select "DbContextClassLibrary"-project and "aspnetchckdbcontext"-Dbccontext and  click next. 
+- Step 4: On the third page, select any feature (for instance, "SecurityLformsFeature") and click "Next"-button. (When you select a feature, the "Next" button becomes available)
+- Step 5: On the fourth page, select "30180-AllModelViews.sql" and click "Next"-button.
+- Step 6: On the fifth page, select "AllModelViews.sql.t4". Leave "startFromId"-variable to be equal to 0!!! Click "Next"-button.
+
+![picture](img/img03rm35.png)    
+
+- Step 6: On the sixth page, copy Sql-code into the clipboard. Remember the last Id which is equal to 6.
+```sql
+/*
+USE [AspNetSecurityDataBase]
+GO
+*/
+    insert into [dbo].[aspnetmodels]([ModelPk], [ModelName], [ModelDescription]) values ( 0, 'aspnetdashboardView', 'Description for aspnetdashboardView')
+    go
+
+    insert into [dbo].[aspnetmodels]([ModelPk], [ModelName], [ModelDescription]) values ( 1, 'aspnetmodelView', 'Description for aspnetmodelView')
+    go
+
+    insert into [dbo].[aspnetmodels]([ModelPk], [ModelName], [ModelDescription]) values ( 2, 'aspnetroleView', 'Description for aspnetroleView')
+    go
+
+    insert into [dbo].[aspnetmodels]([ModelPk], [ModelName], [ModelDescription]) values ( 3, 'aspnetuserView', 'Description for aspnetuserView')
+    go
+
+    insert into [dbo].[aspnetmodels]([ModelPk], [ModelName], [ModelDescription]) values ( 4, 'aspnetrolemaskView', 'Description for aspnetrolemaskView')
+    go
+
+    insert into [dbo].[aspnetmodels]([ModelPk], [ModelName], [ModelDescription]) values ( 5, 'aspnetusermaskView', 'Description for aspnetusermaskView')
+    go
+
+    insert into [dbo].[aspnetmodels]([ModelPk], [ModelName], [ModelDescription]) values ( 6, 'aspnetuserrolesView', 'Description for aspnetuserrolesView')
+    go
+```
+- Step 7: Run "SQL Server Management Studio" and execute Sql-code against "AspNetDbWebApplicationSecurity"-database. this name is taken from the Web.config file.
+- Step 8: On the sixth page, click "Next"-button.
+- Step 9: You are on the third page again. Repeat steps 4-8.
+    - In Step 5 select "30190-AllDashBoards.sql"
+    - In Step 6 select "AllDashBoards.sql.t4". Remember the last Id which is equal to 1.
+```sql
+/*
+USE [AspNetSecurityDataBase]
+GO
+*/
+    insert into [dbo].[aspnetdashboards]([DashboardPk], [DashboardName], [DashboardDescription]) values ( 0, 'SecurityLformsFeatureFtrUserControl', 'Description for SecurityLformsFeatureFtrUserControl')
+    go
+
+    insert into [dbo].[aspnetdashboards]([DashboardPk], [DashboardName], [DashboardDescription]) values ( 1, 'SecurityO2msFeatureFtrUserControl', 'Description for SecurityO2msFeatureFtrUserControl')
+    go
+```
+
+- Step 10: You are on the third page again. Repeat steps 4-8.
+    - In Step 5 select "30185-AllModelViews.cs"
+    - In Step 6 select "AllModelViews.cs.t4". Remember the last Id which is equal to 6. With a code below we redefine "Views"-var.
+```java    
+     {"aspnetdashboardView", 0 },
+     {"aspnetmodelView", 1 },
+     {"aspnetroleView", 2 },
+     {"aspnetuserView", 3 },
+     {"aspnetrolemaskView", 4 },
+     {"aspnetusermaskView", 5 },
+     {"aspnetuserrolesView", 6 },
+```
+
+- Step 11: You are on the third page again. Repeat steps 4-8.
+    - In Step 5 select "30195-AllDashBoards.cs"
+    - In Step 6 select "AllDashBoards.cs.t4". Remember the last Id which is equal to 6. With a code below we redefine "Dashboards" var.
+```java    
+    {"SecurityLformsFeatureFtrUserControl", 0},
+    {"SecurityO2msFeatureFtrUserControl", 1},
+```
+
+### Populate Views and Features data for "LitDbContext"
+To populate data for "LitDbContext" the developer should follow the steps described under [Populare Views and Features data for  aspnetchckdbcontext](#Populare-Views-and-Features-data-for-aspnetchckdbcontext).
+- In Step 3 we select "DbContextClassLibrary"-project and "LitDbContext"-Dbccontext
+- Right before executing "30180-AllModelViews.sql" and "30185-AllModelViews.cs"-scripts we should reset startFromId"-var to 7.
+
+![picture](img/img03rm36.png)   
+
+- Right before executing "AllDashBoards.sql.t4" and "30195-AllDashBoards.cs"-scripts we should reset startFromId"-var to 2.
+
+![picture](img/img03rm37.png)   
+
+- Additional data for "Views"-var:
+```java    
+     {"LitGenreView", 7 },
+```
+- Additional data for "Dashboards"-var:
+```java    
+    {"LitGenreFeatureFtrUserControl", 2},
+```
+### Testing the results of data population
+- Run DbWebApplication
+- Rebuild and Run PrismTestApp
+- Click "Security Lforms Feature"-navigation menu. The result is shown on the slide below
+
+![picture](img/img03rm38.png)
+
+## Add Roles to application
+For now we are ready to add/modify/delete roles for the  application.
+- Click "Security Lforms Feature"-menu item

@@ -6,13 +6,13 @@
 <#@ import namespace="System.Collections" #>
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.Text" #>
-<#@ import namespace="CS2REACTJS" #>
-<#@ import namespace="CS2REACTJS.Model" #>
-<#@ import namespace="CS2REACTJS.Model.Serializable" #>
-<#@ parameter type="CS2REACTJS.Model.Serializable.AllowedFileTypesSerializable" name="AllowedFileTypes" #>
-<#@ parameter type="CS2REACTJS.Model.Serializable.FeatureContextSerializable" name="FeatureContext" #>
-<#@ parameter type="CS2REACTJS.Model.Serializable.FeatureSerializable" name="Feature" #>
-<#@ parameter type="CS2REACTJS.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.AllowedFileTypesSerializable" name="AllowedFileTypes" #>
+<#@ parameter type="CS2WPF.Model.Serializable.FeatureContextSerializable" name="FeatureContext" #>
+<#@ parameter type="CS2WPF.Model.Serializable.FeatureSerializable" name="Feature" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
 <#
 //
 // Before you starts:
@@ -25,7 +25,7 @@ USE [SecurityDataBase]
 GO
 */
 <#
-    string ftrFeatureComponentFolder = "30100-.ftr.component.tsx";
+    string ftrFeatureComponentFolder = "30100-FtrUserControl.xaml.cs";
     string insertSql = "insert into [dbo].[securitydashboards]([DashboardPk], [DashboardName], [DashboardDescription]) values (";
     int currentId = startFromId;
     foreach(FeatureSerializable featureSerializable in FeatureContext.Features) {
@@ -78,7 +78,7 @@ GO
         if(string.IsNullOrEmpty(refItem.FileName)) {
             return result;
         }
-        string fn = refItem.FileName.Replace(".component","Component").Replace(".","-");
+        string fn = refItem.FileName;
         StringBuilder sb = new StringBuilder();
         bool toUpper = true;
         foreach (char c in fn)
@@ -98,8 +98,9 @@ GO
                     sb.Append(c);
                 }
             }
+                
         }
-        return sb.ToString();
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
     }
 
 #>

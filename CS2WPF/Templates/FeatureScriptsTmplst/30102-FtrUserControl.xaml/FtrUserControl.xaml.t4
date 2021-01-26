@@ -96,14 +96,12 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:prism="http://prismlibrary.com/" 
              prism:ViewModelLocator.AutoWireViewModel="True"
-
              xmlns:atch="<#= attachedPrefix #>" 
              atch:<#= AttachedPropertiesExtClassName #>.<#= RegisterRoutedCommandBindingsPropertyName #>="{Binding <#= RoutedCommandHandlersPropertyName #>}"
              atch:<#= AttachedPropertiesExtClassName #>.<#= RegisterRoutedEventBindingsPropertyName #>="{Binding <#= RoutedEventHandlersPropertyName #>}"
-
              xmlns:prx="<#= proxyPrefix #>" 
              xmlns:gridflex="<#= gridflexPrefix #>"
-
+             x:Name="FchrUsrCntrlRootNode"   
              >
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
@@ -133,14 +131,14 @@
             curItem++;
             if (curItem % 2 == 0) {
 #>
-        <Grid gridflex:GridFlex.HorizontalFlex="{Binding Path=<#= FlexOnPropertyName #>, Mode=OneWay}">
+        <Grid gridflex:GridFlex.HorizontalFlex="{Binding DataContext.<#= FlexOnPropertyName #>, Mode=OneWay, ElementName=FchrUsrCntrlRootNode}">
 <#
             }
 #>
             <prx:<#= ProxyUserControlClassName #> Margin="0 0 8 0"
-                    Visibility="{Binding Path=<#= VisiblePrefixPropertyName #><#= modelClassName #>, Mode=OneWay,  Converter={StaticResource BooleanToVisibilityConverter}}"
+                    Visibility="{Binding DataContext.<#= VisiblePrefixPropertyName #><#= modelClassName #>, Mode=OneWay, ElementName=FchrUsrCntrlRootNode,  Converter={StaticResource BooleanToVisibilityConverter}}"
                     prism:RegionManager.RegionName="<#= modelClassName #><#= FtrUserControlClassName #>" 
-                    <#= ContainerMenuItemsPropertyName #>="{Binding <#= ContainerMenuItemsPropertyName #><#= modelClassName #>}"
+                    <#= ContainerMenuItemsPropertyName #>="{Binding DataContext.<#= ContainerMenuItemsPropertyName #><#= modelClassName #>, Mode=OneWay, ElementName=FchrUsrCntrlRootNode}"
 <#
             if (!IsRouted) {
 #>
@@ -150,13 +148,13 @@
 #>
                     <#= ShowAddFilterBtnPropertyName #>="True" 
                     <#= ShowFilterPropertyName #>="True" 
-                    <#= FilterHeightPropertyName #>="{Binding <#= FilterHeightPropertyName #><#= modelClassName #>}"
-                    <#= GridHeightPropertyName #>="{Binding <#= GridHeightPropertyName #><#= modelClassName #>}"
+                    <#= FilterHeightPropertyName #>="{Binding DataContext.<#= FilterHeightPropertyName #><#= modelClassName #>, Mode=OneWay, ElementName=FchrUsrCntrlRootNode}"
+                    <#= GridHeightPropertyName #>="{Binding DataContext.<#= GridHeightPropertyName #><#= modelClassName #>, Mode=OneWay, ElementName=FchrUsrCntrlRootNode}"
 <#
             if (IsO2m) {
 #>
-                    <#= HiddenFiltersDetailPropertyName #>="{Binding <#= FilterHeightPropertyName #><#= modelClassName #>}"
-                    <#= GridHeightDetailPropertyName #>="{Binding <#= GridHeightPropertyName #><#= modelClassName #>}"
+                    <#= HiddenFiltersDetailPropertyName #>="{Binding DataContext.<#= FilterHeightPropertyName #><#= modelClassName #>, Mode=OneWay, ElementName=FchrUsrCntrlRootNode}"
+                    <#= GridHeightDetailPropertyName #>="{Binding DataContext.<#= GridHeightPropertyName #><#= modelClassName #>, Mode=OneWay, ElementName=FchrUsrCntrlRootNode}"
                     <#= ShowFilterDetailPropertyName #>="True" 
                     <#= ShowAddFilterBtnDetailPropertyName #>="True" 
                     <#= CanAddPropertyName #>="False" 
