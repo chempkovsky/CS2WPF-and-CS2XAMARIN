@@ -2249,6 +2249,7 @@ After configuring permissions for roles and assigning roles to users, you can vi
                     GlblSettingsSrv.Permissions = ServicePermission.src2array(rslt);
                 });
             }
+            _regionManager.Regions["MainContentRegion"].RemoveAll();
             */
         }
 ```
