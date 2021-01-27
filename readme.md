@@ -88,7 +88,7 @@
 #### [Populate data for  Authorization](#Populate-data-for-Authorization)
 #### [Add Roles to  application](#Add-Roles-to-application)
 #### [Add bitmask rows for  roles](#Add-bitmask-rows-for-roles)
-#### [View user permissions](#View-user-permissions)
+#### [View user  permissions](#View-user-permissions)
 #### [Turn on  Authorization](#Turn-on-Authorization)
 
 ## Programming tools used to start the development process
