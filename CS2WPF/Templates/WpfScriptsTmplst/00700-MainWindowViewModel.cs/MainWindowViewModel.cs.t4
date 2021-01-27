@@ -233,8 +233,28 @@ namespace <#= MainWindowViewModelNameSpace #> {
                 }
             }
         }
+        /* Uncomment to turn ON Authorization
+        IAspnetusermaskViewServicePermission ServicePermission = null;
+        */
         protected void <#= OnUserChangedNotificationPropertyName #>(object sender, string uname) {
             <#= UserNamePropertyName #> = uname;
+            /* Uncomment to turn ON Authorization
+            if (string.IsNullOrEmpty(uname))
+            {
+                <#= AppSettingServicePropertyName #>.Permissions = <#= AppSettingServicePropertyName #>.GetEmptyPermissions();
+            } else
+            {
+                if(ServicePermission == null)
+                {
+                    ServicePermission = _containerProvider.Resolve<IAspnetusermaskViewServicePermission>();
+                }
+                Application.Current.Dispatcher.Invoke(async () =>
+                {
+                    IaspnetusermaskViewPage rslt = await ServicePermission.getcurrusermasks();
+                    <#= AppSettingServicePropertyName #>.Permissions = ServicePermission.src2array(rslt);
+                });
+            }
+            */
         }
         #endregion
 

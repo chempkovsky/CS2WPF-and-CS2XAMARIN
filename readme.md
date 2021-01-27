@@ -86,7 +86,10 @@
 #### [Modify main menu for Features of  Authorization](#Modify-main-menu-for-Features-of-Authorization)
 #### [Test Features of  Authorization](#Test-Features-of-Authorization)
 #### [Populate data for  Authorization](#Populate-data-for-Authorization)
-
+#### [Add Roles to  application](#Add-Roles-to-application)
+#### [Add bitmask rows for  roles](#Add-bitmask-rows-for-roles)
+#### [View user permissions](#View-user-permissions)
+#### [Turn on  Authorization](#Turn-on-Authorization)
 
 ## Programming tools used to start the development process
 ### The following Programming tools must be used to begin development:
@@ -1605,7 +1608,7 @@ Again, immediately after logging out of the system, the Permissions variable sho
         int[] _Permissions = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 ```
         
-Information about how to generate and setup Authorization for the server and client part of the app will be described in the Wiki of CS2WPF-project.
+Information about how to generate and setup Authorization for the server and client part of the app will be described in the Wiki of CS2WPF-project and in this readme.
 
 Note 1: the developer should not manually populate data for Views and Dashboards vars. There is a special generator scripts for SQL-code (to populate Database tables) and C# code to be inserted in AppGlblSettingsService.cs-file. 
 
@@ -1989,7 +1992,7 @@ Under [Creating LiteratureTest Database on the server  side](#Creating-Literatur
     - aspnetroleView (01598-LformUserControl.xaml)
     - aspnetuserView (01598-LformUserControl.xaml)
     - aspnetrolemaskView (01598-LformUserControl.xaml)
-    - aspnetuserrolesView (01598-LformUserControl.xaml)
+    
 
 ![picture](img/img03rm27.png)
 
@@ -2039,7 +2042,6 @@ Under [Creating LiteratureTest Database on the server  side](#Creating-Literatur
 ###  Creating SecurityO2msFeature
 - Repeat steps 1-21 of [Creating  SecurityLformsFeature](#Creating-SecurityLformsFeature)
 - At Step 5: In the "Feature"-dialog enter "SecurityO2msFeature"-name for the feature and check the following items and click "Save"-button
-    - aspnetroleView (01698-O2mUserControl.xaml)
     - aspnetroleView (02122-O2mMaskUserControl.xaml)
     - aspnetuserView (01698-O2mUserControl.xaml)
     - aspnetuserView (02122-O2mMaskUserControl.xaml)
@@ -2182,3 +2184,85 @@ To populate data for "LitDbContext" the developer should follow the steps descri
 ## Add Roles to application
 For now we are ready to add/modify/delete roles for the  application.
 - Click "Security Lforms Feature"-menu item
+- "AspnetroleViewLformUserControl"-child window gives this opportunity
+
+![picture](img/img03rm39.png)
+
+## Assign roles to user
+For now we are ready to Assign(Remove) roles to user.
+- Click "Security Lforms Feature"-menu item
+- "AspnetuserViewO2mUserControl"-child window gives this opportunity
+
+![picture](img/img03rm40.png)
+
+## Add bitmask rows for roles
+Selecting master rows in "AspnetroleViewO2mMaskUserControl"-controls does not changed the detail panel. This is because "dbo.aspnetrolemasks"-table is empty.
+
+![picture](img/img03rm41.png)
+
+- Navigate to "Security Lforms Feature"
+- With AspnetrolemaskViewLformUserControl add one row for each Role.
+
+![picture](img/img03rm42.png)
+
+Selecting master rows in "AspnetroleViewO2mMaskUserControl"-controls shows the detail panel. 
+
+![picture](img/img03rm43.png)
+
+## View user permissions
+After configuring permissions for roles and assigning roles to users, you can view user permissions, which is READ ONLY.
+- "AspnetuserViewO2mMaskUserControl"-child window gives this opportunity
+
+![picture](img/img03rm44.png)
+
+## Turn on Authorization
+- Step 1: Open "AppGlblSettingsService.cs"-file of CommonServicesPrismModule-project. Comment (or delete) the first line in the body of GetViewModelMask() and GetDashBrdMask() methods.
+```java    
+        public int GetViewModelMask(string vwModel) {
+            //return 15; // delete this line when vwModels is ready
+        ...
+        public int GetDashBrdMask(string dshBrd) {
+            //return 1; // delete this line when dshBrds is ready
+```
+
+- Step 2: Open MainWindowViewModel.cs-file of PrismTestApp-project. Uncomment the code in the body of OnUserChangedNotification() method:
+```java    
+        /* Uncomment to turn ON Authorization
+         
+        IAspnetusermaskViewServicePermission ServicePermission = null;
+        */
+        protected void OnUserChangedNotification(object sender, string uname) {
+            UserName = uname;
+            /* Uncomment to turn ON Authorization
+            if (string.IsNullOrEmpty(uname))
+            {
+                GlblSettingsSrv.Permissions = GlblSettingsSrv.GetEmptyPermissions();
+            } else
+            {
+                if(ServicePermission == null)
+                {
+                    ServicePermission = _containerProvider.Resolve<IAspnetusermaskViewServicePermission>();
+                }
+                Application.Current.Dispatcher.Invoke(async () =>
+                {
+                    IaspnetusermaskViewPage rslt = await ServicePermission.getcurrusermasks();
+                    GlblSettingsSrv.Permissions = ServicePermission.src2array(rslt);
+                });
+            }
+            */
+        }
+```
+- Here is a result:
+
+![picture](img/img03rm45.png)
+
+- And after login:
+
+![picture](img/img03rm46.png)
+
+- But admin does not have permission for "LitGenre"
+
+![picture](img/img03rm47.png)
+
+- Note: Only navigation awair user control and Features support authorization.
+

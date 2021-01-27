@@ -741,7 +741,17 @@ namespace <#= O2mMaskViewModelNameSpace #> {
             ModelViewPropertyOfVwSerializable modelProp = primKeys[i];
 #>
             flt.<#= GetModelPropertyName(maskProp, MaskModel) #> = new List<<#= GetPropertyTypeName(maskProp) #>>();
+<#
+            if(Model.ViewName.ToUpper().Contains("ROLE")) {
+#>
+            flt.<#= GetModelPropertyName(maskProp, MaskModel) #>.Add(_<#= SelectedItemPropertyName #>.Name);
+<#
+            } else {
+#>
             flt.<#= GetModelPropertyName(maskProp, MaskModel) #>.Add(_<#= SelectedItemPropertyName #>.<#= GetModelPropertyName(modelProp, Model) #>);
+<#
+            }
+#>
             flt.<#= GetFilterPropertyOperatorName(maskProp, MaskModel, FilterOperatorSuffix) #> = new List<string>();
             flt.<#= GetFilterPropertyOperatorName(maskProp, MaskModel, FilterOperatorSuffix) #>.Add("<#= FilterEqOperatorValue #>");
 <#
