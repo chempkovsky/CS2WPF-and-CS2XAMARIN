@@ -249,14 +249,28 @@
 #>
                 <DataGridCheckBoxColumn CanUserReorder="True" CanUserResize="True" CanUserSort="<#= IsSortable #>"
                     Visibility="{Binding Path=Data.<#= SelectedColumnsPropertyName #>[(sys:Int32)<#= cntr #>].IsChecked, Mode=OneWay,  Converter={StaticResource BooleanToVisibilityConverter}, Source={StaticResource userControlContext}}"
-                    Header="<#= GetDisplayAttributeValueString2(modelViewUIListPropertySerializable, Model, ShortNameLabelProperty) #>" Binding="{Binding <#= GetModelPropertyNameEx2(modelViewUIListPropertySerializable, Model) #>}"/>
+                    Header="<#= GetDisplayAttributeValueString2(modelViewUIListPropertySerializable, Model, ShortNameLabelProperty) #>" 
+                    Binding="{Binding <#= GetModelPropertyNameEx2(modelViewUIListPropertySerializable, Model) #>}"/>
 <#
         } else {
 #>
                 <DataGridTextColumn  CanUserReorder="True" CanUserResize="True" CanUserSort="<#= IsSortable #>"
                     Visibility="{Binding Path=Data.<#= SelectedColumnsPropertyName #>[(sys:Int32)<#= cntr #>].IsChecked, Mode=OneWay,  Converter={StaticResource BooleanToVisibilityConverter}, Source={StaticResource userControlContext}}"
-                    Header="<#= GetDisplayAttributeValueString2(modelViewUIListPropertySerializable, Model, ShortNameLabelProperty) #>"  Binding="{Binding <#= GetModelPropertyNameEx2(modelViewUIListPropertySerializable, Model) #>}"/>
+                    Header="<#= GetDisplayAttributeValueString2(modelViewUIListPropertySerializable, Model, ShortNameLabelProperty) #>"  
 <#
+                if (IsDateInput(modelViewUIListPropertySerializable, Model)) {
+#>
+                    Binding="{Binding <#= GetModelPropertyNameEx2(modelViewUIListPropertySerializable, Model) #>, StringFormat=d}"/>
+<#
+                } else if (IsCurrencyInput(modelViewUIListPropertySerializable, Model)) {
+#>
+                    Binding="{Binding <#= GetModelPropertyNameEx2(modelViewUIListPropertySerializable, Model) #>, StringFormat=C}"/>
+<#
+                } else {
+#>
+                    Binding="{Binding <#= GetModelPropertyNameEx2(modelViewUIListPropertySerializable, Model) #>}"/>
+<#
+                }
         }
         cntr++;
     }
@@ -531,6 +545,51 @@
     string GetModelPropertyNameEx2(ModelViewUIListPropertySerializable prop, ModelViewSerializable model) {
         ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
         return GetModelPropertyName(sclrProp, model);
+    }
+    string GetAtributeUnNamedValue(ModelViewPropertyOfVwSerializable sclrProp, string attrName) {
+        if(sclrProp != null) {
+            if (sclrProp.Attributes != null) {
+                ModelViewAttributeSerializable modelViewAttributeSerializable =
+                    sclrProp.Attributes.Where(a => a.AttrName == attrName).FirstOrDefault();
+                if(modelViewAttributeSerializable != null) {
+                    if (modelViewAttributeSerializable.VaueProperties != null) {
+                    
+                        ModelViewAttributePropertySerializable modelViewAttributePropertySerializable =
+                            modelViewAttributeSerializable.VaueProperties.Where(p => (string.IsNullOrEmpty(p.PropName) || (p.PropName == "..."))).FirstOrDefault();
+                        if (modelViewAttributePropertySerializable != null) {
+                            return modelViewAttributePropertySerializable.PropValue;
+                        }
+                    }
+                }
+            }
+        }
+        return null;                
+    }
+    bool IsDateTimeInput(ModelViewUIListPropertySerializable prop, ModelViewSerializable model) {
+        if((prop == null) || (model == null)) return false;
+        ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
+        if (sclrProp == null)
+        {
+            return false;
+        }
+        return ("System.DateTime".Equals(sclrProp.UnderlyingTypeName) || "DateTime".Equals(sclrProp.UnderlyingTypeName));
+    }
+    bool IsDateInput(ModelViewUIListPropertySerializable prop, ModelViewSerializable model) {
+        if(IsDateTimeInput(prop, model)) {
+            ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
+            if(sclrProp == null) return false;
+            string rsltStr = GetAtributeUnNamedValue(sclrProp, "DataType");
+            if(string.IsNullOrEmpty(rsltStr)) return false;
+            return (  (String.Compare("DataType.Date", rsltStr) == 0) || (String.Compare("Date", rsltStr) == 0)  ); 
+        }
+        return false;
+    }
+    bool IsCurrencyInput(ModelViewUIListPropertySerializable prop, ModelViewSerializable model) {
+        ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
+        if(sclrProp == null) return false;
+        string rsltStr = GetAtributeUnNamedValue(sclrProp, "DataType");
+        if(string.IsNullOrEmpty(rsltStr)) return false;
+        return (rsltStr.IndexOf("Currency", StringComparison.CurrentCultureIgnoreCase) >= 0); 
     }
 
 #>
