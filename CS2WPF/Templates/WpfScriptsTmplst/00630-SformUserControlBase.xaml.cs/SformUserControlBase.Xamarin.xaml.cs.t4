@@ -1,0 +1,709 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+using System;
+using Xamarin.Forms;
+using System.Collections.Generic;
+using System.Windows.Input;
+
+<#
+
+    string BindingContextFeedbackFolder      = "00166-BindingContextFeedback.cs";
+    string BindingContextFeedbackClassName   = GetModelClassName(Model, BindingContextFeedbackFolder);
+    string BindingContextFeedbackNameSpace   = GetModelNameSpace(Model, BindingContextFeedbackFolder);
+
+    string ContentViewWithBCFeedbackFolder      = "00168-ContentViewWithBCFeedback.cs";
+    string ContentViewWithBCFeedbackClassName   = GetModelClassName(Model, ContentViewWithBCFeedbackFolder);
+    string ContentViewWithBCFeedbackNameSpace   = GetModelNameSpace(Model, ContentViewWithBCFeedbackFolder);
+
+
+    string ISformViewModelInterfaceFolder      = "00198-ISformViewModelInterface.cs";
+    string ISformViewModelInterfaceClassName   = GetModelClassName(Model, ISformViewModelInterfaceFolder);
+    string ISformViewModelInterfaceNameSpace   = GetModelNameSpace(Model, ISformViewModelInterfaceFolder);
+
+    string IBindingContextChangedFolder      = "00220-IBindingContextChanged.cs";
+    string IBindingContextChangedClassName   = GetModelClassName(Model, IBindingContextChangedFolder);
+    string IBindingContextChangedNameSpace   = GetModelNameSpace(Model, IBindingContextChangedFolder);
+
+
+    string IWebServiceFilterRsltInterfaceFolder      = "00204-IWebServiceFilterRsltInterface.cs";
+    string IWebServiceFilterRsltInterfaceClassName   = GetModelClassName(Model, IWebServiceFilterRsltInterfaceFolder);
+    string IWebServiceFilterRsltInterfaceNameSpace   = GetModelNameSpace(Model, IWebServiceFilterRsltInterfaceFolder);
+
+    string IWebServiceFilterMenuInterfaceFolder      = "00206-IWebServiceFilterMenuInterface.cs";
+    string IWebServiceFilterMenuInterfaceClassName   = GetModelClassName(Model, IWebServiceFilterMenuInterfaceFolder);
+    string IWebServiceFilterMenuInterfaceNameSpace   = GetModelNameSpace(Model, IWebServiceFilterMenuInterfaceFolder);
+
+    string SformUserControlBaseFolder               = "00630-SformUserControlBase.xaml.cs";
+    string SformUserControlBaseClassName            = GetModelClassName(Model, SformUserControlBaseFolder);
+    string SformUserControlBaseNameSpace            = GetModelNameSpace(Model, SformUserControlBaseFolder);
+
+
+    string CaptionPropertyName                      = "Caption";
+    string FilterHeightPropertyName                 = "FilterHeight";
+    string ShowFilterPropertyName                   = "ShowFilter";
+    string ShowAddFilterBtnPropertyName             = "ShowAddFilterBtn";
+    string GridHeightPropertyName                   = "GridHeight";
+
+    string ShowBackBtnPropertyName                  = "ShowBackBtn";
+    string NavigationBackCommandPropertyName        = "NavigationBackCommand";
+    string OnNavigationBackCommandPropertyName      = "OnNavigationBackCommand";
+
+
+    string TableMenuItemsPropertyName               = "TableMenuItems";
+    string TableMenuItemsPropertyChangedPropertyName= "TableMenuItemsPropertyChanged";
+    string TableMenuItemsCommandPropertyName        = "TableMenuItemsCommand";
+
+
+    string RowMenuItemsPropertyName                 = "RowMenuItems";
+    string RowMenuItemsPropertyChangedPropertyName  = "RowMenuItemsPropertyChanged";
+    string RowMenuItemsCommandPropertyName          = "RowMenuItemsCommand";
+
+    string ContainerMenuItemsPropertyName           = "ContainerMenuItems";
+    string ContainerMenuItemsCommandPropertyName    = "ContainerMenuItemsCommand";
+    string OnContainerMenuItemsCommandPropertyName  = "OnContainerMenuItemsCommand";
+
+    string HiddenFiltersPropertyName                = "HiddenFilters";
+    string HiddenFiltersPropertyChangedPropertyName = "HiddenFiltersPropertyChanged";
+
+    string OnLoadedPropertyName                     = "OnLoaded";
+    string OnBindingContextChangedPropertyName      = "OnBindingContextChanged";
+    string SelectedRowCommandPropertyName           = "SelectedRowCommand";
+    string BindingContextFeedbackRefPropertyName    = "BindingContextFeedbackRef";
+    string SelectedRowPropertyName                  = "SelectedRow";
+
+    string SformAfterAddItemPropertyName            = "SformAfterAddItem";
+    string SformAfterUpdItemPropertyName            = "SformAfterUpdItem";
+    string SformAfterDelItemPropertyName            = "SformAfterDelItem";
+    string SformAfterAddItemCommandPropertyName     = "SformAfterAddItemCommand";
+    string SformAfterUpdItemCommandPropertyName     = "SformAfterUpdItemCommand";
+    string SformAfterDelItemCommandPropertyName     = "SformAfterDelItemCommand";
+
+
+    List<string> nmSpaces = new List<string>();
+    if ((SformUserControlBaseNameSpace != IWebServiceFilterRsltInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IWebServiceFilterRsltInterfaceNameSpace);
+    if ((SformUserControlBaseNameSpace != IWebServiceFilterMenuInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterMenuInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IWebServiceFilterMenuInterfaceNameSpace);
+    if ((SformUserControlBaseNameSpace != IBindingContextChangedNameSpace) && (nmSpaces.IndexOf(IBindingContextChangedNameSpace) < 0)) 
+        nmSpaces.Add(IBindingContextChangedNameSpace);
+    if ((SformUserControlBaseNameSpace != ISformViewModelInterfaceNameSpace) && (nmSpaces.IndexOf(ISformViewModelInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(ISformViewModelInterfaceNameSpace);
+    if ((SformUserControlBaseNameSpace != ContentViewWithBCFeedbackNameSpace) && (nmSpaces.IndexOf(ContentViewWithBCFeedbackNameSpace) < 0)) 
+        nmSpaces.Add(ContentViewWithBCFeedbackNameSpace);
+    if ((SformUserControlBaseNameSpace != BindingContextFeedbackNameSpace) && (nmSpaces.IndexOf(BindingContextFeedbackNameSpace) < 0)) 
+        nmSpaces.Add(BindingContextFeedbackNameSpace);
+
+    
+
+#>
+<# 
+    foreach(string ns in nmSpaces) {
+#>
+using <#= ns #>;
+<#
+    }
+#>
+
+
+namespace <#= SformUserControlBaseNameSpace #> {
+    /// <summary>
+    /// Interaction logic for <#= SformUserControlBaseClassName #>.xaml
+    /// </summary>
+    public class <#= SformUserControlBaseClassName #>: <#= ContentViewWithBCFeedbackClassName #>
+    {
+
+        #region On<#= BindingContextFeedbackRefPropertyName #>
+        protected override void On<#= BindingContextFeedbackRefPropertyName #>(object v)
+        {
+            <#= BindingContextFeedbackClassName #> bcf = v as <#= BindingContextFeedbackClassName #>;
+            if(bcf == null) return;
+            if(string.IsNullOrEmpty(bcf.BcfName)) return;
+		    if(bcf.BcfName == "<#= SelectedRowPropertyName #>") {
+                ICommand cmd = <#= SelectedRowCommandPropertyName #>; 
+                if(cmd != null) {
+                    if(cmd.CanExecute(bcf.BcfData))
+                        cmd.Execute(bcf.BcfData);
+                }
+            } else if(bcf.BcfName == "<#= RowMenuItemsCommandPropertyName #>") {
+                ICommand cmd = <#= RowMenuItemsCommandPropertyName #>; 
+                if(cmd != null) {
+                    if(cmd.CanExecute(bcf.BcfData))
+                        cmd.Execute(bcf.BcfData);
+                }  
+            } else if(bcf.BcfName == "<#= TableMenuItemsCommandPropertyName #>") {
+                ICommand cmd = <#= TableMenuItemsCommandPropertyName #>; 
+                if(cmd != null) {
+                    if(cmd.CanExecute(bcf.BcfData))
+                        cmd.Execute(bcf.BcfData);
+                }
+            }
+        }
+        #endregion
+        #region <#= TableMenuItemsCommandPropertyName #>
+        public static readonly BindableProperty <#= TableMenuItemsCommandPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= TableMenuItemsCommandPropertyName #>", typeof(ICommand),
+                typeof(<#= SformUserControlBaseClassName #>),
+                null);
+        public ICommand <#= TableMenuItemsCommandPropertyName #>
+        {
+            get
+            {
+                return (ICommand)GetValue(<#= TableMenuItemsCommandPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= TableMenuItemsCommandPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= RowMenuItemsCommandPropertyName #>
+        public static readonly BindableProperty <#= RowMenuItemsCommandPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= RowMenuItemsCommandPropertyName #>", typeof(ICommand),
+                typeof(<#= SformUserControlBaseClassName #>),
+                null);
+        public ICommand <#= RowMenuItemsCommandPropertyName #>
+        {
+            get
+            {
+                return (ICommand)GetValue(<#= RowMenuItemsCommandPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= RowMenuItemsCommandPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= SelectedRowCommandPropertyName #>
+        public static readonly BindableProperty <#= SelectedRowCommandPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= SelectedRowCommandPropertyName #>", typeof(ICommand),
+                typeof(<#= SformUserControlBaseClassName #>),
+                null);
+        public ICommand <#= SelectedRowCommandPropertyName #>
+        {
+            get
+            {
+                return (ICommand)GetValue(<#= SelectedRowCommandPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= SelectedRowCommandPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= CaptionPropertyName #>
+        public static readonly BindableProperty <#= CaptionPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= CaptionPropertyName #>", typeof(string),
+                typeof(<#= SformUserControlBaseClassName #>),
+                null);
+        public string <#= CaptionPropertyName #>
+        {
+            get
+            {
+                return (string)GetValue(<#= CaptionPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= CaptionPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= FilterHeightPropertyName #>
+        public static readonly BindableProperty <#= FilterHeightPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= FilterHeightPropertyName #>", typeof(double),
+                typeof(<#= SformUserControlBaseClassName #>),
+                -1d);
+        public double <#= FilterHeightPropertyName #>
+        {
+            get
+            {
+                return (double)GetValue(<#= FilterHeightPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= FilterHeightPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= ShowFilterPropertyName #>
+        public static readonly BindableProperty <#= ShowFilterPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= ShowFilterPropertyName #>", typeof(bool),
+                typeof(<#= SformUserControlBaseClassName #>),
+                true);
+        public bool <#= ShowFilterPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= ShowFilterPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= ShowFilterPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= ShowAddFilterBtnPropertyName #>
+        public static readonly BindableProperty <#= ShowAddFilterBtnPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= ShowAddFilterBtnPropertyName #>", typeof(bool),
+                typeof(<#= SformUserControlBaseClassName #>),
+                true);
+        public bool <#= ShowAddFilterBtnPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= ShowAddFilterBtnPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= ShowAddFilterBtnPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= GridHeightPropertyName #>
+        public static readonly BindableProperty <#= GridHeightPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= GridHeightPropertyName #>", typeof(double),
+                typeof(<#= SformUserControlBaseClassName #>),
+                -1d);
+        public double <#= GridHeightPropertyName #>
+        {
+            get
+            {
+                return (double)GetValue(<#= GridHeightPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= GridHeightPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= ShowBackBtnPropertyName #>
+        public static readonly BindableProperty <#= ShowBackBtnPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= ShowBackBtnPropertyName #>", typeof(bool),
+                typeof(<#= SformUserControlBaseClassName #>),
+                false);
+        public bool <#= ShowBackBtnPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= ShowBackBtnPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= ShowBackBtnPropertyName #>Property, value);
+            }
+        }
+        #endregion
+
+
+
+
+
+
+
+        #region <#= TableMenuItemsPropertyName #>
+        private static void <#= TableMenuItemsPropertyName #>Changed(BindableObject d, object oldValue, object newValue)
+        {
+            <#= SformUserControlBaseClassName #> inst = d as <#= SformUserControlBaseClassName #>;
+            if (inst != null)
+            {
+                <#= ISformViewModelInterfaceClassName #> bc = inst.BindingContext as <#= ISformViewModelInterfaceClassName #>;
+                if(bc != null)
+                    bc.<#= TableMenuItemsPropertyChangedPropertyName #>(inst, oldValue, newValue);
+           }
+        }
+        public static readonly BindableProperty <#= TableMenuItemsPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= TableMenuItemsPropertyName #>", typeof(IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>),
+                typeof(<#= SformUserControlBaseClassName #>),
+                null, propertyChanged: <#= TableMenuItemsPropertyName #>Changed);
+        public IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> <#= TableMenuItemsPropertyName #>
+        {
+            get
+            {
+                return (IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>)GetValue(<#= TableMenuItemsPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= TableMenuItemsPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= RowMenuItemsPropertyName #>
+        private static void <#= RowMenuItemsPropertyName #>Changed(BindableObject d, object oldValue, object newValue)
+        {
+            <#= SformUserControlBaseClassName #> inst = d as <#= SformUserControlBaseClassName #>;
+            if (inst != null)
+            {
+                <#= ISformViewModelInterfaceClassName #> bc = inst.BindingContext as <#= ISformViewModelInterfaceClassName #>;
+                if(bc != null)
+                    bc.<#= RowMenuItemsPropertyChangedPropertyName #>(inst, oldValue, newValue);
+            }
+        }
+        public static readonly BindableProperty <#= RowMenuItemsPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= RowMenuItemsPropertyName #>", typeof(IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>),
+                typeof(<#= SformUserControlBaseClassName #>),
+                null, propertyChanged: <#= RowMenuItemsPropertyName #>Changed);
+        public IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> <#= RowMenuItemsPropertyName #>
+        {
+            get
+            {
+                return (IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>)GetValue(<#= RowMenuItemsPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= RowMenuItemsPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= ContainerMenuItemsPropertyName #>
+        public static readonly BindableProperty <#= ContainerMenuItemsPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= ContainerMenuItemsPropertyName #>", typeof(IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>),
+                typeof(<#= SformUserControlBaseClassName #>),
+                null);
+        public IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> <#= ContainerMenuItemsPropertyName #>
+        {
+            get
+            {
+                return (IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>)GetValue(<#= ContainerMenuItemsPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= ContainerMenuItemsPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= HiddenFiltersPropertyName #>
+        private static async void <#= HiddenFiltersPropertyName #>Changed(BindableObject d, object oldValue, object newValue)
+        {
+            <#= SformUserControlBaseClassName #> inst = d as <#= SformUserControlBaseClassName #>;
+            if (inst != null)
+            {
+                <#= ISformViewModelInterfaceClassName #> bc = inst.BindingContext as <#= ISformViewModelInterfaceClassName #>;
+                if(bc != null)
+                    await bc.<#= HiddenFiltersPropertyChangedPropertyName #>(inst, oldValue, newValue);
+            }
+        }
+        public static readonly BindableProperty <#= HiddenFiltersPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= HiddenFiltersPropertyName #>", typeof(IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>),
+                typeof(<#= SformUserControlBaseClassName #>),
+                null, propertyChanged: <#= HiddenFiltersPropertyName #>Changed);
+        public IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>> <#= HiddenFiltersPropertyName #>
+        {
+            get
+            {
+                return (IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>)GetValue(<#= HiddenFiltersPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= HiddenFiltersPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= OnBindingContextChangedPropertyName #>
+//        protected override async void <#= OnBindingContextChangedPropertyName #>()
+//        {
+//            base.OnBindingContextChanged();
+//            <#= ISformViewModelInterfaceClassName #> bcs = BindingContext as <#= ISformViewModelInterfaceClassName #>;
+//            if (bcs != null)
+//            {
+//                bcs.<#= RowMenuItemsPropertyChangedPropertyName #>(this, null, <#= RowMenuItemsPropertyName #>);
+//                bcs.<#= TableMenuItemsPropertyChangedPropertyName #>(this, null, <#= TableMenuItemsPropertyName #>);
+//                await bcs.<#= HiddenFiltersPropertyChangedPropertyName #>(this, null, <#= HiddenFiltersPropertyName #>);
+//            }
+//            <#= IBindingContextChangedClassName #> bcl = this.BindingContext as <#= IBindingContextChangedClassName #>;
+//            if (bcl != null)
+//            {
+//                await bcl.<#= OnLoadedPropertyName #>(this);
+//            }
+//        }
+        #endregion
+        #region <#= ContainerMenuItemsCommandPropertyName #>
+        private static void <#= ContainerMenuItemsCommandPropertyName #>Changed(BindableObject bindable, object oldValue, object newValue)
+        {
+            <#= SformUserControlBaseClassName #> d = bindable as <#= SformUserControlBaseClassName #>;
+            if (d != null)
+            {
+                if (d.<#= OnContainerMenuItemsCommandPropertyName #> != null)
+                {
+                    (d.<#= OnContainerMenuItemsCommandPropertyName #> as Command).ChangeCanExecute();
+                }
+            }
+        }
+        public static readonly BindableProperty <#= ContainerMenuItemsCommandPropertyName #>Property =
+            BindableProperty.Create(nameof(<#= ContainerMenuItemsCommandPropertyName #>), typeof(ICommand), 
+            typeof(<#= SformUserControlBaseClassName #>), 
+            null, 
+            propertyChanged: <#= ContainerMenuItemsCommandPropertyName #>Changed);
+        public ICommand <#= ContainerMenuItemsCommandPropertyName #>
+        {
+            get { return (ICommand)GetValue(<#= ContainerMenuItemsCommandPropertyName #>Property); }
+            set { SetValue(<#= ContainerMenuItemsCommandPropertyName #>Property, value); }
+        }
+        #endregion
+        #region <#= OnContainerMenuItemsCommandPropertyName #>
+        protected ICommand _<#= OnContainerMenuItemsCommandPropertyName #> = null;
+        public ICommand <#= OnContainerMenuItemsCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= OnContainerMenuItemsCommandPropertyName #> ?? (_<#= OnContainerMenuItemsCommandPropertyName #> = new Command((p) => <#= OnContainerMenuItemsCommandPropertyName #>Execute(p), (p) => <#= OnContainerMenuItemsCommandPropertyName #>CanExecute(p)));
+            }
+        }
+        protected void <#= OnContainerMenuItemsCommandPropertyName #>Execute(object prm)
+        {
+            ICommand cmd = <#= ContainerMenuItemsCommandPropertyName #>;
+            if(cmd != null) {
+                if(cmd.CanExecute(prm)) {
+                    cmd.Execute(prm);
+                }
+            }
+        }
+        protected bool <#= OnContainerMenuItemsCommandPropertyName #>CanExecute(object p)
+        {
+            return (<#= ContainerMenuItemsCommandPropertyName #> != null); 
+
+//
+//            ICommand cmd = <#= ContainerMenuItemsCommandPropertyName #>;
+//            if (cmd != null)
+//              return cmd.CanExecute(prm);
+//            else
+//              return false;
+        }
+        #endregion
+        #region <#= NavigationBackCommandPropertyName #>
+        private static void <#= NavigationBackCommandPropertyName #>Changed(BindableObject bindable, object oldValue, object newValue)
+        {
+            <#= SformUserControlBaseClassName #> d = bindable as <#= SformUserControlBaseClassName #>;
+            if (d != null)
+            {
+                if (d.<#= OnNavigationBackCommandPropertyName #> != null)
+                {
+                    (d.<#= OnNavigationBackCommandPropertyName #> as Command).ChangeCanExecute();
+                }
+            }
+        }
+        public static readonly BindableProperty NavigationBackCommandProperty =
+            BindableProperty.Create(nameof(<#= NavigationBackCommandPropertyName #>), typeof(ICommand), 
+            typeof(<#= SformUserControlBaseClassName #>), 
+            propertyChanged: <#= NavigationBackCommandPropertyName #>Changed);
+        public ICommand <#= NavigationBackCommandPropertyName #>
+        {
+            get { return (ICommand)GetValue(<#= NavigationBackCommandPropertyName #>Property); }
+            set { SetValue(<#= NavigationBackCommandPropertyName #>Property, value); }
+        }
+        #endregion
+        #region <#= OnNavigationBackCommandPropertyName #>
+        protected ICommand _<#= OnNavigationBackCommandPropertyName #> = null;
+        public ICommand <#= OnNavigationBackCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= OnNavigationBackCommandPropertyName #> ?? (_<#= OnNavigationBackCommandPropertyName #> = new Command(() => <#= OnNavigationBackCommandPropertyName #>Execute(), () => <#= OnNavigationBackCommandPropertyName #>CanExecute()));
+            }
+        }
+        protected void <#= OnNavigationBackCommandPropertyName #>Execute()
+        {
+            ICommand cmd = <#= NavigationBackCommandPropertyName #>;
+            if(cmd != null) {
+                if(cmd.CanExecute(this)) {
+                    cmd.Execute(this);
+                }
+            }
+        }
+        protected bool <#= OnNavigationBackCommandPropertyName #>CanExecute()
+        {
+            return (<#= NavigationBackCommandPropertyName #> != null); 
+//
+//            ICommand cmd = <#= NavigationBackCommandPropertyName #>;
+//            if (cmd != null)
+//              return cmd.CanExecute(this);
+//            else
+//              return false;
+
+        }
+        #endregion
+        #region <#= SformAfterAddItemPropertyName #>
+        private static void <#= SformAfterAddItemPropertyName #>Changed(BindableObject bindable, object oldValue, object newValue)
+        {
+            <#= SformUserControlBaseClassName #> d = bindable as <#= SformUserControlBaseClassName #>;
+            if (d != null)
+            {
+                <#= ISformViewModelInterfaceClassName #> bc = d.BindingContext as <#= ISformViewModelInterfaceClassName #>;
+                if (bc != null)
+                {
+                    bc.<#= SformAfterAddItemCommandPropertyName #>(d, newValue);
+                }
+            }
+        }
+        public static readonly BindableProperty <#= SformAfterAddItemPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= SformAfterAddItemPropertyName #>", typeof(object),
+                typeof(<#= SformUserControlBaseClassName #>),
+                null, propertyChanged: <#= SformAfterAddItemPropertyName #>Changed);
+        public object <#= SformAfterAddItemPropertyName #>
+        {
+            get
+            {
+                return (object)GetValue(<#= SformAfterAddItemPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= SformAfterAddItemPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= SformAfterUpdItemPropertyName #>
+        private static void <#= SformAfterUpdItemPropertyName #>Changed(BindableObject bindable, object oldValue, object newValue)
+        {
+            <#= SformUserControlBaseClassName #> d = bindable as <#= SformUserControlBaseClassName #>;
+            if (d != null)
+            {
+                <#= ISformViewModelInterfaceClassName #> bc = d.BindingContext as <#= ISformViewModelInterfaceClassName #>;
+                if (bc != null)
+                {
+                    bc.<#= SformAfterUpdItemCommandPropertyName #>(d, newValue);
+                }
+            }
+        }
+        public static readonly BindableProperty <#= SformAfterUpdItemPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= SformAfterUpdItemPropertyName #>", typeof(object),
+                typeof(<#= SformUserControlBaseClassName #>),
+                null, propertyChanged: <#= SformAfterUpdItemPropertyName #>Changed);
+        public object <#= SformAfterUpdItemPropertyName #>
+        {
+            get
+            {
+                return (object)GetValue(<#= SformAfterUpdItemPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= SformAfterUpdItemPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= SformAfterDelItemPropertyName #>
+        private static void <#= SformAfterDelItemPropertyName #>Changed(BindableObject bindable, object oldValue, object newValue)
+        {
+            <#= SformUserControlBaseClassName #> d = bindable as <#= SformUserControlBaseClassName #>;
+            if (d != null)
+            {
+                <#= ISformViewModelInterfaceClassName #> bc = d.BindingContext as <#= ISformViewModelInterfaceClassName #>;
+                if (bc != null)
+                {
+                    bc.<#= SformAfterDelItemCommandPropertyName #>(d, newValue);
+                }
+            }
+        }
+        public static readonly BindableProperty <#= SformAfterDelItemPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= SformAfterDelItemPropertyName #>", typeof(object),
+                typeof(<#= SformUserControlBaseClassName #>),
+                null, propertyChanged: <#= SformAfterDelItemPropertyName #>Changed);
+        public object <#= SformAfterDelItemPropertyName #>
+        {
+            get
+            {
+                return (object)GetValue(<#= SformAfterDelItemPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= SformAfterDelItemPropertyName #>Property, value);
+            }
+        }
+        #endregion 
+    }
+}
+
+<#+
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+#>

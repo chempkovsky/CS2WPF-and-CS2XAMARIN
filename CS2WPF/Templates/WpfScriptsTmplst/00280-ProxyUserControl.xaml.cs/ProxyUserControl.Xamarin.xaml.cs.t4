@@ -1,0 +1,1269 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+using System;
+using Xamarin.Forms;
+using System.Collections.Generic;
+using System.Windows.Input;
+
+<#
+
+    string EformModeEnumFolder      = "00026-EformModeEnum.cs";
+    string EformModeEnumClassName   = GetModelClassName(Model, EformModeEnumFolder);
+    string EformModeEnumNameSpace   = GetModelNameSpace(Model, EformModeEnumFolder);
+
+    string IWebServiceFilterMenuInterfaceFolder      = "00206-IWebServiceFilterMenuInterface.cs";
+    string IWebServiceFilterMenuInterfaceClassName   = GetModelClassName(Model, IWebServiceFilterMenuInterfaceFolder);
+    string IWebServiceFilterMenuInterfaceNameSpace   = GetModelNameSpace(Model, IWebServiceFilterMenuInterfaceFolder);
+
+
+    string IWebServiceFilterRsltInterfaceFolder      = "00204-IWebServiceFilterRsltInterface.cs";
+    string IWebServiceFilterRsltInterfaceClassName   = GetModelClassName(Model, IWebServiceFilterRsltInterfaceFolder);
+    string IWebServiceFilterRsltInterfaceNameSpace   = GetModelNameSpace(Model, IWebServiceFilterRsltInterfaceFolder);
+
+
+    string ProxyUserControlFolder     = "00280-ProxyUserControl.xaml.cs";
+    string ProxyUserControlClassName  = GetModelClassName(Model, ProxyUserControlFolder);
+    string ProxyUserControlNameSpace  = GetModelNameSpace(Model, ProxyUserControlFolder);
+
+    string CaptionPropertyName                      = "Caption";
+    string FilterHeightPropertyName                 = "FilterHeight";
+    string ShowFilterPropertyName                   = "ShowFilter";
+    string ShowAddFilterBtnPropertyName             = "ShowAddFilterBtn";
+    string GridHeightPropertyName                   = "GridHeight";
+    string ShowBackBtnPropertyName                  = "ShowBackBtn";
+    string NavigationBackCommandPropertyName        = "NavigationBackCommand";
+    string OnNavigationBackCommandPropertyName      = "OnNavigationBackCommand";
+
+    string TableMenuItemsPropertyName               = "TableMenuItems";
+    string TableMenuItemsCommandPropertyName        = "TableMenuItemsCommand";
+    string OnTableMenuItemsCommandPropertyName      = "OnTableMenuItemsCommand";
+
+    string RowMenuItemsPropertyName                 = "RowMenuItems";
+    string RowMenuItemsCommandPropertyName          = "RowMenuItemsCommand";
+    string OnRowMenuItemsCommandPropertyName        = "OnRowMenuItemsCommand";
+
+    string ContainerMenuItemsPropertyName           = "ContainerMenuItems";
+    string ContainerMenuItemsCommandPropertyName    = "ContainerMenuItemsCommand";
+    string OnContainerMenuItemsCommandPropertyName  = "OnContainerMenuItemsCommand";
+
+    string SelectedRowCommandPropertyName           = "SelectedRowCommand";
+    string OnSelectedRowCommandPropertyName         = "OnSelectedRowCommand";
+
+    string HiddenFiltersPropertyName                = "HiddenFilters";
+
+    string SformAfterAddItemPropertyName            = "SformAfterAddItem";
+    string SformAfterUpdItemPropertyName            = "SformAfterUpdItem";
+    string SformAfterDelItemPropertyName            = "SformAfterDelItem";
+
+    string SformAfterAddItemCommandPropertyName     = "SformAfterAddItemCommand";
+    string OnSformAfterAddItemCommandPropertyName   = "OnSformAfterAddItemCommand";
+    string SformAfterUpdItemCommandPropertyName     = "SformAfterUpdItemCommand";
+    string OnSformAfterUpdItemCommandPropertyName   = "OnSformAfterUpdItemCommand";
+    string SformAfterDelItemCommandPropertyName     = "SformAfterDelItemCommand";
+    string OnSformAfterDelItemCommandPropertyName   = "OnSformAfterDelItemCommand";
+
+
+    string ShowSubmitPropertyName                   = "ShowSubmit";
+    string SubmitCommandPropertyName                = "SubmitCommand";
+    string OnSubmitCommandPropertyName              = "OnSubmitCommand";
+    string CancelCommandPropertyName                = "CancelCommand";
+    string OnCancelCommandPropertyName              = "OnCancelCommand";
+    string FormControlModelPropertyName             = "FormControlModel";
+    string EformModePropertyName                    = "EformMode";
+
+
+
+    string CanAddPropertyName = "CanAdd";
+    string CanUpdPropertyName = "CanUpdate";
+    string CanDelPropertyName = "CanDelete";
+
+    string FilterHeightDetailPropertyName = "FilterHeightDetail"; 
+    string ShowFilterDetailPropertyName = "ShowFilterDetail"; 
+    string ShowAddFilterBtnDetailPropertyName = "ShowAddFilterBtnDetail"; 
+    string GridHeightDetailPropertyName = "GridHeightDetail"; 
+    string HiddenFiltersDetailPropertyName = "HiddenFiltersDetail"; 
+    string TableMenuItemsDetailPropertyName = "TableMenuItemsDetail"; 
+    string RowMenuItemsDetailPropertyName = "RowMenuItemsDetail"; 
+    string CanAddDetailPropertyName = "CanAddDetail"; 
+    string CanUpdDetailPropertyName = "CanUpdateDetail"; 
+    string CanDelDetailPropertyName = "CanDeleteDetail"; 
+    string IsPermissionEditablePropertyName  = "IsPermissionEditable";
+    string PermissionVectorPropertyName      = "PermissionVector";
+
+
+    List<string> nmSpaces = new List<string>();
+    if ((ProxyUserControlNameSpace != IWebServiceFilterMenuInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterMenuInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IWebServiceFilterMenuInterfaceNameSpace);
+    if ((ProxyUserControlNameSpace != IWebServiceFilterRsltInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IWebServiceFilterRsltInterfaceNameSpace);
+    if ((ProxyUserControlNameSpace != EformModeEnumNameSpace) && (nmSpaces.IndexOf(EformModeEnumNameSpace) < 0)) 
+        nmSpaces.Add(EformModeEnumNameSpace);
+
+#>
+<# 
+    foreach(string ns in nmSpaces) {
+#>
+using <#= ns #>;
+<#
+    }
+#>
+
+namespace <#= ProxyUserControlNameSpace #> {
+    /// <summary>
+    /// Interaction logic for <#= ProxyUserControlClassName #>.xaml
+    /// </summary>
+    public partial class <#= ProxyUserControlClassName #>: ContentView
+    {
+        public <#= ProxyUserControlClassName #>()
+        {
+            InitializeComponent();
+        }
+        #region <#= CaptionPropertyName #>
+        public static readonly BindableProperty <#= CaptionPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= CaptionPropertyName #>", typeof(string),
+                typeof(<#= ProxyUserControlClassName #>),
+                null);
+        public string <#= CaptionPropertyName #>
+        {
+            get
+            {
+                return (string)GetValue(<#= CaptionPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= CaptionPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= FilterHeightPropertyName #>
+        public static readonly BindableProperty <#= FilterHeightPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= FilterHeightPropertyName #>", typeof(double),
+                typeof(<#= ProxyUserControlClassName #>),
+                -1d);
+        public double <#= FilterHeightPropertyName #>
+        {
+            get
+            {
+                return (double)GetValue(<#= FilterHeightPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= FilterHeightPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= ShowFilterPropertyName #>
+        public static readonly BindableProperty <#= ShowFilterPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= ShowFilterPropertyName #>", typeof(bool),
+                typeof(<#= ProxyUserControlClassName #>),
+                true);
+        public bool <#= ShowFilterPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= ShowFilterPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= ShowFilterPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= ShowAddFilterBtnPropertyName #>
+        public static readonly BindableProperty <#= ShowAddFilterBtnPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= ShowAddFilterBtnPropertyName #>", typeof(bool),
+                typeof(<#= ProxyUserControlClassName #>),
+                true);
+        public bool <#= ShowAddFilterBtnPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= ShowAddFilterBtnPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= ShowAddFilterBtnPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= GridHeightPropertyName #>
+        public static readonly BindableProperty <#= GridHeightPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= GridHeightPropertyName #>", typeof(double),
+                typeof(<#= ProxyUserControlClassName #>),
+                -1d);
+        public double <#= GridHeightPropertyName #>
+        {
+            get
+            {
+                return (double)GetValue(<#= GridHeightPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= GridHeightPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= ShowBackBtnPropertyName #>
+        public static readonly BindableProperty <#= ShowBackBtnPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= ShowBackBtnPropertyName #>", typeof(bool),
+                typeof(<#= ProxyUserControlClassName #>),
+                false);
+        public bool <#= ShowBackBtnPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= ShowBackBtnPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= ShowBackBtnPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= NavigationBackCommandPropertyName #>
+        private static void <#= NavigationBackCommandPropertyName #>Changed(BindableObject bindable, object oldValue, object newValue)
+        {
+            <#= ProxyUserControlClassName #> d = bindable as <#= ProxyUserControlClassName #>;
+            if (d != null)
+            {
+                (d.<#= OnNavigationBackCommandPropertyName #> as Command).ChangeCanExecute();
+            }
+        }
+        public static readonly BindableProperty NavigationBackCommandProperty =
+            BindableProperty.Create(nameof(<#= NavigationBackCommandPropertyName #>), typeof(ICommand), 
+            typeof(<#= ProxyUserControlClassName #>), 
+            propertyChanged: <#= NavigationBackCommandPropertyName #>Changed);
+        public ICommand <#= NavigationBackCommandPropertyName #>
+        {
+            get { return (ICommand)GetValue(<#= NavigationBackCommandPropertyName #>Property); }
+            set { SetValue(<#= NavigationBackCommandPropertyName #>Property, value); }
+        }
+        #endregion
+        #region <#= OnNavigationBackCommandPropertyName #>
+        protected ICommand _<#= OnNavigationBackCommandPropertyName #> = null;
+        public ICommand <#= OnNavigationBackCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= OnNavigationBackCommandPropertyName #> ?? (_<#= OnNavigationBackCommandPropertyName #> = new Command((prm) => <#= OnNavigationBackCommandPropertyName #>Execute(prm), (prm) => <#= OnNavigationBackCommandPropertyName #>CanExecute(prm)));
+            }
+        }
+        protected void <#= OnNavigationBackCommandPropertyName #>Execute(object  prm)
+        {
+            ICommand cmd = <#= NavigationBackCommandPropertyName #>;
+            if(cmd != null) {
+                if(cmd.CanExecute(prm)) {
+                    cmd.Execute(prm);
+                }
+            }
+        }
+        protected bool <#= OnNavigationBackCommandPropertyName #>CanExecute(object  prm)
+        {
+            return (<#= NavigationBackCommandPropertyName #> != null); 
+//
+//            ICommand cmd = <#= NavigationBackCommandPropertyName #>;
+//            if (cmd != null)
+//              return cmd.CanExecute(prm);
+//            else
+//              return false;
+
+        }
+        #endregion
+        #region <#= TableMenuItemsPropertyName #>
+        public static readonly BindableProperty <#= TableMenuItemsPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= TableMenuItemsPropertyName #>", typeof(IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>),
+                typeof(<#= ProxyUserControlClassName #>),
+                null);
+        public IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> <#= TableMenuItemsPropertyName #>
+        {
+            get
+            {
+                return (IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>)GetValue(<#= TableMenuItemsPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= TableMenuItemsPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= TableMenuItemsCommandPropertyName #>
+        private static void <#= TableMenuItemsCommandPropertyName #>Changed(BindableObject bindable, object oldValue, object newValue)
+        {
+            <#= ProxyUserControlClassName #> d = bindable as <#= ProxyUserControlClassName #>;
+            if (d != null)
+            {
+                (d.<#= OnTableMenuItemsCommandPropertyName #> as Command).ChangeCanExecute();
+            }
+        }
+        public static readonly BindableProperty <#= TableMenuItemsCommandPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= TableMenuItemsCommandPropertyName #>", typeof(ICommand),
+                typeof(<#= ProxyUserControlClassName #>),
+                null, propertyChanged: <#= TableMenuItemsCommandPropertyName #>Changed);
+        public ICommand <#= TableMenuItemsCommandPropertyName #>
+        {
+            get
+            {
+                return (ICommand)GetValue(<#= TableMenuItemsCommandPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= TableMenuItemsCommandPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= OnTableMenuItemsCommandPropertyName #>
+        protected ICommand _<#= OnTableMenuItemsCommandPropertyName #> = null;
+        public ICommand <#= OnTableMenuItemsCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= OnTableMenuItemsCommandPropertyName #> ?? (_<#= OnTableMenuItemsCommandPropertyName #> = new Command((prm) => <#= OnTableMenuItemsCommandPropertyName #>Execute(prm), (prm) => <#= OnTableMenuItemsCommandPropertyName #>CanExecute(prm)));
+            }
+        }
+        protected void <#= OnTableMenuItemsCommandPropertyName #>Execute(object  prm)
+        {
+            ICommand cmd = <#= TableMenuItemsCommandPropertyName #>;
+            if(cmd != null) {
+                if(cmd.CanExecute(prm)) {
+                    cmd.Execute(prm);
+                }
+            }
+        }
+        protected bool <#= OnTableMenuItemsCommandPropertyName #>CanExecute(object  prm)
+        {
+            return (<#= TableMenuItemsCommandPropertyName #> != null); 
+//
+//            ICommand cmd = <#= TableMenuItemsCommandPropertyName #>;
+//            if (cmd != null)
+//              return cmd.CanExecute(prm);
+//            else
+//              return false;
+
+        }
+        #endregion
+        #region <#= RowMenuItemsPropertyName #>
+        public static readonly BindableProperty <#= RowMenuItemsPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= RowMenuItemsPropertyName #>", typeof(IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>),
+                typeof(<#= ProxyUserControlClassName #>),
+                null);
+        public IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> <#= RowMenuItemsPropertyName #>
+        {
+            get
+            {
+                return (IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>)GetValue(<#= RowMenuItemsPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= RowMenuItemsPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= RowMenuItemsCommandPropertyName #>
+        private static void <#= RowMenuItemsCommandPropertyName #>Changed(BindableObject bindable, object oldValue, object newValue)
+        {
+            <#= ProxyUserControlClassName #> d = bindable as <#= ProxyUserControlClassName #>;
+            if (d != null)
+            {
+                (d.<#= OnRowMenuItemsCommandPropertyName #> as Command).ChangeCanExecute();
+            }
+        }
+        public static readonly BindableProperty <#= RowMenuItemsCommandPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= RowMenuItemsCommandPropertyName #>", typeof(ICommand),
+                typeof(<#= ProxyUserControlClassName #>),
+                null);
+        public ICommand <#= RowMenuItemsCommandPropertyName #>
+        {
+            get
+            {
+                return (ICommand)GetValue(<#= RowMenuItemsCommandPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= RowMenuItemsCommandPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= OnRowMenuItemsCommandPropertyName #>
+        protected ICommand _<#= OnRowMenuItemsCommandPropertyName #> = null;
+        public ICommand <#= OnRowMenuItemsCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= OnRowMenuItemsCommandPropertyName #> ?? (_<#= OnRowMenuItemsCommandPropertyName #> = new Command((prm) => <#= OnRowMenuItemsCommandPropertyName #>Execute(prm), (prm) => <#= OnRowMenuItemsCommandPropertyName #>CanExecute(prm)));
+            }
+        }
+        protected void <#= OnRowMenuItemsCommandPropertyName #>Execute(object  prm)
+        {
+            ICommand cmd = <#= RowMenuItemsCommandPropertyName #>;
+            if(cmd != null) {
+                if(cmd.CanExecute(prm)) {
+                    cmd.Execute(prm);
+                }
+            }
+        }
+        protected bool <#= OnRowMenuItemsCommandPropertyName #>CanExecute(object  prm)
+        {
+            return (<#= RowMenuItemsCommandPropertyName #> != null); 
+//
+//            ICommand cmd = <#= RowMenuItemsCommandPropertyName #>;
+//            if (cmd != null)
+//              return cmd.CanExecute(prm);
+//            else
+//              return false;
+
+        }
+        #endregion
+        #region <#= ContainerMenuItemsPropertyName #>
+        public static readonly BindableProperty <#= ContainerMenuItemsPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= ContainerMenuItemsPropertyName #>", typeof(IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>),
+                typeof(<#= ProxyUserControlClassName #>),
+                null);
+        public IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> <#= ContainerMenuItemsPropertyName #>
+        {
+            get
+            {
+                return (IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>)GetValue(<#= ContainerMenuItemsPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= ContainerMenuItemsPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= ContainerMenuItemsCommandPropertyName #>
+        private static void <#= ContainerMenuItemsCommandPropertyName #>Changed(BindableObject bindable, object oldValue, object newValue)
+        {
+            <#= ProxyUserControlClassName #> d = bindable as <#= ProxyUserControlClassName #>;
+            if (d != null)
+            {
+                (d.<#= OnContainerMenuItemsCommandPropertyName #> as Command).ChangeCanExecute();
+            }
+        }
+        public static readonly BindableProperty <#= ContainerMenuItemsCommandPropertyName #>Property =
+            BindableProperty.Create(nameof(<#= ContainerMenuItemsCommandPropertyName #>), typeof(ICommand), 
+            typeof(<#= ProxyUserControlClassName #>), 
+            null, propertyChanged: <#= ContainerMenuItemsCommandPropertyName #>Changed);
+        public ICommand <#= ContainerMenuItemsCommandPropertyName #>
+        {
+            get { return (ICommand)GetValue(<#= ContainerMenuItemsCommandPropertyName #>Property); }
+            set { SetValue(<#= ContainerMenuItemsCommandPropertyName #>Property, value); }
+        }
+        #endregion
+        #region <#= OnContainerMenuItemsCommandPropertyName #>
+        protected ICommand _<#= OnContainerMenuItemsCommandPropertyName #> = null;
+        public ICommand <#= OnContainerMenuItemsCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= OnContainerMenuItemsCommandPropertyName #> ?? (_<#= OnContainerMenuItemsCommandPropertyName #> = new Command((p) => <#= OnContainerMenuItemsCommandPropertyName #>Execute(p), (p) => <#= OnContainerMenuItemsCommandPropertyName #>CanExecute(p)));
+            }
+        }
+        protected void <#= OnContainerMenuItemsCommandPropertyName #>Execute(object prm)
+        {
+            ICommand cmd = <#= ContainerMenuItemsCommandPropertyName #>;
+            if(cmd != null) {
+                if(cmd.CanExecute(prm)) {
+                    cmd.Execute(prm);
+                }
+            }
+        }
+        protected bool <#= OnContainerMenuItemsCommandPropertyName #>CanExecute(object prm)
+        {
+            return (<#= ContainerMenuItemsCommandPropertyName #> != null); 
+
+//
+//            ICommand cmd = <#= ContainerMenuItemsCommandPropertyName #>;
+//            if (cmd != null)
+//              return cmd.CanExecute(prm);
+//            else
+//              return false;
+
+        }
+        #endregion
+        #region <#= SelectedRowCommandPropertyName #>
+        private static void <#= SelectedRowCommandPropertyName #>Changed(BindableObject bindable, object oldValue, object newValue)
+        {
+            <#= ProxyUserControlClassName #> d = bindable as <#= ProxyUserControlClassName #>;
+            if (d != null)
+            {
+                (d.<#= OnSelectedRowCommandPropertyName #> as Command).ChangeCanExecute();
+            }
+        }
+        public static readonly BindableProperty <#= SelectedRowCommandPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= SelectedRowCommandPropertyName #>", typeof(ICommand),
+                typeof(<#= ProxyUserControlClassName #>),
+                null, propertyChanged: <#= SelectedRowCommandPropertyName #>Changed);
+        public ICommand <#= SelectedRowCommandPropertyName #>
+        {
+            get
+            {
+                return (ICommand)GetValue(<#= SelectedRowCommandPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= SelectedRowCommandPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= OnSelectedRowCommandPropertyName #>
+        protected ICommand _<#= OnSelectedRowCommandPropertyName #> = null;
+        public ICommand <#= OnSelectedRowCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= OnSelectedRowCommandPropertyName #> ?? (_<#= OnSelectedRowCommandPropertyName #> = new Command((p) => <#= OnSelectedRowCommandPropertyName #>Execute(p), (p) => <#= OnSelectedRowCommandPropertyName #>CanExecute(p)));
+            }
+        }
+        protected void <#= OnSelectedRowCommandPropertyName #>Execute(object prm)
+        {
+            ICommand cmd = <#= SelectedRowCommandPropertyName #>;
+            if(cmd != null) {
+                if(cmd.CanExecute(prm)) {
+                    cmd.Execute(prm);
+                }
+            }
+        }
+        protected bool <#= OnSelectedRowCommandPropertyName #>CanExecute(object prm)
+        {
+            return (<#= SelectedRowCommandPropertyName #> != null); 
+
+//
+//            ICommand cmd = <#= ContainerMenuItemsCommandPropertyName #>;
+//            if (cmd != null)
+//              return cmd.CanExecute(prm);
+//            else
+//              return false;
+
+        }
+        #endregion
+        #region <#= HiddenFiltersPropertyName #>
+        public static readonly BindableProperty <#= HiddenFiltersPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= HiddenFiltersPropertyName #>", typeof(IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>),
+                typeof(<#= ProxyUserControlClassName #>),
+                null);
+        public IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>> <#= HiddenFiltersPropertyName #>
+        {
+            get
+            {
+                return (IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>)GetValue(<#= HiddenFiltersPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= HiddenFiltersPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= SformAfterAddItemPropertyName #>
+        public static readonly BindableProperty <#= SformAfterAddItemPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= SformAfterAddItemPropertyName #>", typeof(object),
+                typeof(<#= ProxyUserControlClassName #>),
+                null);
+        public object <#= SformAfterAddItemPropertyName #>
+        {
+            get
+            {
+                return (object)GetValue(<#= SformAfterAddItemPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= SformAfterAddItemPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= SformAfterUpdItemPropertyName #>
+        public static readonly BindableProperty <#= SformAfterUpdItemPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= SformAfterUpdItemPropertyName #>", typeof(object),
+                typeof(<#= ProxyUserControlClassName #>),
+                null);
+        public object <#= SformAfterUpdItemPropertyName #>
+        {
+            get
+            {
+                return (object)GetValue(<#= SformAfterUpdItemPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= SformAfterUpdItemPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= SformAfterDelItemPropertyName #>
+        public static readonly BindableProperty <#= SformAfterDelItemPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= SformAfterDelItemPropertyName #>", typeof(object),
+                typeof(<#= ProxyUserControlClassName #>),
+                null);
+        public object <#= SformAfterDelItemPropertyName #>
+        {
+            get
+            {
+                return (object)GetValue(<#= SformAfterDelItemPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= SformAfterDelItemPropertyName #>Property, value);
+            }
+        }
+        #endregion 
+        #region <#= SubmitCommandPropertyName #>
+        private static void <#= SubmitCommandPropertyName #>Changed(BindableObject bindable, object oldValue, object newValue)
+        {
+            <#= ProxyUserControlClassName #> d = bindable as <#= ProxyUserControlClassName #>;
+            if (d != null)
+            {
+                if (d.<#= OnSubmitCommandPropertyName #> != null)
+                {
+                    (d.<#= OnSubmitCommandPropertyName #> as Command).ChangeCanExecute();
+                }
+            }
+        }
+        public static readonly BindableProperty <#= SubmitCommandPropertyName #>Property =
+            BindableProperty.Create(nameof(<#= SubmitCommandPropertyName #>), typeof(ICommand), 
+            typeof(<#= ProxyUserControlClassName #>), 
+            null, 
+            propertyChanged: <#= SubmitCommandPropertyName #>Changed);
+        public ICommand <#= SubmitCommandPropertyName #>
+        {
+            get { return (ICommand)GetValue(<#= SubmitCommandPropertyName #>Property); }
+            set { SetValue(<#= SubmitCommandPropertyName #>Property, value); }
+        }
+        #endregion
+
+        #region <#= OnSubmitCommandPropertyName #>
+        protected ICommand _<#= OnSubmitCommandPropertyName #> = null;
+        public ICommand <#= OnSubmitCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= OnSubmitCommandPropertyName #> ?? (_<#= OnSubmitCommandPropertyName #> = new Command((p) => <#= OnSubmitCommandPropertyName #>Execute(p), (p) => <#= OnSubmitCommandPropertyName #>CanExecute(p)));
+            }
+        }
+        protected void <#= OnSubmitCommandPropertyName #>Execute(object prm)
+        {
+            ICommand cmd = <#= SubmitCommandPropertyName #>;
+            if(cmd != null) {
+                if(cmd.CanExecute(prm)) {
+                    cmd.Execute(prm);
+                }
+            }
+        }
+        protected bool <#= OnSubmitCommandPropertyName #>CanExecute(object p)
+        {
+            return (<#= SubmitCommandPropertyName #> != null); 
+        }
+        #endregion
+
+        #region <#= CancelCommandPropertyName #>
+        private static void <#= CancelCommandPropertyName #>Changed(BindableObject bindable, object oldValue, object newValue)
+        {
+            <#= ProxyUserControlClassName #> d = bindable as <#= ProxyUserControlClassName #>;
+            if (d != null)
+            {
+                if (d.<#= OnCancelCommandPropertyName #> != null)
+                {
+                    (d.<#= OnCancelCommandPropertyName #> as Command).ChangeCanExecute();
+                }
+            }
+        }
+        public static readonly BindableProperty <#= CancelCommandPropertyName #>Property =
+            BindableProperty.Create(nameof(<#= CancelCommandPropertyName #>), typeof(ICommand), 
+            typeof(<#= ProxyUserControlClassName #>), 
+            null, 
+            propertyChanged: <#= CancelCommandPropertyName #>Changed);
+        public ICommand <#= CancelCommandPropertyName #>
+        {
+            get { return (ICommand)GetValue(<#= CancelCommandPropertyName #>Property); }
+            set { SetValue(<#= CancelCommandPropertyName #>Property, value); }
+        }
+        #endregion
+
+        #region <#= OnCancelCommandPropertyName #>
+        protected ICommand _<#= OnCancelCommandPropertyName #> = null;
+        public ICommand <#= OnCancelCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= OnCancelCommandPropertyName #> ?? (_<#= OnCancelCommandPropertyName #> = new Command((p) => <#= OnCancelCommandPropertyName #>Execute(p), (p) => <#= OnCancelCommandPropertyName #>CanExecute(p)));
+            }
+        }
+        protected void <#= OnCancelCommandPropertyName #>Execute(object prm)
+        {
+            ICommand cmd = <#= CancelCommandPropertyName #>;
+            if(cmd != null) {
+                if(cmd.CanExecute(prm)) {
+                    cmd.Execute(prm);
+                }
+            }
+        }
+        protected bool <#= OnCancelCommandPropertyName #>CanExecute(object p)
+        {
+            return (<#= CancelCommandPropertyName #> != null); 
+        }
+        #endregion
+
+        #region <#= ShowSubmitPropertyName #>
+        public static readonly BindableProperty <#= ShowSubmitPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= ShowSubmitPropertyName #>", typeof(bool),
+                typeof(<#= ProxyUserControlClassName #>),
+                true);
+        public bool <#= ShowSubmitPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= ShowSubmitPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= ShowSubmitPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= FormControlModelPropertyName #>
+        public static readonly BindableProperty <#= FormControlModelPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= FormControlModelPropertyName #>", typeof(object),
+                typeof(<#= ProxyUserControlClassName #>),
+                null);
+        public object <#= FormControlModelPropertyName #>
+        {
+            get
+            {
+                return (object)GetValue(<#= FormControlModelPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= FormControlModelPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= EformModePropertyName #>
+        public static readonly BindableProperty <#= EformModePropertyName #>Property =
+                BindableProperty.Create(
+                "<#= EformModePropertyName #>", typeof(<#= EformModeEnumClassName #>),
+                typeof(<#= ProxyUserControlClassName #>),
+                <#= EformModeEnumClassName #>.DeleteMode);
+        public <#= EformModeEnumClassName #> <#= EformModePropertyName #>
+        {
+            get
+            {
+                return (<#= EformModeEnumClassName #>)GetValue(<#= EformModePropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= EformModePropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= CanAddPropertyName #>
+        public static readonly BindableProperty <#= CanAddPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= CanAddPropertyName #>", typeof(bool),
+                typeof(<#= ProxyUserControlClassName #>),
+                false);
+        public bool <#= CanAddPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= CanAddPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= CanAddPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= CanUpdPropertyName #>
+        public static readonly BindableProperty <#= CanUpdPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= CanUpdPropertyName #>", typeof(bool),
+                typeof(<#= ProxyUserControlClassName #>),
+                false);
+        public bool <#= CanUpdPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= CanUpdPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= CanUpdPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= CanDelPropertyName #>
+        public static readonly BindableProperty <#= CanDelPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= CanDelPropertyName #>", typeof(bool),
+                typeof(<#= ProxyUserControlClassName #>),
+                false);
+        public bool <#= CanDelPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= CanDelPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= CanDelPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= SformAfterAddItemCommandPropertyName #>
+        public static readonly BindableProperty <#= SformAfterAddItemCommandPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= SformAfterAddItemCommandPropertyName #>", typeof(ICommand),
+                typeof(<#= ProxyUserControlClassName #>),
+                null);
+        public ICommand <#= SformAfterAddItemCommandPropertyName #>
+        {
+            get
+            {
+                return (ICommand)GetValue(<#= SformAfterAddItemCommandPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= SformAfterAddItemCommandPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= OnSformAfterAddItemCommandPropertyName #>
+        protected ICommand _<#= OnSformAfterAddItemCommandPropertyName #> = null;
+        public ICommand <#= OnSformAfterAddItemCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= OnSformAfterAddItemCommandPropertyName #> ?? (_<#= OnSformAfterAddItemCommandPropertyName #> = new Command((p) => <#= OnSformAfterAddItemCommandPropertyName #>Execute(p), (p) => <#= OnSformAfterAddItemCommandPropertyName #>CanExecute(p)));
+            }
+        }
+        protected void <#= OnSformAfterAddItemCommandPropertyName #>Execute(object prm)
+        {
+            ICommand cmd = <#= SformAfterAddItemCommandPropertyName #>;
+            if(cmd != null) {
+                if(cmd.CanExecute(prm)) {
+                    cmd.Execute(prm);
+                }
+            }
+        }
+        protected bool <#= OnSformAfterAddItemCommandPropertyName #>CanExecute(object p)
+        {
+            return (<#= SformAfterAddItemCommandPropertyName #> != null); 
+        }
+        #endregion
+        #region <#= SformAfterUpdItemCommandPropertyName #>
+        public static readonly BindableProperty <#= SformAfterUpdItemCommandPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= SformAfterUpdItemCommandPropertyName #>", typeof(ICommand),
+                typeof(<#= ProxyUserControlClassName #>),
+                null);
+        public ICommand <#= SformAfterUpdItemCommandPropertyName #>
+        {
+            get
+            {
+                return (ICommand)GetValue(<#= SformAfterUpdItemCommandPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= SformAfterUpdItemCommandPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= OnSformAfterUpdItemCommandPropertyName #>
+        protected ICommand _<#= OnSformAfterUpdItemCommandPropertyName #> = null;
+        public ICommand <#= OnSformAfterUpdItemCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= OnSformAfterUpdItemCommandPropertyName #> ?? (_<#= OnSformAfterUpdItemCommandPropertyName #> = new Command((p) => <#= OnSformAfterUpdItemCommandPropertyName #>Execute(p), (p) => <#= OnSformAfterUpdItemCommandPropertyName #>CanExecute(p)));
+            }
+        }
+        protected void <#= OnSformAfterUpdItemCommandPropertyName #>Execute(object prm)
+        {
+            ICommand cmd = <#= SformAfterUpdItemCommandPropertyName #>;
+            if(cmd != null) {
+                if(cmd.CanExecute(prm)) {
+                    cmd.Execute(prm);
+                }
+            }
+        }
+        protected bool <#= OnSformAfterUpdItemCommandPropertyName #>CanExecute(object p)
+        {
+            return (<#= SformAfterUpdItemCommandPropertyName #> != null); 
+        }
+        #endregion
+        #region <#= SformAfterDelItemCommandPropertyName #>
+        public static readonly BindableProperty <#= SformAfterDelItemCommandPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= SformAfterDelItemCommandPropertyName #>", typeof(ICommand),
+                typeof(<#= ProxyUserControlClassName #>),
+                null);
+        public ICommand <#= SformAfterDelItemCommandPropertyName #>
+        {
+            get
+            {
+                return (ICommand)GetValue(<#= SformAfterDelItemCommandPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= SformAfterDelItemCommandPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= OnSformAfterDelItemCommandPropertyName #>
+        protected ICommand _<#= OnSformAfterDelItemCommandPropertyName #> = null;
+        public ICommand <#= OnSformAfterDelItemCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= OnSformAfterDelItemCommandPropertyName #> ?? (_<#= OnSformAfterDelItemCommandPropertyName #> = new Command((p) => <#= OnSformAfterDelItemCommandPropertyName #>Execute(p), (p) => <#= OnSformAfterDelItemCommandPropertyName #>CanExecute(p)));
+            }
+        }
+        protected void <#= OnSformAfterDelItemCommandPropertyName #>Execute(object prm)
+        {
+            ICommand cmd = <#= SformAfterUpdItemCommandPropertyName #>;
+            if(cmd != null) {
+                if(cmd.CanExecute(prm)) {
+                    cmd.Execute(prm);
+                }
+            }
+        }
+        protected bool <#= OnSformAfterDelItemCommandPropertyName #>CanExecute(object p)
+        {
+            return (<#= SformAfterUpdItemCommandPropertyName #> != null); 
+        }
+        #endregion
+
+
+
+
+
+
+        #region <#= CanAddDetailPropertyName #>
+        public static readonly BindableProperty <#= CanAddDetailPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= CanAddDetailPropertyName #>", typeof(bool),
+                typeof(<#= ProxyUserControlClassName #>),
+                false);
+        public bool <#= CanAddDetailPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= CanAddDetailPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= CanAddDetailPropertyName #>Property, value);
+            }
+        }
+        #endregion
+
+        #region <#= CanUpdDetailPropertyName #>
+        public static readonly BindableProperty <#= CanUpdDetailPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= CanUpdDetailPropertyName #>", typeof(bool),
+                typeof(<#= ProxyUserControlClassName #>),
+                false);
+        public bool <#= CanUpdDetailPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= CanUpdDetailPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= CanUpdDetailPropertyName #>Property, value);
+            }
+        }
+        #endregion
+
+        #region <#= CanDelDetailPropertyName #>
+        public static readonly BindableProperty <#= CanDelDetailPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= CanDelDetailPropertyName #>", typeof(bool),
+                typeof(<#= ProxyUserControlClassName #>),
+                false);
+        public bool <#= CanDelDetailPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= CanDelDetailPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= CanDelDetailPropertyName #>Property, value);
+            }
+        }
+        #endregion
+
+        #region <#= FilterHeightDetailPropertyName #>
+        public static readonly BindableProperty <#= FilterHeightDetailPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= FilterHeightDetailPropertyName #>", typeof(double),
+                typeof(<#= ProxyUserControlClassName #>),
+                double.MaxValue);
+        public double <#= FilterHeightDetailPropertyName #>
+        {
+            get
+            {
+                return (double)GetValue(<#= FilterHeightDetailPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= FilterHeightDetailPropertyName #>Property, value);
+            }
+        }
+        #endregion
+
+        #region <#= ShowFilterDetailPropertyName #>
+        public static readonly BindableProperty <#= ShowFilterDetailPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= ShowFilterDetailPropertyName #>", typeof(bool),
+                typeof(<#= ProxyUserControlClassName #>),
+                true);
+        public bool <#= ShowFilterDetailPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= ShowFilterDetailPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= ShowFilterDetailPropertyName #>Property, value);
+            }
+        }
+        #endregion
+
+        #region <#= ShowAddFilterBtnDetailPropertyName #>
+        public static readonly BindableProperty <#= ShowAddFilterBtnDetailPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= ShowAddFilterBtnDetailPropertyName #>", typeof(bool),
+                typeof(<#= ProxyUserControlClassName #>),
+                true);
+        public bool <#= ShowAddFilterBtnDetailPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= ShowAddFilterBtnDetailPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= ShowAddFilterBtnDetailPropertyName #>Property, value);
+            }
+        }
+        #endregion
+
+        #region <#= GridHeightDetailPropertyName #>
+        public static readonly BindableProperty <#= GridHeightDetailPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= GridHeightDetailPropertyName #>", typeof(double),
+                typeof(<#= ProxyUserControlClassName #>),
+                double.MaxValue);
+        public double <#= GridHeightDetailPropertyName #>
+        {
+            get
+            {
+                return (double)GetValue(<#= GridHeightDetailPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= GridHeightDetailPropertyName #>Property, value);
+            }
+        }
+        #endregion
+
+        #region <#= HiddenFiltersDetailPropertyName #>
+        public static readonly BindableProperty <#= HiddenFiltersDetailPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= HiddenFiltersDetailPropertyName #>", typeof(IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>),
+                typeof(<#= ProxyUserControlClassName #>),
+                null);
+        public IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>> <#= HiddenFiltersDetailPropertyName #>
+        {
+            get
+            {
+                return (IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>)GetValue(<#= HiddenFiltersDetailPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= HiddenFiltersDetailPropertyName #>Property, value);
+            }
+        }
+        #endregion
+
+        #region <#= RowMenuItemsDetailPropertyName #>
+        public static readonly BindableProperty <#= RowMenuItemsDetailPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= RowMenuItemsDetailPropertyName #>", typeof(IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>),
+                typeof(<#= ProxyUserControlClassName #>),
+                null);
+        public IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> <#= RowMenuItemsDetailPropertyName #>
+        {
+            get
+            {
+                return (IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>)GetValue(<#= RowMenuItemsDetailPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= RowMenuItemsDetailPropertyName #>Property, value);
+            }
+        }
+        #endregion
+
+        #region <#= TableMenuItemsDetailPropertyName #>
+        public static readonly BindableProperty <#= TableMenuItemsDetailPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= TableMenuItemsDetailPropertyName #>", typeof(IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>),
+                typeof(<#= ProxyUserControlClassName #>),
+                null);
+        public IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> <#= TableMenuItemsDetailPropertyName #>
+        {
+            get
+            {
+                return (IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>)GetValue(<#= TableMenuItemsDetailPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= TableMenuItemsDetailPropertyName #>Property, value);
+            }
+        }
+        #endregion
+
+        #region <#= IsPermissionEditablePropertyName #>
+        public static readonly BindableProperty <#= IsPermissionEditablePropertyName #>Property =
+                BindableProperty.Create(
+                "<#= IsPermissionEditablePropertyName #>", typeof(bool),
+                typeof(<#= ProxyUserControlClassName #>),
+                false);
+        public bool <#= IsPermissionEditablePropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= IsPermissionEditablePropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= IsPermissionEditablePropertyName #>Property, value);
+            }
+        }
+        #endregion
+
+        #region <#= PermissionVectorPropertyName #>
+        public static readonly BindableProperty <#= PermissionVectorPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= PermissionVectorPropertyName #>", typeof(int[]),
+                typeof(<#= ProxyUserControlClassName #>),
+                null);
+        public int[] <#= PermissionVectorPropertyName #>
+        {
+            get
+            {
+                return (int[])GetValue(<#= PermissionVectorPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= PermissionVectorPropertyName #>Property, value);
+            }
+        }
+        #endregion
+
+    }
+}
+
+<#+
+
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+
+#>

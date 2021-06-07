@@ -1,0 +1,185 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="xaml" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+<#
+
+
+
+    string IconFontFolder      = "00178-IconFont.cs";
+    string IconFontClassName   = GetModelClassName(Model, IconFontFolder);
+    string IconFontNameSpace   = GetModelNameSpace(Model, IconFontFolder);
+    string IconFontNameProject = GetModelProjectName(Model, IconFontFolder);
+
+    string TablePaginationUserControlFolder      = "00252-TablePaginationUserControl.xaml.cs";
+    string TablePaginationUserControlClassName   = GetModelClassName(Model, TablePaginationUserControlFolder);
+    string TablePaginationUserControlNameSpace   = GetModelNameSpace(Model, TablePaginationUserControlFolder);
+
+
+    string TablePaginationUserControlXamlFolder      = "00254-TablePaginationUserControl.xaml";
+    string TablePaginationUserControlXamlClassName   = GetModelClassName(Model, TablePaginationUserControlXamlFolder);
+    string TablePaginationUserControlXamlNameSpace   = GetModelNameSpace(Model, TablePaginationUserControlXamlFolder);
+    string TablePaginationUserControlXamlProject     = GetModelProjectName(Model, TablePaginationUserControlXamlFolder);
+    
+    string TitlePropertyName = "Title";
+    string RowsPerPageOptionsPropertyName = "RowsPerPageOptions";
+    string RowsPerPagePropertyName = "RowsPerPage";
+    string CountFromPropertyName = "CountFrom";
+    string CountToPropertyName = "CountTo";
+    string TotalCountPropertyName = "TotalCount";
+    string CurrentPagePropertyName = "CurrentPage";
+    string PreviousButtonIconNamePropertyName = "PreviousButtonIconName";
+    string NextButtonIconNamePropertyName = "NextButtonIconName";
+
+    string ButtonIconColorPropertyName = "ButtonIconColor";
+    string ButtonBackgroundColorPropertyName = "ButtonBackgroundColor";
+
+
+    string CurrentPageChangedPropertyName  = "CurrentPageChanged";
+    string RowsPerPageChangedPropertyName  = "RowsPerPageChanged";
+    string TotalCountChangedPropertyName  = "TotalCountChanged";
+    string OnNextPageCommandPropertyName  = "OnNextPageCommand";
+    string OnPreviousPageCommandPropertyName  = "OnPreviousPageCommand";
+
+
+    string IconFontPrefix = "clr-namespace:" + IconFontNameSpace;
+    if(IconFontNameProject != TablePaginationUserControlXamlProject) {
+        IconFontPrefix = IconFontPrefix + ";assembly=" + IconFontNameProject;
+    }
+
+#>
+<ContentView x:Class="<#= TablePaginationUserControlNameSpace #>.<#= TablePaginationUserControlClassName #>"
+             xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:fontIcons="<#= IconFontPrefix #>"
+             x:Name="tblPgntrUsrCntrlRootNode">
+    <StackLayout Orientation="Horizontal">
+        <Label VerticalOptions="Center" Text="{Binding <#= TitlePropertyName #>, Source={x:Reference tblPgntrUsrCntrlRootNode}}"/>
+        <Picker WidthRequest="{OnPlatform iOS=50, Android=50, UWP=80}"
+                ItemsSource="{Binding <#= RowsPerPageOptionsPropertyName #>, Source={x:Reference tblPgntrUsrCntrlRootNode}}" 
+                SelectedItem="{Binding <#= RowsPerPagePropertyName #>, Source={x:Reference tblPgntrUsrCntrlRootNode}, Mode=TwoWay}"/>
+        <Label VerticalOptions="Center" Text="{Binding <#= CountFromPropertyName #>, Source={x:Reference tblPgntrUsrCntrlRootNode}}"/>
+        <Label VerticalOptions="Center" Text=" - "/>
+        <Label VerticalOptions="Center" Text="{Binding <#= CountToPropertyName #>, Source={x:Reference tblPgntrUsrCntrlRootNode}}"/>
+        <Label VerticalOptions="Center" Text=" / "/>
+        <Label VerticalOptions="Center" Text="{Binding <#= TotalCountPropertyName #>, Source={x:Reference tblPgntrUsrCntrlRootNode}}"/>
+        <Button VerticalOptions="Center" WidthRequest="30" HeightRequest="36" 
+                Command="{Binding Path=<#= OnPreviousPageCommandPropertyName #>, Source={x:Reference tblPgntrUsrCntrlRootNode}}"
+                Text="{Binding  <#= PreviousButtonIconNamePropertyName #>, Source={x:Reference tblPgntrUsrCntrlRootNode}}" 
+                FontFamily="CustomIconFontAlias" 
+                BackgroundColor="{Binding  <#= ButtonBackgroundColorPropertyName #>, Source={x:Reference tblPgntrUsrCntrlRootNode}}" 
+                TextColor="{Binding  <#= ButtonIconColorPropertyName #>, Source={x:Reference tblPgntrUsrCntrlRootNode}}" 
+                FontSize="{OnPlatform iOS=Default, Android=Default, UWP=Default}"/>
+        <Button VerticalOptions="Center" WidthRequest="30" HeightRequest="36" 
+                Command="{Binding Path=<#= OnNextPageCommandPropertyName #>, Source={x:Reference tblPgntrUsrCntrlRootNode}}"
+                Text="{Binding  <#= NextButtonIconNamePropertyName #>, Source={x:Reference tblPgntrUsrCntrlRootNode}}" 
+                FontFamily="CustomIconFontAlias" 
+                BackgroundColor="{Binding  <#= ButtonBackgroundColorPropertyName #>, Source={x:Reference tblPgntrUsrCntrlRootNode}}" 
+                TextColor="{Binding  <#= ButtonIconColorPropertyName #>, Source={x:Reference tblPgntrUsrCntrlRootNode}}" 
+                FontSize="{OnPlatform iOS=Default, Android=Default, UWP=Default}"/>
+    </StackLayout> 
+</ContentView>
+
+
+<#+
+
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+    string GetModelProjectName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileProject)) {
+            return result;
+        }
+        string[] fnArr = refItem.FileProject.Split(new char[] {'\\'}, 100, System.StringSplitOptions.None); 
+        string fn = fnArr[fnArr.Length - 1];
+
+        return fn.Replace(".csproj","");
+    }
+
+#>

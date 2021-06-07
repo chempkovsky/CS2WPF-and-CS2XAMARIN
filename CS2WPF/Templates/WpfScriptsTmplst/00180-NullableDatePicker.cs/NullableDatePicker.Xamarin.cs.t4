@@ -1,0 +1,185 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+using System;
+using Xamarin.Forms;
+<#
+
+    string NullableDatePickerFolder      = "00180-NullableDatePicker.cs";
+    string NullableDatePickerClassName   = GetModelClassName(Model, NullableDatePickerFolder);
+    string NullableDatePickerNameSpace   = GetModelNameSpace(Model, NullableDatePickerFolder);
+    
+#>
+
+namespace <#= NullableDatePickerNameSpace #> {
+    public class <#= NullableDatePickerClassName #>: DatePicker
+    {
+		public <#= NullableDatePickerClassName #>()
+		{
+			Format = "d";
+		}
+		public string _originalFormat = null;
+
+		public static readonly BindableProperty PlaceHolderProperty =
+			BindableProperty.Create(nameof(PlaceHolder), typeof(string), typeof(<#= NullableDatePickerClassName #>), "/ . / . /");
+
+		public string PlaceHolder
+		{
+			get { return (string)GetValue(PlaceHolderProperty); }
+			set
+			{
+				SetValue(PlaceHolderProperty, value);
+			}
+		}
+
+
+		public static readonly BindableProperty NullableDateProperty =
+		BindableProperty.Create(nameof(NullableDate), typeof(DateTime?), typeof(<#= NullableDatePickerClassName #>), null, defaultBindingMode: BindingMode.TwoWay);
+
+		public DateTime? NullableDate
+		{
+			get { return (DateTime?)GetValue(NullableDateProperty); }
+			set { SetValue(NullableDateProperty, value); UpdateDate(); }
+		}
+
+		private void UpdateDate()
+		{
+			if (NullableDate != null)
+			{
+				if (_originalFormat != null)
+				{
+					Format = _originalFormat;
+				}
+			}
+			else
+			{
+				Format = PlaceHolder;
+
+			}
+
+		}
+		protected override void OnBindingContextChanged()
+		{
+			base.OnBindingContextChanged();
+			if (BindingContext != null)
+			{
+				_originalFormat = Format;
+				UpdateDate();
+			}
+		}
+
+		protected override void OnPropertyChanged(string propertyName = null)
+		{
+			base.OnPropertyChanged(propertyName);
+
+			if (propertyName == DateProperty.PropertyName || (propertyName == IsFocusedProperty.PropertyName && !IsFocused && (Date.ToString("d") == DateTime.Now.ToString("d"))))
+			{
+				AssignValue();
+			}
+
+			if (propertyName == NullableDateProperty.PropertyName && NullableDate.HasValue)
+			{
+				Date = NullableDate.Value;
+				if (Date.ToString(_originalFormat) == DateTime.Now.ToString(_originalFormat))
+				{
+					//this code was done because when date selected is the actual date the"DateProperty" does not raise  
+					UpdateDate();
+				}
+			}
+		}
+
+		public void CleanDate()
+		{
+			NullableDate = null;
+			UpdateDate();
+		}
+		public void AssignValue()
+		{
+			NullableDate = Date;
+			UpdateDate();
+		}
+    }
+}
+
+<#+
+
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+
+#>

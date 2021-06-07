@@ -1,0 +1,379 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+using Xamarin.Forms;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Windows.Input;
+using Prism.Services.Dialogs;
+
+<#
+
+    string EformModeEnumFolder                      = "00026-EformModeEnum.cs";
+    string EformModeEnumClassName                   = GetModelClassName(Model, EformModeEnumFolder);
+    string EformModeEnumNameSpace                   = GetModelNameSpace(Model, EformModeEnumFolder);
+
+    string IWebServiceFilterDefInterfaceFolder      = "00200-IWebServiceFilterDefInterface.cs";
+    string IWebServiceFilterDefInterfaceClassName   = GetModelClassName(Model, IWebServiceFilterDefInterfaceFolder);
+    string IWebServiceFilterDefInterfaceNameSpace   = GetModelNameSpace(Model, IWebServiceFilterDefInterfaceFolder);
+
+
+    string IAppGlblSettingsServiceFolder            = "00080-IAppGlblSettingsService.cs";
+    string IAppGlblSettingsServiceClassName         = GetModelClassName(Model, IAppGlblSettingsServiceFolder);
+    string IAppGlblSettingsServiceNameSpace         = GetModelNameSpace(Model, IAppGlblSettingsServiceFolder);
+
+    string IWebServiceFilterRsltInterfaceFolder     = "00204-IWebServiceFilterRsltInterface.cs";
+    string IWebServiceFilterRsltInterfaceClassName  = GetModelClassName(Model, IWebServiceFilterRsltInterfaceFolder);
+    string IWebServiceFilterRsltInterfaceNameSpace  = GetModelNameSpace(Model, IWebServiceFilterRsltInterfaceFolder);
+
+
+    string EdlgViewModelBaseFolder                  = "00638-EdlgViewModelBase.cs";
+    string EdlgViewModelBaseClassName               = GetModelClassName(Model, EdlgViewModelBaseFolder);
+    string EdlgViewModelBaseNameSpace               = GetModelNameSpace(Model, EdlgViewModelBaseFolder);
+
+
+
+
+    string CaptionPropertyName                  = "Caption";
+    string HiddenFiltersPropertyName            = "HiddenFilters";
+    string EformModePropertyName                = "EformMode";
+    string FormControlModelPropertyName         = "FormControlModel";
+    string ShowSubmitPropertyName               = "ShowSubmit";
+
+    string RegionPropertyName                   = "Region";
+    string DialogRegionPropertyName             = "DialogRegion";
+
+
+    string AppSettingServicePropertyName        = "GlblSettingsSrv";
+    string RoutedCommandHandlersPropertyName    = "RoutedCommandHandlers";
+
+    string SubmitCommandPropertyName        = "SubmitCommand";
+    string CancelCommandPropertyName        = "CancelCommand";
+
+
+    List<string> nmSpaces = new List<string>();
+    if ((EdlgViewModelBaseNameSpace != IWebServiceFilterRsltInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IWebServiceFilterRsltInterfaceNameSpace);
+    if ((EdlgViewModelBaseNameSpace != IAppGlblSettingsServiceNameSpace) && (nmSpaces.IndexOf(IAppGlblSettingsServiceNameSpace) < 0)) 
+        nmSpaces.Add(IAppGlblSettingsServiceNameSpace);
+    if ((EdlgViewModelBaseNameSpace != EformModeEnumNameSpace) && (nmSpaces.IndexOf(EformModeEnumNameSpace) < 0)) 
+        nmSpaces.Add(EformModeEnumNameSpace);
+
+
+    
+#>
+<# 
+    foreach(string ns in nmSpaces) {
+#>
+using <#= ns #>;
+<#
+    }
+#>
+
+
+namespace <#= EdlgViewModelBaseNameSpace #> {
+    public class <#= EdlgViewModelBaseClassName #>: INotifyPropertyChanged, IDialogAware
+    {
+        protected <#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName #>=null;
+        protected IDialogService _dialogService=null;
+        public <#= EdlgViewModelBaseClassName #>(<#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName  #>, IDialogService dialogService) {
+
+            this.<#= AppSettingServicePropertyName #> = <#= AppSettingServicePropertyName #>;
+            this._dialogService = dialogService;
+
+
+        }
+        #region INotifyPropertyChanged
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string name = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+        #endregion
+
+        #region IDialogAware
+        event Action<IDialogParameters> _RequestClose;
+        public event Action<IDialogParameters> RequestClose
+        {
+            add
+            {
+                _RequestClose += value;
+            }
+            remove
+            {
+                _RequestClose -= value;
+            }
+        }
+        public bool CanCloseDialog()
+        {
+            return true;
+        }
+
+        public void OnDialogClosed()
+        {
+            
+        }
+        public void OnDialogOpened(IDialogParameters parameters)
+        {
+            if (parameters == null) return;
+            if (parameters.ContainsKey("<#= CaptionPropertyName #>"))
+            {
+                <#= CaptionPropertyName #> = parameters.GetValue<string>("<#= CaptionPropertyName #>");
+                Title = <#= CaptionPropertyName #>;
+            }
+            if (parameters.ContainsKey("<#= HiddenFiltersPropertyName #>"))  
+            {
+                <#= HiddenFiltersPropertyName #> = parameters.GetValue<IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>>("<#= HiddenFiltersPropertyName #>");
+            }
+            if (parameters.ContainsKey("<#= EformModePropertyName #>"))  
+            {
+                <#= EformModePropertyName #> = parameters.GetValue<<#= EformModeEnumClassName #>>("<#= EformModePropertyName #>");
+            }
+            if (parameters.ContainsKey("<#= FormControlModelPropertyName #>"))  
+            {
+                <#= FormControlModelPropertyName #> = parameters.GetValue<object>("<#= FormControlModelPropertyName #>");
+            }
+            if (parameters.ContainsKey("<#= ShowSubmitPropertyName #>"))  
+            {
+                <#= ShowSubmitPropertyName #> = parameters.GetValue<bool>("<#= ShowSubmitPropertyName #>");
+            }
+        }
+        #endregion
+
+        #region Title
+        string _Title = "";
+        public string Title {
+            get { return _Title; }
+            set {
+                if(_Title != value) {
+                    _Title = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+
+        #region <#= CaptionPropertyName #>
+        string _<#= CaptionPropertyName #> = null;
+        public string <#= CaptionPropertyName #>
+        {
+            get
+            {
+                return _<#= CaptionPropertyName #>;
+            }
+            set
+            {
+                if (_<#= CaptionPropertyName #> != value)
+                {
+                    _<#= CaptionPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+
+        #region <#= HiddenFiltersPropertyName #>
+        IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>> _<#= HiddenFiltersPropertyName #> = null;
+        public IEnumerable<IWebServiceFilterRsltInterface> <#= HiddenFiltersPropertyName #>
+        {
+            get
+            {
+                return _<#= HiddenFiltersPropertyName #>;
+            }
+            set
+            {
+                if (_<#= HiddenFiltersPropertyName #> != value)
+                {
+                    _<#= HiddenFiltersPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+
+        #region <#= EformModePropertyName #>    
+        protected <#= EformModeEnumClassName #> _<#= EformModePropertyName #> = <#= EformModeEnumClassName #>.DeleteMode;
+        public <#= EformModeEnumClassName #> <#= EformModePropertyName #>
+        {
+            get
+            {
+                return _<#= EformModePropertyName #>;
+            }
+            set
+            {
+                if (_<#= EformModePropertyName #> != value) {
+                    _<#= EformModePropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+
+        #region <#= FormControlModelPropertyName #>
+        protected object _<#= FormControlModelPropertyName #> = null;
+        public object <#= FormControlModelPropertyName #>
+        {
+            get
+            {
+                return _<#= FormControlModelPropertyName #>;
+            }
+            set
+            {
+                if (_<#= FormControlModelPropertyName #> != value) {
+                    _<#= FormControlModelPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+
+        #region <#= ShowSubmitPropertyName #>
+        bool _<#= ShowSubmitPropertyName #> = true;
+        public bool <#= ShowSubmitPropertyName #>
+        {
+            get
+            {
+                return _<#= ShowSubmitPropertyName #>;
+            }
+            set
+            {
+                if (_<#= ShowSubmitPropertyName #> != value)
+                {
+                    _<#= ShowSubmitPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+
+
+        #region <#= SubmitCommandPropertyName #>
+        private ICommand _<#= SubmitCommandPropertyName #>;
+        public ICommand <#= SubmitCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= SubmitCommandPropertyName #> ?? (_<#= SubmitCommandPropertyName #> = new Command((param) => <#= SubmitCommandPropertyName #>Action(param), (param) => <#= SubmitCommandPropertyName #>CanExecute(param)));
+            }
+        }
+        protected void <#= SubmitCommandPropertyName #>Action(object param)
+        {
+            DialogParameters parameters = new DialogParameters();
+            parameters.Add("<#= FormControlModelPropertyName #>", param);
+            parameters.Add("Result", true);
+            _RequestClose?.Invoke(parameters);
+        }
+        protected bool <#= SubmitCommandPropertyName #>CanExecute(object param)
+        {
+            return true;
+        }
+        #endregion
+
+        #region <#= CancelCommandPropertyName #>
+        private ICommand _<#= CancelCommandPropertyName #>;
+        public ICommand <#= CancelCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= CancelCommandPropertyName #> ?? (_<#= CancelCommandPropertyName #> = new Command((param) => <#= CancelCommandPropertyName #>Action(param), (param) => <#= CancelCommandPropertyName #>CanExecute(param)));
+            }
+        }
+        protected void <#= CancelCommandPropertyName #>Action(object param)
+        {
+            DialogParameters parameters = new DialogParameters();
+            parameters.Add("Result", false);
+            _RequestClose?.Invoke(parameters);
+        }
+        protected bool <#= CancelCommandPropertyName #>CanExecute(object param)
+        {
+            return true;
+        }
+        #endregion
+
+    }
+}
+
+<#+
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+#>

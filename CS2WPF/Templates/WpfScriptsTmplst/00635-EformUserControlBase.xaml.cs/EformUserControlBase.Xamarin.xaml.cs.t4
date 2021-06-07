@@ -1,0 +1,447 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+using System;
+using Xamarin.Forms;
+using System.Collections.Generic;
+using System.Windows.Input;
+
+<#
+
+    string EformModeEnumFolder                      = "00026-EformModeEnum.cs";
+    string EformModeEnumClassName                   = GetModelClassName(Model, EformModeEnumFolder);
+    string EformModeEnumNameSpace                   = GetModelNameSpace(Model, EformModeEnumFolder);
+
+    string BindingContextFeedbackFolder             = "00166-BindingContextFeedback.cs";
+    string BindingContextFeedbackClassName          = GetModelClassName(Model, BindingContextFeedbackFolder);
+    string BindingContextFeedbackNameSpace          = GetModelNameSpace(Model, BindingContextFeedbackFolder);
+
+    string ContentViewWithBCFeedbackFolder          = "00168-ContentViewWithBCFeedback.cs";
+    string ContentViewWithBCFeedbackClassName       = GetModelClassName(Model, ContentViewWithBCFeedbackFolder);
+    string ContentViewWithBCFeedbackNameSpace       = GetModelNameSpace(Model, ContentViewWithBCFeedbackFolder);
+
+    string IEformViewModelInterfaceFolder           = "00199-IEformViewModelInterface.cs";
+    string IEformViewModelInterfaceClassName        = GetModelClassName(Model, IEformViewModelInterfaceFolder);
+    string IEformViewModelInterfaceNameSpace        = GetModelNameSpace(Model, IEformViewModelInterfaceFolder);
+
+    string IBindingContextChangedFolder             = "00220-IBindingContextChanged.cs";
+    string IBindingContextChangedClassName          = GetModelClassName(Model, IBindingContextChangedFolder);
+    string IBindingContextChangedNameSpace          = GetModelNameSpace(Model, IBindingContextChangedFolder);
+
+    string IWebServiceFilterRsltInterfaceFolder      = "00204-IWebServiceFilterRsltInterface.cs";
+    string IWebServiceFilterRsltInterfaceClassName   = GetModelClassName(Model, IWebServiceFilterRsltInterfaceFolder);
+    string IWebServiceFilterRsltInterfaceNameSpace   = GetModelNameSpace(Model, IWebServiceFilterRsltInterfaceFolder);
+
+    string IWebServiceFilterMenuInterfaceFolder      = "00206-IWebServiceFilterMenuInterface.cs";
+    string IWebServiceFilterMenuInterfaceClassName   = GetModelClassName(Model, IWebServiceFilterMenuInterfaceFolder);
+    string IWebServiceFilterMenuInterfaceNameSpace   = GetModelNameSpace(Model, IWebServiceFilterMenuInterfaceFolder);
+
+
+
+    string EformUserControlBaseFolder                = "00635-EformUserControlBase.xaml.cs";
+    string EformUserControlBaseClassName             = GetModelClassName(Model, EformUserControlBaseFolder);
+    string EformUserControlBaseNameSpace             = GetModelNameSpace(Model, EformUserControlBaseFolder);
+
+    string CaptionPropertyName                      = "Caption";
+
+    string ShowSubmitPropertyName                   = "ShowSubmit";
+    string SubmitCommandPropertyName                = "SubmitCommand";
+
+    string ContainerMenuItemsPropertyName           = "ContainerMenuItems";
+    string ContainerMenuItemsCommandPropertyName    = "ContainerMenuItemsCommand";
+    string OnContainerMenuItemsCommandPropertyName  = "OnContainerMenuItemsCommand";
+
+    string HiddenFiltersPropertyName                = "HiddenFilters";
+    string HiddenFiltersPropertyChangedPropertyName = "HiddenFiltersPropertyChanged";
+
+    string FormControlModelPropertyName             = "FormControlModel";
+    string FormControlModelChangedPropertyName      = "FormControlModelChanged";
+
+    string EformModePropertyName                    = "EformMode";
+    string EformModeChangedPropertyName             = "EformModeChanged";
+
+    string OnLoadedPropertyName                     = "OnLoaded";
+
+    string BindingContextFeedbackRefPropertyName    = "BindingContextFeedbackRef";
+    string CancelCommandPropertyName                = "CancelCommand";
+    string OnCancelCommandPropertyName              = "OnCancelCommand";
+
+
+    List<string> nmSpaces = new List<string>();
+    if ((EformUserControlBaseNameSpace != IWebServiceFilterRsltInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IWebServiceFilterRsltInterfaceNameSpace);
+    if ((EformUserControlBaseNameSpace != IWebServiceFilterMenuInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterMenuInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IWebServiceFilterMenuInterfaceNameSpace);
+    if ((EformUserControlBaseNameSpace != EformModeEnumNameSpace) && (nmSpaces.IndexOf(EformModeEnumNameSpace) < 0)) 
+        nmSpaces.Add(EformModeEnumNameSpace);
+    if ((EformUserControlBaseNameSpace != IEformViewModelInterfaceNameSpace) && (nmSpaces.IndexOf(IEformViewModelInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IEformViewModelInterfaceNameSpace);
+    if ((EformUserControlBaseNameSpace != IEformViewModelInterfaceNameSpace) && (nmSpaces.IndexOf(IBindingContextChangedNameSpace) < 0)) 
+        nmSpaces.Add(IBindingContextChangedNameSpace);
+    if ((EformUserControlBaseNameSpace != ContentViewWithBCFeedbackNameSpace) && (nmSpaces.IndexOf(ContentViewWithBCFeedbackNameSpace) < 0)) 
+        nmSpaces.Add(ContentViewWithBCFeedbackNameSpace);
+    if ((EformUserControlBaseNameSpace != BindingContextFeedbackNameSpace) && (nmSpaces.IndexOf(BindingContextFeedbackNameSpace) < 0)) 
+        nmSpaces.Add(BindingContextFeedbackNameSpace);
+    
+#>
+<# 
+    foreach(string ns in nmSpaces) {
+#>
+using <#= ns #>;
+<#
+    }
+#>
+
+
+namespace <#= EformUserControlBaseNameSpace #> {
+    /// <summary>
+    /// Interaction logic for <#= EformUserControlBaseClassName #>.xaml
+    /// </summary>
+    public class <#= EformUserControlBaseClassName #>: <#= ContentViewWithBCFeedbackClassName #>
+    {
+       // public <#= EformUserControlBaseClassName #>()
+       // {
+       //     InitializeComponent();
+       //     <#= OnLoadedPropertyName #>();
+       // }
+
+        #region On<#= BindingContextFeedbackRefPropertyName #>
+        protected override void On<#= BindingContextFeedbackRefPropertyName #>(object v)
+        {
+            <#= BindingContextFeedbackClassName #> bcf = v as <#= BindingContextFeedbackClassName #>;
+            if(bcf == null) return;
+            if(string.IsNullOrEmpty(bcf.BcfName)) return;
+		    if(bcf.BcfName == "<#= SubmitCommandPropertyName #>") {
+                ICommand cmd = <#= SubmitCommandPropertyName #>; 
+                if(cmd != null) {
+                    if(cmd.CanExecute(bcf.BcfData))
+                        cmd.Execute(bcf.BcfData);
+                }
+            } else if(bcf.BcfName == "<#= CancelCommandPropertyName #>") {
+                ICommand cmd = <#= CancelCommandPropertyName #>; 
+                if(cmd != null) {
+                    if(cmd.CanExecute(bcf.BcfData))
+                        cmd.Execute(bcf.BcfData);
+                }
+            }
+        }
+        #endregion
+
+        #region <#= OnLoadedPropertyName #>
+        // "async void" is correct for this method
+        protected virtual async void <#= OnLoadedPropertyName #>()
+        {
+            <#= IEformViewModelInterfaceClassName #> bcs = BindingContext as <#= IEformViewModelInterfaceClassName #>;
+            if (bcs != null)
+            {
+                await bcs.<#= HiddenFiltersPropertyChangedPropertyName #>(this, null, <#= HiddenFiltersPropertyName #>);
+                await bcs.<#= FormControlModelChangedPropertyName #>(this, null, <#= FormControlModelPropertyName #>);
+                await bcs.<#= EformModeChangedPropertyName #>(this, null, <#= EformModePropertyName #>);
+            }
+            <#= IBindingContextChangedClassName #> bcl = this.BindingContext as <#= IBindingContextChangedClassName #>;
+            if (bcl != null)
+            {
+                await bcl.<#= OnLoadedPropertyName #>(this);
+            }
+        }
+        #endregion
+
+        #region <#= CaptionPropertyName #>
+        public static readonly BindableProperty <#= CaptionPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= CaptionPropertyName #>", typeof(string),
+                typeof(<#= EformUserControlBaseClassName #>),
+                null);
+        public string <#= CaptionPropertyName #>
+        {
+            get
+            {
+                return (string)GetValue(<#= CaptionPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= CaptionPropertyName #>Property, value);
+            }
+        }
+        #endregion
+
+        #region <#= ContainerMenuItemsPropertyName #>
+        public static readonly BindableProperty <#= ContainerMenuItemsPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= ContainerMenuItemsPropertyName #>", typeof(IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>),
+                typeof(<#= EformUserControlBaseClassName #>),
+                null);
+        public IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> <#= ContainerMenuItemsPropertyName #>
+        {
+            get
+            {
+                return (IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>)GetValue(<#= ContainerMenuItemsPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= ContainerMenuItemsPropertyName #>Property, value);
+            }
+        }
+        #endregion
+
+        #region <#= ShowSubmitPropertyName #>
+        public static readonly BindableProperty <#= ShowSubmitPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= ShowSubmitPropertyName #>", typeof(bool),
+                typeof(<#= EformUserControlBaseClassName #>),
+                true);
+        public bool <#= ShowSubmitPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= ShowSubmitPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= ShowSubmitPropertyName #>Property, value);
+            }
+        }
+        #endregion
+
+        #region <#= HiddenFiltersPropertyName #>
+        private static async void <#= HiddenFiltersPropertyName #>Changed(BindableObject d, object oldValue, object newValue)
+        {
+            <#= EformUserControlBaseClassName #> inst = d as <#= EformUserControlBaseClassName #>;
+            if (inst != null)
+            {
+                <#= IEformViewModelInterfaceClassName #> bc = inst.BindingContext as <#= IEformViewModelInterfaceClassName #>;
+                if(bc != null)
+                    await bc.<#= HiddenFiltersPropertyChangedPropertyName #>(inst, oldValue, newValue);
+            }
+        }
+        public static readonly BindableProperty <#= HiddenFiltersPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= HiddenFiltersPropertyName #>", typeof(IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>),
+                typeof(<#= EformUserControlBaseClassName #>),
+                null, propertyChanged: <#= HiddenFiltersPropertyName #>Changed);
+        public IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>> <#= HiddenFiltersPropertyName #>
+        {
+            get
+            {
+                return (IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>)GetValue(<#= HiddenFiltersPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= HiddenFiltersPropertyName #>Property, value);
+            }
+        }
+        #endregion
+
+        #region <#= FormControlModelPropertyName #>
+        private static async void <#= FormControlModelPropertyName #>Changed(BindableObject d, object oldValue, object newValue)
+        {
+            <#= EformUserControlBaseClassName #> inst = d as <#= EformUserControlBaseClassName #>;
+            if (inst != null)
+            {
+                <#= IEformViewModelInterfaceClassName #> bc = inst.BindingContext as <#= IEformViewModelInterfaceClassName #>;
+                if(bc != null)
+                    await bc.<#= FormControlModelChangedPropertyName #>(inst, oldValue, newValue);
+            }
+        }
+        public static readonly BindableProperty <#= FormControlModelPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= FormControlModelPropertyName #>", typeof(object), // this is correct
+                typeof(<#= EformUserControlBaseClassName #>),
+                null, propertyChanged: <#= FormControlModelPropertyName #>Changed);
+        public object <#= FormControlModelPropertyName #> // this is correct
+        {
+            get
+            {
+                return (object)GetValue(<#= FormControlModelPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= FormControlModelPropertyName #>Property, value);
+            }
+        }
+        #endregion
+
+        #region <#= EformModePropertyName #>
+        private static async void <#= EformModePropertyName #>Changed(BindableObject d, object oldValue, object newValue)
+        {
+            <#= EformUserControlBaseClassName #> inst = d as <#= EformUserControlBaseClassName #>;
+            if (inst != null)
+            {
+                <#= IEformViewModelInterfaceClassName #> bc = inst.BindingContext as <#= IEformViewModelInterfaceClassName #>;
+                if(bc != null)
+                    await bc.<#= EformModeChangedPropertyName #>(inst, oldValue, newValue);
+            }
+        }
+        public static readonly BindableProperty <#= EformModePropertyName #>Property =
+                BindableProperty.Create(
+                "<#= EformModePropertyName #>", typeof(<#= EformModeEnumClassName #>),
+                typeof(<#= EformUserControlBaseClassName #>),
+                <#= EformModeEnumClassName #>.DeleteMode, propertyChanged: <#= EformModePropertyName #>Changed);
+        public <#= EformModeEnumClassName #> <#= EformModePropertyName #>
+        {
+            get
+            {
+                return (<#= EformModeEnumClassName #>)GetValue(<#= EformModePropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= EformModePropertyName #>Property, value);
+            }
+        }
+        #endregion
+
+        #region <#= ContainerMenuItemsCommandPropertyName #>
+        private static void <#= ContainerMenuItemsCommandPropertyName #>Changed(BindableObject bindable, object oldValue, object newValue)
+        {
+            <#= EformUserControlBaseClassName #> d = bindable as <#= EformUserControlBaseClassName #>;
+            if (d != null)
+            {
+                if (d.<#= OnContainerMenuItemsCommandPropertyName #> != null)
+                {
+                    (d.<#= OnContainerMenuItemsCommandPropertyName #> as Command).ChangeCanExecute();
+                }
+            }
+        }
+        public static readonly BindableProperty <#= ContainerMenuItemsCommandPropertyName #>Property =
+            BindableProperty.Create(nameof(<#= ContainerMenuItemsCommandPropertyName #>), typeof(ICommand), 
+            typeof(<#= EformUserControlBaseClassName #>), 
+            null, 
+            propertyChanged: <#= ContainerMenuItemsCommandPropertyName #>Changed);
+        public ICommand <#= ContainerMenuItemsCommandPropertyName #>
+        {
+            get { return (ICommand)GetValue(<#= ContainerMenuItemsCommandPropertyName #>Property); }
+            set { SetValue(<#= ContainerMenuItemsCommandPropertyName #>Property, value); }
+        }
+        #endregion
+
+        #region <#= OnContainerMenuItemsCommandPropertyName #>
+        protected ICommand _<#= OnContainerMenuItemsCommandPropertyName #> = null;
+        public ICommand <#= OnContainerMenuItemsCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= OnContainerMenuItemsCommandPropertyName #> ?? (_<#= OnContainerMenuItemsCommandPropertyName #> = new Command((p) => <#= OnContainerMenuItemsCommandPropertyName #>Execute(p), (p) => <#= OnContainerMenuItemsCommandPropertyName #>CanExecute(p)));
+            }
+        }
+        protected void <#= OnContainerMenuItemsCommandPropertyName #>Execute(object prm)
+        {
+            ICommand cmd = <#= ContainerMenuItemsCommandPropertyName #>;
+            if(cmd != null) {
+                if(cmd.CanExecute(prm)) {
+                    cmd.Execute(prm);
+                }
+            }
+        }
+        protected bool <#= OnContainerMenuItemsCommandPropertyName #>CanExecute(object p)
+        {
+            return (<#= ContainerMenuItemsCommandPropertyName #> != null); 
+        }
+        #endregion
+
+        #region <#= SubmitCommandPropertyName #>
+        public static readonly BindableProperty <#= SubmitCommandPropertyName #>Property =
+            BindableProperty.Create(nameof(<#= SubmitCommandPropertyName #>), typeof(ICommand), 
+            typeof(<#= EformUserControlBaseClassName #>), 
+            null);
+        public ICommand <#= SubmitCommandPropertyName #>
+        {
+            get { return (ICommand)GetValue(<#= SubmitCommandPropertyName #>Property); }
+            set { SetValue(<#= SubmitCommandPropertyName #>Property, value); }
+        }
+        #endregion
+
+        #region <#= CancelCommandPropertyName #>
+        public static readonly BindableProperty <#= CancelCommandPropertyName #>Property =
+            BindableProperty.Create(nameof(<#= CancelCommandPropertyName #>), typeof(ICommand), 
+            typeof(<#= EformUserControlBaseClassName #>), 
+            null);
+        public ICommand <#= CancelCommandPropertyName #>
+        {
+            get { return (ICommand)GetValue(<#= CancelCommandPropertyName #>Property); }
+            set { SetValue(<#= CancelCommandPropertyName #>Property, value); }
+        }
+        #endregion
+
+    }
+}
+
+<#+
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+#>

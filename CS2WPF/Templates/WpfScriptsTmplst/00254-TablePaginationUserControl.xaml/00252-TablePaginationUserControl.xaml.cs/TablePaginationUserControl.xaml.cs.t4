@@ -1,0 +1,508 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+using System;
+using System.Collections.Generic;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+<#
+ 
+    string TablePaginationUserControlFolder      = "00252-TablePaginationUserControl.xaml.cs";
+    string TablePaginationUserControlClassName   = GetModelClassName(Model, TablePaginationUserControlFolder);
+    string TablePaginationUserControlNameSpace   = GetModelNameSpace(Model, TablePaginationUserControlFolder);
+
+
+    string TitlePropertyName = "Title";
+    string RowsPerPageOptionsPropertyName = "RowsPerPageOptions";
+    string RowsPerPagePropertyName = "RowsPerPage";
+    string CountFromPropertyName = "CountFrom";
+    string CountToPropertyName = "CountTo";
+    string TotalCountPropertyName = "TotalCount";
+    string CurrentPagePropertyName = "CurrentPage";
+    string PreviousButtonIconNamePropertyName = "PreviousButtonIconName";
+    string PreviousButtonToolTipPropertyName = "PreviousButtonToolTip";
+    string PreviousButtonIconColorPropertyName = "PreviousButtonIconColor";
+    string NextButtonIconNamePropertyName = "NextButtonIconName";
+    string NextButtonToolTipPropertyName = "NextButtonToolTip";
+    string NextButtonIconColorPropertyName = "NextButtonIconColor";
+
+    string CurrentPageChangedPropertyName  = "CurrentPageChanged";
+    string RowsPerPageChangedPropertyName  = "RowsPerPageChanged";
+    string TotalCountChangedPropertyName  = "TotalCountChanged";
+    string NextPageCommandPropertyName  = "NextPageCommand";
+    string PreviousPageCommandPropertyName  = "PreviousPageCommand";
+
+#>
+
+namespace <#= TablePaginationUserControlNameSpace #> {
+    /// <summary>
+    /// Interaction logic for <#= TablePaginationUserControlClassName #>.xaml
+    /// </summary>
+    public partial class <#= TablePaginationUserControlClassName #> : UserControl
+    {
+        public <#= TablePaginationUserControlClassName #>()
+        {
+            InitializeComponent();
+        }
+        protected void ResetToAndFrom()
+        {
+            if(<#= CurrentPagePropertyName #>.HasValue && <#= RowsPerPagePropertyName #>.HasValue && <#= TotalCountPropertyName #>.HasValue)
+            {
+                int w = <#= CurrentPagePropertyName #>.Value * <#= RowsPerPagePropertyName #>.Value + 1;
+                if(w > <#= TotalCountPropertyName #>.Value) w = <#= TotalCountPropertyName #>.Value;
+                <#= CountFromPropertyName #> = w;
+                int v = <#= CurrentPagePropertyName #>.Value * <#= RowsPerPagePropertyName #>.Value + <#= RowsPerPagePropertyName #>.Value;
+                if (v > <#= TotalCountPropertyName #>.Value) v = <#= TotalCountPropertyName #>.Value;
+                <#= CountToPropertyName #> = v;
+            } else
+            {
+                <#= CountFromPropertyName #> = null;
+                <#= CountToPropertyName #> = null;
+            }
+        }
+
+        #region <#= TitlePropertyName #>
+        public static readonly DependencyProperty <#= TitlePropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= TitlePropertyName #>", typeof(string),
+                typeof(<#= TablePaginationUserControlClassName #>),
+                new PropertyMetadata("Page size"));
+        public string <#= TitlePropertyName #>
+        {
+            get
+            {
+                return (string)GetValue(<#= TitlePropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= TitlePropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= RowsPerPageOptionsPropertyName #>
+        public static readonly DependencyProperty <#= RowsPerPageOptionsPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= RowsPerPageOptionsPropertyName #>", typeof(IEnumerable<int>),
+                typeof(<#= TablePaginationUserControlClassName #>),
+                new PropertyMetadata(null));
+        public IEnumerable<int> <#= RowsPerPageOptionsPropertyName #>
+        {
+            get
+            {
+                return (IEnumerable<int>)GetValue(<#= RowsPerPageOptionsPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= RowsPerPageOptionsPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= RowsPerPagePropertyName #>
+        private static void <#= RowsPerPagePropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            TablePaginationUserControl inst = d as TablePaginationUserControl;
+            if (inst != null)
+            {
+                inst.ResetToAndFrom();
+                RoutedPropertyChangedEventArgs<Nullable<int>> newEventArgs = new RoutedPropertyChangedEventArgs<Nullable<int>>(e.OldValue as Nullable<int>, e.NewValue as Nullable<int>, <#= TablePaginationUserControlClassName #>.<#= RowsPerPageChangedPropertyName #>Event);
+                inst.RaiseEvent(newEventArgs);
+            }
+        }
+        public static readonly DependencyProperty <#= RowsPerPagePropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= RowsPerPagePropertyName #>", typeof(Nullable<int>),
+                typeof(<#= TablePaginationUserControlClassName #>),
+                new PropertyMetadata(null, <#= RowsPerPagePropertyName #>Changed));
+        public Nullable<int> <#= RowsPerPagePropertyName #>
+        {
+            get
+            {
+                return (Nullable<int>)GetValue(<#= RowsPerPagePropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= RowsPerPagePropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= CountFromPropertyName #>
+        public static readonly DependencyProperty <#= CountFromPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= CountFromPropertyName #>", typeof(Nullable<int>),
+                typeof(<#= TablePaginationUserControlClassName #>),
+                new PropertyMetadata(null));
+        public Nullable<int> <#= CountFromPropertyName #>
+        {
+            get
+            {
+                return (Nullable<int>)GetValue(<#= CountFromPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= CountFromPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= CountToPropertyName #>
+        public static readonly DependencyProperty <#= CountToPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= CountToPropertyName #>", typeof(Nullable<int>),
+                typeof(<#= TablePaginationUserControlClassName #>),
+                new PropertyMetadata(null));
+        public Nullable<int> <#= CountToPropertyName #>
+        {
+            get
+            {
+                return (Nullable<int>)GetValue(<#= CountToPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= CountToPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= TotalCountPropertyName #>
+        private static void <#= TotalCountPropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+
+            TablePaginationUserControl inst = d as TablePaginationUserControl;
+            if (inst != null)
+            {
+                inst.ResetToAndFrom();
+                RoutedPropertyChangedEventArgs<Nullable<int>> newEventArgs = new RoutedPropertyChangedEventArgs<Nullable<int>>(e.OldValue as Nullable<int>, e.NewValue as Nullable<int>, <#= TablePaginationUserControlClassName #>.<#= TotalCountChangedPropertyName #>Event);
+                inst.RaiseEvent(newEventArgs);
+            }
+        }
+        public static readonly DependencyProperty <#= TotalCountPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= TotalCountPropertyName #>", typeof(Nullable<int>),
+                typeof(<#= TablePaginationUserControlClassName #>),
+                new PropertyMetadata(0, <#= TotalCountPropertyName #>Changed));
+        public Nullable<int> <#= TotalCountPropertyName #>
+        {
+            get
+            {
+                return (Nullable<int>)GetValue(<#= TotalCountPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= TotalCountPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= CurrentPagePropertyName #>
+        private static void <#= CurrentPagePropertyName #>Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            TablePaginationUserControl inst = d as TablePaginationUserControl;
+            if (inst != null)
+            {
+                inst.ResetToAndFrom();
+                RoutedPropertyChangedEventArgs<Nullable<int>> newEventArgs = new RoutedPropertyChangedEventArgs<Nullable<int>>(e.OldValue as Nullable<int>, e.NewValue as Nullable<int>, <#= TablePaginationUserControlClassName #>.<#= CurrentPageChangedPropertyName #>Event);
+                inst.RaiseEvent(newEventArgs);
+            }
+        }
+        public static readonly DependencyProperty <#= CurrentPagePropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= CurrentPagePropertyName #>", typeof(Nullable<int>),
+                typeof(<#= TablePaginationUserControlClassName #>),
+                new PropertyMetadata(0, <#= CurrentPagePropertyName #>Changed));
+        public Nullable<int> <#= CurrentPagePropertyName #>
+        {
+            get
+            {
+                return (Nullable<int>)GetValue(<#= CurrentPagePropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= CurrentPagePropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= PreviousButtonIconNamePropertyName #>
+        public static readonly DependencyProperty <#= PreviousButtonIconNamePropertyName #>Property =
+                DependencyProperty.Register(
+                "PreviousButtonIconName", typeof(string),
+                typeof(<#= TablePaginationUserControlClassName #>),
+                new PropertyMetadata("ChevronLeft"));
+        public string <#= PreviousButtonIconNamePropertyName #>
+        {
+            get
+            {
+                return (string)GetValue(<#= PreviousButtonIconNamePropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= PreviousButtonIconNamePropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= PreviousButtonToolTipPropertyName #>
+        public static readonly DependencyProperty <#= PreviousButtonToolTipPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= PreviousButtonToolTipPropertyName #>", typeof(string),
+                typeof(<#= TablePaginationUserControlClassName #>),
+                new PropertyMetadata("Previous Page"));
+        public string <#= PreviousButtonToolTipPropertyName #>
+        {
+            get
+            {
+                return (string)GetValue(<#= PreviousButtonToolTipPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= PreviousButtonToolTipPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= PreviousButtonIconColorPropertyName #>
+        public static readonly DependencyProperty <#= PreviousButtonIconColorPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= PreviousButtonIconColorPropertyName #>", typeof(string),
+                typeof(<#= TablePaginationUserControlClassName #>),
+                new PropertyMetadata("Primary"));
+        public string <#= PreviousButtonIconColorPropertyName #>
+        {
+            get
+            {
+                return (string)GetValue(<#= PreviousButtonIconColorPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= PreviousButtonIconColorPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= NextButtonIconNamePropertyName #>
+        public static readonly DependencyProperty <#= NextButtonIconNamePropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= NextButtonIconNamePropertyName #>", typeof(string),
+                typeof(<#= TablePaginationUserControlClassName #>),
+                new PropertyMetadata("ChevronRight"));
+        public string <#= NextButtonIconNamePropertyName #>
+        {
+            get
+            {
+                return (string)GetValue(<#= NextButtonIconNamePropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= NextButtonIconNamePropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= NextButtonToolTipPropertyName #>
+        public static readonly DependencyProperty <#= NextButtonToolTipPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= NextButtonToolTipPropertyName #>", typeof(string),
+                typeof(<#= TablePaginationUserControlClassName #>),
+                new PropertyMetadata("Next Page"));
+        public string <#= NextButtonToolTipPropertyName #>
+        {
+            get
+            {
+                return (string)GetValue(<#= NextButtonToolTipPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= NextButtonToolTipPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= NextButtonIconColorPropertyName #>
+        public static readonly DependencyProperty <#= NextButtonIconColorPropertyName #>Property =
+                DependencyProperty.Register(
+                "<#= NextButtonIconColorPropertyName #>", typeof(string),
+                typeof(<#= TablePaginationUserControlClassName #>),
+                new PropertyMetadata("Primary"));
+        public string <#= NextButtonIconColorPropertyName #>
+        {
+            get
+            {
+                return (string)GetValue(<#= NextButtonIconColorPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= NextButtonIconColorPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= CurrentPageChangedPropertyName #>Event
+        public static readonly RoutedEvent <#= CurrentPageChangedPropertyName #>Event = EventManager.RegisterRoutedEvent("<#= CurrentPageChangedPropertyName #>", RoutingStrategy.Bubble, typeof(RoutedPropertyChangedEventHandler<Nullable<int>>), typeof(<#= TablePaginationUserControlClassName #>));
+        public static void Add<#= CurrentPageChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<Nullable<int>> handler)
+        {
+            UIElement uie = d as UIElement;
+            if (uie != null)
+            {
+                uie.AddHandler(<#= TablePaginationUserControlClassName #>.<#= CurrentPageChangedPropertyName #>Event, handler);
+            }
+        }
+        public static void Remove<#= CurrentPageChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<Nullable<int>> handler)
+        {
+            UIElement uie = d as UIElement;
+            if (uie != null)
+            {
+                uie.RemoveHandler(<#= TablePaginationUserControlClassName #>.<#= CurrentPageChangedPropertyName #>Event, handler);
+            }
+        }
+        #endregion
+        #region <#= RowsPerPageChangedPropertyName #>Event
+        public static readonly RoutedEvent <#= RowsPerPageChangedPropertyName #>Event = EventManager.RegisterRoutedEvent("<#= RowsPerPageChangedPropertyName #>", RoutingStrategy.Bubble, typeof(RoutedPropertyChangedEventHandler<Nullable<int>>), typeof(<#= TablePaginationUserControlClassName #>));
+        public static void Add<#= RowsPerPageChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<Nullable<int>> handler)
+        {
+            UIElement uie = d as UIElement;
+            if (uie != null)
+            {
+                uie.AddHandler(<#= TablePaginationUserControlClassName #>.<#= RowsPerPageChangedPropertyName #>Event, handler);
+            }
+        }
+        public static void Remove<#= RowsPerPageChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<Nullable<int>> handler)
+        {
+            UIElement uie = d as UIElement;
+            if (uie != null)
+            {
+                uie.RemoveHandler(<#= TablePaginationUserControlClassName #>.<#= RowsPerPageChangedPropertyName #>Event, handler);
+            }
+        }
+        #endregion
+        #region <#= TotalCountChangedPropertyName #>Event
+        public static readonly RoutedEvent <#= TotalCountChangedPropertyName #>Event = EventManager.RegisterRoutedEvent("<#= TotalCountChangedPropertyName #>", RoutingStrategy.Bubble, typeof(RoutedPropertyChangedEventHandler<Nullable<int>>), typeof(<#= TablePaginationUserControlClassName #>));
+        public static void Add<#= TotalCountChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<Nullable<int>> handler)
+        {
+            UIElement uie = d as UIElement;
+            if (uie != null)
+            {
+                uie.AddHandler(<#= TablePaginationUserControlClassName #>.<#= TotalCountChangedPropertyName #>Event, handler);
+            }
+        }
+        public static void Remove<#= TotalCountChangedPropertyName #>(DependencyObject d, RoutedPropertyChangedEventHandler<Nullable<int>> handler)
+        {
+            UIElement uie = d as UIElement;
+            if (uie != null)
+            {
+                uie.RemoveHandler(<#= TablePaginationUserControlClassName #>.<#= TotalCountChangedPropertyName #>Event, handler);
+            }
+        }
+        #endregion
+        #region RoutedCommands
+        public static RoutedCommand <#= NextPageCommandPropertyName #> = new RoutedCommand("<#= NextPageCommandPropertyName #>", typeof(<#= TablePaginationUserControlClassName #>));
+        public static RoutedCommand <#= PreviousPageCommandPropertyName #> = new RoutedCommand("<#= PreviousPageCommandPropertyName #>", typeof(<#= TablePaginationUserControlClassName #>));
+        #endregion
+        #region <#= NextPageCommandPropertyName #>
+        private void Executed<#= NextPageCommandPropertyName #>(object sender, ExecutedRoutedEventArgs e)
+        {
+            e.Handled = true;
+            if (CurrentPage.HasValue && CountTo.HasValue && TotalCount.HasValue ? CountTo.Value < TotalCount.Value : false)
+            {
+                CurrentPage = CurrentPage.Value + 1;
+            }
+        }
+        private void CanExecute<#= NextPageCommandPropertyName #>(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.Handled = true;
+            e.CanExecute = (CountTo.HasValue && TotalCount.HasValue ? CountTo.Value < TotalCount.Value : false);
+        }
+        #endregion
+        #region <#= PreviousPageCommandPropertyName #>
+        private void Executed<#= PreviousPageCommandPropertyName #>(object sender, ExecutedRoutedEventArgs e)
+        {
+            e.Handled = true;
+            if (CurrentPage.HasValue ? CurrentPage.Value > 0 : false)
+            {
+                CurrentPage = CurrentPage.Value - 1;
+            }
+        }
+        private void CanExecute<#= PreviousPageCommandPropertyName #>(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.Handled = true;
+            e.CanExecute = (CurrentPage.HasValue ? CurrentPage.Value > 0 : false);
+        }
+        #endregion
+
+
+
+   }
+}
+
+<#+
+
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+
+#>

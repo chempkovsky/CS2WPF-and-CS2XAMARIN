@@ -1,0 +1,372 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+using Xamarin.Forms;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Windows.Input;
+using Prism.Services.Dialogs;
+<#
+
+    string IAppGlblSettingsServiceFolder                = "00080-IAppGlblSettingsService.cs";
+    string IAppGlblSettingsServiceClassName             = GetModelClassName(Model, IAppGlblSettingsServiceFolder);
+    string IAppGlblSettingsServiceNameSpace             = GetModelNameSpace(Model, IAppGlblSettingsServiceFolder);
+
+    string IWebServiceFilterRsltInterfaceFolder         = "00204-IWebServiceFilterRsltInterface.cs";
+    string IWebServiceFilterRsltInterfaceClassName      = GetModelClassName(Model, IWebServiceFilterRsltInterfaceFolder);
+    string IWebServiceFilterRsltInterfaceNameSpace      = GetModelNameSpace(Model, IWebServiceFilterRsltInterfaceFolder);
+
+    string SdlgViewModelBaseFolder                      = "00633-SdlgViewModelBase.cs";
+    string SdlgViewModelBaseClassName                   = GetModelClassName(Model, SdlgViewModelBaseFolder);
+    string SdlgViewModelBaseNameSpace                   = GetModelNameSpace(Model, SdlgViewModelBaseFolder);
+
+    string CaptionPropertyName                      = "Caption";
+    string FilterHeightPropertyName                 = "FilterHeight";
+    string GridHeightPropertyName                   = "GridHeight";
+    string HiddenFiltersPropertyName                = "HiddenFilters";
+    string AppSettingServicePropertyName            = "GlblSettingsSrv";
+    string RegionPropertyName                       = "Region";
+    string DialogRegionPropertyName                 = "DialogRegion";
+    string OkCommandPropertyName                    = "OkCommand";
+    string CancelCommandPropertyName                = "CancelCommand";
+    string OnSelectedRowCommandPropertyName         = "OnSelectedRowCommand";
+    string SelectedItemPropertyName                 = "SelectedItem";
+
+    List<string> nmSpaces = new List<string>();
+    if ((SdlgViewModelBaseNameSpace != IWebServiceFilterRsltInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IWebServiceFilterRsltInterfaceNameSpace);
+    if ((SdlgViewModelBaseNameSpace != IAppGlblSettingsServiceNameSpace) && (nmSpaces.IndexOf(IAppGlblSettingsServiceNameSpace) < 0)) 
+        nmSpaces.Add(IAppGlblSettingsServiceNameSpace);
+
+
+    foreach(string ns in nmSpaces) {
+#>
+using <#= ns #>;
+<#
+    }
+#>
+
+
+namespace <#= SdlgViewModelBaseNameSpace #> {
+    public class <#= SdlgViewModelBaseClassName #>: INotifyPropertyChanged, IDialogAware
+    {
+        protected <#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName #>=null;
+        public <#= SdlgViewModelBaseClassName #>(<#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName  #>) {
+            this.<#= AppSettingServicePropertyName #> = <#= AppSettingServicePropertyName #>;
+            //if(this.<#= AppSettingServicePropertyName #> != null) {
+            //    _<#= FilterHeightPropertyName #> = 3 * this.<#= AppSettingServicePropertyName #>.FilterHeightFactor + this.<#= AppSettingServicePropertyName #>.FilterHeightAddition;
+            //    _<#= GridHeightPropertyName #> = 10 * this.<#= AppSettingServicePropertyName #>.TableHeightFactor + this.<#= AppSettingServicePropertyName #>.TableHeightAddition;
+            //}
+        }
+        #region INotifyPropertyChanged
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string name = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+        #endregion
+
+        #region IDialogAware
+        event Action<IDialogParameters> _RequestClose;
+        public event Action<IDialogParameters> RequestClose
+        {
+            add
+            {
+                _RequestClose += value;
+            }
+            remove
+            {
+                _RequestClose -= value;
+            }
+        }
+        public bool CanCloseDialog()
+        {
+            return true;
+        }
+
+        public void OnDialogClosed()
+        {
+            
+        }
+        public void OnDialogOpened(IDialogParameters parameters)
+        {
+            if (parameters == null) return;
+            if (parameters.ContainsKey("<#= CaptionPropertyName #>"))
+            {
+                <#= CaptionPropertyName #> = parameters.GetValue<string>("<#= CaptionPropertyName #>");
+                Title = <#= CaptionPropertyName #>;
+            }
+            if (parameters.ContainsKey("<#= FilterHeightPropertyName #>"))
+            {
+                <#= FilterHeightPropertyName #> = parameters.GetValue<double>("<#= FilterHeightPropertyName #>");
+            }
+            if (parameters.ContainsKey("<#= GridHeightPropertyName #>"))
+            {
+                <#= GridHeightPropertyName #> = parameters.GetValue<double>("<#= GridHeightPropertyName #>");
+            }
+            if (parameters.ContainsKey("<#= HiddenFiltersPropertyName #>"))  
+            {
+                <#= HiddenFiltersPropertyName #> = parameters.GetValue<IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>>("<#= HiddenFiltersPropertyName #>");
+            }
+        }
+        #endregion
+
+
+        #region <#= SelectedItemPropertyName #>
+        protected object _<#= SelectedItemPropertyName #> = null;
+        protected object <#= SelectedItemPropertyName #> 
+        {
+            get
+            {
+                return _<#= SelectedItemPropertyName #>;
+            }
+            set
+            {
+                if (_<#= SelectedItemPropertyName #> != value)
+                {
+                    _<#= SelectedItemPropertyName #> = value;
+                    OnPropertyChanged();
+                    (<#= OkCommandPropertyName #> as Command).ChangeCanExecute();
+                }
+            }
+        }
+        #endregion
+
+        #region Title
+        string _Title = "";
+        public string Title {
+            get { return _Title; }
+            set {
+                if(_Title != value) {
+                    _Title = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+
+        #region <#= GridHeightPropertyName #>
+        double _<#= GridHeightPropertyName #> = -1d;
+        public double <#= GridHeightPropertyName #>
+        {
+            get
+            {
+                return _<#= GridHeightPropertyName #>;
+            }
+            set
+            {
+                if (_<#= GridHeightPropertyName #> != value)
+                {
+                    _<#= GridHeightPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+
+        #region <#= FilterHeightPropertyName #>
+        double _<#= FilterHeightPropertyName #> = -1d;
+        public double <#= FilterHeightPropertyName #>
+        {
+            get
+            {
+                return _<#= FilterHeightPropertyName #>;
+            }
+            set
+            {
+                if (_<#= FilterHeightPropertyName #> != value)
+                {
+                    _<#= FilterHeightPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+
+        #region <#= CaptionPropertyName #>
+        string _<#= CaptionPropertyName #> = null;
+        public string <#= CaptionPropertyName #>
+        {
+            get
+            {
+                return _<#= CaptionPropertyName #>;
+            }
+            set
+            {
+                if (_<#= CaptionPropertyName #> != value)
+                {
+                    _<#= CaptionPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+
+        #region <#= HiddenFiltersPropertyName #>
+        IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>> _<#= HiddenFiltersPropertyName #> = null;
+        public IEnumerable<IWebServiceFilterRsltInterface> <#= HiddenFiltersPropertyName #>
+        {
+            get
+            {
+                return _<#= HiddenFiltersPropertyName #>;
+            }
+            set
+            {
+                if (_<#= HiddenFiltersPropertyName #> != value)
+                {
+                    _<#= HiddenFiltersPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+
+        #region <#= OnSelectedRowCommandPropertyName #>
+        protected ICommand _<#= OnSelectedRowCommandPropertyName #> = null;
+        public ICommand <#= OnSelectedRowCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= OnSelectedRowCommandPropertyName #> ?? (_<#= OnSelectedRowCommandPropertyName #> = new Command((p) => <#= OnSelectedRowCommandPropertyName #>Execute(p), (p) => <#= OnSelectedRowCommandPropertyName #>CanExecute(p)));
+            }
+        }
+        protected void <#= OnSelectedRowCommandPropertyName #>Execute(object prm)
+        {
+                <#= SelectedItemPropertyName #>  = prm;
+        }
+        protected bool <#= OnSelectedRowCommandPropertyName #>CanExecute(object prm)
+        {
+            return true; 
+        }
+        #endregion
+
+        #region <#= OkCommandPropertyName #>
+        private ICommand _<#= OkCommandPropertyName #>;
+        public ICommand <#= OkCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= OkCommandPropertyName #> ?? (_<#= OkCommandPropertyName #> = new Command((param) => <#= OkCommandPropertyName #>Action(param), (param) => <#= OkCommandPropertyName #>CanExecute(param)));
+            }
+        }
+        protected void <#= OkCommandPropertyName #>Action(object param)
+        {
+            if(_<#= SelectedItemPropertyName #> != null) {
+                DialogParameters parameters = new DialogParameters();
+                parameters.Add("<#= SelectedItemPropertyName #>", _<#= SelectedItemPropertyName #>);
+                parameters.Add("Result", true);
+                _RequestClose?.Invoke(parameters);
+            }
+        }
+        protected bool <#= OkCommandPropertyName #>CanExecute(object param)
+        {
+            return _<#= SelectedItemPropertyName #> != null;
+        }
+        #endregion
+        #region <#= CancelCommandPropertyName #>
+        private ICommand _<#= CancelCommandPropertyName #>;
+        public ICommand <#= CancelCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= CancelCommandPropertyName #> ?? (_<#= CancelCommandPropertyName #> = new Command((param) => <#= CancelCommandPropertyName #>Action(param), (param) => <#= CancelCommandPropertyName #>CanExecute(param)));
+            }
+        }
+        protected void <#= CancelCommandPropertyName #>Action(object param)
+        {
+            DialogParameters parameters = new DialogParameters();
+            parameters.Add("Result", false);
+            _RequestClose?.Invoke(parameters);
+        }
+        protected bool <#= CancelCommandPropertyName #>CanExecute(object param)
+        {
+            return true;
+        }
+        #endregion
+    }
+}
+
+<#+
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+#>

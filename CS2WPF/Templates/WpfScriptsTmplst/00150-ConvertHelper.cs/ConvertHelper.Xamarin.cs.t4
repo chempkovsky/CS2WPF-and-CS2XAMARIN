@@ -1,0 +1,159 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+using System;
+<#
+
+    string convertHelperModelFolder      = "00150-ConvertHelper.cs";
+    string convertHelperModelClassName   = GetModelClassName(Model, convertHelperModelFolder);
+    string convertHelperModelNameSpace   = GetModelNameSpace(Model, convertHelperModelFolder);
+    
+#>
+
+namespace <#= convertHelperModelNameSpace #> {
+    public static class  <#= convertHelperModelClassName #>
+    {
+        public static object TryToConvert(string datatype, object val)
+        {
+            if ((val == null) || string.IsNullOrEmpty(datatype)) return null;
+            if (val is string) { if (string.IsNullOrEmpty(val as string)) return null; }
+            object result = null;
+            try
+            {
+                switch (datatype)
+                {
+                    case "int16":
+                        result = Convert.ToInt16(val);
+                        break;
+                    case "int32":
+                        result = Convert.ToInt32(val);
+                        break;
+                    case "int64":
+                        result = Convert.ToInt64(val);
+                        break;
+                    case "uint16":
+                        result = Convert.ToUInt16(val);
+                        break;
+                    case "uint32":
+                        result = Convert.ToUInt32(val);
+                        break;
+                    case "uint64":
+                        result = Convert.ToUInt64(val);
+                        break;
+                    case "double":
+                        result = Convert.ToDouble(val);
+                        break;
+                    case "decimal":
+                        result = Convert.ToDecimal(val);
+                        break;
+                    case "single":
+                        result = Convert.ToSingle(val);
+                        break;
+                    case "date":
+                    case "datetime":
+                        result = Convert.ToDateTime(val);
+                        break;
+                    case "string":
+                        result = val as string;
+                        break;
+                    case "guid":
+                        {
+                            string s = val as string;
+                            Guid g;
+                            if(Guid.TryParse(s, out g)) {
+                                result = g;
+                            }
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+            catch { }
+            return result;
+        }
+    }
+}
+
+<#+
+
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+
+#>

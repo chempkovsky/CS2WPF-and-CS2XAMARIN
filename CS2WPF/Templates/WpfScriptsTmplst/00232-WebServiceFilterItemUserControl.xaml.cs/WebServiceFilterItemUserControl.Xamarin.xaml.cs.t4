@@ -1,0 +1,788 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Input;
+using Xamarin.Forms;
+using Xamarin.Forms.Xaml;
+<#
+
+    string commandHelperModelFolder      = "00140-CommandHelper.cs";
+    string commandHelperModelClassName   = GetModelClassName(Model, commandHelperModelFolder);
+    string commandHelperModelNameSpace   = GetModelNameSpace(Model, commandHelperModelFolder);
+    
+    string convertHelperModelFolder      = "00150-ConvertHelper.cs";
+    string convertHelperModelClassName   = GetModelClassName(Model, convertHelperModelFolder);
+    string convertHelperModelNameSpace   = GetModelNameSpace(Model, convertHelperModelFolder);
+
+    string IWebServiceFilterDefInterfaceFolder      = "00200-IWebServiceFilterDefInterface.cs";
+    string IWebServiceFilterDefInterfaceClassName   = GetModelClassName(Model, IWebServiceFilterDefInterfaceFolder);
+    string IWebServiceFilterDefInterfaceNameSpace   = GetModelNameSpace(Model, IWebServiceFilterDefInterfaceFolder);
+
+    string IWebServiceFilterOperatorInterfaceFolder      = "00202-IWebServiceFilterOperatorInterface.cs";
+    string IWebServiceFilterOperatorInterfaceClassName   = GetModelClassName(Model, IWebServiceFilterOperatorInterfaceFolder);
+    string IWebServiceFilterOperatorInterfaceNameSpace   = GetModelNameSpace(Model, IWebServiceFilterOperatorInterfaceFolder);
+
+    string IWebServiceFilterRsltInterfaceFolder      = "00204-IWebServiceFilterRsltInterface.cs";
+    string IWebServiceFilterRsltInterfaceClassName   = GetModelClassName(Model, IWebServiceFilterRsltInterfaceFolder);
+    string IWebServiceFilterRsltInterfaceNameSpace   = GetModelNameSpace(Model, IWebServiceFilterRsltInterfaceFolder);
+
+    string WebServiceFilterItemUserControlFolder      = "00232-WebServiceFilterItemUserControl.xaml.cs";
+    string WebServiceFilterItemUserControlClassName   = GetModelClassName(Model, WebServiceFilterItemUserControlFolder);
+    string WebServiceFilterItemUserControlNameSpace   = GetModelNameSpace(Model, WebServiceFilterItemUserControlFolder);
+
+    string SelectedFilterOperatorPropertyName = "SelectedFilterOperator";
+    string SelectedFilterOperatorNamePropertyName = "SelectedFilterOperatorName";
+    string FilterOperatorsPropertyName = "FilterOperators";
+    string SelectedFilterDefinitionPropertyName = "SelectedFilterDefinition";
+    string FilterDefinitionsPropertyName = "FilterDefinitions";
+    string FilterValuePropertyName = "FilterValue";
+    string IsDateInputPropertyName = "IsDateInput";
+    string IsFilterValueReadOnlyPropertyName = "IsFilterValueReadOnly";
+    string FilterErrorPropertyName = "FilterError";
+    string FilterValuePromptPropertyName = "FilterValuePrompt";
+    string RemoveNotificationPropertyName = "RemoveNotification";
+    string RemoveCommandPropertyName = "RemoveCommand";
+    string SelectedFilterDataTypePropertyName = "SelectedFilterDataType";
+    string SelectedFilterNamePropertyName = "SelectedFilterName";
+    string SelectedModelRefPropertyName = "SelectedModelRef";
+    string RemoveWebServiceFilterItemCommandPropertyName = "RemoveWebServiceFilterItemCommand";
+    string FilterItemCommandPropertyName = "FilterItemCommand";
+
+
+    List<string> nmSpaces = new List<string>();
+    if (WebServiceFilterItemUserControlNameSpace != IWebServiceFilterDefInterfaceNameSpace) nmSpaces.Add(IWebServiceFilterDefInterfaceNameSpace);
+    if ((WebServiceFilterItemUserControlNameSpace != IWebServiceFilterOperatorInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterOperatorInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IWebServiceFilterOperatorInterfaceNameSpace);
+    if ((WebServiceFilterItemUserControlNameSpace != IWebServiceFilterDefInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterDefInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IWebServiceFilterDefInterfaceNameSpace);
+    if ((WebServiceFilterItemUserControlNameSpace != commandHelperModelNameSpace) && (nmSpaces.IndexOf(commandHelperModelNameSpace) < 0)) 
+        nmSpaces.Add(commandHelperModelNameSpace);
+    if ((WebServiceFilterItemUserControlNameSpace != convertHelperModelNameSpace) && (nmSpaces.IndexOf(convertHelperModelNameSpace) < 0)) 
+        nmSpaces.Add(convertHelperModelNameSpace);
+
+
+
+#>
+<# 
+    foreach(string ns in nmSpaces) {
+#>
+using <#= ns #>;
+<#
+    }
+#>
+
+namespace <#= WebServiceFilterItemUserControlNameSpace #> {
+    /// <summary>
+    /// Interaction logic for <#= WebServiceFilterItemUserControlClassName #>.xaml
+    /// </summary>
+    [XamlCompilation(XamlCompilationOptions.Compile)]
+    public partial class <#= WebServiceFilterItemUserControlClassName #>: ContentView
+    {
+        public <#= WebServiceFilterItemUserControlClassName #>()
+        {
+            InitializeComponent();
+        }
+
+
+        #region <#= SelectedFilterOperatorNamePropertyName #>
+        public static readonly BindableProperty <#= SelectedFilterOperatorNamePropertyName #>Property =
+                BindableProperty.Create(
+                "<#= SelectedFilterOperatorNamePropertyName #>", typeof(string),
+                typeof(<#= WebServiceFilterItemUserControlClassName #>),
+                null);
+        public string <#= SelectedFilterOperatorNamePropertyName #>
+        {
+            get
+            {
+                return (string)GetValue(<#= SelectedFilterOperatorNamePropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= SelectedFilterOperatorNamePropertyName #>Property, value);
+            }
+        }
+        #endregion
+
+        #region <#= SelectedFilterOperatorPropertyName #>
+        private static void <#= SelectedFilterOperatorPropertyName #>Changed(BindableObject d, object oldValue, object newValue)
+        {
+            <#= WebServiceFilterItemUserControlClassName #> inst = d as <#= WebServiceFilterItemUserControlClassName #>;
+            if (inst != null)
+            {
+                <#= IWebServiceFilterOperatorInterfaceClassName #> newV = newValue as <#= IWebServiceFilterOperatorInterfaceClassName #>;
+                if(newV == null)
+                {
+                    inst.<#= SelectedFilterOperatorNamePropertyName #> = null;
+                } else
+                {
+                    inst.<#= SelectedFilterOperatorNamePropertyName #> = newV.oName;
+                }
+            }
+        }
+        public static readonly BindableProperty <#= SelectedFilterOperatorPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= SelectedFilterOperatorPropertyName #>", typeof(<#= IWebServiceFilterOperatorInterfaceClassName #>),
+                typeof(<#= WebServiceFilterItemUserControlClassName #>),
+                null, propertyChanged: <#= SelectedFilterOperatorPropertyName #>Changed);
+        public <#= IWebServiceFilterOperatorInterfaceClassName #> <#= SelectedFilterOperatorPropertyName #>
+        {
+            get
+            {
+                return (<#= IWebServiceFilterOperatorInterfaceClassName #>)GetValue(<#= SelectedFilterOperatorPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= SelectedFilterOperatorPropertyName #>Property, value);
+            }
+        }
+        #endregion
+
+        #region <#= FilterOperatorsPropertyName #>
+        private static void <#= FilterOperatorsPropertyName #>Changed(BindableObject d, object oldValue, object newValue)
+        {
+            <#= WebServiceFilterItemUserControlClassName #> inst = d as <#= WebServiceFilterItemUserControlClassName #>;
+            if (inst != null)
+            {
+                IEnumerable<<#= IWebServiceFilterOperatorInterfaceClassName #>> newVals = newValue as IEnumerable<<#= IWebServiceFilterOperatorInterfaceClassName #>>;
+                if (newVals == null)
+                {
+                        inst.<#= SelectedFilterOperatorNamePropertyName #> = null;
+                        inst.<#= SelectedFilterOperatorPropertyName #> = null;
+                }
+                else
+                {
+                    <#= IWebServiceFilterOperatorInterfaceClassName #> v = newVals.FirstOrDefault();
+                    if (v == null)
+                    {
+                        inst.<#= SelectedFilterOperatorNamePropertyName #> = null;
+                        inst.<#= SelectedFilterOperatorPropertyName #> = null;
+                    }
+                    else
+                    {
+                        inst.<#= SelectedFilterOperatorNamePropertyName #> = v.oName;
+                        inst.<#= SelectedFilterOperatorPropertyName #> = v;
+                    }
+                }
+            }
+        }
+        public static readonly BindableProperty <#= FilterOperatorsPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= FilterOperatorsPropertyName #>", typeof(IEnumerable<<#= IWebServiceFilterOperatorInterfaceClassName #>>),
+                typeof(<#= WebServiceFilterItemUserControlClassName #>),
+                null, propertyChanged: <#= FilterOperatorsPropertyName #>Changed);
+        public IEnumerable<<#= IWebServiceFilterOperatorInterfaceClassName #>> <#= FilterOperatorsPropertyName #>
+        {
+            get
+            {
+                return (IEnumerable<<#= IWebServiceFilterOperatorInterfaceClassName #>>)GetValue(<#= FilterOperatorsPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= FilterOperatorsPropertyName #>Property, value);
+            }
+        }
+        #endregion
+
+        #region <#= SelectedFilterDefinitionPropertyName #>
+        private static void <#= SelectedFilterDefinitionPropertyName #>Changed(BindableObject d, object oldValue, object newValue)
+        {
+            <#= WebServiceFilterItemUserControlClassName #> inst = d as <#= WebServiceFilterItemUserControlClassName #>;
+            if (inst != null)
+            {
+                if (oldValue != null)
+                {
+                    inst.<#= FilterValuePropertyName #> = null;
+                }
+                inst.UpdateIsDateInput();
+                inst.UpdateIsFilterValueReadOnly();
+                inst.UpdateFilterError();
+                inst.UpdateFilterValuePrompt();
+                <#= IWebServiceFilterDefInterfaceClassName #> sfd = inst.<#= SelectedFilterDefinitionPropertyName #>;
+                if (sfd == null)
+                {
+                    inst.<#= SelectedFilterDataTypePropertyName #> = null;
+                    inst.<#= SelectedFilterNamePropertyName #> = null;
+                }
+                else
+                {
+                    inst.<#= SelectedFilterDataTypePropertyName #> = sfd.fltrDataType;
+                    inst.<#= SelectedFilterNamePropertyName #> = sfd.fltrName;
+                }
+            }
+        }
+        public static readonly BindableProperty <#= SelectedFilterDefinitionPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= SelectedFilterDefinitionPropertyName #>", typeof(<#= IWebServiceFilterDefInterfaceClassName #>),
+                typeof(<#= WebServiceFilterItemUserControlClassName #>),
+                null, propertyChanged: <#= SelectedFilterDefinitionPropertyName #>Changed);
+        public <#= IWebServiceFilterDefInterfaceClassName #> <#= SelectedFilterDefinitionPropertyName #>
+        {
+            get
+            {
+                return (<#= IWebServiceFilterDefInterfaceClassName #>)GetValue(<#= SelectedFilterDefinitionPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= SelectedFilterDefinitionPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= SelectedFilterDataTypePropertyName #>
+        public static readonly BindableProperty <#= SelectedFilterDataTypePropertyName #>Property =
+                BindableProperty.Create(
+                "<#= SelectedFilterDataTypePropertyName #>", typeof(string),
+                typeof(<#= WebServiceFilterItemUserControlClassName #>),
+                null);
+        public string <#= SelectedFilterDataTypePropertyName #>
+        {
+            get
+            {
+                return (string)GetValue(<#= SelectedFilterDataTypePropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= SelectedFilterDataTypePropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= SelectedFilterNamePropertyName #> 
+        public static readonly BindableProperty <#= SelectedFilterNamePropertyName #>Property =
+                BindableProperty.Create(
+                "<#= SelectedFilterNamePropertyName #>", typeof(string),
+                typeof(<#= WebServiceFilterItemUserControlClassName #>),
+                null);
+        public string <#= SelectedFilterNamePropertyName #>
+        {
+            get
+            {
+                return (string)GetValue(<#= SelectedFilterNamePropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= SelectedFilterNamePropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= FilterDefinitionsPropertyName #>
+        private static void <#= FilterDefinitionsPropertyName #>Changed(BindableObject d, object oldValue, object newValue)
+        {
+            <#= WebServiceFilterItemUserControlClassName #> inst = d as <#= WebServiceFilterItemUserControlClassName #>;
+            if (inst != null)
+            {
+                IEnumerable<<#= IWebServiceFilterDefInterfaceClassName #>> newVals = newValue as IEnumerable<<#= IWebServiceFilterDefInterfaceClassName #>>;
+                if (newVals == null)
+                {
+                    inst.SelectedFilterDefinition = null;
+                }
+                else
+                {
+                    inst.SelectedFilterDefinition = newVals.Where(p => p.fltrName == null).FirstOrDefault();
+                }
+            }
+        }
+        public static readonly BindableProperty <#= FilterDefinitionsPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= FilterDefinitionsPropertyName #>", typeof(IEnumerable<<#= IWebServiceFilterDefInterfaceClassName #>>),
+                typeof(<#= WebServiceFilterItemUserControlClassName #>),
+                null, propertyChanged: <#= FilterDefinitionsPropertyName #>Changed);
+        public IEnumerable<<#= IWebServiceFilterDefInterfaceClassName #>> <#= FilterDefinitionsPropertyName #>
+        {
+            get { 
+                return (IEnumerable<<#= IWebServiceFilterDefInterfaceClassName #>>)GetValue(<#= FilterDefinitionsPropertyName #>Property); 
+            }
+            set { 
+                SetValue(<#= FilterDefinitionsPropertyName #>Property, value); 
+            }
+        }
+        #endregion
+        #region <#= FilterValuePropertyName #>
+        private static void <#= FilterValuePropertyName #>Changed(BindableObject d, object oldValue, object newValue)
+        {
+            <#= WebServiceFilterItemUserControlClassName #> inst = d as <#= WebServiceFilterItemUserControlClassName #>;
+            if (inst != null)
+            {
+                inst.UpdateFilterError();
+                inst.UpdateFilterValuePrompt();
+            }
+        }
+        public static readonly BindableProperty <#= FilterValuePropertyName #>Property =
+                BindableProperty.Create(
+                "<#= FilterValuePropertyName #>", typeof(object),
+                typeof(<#= WebServiceFilterItemUserControlClassName #>),
+                null, propertyChanged: <#= FilterValuePropertyName #>Changed);
+        public object <#= FilterValuePropertyName #>
+        {
+            get
+            {
+                return (object)GetValue(<#= FilterValuePropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= FilterValuePropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= IsDateInputPropertyName #>
+        protected void UpdateIsDateInput()
+        {
+            if(<#= SelectedFilterDefinitionPropertyName #> == null)
+            {
+                <#= IsDateInputPropertyName #> = false;
+            } else
+            {
+                <#= IsDateInputPropertyName #> = "datetime".Equals(<#= SelectedFilterDefinitionPropertyName #>.fltrDataType, StringComparison.OrdinalIgnoreCase) || 
+                              "date".Equals(<#= SelectedFilterDefinitionPropertyName #>.fltrDataType, StringComparison.OrdinalIgnoreCase);
+            }
+        }
+        private static void <#= IsDateInputPropertyName #>Changed(BindableObject d, object oldValue, object newValue)
+        {
+            <#= WebServiceFilterItemUserControlClassName #> inst = d as <#= WebServiceFilterItemUserControlClassName #>;
+            if ((inst != null) && (newValue is bool))
+            {
+                inst.<#= IsDateInputPropertyName #> = (bool)newValue;
+            }
+        }
+        public static readonly BindableProperty <#= IsDateInputPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= IsDateInputPropertyName #>", typeof(bool),
+                typeof(<#= WebServiceFilterItemUserControlClassName #>),
+                false, propertyChanged: <#= IsDateInputPropertyName #>Changed);
+        public bool <#= IsDateInputPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= IsDateInputPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= IsDateInputPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= IsFilterValueReadOnlyPropertyName #>
+        private void UpdateIsFilterValueReadOnly()
+        {
+            var x = <#= SelectedFilterDefinitionPropertyName #>;
+            if (x == null)
+            {
+                <#= IsFilterValueReadOnlyPropertyName #> = true;
+            } else
+            {
+                <#= IsFilterValueReadOnlyPropertyName #> = string.IsNullOrEmpty(<#= SelectedFilterDefinitionPropertyName #>.fltrDataType);
+            }
+        }
+        private static void <#= IsFilterValueReadOnlyPropertyName #>Changed(BindableObject d, object oldValue, object newValue)
+        {
+            <#= WebServiceFilterItemUserControlClassName #> inst = d as <#= WebServiceFilterItemUserControlClassName #>;
+            if ((inst != null) && (newValue is bool))
+            {
+                inst.<#= IsFilterValueReadOnlyPropertyName #> = (bool)newValue;
+            }
+        }
+        public static readonly BindableProperty <#= IsFilterValueReadOnlyPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= IsFilterValueReadOnlyPropertyName #>", typeof(bool),
+                typeof(<#= WebServiceFilterItemUserControlClassName #>),
+                true, propertyChanged: <#= IsFilterValueReadOnlyPropertyName #>Changed);
+        public bool <#= IsFilterValueReadOnlyPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= IsFilterValueReadOnlyPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= IsFilterValueReadOnlyPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= FilterErrorPropertyName #>
+        protected void UpdateFilterError()
+        {
+            if (<#= SelectedFilterDefinitionPropertyName #> == null)
+            {
+                <#= FilterErrorPropertyName #> = string.Empty;
+            }
+            else if (string.IsNullOrEmpty(<#= SelectedFilterDefinitionPropertyName #>.fltrDataType))
+            {
+                <#= FilterErrorPropertyName #> = string.Empty;
+            } else {
+                if (<#= FilterValuePropertyName #> == null)
+                {
+                    <#= FilterErrorPropertyName #> = "Empty filter item will not be applied";
+                }
+                else if (IsDateInput) {
+                    if(<#= FilterValuePropertyName #> is DateTime)
+                    {
+                        <#= FilterErrorPropertyName #> = string.Empty;
+                    } else
+                    {
+                        DateTime i;
+                        if (DateTime.TryParse(<#= FilterValuePropertyName #>?.ToString(), out i))
+                        {
+                            <#= FilterErrorPropertyName #> = string.Empty;
+                        }
+                        else
+                        {
+                            <#= FilterErrorPropertyName #> = "Filter item will not be applied: incorrect format";
+                        }
+                    }
+
+
+                } else {
+                    string tstvl = (<#= FilterValuePropertyName #> is string) ? <#= FilterValuePropertyName #> as string : <#= FilterValuePropertyName #>.ToString();
+                    bool tstrslt = false;
+                    bool maxLn = false;
+                    object minVal = null;
+                    object maxVal = null;
+                    switch (<#= SelectedFilterDefinitionPropertyName #>.fltrDataType)
+                    {
+                        case "int16":
+                            {
+                                Int16 i; tstrslt = Int16.TryParse(tstvl, out i);
+                                if (tstrslt)
+                                {
+                                    object k = ConvertHelper.TryToConvert("int16", <#= SelectedFilterDefinitionPropertyName #>.fltrMin);
+                                    if (k != null) { if ((Int16)k > i) minVal = k; }
+                                    k = ConvertHelper.TryToConvert("int16", <#= SelectedFilterDefinitionPropertyName #>.fltrMax);
+                                    if (k != null) { if ((Int16)k < i) maxVal = k; }
+                                }
+                            }
+                            break;
+                        case "int32":
+                            {
+                                Int32 i; tstrslt = Int32.TryParse(tstvl, out i);
+                                if (tstrslt)
+                                {
+                                    object k = ConvertHelper.TryToConvert("int32", <#= SelectedFilterDefinitionPropertyName #>.fltrMin);
+                                    if (k != null) { if ((Int32)k > i) minVal = k; }
+                                    k = ConvertHelper.TryToConvert("int32", <#= SelectedFilterDefinitionPropertyName #>.fltrMax);
+                                    if (k != null) { if ((Int32)k < i) maxVal = k; }
+                                }
+                            }
+                            break;
+                        case "int64":
+                            {
+                                Int64 i; tstrslt = Int64.TryParse(tstvl, out i);
+                                if (tstrslt)
+                                {
+                                    object k = ConvertHelper.TryToConvert("int64", <#= SelectedFilterDefinitionPropertyName #>.fltrMin);
+                                    if (k != null) { if ((Int64)k > i) minVal = k; }
+                                    k = ConvertHelper.TryToConvert("int64", <#= SelectedFilterDefinitionPropertyName #>.fltrMax);
+                                    if (k != null) { if ((Int64)k < i) maxVal = k; }
+                                }
+                            }
+                            break;
+                        case "uint16":
+                            {
+                                UInt16 i; tstrslt = UInt16.TryParse(tstvl, out i);
+                                if (tstrslt)
+                                {
+                                    object k = ConvertHelper.TryToConvert("uint16", <#= SelectedFilterDefinitionPropertyName #>.fltrMin);
+                                    if (k != null) { if ((UInt16)k > i) minVal = k; }
+                                    k = ConvertHelper.TryToConvert("uint16", <#= SelectedFilterDefinitionPropertyName #>.fltrMax);
+                                    if (k != null) { if ((UInt16)k < i) maxVal = k; }
+                                }
+                            }
+                            break;
+                        case "uint32":
+                            {
+                                UInt32 i; tstrslt = UInt32.TryParse(tstvl, out i);
+                                if (tstrslt)
+                                {
+                                    object k = ConvertHelper.TryToConvert("uint32", <#= SelectedFilterDefinitionPropertyName #>.fltrMin);
+                                    if (k != null) { if ((UInt32)k > i) minVal = k; }
+                                    k = ConvertHelper.TryToConvert("uint32", <#= SelectedFilterDefinitionPropertyName #>.fltrMax);
+                                    if (k != null) { if ((UInt32)k < i) maxVal = k; }
+                                }
+                            }
+                            break;
+                        case "uint64":
+                            {
+                                UInt64 i; tstrslt = UInt64.TryParse(tstvl, out i);
+                                if (tstrslt)
+                                {
+                                    object k = ConvertHelper.TryToConvert("uint64", <#= SelectedFilterDefinitionPropertyName #>.fltrMin);
+                                    if (k != null) { if ((UInt64)k > i) minVal = k; }
+                                    k = ConvertHelper.TryToConvert("uint64", <#= SelectedFilterDefinitionPropertyName #>.fltrMax);
+                                    if (k != null) { if ((UInt64)k < i) maxVal = k; }
+                                }
+                            }
+                            break;
+                        case "double":
+                            {
+                                double i; tstrslt = double.TryParse(tstvl, out i);
+                                if (tstrslt)
+                                {
+                                    object k = ConvertHelper.TryToConvert("double", <#= SelectedFilterDefinitionPropertyName #>.fltrMin);
+                                    if (k != null) { if ((double)k > i) minVal = k; }
+                                    k = ConvertHelper.TryToConvert("double", <#= SelectedFilterDefinitionPropertyName #>.fltrMax);
+                                    if (k != null) { if ((double)k < i) maxVal = k; }
+                                }
+                            }
+                            break;
+                        case "decimal":
+                            {
+                                decimal i; tstrslt = decimal.TryParse(tstvl, out i);
+                                if (tstrslt)
+                                {
+                                    object k = ConvertHelper.TryToConvert("decimal", <#= SelectedFilterDefinitionPropertyName #>.fltrMin);
+                                    if (k != null) { if ((decimal)k > i) minVal = k; }
+                                    k = ConvertHelper.TryToConvert("decimal", <#= SelectedFilterDefinitionPropertyName #>.fltrMax);
+                                    if (k != null) { if ((decimal)k < i) maxVal = k; }
+                                }
+                            }
+                            break;
+                        case "single":
+                            {
+                                Single i; tstrslt = Single.TryParse(tstvl, out i);
+                                if (tstrslt)
+                                {
+                                    object k = ConvertHelper.TryToConvert("single", <#= SelectedFilterDefinitionPropertyName #>.fltrMin);
+                                    if (k != null) { if ((Single)k > i) minVal = k; }
+                                    k = ConvertHelper.TryToConvert("single", <#= SelectedFilterDefinitionPropertyName #>.fltrMax);
+                                    if (k != null) { if ((Single)k < i) maxVal = k; }
+                                }
+                            }
+                            break;
+                        case "guid":
+                            { Guid i; tstrslt = Guid.TryParse(tstvl, out i); }
+                            break;
+                        case "date":
+                        case "datetime":
+                            {
+                                DateTime i; tstrslt = DateTime.TryParse(tstvl, out i);
+                                //if (tstrslt)
+                                //{
+                                //    dynamic k = ConvertHelper.TryToConvert("datetime", <#= SelectedFilterDefinitionPropertyName #>.fltrMin);
+                                //    if (k != null) { if (k > i) minVal = k; }
+                                //    k = ConvertHelper.TryToConvert("datetime", <#= SelectedFilterDefinitionPropertyName #>.fltrMax);
+                                //    if (k != null) { if (k < i) maxVal = k; }
+                                //}
+                            }
+                            break;
+                        default:
+                            {
+                                tstrslt = true;
+                                if (<#= SelectedFilterDefinitionPropertyName #>.fltrMaxLen.HasValue) maxLn = tstvl.Length > <#= SelectedFilterDefinitionPropertyName #>.fltrMaxLen.Value;
+                            }
+                            break;
+                    }
+                    if (!tstrslt)
+                    {
+                        <#= FilterErrorPropertyName #> = "Filter item will not be applied: incorrect format";
+                    }
+                    else if (maxLn)
+                    {
+                        <#= FilterErrorPropertyName #> = "Filter item will not be applied: line length is greater than specified";
+                    }
+                    else
+                    {
+                        if (minVal != null)
+                            <#= FilterErrorPropertyName #> = "Filter item will not be applied: the value must be greater than " + minVal;
+                        else if (maxVal != null)
+                            <#= FilterErrorPropertyName #> = "Filter item will not be applied: the value must be less than " + maxVal;
+                        else <#= FilterErrorPropertyName #> = string.Empty;
+                    }
+                }
+            }
+        }
+        private static void <#= FilterErrorPropertyName #>Changed(BindableObject d, object oldValue, object newValue)
+        {
+            <#= WebServiceFilterItemUserControlClassName #> inst = d as <#= WebServiceFilterItemUserControlClassName #>;
+            if (inst != null)
+            {
+                inst.UpdateFilterValuePrompt();
+            }
+        }
+        public static readonly BindableProperty <#= FilterErrorPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= FilterErrorPropertyName #>", typeof(string),
+                typeof(<#= WebServiceFilterItemUserControlClassName #>),
+                null, propertyChanged: <#= FilterErrorPropertyName #>Changed);
+
+
+        public string <#= FilterErrorPropertyName #>
+        {
+            get
+            {
+                return (string)GetValue(<#= FilterErrorPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= FilterErrorPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= FilterValuePromptPropertyName #>
+        private void UpdateFilterValuePrompt()
+        {
+            string error = FilterError;
+            if(string.IsNullOrEmpty(error)) {
+                if (<#= SelectedFilterDefinitionPropertyName #> != null)
+                {
+                    if ("string".Equals(<#= SelectedFilterDefinitionPropertyName #>.fltrDataType, StringComparison.OrdinalIgnoreCase) && <#= SelectedFilterDefinitionPropertyName #>.fltrMaxLen.HasValue)
+                    {
+                        string s = FilterValue as string;
+                        if (s != null)
+                        {
+                            <#= FilterValuePromptPropertyName #> = "(" + s.Length + " of " + <#= SelectedFilterDefinitionPropertyName #>.fltrMaxLen.Value + ")";
+                            return;
+                        }
+                    }
+                }
+                <#= FilterValuePromptPropertyName #> = "Enter filter value";
+            }
+            else
+            {
+                <#= FilterValuePromptPropertyName #> = error;
+            }
+        }
+        public static readonly BindableProperty <#= FilterValuePromptPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= FilterValuePromptPropertyName #>", typeof(string),
+                typeof(<#= WebServiceFilterItemUserControlClassName #>),
+                null);
+        public string <#= FilterValuePromptPropertyName #>
+        {
+            get
+            {
+                return (string)GetValue(<#= FilterValuePromptPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= FilterValuePromptPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= SelectedModelRefPropertyName #>
+        public static readonly BindableProperty <#= SelectedModelRefPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= SelectedModelRefPropertyName #>", typeof(<#= IWebServiceFilterRsltInterfaceClassName #>),
+                typeof(<#= WebServiceFilterItemUserControlClassName #>),
+                null);
+        public <#= IWebServiceFilterRsltInterfaceClassName #> <#= SelectedModelRefPropertyName #>
+        {
+            get
+            {
+                return (<#= IWebServiceFilterRsltInterfaceClassName #>)GetValue(<#= SelectedModelRefPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= SelectedModelRefPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= RemoveWebServiceFilterItemCommandPropertyName #>Property
+        public static readonly BindableProperty <#= RemoveWebServiceFilterItemCommandPropertyName #>Property = 
+            BindableProperty.Create(nameof(<#= RemoveWebServiceFilterItemCommandPropertyName #>), typeof(ICommand), typeof(<#= WebServiceFilterItemUserControlClassName #>), null);
+        public ICommand <#= RemoveWebServiceFilterItemCommandPropertyName #>
+        {
+            get { return (ICommand)GetValue(<#= RemoveWebServiceFilterItemCommandPropertyName #>Property); }
+            set { SetValue(<#= RemoveWebServiceFilterItemCommandPropertyName #>Property, value); }
+        }
+        protected ICommand _<#= FilterItemCommandPropertyName #> = null;
+        public ICommand <#= FilterItemCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= FilterItemCommandPropertyName #> ?? (_<#= FilterItemCommandPropertyName #> = new Command(() => <#= FilterItemCommandPropertyName #>Execute(), () => <#= FilterItemCommandPropertyName #>CanExecute()));
+            }
+        }
+        protected void <#= FilterItemCommandPropertyName #>Execute()
+        {
+            <#= RemoveWebServiceFilterItemCommandPropertyName #>?.Execute(<#= SelectedModelRefPropertyName #>);
+        }
+        protected bool <#= FilterItemCommandPropertyName #>CanExecute()
+        {
+            return true;
+        }
+        #endregion
+    }
+}
+
+<#+
+
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+
+#>

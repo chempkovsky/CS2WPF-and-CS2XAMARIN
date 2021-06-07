@@ -1,0 +1,688 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+using Xamarin.Forms;
+using System.Threading.Tasks;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using System.Windows.Input;
+using System.Collections.ObjectModel;
+using System.Collections.Generic;
+using Prism.Services.Dialogs;
+
+
+<#
+
+    string EformModeEnumFolder                      = "00026-EformModeEnum.cs";
+    string EformModeEnumClassName                   = GetModelClassName(Model, EformModeEnumFolder);
+    string EformModeEnumNameSpace                   = GetModelNameSpace(Model, EformModeEnumFolder);
+
+    string IAppGlblSettingsServiceFolder            = "00080-IAppGlblSettingsService.cs";
+    string IAppGlblSettingsServiceClassName         = GetModelClassName(Model, IAppGlblSettingsServiceFolder);
+    string IAppGlblSettingsServiceNameSpace         = GetModelNameSpace(Model, IAppGlblSettingsServiceFolder);
+
+    string BindingContextFeedbackFolder             = "00166-BindingContextFeedback.cs";
+    string BindingContextFeedbackClassName          = GetModelClassName(Model, BindingContextFeedbackFolder);
+    string BindingContextFeedbackNameSpace          = GetModelNameSpace(Model, BindingContextFeedbackFolder);
+
+    string IconFontFolder                           = "00178-IconFont.cs";
+    string IconFontClassName                        = GetModelClassName(Model, IconFontFolder);
+    string IconFontNameSpace                        = GetModelNameSpace(Model, IconFontFolder);
+
+    string ILformViewModelInterfaceFolder           = "00197-ILformViewModelInterface.cs";
+    string ILformViewModelInterfaceClassName        = GetModelClassName(Model, ILformViewModelInterfaceFolder);
+    string ILformViewModelInterfaceNameSpace        = GetModelNameSpace(Model, ILformViewModelInterfaceFolder);
+
+    string IWebServiceFilterRsltInterfaceFolder     = "00204-IWebServiceFilterRsltInterface.cs";
+    string IWebServiceFilterRsltInterfaceClassName  = GetModelClassName(Model, IWebServiceFilterRsltInterfaceFolder);
+    string IWebServiceFilterRsltInterfaceNameSpace  = GetModelNameSpace(Model, IWebServiceFilterRsltInterfaceFolder);
+
+    string IWebServiceFilterMenuInterfaceFolder     = "00206-IWebServiceFilterMenuInterface.cs";
+    string IWebServiceFilterMenuInterfaceClassName  = GetModelClassName(Model, IWebServiceFilterMenuInterfaceFolder);
+    string IWebServiceFilterMenuInterfaceNameSpace  = GetModelNameSpace(Model, IWebServiceFilterMenuInterfaceFolder);
+
+    string WebServiceFilterRsltViewModelFolder      = "00215-WebServiceFilterRsltViewModel.cs";
+    string WebServiceFilterRsltViewModelClassName   = GetModelClassName(Model, WebServiceFilterRsltViewModelFolder);
+    string WebServiceFilterRsltViewModelNameSpace   = GetModelNameSpace(Model, WebServiceFilterRsltViewModelFolder);
+
+    string WebServiceFilterMenuViewModelFolder      = "00217-WebServiceFilterMenuViewModel.cs";
+    string WebServiceFilterMenuViewModelClassName   = GetModelClassName(Model, WebServiceFilterMenuViewModelFolder);
+    string WebServiceFilterMenuViewModelNameSpace   = GetModelNameSpace(Model, WebServiceFilterMenuViewModelFolder);
+
+    string IBindingContextChangedFolder             = "00220-IBindingContextChanged.cs";
+    string IBindingContextChangedClassName          = GetModelClassName(Model, IBindingContextChangedFolder);
+    string IBindingContextChangedNameSpace          = GetModelNameSpace(Model, IBindingContextChangedFolder);
+
+
+
+    string LformViewModelBaseFolder                 = "00641-LformViewModelBase.cs";
+    string LformViewModelBaseClassName              = GetModelClassName(Model, LformViewModelBaseFolder);
+    string LformViewModelBaseNameSpace              = GetModelNameSpace(Model, LformViewModelBaseFolder);
+
+
+
+    string HiddenFiltersPropertyName                    = "HiddenFilters";
+    string HiddenFiltersVMPropertyName                  = "HiddenFiltersVM";
+    string HiddenFiltersPropertyChangedPropertyName     = "HiddenFiltersPropertyChanged";
+
+    string TableMenuItemsPropertyName                   = "TableMenuItems";
+    string TableMenuItemsVMPropertyName                 = "TableMenuItemsVM";
+    string TableMenuItemsPropertyChangedPropertyName    = "TableMenuItemsPropertyChanged";
+    string TableMenuItemsCommandPropertyName            = "TableMenuItemsCommand";
+
+    string RowMenuItemsPropertyName                     = "RowMenuItems";
+    string RowMenuItemsVMPropertyName                   = "RowMenuItemsVM";
+    string RowMenuItemsPropertyChangedPropertyName      = "RowMenuItemsPropertyChanged";
+    string RowMenuItemsCommandPropertyName              = "RowMenuItemsCommand";
+
+    string SelectedRowPropertyName                      = "SelectedRow";
+    string SelectedRowCommandPropertyName               = "SelectedRowCommand";
+
+
+
+    string IsOnLoadedCalledPropertyName         = "IsOnLoadedCalled";
+
+    string RegionPropertyName                   = "Region";
+    string LformRegionPropertyName              = "LformRegion";
+
+    string DisplayLabelProperty                 = "Name";
+    string DisplayHintProperty                  = "Prompt";
+
+    string FormRootServicePropertyName          = "FrmRootSrv";
+    string AppSettingServicePropertyName        = "GlblSettingsSrv";
+    string GetWithFilterMethodName              = "getwithfilter";
+    string ColumnSelectorDlgPropertyName        = "ColumnSelectorDlg";
+
+    string CanAddPropertyName                   = "CanAdd";
+    string CanAddVMPropertyName                 = "CanAddVM";
+    string CanAddPropertyChangedPropertyName    = "CanAddPropertyChanged";
+
+    string CanUpdPropertyName                   = "CanUpdate";
+    string CanUpdVMPropertyName                 = "CanUpdateVM";
+    string CanUpdPropertyChangedPropertyName    = "CanUpdatePropertyChanged";
+
+    string CanDelPropertyName                   = "CanDelete";
+    string CanDelVMPropertyName                 = "CanDeleteVM";
+    string CanDelPropertyChangedPropertyName    = "CanDeletePropertyChanged";
+
+    string SformAfterAddItemPropertyName        = "SformAfterAddItem";
+    string SformAfterUpdItemPropertyName        = "SformAfterUpdItem";
+    string SformAfterDelItemPropertyName        = "SformAfterDelItem";
+    string SformAddItemCommandPropertyName      = "SformAddItemCommand";
+    string SformUpdItemCommandPropertyName      = "SformUpdItemCommand";
+    string SformDelItemCommandPropertyName      = "SformDelItemCommand";
+    string SformAfterAddItemCommandPropertyName = "SformAfterAddItemCommand";
+    string SformAfterUpdItemCommandPropertyName = "SformAfterUpdItemCommand";
+    string SformAfterDelItemCommandPropertyName = "SformAfterDelItemCommand";
+
+    string FormControlModelPropertyName         = "FormControlModel";
+    string CaptionPropertyName                  = "Caption";
+    string EformModePropertyName                = "EformMode";
+    string ShowSubmitPropertyName               = "ShowSubmit";
+
+    string UIDispatcherInvokePropertyName       = "Application.Current.Dispatcher.Invoke";
+
+    string BindingContextFeedbackRefPropertyName    = "BindingContextFeedbackRef";
+    string OnLoadedPropertyName                     = "OnLoaded";
+
+    string edialogNamePropertyName                  = "edialogName";
+
+    List<string> nmSpaces = new List<string>();
+    if ((LformViewModelBaseNameSpace != IWebServiceFilterRsltInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IWebServiceFilterRsltInterfaceNameSpace);
+    if ((LformViewModelBaseNameSpace != WebServiceFilterRsltViewModelNameSpace) && (nmSpaces.IndexOf(WebServiceFilterRsltViewModelNameSpace) < 0)) 
+        nmSpaces.Add(WebServiceFilterRsltViewModelNameSpace);
+    if ((LformViewModelBaseNameSpace != IAppGlblSettingsServiceNameSpace) && (nmSpaces.IndexOf(IAppGlblSettingsServiceNameSpace) < 0)) 
+        nmSpaces.Add(IAppGlblSettingsServiceNameSpace);
+    if ((LformViewModelBaseNameSpace != WebServiceFilterMenuViewModelNameSpace) && (nmSpaces.IndexOf(WebServiceFilterMenuViewModelNameSpace) < 0)) 
+        nmSpaces.Add(WebServiceFilterMenuViewModelNameSpace);
+    if ((LformViewModelBaseNameSpace != IWebServiceFilterMenuInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterMenuInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IWebServiceFilterMenuInterfaceNameSpace);
+    if ((LformViewModelBaseNameSpace != IWebServiceFilterMenuInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterMenuInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IWebServiceFilterMenuInterfaceNameSpace);
+    if ((LformViewModelBaseNameSpace != EformModeEnumNameSpace) && (nmSpaces.IndexOf(EformModeEnumNameSpace) < 0)) 
+        nmSpaces.Add(EformModeEnumNameSpace);
+    if ((LformViewModelBaseNameSpace != ILformViewModelInterfaceNameSpace) && (nmSpaces.IndexOf(ILformViewModelInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(ILformViewModelInterfaceNameSpace);
+    if ((LformViewModelBaseNameSpace != IBindingContextChangedNameSpace) && (nmSpaces.IndexOf(IBindingContextChangedNameSpace) < 0)) 
+        nmSpaces.Add(IBindingContextChangedNameSpace);
+    if ((LformViewModelBaseNameSpace != BindingContextFeedbackNameSpace) && (nmSpaces.IndexOf(BindingContextFeedbackNameSpace) < 0)) 
+        nmSpaces.Add(BindingContextFeedbackNameSpace);
+    if ((LformViewModelBaseNameSpace != IconFontNameSpace) && (nmSpaces.IndexOf(IconFontNameSpace) < 0)) 
+        nmSpaces.Add(IconFontNameSpace);
+
+    
+
+#>
+<# 
+    foreach(string ns in nmSpaces) {
+#>
+using <#= ns #>;
+<#
+    }
+#>
+
+namespace <#= LformViewModelBaseNameSpace #> {
+    public class <#= LformViewModelBaseClassName #>: INotifyPropertyChanged, <#= IBindingContextChangedClassName #>, <#= ILformViewModelInterfaceClassName #>
+    {
+        protected <#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName #>=null;
+        protected IDialogService _dialogService=null;
+        protected string <#= edialogNamePropertyName #> = "noname";
+        public <#= LformViewModelBaseClassName #>(<#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName  #>, IDialogService dialogService) {
+            this.<#= AppSettingServicePropertyName #> = <#= AppSettingServicePropertyName #>;
+            this._dialogService = dialogService;
+            _<#= TableMenuItemsVMPropertyName #> = GetDefault<#= TableMenuItemsVMPropertyName #>();
+            _<#= RowMenuItemsVMPropertyName #> = GetDefault<#= RowMenuItemsVMPropertyName #>();
+        }
+        #region INotifyPropertyChanged
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string name = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+        #endregion
+        #region <#= BindingContextFeedbackRefPropertyName #>
+        object _<#= BindingContextFeedbackRefPropertyName #> = null;
+        public object <#= BindingContextFeedbackRefPropertyName #> {
+            get { return _<#= BindingContextFeedbackRefPropertyName #>; }
+            set { 
+                if(_<#= BindingContextFeedbackRefPropertyName #> != value) {
+                    _<#= BindingContextFeedbackRefPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+        #region <#= IBindingContextChangedClassName #>
+        public async Task <#= OnLoadedPropertyName #>(object sender)
+        {
+        }
+        #endregion
+        #region <#= HiddenFiltersPropertyChangedPropertyName #>
+        public void <#= HiddenFiltersPropertyChangedPropertyName #>(object Sender, object OldValue, object NewValue)
+        {
+            IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>> hfs = NewValue as IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>;
+            ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>> newhfs = new ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>();
+            if(hfs != null) {
+                foreach(<#= IWebServiceFilterRsltInterfaceClassName #> hf  in hfs) {
+                    newhfs.Add( new <#= WebServiceFilterRsltViewModelClassName #>() {fltrName=hf.fltrName, fltrDataType=hf.fltrDataType,  fltrOperator=hf.fltrOperator, fltrValue=hf.fltrValue, fltrError=hf.fltrError });
+                }
+            }
+            <#= HiddenFiltersVMPropertyName #> = newhfs;
+        }
+        #endregion
+        #region <#= HiddenFiltersVMPropertyName #>
+        IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>> _<#= HiddenFiltersVMPropertyName #> = new ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>();
+        public IEnumerable<IWebServiceFilterRsltInterface> <#= HiddenFiltersVMPropertyName #>
+        {
+            get
+            {
+                return _<#= HiddenFiltersVMPropertyName #>;
+            }
+            set
+            {
+                if (_<#= HiddenFiltersVMPropertyName #> != value)
+                {
+                    _<#= HiddenFiltersVMPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+        #region <#= TableMenuItemsPropertyChangedPropertyName #>
+        protected ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>> GetDefault<#= TableMenuItemsVMPropertyName #>() {
+            return new ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>>()  {
+                new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "TableAddMI", Caption="Add Item", IconName="TablePlus", IconColor=Color.Default, Enabled=true, Data=null},
+            };
+        }
+        public void <#= TableMenuItemsPropertyChangedPropertyName #>(object Sender, object OldValue, object NewValue) {
+            ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>> tmis = GetDefault<#= TableMenuItemsVMPropertyName #>();
+            IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> intmis = NewValue as IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>;
+            if(intmis != null) {
+                foreach(<#= IWebServiceFilterMenuInterfaceClassName #> tmi  in intmis) {
+                    tmis.Add( new <#= WebServiceFilterMenuViewModelClassName #>() {Id = tmi.Id, Caption=tmi.Caption,  IconName=tmi.IconName, IconColor=tmi.IconColor, Enabled=tmi.Enabled, Data=tmi.Data, FeedbackData=tmi.FeedbackData });
+                }
+            }
+            <#= TableMenuItemsVMPropertyName #> = tmis;
+        }
+        #endregion
+        #region <#= TableMenuItemsVMPropertyName #>
+        protected IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> _<#= TableMenuItemsVMPropertyName #> = null;
+        public IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> <#= TableMenuItemsVMPropertyName #>
+        { 
+            get
+            {
+                return _<#= TableMenuItemsVMPropertyName #>;
+            }
+            set
+            {
+                if (_<#= TableMenuItemsVMPropertyName #> != value)
+                {
+                    _<#= TableMenuItemsVMPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+        #region <#= RowMenuItemsPropertyChangedPropertyName #>
+        protected ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>> GetDefault<#= RowMenuItemsVMPropertyName #>() {
+            return new ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>>()  {
+                new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "RowUpdMI", Caption="Update item", IconName="TableEdit", IconColor=Color.Default, Enabled=true, Data=null},
+                new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "RowDelMI", Caption="Delete item", IconName="TableRemove", IconColor=Color.Default, Enabled=true, Data=null},
+            };
+        }
+        public void <#= RowMenuItemsPropertyChangedPropertyName #>(object Sender, object OldValue, object NewValue) {
+            ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>> tmis = GetDefault<#= RowMenuItemsVMPropertyName #>();
+            IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> intmis = null;
+            intmis = NewValue as IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>;
+            if(intmis != null) {
+                foreach(<#= IWebServiceFilterMenuInterfaceClassName #> tmi  in intmis) {
+                    tmis.Add( new <#= WebServiceFilterMenuViewModelClassName #>() {Id = tmi.Id, Caption=tmi.Caption,  IconName=tmi.IconName, IconColor=tmi.IconColor, Enabled=tmi.Enabled, Data=tmi.Data, FeedbackData=tmi.FeedbackData });
+                }
+            }
+            <#= RowMenuItemsVMPropertyName #> = tmis;
+        }
+        #endregion
+        #region <#= RowMenuItemsVMPropertyName #>
+        protected IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> _<#= RowMenuItemsVMPropertyName #> = null;
+        public IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> <#= RowMenuItemsVMPropertyName #>
+        { 
+            get
+            {
+                return _<#= RowMenuItemsVMPropertyName #>;
+            }
+            set
+            {
+                if (_<#= RowMenuItemsVMPropertyName #> != value)
+                {
+                    _<#= RowMenuItemsVMPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+        #region <#= SelectedRowCommandPropertyName #>
+        protected ICommand _<#= SelectedRowCommandPropertyName #> = null;
+        public ICommand <#= SelectedRowCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= SelectedRowCommandPropertyName #> ?? (_<#= SelectedRowCommandPropertyName #> = new Command((p) => <#= SelectedRowCommandPropertyName #>Execute(p), (p) => <#= SelectedRowCommandPropertyName #>CanExecute(p)));
+            }
+        }
+        protected void <#= SelectedRowCommandPropertyName #>Execute(object p)
+        {
+            <#= BindingContextFeedbackRefPropertyName #> = new <#= BindingContextFeedbackClassName #>() {
+		        BcfName = "<#= SelectedRowPropertyName #>",
+		        BcfData = p
+            };
+        }
+        protected bool <#= SelectedRowCommandPropertyName #>CanExecute(object p)
+        {
+            return true; 
+        }
+        #endregion
+        #region <#= TableMenuItemsCommandPropertyName #>
+        protected ICommand _<#= TableMenuItemsCommandPropertyName #> = null;
+        public ICommand <#= TableMenuItemsCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= TableMenuItemsCommandPropertyName #> ?? (_<#= TableMenuItemsCommandPropertyName #> = new Command((p) => <#= TableMenuItemsCommandPropertyName #>Execute(p), (p) => <#= TableMenuItemsCommandPropertyName #>CanExecute(p)));
+            }
+        }
+        protected void <#= TableMenuItemsCommandPropertyName #>Execute(object p)
+        {
+            <#= WebServiceFilterMenuViewModelClassName #> mi = p as <#= WebServiceFilterMenuViewModelClassName #>;
+            if(mi != null) {
+                if(mi.Id == "TableAddMI") {
+                    if(!<#= CanAddVMPropertyName #>) {
+                        var parameters = new DialogParameters
+                        {
+                            { "Title", "Access denied" },
+                            { "Message", "You do not have permission" },
+                            { "MessageIconName", <#= IconFontClassName #>.Info_outline },
+                            { "MessageIconColor", Application.Current.Resources["IconButtonDangerColor"] },
+                            { "ShowOkBtn", true },
+                            { "ShowCancelBtn", false },
+                        };
+                        _dialogService.ShowDialog("MessageDlg", parameters, (dp)=>{ });
+                        return;
+                    }
+                    <#= SformAddItemCommandPropertyName #>();
+                    return;
+                }
+            }
+            <#= BindingContextFeedbackRefPropertyName #> = new <#= BindingContextFeedbackClassName #>() {
+		        BcfName = "<#= TableMenuItemsCommandPropertyName #>",
+		        BcfData = p
+            };
+        }
+        protected bool <#= TableMenuItemsCommandPropertyName #>CanExecute(object p)
+        {
+            return true; 
+        }
+        #endregion
+        #region <#= RowMenuItemsCommandPropertyName #>
+        protected ICommand _<#= RowMenuItemsCommandPropertyName #> = null;
+        public ICommand <#= RowMenuItemsCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= RowMenuItemsCommandPropertyName #> ?? (_<#= RowMenuItemsCommandPropertyName #> = new Command((p) => <#= RowMenuItemsCommandPropertyName #>Execute(p), (p) => <#= RowMenuItemsCommandPropertyName #>CanExecute(p)));
+            }
+        }
+        protected void <#= RowMenuItemsCommandPropertyName #>Execute(object p)
+        {
+            <#= WebServiceFilterMenuViewModelClassName #> mi = p as <#= WebServiceFilterMenuViewModelClassName #>;
+            if(mi != null) {
+                if(mi.Id == "RowUpdMI") {
+                    if(!<#= CanUpdVMPropertyName #>) {
+                        var parameters = new DialogParameters
+                        {
+                            { "Title", "Access denied" },
+                            { "Message", "You do not have permission" },
+                            { "MessageIconName", <#= IconFontClassName #>.Info_outline },
+                            { "MessageIconColor", Application.Current.Resources["IconButtonDangerColor"] },
+                            { "ShowOkBtn", true },
+                            { "ShowCancelBtn", false },
+                        };
+                        _dialogService.ShowDialog("MessageDlg", parameters, (dp)=>{ });
+                        return;
+                    }
+                    <#= SformUpdItemCommandPropertyName #>(mi.FeedbackData);
+                    return;
+                }
+                if(mi.Id == "RowDelMI") {
+                    if(!<#= CanDelVMPropertyName #>) {
+                        var parameters = new DialogParameters
+                        {
+                            { "Title", "Access denied" },
+                            { "Message", "You do not have permission" },
+                            { "MessageIconName", <#= IconFontClassName #>.Info_outline },
+                            { "MessageIconColor", Application.Current.Resources["IconButtonDangerColor"] },
+                            { "ShowOkBtn", true },
+                            { "ShowCancelBtn", false },
+                        };
+                        _dialogService.ShowDialog("MessageDlg", parameters, (dp)=>{ });
+                        return;
+                    }
+                    <#= SformDelItemCommandPropertyName #>(mi.FeedbackData);
+                    return;
+                }
+            }
+            <#= BindingContextFeedbackRefPropertyName #> = new <#= BindingContextFeedbackClassName #>() {
+		        BcfName = "<#= RowMenuItemsCommandPropertyName #>",
+		        BcfData = p
+            };
+        }
+        protected bool <#= RowMenuItemsCommandPropertyName #>CanExecute(object p) {
+            return true;
+        }
+        #endregion
+        #region <#= CanAddVMPropertyName #>
+        public void <#= CanAddPropertyChangedPropertyName #>(object Sender, object OldValue, object NewValue) {
+            if(NewValue is bool)
+                <#= CanAddVMPropertyName #> = (bool)NewValue;
+        }
+        protected bool _<#= CanAddVMPropertyName #> = false;
+        public bool <#= CanAddVMPropertyName #>
+        { 
+            get
+            {
+                return _<#= CanAddVMPropertyName #>;
+            }
+            set
+            {
+                if (_<#= CanAddVMPropertyName #> != value)
+                {
+                    _<#= CanAddVMPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+        #region <#= CanUpdVMPropertyName #>
+        public void <#= CanUpdPropertyChangedPropertyName #>(object Sender, object OldValue, object NewValue) {
+            if(NewValue is bool)
+                <#= CanUpdVMPropertyName #> = (bool)NewValue;
+        }
+        protected bool _<#= CanUpdVMPropertyName #> = false;
+        public bool <#= CanUpdVMPropertyName #>
+        { 
+            get
+            {
+                return _<#= CanUpdVMPropertyName #>;
+            }
+            set
+            {
+                if (_<#= CanUpdVMPropertyName #> != value)
+                {
+                    _<#= CanUpdVMPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+        #region <#= CanDelVMPropertyName #>
+        public void <#= CanDelPropertyChangedPropertyName #>(object Sender, object OldValue, object NewValue) {
+            if(NewValue is bool)
+                <#= CanDelVMPropertyName #> = (bool)NewValue;
+        }
+        protected bool _<#= CanDelVMPropertyName #> = false;
+        public bool <#= CanDelVMPropertyName #>
+        { 
+            get
+            {
+                return _<#= CanDelVMPropertyName #>;
+            }
+            set
+            {
+                if (_<#= CanDelVMPropertyName #> != value)
+                {
+                    _<#= CanDelVMPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+        #region <#= SformAfterAddItemPropertyName #>
+        protected object _<#= SformAfterAddItemPropertyName #>=null;
+        public object <#= SformAfterAddItemPropertyName #> {
+            get { return _<#= SformAfterAddItemPropertyName #>; }
+            set { 
+                if (_<#= SformAfterAddItemPropertyName #> != value) { 
+                    _<#= SformAfterAddItemPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+        #region <#= SformAddItemCommandPropertyName #>
+        public void <#= SformAddItemCommandPropertyName #>() {
+            if (!<#= CanAddVMPropertyName #>) return;
+            IDialogParameters prms = new DialogParameters();
+            prms.Add("<#= CaptionPropertyName #>", "Add Item");
+            prms.Add("<#= HiddenFiltersPropertyName #>", <#= HiddenFiltersVMPropertyName #>);
+            prms.Add("<#= EformModePropertyName #>", <#= EformModeEnumClassName #>.AddMode);
+            prms.Add("<#= ShowSubmitPropertyName  #>", true);
+            // prms.Add("<#= FormControlModelPropertyName #>", null);
+            _dialogService.ShowDialog(<#= edialogNamePropertyName #>, prms, (rslt) => {
+                if(rslt == null) return;
+                var rtprms = rslt.Parameters;
+                if (rtprms == null) return;
+                if (!rtprms.ContainsKey("Result")) return;
+                if(!rtprms.GetValue<bool>("Result")) return;
+                if (rtprms.ContainsKey("<#= FormControlModelPropertyName #>")) {
+                    object itm = rtprms.GetValue<object>("<#= FormControlModelPropertyName #>");
+                    <#= SformAfterAddItemPropertyName #> = null;
+                    <#= SformAfterAddItemPropertyName #> = itm;
+                    <#= BindingContextFeedbackRefPropertyName #> = new <#= BindingContextFeedbackClassName #>() {
+		                BcfName = "<#= SformAfterAddItemCommandPropertyName #>",
+		                BcfData = itm
+                    };
+                }
+            });
+        }
+        #endregion
+        #region <#= SformAfterUpdItemPropertyName #>
+        protected object _<#= SformAfterUpdItemPropertyName #>=null;
+        public object <#= SformAfterUpdItemPropertyName #> {
+            get { return _<#= SformAfterUpdItemPropertyName #>; }
+            set { 
+                if (_<#= SformAfterUpdItemPropertyName #> != value) { 
+                    _<#= SformAfterUpdItemPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+        #region <#= SformUpdItemCommandPropertyName #>
+        public void <#= SformUpdItemCommandPropertyName #>(object selected) {
+            if ((!<#= CanUpdVMPropertyName #>) || (selected == null)) return;
+            IDialogParameters prms = new DialogParameters();
+            prms.Add("<#= CaptionPropertyName #>", "Update Item");
+            prms.Add("<#= HiddenFiltersPropertyName #>", <#= HiddenFiltersVMPropertyName #>);
+            prms.Add("<#= EformModePropertyName #>", <#= EformModeEnumClassName #>.UpdateMode);
+            prms.Add("<#= ShowSubmitPropertyName  #>", true);
+            prms.Add("<#= FormControlModelPropertyName #>", selected);
+            _dialogService.ShowDialog(<#= edialogNamePropertyName #>, prms, (rslt) => {
+                if(rslt == null) return;
+                var rtprms = rslt.Parameters;
+                if (rtprms == null) return;
+                if (!rtprms.ContainsKey("Result")) return;
+                if(!rtprms.GetValue<bool>("Result")) return;
+                if (rtprms.ContainsKey("<#= FormControlModelPropertyName #>")) {
+                    object itm = rtprms.GetValue<object>("<#= FormControlModelPropertyName #>");
+                    <#= SformAfterUpdItemPropertyName #> = null;
+                    <#= SformAfterUpdItemPropertyName #> = itm;
+                    <#= BindingContextFeedbackRefPropertyName #> = new <#= BindingContextFeedbackClassName #>() {
+		                BcfName = "<#= SformAfterUpdItemCommandPropertyName #>",
+		                BcfData = itm
+                    };
+                }
+            });
+        }
+        #endregion
+        #region <#= SformAfterDelItemPropertyName #>
+        protected object _<#= SformAfterDelItemPropertyName #>=null;
+        public object <#= SformAfterDelItemPropertyName #> {
+            get { return _<#= SformAfterDelItemPropertyName #>; }
+            set { 
+                if (_<#= SformAfterDelItemPropertyName #> != value) { 
+                    _<#= SformAfterDelItemPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+        #region <#= SformDelItemCommandPropertyName #>
+        public void <#= SformDelItemCommandPropertyName #>(object selected) {
+            if ((!<#= CanDelVMPropertyName #>) || (selected == null)) return;
+            IDialogParameters prms = new DialogParameters();
+            prms.Add("<#= CaptionPropertyName #>", "Delete Item");
+            prms.Add("<#= HiddenFiltersPropertyName #>", <#= HiddenFiltersVMPropertyName #>);
+            prms.Add("<#= EformModePropertyName #>", <#= EformModeEnumClassName #>.DeleteMode);
+            prms.Add("<#= ShowSubmitPropertyName  #>", true);
+            prms.Add("<#= FormControlModelPropertyName #>", selected);
+            _dialogService.ShowDialog(<#= edialogNamePropertyName #>, prms, (rslt) => {
+                if(rslt == null) return;
+                var rtprms = rslt.Parameters;
+                if (rtprms == null) return;
+                if (!rtprms.ContainsKey("Result")) return;
+                if(!rtprms.GetValue<bool>("Result")) return;
+                if (rtprms.ContainsKey("<#= FormControlModelPropertyName #>")) {
+                    object itm = rtprms.GetValue<object>("<#= FormControlModelPropertyName #>");
+                    <#= SformAfterDelItemPropertyName #> = null;
+                    <#= SformAfterDelItemPropertyName #> = itm;
+                    <#= BindingContextFeedbackRefPropertyName #> = new <#= BindingContextFeedbackClassName #>() {
+		                BcfName = "<#= SformAfterDelItemCommandPropertyName #>",
+		                BcfData = itm
+                    };
+                }
+            });
+        }
+        #endregion
+    }
+}
+
+<#+
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+#>

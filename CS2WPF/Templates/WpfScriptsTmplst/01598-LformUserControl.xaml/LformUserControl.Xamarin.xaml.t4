@@ -1,0 +1,436 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="xaml" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+
+<#
+
+    string ProxyUserControlFolder           = "00280-ProxyUserControl.xaml.cs";
+    string ProxyUserControlClassName        = GetContextModelClassName(Context, ProxyUserControlFolder);
+    string ProxyUserControlNameSpace        = GetContextModelNameSpace(Context, ProxyUserControlFolder);
+    string ProxyUserControlProject          = GetContextModelProjectName(Context, ProxyUserControlFolder);
+
+    string LformUserControlBaseFolder       = "00640-LformUserControlBase.xaml.cs";
+    string LformUserControlBaseClassName    = GetContextModelClassName(Context, LformUserControlBaseFolder);
+    string LformUserControlBaseNameSpace    = GetContextModelNameSpace(Context, LformUserControlBaseFolder);
+    string LformUserControlBaseProject      = GetContextModelProjectName(Context, LformUserControlBaseFolder);
+
+    string SformUserControlFolder           = "01420-SformUserControl.xaml.cs";
+    string SformUserControlClassName        = GetModelClassName(Model, SformUserControlFolder);
+    string SformUserControlNameSpace        = GetModelNameSpace(Model, SformUserControlFolder);
+    string SformUserControlProject          = GetModelProjectName(Model, SformUserControlFolder);
+
+    string LformUserControlFolder          = "01596-LformUserControl.xaml.cs";
+    string LformUserControlClassName       = GetModelClassName(Model, LformUserControlFolder);
+    string LformUserControlNameSpace       = GetModelNameSpace(Model, LformUserControlFolder);
+    string LformUserControlProject         = GetModelProjectName(Model, LformUserControlFolder);
+    
+    string LformUserControlXamlFolder      = "01598-LformUserControl.xaml";
+    string LformUserControlXamlClassName   = GetModelClassName(Model, LformUserControlXamlFolder);
+    string LformUserControlXamlNameSpace   = GetModelNameSpace(Model, LformUserControlXamlFolder);
+    string LformUserControlXamlProject     = GetModelProjectName(Model, LformUserControlXamlFolder);
+
+
+
+
+    string CaptionPropertyName                  = "Caption";
+    string FilterHeightPropertyName             = "FilterHeight";
+    string ShowFilterPropertyName               = "ShowFilter";
+    string ShowAddFilterBtnPropertyName         = "ShowAddFilterBtn";
+    string GridHeightPropertyName               = "GridHeight";
+
+    string HiddenFiltersPropertyName            = "HiddenFilters";
+    string HiddenFiltersVMPropertyName          = "HiddenFiltersVM";
+    string CanAddPropertyName                   = "CanAdd";
+    string CanUpdPropertyName                   = "CanUpdate";
+    string CanDelPropertyName                   = "CanDelete";
+    string CanAddVMPropertyName                 = "CanAddVM";
+    string CanUpdVMPropertyName                 = "CanUpdateVM";
+    string CanDelVMPropertyName                 = "CanDeleteVM";
+
+
+    string RegionPropertyName                   = "Region";
+    string LformRegionPropertyName              = "LformRegion";
+    string ProxyPropertyName                    = "Proxy";
+
+    string BindingContextFeedbackRefPropertyName = "BindingContextFeedbackRef";
+
+    string ContainerMenuItemsPropertyName           = "ContainerMenuItems";
+    string ContainerMenuItemsCommandPropertyName    = "ContainerMenuItemsCommand";
+    string OnContainerMenuItemsCommandPropertyName  = "OnContainerMenuItemsCommand";
+
+    string ShowBackBtnPropertyName                  = "ShowBackBtn";
+    string NavigationBackCommandPropertyName        = "NavigationBackCommand";
+    string OnNavigationBackCommandPropertyName      = "OnNavigationBackCommand";
+
+    string TableMenuItemsPropertyName               = "TableMenuItems";
+    string TableMenuItemsVMPropertyName             = "TableMenuItemsVM";
+    string TableMenuItemsCommandPropertyName        = "TableMenuItemsCommand";
+
+    string RowMenuItemsPropertyName                 = "RowMenuItems";
+    string RowMenuItemsVMPropertyName               = "RowMenuItemsVM";
+    string RowMenuItemsCommandPropertyName          = "RowMenuItemsCommand";
+
+    string SelectedRowCommandPropertyName           = "SelectedRowCommand";
+
+    string SformAfterAddItemPropertyName            = "SformAfterAddItem";
+    string SformAfterUpdItemPropertyName            = "SformAfterUpdItem";
+    string SformAfterDelItemPropertyName            = "SformAfterDelItem";
+
+    string proxyPrefix = "clr-namespace:" + ProxyUserControlNameSpace;
+    if(ProxyUserControlProject != LformUserControlProject) {
+        proxyPrefix = proxyPrefix + ";assembly=" + ProxyUserControlProject;
+    }
+    string sformPrefix = "clr-namespace:" + SformUserControlNameSpace;
+    if(SformUserControlProject != LformUserControlProject) {
+        sformPrefix = sformPrefix + ";assembly=" + SformUserControlProject;
+    }
+    string lformUCBasePrefix = "clr-namespace:" + LformUserControlBaseNameSpace;
+    if(LformUserControlBaseProject != LformUserControlProject) {
+        lformUCBasePrefix = lformUCBasePrefix + ";assembly=" + LformUserControlBaseProject;
+    }
+
+    
+
+    bool IsInTheSameModule = (SformUserControlProject == LformUserControlProject);
+
+#>
+
+<lfucbs:<#= LformUserControlBaseClassName #> x:Class="<#= LformUserControlNameSpace #>.<#= LformUserControlClassName #>"
+             xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+
+             xmlns:prism="http://prismlibrary.com"
+             prism:ViewModelLocator.AutowireViewModel="True"
+
+             xmlns:lfucbs="<#= lformUCBasePrefix #>" 
+
+<#
+    if(IsInTheSameModule) {
+#>
+             xmlns:sfrm="<#= sformPrefix #>" 
+<#
+    } else {
+#>
+             xmlns:prx="<#= proxyPrefix #>" 
+<#
+    }
+#>
+             <#= BindingContextFeedbackRefPropertyName #>="{Binding BindingContext.<#= BindingContextFeedbackRefPropertyName #>, Source={x:Reference lformUsrCntrlRootNode}}"
+             x:Name="lformUsrCntrlRootNode">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+<#
+    if(IsInTheSameModule) {
+#>
+        <sfrm:<#= SformUserControlClassName #>  Grid.Row="0"
+<#
+    } else {
+#>
+        <prx:<#= ProxyUserControlClassName #> Grid.Row="0" 
+            x:Name="<#= SformUserControlClassName #><#= ProxyPropertyName #>"
+            prism:RegionManager.RegionName="<#= SformUserControlClassName #><#= LformRegionPropertyName #>"
+<#
+    }
+#>
+            <#= CaptionPropertyName #>="{Binding <#= CaptionPropertyName #>, Mode=OneWay, Source={x:Reference lformUsrCntrlRootNode}}" 
+            <#= FilterHeightPropertyName #>="{Binding <#= FilterHeightPropertyName #>, Mode=OneWay, Source={x:Reference lformUsrCntrlRootNode}}" 
+            <#= ShowFilterPropertyName #>="{Binding <#= ShowFilterPropertyName #>, Mode=OneWay, Source={x:Reference lformUsrCntrlRootNode}}" 
+            <#= ShowAddFilterBtnPropertyName #>="{Binding <#= ShowAddFilterBtnPropertyName #>, Mode=OneWay, Source={x:Reference lformUsrCntrlRootNode}}" 
+            <#= GridHeightPropertyName #>="{Binding <#= GridHeightPropertyName #>, Mode=OneWay, Source={x:Reference lformUsrCntrlRootNode}}" 
+
+            <#= ContainerMenuItemsPropertyName #>="{Binding <#= ContainerMenuItemsPropertyName #>, Mode=OneWay, Source={x:Reference lformUsrCntrlRootNode}}" 
+            <#= ContainerMenuItemsCommandPropertyName #>="{Binding <#= OnContainerMenuItemsCommandPropertyName #>, Source={x:Reference lformUsrCntrlRootNode}}"
+
+            <#= ShowBackBtnPropertyName #>="{Binding <#= ShowBackBtnPropertyName #>, Mode=OneWay, Source={x:Reference lformUsrCntrlRootNode}}" 
+            <#= NavigationBackCommandPropertyName #>="{Binding <#= OnNavigationBackCommandPropertyName #>, Source={x:Reference lformUsrCntrlRootNode}}"                                
+
+            <#= TableMenuItemsPropertyName #>="{Binding BindingContext.<#= TableMenuItemsVMPropertyName #>, Mode=OneWay, Source={x:Reference lformUsrCntrlRootNode}}" 
+            <#= TableMenuItemsCommandPropertyName #>="{Binding BindingContext.<#= TableMenuItemsCommandPropertyName #>, Source={x:Reference lformUsrCntrlRootNode}}"
+
+            <#= RowMenuItemsPropertyName #>="{Binding BindingContext.<#= RowMenuItemsVMPropertyName #>, Mode=OneWay, Source={x:Reference lformUsrCntrlRootNode}}" 
+            <#= RowMenuItemsCommandPropertyName #>="{Binding BindingContext.<#= RowMenuItemsCommandPropertyName #>, Source={x:Reference lformUsrCntrlRootNode}}"
+
+            <#= SelectedRowCommandPropertyName #>="{Binding BindingContext.<#= SelectedRowCommandPropertyName #>, Source={x:Reference lformUsrCntrlRootNode}}"
+
+
+            <#= HiddenFiltersPropertyName #>="{Binding BindingContext.<#= HiddenFiltersVMPropertyName #>, Mode=OneWay, Source={x:Reference lformUsrCntrlRootNode}}" 
+
+            <#= SformAfterAddItemPropertyName #>="{Binding BindingContext.<#= SformAfterAddItemPropertyName #>, Mode=OneWay, Source={x:Reference lformUsrCntrlRootNode}}" 
+            <#= SformAfterUpdItemPropertyName #>="{Binding BindingContext.<#= SformAfterUpdItemPropertyName #>, Mode=OneWay, Source={x:Reference lformUsrCntrlRootNode}}" 
+            <#= SformAfterDelItemPropertyName #>="{Binding BindingContext.<#= SformAfterDelItemPropertyName #>, Mode=OneWay, Source={x:Reference lformUsrCntrlRootNode}}" 
+
+            />
+    </Grid>
+</lfucbs:<#= LformUserControlBaseClassName #>>
+
+
+<#+
+
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+    string GetModelProjectName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileProject)) {
+            return result;
+        }
+        string[] fnArr = refItem.FileProject.Split(new char[] {'\\'}, 100, System.StringSplitOptions.None); 
+        string fn = fnArr[fnArr.Length - 1];
+
+        return fn.Replace(".csproj","");
+    }
+    string GetContextModelNameSpace(DbContextSerializable context, string fileType) {
+        string result="";
+        if ((context == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (context.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            context.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+    string GetContextModelClassName(DbContextSerializable context, string fileType) {
+        string result="";
+        if ((context == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (context.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            context.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+    string GetContextModelProjectName(DbContextSerializable context, string fileType) {
+        string result="";
+        if ((context == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (context.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            context.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileProject)) {
+            return result;
+        }
+        string[] fnArr = refItem.FileProject.Split(new char[] {'\\'}, 100, System.StringSplitOptions.None); 
+        string fn = fnArr[fnArr.Length - 1];
+
+        return fn.Replace(".csproj","");
+    }
+    string GetDisplayAttributeValueString2(ModelViewUIListPropertySerializable prop, ModelViewSerializable model, string propName) {
+            ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
+            if (sclrProp == null)
+            {
+                return prop.ViewPropertyName;
+            }
+            if(sclrProp.Attributes == null)
+            {
+                return prop.ViewPropertyName;
+            }
+            ModelViewAttributeSerializable attr =
+                sclrProp.Attributes.Where(a => a.AttrName == "Display").FirstOrDefault();
+            if (attr == null)
+            {
+                return prop.ViewPropertyName;
+            }
+            if (attr.VaueProperties == null)
+            {
+                return prop.ViewPropertyName;
+            }
+            ModelViewAttributePropertySerializable attrProp = 
+                attr.VaueProperties.Where(v => v.PropName == propName).FirstOrDefault();
+            if (attrProp == null)
+            {
+                return prop.ViewPropertyName;
+            }
+            if (string.IsNullOrEmpty( attrProp.PropValue ) )
+            {
+                return prop.ViewPropertyName;
+            } else
+            {
+                char[] charsToTrim = { '"', ' '};
+                return attrProp.PropValue.Trim(charsToTrim);
+            }
+    }
+    public string FirstLetterToLower(string str)
+    {
+        if (str == null)
+            return null;
+        if (str.Length > 1)
+            return char.ToLower(str[0]) + str.Substring(1);
+        return str.ToUpper();
+    }
+    bool IsBooleanInput(ModelViewUIListPropertySerializable prop, ModelViewSerializable model) {
+        if((prop == null) || (model == null)) return false;
+        ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
+        if (sclrProp == null)
+        {
+            return false;
+        }
+        return"System.Boolean".Equals(sclrProp.UnderlyingTypeName) || "Boolean".Equals(sclrProp.UnderlyingTypeName) || "bool".Equals(sclrProp.UnderlyingTypeName);
+    }
+    bool hasSortHeader(ModelViewUIListPropertySerializable modelViewUIListPropertySerializable, ModelViewSerializable model) {
+        if ((model == null) || (modelViewUIListPropertySerializable == null)) {
+            return false;
+        }
+        if ((model.UIListProperties == null) || (model.ScalarProperties == null)) {
+            return false;
+        }
+        return model.ScalarProperties.Any(s => s.ViewPropertyName == modelViewUIListPropertySerializable.ViewPropertyName && s.IsUsedBySorting);
+    }
+    string GetModelPropertyName(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+        if (model.GenerateJSonAttribute) {
+            return prop.ViewPropertyName;
+        } else {
+            return FirstLetterToLower(prop.ViewPropertyName);
+        }
+    }
+    string GetModelPropertyNameEx(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model) {
+        ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
+        return GetModelPropertyName(sclrProp, model);
+    }
+    string GetModelPropertyNameEx2(ModelViewUIListPropertySerializable prop, ModelViewSerializable model) {
+        ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
+        return GetModelPropertyName(sclrProp, model);
+    }
+
+#>

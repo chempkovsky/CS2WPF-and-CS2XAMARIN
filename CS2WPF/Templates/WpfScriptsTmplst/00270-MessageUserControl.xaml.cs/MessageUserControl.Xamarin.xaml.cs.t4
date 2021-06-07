@@ -1,0 +1,306 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+using System;
+using Xamarin.Forms;
+using System.Windows.Input;
+<#
+
+    string IconFontFolder      = "00178-IconFont.cs";
+    string IconFontClassName   = GetModelClassName(Model, IconFontFolder);
+    string IconFontNameSpace   = GetModelNameSpace(Model, IconFontFolder);
+
+    string MessageUserControlFolder     = "00270-MessageUserControl.xaml.cs";
+    string MessageUserControlClassName  = GetModelClassName(Model, MessageUserControlFolder);
+    string MessageUserControlNameSpace  = GetModelNameSpace(Model, MessageUserControlFolder);
+
+    string TitlePropertyName = "Title";
+    string MessagePropertyName = "Message";
+    string MessageIconNamePropertyName = "MessageIconName";
+    string MessageIconColorPropertyName = "MessageIconColor";
+    string ShowOkBtnPropertyName = "ShowOkBtn";
+    string ShowCancelBtnPropertyName = "ShowCancelBtn";
+    string OkCommandPropertyName = "OkCommand";
+    string OnOkCommandPropertyName = "OnOkCommand";
+    string CancelCommandPropertyName = "CancelCommand";
+    string OnCancelCommandPropertyName = "OnCancelCommand";
+
+   
+
+#>
+
+<# 
+    if(MessageUserControlNameSpace != IconFontNameSpace) { 
+#>
+using <#= IconFontNameSpace #>;
+<#
+    }
+#>
+
+namespace <#= MessageUserControlNameSpace #> {
+    /// <summary>
+    /// Interaction logic for <#= MessageUserControlClassName #>.xaml
+    /// </summary>
+    public partial class <#= MessageUserControlClassName #>: ContentView
+    {
+        public <#= MessageUserControlClassName #>()
+        {
+            InitializeComponent();
+        }
+        #region <#= TitlePropertyName #>
+        public static readonly BindableProperty <#= TitlePropertyName #>Property =
+                BindableProperty.Create(
+                "<#= TitlePropertyName #>", typeof(string),
+                typeof(<#= MessageUserControlClassName #>),
+                null);
+        public string <#= TitlePropertyName #>
+        {
+            get
+            {
+                return (string)GetValue(<#= TitlePropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= TitlePropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= MessagePropertyName #>
+        public static readonly BindableProperty <#= MessagePropertyName #>Property =
+                BindableProperty.Create(
+                "<#= MessagePropertyName #>", typeof(string),
+                typeof(<#= MessageUserControlClassName #>),
+                null);
+        public string <#= MessagePropertyName #>
+        {
+            get
+            {
+                return (string)GetValue(<#= MessagePropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= MessagePropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= MessageIconNamePropertyName #>
+        public static readonly BindableProperty <#= MessageIconNamePropertyName #>Property =
+                BindableProperty.Create(
+                "<#= MessageIconNamePropertyName #>", typeof(string),
+                typeof(<#= MessageUserControlClassName #>),
+                <#= IconFontClassName #>.Info_outline);
+        public string <#= MessageIconNamePropertyName #>
+        {
+            get
+            {
+                return (string)GetValue(<#= MessageIconNamePropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= MessageIconNamePropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= MessageIconColorPropertyName #>
+        public static readonly BindableProperty <#= MessageIconColorPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= MessageIconColorPropertyName #>", typeof(Color),
+                typeof(<#= MessageUserControlClassName #>),
+                Color.FromHex("#FFFFAB40"));
+        public Color <#= MessageIconColorPropertyName #>
+        {
+            get
+            {
+                return (Color)GetValue(<#= MessageIconColorPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= MessageIconColorPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= ShowOkBtnPropertyName #>
+        public static readonly BindableProperty <#= ShowOkBtnPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= ShowOkBtnPropertyName #>", typeof(bool),
+                typeof(<#= MessageUserControlClassName #>),
+                false);
+        public bool <#= ShowOkBtnPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= ShowOkBtnPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= ShowOkBtnPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= ShowCancelBtnPropertyName #>
+        public static readonly BindableProperty <#= ShowCancelBtnPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= ShowCancelBtnPropertyName #>", typeof(bool),
+                typeof(<#= MessageUserControlClassName #>),
+                false);
+        public bool <#= ShowCancelBtnPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= ShowCancelBtnPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= ShowCancelBtnPropertyName #>Property, value);
+            }
+        }
+        #endregion
+
+        #region <#= OkCommandPropertyName #>
+        public static readonly BindableProperty <#= OkCommandPropertyName #>Property =
+            BindableProperty.Create(nameof(<#= OkCommandPropertyName #>), typeof(ICommand), typeof(<#= MessageUserControlClassName #>), null);
+        public ICommand <#= OkCommandPropertyName #>
+        {
+            get { return (ICommand)GetValue(<#= OkCommandPropertyName #>Property); }
+            set { SetValue(<#= OkCommandPropertyName #>Property, value); }
+        }
+        #endregion
+        #region <#= OnOkCommandPropertyName #>
+        protected ICommand _<#= OnOkCommandPropertyName #> = null;
+        public ICommand <#= OnOkCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= OnOkCommandPropertyName #> ?? (_<#= OnOkCommandPropertyName #> = new Command(() => <#= OnOkCommandPropertyName #>Execute(), () => <#= OnOkCommandPropertyName #>CanExecute()));
+            }
+        }
+        private void <#= OnOkCommandPropertyName #>Execute()
+        {
+            if(<#= OkCommandPropertyName #> != null) {
+                if(<#= OkCommandPropertyName #>.CanExecute(this)) {
+                    <#= OkCommandPropertyName #>.Execute(this);
+                }
+            }
+        }
+        private bool <#= OnOkCommandPropertyName #>CanExecute()
+        {
+            return true;
+        }
+        #endregion
+        #region <#= CancelCommandPropertyName #>
+        public static readonly BindableProperty <#= CancelCommandPropertyName #>Property =
+            BindableProperty.Create(nameof(<#= CancelCommandPropertyName #>), typeof(ICommand), typeof(<#= MessageUserControlClassName #>), null);
+        public ICommand <#= CancelCommandPropertyName #>
+        {
+            get { return (ICommand)GetValue(<#= CancelCommandPropertyName #>Property); }
+            set { SetValue(<#= CancelCommandPropertyName #>Property, value); }
+        }
+        #endregion
+        #region <#= OnCancelCommandPropertyName #>
+        protected ICommand _<#= OnCancelCommandPropertyName #> = null;
+        public ICommand <#= OnCancelCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= OnCancelCommandPropertyName #> ?? (_<#= OnCancelCommandPropertyName #> = new Command(() => <#= OnCancelCommandPropertyName #>Execute(), () => <#= OnCancelCommandPropertyName #>CanExecute()));
+            }
+        }
+        private void <#= OnCancelCommandPropertyName #>Execute()
+        {
+            if(<#= CancelCommandPropertyName #> != null) {
+                if(<#= CancelCommandPropertyName #>.CanExecute(this)) {
+                    <#= CancelCommandPropertyName #>.Execute(this);
+                }
+            }
+        }
+        private bool <#= OnCancelCommandPropertyName #>CanExecute()
+        {
+            return true;
+        }
+        #endregion
+
+    }
+}
+
+<#+
+
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+
+#>

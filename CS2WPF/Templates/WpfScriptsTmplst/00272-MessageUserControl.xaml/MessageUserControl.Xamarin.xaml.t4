@@ -1,0 +1,164 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="xaml" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+<#
+
+    string MessageUserControlFolder            = "00270-MessageUserControl.xaml.cs";
+    string MessageUserControlClassName         = GetModelClassName(Model, MessageUserControlFolder);
+    string MessageUserControlNameSpace         = GetModelNameSpace(Model, MessageUserControlFolder);
+
+
+    string MessageUserControlXamlFolder      = "00272-MessageUserControl.xaml";
+    string MessageUserControlXamlClassName   = GetModelClassName(Model, MessageUserControlXamlFolder);
+    string MessageUserControlXamlNameSpace   = GetModelNameSpace(Model, MessageUserControlXamlFolder);
+    string MessageUserControlXamlProject     = GetModelProjectName(Model, MessageUserControlXamlFolder);
+    
+    string TitlePropertyName = "Title";
+    string MessagePropertyName = "Message";
+    string MessageIconNamePropertyName = "MessageIconName";
+    string MessageIconColorPropertyName = "MessageIconColor";
+    string ShowOkBtnPropertyName = "ShowOkBtn";
+    string ShowCancelBtnPropertyName = "ShowCancelBtn";
+    string OnOkCommandPropertyName = "OnOkCommand";
+    string OnCancelCommandPropertyName = "OnCancelCommand";
+
+
+#>
+<ContentView x:Class="<#= MessageUserControlNameSpace #>.<#= MessageUserControlClassName #>"
+             xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Name="msgUsrCntrlRootNode">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Label Grid.Row="0" FontAttributes="Bold" Text="{Binding <#= TitlePropertyName #>, Source={x:Reference msgUsrCntrlRootNode}}"/>
+        <Grid Grid.Row="1" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Label  Grid.Column="0" 
+                    FontFamily="CustomIconFontAlias" 
+                    FontSize="Title"
+                    Text="{Binding <#= MessageIconNamePropertyName #>, Source={x:Reference msgUsrCntrlRootNode}}"
+                    TextColor="{Binding <#= MessageIconColorPropertyName #>, Source={x:Reference msgUsrCntrlRootNode}}"  
+                    BackgroundColor="{DynamicResource IconMessageBackgroundColor}"/>
+            <Label  Grid.Column="1" 
+                    Text="{Binding <#= MessagePropertyName #>, Source={x:Reference msgUsrCntrlRootNode}}"/>
+        </Grid>
+        <StackLayout Orientation="Horizontal" Grid.Row="2">
+            <Button Text="Ok"  IsVisible="{Binding <#= ShowOkBtnPropertyName #>, Mode=OneWay, Source={x:Reference msgUsrCntrlRootNode}}"
+                Command="{Binding <#= OnOkCommandPropertyName #>, Source={x:Reference msgUsrCntrlRootNode}}"/>
+            <Button Text="Cancel" IsVisible="{Binding <#= ShowCancelBtnPropertyName #>, Mode=OneWay, Source={x:Reference msgUsrCntrlRootNode}}" 
+                Command="{Binding <#= OnCancelCommandPropertyName #>, Source={x:Reference msgUsrCntrlRootNode}}"/>
+        </StackLayout>
+    </Grid>
+</ContentView>
+
+
+<#+
+
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+    string GetModelProjectName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileProject)) {
+            return result;
+        }
+        string[] fnArr = refItem.FileProject.Split(new char[] {'\\'}, 100, System.StringSplitOptions.None); 
+        string fn = fnArr[fnArr.Length - 1];
+
+        return fn.Replace(".csproj","");
+    }
+
+#>

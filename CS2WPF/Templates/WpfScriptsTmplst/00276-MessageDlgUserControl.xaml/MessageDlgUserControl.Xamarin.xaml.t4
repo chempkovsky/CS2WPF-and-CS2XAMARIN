@@ -1,0 +1,159 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="xaml" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+<#
+
+
+    string MessageUserControlFolder            = "00270-MessageUserControl.xaml.cs";
+    string MessageUserControlClassName         = GetModelClassName(Model, MessageUserControlFolder);
+    string MessageUserControlNameSpace         = GetModelNameSpace(Model, MessageUserControlFolder);
+    string MessageUserControlProject           = GetModelProjectName(Model, MessageUserControlFolder);
+
+    string MessageDlgUserControlFolder     = "00274-MessageDlgUserControl.xaml.cs";
+    string MessageDlgUserControlClassName  = GetModelClassName(Model, MessageDlgUserControlFolder);
+    string MessageDlgUserControlNameSpace  = GetModelNameSpace(Model, MessageDlgUserControlFolder);
+
+
+    string MessageDlgUserControlXamlFolder      = "00276-MessageDlgUserControl.xaml";
+    string MessageDlgUserControlXamlClassName   = GetModelClassName(Model, MessageDlgUserControlXamlFolder);
+    string MessageDlgUserControlXamlNameSpace   = GetModelNameSpace(Model, MessageDlgUserControlXamlFolder);
+    string MessageDlgUserControlXamlProject     = GetModelProjectName(Model, MessageDlgUserControlXamlFolder);
+    
+    string TitlePropertyName = "Title";
+    string MessagePropertyName = "Message";
+    string MessageIconNamePropertyName = "MessageIconName";
+    string MessageIconColorPropertyName = "MessageIconColor";
+    string ShowOkBtnPropertyName = "ShowOkBtn";
+    string ShowCancelBtnPropertyName = "ShowCancelBtn";
+    string RegisterRoutedCommandBindingsPropertyName = "RegisterRoutedCommandBindings";
+    string RoutedCommandHandlersPropertyName = "RoutedCommandHandlers";
+    string OkCommandPropertyName = "OkCommand";
+    string CancelCommandPropertyName = "CancelCommand";
+    string msgusrctrlPrefix = "clr-namespace:" + MessageUserControlNameSpace;
+    if(MessageUserControlProject != MessageDlgUserControlXamlProject) {
+        msgusrctrlPrefix = msgusrctrlPrefix + ";assembly=" + MessageUserControlProject;
+    }
+
+#>
+<ContentView x:Class="<#= MessageDlgUserControlNameSpace #>.<#= MessageDlgUserControlClassName #>"
+             xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:msgusrctrl="<#= msgusrctrlPrefix #>"
+             x:Name="messageDlgCntrlRootNode"
+             BackgroundColor="{DynamicResource ColumnSelectorDlgBackgroundColor}">
+    <msgusrctrl:<#= MessageUserControlClassName #> 
+        <#= TitlePropertyName #>="{Binding BindingContext.<#= TitlePropertyName #>, Mode=OneWay, Source={x:Reference messageDlgCntrlRootNode}}" 
+        <#= MessagePropertyName #>="{Binding BindingContext.<#= MessagePropertyName #>, Mode=OneWay, Source={x:Reference messageDlgCntrlRootNode}}"
+        <#= MessageIconNamePropertyName #>="{Binding BindingContext.<#= MessageIconNamePropertyName #>, Mode=OneWay, Source={x:Reference messageDlgCntrlRootNode}}"
+        <#= MessageIconColorPropertyName #>="{Binding BindingContext.<#= MessageIconColorPropertyName #>, Mode=OneWay, Source={x:Reference messageDlgCntrlRootNode}}"
+        <#= ShowOkBtnPropertyName #>="{Binding BindingContext.<#= ShowOkBtnPropertyName #>, Mode=OneWay, Source={x:Reference messageDlgCntrlRootNode}}"
+        <#= ShowCancelBtnPropertyName #>="{Binding BindingContext.<#= ShowCancelBtnPropertyName #>, Mode=OneWay, Source={x:Reference messageDlgCntrlRootNode}}"
+        <#= OkCommandPropertyName #>="{Binding BindingContext.<#= OkCommandPropertyName #>, Mode=OneWay, Source={x:Reference messageDlgCntrlRootNode}}"
+        <#= CancelCommandPropertyName #>="{Binding BindingContext.<#= CancelCommandPropertyName #>, Mode=OneWay, Source={x:Reference messageDlgCntrlRootNode}}">
+    </msgusrctrl:<#= MessageUserControlClassName #>>
+</ContentView>
+
+
+<#+
+
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+    string GetModelProjectName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileProject)) {
+            return result;
+        }
+        string[] fnArr = refItem.FileProject.Split(new char[] {'\\'}, 100, System.StringSplitOptions.None); 
+        string fn = fnArr[fnArr.Length - 1];
+
+        return fn.Replace(".csproj","");
+    }
+
+#>

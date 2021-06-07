@@ -1,0 +1,284 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="xaml" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+<#
+
+    string gridFlexModelFolder      = "00100-GridFlex.cs";
+    string gridFlexModelClassName   = GetModelClassName(Model, gridFlexModelFolder);
+    string gridFlexModelNameSpace   = GetModelNameSpace(Model, gridFlexModelFolder);
+    string gridFlexModelProject     = GetModelProjectName(Model, gridFlexModelFolder);
+
+    string NullableDatePickerFolder      = "00180-NullableDatePicker.cs";
+    string NullableDatePickerClassName   = GetModelClassName(Model, NullableDatePickerFolder);
+    string NullableDatePickerNameSpace   = GetModelNameSpace(Model, NullableDatePickerFolder);
+    string NullableDatePickerProject     = GetModelProjectName(Model, NullableDatePickerFolder);
+
+    string InverseBooleanConverterFolder      = "00170-InverseBooleanConverter.cs";
+    string InverseBooleanConverterClassName   = GetModelClassName(Model, InverseBooleanConverterFolder);
+    string InverseBooleanConverterNameSpace   = GetModelNameSpace(Model, InverseBooleanConverterFolder);
+    string InverseBooleanConverterProject     = GetModelProjectName(Model, InverseBooleanConverterFolder);
+
+
+    string RoutedCommandExtFolder      = "00224-RoutedCommandExt.cs";
+    string RoutedCommandExtClassName   = GetModelClassName(Model, RoutedCommandExtFolder);
+    string RoutedCommandExtNameSpace   = GetModelNameSpace(Model, RoutedCommandExtFolder);
+    string RoutedCommandExtProject     = GetModelProjectName(Model, RoutedCommandExtFolder);
+
+    string IconFontFolder      = "00178-IconFont.cs";
+    string IconFontClassName   = GetModelClassName(Model, IconFontFolder);
+    string IconFontNameSpace   = GetModelNameSpace(Model, IconFontFolder);
+    string IconFontNameProject = GetModelProjectName(Model, IconFontFolder);
+
+    string WebServiceFilterItemUserControlFolder      = "00232-WebServiceFilterItemUserControl.xaml.cs";
+    string WebServiceFilterItemUserControlClassName   = GetModelClassName(Model, WebServiceFilterItemUserControlFolder);
+    string WebServiceFilterItemUserControlNameSpace   = GetModelNameSpace(Model, WebServiceFilterItemUserControlFolder);
+
+    string WebServiceFilterItemUserControlXamlFolder      = "00234-WebServiceFilterItemUserControl.xaml";
+    string WebServiceFilterItemUserControlXamlClassName   = GetModelClassName(Model, WebServiceFilterItemUserControlXamlFolder);
+    string WebServiceFilterItemUserControlXamlNameSpace   = GetModelNameSpace(Model, WebServiceFilterItemUserControlXamlFolder);
+    string WebServiceFilterItemUserControlXamlProject     = GetModelProjectName(Model, WebServiceFilterItemUserControlXamlFolder);
+    
+    string SelectedFilterOperatorPropertyName = "SelectedFilterOperator";
+    string FilterOperatorsPropertyName = "FilterOperators";
+    string SelectedFilterDefinitionPropertyName = "SelectedFilterDefinition";
+    string FilterDefinitionsPropertyName = "FilterDefinitions";
+    string FilterValuePropertyName = "FilterValue";
+    string IsDateInputPropertyName = "IsDateInput";
+    string IsFilterValueReadOnlyPropertyName = "IsFilterValueReadOnly";
+    string FilterErrorPropertyName = "FilterError";
+    string FilterValuePromptPropertyName = "FilterValuePrompt";
+    string DefaultTexBlockForegroundPropertyName = "DefaultTexBlockForeground";
+    string SelectedModelRefPropertyName = "SelectedModelRef";
+    string FontFamilyPropertyName = "CustomIconFontAlias";
+    //////////////////////////////// 
+    string FilterItemCommandPropertyName = "FilterItemCommand";
+    ////////////////////////////////
+
+
+
+    string IconFontPrefix = "clr-namespace:" + IconFontNameSpace;
+    if(IconFontNameProject != WebServiceFilterItemUserControlXamlProject) {
+        IconFontPrefix = IconFontPrefix + ";assembly=" + IconFontNameProject;
+    }
+    string NullableDatePickerPrefix = "clr-namespace:" + NullableDatePickerNameSpace;
+    if(NullableDatePickerProject != WebServiceFilterItemUserControlXamlProject) {
+        NullableDatePickerPrefix = NullableDatePickerPrefix + ";assembly=" + NullableDatePickerProject;
+    }
+    string gridflexPrefix = "clr-namespace:" + gridFlexModelNameSpace;
+    if(gridFlexModelProject != WebServiceFilterItemUserControlXamlProject) {
+        gridflexPrefix = gridflexPrefix + ";assembly=" + gridFlexModelProject;
+    }
+    string routedCommandPrefix = "clr-namespace:" + RoutedCommandExtNameSpace;
+    if(RoutedCommandExtProject != WebServiceFilterItemUserControlXamlProject) {
+        routedCommandPrefix = routedCommandPrefix + ";assembly=" + RoutedCommandExtProject;
+    }
+    string invboolcnvPrefix = "clr-namespace:" + InverseBooleanConverterNameSpace;
+    if(InverseBooleanConverterProject != WebServiceFilterItemUserControlXamlProject) {
+        invboolcnvPrefix = invboolcnvPrefix + ";assembly=" + InverseBooleanConverterProject;
+    }
+
+
+#>
+<?xml version="1.0" encoding="UTF-8"?>
+<ContentView xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="<#= WebServiceFilterItemUserControlNameSpace #>.<#= WebServiceFilterItemUserControlClassName #>"
+
+             xmlns:gridflex="<#= gridflexPrefix #>"
+             xmlns:invboolcnv="<#= invboolcnvPrefix #>" 
+             xmlns:nullableDatePicker="<#= NullableDatePickerPrefix #>" 
+             xmlns:fontIcons="<#= IconFontPrefix #>"
+             x:Name="fltrItmUsrCntrlRootNode">
+    <ContentView.Resources>
+        <invboolcnv:<#= InverseBooleanConverterClassName #> x:Key="<#= InverseBooleanConverterClassName #>"/>
+    </ContentView.Resources>
+
+    <Grid gridflex:<#= gridFlexModelClassName #>.HorizontalFlex="true" 
+        RowDefinitions="Auto,Auto" ColumnDefinitions="*" Margin="0,0,8,0">
+        <Grid Grid.Row="0" Grid.Column="0"
+            Margin="8,0,0,0" RowSpacing="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Label Grid.Row="0" FontSize="Caption" >Column name</Label>
+            <Picker Grid.Row="1" ItemsSource="{Binding Path=<#= FilterDefinitionsPropertyName #>, Source={x:Reference fltrItmUsrCntrlRootNode}}" 
+                      ItemDisplayBinding="{Binding fltrCaption}" 
+                      SelectedItem="{Binding Path=<#= SelectedFilterDefinitionPropertyName #>, Source={x:Reference fltrItmUsrCntrlRootNode}, Mode=TwoWay}"/>
+            <Label Grid.Row="2" FontSize="Caption">Select Column name</Label>
+        </Grid>
+        <Grid Grid.Row="1" Grid.Column="0"
+            Margin="8,0,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="8*"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid Grid.Column="0" RowSpacing="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Label Grid.Row="0" FontSize="Caption" >Operator</Label>
+                <Picker Grid.Row="1" ItemsSource="{Binding Path=<#= FilterOperatorsPropertyName #>, Source={x:Reference fltrItmUsrCntrlRootNode}}" 
+                      ItemDisplayBinding="{Binding oCaption}" 
+                      SelectedItem="{Binding Path=<#= SelectedFilterOperatorPropertyName #>, Source={x:Reference fltrItmUsrCntrlRootNode}, Mode=TwoWay}"/>
+                <Label Grid.Row="2" FontSize="Caption">Select operator</Label>
+            </Grid>
+            <Grid Grid.Column="1" RowSpacing="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Label Grid.Row="0" FontSize="Caption">Filter value</Label>
+                <Grid Grid.Row="1" ColumnSpacing="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <ContentView Grid.Column="0">
+                        <ContentView.Content>
+                                        <Entry  IsReadOnly="{Binding <#= IsFilterValueReadOnlyPropertyName #>, Mode=OneWay, Source={x:Reference fltrItmUsrCntrlRootNode}}" 
+                                                Text="{Binding <#= FilterValuePropertyName #>, Mode=TwoWay, Source={x:Reference fltrItmUsrCntrlRootNode}}"/>
+                        </ContentView.Content>
+                        <ContentView.Triggers>
+                            <DataTrigger TargetType="ContentView" Binding="{Binding <#= IsDateInputPropertyName #>, Source={x:Reference fltrItmUsrCntrlRootNode}}" Value="True">
+                                <Setter Property="Content" >
+                                    <Setter.Value>
+                                        <nullableDatePicker:<#= NullableDatePickerClassName #> Grid.Column="0" 
+                                                IsEnabled="{Binding <#= IsFilterValueReadOnlyPropertyName #>, Source={x:Reference fltrItmUsrCntrlRootNode}, Mode=OneWay, Converter={StaticResource <#= InverseBooleanConverterClassName #>}}"  
+                                                NullableDate="{Binding <#= FilterValuePropertyName #>, Mode=TwoWay, Source={x:Reference fltrItmUsrCntrlRootNode}}"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </DataTrigger>
+                        </ContentView.Triggers>
+                    </ContentView>
+                    <Button Grid.Column="1" WidthRequest="40"
+                            Command="{Binding Path=<#= FilterItemCommandPropertyName #>, Source={x:Reference fltrItmUsrCntrlRootNode}}"
+                            Text="{x:Static fontIcons:<#= IconFontClassName #>.Delete_outline}" FontFamily="<#= FontFamilyPropertyName #>" BackgroundColor="{DynamicResource IconButtonBackgroundColor}" 
+                            TextColor="{DynamicResource IconButtonDangerColor}" 
+                            FontSize="{OnPlatform iOS=Default, Android=Large, UWP=Default}">
+                    </Button>
+                </Grid>
+                <Label  Grid.Row="2" FontSize="Caption" Text="{Binding Path=<#= FilterValuePromptPropertyName #>, Source={x:Reference fltrItmUsrCntrlRootNode}}" TextColor="{x:DynamicResource ValidationErrorColor}">
+                    <Label.Triggers>
+                        <DataTrigger TargetType="Label" Binding="{Binding Path=<#= FilterErrorPropertyName #>, Source={x:Reference fltrItmUsrCntrlRootNode}}" Value="">
+                            <Setter Property="TextColor" Value="Default" />
+                        </DataTrigger>
+                        <DataTrigger TargetType="Label" Binding="{Binding Path=<#= FilterErrorPropertyName #>, Source={x:Reference fltrItmUsrCntrlRootNode}}" Value="{x:Null}">
+                            <Setter Property="TextColor" Value="Default" />
+                        </DataTrigger>
+                    </Label.Triggers>
+                </Label>
+            </Grid>
+        </Grid>
+    </Grid>
+</ContentView>
+
+
+<#+
+
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+    string GetModelProjectName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileProject)) {
+            return result;
+        }
+        string[] fnArr = refItem.FileProject.Split(new char[] {'\\'}, 100, System.StringSplitOptions.None); 
+        string fn = fnArr[fnArr.Length - 1];
+
+        return fn.Replace(".csproj","");
+    }
+
+#>
