@@ -11,6 +11,10 @@
 - The developer uses Wpf Forms and FeatureScripts Wizards to create Rich Client Application.
 - Rich Client Application Wizards uses the Prism framework to create loosely coupled, maintainable, and testable XAML applications.
 
+## Hands on Lab
+- Goto wiki to get practical skills
+https://github.com/chempkovsky/CS2WPF/wiki
+
 ## CS2WPF is implemented as Microsoft Visual Studio Extension (.vsix) and consists of five wizards:
 1. DBContext Wizard
 2. ModelViews Wizard
