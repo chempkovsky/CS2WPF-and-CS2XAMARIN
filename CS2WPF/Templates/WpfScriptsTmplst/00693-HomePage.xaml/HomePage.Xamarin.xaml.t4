@@ -1,5 +1,5 @@
 ﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
-<#@ output extension="cs" #>
+<#@ output extension="xaml" #>
 <#@ assembly name="System.Core" #>
 <#@ import namespace="System" #>
 <#@ import namespace="System.Linq" #>
@@ -11,58 +11,48 @@
 <#@ import namespace="CS2WPF.Model.Serializable" #>
 <#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+
 <#
 
-    
     string IconFontFolder      = "00178-IconFont.cs";
     string IconFontClassName   = GetModelClassName(Model, IconFontFolder);
     string IconFontNameSpace   = GetModelNameSpace(Model, IconFontFolder);
+    string IconFontNameProject = GetModelProjectName(Model, IconFontFolder);
 
+    string HomePageFolder     = "00691-HomePage.xaml.cs";
+    string HomePageClassName  = GetModelClassName(Model, HomePageFolder);
+    string HomePageNameSpace  = GetModelNameSpace(Model, HomePageFolder);
+    string HomePageProject    = GetModelProjectName(Model, HomePageFolder);
+
+    string HomePageXamlFolder      = "00693-HomePage.xaml";
+    string HomePageXamlClassName   = GetModelClassName(Model, HomePageXamlFolder);
+    string HomePageXamlNameSpace   = GetModelNameSpace(Model, HomePageXamlFolder);
+    string HomePageXamlProject     = GetModelProjectName(Model, HomePageXamlFolder);
+    
+    string IconFontPrefix = "clr-namespace:" + IconFontNameSpace;
+    if(IconFontNameProject != HomePageProject) {
+        IconFontPrefix = IconFontPrefix + ";assembly=" + IconFontNameProject;
+    }
 
 #>
 
-namespace <#= IconFontNameSpace #> {
-    public static class  <#= IconFontClassName #>
-    {
+<ContentPage x:Class="<#= HomePageNameSpace #>.<#= HomePageClassName #>"
+             xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:prism="http://prismlibrary.com"
+             prism:ViewModelLocator.AutowireViewModel="True"
 
-		public const string West = "\uf1e6";
-		public const string East = "\uf1df";
+             xmlns:fontIcons="<#= IconFontPrefix #>"
 
-		public const string Close = "\ue5cd";
-		public const string Delete_outline = "\ue92e";
+             x:Name="homeCntrlRootNode">
+    <StackLayout HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" Orientation="Vertical">
+        <Label  FontFamily="CustomIconFontAlias" HorizontalOptions="Center" FontSize="Header"
+                Text="{x:Static fontIcons:<#= IconFontClassName #>.Home}"/>
+        <Label Text="Home page" HorizontalOptions="Center" FontSize="Header"/>
+    </StackLayout>
+    
+</ContentPage>
 
-		public const string More_vert = "\ue5d4";
-		public const string More_horiz = "\ue5d3";
-
-		public const string Menu = "\ue5d2";
-		public const string Settings = "\ue8b8";
-
-		public const string Replay = "\ue042";
-
-		public const string Arrow_back = "\ue5c4";
-		public const string Filter_9_plus = "\ue3da";
-		public const string Filter_none = "\ue3e0";
-		public const string Refresh = "\ue5d5";
-		public const string Chevron_left = "\ue5cb";
-		public const string Chevron_right = "\ue5cc";
-		public const string Arrow_left = "\ue5de";
-		public const string Arrow_right = "\ue5df";
-		public const string Arrow_forward = "\ue5c8";
-        public const string Info_outline = "\ue88f";
-        public const string Expand_less = "\ue5ce";
-	    public const string Expand_more = "\ue5cf";
-	    public const string Arrow_drop_down = "\ue5c5";
-	    public const string Arrow_drop_up = "\ue5c7";
-        public const string Search = "\ue8b6";
-        public const string Info = "\ue88e"; // info
-        public const string Home = "\ue88a"; // home
-        public const string Unpublished = "\uf236"; // page not found
-        public const string Pan_tool = "\ue925"; // Access Denied
-        public const string Warning = "\ue002"; // Warning
-		public const string Error_outline = "\ue001";
-		public const string Error = "\ue000";
-    }
-}
 
 <#+
 
@@ -133,6 +123,27 @@ namespace <#= IconFontNameSpace #> {
                 
         }
         return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+    string GetModelProjectName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileProject)) {
+            return result;
+        }
+        string[] fnArr = refItem.FileProject.Split(new char[] {'\\'}, 100, System.StringSplitOptions.None); 
+        string fn = fnArr[fnArr.Length - 1];
+
+        return fn.Replace(".csproj","");
     }
 
 #>
