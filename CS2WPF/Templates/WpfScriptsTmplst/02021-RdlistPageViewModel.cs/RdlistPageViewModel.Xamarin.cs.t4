@@ -66,25 +66,24 @@ using Prism.Navigation;
     string modelInterfaceNameSpace                  = GetModelNameSpace(Model, modelInterfaceFolder);
 
 
-    string SformUserControlFolder           = "01420-SformUserControl.xaml.cs";
-    string SformUserControlClassName        = GetModelClassName(Model, SformUserControlFolder);
-    string SformUserControlNameSpace        = GetModelNameSpace(Model, SformUserControlFolder);
-    string SformUserControlProject          = GetModelProjectName(Model, SformUserControlFolder);
+    string LformUserControlFolder           = "01596-LformUserControl.xaml.cs";
+    string LformUserControlClassName        = GetModelClassName(Model, LformUserControlFolder);
+    string LformUserControlNameSpace        = GetModelNameSpace(Model, LformUserControlFolder);
+    string LformUserControlProject          = GetModelProjectName(Model, LformUserControlFolder);
 
 
     string ReditPageFolder                  = "01817-ReditPage.xaml.cs";
     string ReditPageClassName               = GetModelClassName(Model, ReditPageFolder);
     string ReditPageNameSpace               = GetModelNameSpace(Model, ReditPageFolder);
-
-    string RlistPageFolder                  = "01917-RlistPage.xaml.cs";
-    string RlistPageClassName               = GetModelClassName(Model, RlistPageFolder);
-    string RlistPageNameSpace               = GetModelNameSpace(Model, RlistPageFolder);
-    string RlistPageProject                 = GetModelProjectName(Model, RlistPageFolder);
+           
+    string RdlistPageFolder                  = "02017-RdlistPage.xaml.cs";
+    string RdlistPageClassName               = GetModelClassName(Model, RdlistPageFolder);
+    string RdlistPageNameSpace               = GetModelNameSpace(Model, RdlistPageFolder);
+    string RdlistPageProject                 = GetModelProjectName(Model, RdlistPageFolder);
     
-    string RlistPageViewModelFolder         = "01921-RlistPageViewModel.cs";
-    string RlistPageViewModelClassName      = GetModelClassName(Model, RlistPageViewModelFolder);
-    string RlistPageViewModelNameSpace      = GetModelNameSpace(Model, RlistPageViewModelFolder);
-
+    string RdlistPageViewModelFolder        = "02021-RdlistPageViewModel.cs";
+    string RdlistPageViewModelClassName     = GetModelClassName(Model, RdlistPageViewModelFolder);
+    string RdlistPageViewModelNameSpace     = GetModelNameSpace(Model, RdlistPageViewModelFolder);
 
     string HiddenFiltersPropertyName                 = "HiddenFilters";
     string OnHiddenFiltersChangedPropertyName        = "OnHiddenFiltersChanged";
@@ -96,31 +95,19 @@ using Prism.Navigation;
     string RowMenuItemsPropertyName                  = "RowMenuItems";
     string RowMenuItemsPropertyChangedPropertyName   = "RowMenuItemsPropertyChanged";
 
-
     string RegionPropertyName                        = "Region";
-    string RlistPageRegionPropertyName               = "RlistPageRegion";
+    string RdlistPageRegionPropertyName              = "RdlistPageRegion";
+
+    string FormRootServicePropertyName               = "FrmRootSrv";
+    string AppSettingServicePropertyName             = "GlblSettingsSrv";
+    string GetWithFilterMethodName                   = "getwithfilter";
+    string ColumnSelectorDlgPropertyName             = "ColumnSelectorDlg";
 
 
-    string FormRootServicePropertyName          = "FrmRootSrv";
-    string AppSettingServicePropertyName        = "GlblSettingsSrv";
-    string GetWithFilterMethodName              = "getwithfilter";
-    string ColumnSelectorDlgPropertyName        = "ColumnSelectorDlg";
 
 
 
 
-    string SformAfterAddItemPropertyName        = "SformAfterAddItem";
-    string SformAfterUpdItemPropertyName        = "SformAfterUpdItem";
-    string SformAfterDelItemPropertyName        = "SformAfterDelItem";
-
-
-    string SformAddItemCommandPropertyName      = "SformAddItemCommand";
-    string SformUpdItemCommandPropertyName      = "SformUpdItemCommand";
-    string SformDelItemCommandPropertyName      = "SformDelItemCommand";
-    string SformAfterAddItemCommandPropertyName = "SformAfterAddItemCommand";
-    string SformAfterUpdItemCommandPropertyName = "SformAfterUpdItemCommand";
-    string SformAfterDelItemCommandPropertyName = "SformAfterDelItemCommand";
-    string SformLoadedCommandPropertyName       = "SformLoadedCommand";
 
 
     string TableMenuItemsCommandPropertyName    = "TableMenuItemsCommand";
@@ -128,6 +115,9 @@ using Prism.Navigation;
     string SelectedRowPropertyName              = "SelectedRow";
     string SelectedRowCommandPropertyName       = "SelectedRowCommand";
 
+    string CanAddPropertyName                   = "CanAdd";
+    string CanUpdPropertyName                   = "CanUpdate";
+    string CanDelPropertyName                   = "CanDelete";
 
     string FormControlModelPropertyName         = "FormControlModel";
     string CaptionPropertyName                  = "Caption";
@@ -146,26 +136,26 @@ using Prism.Navigation;
     List<ModelViewPropertyOfVwSerializable> primKeys = GetModelPrimaryKeyProps(Model);
 
     List<string> nmSpaces = new List<string>();
-    if ((RlistPageViewModelNameSpace != IWebServiceFilterRsltInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace) < 0)) 
+    if ((RdlistPageViewModelNameSpace != IWebServiceFilterRsltInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace) < 0)) 
         nmSpaces.Add(IWebServiceFilterRsltInterfaceNameSpace);
-    if ((RlistPageViewModelNameSpace != WebServiceFilterRsltViewModelNameSpace) && (nmSpaces.IndexOf(WebServiceFilterRsltViewModelNameSpace) < 0)) 
+    if ((RdlistPageViewModelNameSpace != WebServiceFilterRsltViewModelNameSpace) && (nmSpaces.IndexOf(WebServiceFilterRsltViewModelNameSpace) < 0)) 
         nmSpaces.Add(WebServiceFilterRsltViewModelNameSpace);
-    if ((RlistPageViewModelNameSpace != IAppGlblSettingsServiceNameSpace) && (nmSpaces.IndexOf(IAppGlblSettingsServiceNameSpace) < 0)) 
+    if ((RdlistPageViewModelNameSpace != IAppGlblSettingsServiceNameSpace) && (nmSpaces.IndexOf(IAppGlblSettingsServiceNameSpace) < 0)) 
         nmSpaces.Add(IAppGlblSettingsServiceNameSpace);
-    if ((RlistPageViewModelNameSpace != WebServiceFilterMenuViewModelNameSpace) && (nmSpaces.IndexOf(WebServiceFilterMenuViewModelNameSpace) < 0)) 
+    if ((RdlistPageViewModelNameSpace != WebServiceFilterMenuViewModelNameSpace) && (nmSpaces.IndexOf(WebServiceFilterMenuViewModelNameSpace) < 0)) 
         nmSpaces.Add(WebServiceFilterMenuViewModelNameSpace);
-    if ((RlistPageViewModelNameSpace != IWebServiceFilterMenuInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterMenuInterfaceNameSpace) < 0)) 
+    if ((RdlistPageViewModelNameSpace != IWebServiceFilterMenuInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterMenuInterfaceNameSpace) < 0)) 
         nmSpaces.Add(IWebServiceFilterMenuInterfaceNameSpace);
-    if ((RlistPageViewModelNameSpace != IWebServiceFilterMenuInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterMenuInterfaceNameSpace) < 0)) 
+    if ((RdlistPageViewModelNameSpace != IWebServiceFilterMenuInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterMenuInterfaceNameSpace) < 0)) 
         nmSpaces.Add(IWebServiceFilterMenuInterfaceNameSpace);
-    if ((RlistPageViewModelNameSpace != EformModeEnumNameSpace) && (nmSpaces.IndexOf(EformModeEnumNameSpace) < 0)) 
+    if ((RdlistPageViewModelNameSpace != EformModeEnumNameSpace) && (nmSpaces.IndexOf(EformModeEnumNameSpace) < 0)) 
         nmSpaces.Add(EformModeEnumNameSpace);
-    if ((RlistPageViewModelNameSpace != modelInterfaceNameSpace) && (nmSpaces.IndexOf(modelInterfaceNameSpace) < 0)) 
+    if ((RdlistPageViewModelNameSpace != modelInterfaceNameSpace) && (nmSpaces.IndexOf(modelInterfaceNameSpace) < 0)) 
         nmSpaces.Add(modelInterfaceNameSpace);
-    if ((RlistPageViewModelNameSpace != ISformViewModelInterfaceNameSpace) && (nmSpaces.IndexOf(ISformViewModelInterfaceNameSpace) < 0)) 
+    if ((RdlistPageViewModelNameSpace != ISformViewModelInterfaceNameSpace) && (nmSpaces.IndexOf(ISformViewModelInterfaceNameSpace) < 0)) 
         nmSpaces.Add(ISformViewModelInterfaceNameSpace);
 
-    bool IsInTheSameModule = (SformUserControlProject == RlistPageProject);
+    bool IsInTheSameModule = (LformUserControlProject == RdlistPageProject);
     
     
 #>
@@ -181,8 +171,8 @@ using <#= ns #>;
 <#
     if(!IsInTheSameModule) {
 #>
-    "<#= SformUserControlClassName #>"-UserControl is defined in the "<#= SformUserControlProject #>"-project.
-    In the file of IModule-class of "<#= SformUserControlProject #>"-project the following line of code must be inserted:
+    "<#= LformUserControlClassName #>"-UserControl is defined in the "<#= LformUserControlProject #>"-project.
+    In the file of IModule-class of "<#= LformUserControlProject #>"-project the following line of code must be inserted:
 
         public void OnInitialized(IContainerProvider containerProvider)
         {
@@ -191,8 +181,8 @@ using <#= ns #>;
             if (regionManager != null)
             {
                 ...
-                // According to requirements of the "<#= RlistPageViewModelClassName #>.cs"-file of "<#= RlistPageProject #>"-project. 
-                regionManager.RegisterViewWithRegion("<#= SformUserControlClassName #><#= RlistPageRegionPropertyName #>", typeof(<#= SformUserControlClassName #>));
+                // According to requirements of the "<#= RdlistPageViewModelClassName #>.cs"-file of "<#= RdlistPageProject #>"-project. 
+                regionManager.RegisterViewWithRegion("<#= LformUserControlClassName #><#= RdlistPageRegionPropertyName #>", typeof(<#= LformUserControlClassName #>));
                 ...
             }
             ...
@@ -201,31 +191,31 @@ using <#= ns #>;
     }
 #>
 
-    "<#= RlistPageClassName #>" UserControl is defined in the "<#= RlistPageProject #>"-project.
-    In the file of IModule-class of "<#= RlistPageProject #>"-project the following line of code must be inserted:
+    "<#= RdlistPageClassName #>" UserControl is defined in the "<#= RdlistPageProject #>"-project.
+    In the file of IModule-class of "<#= RdlistPageProject #>"-project the following line of code must be inserted:
 
         public void RegisterTypes(IContainerRegistry containerRegistry)
         {
             ...
-            // According to requirements of the "<#= RlistPageViewModelClassName #>.cs"-file of "<#= RlistPageProject #>"-project. 
-            ViewModelLocationProvider.Register<<#= RlistPageClassName #>, <#= RlistPageViewModelClassName #>>();
-            // According to requirements of the "<#= RlistPageViewModelClassName #>.cs"-file of "<#= RlistPageProject #>"-project. 
-            containerRegistry.RegisterForNavigation<<#= RlistPageClassName #>, <#= RlistPageViewModelClassName #>>("<#= RlistPageClassName #>");
+            // According to requirements of the "<#= RdlistPageViewModelClassName #>.cs"-file of "<#= RdlistPageProject #>"-project. 
+            ViewModelLocationProvider.Register<<#= RdlistPageClassName #>, <#= RdlistPageViewModelClassName #>>();
+            // According to requirements of the "<#= RdlistPageViewModelClassName #>.cs"-file of "<#= RdlistPageProject #>"-project. 
+            containerRegistry.RegisterForNavigation<<#= RdlistPageClassName #>, <#= RdlistPageViewModelClassName #>>("<#= RdlistPageClassName #>");
             // Only if you need to get an instance of controls, insert two lines below
-            // According to requirements of the "<#= RlistPageViewModelClassName #>.cs"-file of "<#= RlistPageProject #>"-project. 
-            // containerRegistry.Register<ContentPage, <#= RlistPageClassName #>>("<#= RlistPageClassName #>");
+            // According to requirements of the "<#= RdlistPageViewModelClassName #>.cs"-file of "<#= RdlistPageProject #>"-project. 
+            // containerRegistry.Register<ContentPage, <#= RdlistPageClassName #>>("<#= RdlistPageClassName #>");
             ...
         }
 */
 
-namespace <#= RlistPageViewModelNameSpace #> {
+namespace <#= RdlistPageViewModelNameSpace #> {
 
-    public class <#= RlistPageViewModelClassName #>: INotifyPropertyChanged, INavigationAware 
+    public class <#= RdlistPageViewModelClassName #>: INotifyPropertyChanged, INavigationAware 
     {
         protected <#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName #>=null;
         protected <#= GetModelServiceInterfaceName(Model) #> <#= FormServicePrefix #><#= Model.ViewName #> = null;
         protected INavigationService _navigationService;
-        public <#= RlistPageViewModelClassName #>(<#= GetModelServiceInterfaceName(Model) #> _<#= FormServicePrefix #><#= Model.ViewName #>, <#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName  #>, INavigationService navigationService) {
+        public <#= RdlistPageViewModelClassName #>(<#= GetModelServiceInterfaceName(Model) #> _<#= FormServicePrefix #><#= Model.ViewName #>, <#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName  #>, INavigationService navigationService) {
             this.<#= AppSettingServicePropertyName #> = <#= AppSettingServicePropertyName #>;
             this.<#= FormServicePrefix #><#= Model.ViewName #> = _<#= FormServicePrefix #><#= Model.ViewName #>;
             this._navigationService = navigationService;
@@ -264,8 +254,6 @@ namespace <#= RlistPageViewModelNameSpace #> {
         #region <#= RowMenuItemsPropertyName #>
         protected ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>> GetDefault<#= RowMenuItemsPropertyName #>() {
             return new ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>>()  {
-                new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "RowUpdMI", Caption="Update item", IconName="TableEdit", IconColor=Color.Default, Enabled=true, Data=null},
-                new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "RowDelMI", Caption="Delete item", IconName="TableRemove", IconColor=Color.Default, Enabled=true, Data=null},
 <#
         foreach(string detailViewName in detailViews) {
             ModelViewSerializable detailView = GetModelViewByName(Context, detailViewName);
@@ -275,7 +263,7 @@ namespace <#= RlistPageViewModelNameSpace #> {
 <#
                 continue;
             }
-            string detailViewClassName = GetModelClassName(detailView, RlistPageFolder);
+            string detailViewClassName = GetModelClassName(detailView, RdlistPageFolder);
             List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detailView, null);
             if (foreignKeys == null) continue;
             if (foreignKeys.Count < 1) continue;
@@ -308,9 +296,7 @@ namespace <#= RlistPageViewModelNameSpace #> {
         #endregion
         #region <#= TableMenuItemsPropertyName #>
         protected ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>> GetDefault<#= TableMenuItemsPropertyName #>() {
-            return new ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>>()  {
-                new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "TableAddMI", Caption="Add Item", IconName="TablePlus", IconColor=Color.Default, Enabled=true, Data=null},
-            };
+            return new ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>>()  {};
         }
         protected IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> _<#= TableMenuItemsPropertyName #> = null;
         public IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> <#= TableMenuItemsPropertyName #>
@@ -374,7 +360,7 @@ namespace <#= RlistPageViewModelNameSpace #> {
 <#
                 continue;
             }
-            string detailViewClassName = GetModelClassName(detailView, RlistPageFolder);
+            string detailViewClassName = GetModelClassName(detailView, RdlistPageFolder);
             List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detailView, null);
             if (foreignKeys == null) continue;
             if (foreignKeys.Count < 1) continue;
@@ -411,77 +397,58 @@ namespace <#= RlistPageViewModelNameSpace #> {
 
 
 
-
-
-        #region <#= SformAfterAddItemPropertyName #>
-        protected object _<#= SformAfterAddItemPropertyName #> = null;
-        public object <#= SformAfterAddItemPropertyName #>
+        #region <#= CanAddPropertyName #>
+        protected bool _<#= CanAddPropertyName #> = false;
+        public bool <#= CanAddPropertyName #>
         { 
             get
             {
-                return _<#= SformAfterAddItemPropertyName #>;
+                return _<#= CanAddPropertyName #>;
             }
             set
             {
-                if (_<#= SformAfterAddItemPropertyName #> != value)
+                if (_<#= CanAddPropertyName #> != value)
                 {
-                    _<#= SformAfterAddItemPropertyName #> = value;
+                    _<#= CanAddPropertyName #> = value;
                     OnPropertyChanged();
                 }
             }
         }
         #endregion
-        #region <#= SformAfterUpdItemPropertyName #>
-        protected object _<#= SformAfterUpdItemPropertyName #> = null;
-        public object <#= SformAfterUpdItemPropertyName #>
+        #region <#= CanUpdPropertyName #>
+        protected bool _<#= CanUpdPropertyName #> = false;
+        public bool <#= CanUpdPropertyName #>
         { 
             get
             {
-                return _<#= SformAfterUpdItemPropertyName #>;
+                return _<#= CanUpdPropertyName #>;
             }
             set
             {
-                if (_<#= SformAfterUpdItemPropertyName #> != value)
+                if (_<#= CanUpdPropertyName #> != value)
                 {
-                    _<#= SformAfterUpdItemPropertyName #> = value;
+                    _<#= CanUpdPropertyName #> = value;
                     OnPropertyChanged();
                 }
             }
         }
         #endregion
-        #region <#= SformAfterDelItemPropertyName #>
-        protected object _<#= SformAfterDelItemPropertyName #> = null;
-        public object <#= SformAfterDelItemPropertyName #>
+        #region <#= CanDelPropertyName #>
+        protected object _<#= CanDelPropertyName #> = false;
+        public object <#= CanDelPropertyName #>
         { 
             get
             {
-                return _<#= SformAfterDelItemPropertyName #>;
+                return _<#= CanDelPropertyName #>;
             }
             set
             {
-                if (_<#= SformAfterDelItemPropertyName #> != value)
+                if (_<#= CanDelPropertyName #> != value)
                 {
-                    _<#= SformAfterDelItemPropertyName #> = value;
+                    _<#= CanDelPropertyName #> = value;
                     OnPropertyChanged();
                 }
             }
-        }
-        #endregion
-        #region <#= SformAddItemCommandPropertyName #>
-        public async Task <#= SformAddItemCommandPropertyName #>() {
-            if ((PermissionMask & 8) != 8) {
-                INavigationResult nr1 = await _navigationService.NavigateAsync("<#= AccessDeniedPageClassName #>");
-                await OnNavigationResult(nr1);
-                return;
-            }
-
-            NavigationParameters navigationParameters = new NavigationParameters();
-            foreach(<#= IWebServiceFilterRsltInterfaceClassName #> hf in <#= HiddenFiltersPropertyName #>) {
-                navigationParameters.Add(hf.fltrName, hf.fltrValue);
-            }
-            navigationParameters.Add("<#= EformModeEnumClassName #>", <#= EformModeEnumClassName #>.AddMode);
-            INavigationResult nr2 = await _navigationService.NavigateAsync("<#= ReditPageClassName #>", navigationParameters);
-            await OnNavigationResult(nr2);
         }
         #endregion
         #region <#= TableMenuItemsCommandPropertyName #>
@@ -495,12 +462,6 @@ namespace <#= RlistPageViewModelNameSpace #> {
         }
         protected async void <#= TableMenuItemsCommandPropertyName #>Execute(object prm)
         {
-            if(prm == null) return;
-            <#= IWebServiceFilterMenuInterfaceClassName #> mi = prm as <#= IWebServiceFilterMenuInterfaceClassName #>;
-            if (mi == null) return;
-            if(mi.Id == "TableAddMI") {
-                await <#= SformAddItemCommandPropertyName #>();
-            }
         }
         protected bool <#= TableMenuItemsCommandPropertyName #>CanExecute(object prm)
         {
@@ -509,56 +470,6 @@ namespace <#= RlistPageViewModelNameSpace #> {
         #endregion
 
 
-        #region <#= SformUpdItemCommandPropertyName #>
-        public async Task <#= SformUpdItemCommandPropertyName #>(<#= modelInterfaceClassName #> selected) {
-            if (selected == null) return;
-            if ((PermissionMask & 4) != 4) {
-                INavigationResult nr1 = await _navigationService.NavigateAsync("<#= AccessDeniedPageClassName #>");
-                await OnNavigationResult(nr1);
-                return;
-            }
-
-            NavigationParameters navigationParameters = new NavigationParameters();
-            foreach(<#= IWebServiceFilterRsltInterfaceClassName #> hf in <#= HiddenFiltersPropertyName #>) {
-                navigationParameters.Add(hf.fltrName, hf.fltrValue);
-            }
-            navigationParameters.Add("<#= EformModeEnumClassName #>", <#= EformModeEnumClassName #>.UpdateMode);
-<#
-            foreach(ModelViewPropertyOfVwSerializable pk in primKeys) {
-#>
-            navigationParameters.Add("<#= GetPrimKeyVarName(pk) #>", selected.<#= GetModelPropertyName(pk, Model) #>);
-<#
-            }
-#>
-            INavigationResult nr2 = await _navigationService.NavigateAsync("<#= ReditPageClassName #>", navigationParameters);
-            await OnNavigationResult(nr2);
-        }
-        #endregion
-        #region <#= SformDelItemCommandPropertyName #>
-        public async Task <#= SformDelItemCommandPropertyName #>(<#= modelInterfaceClassName #> selected) {
-            if (selected == null) return;
-            if((PermissionMask & 2) != 2) {
-                INavigationResult nr1 = await _navigationService.NavigateAsync("<#= AccessDeniedPageClassName #>");
-                await OnNavigationResult(nr1);
-                return;
-            }
-
-            NavigationParameters navigationParameters = new NavigationParameters();
-            foreach(<#= IWebServiceFilterRsltInterfaceClassName #> hf in <#= HiddenFiltersPropertyName #>) {
-                navigationParameters.Add(hf.fltrName, hf.fltrValue);
-            }
-            navigationParameters.Add("<#= EformModeEnumClassName #>", <#= EformModeEnumClassName #>.DeleteMode);
-<#
-            foreach(ModelViewPropertyOfVwSerializable pk in primKeys) {
-#>
-            navigationParameters.Add("<#= GetPrimKeyVarName(pk) #>", selected.<#= GetModelPropertyName(pk, Model) #>);
-<#
-            }
-#>
-            INavigationResult nr2 = await _navigationService.NavigateAsync("<#= ReditPageClassName #>", navigationParameters);
-            await OnNavigationResult(nr2);
-        }
-        #endregion
         #region <#= RowMenuItemsCommandPropertyName #>
         protected ICommand _<#= RowMenuItemsCommandPropertyName #> = null;
         public ICommand <#= RowMenuItemsCommandPropertyName #>
@@ -575,12 +486,6 @@ namespace <#= RlistPageViewModelNameSpace #> {
             <#= modelInterfaceClassName #> arow = mi.FeedbackData as <#= modelInterfaceClassName #>;
             if (arow == null) return;
             switch(mi.Id) {
-                case "RowUpdMI":
-                    await <#= SformUpdItemCommandPropertyName #>(arow);
-                    break;
-                case "RowDelMI":
-                    await <#= SformDelItemCommandPropertyName #>(arow);
-                    break;
 <#
         foreach(string detailViewName in detailViews) {
             ModelViewSerializable detailView = GetModelViewByName(Context, detailViewName);
@@ -590,7 +495,7 @@ namespace <#= RlistPageViewModelNameSpace #> {
 <#
                 continue;
             }
-            string detailViewClassName = GetModelClassName(detailView, RlistPageFolder);
+            string detailViewClassName = GetModelClassName(detailView, RdlistPageFolder);
             List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detailView, null);
             if (foreignKeys == null) continue;
             if (foreignKeys.Count < 1) continue;
@@ -659,9 +564,9 @@ namespace <#= RlistPageViewModelNameSpace #> {
             if ((PermissionMask & 1) != 1) {
                 throw new Exception("Access Denied to navigate <#= Model.ViewName #>");
             }
-            <#= SformAfterAddItemPropertyName  #> = null; 
-            <#= SformAfterUpdItemPropertyName  #> = null; 
-            <#= SformAfterDelItemPropertyName  #> = null; 
+            <#= CanAddPropertyName  #> = (PermissionMask & 8) == 8; 
+            <#= CanUpdPropertyName  #> = (PermissionMask & 4) == 4; 
+            <#= CanDelPropertyName  #> = (PermissionMask & 2) == 2; 
 
             ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>> hf = new ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>();
 <#
@@ -697,58 +602,6 @@ namespace <#= RlistPageViewModelNameSpace #> {
                 }
             } 
             if (resetHF) { <#= HiddenFiltersPropertyName #> = hf; }
-
-          
-            if (prms.ContainsKey("<#= EformModeEnumClassName #>")) {
-                <#= EformModeEnumClassName #> mode = prms.GetValue<<#= EformModeEnumClassName #>>("<#= EformModeEnumClassName #>");
-<#
-            foreach(ModelViewPropertyOfVwSerializable pk in primKeys) {
-#>
-                <#= GetPropertyTypeName(pk) #> <#= GetPrimKeyVarName(pk) #> = default(<#= GetPropertyTypeName(pk) #>);
-                if(prms.ContainsKey("<#= GetPrimKeyVarName(pk) #>")) {
-                    <#= GetPrimKeyVarName(pk) #> = prms.GetValue<<#= GetPropertyTypeName(pk) #>>("<#= GetPrimKeyVarName(pk) #>");
-                }
-<#
-            }
-#>
-            
-                if ((mode == <#= EformModeEnumClassName #>.AddMode) || (mode == <#= EformModeEnumClassName #>.UpdateMode)) {
-                    <#= GetInterfaceName(Model) #> tdata = await <#= FormServicePrefix #><#= Model.ViewName #>.<#= GetOneMethodName #>(
-<#
-            {
-                bool isFirst= true;
-                foreach(ModelViewPropertyOfVwSerializable pk in primKeys) {
-                    if (isFirst) {
-                        isFirst = false;
-#>
-                            <#= GetPrimKeyVarName(pk) #>
-<#
-                    } else {
-#>
-                          , <#= GetPrimKeyVarName(pk) #>
-<#
-                    }
-                }
-            }
-#>
-                        );
-                    if (mode == <#= EformModeEnumClassName #>.AddMode) {
-                        <#= SformAfterAddItemPropertyName  #> = tdata; 
-                    } else {
-                        <#= SformAfterUpdItemPropertyName  #> = tdata; 
-                    }
-                } else {
-                    <#= GetInterfaceName(Model) #> data = <#= FormServicePrefix #><#= Model.ViewName #>.<#= CopyToModelMethodName #>(null,null);
-<#
-            foreach(ModelViewPropertyOfVwSerializable pk in primKeys) {
-#>
-                    data.<#= GetModelPropertyName(pk, Model) #> = <#= GetPrimKeyVarName(pk) #>;
-<#
-            }
-#>
-                    <#= SformAfterDelItemPropertyName  #> = data;
-                }
-            }
         }
         #endregion
     }

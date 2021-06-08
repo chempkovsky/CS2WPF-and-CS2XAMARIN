@@ -1,0 +1,389 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="xaml" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+
+<#
+
+    string ProxyUserControlFolder           = "00280-ProxyUserControl.xaml.cs";
+    string ProxyUserControlClassName        = GetContextModelClassName(Context, ProxyUserControlFolder);
+    string ProxyUserControlNameSpace        = GetContextModelNameSpace(Context, ProxyUserControlFolder);
+    string ProxyUserControlProject          = GetContextModelProjectName(Context, ProxyUserControlFolder);
+
+    string LformUserControlFolder           = "01596-LformUserControl.xaml.cs";
+    string LformUserControlClassName        = GetModelClassName(Model, LformUserControlFolder);
+    string LformUserControlNameSpace        = GetModelNameSpace(Model, LformUserControlFolder);
+    string LformUserControlProject          = GetModelProjectName(Model, LformUserControlFolder);
+    
+
+    string RdlistPageFolder                  = "02017-RdlistPage.xaml.cs";
+    string RdlistPageClassName               = GetModelClassName(Model, RdlistPageFolder);
+    string RdlistPageNameSpace               = GetModelNameSpace(Model, RdlistPageFolder);
+    string RdlistPageProject                 = GetModelProjectName(Model, RdlistPageFolder);
+    
+    string RdlistPageXamlFolder              = "02019-RdlistPage.xaml";
+    string RdlistPageXamlClassName           = GetModelClassName(Model, RdlistPageXamlFolder);
+    string RdlistPageXamlNameSpace           = GetModelNameSpace(Model, RdlistPageXamlFolder);
+    string RdlistPageXamlProject             = GetModelProjectName(Model, RdlistPageXamlFolder);
+
+
+    string CaptionPropertyName              = "Caption";
+    string FilterHeightPropertyName         = "FilterHeight";
+    string ShowFilterPropertyName           = "ShowFilter";
+    string ShowAddFilterBtnPropertyName     = "ShowAddFilterBtn";
+    string ShowBackBtnPropertyName          = "ShowBackBtn";
+    string GridHeightPropertyName           = "GridHeight";
+    string TableMenuItemsPropertyName       = "TableMenuItems";
+    string RowMenuItemsPropertyName         = "RowMenuItems";
+    string ContainerMenuItemsPropertyName   = "ContainerMenuItems";
+    string HiddenFiltersPropertyName        = "HiddenFilters";
+    string SelectedRowCommandPropertyName   = "SelectedRowCommand";
+
+    string SformAfterAddItemPropertyName    = "SformAfterAddItem";
+    string SformAfterUpdItemPropertyName    = "SformAfterUpdItem";
+    string SformAfterDelItemPropertyName    = "SformAfterDelItem";
+
+    string TableMenuItemsCommandPropertyName    = "TableMenuItemsCommand";
+    string RowMenuItemsCommandPropertyName      = "RowMenuItemsCommand";
+    
+    string CanAddPropertyName                   = "CanAdd";
+    string CanUpdPropertyName                   = "CanUpdate";
+    string CanDelPropertyName                   = "CanDelete";
+
+
+    string RegionPropertyName = "Region";
+    string RdlistPageRegionPropertyName = "RdlistPageRegion";
+    
+
+    string proxyPrefix = "clr-namespace:" + ProxyUserControlNameSpace;
+    if(ProxyUserControlProject != RdlistPageProject) {
+        proxyPrefix = proxyPrefix + ";assembly=" + ProxyUserControlProject;
+    }
+    string lformPrefix = "clr-namespace:" + LformUserControlNameSpace;
+    if(LformUserControlProject != RdlistPageProject) {
+        lformPrefix = lformPrefix + ";assembly=" + LformUserControlProject;
+    }
+
+    bool IsInTheSameModule = (LformUserControlProject == RdlistPageProject);
+
+#>
+
+<ContentPage x:Class="<#= RdlistPageNameSpace #>.<#= RdlistPageClassName #>"
+             xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:prism="http://prismlibrary.com" 
+             prism:ViewModelLocator.AutowireViewModel="True"
+
+<#
+    if(IsInTheSameModule) {
+#>
+             xmlns:lfrm="<#= lformPrefix #>" 
+<#
+    } else {
+#>
+             xmlns:prx="<#= proxyPrefix #>" 
+<#
+    }
+#>
+
+             x:Name="rdlistUsrCntrlRootNode"
+             >
+<#
+    if(IsInTheSameModule) {
+#>
+        <lfrm:<#= LformUserControlClassName #>  
+<#
+    } else {
+#>
+        <prx:<#= ProxyUserControlClassName #> 
+            prism:RegionManager.RegionName="<#= LformUserControlClassName #><#= RdlistPageRegionPropertyName #>"
+<#
+    }
+#>
+
+            <#= CaptionPropertyName #>="{Binding BindingContext.<#= CaptionPropertyName #>, Mode=OneWay, Source={x:Reference rdlistUsrCntrlRootNode}}" 
+            <#= FilterHeightPropertyName #>="{Binding BindingContext.<#= FilterHeightPropertyName #>, Mode=OneWay, Source={x:Reference rdlistUsrCntrlRootNode}}" 
+            <#= ShowFilterPropertyName #>="True" 
+            <#= ShowAddFilterBtnPropertyName #>="True" 
+            <#= GridHeightPropertyName #>="{Binding BindingContext.<#= GridHeightPropertyName #>, Mode=OneWay, Source={x:Reference rdlistUsrCntrlRootNode}}" 
+            <#= ShowBackBtnPropertyName #>="False" 
+            <#= HiddenFiltersPropertyName #>="{Binding BindingContext.<#= HiddenFiltersPropertyName #>, Mode=OneWay, Source={x:Reference rdlistUsrCntrlRootNode}}" 
+            <#= SelectedRowCommandPropertyName #>="{Binding BindingContext.<#= SelectedRowCommandPropertyName #>, Mode=OneWay, Source={x:Reference rdlistUsrCntrlRootNode}}" 
+            <#= TableMenuItemsCommandPropertyName #>="{Binding BindingContext.<#= TableMenuItemsCommandPropertyName #>, Mode=OneWay, Source={x:Reference rdlistUsrCntrlRootNode}}" 
+            <#= RowMenuItemsCommandPropertyName #>="{Binding BindingContext.<#= RowMenuItemsCommandPropertyName #>, Mode=OneWay, Source={x:Reference rdlistUsrCntrlRootNode}}" 
+            <#= TableMenuItemsPropertyName #>="{Binding BindingContext.<#= TableMenuItemsPropertyName #>, Mode=OneWay, Source={x:Reference rdlistUsrCntrlRootNode}}" 
+            <#= RowMenuItemsPropertyName #>="{Binding BindingContext.<#= RowMenuItemsPropertyName #>, Mode=OneWay, Source={x:Reference rdlistUsrCntrlRootNode}}" 
+            <#= CanAddPropertyName #>="{Binding BindingContext.<#= CanAddPropertyName #>, Mode=OneWay, Source={x:Reference rdlistUsrCntrlRootNode}}" 
+            <#= CanUpdPropertyName #>="{Binding BindingContext.<#= CanUpdPropertyName #>, Mode=OneWay, Source={x:Reference rdlistUsrCntrlRootNode}}" 
+            <#= CanDelPropertyName #>="{Binding BindingContext.<#= CanDelPropertyName #>, Mode=OneWay, Source={x:Reference rdlistUsrCntrlRootNode}}" 
+
+            />
+</ContentPage>
+
+
+<#+
+
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+    string GetModelProjectName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileProject)) {
+            return result;
+        }
+        string[] fnArr = refItem.FileProject.Split(new char[] {'\\'}, 100, System.StringSplitOptions.None); 
+        string fn = fnArr[fnArr.Length - 1];
+
+        return fn.Replace(".csproj","");
+    }
+    string GetContextModelNameSpace(DbContextSerializable context, string fileType) {
+        string result="";
+        if ((context == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (context.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            context.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+    string GetContextModelClassName(DbContextSerializable context, string fileType) {
+        string result="";
+        if ((context == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (context.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            context.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+    string GetContextModelProjectName(DbContextSerializable context, string fileType) {
+        string result="";
+        if ((context == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (context.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            context.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileProject)) {
+            return result;
+        }
+        string[] fnArr = refItem.FileProject.Split(new char[] {'\\'}, 100, System.StringSplitOptions.None); 
+        string fn = fnArr[fnArr.Length - 1];
+
+        return fn.Replace(".csproj","");
+    }
+    string GetDisplayAttributeValueString2(ModelViewUIListPropertySerializable prop, ModelViewSerializable model, string propName) {
+            ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
+            if (sclrProp == null)
+            {
+                return prop.ViewPropertyName;
+            }
+            if(sclrProp.Attributes == null)
+            {
+                return prop.ViewPropertyName;
+            }
+            ModelViewAttributeSerializable attr =
+                sclrProp.Attributes.Where(a => a.AttrName == "Display").FirstOrDefault();
+            if (attr == null)
+            {
+                return prop.ViewPropertyName;
+            }
+            if (attr.VaueProperties == null)
+            {
+                return prop.ViewPropertyName;
+            }
+            ModelViewAttributePropertySerializable attrProp = 
+                attr.VaueProperties.Where(v => v.PropName == propName).FirstOrDefault();
+            if (attrProp == null)
+            {
+                return prop.ViewPropertyName;
+            }
+            if (string.IsNullOrEmpty( attrProp.PropValue ) )
+            {
+                return prop.ViewPropertyName;
+            } else
+            {
+                char[] charsToTrim = { '"', ' '};
+                return attrProp.PropValue.Trim(charsToTrim);
+            }
+    }
+    public string FirstLetterToLower(string str)
+    {
+        if (str == null)
+            return null;
+        if (str.Length > 1)
+            return char.ToLower(str[0]) + str.Substring(1);
+        return str.ToUpper();
+    }
+    bool IsBooleanInput(ModelViewUIListPropertySerializable prop, ModelViewSerializable model) {
+        if((prop == null) || (model == null)) return false;
+        ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
+        if (sclrProp == null)
+        {
+            return false;
+        }
+        return"System.Boolean".Equals(sclrProp.UnderlyingTypeName) || "Boolean".Equals(sclrProp.UnderlyingTypeName) || "bool".Equals(sclrProp.UnderlyingTypeName);
+    }
+    bool hasSortHeader(ModelViewUIListPropertySerializable modelViewUIListPropertySerializable, ModelViewSerializable model) {
+        if ((model == null) || (modelViewUIListPropertySerializable == null)) {
+            return false;
+        }
+        if ((model.UIListProperties == null) || (model.ScalarProperties == null)) {
+            return false;
+        }
+        return model.ScalarProperties.Any(s => s.ViewPropertyName == modelViewUIListPropertySerializable.ViewPropertyName && s.IsUsedBySorting);
+    }
+    string GetModelPropertyName(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+        if (model.GenerateJSonAttribute) {
+            return prop.ViewPropertyName;
+        } else {
+            return FirstLetterToLower(prop.ViewPropertyName);
+        }
+    }
+    string GetModelPropertyNameEx(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model) {
+        ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
+        return GetModelPropertyName(sclrProp, model);
+    }
+    string GetModelPropertyNameEx2(ModelViewUIListPropertySerializable prop, ModelViewSerializable model) {
+        ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
+        return GetModelPropertyName(sclrProp, model);
+    }
+
+#>
