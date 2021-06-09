@@ -130,7 +130,8 @@ using Prism.Navigation;
     string CopyToModelNotifyMethodName          = "CopyToModelNotify";
     string CopyToModelMethodName                = "CopyToModel";
 
-    string CurrentNavigationContextPropertyName = "CurrentNavigationContext";
+    string FilterHeightPropertyName             = "FilterHeight";
+    string GridHeightPropertyName               = "GridHeight";
 
     List<string> detailViews = GetDetailViews(Model, Context, null);
     List<ModelViewPropertyOfVwSerializable> primKeys = GetModelPrimaryKeyProps(Model);
@@ -233,8 +234,6 @@ namespace <#= RdlistPageViewModelNameSpace #> {
 
         protected int PermissionMask = 0; 
 
-
-
         #region <#= CaptionPropertyName #>
         string _<#= CaptionPropertyName #> = "<#= Model.ViewName #>";
         public string <#= CaptionPropertyName #>
@@ -246,6 +245,42 @@ namespace <#= RdlistPageViewModelNameSpace #> {
             set {
                 if(_<#= CaptionPropertyName #> != value) {
                     _<#= CaptionPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+        #region <#= GridHeightPropertyName #>
+        protected double _<#= GridHeightPropertyName #> = -1d;
+        public double <#= GridHeightPropertyName #>
+        { 
+            get
+            {
+                return _<#= GridHeightPropertyName #>;
+            }
+            set
+            {
+                if (_<#= GridHeightPropertyName #> != value)
+                {
+                    _<#= GridHeightPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+        #region <#= FilterHeightPropertyName #>
+        protected double _<#= FilterHeightPropertyName #> = -1d;
+        public double <#= FilterHeightPropertyName #>
+        { 
+            get
+            {
+                return _<#= FilterHeightPropertyName #>;
+            }
+            set
+            {
+                if (_<#= FilterHeightPropertyName #> != value)
+                {
+                    _<#= FilterHeightPropertyName #> = value;
                     OnPropertyChanged();
                 }
             }
@@ -369,7 +404,7 @@ namespace <#= RdlistPageViewModelNameSpace #> {
         #region <#= detailViewClassName #><#= foreignKey.NavigationName #>Command
         public async Task <#= detailViewClassName #><#= foreignKey.NavigationName #>Command(<#= modelInterfaceClassName #> selected) { 
             if (((<#= AppSettingServicePropertyName #>.GetViewModelMask("<#= detailView.ViewName #>") & 1) != 1 )) {
-                INavigationResult nr1 = await _navigationService.NavigateAsync("<#= AccessDeniedPageClassName #>", navigationParameters);
+                INavigationResult nr1 = await _navigationService.NavigateAsync("<#= AccessDeniedPageClassName #>");
                 await OnNavigationResult(nr1);
                 return;
             }
