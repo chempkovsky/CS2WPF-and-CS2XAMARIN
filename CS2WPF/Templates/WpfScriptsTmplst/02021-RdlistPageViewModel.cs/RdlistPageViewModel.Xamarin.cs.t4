@@ -102,6 +102,7 @@ using Prism.Navigation;
     string AppSettingServicePropertyName             = "GlblSettingsSrv";
     string GetWithFilterMethodName                   = "getwithfilter";
     string ColumnSelectorDlgPropertyName             = "ColumnSelectorDlg";
+    string IsParentLoadedPropertyName                = "IsParentLoaded";
 
 
 
@@ -587,6 +588,23 @@ namespace <#= RdlistPageViewModelNameSpace #> {
        }
        #endregion
 
+       #region <#= IsParentLoadedPropertyName #>
+       bool _<#= IsParentLoadedPropertyName #> = false;
+       public bool <#= IsParentLoadedPropertyName #>
+       { 
+           get
+           {
+               return _<#= IsParentLoadedPropertyName #>;
+           }
+           set {
+               if(_<#= IsParentLoadedPropertyName #> != value) {
+                   _<#= IsParentLoadedPropertyName #> = value;
+                   OnPropertyChanged();
+               }
+           }
+       }
+       #endregion
+
        #region INavigationAware
        public bool IsNavigationTarget(INavigationParameters prms) {
             return true;
@@ -594,7 +612,7 @@ namespace <#= RdlistPageViewModelNameSpace #> {
        public void OnNavigatedFrom(INavigationParameters prms) {
             
        }
-       public async void OnNavigatedTo(INavigationParameters prms) {
+       public void OnNavigatedTo(INavigationParameters prms) {
             PermissionMask = <#= AppSettingServicePropertyName #>.GetViewModelMask("<#= Model.ViewName #>");
             if ((PermissionMask & 1) != 1) {
                 throw new Exception("Access Denied to navigate <#= Model.ViewName #>");
@@ -637,6 +655,7 @@ namespace <#= RdlistPageViewModelNameSpace #> {
                 }
             } 
             if (resetHF) { <#= HiddenFiltersPropertyName #> = hf; }
+            <#= IsParentLoadedPropertyName #> = true;
         }
         #endregion
     }

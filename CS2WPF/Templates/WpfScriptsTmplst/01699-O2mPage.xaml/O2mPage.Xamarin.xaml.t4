@@ -25,10 +25,10 @@
     string LformUserControlProject          = GetModelProjectName(Model, LformUserControlFolder);
     
 
-    string O2mpPageFolder                   = "01697-O2mpPage.xaml.cs";
-    string O2mpPageClassName                = GetModelClassName(Model, O2mpPageFolder);
-    string O2mpPageNameSpace                = GetModelNameSpace(Model, O2mpPageFolder);
-    string O2mpPageProject                  = GetModelProjectName(Model, O2mpPageFolder);
+    string O2mPageFolder                   = "01697-O2mPage.xaml.cs";
+    string O2mPageClassName                = GetModelClassName(Model, O2mPageFolder);
+    string O2mPageNameSpace                = GetModelNameSpace(Model, O2mPageFolder);
+    string O2mPageProject                  = GetModelProjectName(Model, O2mPageFolder);
 
     string O2mPageXamlFolder                = "01699-O2mPage.xaml";
     string O2mPageXamlClassName             = GetModelClassName(Model, O2mPageXamlFolder);
@@ -83,22 +83,24 @@
 
     string TemplateViewSuffixPropertyName           = "TemplateView"; 
 
+    string IsParentLoadedPropertyName               = "IsParentLoaded";
+
     string proxyPrefix = "clr-namespace:" + ProxyUserControlNameSpace;
-    if(ProxyUserControlProject != O2mpPageProject) {
+    if(ProxyUserControlProject != O2mPageProject) {
         proxyPrefix = proxyPrefix + ";assembly=" + ProxyUserControlProject;
     }
     string lformPrefix = "clr-namespace:" + LformUserControlNameSpace;
-    if(LformUserControlProject != O2mpPageProject) {
+    if(LformUserControlProject != O2mPageProject) {
         lformPrefix = lformPrefix + ";assembly=" + LformUserControlProject;
     }
 
-    bool IsInTheSameModule = (LformUserControlProject == O2mpPageProject);
+    bool IsInTheSameModule = (LformUserControlProject == O2mPageProject);
 
     List<string> detailViews = GetDetailViews(Model, Context, null);
 
 #>
 
-<ContentPage x:Class="<#= O2mpPageNameSpace #>.<#= O2mpPageClassName #>"
+<ContentPage x:Class="<#= O2mPageNameSpace #>.<#= O2mPageClassName #>"
              xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:prism="http://prismlibrary.com" 
@@ -133,7 +135,7 @@
                 continue;
             }
             string localLformUserControlProject  = GetModelProjectName(detailView, LformUserControlFolder);
-            if (localLformUserControlProject == O2mpPageProject)
+            if (localLformUserControlProject == O2mPageProject)
             {
                 string locallformPrefix = "clr-namespace:" + GetModelNameSpace(detailView, LformUserControlFolder);
 #>
@@ -196,12 +198,14 @@
             <#= CanAddPropertyName #>="{Binding BindingContext.<#= CanAddPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
             <#= CanUpdPropertyName #>="{Binding BindingContext.<#= CanUpdPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
             <#= CanDelPropertyName #>="{Binding BindingContext.<#= CanDelPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+            <#= IsParentLoadedPropertyName #>="{Binding BindingContext.<#= IsParentLoadedPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+            
             />
 
         <StackLayout>
             <Label Text="Selected detail"/>
             <Picker ItemsSource="{Binding BindingContext.<#= DetailsListPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
-                    ItemDisplayBinding="<#= CaptionPropertyName #>" 
+                    ItemDisplayBinding="{Binding <#= CaptionPropertyName #>}" 
                     SelectedItem="{Binding BindingContext.<#= SelectedDetailsListItemPropertyName #>, Source={x:Reference o2mUsrCntrlRootNode}, Mode=TwoWay}">
             </Picker>
         </StackLayout>
@@ -238,7 +242,7 @@
                     <ControlTemplate x:Key="<#= detailViewClassName #><#= TemplateViewSuffixPropertyName #>">
 <#
 
-            if (localLformUserControlProject == O2mpPageProject)
+            if (localLformUserControlProject == O2mPageProject)
             {
 #>
                         <lfrm<#= id #>:<#= GetModelClassName(detailView, LformUserControlFolder) #> 
@@ -266,6 +270,7 @@
                             <#= CanAddPropertyName #>="{Binding BindingContext.<#= CanAddDetailPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
                             <#= CanUpdPropertyName #>="{Binding BindingContext.<#= CanUpdDetailPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
                             <#= CanDelPropertyName #>="{Binding BindingContext.<#= CanDelDetailPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+                            <#= IsParentLoadedPropertyName #>="{Binding BindingContext.<#= IsDetailReadyPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
                             />
                     </ControlTemplate>
 

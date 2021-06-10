@@ -141,6 +141,7 @@ using System.Threading.Tasks;
 
     string IsInQueryPropertyName                = "IsInQuery";
     string IsOnLoadedCalledPropertyName         = "IsOnLoadedCalled";
+    string OnLoadedPropertyName                 = "OnLoaded";
 
     string RowsPerPageOptionsPropertyName = "RowsPerPageOptions";
     string TotalCountPropertyName = "TotalCount";
@@ -297,11 +298,16 @@ namespace <#= SformViewModelNameSpace #> {
         #endregion
 
 
-        public async Task OnLoaded(object sender)
+        public async Task <#= OnLoadedPropertyName #>(object sender, object newValue)
         {
-            if(!<#= IsOnLoadedCalledPropertyName #>) {
-                <#= IsOnLoadedCalledPropertyName #> = true;
-                await onFilter();
+            if (newValue is bool) {
+                bool v = (bool)newValue;
+                if ((!<#= IsOnLoadedCalledPropertyName #>) && v) {
+                    <#= IsOnLoadedCalledPropertyName #> = true;
+                    await onFilter();
+                } else {
+                    <#= IsOnLoadedCalledPropertyName #> = v;
+                }
             }
         }
         protected bool <#= IsOnLoadedCalledPropertyName #> = false;

@@ -23,6 +23,7 @@ using System.Threading.Tasks;
 using System.Runtime.CompilerServices;
 using System.Collections.Generic;
 using Prism.Navigation;
+using Xamarin.Essentials;
 
 <#
 
@@ -112,6 +113,7 @@ using Prism.Navigation;
 
     string SubmitCommandPropertyName            = "SubmitCommand";
     string CancelCommandPropertyName            = "CancelCommand";
+    string IsParentLoadedPropertyName           = "IsParentLoaded";
     
 
     List<string> detailViews = GetDetailViews(Model, Context, null);
@@ -292,6 +294,22 @@ namespace <#= ReditPageViewModelNameSpace #> {
             }
         }
         #endregion
+        #region <#= IsParentLoadedPropertyName #>
+        bool _<#= IsParentLoadedPropertyName #> = false;
+        public bool <#= IsParentLoadedPropertyName #>
+        { 
+            get
+            {
+                return _<#= IsParentLoadedPropertyName #>;
+            }
+            set {
+                if(_<#= IsParentLoadedPropertyName #> != value) {
+                    _<#= IsParentLoadedPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
         #region INavigationAware
         public bool IsNavigationTarget(NavigationContext navigationContext) {
             return true;
@@ -308,7 +326,7 @@ namespace <#= ReditPageViewModelNameSpace #> {
                 prms.Add("<#= EformModeEnumClassName #>", <#= EformModePropertyName #>);
             }
         }
-        public async void OnNavigatedTo(INavigationParameters prms) {
+        public void OnNavigatedTo(INavigationParameters prms) {
             <#= IsCanceledPropertyName #> = true;
             <#= EformModeEnumClassName #> modeToCheck = <#= EformModeEnumClassName #>.DeleteMode;
             if(prms.ContainsKey("<#= EformModeEnumClassName #>")) {
@@ -374,7 +392,8 @@ namespace <#= ReditPageViewModelNameSpace #> {
 <#
             }
 #>
-                    <#= GetInterfaceName(Model) #> data = await <#= FormServicePrefix #><#= Model.ViewName #>.<#= GetOneMethodName #>(
+                    // <#= GetInterfaceName(Model) #> data
+                    _ = await <#= FormServicePrefix #><#= Model.ViewName #>.<#= GetOneMethodName #>(
 <#
             {
                 bool isFirst= true;
@@ -392,20 +411,27 @@ namespace <#= ReditPageViewModelNameSpace #> {
                 }
             }
 #>
-                        );
-                    <#= CaptionPropertyName #> = locCaption;
-                    if (resetHF) { <#= HiddenFiltersPropertyName #> = hf; }
-                    <#= EformModePropertyName #> = locmode;
-                    <#= FormControlModelPropertyName #> = <#= FormServicePrefix #><#= Model.ViewName #>.<#= CopyToModelNotifyMethodName #>(data, null);
+                        ).ContinueWith((data) => {
+                                MainThread.InvokeOnMainThreadAsync(() =>
+                                {
+                                    <#= CaptionPropertyName #> = locCaption;
+                                    if (resetHF) { <#= HiddenFiltersPropertyName #> = hf; }
+                                    <#= EformModePropertyName #> = locmode;
+                                    <#= FormControlModelPropertyName #> = <#= FormServicePrefix #><#= Model.ViewName #>.<#= CopyToModelNotifyMethodName #>(data.Result, null);
+                                    <#= IsParentLoadedPropertyName #> = true;
+                                });
+                        });
                 } else {
                     <#= CaptionPropertyName #> = "Add item for <#= Model.ViewName #>";
                     if (resetHF) { <#= HiddenFiltersPropertyName #> = hf; }
                     <#= FormControlModelPropertyName #> = <#= FormServicePrefix #><#= Model.ViewName #>.<#= CopyToModelNotifyMethodName #>(null,null); // this is correct: cleanup twice
                     <#= EformModePropertyName #> = <#= EformModeEnumClassName #>.AddMode;
                     <#= FormControlModelPropertyName #> = null; // since DateTime-issue this is correct: <#= FormServicePrefix #><#= Model.ViewName #>.<#= CopyToModelNotifyMethodName #>(null,null);
+                    <#= IsParentLoadedPropertyName #> = true;
                 }
             } else {
                 if (resetHF) { <#= HiddenFiltersPropertyName #> = hf; }
+                <#= IsParentLoadedPropertyName #> = true;
             }
         }
         #endregion

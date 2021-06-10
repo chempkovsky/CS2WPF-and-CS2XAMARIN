@@ -22,6 +22,7 @@ using System.Threading.Tasks;
 using System.Runtime.CompilerServices;
 using System.Collections.Generic;
 using Prism.Navigation;
+using Xamarin.Essentials;
 
 <#
 
@@ -142,6 +143,8 @@ using Prism.Navigation;
 
     string FilterHeightPropertyName             = "FilterHeight";
     string GridHeightPropertyName               = "GridHeight";
+
+    string IsParentLoadedPropertyName           = "IsParentLoaded";
 
     List<string> detailViews = GetDetailViews(Model, Context, null);
     List<ModelViewPropertyOfVwSerializable> primKeys = GetModelPrimaryKeyProps(Model);
@@ -684,6 +687,22 @@ namespace <#= RlistPageViewModelNameSpace #> {
        }
        #endregion
 
+       #region <#= IsParentLoadedPropertyName #>
+       bool _<#= IsParentLoadedPropertyName #> = false;
+       public bool <#= IsParentLoadedPropertyName #>
+       { 
+           get
+           {
+               return _<#= IsParentLoadedPropertyName #>;
+           }
+           set {
+               if(_<#= IsParentLoadedPropertyName #> != value) {
+                   _<#= IsParentLoadedPropertyName #> = value;
+                   OnPropertyChanged();
+               }
+           }
+       }
+       #endregion
        #region INavigationAware
        public bool IsNavigationTarget(INavigationParameters prms) {
             return true;
@@ -691,7 +710,7 @@ namespace <#= RlistPageViewModelNameSpace #> {
        public void OnNavigatedFrom(INavigationParameters prms) {
             
        }
-       public async void OnNavigatedTo(INavigationParameters prms) {
+       public void OnNavigatedTo(INavigationParameters prms) {
             PermissionMask = <#= AppSettingServicePropertyName #>.GetViewModelMask("<#= Model.ViewName #>");
             if ((PermissionMask & 1) != 1) {
                 throw new Exception("Access Denied to navigate <#= Model.ViewName #>");
@@ -750,7 +769,8 @@ namespace <#= RlistPageViewModelNameSpace #> {
 #>
             
                 if ((mode == <#= EformModeEnumClassName #>.AddMode) || (mode == <#= EformModeEnumClassName #>.UpdateMode)) {
-                    <#= GetInterfaceName(Model) #> tdata = await <#= FormServicePrefix #><#= Model.ViewName #>.<#= GetOneMethodName #>(
+                    // <#= GetInterfaceName(Model) #> tdata 
+                    _ = await <#= FormServicePrefix #><#= Model.ViewName #>.<#= GetOneMethodName #>(
 <#
             {
                 bool isFirst= true;
@@ -768,12 +788,15 @@ namespace <#= RlistPageViewModelNameSpace #> {
                 }
             }
 #>
-                        );
-                    if (mode == <#= EformModeEnumClassName #>.AddMode) {
-                        <#= SformAfterAddItemPropertyName  #> = tdata; 
-                    } else {
-                        <#= SformAfterUpdItemPropertyName  #> = tdata; 
-                    }
+                        ).ContinueWith((tdata) => {MainThread.InvokeOnMainThreadAsync(() =>{
+                            if (mode == <#= EformModeEnumClassName #>.AddMode) {
+                                <#= SformAfterAddItemPropertyName  #> = tdata; 
+                            } else {
+                                <#= SformAfterUpdItemPropertyName  #> = tdata; 
+                            }
+                            <#= IsParentLoadedPropertyName #> = true;
+                        });
+                    });
                 } else {
                     <#= GetInterfaceName(Model) #> data = <#= FormServicePrefix #><#= Model.ViewName #>.<#= CopyToModelMethodName #>(null,null);
 <#
@@ -784,7 +807,10 @@ namespace <#= RlistPageViewModelNameSpace #> {
             }
 #>
                     <#= SformAfterDelItemPropertyName  #> = data;
+                    <#= IsParentLoadedPropertyName #> = true;
                 }
+            } else {
+                <#= IsParentLoadedPropertyName #> = true;
             }
         }
         #endregion

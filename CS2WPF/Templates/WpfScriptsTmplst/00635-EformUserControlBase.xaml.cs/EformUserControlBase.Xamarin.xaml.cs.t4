@@ -75,6 +75,7 @@ using System.Windows.Input;
     string BindingContextFeedbackRefPropertyName    = "BindingContextFeedbackRef";
     string CancelCommandPropertyName                = "CancelCommand";
     string OnCancelCommandPropertyName              = "OnCancelCommand";
+    string IsParentLoadedPropertyName               = "IsParentLoaded";
 
 
     List<string> nmSpaces = new List<string>();
@@ -151,7 +152,7 @@ namespace <#= EformUserControlBaseNameSpace #> {
             <#= IBindingContextChangedClassName #> bcl = this.BindingContext as <#= IBindingContextChangedClassName #>;
             if (bcl != null)
             {
-                await bcl.<#= OnLoadedPropertyName #>(this);
+                await bcl.<#= OnLoadedPropertyName #>(this, <#= IsParentLoadedPropertyName #>);
             }
         }
         #endregion
@@ -369,6 +370,36 @@ namespace <#= EformUserControlBaseNameSpace #> {
         {
             get { return (ICommand)GetValue(<#= CancelCommandPropertyName #>Property); }
             set { SetValue(<#= CancelCommandPropertyName #>Property, value); }
+        }
+        #endregion
+        #region <#= IsParentLoadedPropertyName #>
+        private static async void <#= IsParentLoadedPropertyName #>Changed(BindableObject bindable, object oldValue, object newValue)
+        {
+            <#= EformUserControlBaseClassName #> d = bindable as <#= EformUserControlBaseClassName #>;
+            if (d != null)
+            {
+               <#= IBindingContextChangedClassName #> bcl = d.BindingContext as <#= IBindingContextChangedClassName #>;
+                if (bcl != null)
+                {
+                    await bcl.<#= OnLoadedPropertyName #>(bindable, newValue);
+                }
+            }
+        }
+        public static readonly BindableProperty <#= IsParentLoadedPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= IsParentLoadedPropertyName #>", typeof(bool),
+                typeof(<#= EformUserControlBaseClassName #>),
+                false, propertyChanged: <#= IsParentLoadedPropertyName #>Changed);
+        public bool <#= IsParentLoadedPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= IsParentLoadedPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= IsParentLoadedPropertyName #>Property, value);
+            }
         }
         #endregion
 

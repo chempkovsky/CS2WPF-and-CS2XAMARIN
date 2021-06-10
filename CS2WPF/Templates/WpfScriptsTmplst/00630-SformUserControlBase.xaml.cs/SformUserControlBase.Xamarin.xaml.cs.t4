@@ -81,6 +81,7 @@ using System.Windows.Input;
     string SelectedRowCommandPropertyName           = "SelectedRowCommand";
     string BindingContextFeedbackRefPropertyName    = "BindingContextFeedbackRef";
     string SelectedRowPropertyName                  = "SelectedRow";
+    string IsParentLoadedPropertyName               = "IsParentLoaded";
 
     string SformAfterAddItemPropertyName            = "SformAfterAddItem";
     string SformAfterUpdItemPropertyName            = "SformAfterUpdItem";
@@ -634,6 +635,40 @@ namespace <#= SformUserControlBaseNameSpace #> {
             }
         }
         #endregion 
+        #region <#= IsParentLoadedPropertyName #>
+        private static async void <#= IsParentLoadedPropertyName #>Changed(BindableObject bindable, object oldValue, object newValue)
+        {
+            <#= SformUserControlBaseClassName #> d = bindable as <#= SformUserControlBaseClassName #>;
+            if (d != null)
+            {
+               <#= IBindingContextChangedClassName #> bcl = d.BindingContext as <#= IBindingContextChangedClassName #>;
+                if (bcl != null)
+                {
+                    await bcl.<#= OnLoadedPropertyName #>(bindable, newValue);
+                }
+            }
+        }
+        public static readonly BindableProperty <#= IsParentLoadedPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= IsParentLoadedPropertyName #>", typeof(bool),
+                typeof(<#= SformUserControlBaseClassName #>),
+                false, propertyChanged: <#= IsParentLoadedPropertyName #>Changed);
+        public bool <#= IsParentLoadedPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= IsParentLoadedPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= IsParentLoadedPropertyName #>Property, value);
+            }
+        }
+        #endregion
+
+
+
+
     }
 }
 

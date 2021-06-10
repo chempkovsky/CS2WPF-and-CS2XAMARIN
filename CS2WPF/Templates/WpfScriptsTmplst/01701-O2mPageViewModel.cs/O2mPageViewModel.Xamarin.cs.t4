@@ -80,10 +80,10 @@ using Prism.Navigation;
     string LformUserControlProject          = GetModelProjectName(Model, LformUserControlFolder);
 
 
-    string O2mpPageFolder                   = "01697-O2mpPage.xaml.cs";
-    string O2mpPageClassName                = GetModelClassName(Model, O2mpPageFolder);
-    string O2mpPageNameSpace                = GetModelNameSpace(Model, O2mpPageFolder);
-    string O2mpPageProject                  = GetModelProjectName(Model, O2mpPageFolder);
+    string O2mPageFolder                   = "01697-O2mpPage.xaml.cs";
+    string O2mPageClassName                = GetModelClassName(Model, O2mPageFolder);
+    string O2mPageNameSpace                = GetModelNameSpace(Model, O2mPageFolder);
+    string O2mPageProject                  = GetModelProjectName(Model, O2mPageFolder);
 
     string O2mPageViewModelFolder           = "01701-O2mPageViewModel.cs";
     string O2mPageViewModelClassName        = GetModelClassName(Model, O2mPageViewModelFolder);
@@ -95,6 +95,7 @@ using Prism.Navigation;
     string RowMenuItemsPropertyName                 = "RowMenuItems";
     string RegionPropertyName                       = "Region";
     string RdlistPageRegionPropertyName             = "RdlistPageRegion";
+    string DetailRegionPropertyName                 = "DetailRegion";
 
     string TableMenuItemsCommandPropertyName        = "TableMenuItemsCommand";
     string RowMenuItemsCommandPropertyName          = "RowMenuItemsCommand";
@@ -135,6 +136,9 @@ using Prism.Navigation;
     string AppSettingServicePropertyName            = "GlblSettingsSrv";
     string ForeignKeyDetailsName                    = "ForeignKeyDetails";
 
+    string IsParentLoadedPropertyName               = "IsParentLoaded";
+
+
     List<string> detailViews = GetDetailViews(Model, Context, null);
     List<ModelViewPropertyOfVwSerializable> primKeys = GetModelPrimaryKeyProps(Model);
 
@@ -162,7 +166,7 @@ using Prism.Navigation;
     if ((O2mPageViewModelNameSpace != O2mListItemViewModelNameSpace) && (nmSpaces.IndexOf(O2mListItemViewModelNameSpace) < 0)) 
         nmSpaces.Add(O2mListItemViewModelNameSpace);
     
-    bool IsInTheSameModule = (LformUserControlProject == O2mpPageProject);
+    bool IsInTheSameModule = (LformUserControlProject == O2mPageProject);
     
     
 #>
@@ -188,7 +192,7 @@ using <#= ns #>;
             if (regionManager != null)
             {
                 ...
-                // According to requirements of the "<#= O2mPageViewModelClassName #>.cs"-file of "<#= O2mpPageProject #>"-project. 
+                // According to requirements of the "<#= O2mPageViewModelClassName #>.cs"-file of "<#= O2mPageProject #>"-project. 
                 regionManager.RegisterViewWithRegion("<#= LformUserControlClassName #><#= RdlistPageRegionPropertyName #>", typeof(<#= LformUserControlClassName #>));
                 ...
             }
@@ -198,19 +202,19 @@ using <#= ns #>;
     }
 #>
 
-    "<#= O2mpPageClassName #>" UserControl is defined in the "<#= O2mpPageProject #>"-project.
-    In the file of IModule-class of "<#= O2mpPageProject #>"-project the following line of code must be inserted:
+    "<#= O2mPageClassName #>" UserControl is defined in the "<#= O2mPageProject #>"-project.
+    In the file of IModule-class of "<#= O2mPageProject #>"-project the following line of code must be inserted:
 
         public void RegisterTypes(IContainerRegistry containerRegistry)
         {
             ...
-            // According to requirements of the "<#= O2mPageViewModelClassName #>.cs"-file of "<#= O2mpPageProject #>"-project. 
-            ViewModelLocationProvider.Register<<#= O2mpPageClassName #>, <#= O2mPageViewModelClassName #>>();
-            // According to requirements of the "<#= O2mPageViewModelClassName #>.cs"-file of "<#= O2mpPageProject #>"-project. 
-            containerRegistry.RegisterForNavigation<<#= O2mpPageClassName #>, <#= O2mPageViewModelClassName #>>("<#= O2mpPageClassName #>");
+            // According to requirements of the "<#= O2mPageViewModelClassName #>.cs"-file of "<#= O2mPageProject #>"-project. 
+            ViewModelLocationProvider.Register<<#= O2mPageClassName #>, <#= O2mPageViewModelClassName #>>();
+            // According to requirements of the "<#= O2mPageViewModelClassName #>.cs"-file of "<#= O2mPageProject #>"-project. 
+            containerRegistry.RegisterForNavigation<<#= O2mPageClassName #>, <#= O2mPageViewModelClassName #>>("<#= O2mPageClassName #>");
             // Only if you need to get an instance of controls, insert two lines below
-            // According to requirements of the "<#= O2mPageViewModelClassName #>.cs"-file of "<#= O2mpPageProject #>"-project. 
-            // containerRegistry.Register<ContentPage, <#= O2mpPageClassName #>>("<#= O2mpPageClassName #>");
+            // According to requirements of the "<#= O2mPageViewModelClassName #>.cs"-file of "<#= O2mPageProject #>"-project. 
+            // containerRegistry.Register<ContentPage, <#= O2mPageClassName #>>("<#= O2mPageClassName #>");
             ...
         }
 */
@@ -243,7 +247,22 @@ namespace <#= O2mPageViewModelNameSpace #> {
 
         protected int PermissionMask = 0; 
 
-
+        #region <#= IsParentLoadedPropertyName #>
+        bool _<#= IsParentLoadedPropertyName #> = false;
+        public bool <#= IsParentLoadedPropertyName #>
+        { 
+            get
+            {
+                return _<#= IsParentLoadedPropertyName #>;
+            }
+            set {
+                if(_<#= IsParentLoadedPropertyName #> != value) {
+                    _<#= IsParentLoadedPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
 
         #region <#= CaptionPropertyName #>
         string _<#= CaptionPropertyName #> = "<#= Model.ViewName #>";
@@ -510,7 +529,7 @@ namespace <#= O2mPageViewModelNameSpace #> {
        public void OnNavigatedFrom(INavigationParameters prms) {
             
        }
-       public async void OnNavigatedTo(INavigationParameters prms) {
+       public void OnNavigatedTo(INavigationParameters prms) {
             PermissionMask = <#= AppSettingServicePropertyName #>.GetViewModelMask("<#= Model.ViewName #>");
             if ((PermissionMask & 1) != 1) {
                 throw new Exception("Access Denied to navigate <#= Model.ViewName #>");
@@ -553,6 +572,7 @@ namespace <#= O2mPageViewModelNameSpace #> {
                 }
             } 
             if (resetHF) { <#= HiddenFiltersPropertyName #> = hf; }
+            <#= IsParentLoadedPropertyName #> = true;
         }
         #endregion
 
@@ -804,12 +824,13 @@ namespace <#= O2mPageViewModelNameSpace #> {
             if (foreignKeys.Count < 1) continue;
             foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
 #>
-            new <#= O2mListItemViewModelClassName #>() {<#= CaptionPropertyName #> = "<#= detailViewName #>: <#= foreignKey.NavigationName #>", <#= ForeignKeyDetailsName #> = "<#= detailViewClassName #>:<#= foreignKey.NavigationName #>",  <#= RegionPropertyName #> = "<#= detailViewClassName #><#= RegionPropertyName #>" },
+            new <#= O2mListItemViewModelClassName #>() {<#= CaptionPropertyName #> = "<#= detailViewName #>: <#= foreignKey.NavigationName #>", <#= ForeignKeyDetailsName #> = "<#= detailViewClassName #>:<#= foreignKey.NavigationName #>",  <#= RegionPropertyName #> = "<#= detailViewClassName #><#= DetailRegionPropertyName #>" },
 <#
             }
         }
 #>
         };
+        public IEnumerable<<#= IO2mListItemInterfaceClassName #>> <#= DetailsListPropertyName #> { get { return _<#= DetailsListPropertyName #>; } }
         #endregion
 
         #region DefineHiddenDetailFilter

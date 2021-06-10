@@ -57,6 +57,7 @@ using Prism.Services.Dialogs;
     string CancelCommandPropertyName            = "CancelCommand";
     string SelectedItemPropertyName             = "SelectedItem";
     string OnSelectedRowCommandPropertyName     = "OnSelectedRowCommand";
+    string IsParentLoadedPropertyName           = "IsParentLoaded";
 
 
 
@@ -170,6 +171,7 @@ namespace <#= LdlgViewModelBaseNameSpace #> {
             {
                 <#= HiddenFiltersPropertyName #> = parameters.GetValue<IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>>("<#= HiddenFiltersPropertyName #>");
             }
+            <#= IsParentLoadedPropertyName #> = true;
         }
         #endregion
 
@@ -256,6 +258,19 @@ namespace <#= LdlgViewModelBaseNameSpace #> {
                 if (_<#= HiddenFiltersPropertyName #> != value)
                 {
                     _<#= HiddenFiltersPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+
+        #region <#= IsParentLoadedPropertyName #>
+        protected bool _<#= IsParentLoadedPropertyName #> = false;
+        public bool <#= IsParentLoadedPropertyName #> {
+            get { return _<#= IsParentLoadedPropertyName #>; }
+            set { 
+                if(_<#= IsParentLoadedPropertyName #> != value) {
+                    _<#= IsParentLoadedPropertyName #> = value;
                     OnPropertyChanged();
                 }
             }

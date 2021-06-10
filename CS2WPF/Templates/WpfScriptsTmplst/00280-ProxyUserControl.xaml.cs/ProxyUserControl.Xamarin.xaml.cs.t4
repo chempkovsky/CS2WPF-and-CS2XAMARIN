@@ -73,6 +73,7 @@ using System.Windows.Input;
     string SformAfterDelItemCommandPropertyName     = "SformAfterDelItemCommand";
     string OnSformAfterDelItemCommandPropertyName   = "OnSformAfterDelItemCommand";
 
+    string IsParentLoadedPropertyName               = "IsParentLoaded";
 
     string ShowSubmitPropertyName                   = "ShowSubmit";
     string SubmitCommandPropertyName                = "SubmitCommand";
@@ -966,6 +967,24 @@ namespace <#= ProxyUserControlNameSpace #> {
         protected bool <#= OnSformAfterDelItemCommandPropertyName #>CanExecute(object p)
         {
             return (<#= SformAfterUpdItemCommandPropertyName #> != null); 
+        }
+        #endregion
+        #region <#= IsParentLoadedPropertyName #>
+        public static readonly BindableProperty <#= IsParentLoadedPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= IsParentLoadedPropertyName #>", typeof(bool),
+                typeof(<#= ProxyUserControlClassName #>),
+                false);
+        public bool <#= IsParentLoadedPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= IsParentLoadedPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= IsParentLoadedPropertyName #>Property, value);
+            }
         }
         #endregion
 

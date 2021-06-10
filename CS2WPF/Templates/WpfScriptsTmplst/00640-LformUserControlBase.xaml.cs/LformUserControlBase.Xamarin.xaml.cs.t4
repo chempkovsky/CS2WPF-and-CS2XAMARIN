@@ -100,6 +100,7 @@ using System.Windows.Input;
 
     string OnLoadedCommandPropertyName              = "OnLoadedCommand";
     string OnLoadedPropertyName                     = "OnLoaded";
+    string IsParentLoadedPropertyName               = "IsParentLoaded";
 
 
     List<string> nmSpaces = new List<string>();
@@ -691,6 +692,37 @@ namespace <#= LformUserControlBaseNameSpace #> {
             }
         }
         #endregion
+        #region <#= IsParentLoadedPropertyName #>
+        private static async void <#= IsParentLoadedPropertyName #>Changed(BindableObject bindable, object oldValue, object newValue)
+        {
+            <#= LformUserControlBaseClassName #> d = bindable as <#= LformUserControlBaseClassName #>;
+            if (d != null)
+            {
+               <#= IBindingContextChangedClassName #> bcl = d.BindingContext as <#= IBindingContextChangedClassName #>;
+                if (bcl != null)
+                {
+                    await bcl.<#= OnLoadedPropertyName #>(bindable, newValue);
+                }
+            }
+        }
+        public static readonly BindableProperty <#= IsParentLoadedPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= IsParentLoadedPropertyName #>", typeof(bool),
+                typeof(<#= LformUserControlBaseClassName #>),
+                false, propertyChanged: <#= IsParentLoadedPropertyName #>Changed);
+        public bool <#= IsParentLoadedPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= IsParentLoadedPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= IsParentLoadedPropertyName #>Property, value);
+            }
+        }
+        #endregion
+
     }
 }
 

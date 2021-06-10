@@ -415,35 +415,40 @@ namespace <#= EformViewModelNameSpace #> {
 <#  
     if (ModelHasDoInitMethod) {
 #>
-        public async Task <#= OnLoadedPropertyName #>(object sender)
+        public async Task <#= OnLoadedPropertyName #>(object sender, object newValue)
 <#  
     } else {
 #>
-        public async Task <#= OnLoadedPropertyName #>(object sender)
+        public async Task <#= OnLoadedPropertyName #>(object sender, object newValue)
 <#  
     }
 #>
         {
-            try {
-                if (!<#= IsOnLoadedCalledPropertyName #>) {
-                    <#= IsLoadingPropertyName #> = true;
-                    <#= IsOnLoadedCalledPropertyName #> = true;
-                    await DoClearControls();
-                    await RunEformModeChanged();
-                    await InputToControls();
+            if (newValue is bool) {
+                bool v = (bool)newValue;
+                if ((!<#= IsOnLoadedCalledPropertyName #>) && v) {
+                    try {
+                            <#= IsLoadingPropertyName #> = true;
+                            <#= IsOnLoadedCalledPropertyName #> = true;
+                            await DoClearControls();
+                            await RunEformModeChanged();
+                            await InputToControls();
 <#  
     if (ModelHasDoInitMethod) {
 #>
-                    await DoInit();
+                            await DoInit();
 <#  
     }
 #>
-                    ClearValidationMessages();
+                            ClearValidationMessages();
+                    } 
+                    finally
+                    {
+                        <#= IsLoadingPropertyName #> = false;
+                    }
+                } else {
+                    <#= IsOnLoadedCalledPropertyName #> = v;
                 }
-            } 
-            finally
-            {
-                <#= IsLoadingPropertyName #> = false;
             }
         }
         protected bool <#= IsOnLoadedCalledPropertyName #> = false;
@@ -469,7 +474,20 @@ namespace <#= EformViewModelNameSpace #> {
         protected bool _<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, EnabledSufix) #> = false;
         public bool <#=  GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, EnabledSufix) #> {
             get { return _<#=  GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, EnabledSufix) #>; }
-            set { if(_<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, EnabledSufix) #> != value) { _<#=  GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, EnabledSufix) #> = value; OnPropertyChanged(); } }
+            set { 
+                if(_<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, EnabledSufix) #> != value) 
+                { 
+                    _<#=  GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, EnabledSufix) #> = value; 
+                    OnPropertyChanged(); 
+<#
+                    if(HasButton(modelViewUIFormPropertySerializable, Model)) {
+#>
+                    (<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, SearchClickSufix) #>Command as Command).ChangeCanExecute();
+<#
+                    }
+#>
+                } 
+            }
         }
         public string <#=  GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ValueErrorSufix) #> {
             get {
@@ -535,7 +553,7 @@ namespace <#= EformViewModelNameSpace #> {
         }
         public string <#=  GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ButtonErrorSufix) #> {
             get {
-                return GetFirstError("<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ButtonSufix) #>")
+                return GetFirstError("<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ButtonSufix) #>");
             }
         }
 <#
@@ -595,7 +613,7 @@ namespace <#= EformViewModelNameSpace #> {
 <#  
                             } else {
 #>
-                            <#= GetInterfaceName(locView) #> amObj <#=  GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #> as <#= GetInterfaceName(locView) #>;
+                            <#= GetInterfaceName(locView) #> amObj = <#=  GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #> as <#= GetInterfaceName(locView) #>;
                             if(amObj!= null) {
                                 return amObj.<#= GetControlListPropertyName(modelViewUIFormPropertySerializable, Model, Context, 1) #>;
                             } else {
@@ -621,7 +639,7 @@ namespace <#= EformViewModelNameSpace #> {
 <#  
                             } else {
 #>
-                            <#= GetInterfaceName(locView) #> umObj <#=  GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #> as <#= GetInterfaceName(locView) #>;
+                            <#= GetInterfaceName(locView) #> umObj = <#=  GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #> as <#= GetInterfaceName(locView) #>;
                             if(umObj!= null) {
                                 return umObj.<#= GetControlListPropertyName(modelViewUIFormPropertySerializable, Model, Context, 2) #>;
                             } else {
@@ -647,7 +665,7 @@ namespace <#= EformViewModelNameSpace #> {
 <#  
                             } else {
 #>
-                            <#= GetInterfaceName(locView) #> dmObj <#=  GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #> as <#= GetInterfaceName(locView) #>;
+                            <#= GetInterfaceName(locView) #> dmObj = <#=  GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #> as <#= GetInterfaceName(locView) #>;
                             if(dmObj!= null) {
                                 return dmObj.<#= GetControlListPropertyName(modelViewUIFormPropertySerializable, Model, Context, 3) #>;
                             } else {
@@ -910,6 +928,7 @@ namespace <#= EformViewModelNameSpace #> {
                     <#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, EnabledSufix) #> = false;
                     _<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #> = null;
                     OnPropertyChanged("<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>");
+                    OnPropertyChanged("<#=  GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadTextSufix) #>"); 
 <#   
                 } // else if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.Typeahead) {
                 else if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.SearchDialog) {
@@ -981,6 +1000,7 @@ namespace <#= EformViewModelNameSpace #> {
 #>
                         _<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #> = null;
                         OnPropertyChanged("<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>");
+                        OnPropertyChanged("<#=  GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadTextSufix) #>"); 
 <#    
                     } // else if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.Typeahead) {
                     else if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.SearchDialog) {
@@ -1263,6 +1283,7 @@ if (ModelHasDoInitMethod) {
                         <#= UIDispatcherInvokePropertyName #>(() => {
                                 _<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #> = dataN;
                                 OnPropertyChanged("<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>");
+                                OnPropertyChanged("<#=  GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadTextSufix) #>"); 
                                 ValidateObjectField(dataN, "<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>");
                         });
 <#
@@ -1394,6 +1415,7 @@ if (ModelHasDoInitMethod) {
                         <#= UIDispatcherInvokePropertyName #>(() => {
                                 _<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #> = dataN;
                                 OnPropertyChanged("<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>");
+                                OnPropertyChanged("<#=  GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadTextSufix) #>"); 
                                 ValidateObjectField(dataN, "<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>");
                         });
 <#
@@ -1532,9 +1554,11 @@ if (ModelHasDoInitMethod) {
                     }
                 }
                 int indx = -1;
+                <#= GetInterfaceNameEx(Context, viewName) #> lfc = null;
                 if ((newLst != null) && ((<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #> as <#= GetInterfaceNameEx(Context, viewName) #>) != null)) {
-                    <#= GetInterfaceNameEx(Context, viewName) #> lfc = <#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #> as <#= GetInterfaceNameEx(Context, viewName) #>;
+                    lfc = <#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #> as <#= GetInterfaceNameEx(Context, viewName) #>;
                     <#= GetInterfaceNameEx(Context, viewName) #> slctItm = newLst.Where(e => <#= GetPrimKeyFilterForFindIndexMethod(Context, viewName, "e", "lfc")  #>).FirstOrDefault();
+                    // it worked for WPF: insert old item in new list. As a result <#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #> stayed unchanged
                     if(slctItm != null) {
                         indx = newLst.IndexOf(slctItm);
                         if(indx > -1) {
@@ -1544,8 +1568,19 @@ if (ModelHasDoInitMethod) {
                     }
                 }
                 <#= UIDispatcherInvokePropertyName #>(() => {
+                    // next line of code this is not required for WPF:
+                    // reseting the <#= GetExpressionForControlList(modelViewUIFormPropertySerializable, Model, ComboSufix) #> discards the <#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #>
+                    // to avoid notification the value of the <#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #> should be set to null 
+                    _<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #> = null;
+
                     _<#= GetExpressionForControlList(modelViewUIFormPropertySerializable, Model, ComboSufix) #> = newLst;
                     OnPropertyChanged("<#= GetExpressionForControlList(modelViewUIFormPropertySerializable, Model, ComboSufix) #>");
+                    // set the <#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #> back to it's value
+                    // next "if" is not required for WPF
+                    if(indx >= 0) {
+                        _<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #> = lfc;
+                        OnPropertyChanged("<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #>");
+                    }
                 });
                 if ((newLst == null) || (indx < 0)) {
                     await <#= GetExpressionForOnValChangedMethod(modelViewUIFormPropertySerializable, Model) #>(null, true);
@@ -1730,9 +1765,11 @@ if (ModelHasDoInitMethod) {
                         }
                     }
                     int indx = -1;
+                    <#= GetInterfaceNameEx(Context, viewName) #> lfc = null;
                     if ((newLst != null) && ((<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #> as <#= GetInterfaceNameEx(Context, viewName) #>) != null)) {
                         <#= GetInterfaceNameEx(Context, viewName) #> lfc = <#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #> as <#= GetInterfaceNameEx(Context, viewName) #>;
                         <#= GetInterfaceNameEx(Context, viewName) #> slctItm = newLst.Where(e => <#= GetPrimKeyFilterForFindIndexMethod(Context, viewName, "e", "lfc")  #>).FirstOrDefault();
+                        // it worked for WPF: insert old item in new list. As a result <#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #> stayed unchanged
                         if(slctItm != null) {
                             indx = newLst.IndexOf(slctItm);
                             if(indx > -1) {
@@ -1742,8 +1779,20 @@ if (ModelHasDoInitMethod) {
                         }
                     }
                     <#= UIDispatcherInvokePropertyName #>(() => {
+                        // next line of code this is not required for WPF:
+                        // reseting the <#= GetExpressionForControlList(modelViewUIFormPropertySerializable, Model, ComboSufix) #> discards the <#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #>
+                        // to avoid notification the value of the <#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #> should be set to null 
+                        _<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #> = null;
+
                         _<#= GetExpressionForControlList(modelViewUIFormPropertySerializable, Model, ComboSufix) #> = newLst;
                         OnPropertyChanged("<#= GetExpressionForControlList(modelViewUIFormPropertySerializable, Model, ComboSufix) #>");
+
+                        // set the <#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #> back to it's value
+                        // next "if" is not required for WPF
+                        if(indx >= 0) {
+                            _<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #> = lfc;
+                            OnPropertyChanged("<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #>");
+                        }
                     });
                     if ((newLst == null) || (indx < 0)) {
                         await <#= GetExpressionForOnValChangedMethod(modelViewUIFormPropertySerializable, Model) #>(null, true);
@@ -2054,7 +2103,7 @@ if (ModelHasDoInitMethod) {
                 return;
             }
             ObservableCollection<<#= GetInterfaceName(locView) #>>  rslt = new ObservableCollection<<#= GetInterfaceName(locView) #>>();
-            foreach(<#= GetInterfaceName(locView) #> itm in t.Result.items) {
+            foreach(<#= GetInterfaceName(locView) #> itm in t.items) {
                 rslt.Add(<#= servisPropNm #>.<#= CopyToModelNotifyMethodName #>(itm));
             }
             <#=  GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadItemsSourceSufix) #> = rslt;
@@ -2393,6 +2442,7 @@ if (ModelHasDoInitMethod) {
                 <#= UIDispatcherInvokePropertyName #>(() => {
                     _<#=  GetModelPropertyNameWithSufix(dtlModelViewUIFormPropertySerializable, Model, TypeaheadSufix) #> = null;
                     OnPropertyChanged("<#=  GetModelPropertyNameWithSufix(dtlModelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>");
+                    OnPropertyChanged("<#=  GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadTextSufix) #>"); 
                     ValidateObjectField(null, "<#=  GetModelPropertyNameWithSufix(dtlModelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>");
                 });
                 await <#= GetExpressionForOnValChangedMethod(dtlModelViewUIFormPropertySerializable, Model) #>(null, dscrdChld);
@@ -2445,17 +2495,17 @@ if (ModelHasDoInitMethod) {
         get
         {
             return _<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, SearchClickSufix) #>Command ?? 
-                _<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, SearchClickSufix) #>Command = 
+                (_<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, SearchClickSufix) #>Command = 
                     new Command(
-                        (param) => <#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, SearchClickSufix) #>(), 
-                        (param) => <#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, SearchClickSufix) #>CanExecute());
+                        (param) => <#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, SearchClickSufix) #>(param), 
+                        (param) => <#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, SearchClickSufix) #>CanExecute(param)));
         }
     }
-    public bool <#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, SearchClickSufix) #>CanExecute()
+    public bool <#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, SearchClickSufix) #>CanExecute(object param)
     {
         return <#=  GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, EnabledSufix) #>;
     }
-    public void <#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, SearchClickSufix) #>() {
+    public void <#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, SearchClickSufix) #>(object param) {
 <#
                 {
                 bool genElse = false;
@@ -2613,7 +2663,9 @@ if (ModelHasDoInitMethod) {
 
             dialogService.ShowDialog("<#= GetModelClassName(locView, SdlgViewModelFolder) #>", dlgParams, async (rslt) => {
                 if (rslt == null) return;
-                if (rslt.Result != ButtonResult.OK) return;
+                if (rslt.Parameters == null) return;
+                if (!rslt.Parameters.ContainsKey("Result")) return;
+                if (!rslt.Parameters.GetValue<bool>("Result")) return;
                 if (rslt.Parameters.ContainsKey("SelectedItem"))
                 {
                     object itm = rslt.Parameters.GetValue<object>("SelectedItem");
@@ -2877,7 +2929,7 @@ if (ModelHasDoInitMethod) {
                 case "<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ButtonSufix) #>":
                     requiredAttribute = new RequiredAttribute();
                     msg = requiredAttribute.FormatErrorMessage(string.Empty);
-                    msgfiledName = "<#= GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>";
+                    msgfiledName = "<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ButtonSufix) #>";
                     break;
 <#
                 }

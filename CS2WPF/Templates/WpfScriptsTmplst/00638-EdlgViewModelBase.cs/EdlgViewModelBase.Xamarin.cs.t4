@@ -61,8 +61,9 @@ using Prism.Services.Dialogs;
     string AppSettingServicePropertyName        = "GlblSettingsSrv";
     string RoutedCommandHandlersPropertyName    = "RoutedCommandHandlers";
 
-    string SubmitCommandPropertyName        = "SubmitCommand";
-    string CancelCommandPropertyName        = "CancelCommand";
+    string SubmitCommandPropertyName            = "SubmitCommand";
+    string CancelCommandPropertyName            = "CancelCommand";
+    string IsParentLoadedPropertyName           = "IsParentLoaded";
 
 
     List<string> nmSpaces = new List<string>();
@@ -151,6 +152,7 @@ namespace <#= EdlgViewModelBaseNameSpace #> {
             {
                 <#= ShowSubmitPropertyName #> = parameters.GetValue<bool>("<#= ShowSubmitPropertyName #>");
             }
+            <#= IsParentLoadedPropertyName #> = true;
         }
         #endregion
 
@@ -199,6 +201,19 @@ namespace <#= EdlgViewModelBaseNameSpace #> {
                 if (_<#= HiddenFiltersPropertyName #> != value)
                 {
                     _<#= HiddenFiltersPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+
+        #region <#= IsParentLoadedPropertyName #>
+        protected bool _<#= IsParentLoadedPropertyName #> = false;
+        public bool <#= IsParentLoadedPropertyName #> {
+            get { return _<#= IsParentLoadedPropertyName #>; }
+            set { 
+                if(_<#= IsParentLoadedPropertyName #> != value) {
+                    _<#= IsParentLoadedPropertyName #> = value;
                     OnPropertyChanged();
                 }
             }
