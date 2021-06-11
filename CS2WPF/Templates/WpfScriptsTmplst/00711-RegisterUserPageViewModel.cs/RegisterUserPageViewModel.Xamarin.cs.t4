@@ -1,0 +1,490 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+
+using Xamarin.Forms;
+using System.ComponentModel;
+using System.Windows.Input;
+using Prism.Navigation;
+
+<#
+
+    string IRegisterModelFolder      = "00500-IRegisterModel.cs";
+    string IRegisterModelClassName   = GetModelClassName(Model, IRegisterModelFolder);
+    string IRegisterModelNameSpace   = GetModelNameSpace(Model, IRegisterModelFolder);
+
+    string IAppGlblLoginServiceFolder      = "00508-IAppGlblLoginService.cs";
+    string IAppGlblLoginServiceClassName   = GetModelClassName(Model, IAppGlblLoginServiceFolder);
+    string IAppGlblLoginServiceNameSpace   = GetModelNameSpace(Model, IAppGlblLoginServiceFolder);
+    string IAppGlblLoginServiceProject     = GetModelProjectName(Model, IAppGlblLoginServiceFolder);
+
+    string HomePageFolder     = "00691-HomePage.xaml.cs";
+    string HomePageClassName  = GetModelClassName(Model, HomePageFolder);
+    string HomePageNameSpace  = GetModelNameSpace(Model, HomePageFolder);
+
+    string RegisterUserPageFolder               = "00707-RegisterUserPage.xaml.cs";
+    string RegisterUserPageClassName            = GetModelClassName(Model, RegisterUserPageFolder);
+    string RegisterUserPageNameSpace            = GetModelNameSpace(Model, RegisterUserPageFolder);
+    string RegisterUserPageProject              = GetModelProjectName(Model, RegisterUserPageFolder);
+
+    string RegisterUserPageXamlFolder           = "00709-RegisterUserPage.xaml";
+    string RegisterUserPageXamlClassName        = GetModelClassName(Model, RegisterUserPageXamlFolder);
+    string RegisterUserPageXamlNameSpace        = GetModelNameSpace(Model, RegisterUserPageXamlFolder);
+    string RegisterUserPageXamlProject          = GetModelProjectName(Model, RegisterUserPageXamlFolder);
+
+    string RegisterUserPageViewModelFolder      = "00711-RegisterUserPageViewModel.cs";
+    string RegisterUserPageViewModelClassName   = GetModelClassName(Model, RegisterUserPageViewModelFolder);
+    string RegisterUserPageViewModelNameSpace   = GetModelNameSpace(Model, RegisterUserPageViewModelFolder);
+    string RegisterUserPageViewModelProject     = GetModelProjectName(Model, RegisterUserPageViewModelFolder);
+
+    string UserNamePropertyName         = "UserName";
+    string UserNameCaptionPropertyName  = "UserNameCaption";
+    string UserNamePropmptPropertyName  = "UserNamePropmpt";
+    string UserNameErrorPropertyName    = "UserNameError";
+
+    string PassWordPropertyName             = "PassWord";
+    string PassWordCaptionPropertyName      = "PassWordCaption";
+    string PassWordPropmptPropertyName      = "PassWordPropmpt";
+    string PassWordErrorPropertyName        = "PassWordError";
+    string PassWordShowPropertyName         = "PassWordShow";
+    string PassWordIsPasswordPropertyName   = "PassWordIsPassword";
+
+    string ConfirmPassWordPropertyName              = "ConfirmPassWord";
+    string ConfirmPassWordCaptionPropertyName       = "ConfirmPassWordCaption";
+    string ConfirmPassWordPropmptPropertyName       = "ConfirmPassWordPropmpt";
+    string ConfirmPassWordErrorPropertyName         = "ConfirmPassWordError";
+    string ConfirmPassWordShowPropertyName          = "ConfirmPassWordShow";
+    string ConfirmPassWordIsPasswordPropertyName    = "ConfirmPassWordIsPassword";
+
+    string OkCommandPropertyName                    = "OkCommand";
+    string CancelCommandPropertyName                = "CancelCommand";
+
+    string ValueErrorSufix                          = "Error"; 
+
+    List<string> nmSpaces = new List<string>();
+    if ((RegisterUserPageViewModelNameSpace != IAppGlblLoginServiceNameSpace) && (nmSpaces.IndexOf(IAppGlblLoginServiceNameSpace) < 0)) 
+        nmSpaces.Add(IAppGlblLoginServiceNameSpace);
+    if ((RegisterUserPageViewModelNameSpace != IRegisterModelNameSpace) && (nmSpaces.IndexOf(IRegisterModelNameSpace) < 0)) 
+        nmSpaces.Add(IRegisterModelNameSpace);
+
+#>
+<# 
+    foreach(string ns in nmSpaces) {
+#>
+using <#= ns #>;
+<#
+    }
+#>
+
+/*
+
+    "<#= RegisterUserPageViewModelClassName #>" UserControl is defined in the "<#= RegisterUserPageViewModelProject #>"-project.
+    In the file of IModule-class of "<#= RegisterUserPageViewModelProject #>"-project the following line of code must be inserted:
+
+
+        public void RegisterTypes(IContainerRegistry containerRegistry)
+        {
+            ...
+
+            ViewModelLocationProvider.Register<<#= RegisterUserPageClassName #>, <#= RegisterUserPageViewModelClassName #>>();
+            containerRegistry.RegisterForNavigation<<#= RegisterUserPageClassName #>, <#= RegisterUserPageViewModelClassName #>>("<#= RegisterUserPageClassName #>");
+            ...
+        }
+
+*/
+
+namespace <#= RegisterUserPageViewModelNameSpace #> {
+    public class <#= RegisterUserPageViewModelClassName #>: INotifyPropertyChanged, INotifyDataErrorInfo  
+    {
+        <#= IAppGlblLoginServiceClassName #> _<#= AppLoginServicePropertyName #>;
+        protected INavigationService _navigationService;
+        public <#= RegisterUserPageViewModelClassName #>(<#= IAppGlblLoginServiceClassName #> <#= AppLoginServicePropertyName #>, INavigationService navigationService) {
+            _<#= AppLoginServicePropertyName #> = <#= AppLoginServicePropertyName #>;
+            _navigationService = navigationService;
+        }
+
+        #region INotifyPropertyChanged
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string name = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+        #endregion
+        #region INotifyDataErrorInfo
+        Dictionary<string, ICollection<string>> ValidationErrors = new Dictionary<string, ICollection<string>>();
+        public bool HasErrors { get { return (ValidationErrors.Count > 0) || (ValidationErrors.Count > 0); } }
+        public System.Collections.IEnumerable GetErrors(string propertyName)
+        {
+            if (string.IsNullOrEmpty(propertyName)) {
+                return null;
+            }
+            if(ValidationErrors.ContainsKey(propertyName)) 
+                return ValidationErrors[propertyName];
+            return null;
+        }
+        public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
+        private void RaiseErrorsChanged(string propertyName)
+        {
+            //if (ErrorsChanged != null)
+            //    ErrorsChanged(this, new DataErrorsChangedEventArgs(propertyName));
+            OnPropertyChanged(propertyName + "<#= ValueErrorSufix #>");
+        }
+        public void ValidateField(object value, [CallerMemberName] string filedName = null) {
+            if (string.IsNullOrEmpty(filedName)) return;
+            string stringValue = value as string;
+            string ErrorMsg = null;
+            IList<string> rslt = null;
+            switch(filedName) {
+                case "<#= UserNamePropertyName #>":
+                    if (string.IsNullOrEmpty(stringValue)) {
+                        ErrorMsg = "<#= UserNamePropertyName #> is a required filed";
+                    } else if (stringValue.Length < 3) {
+                        ErrorMsg = "<#= UserNamePropertyName #>.Length must be large than 2";
+                    }
+                    break;
+                case "<#= PassWordPropertyName #>":
+                    if (string.IsNullOrEmpty(stringValue)) {
+                        ErrorMsg = "<#= PassWordPropertyName #> is a required filed";
+                    } else if (stringValue.Length < 6) {
+                        ErrorMsg = "<#= PassWordPropertyName #>.Length must be large than 5";
+                    } else if (<#= PassWordPropertyName #> != <#= ConfirmPassWordPropertyName #>) {
+                        ErrorMsg = "<#= PassWordPropertyName #> and <#= ConfirmPassWordPropertyName #> must be identical";
+                    }
+                    break;
+                case "<#= ConfirmPassWordPropertyName #>":
+                    if (string.IsNullOrEmpty(stringValue)) {
+                        ErrorMsg = "<#= ConfirmPassWordPropertyName #> is a required filed";
+                    } else if (stringValue.Length < 6) {
+                        ErrorMsg = "<#= ConfirmPassWordPropertyName #>.Length must be large than 5";
+                    } else if (<#= PassWordPropertyName #> != <#= ConfirmPassWordPropertyName #>) {
+                        ErrorMsg = "<#= PassWordPropertyName #> and <#= ConfirmPassWordPropertyName #> must be identical";
+                    }
+                    break;
+                default:
+                    break;
+            }
+            if (!string.IsNullOrEmpty(ErrorMsg)) {
+                rslt = new List<string>() { ErrorMsg };
+            }
+            bool hasErrors = rslt != null;
+            hasErrors = hasErrors ? (rslt.Count > 0) : false;
+            if(hasErrors) {
+                ValidationErrors[filedName] = rslt;
+                RaiseErrorsChanged(filedName);
+            } else {
+                if(ValidationErrors.ContainsKey(filedName))  {
+                    ValidationErrors.Remove(filedName);
+                    RaiseErrorsChanged(filedName);
+                }
+            }
+        }
+        public string GetFirstError(string propertyName)
+        {
+            if (string.IsNullOrEmpty(propertyName)) {
+                return "";
+            }
+            string str = null;
+            if(ValidationErrors.ContainsKey(propertyName)) 
+                str = ValidationErrors[propertyName].FirstOrDefault(i => !string.IsNullOrEmpty(i));
+            return str==null ? "" : str;
+        }
+        #endregion
+
+        #region <#= UserNamePropertyName #>
+        protected string _<#= UserNamePropertyName #> = "";
+        public string <#= UserNamePropertyName #> 
+        {
+            get { return _<#= UserNamePropertyName #>; }
+            set
+            {
+                if (<#= UserNamePropertyName #> != value) {
+                    _<#= UserNamePropertyName #> = value;
+                    OnPropertyChanged();
+                    ValidateField(value);
+                }
+            }
+        }
+        public string <#= UserNamePropmptPropertyName #> {
+            get { return "Enter User Name"; }
+        }
+        public string <#= UserNameCaptionPropertyName #> {
+            get { return "User Name"; }
+        }
+        #endregion
+        #region <#= PassWordPropertyName #>
+        protected string _<#= PassWordPropertyName #> = "";
+        public string <#= PassWordPropertyName #> 
+        {
+            get { return _<#= PassWordPropertyName #>; }
+            set
+            {
+                if (<#= PassWordPropertyName #> != value) {
+                    _<#= PassWordPropertyName #> = value;
+                    OnPropertyChanged();
+                    ValidateField(value);
+                }
+            }
+        }
+        public string <#= PassWordPropmptPropertyName #> {
+            get { return "Enter Password"; }
+        }
+        public string <#= PassWordCaptionPropertyName #> {
+            get { return "Password"; }
+        }
+        #endregion
+        #region <#= ConfirmPassWordPropertyName #>
+        protected string _<#= ConfirmPassWordPropertyName #> = "";
+        public string <#= ConfirmPassWordPropertyName #> 
+        {
+            get { return _<#= ConfirmPassWordPropertyName #>; }
+            set
+            {
+                if (<#= ConfirmPassWordPropertyName #> != value) {
+                    _<#= ConfirmPassWordPropertyName #> = value;
+                    OnPropertyChanged();
+                    ValidateField(value);
+                }
+            }
+        }
+        public string <#= ConfirmPassWordPropmptPropertyName #> {
+            get { return "Repeat Password"; }
+        }
+        public string <#= ConfirmPassWordCaptionPropertyName #> {
+            get { return "Confirm Password"; }
+        }
+        #endregion
+        #region <#= UserNameErrorPropertyName #>
+        public string <#= UserNameErrorPropertyName #> {
+            get 
+            {
+                return GetFirstError("<#= UserNamePropertyName #>");
+            }
+        }
+        #endregion
+        #region <#= PassWordErrorPropertyName #>
+        public string <#= PassWordErrorPropertyName #> {
+            get 
+            {
+                return GetFirstError("<#= PassWordPropertyName #>");
+            }
+        }
+        #endregion
+        #region <#= ConfirmPassWordErrorPropertyName #>
+        public string <#= ConfirmPassWordErrorPropertyName #> {
+            get 
+            {
+                return GetFirstError("<#= ConfirmPassWordPropertyName #>");
+            }
+        }
+        #endregion
+        #region <#= PassWordIsPasswordPropertyName #>
+        protected bool _<#= PassWordIsPasswordPropertyName #> = true;
+        public bool <#= PassWordIsPasswordPropertyName #> 
+        {
+            get { return _<#= PassWordIsPasswordPropertyName #>; }
+            set
+            {
+                if (<#= PassWordIsPasswordPropertyName #> != value) {
+                    _<#= PassWordIsPasswordPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+        #region <#= ConfirmPassWordIsPasswordPropertyName #>
+        protected bool _<#= ConfirmPassWordIsPasswordPropertyName #> = true;
+        public bool <#= ConfirmPassWordIsPasswordPropertyName #> 
+        {
+            get { return _<#= ConfirmPassWordIsPasswordPropertyName #>; }
+            set
+            {
+                if (<#= ConfirmPassWordIsPasswordPropertyName #> != value) {
+                    _<#= ConfirmPassWordIsPasswordPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+        #region <#= CancelCommandPropertyName #>
+        private ICommand _<#= CancelCommandPropertyName #>;
+        public ICommand <#= CancelCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= CancelCommandPropertyName #> ?? (_<#= CancelCommandPropertyName #> = new Command((param) => <#= CancelCommandPropertyName #>Action(param), (param) => <#= CancelCommandPropertyName #>CanExecute(param)));
+            }
+        }
+        protected async void <#= CancelCommandPropertyName #>Action(object param)
+        {
+            await _navigationService.NavigateAsync("<#= HomePageClassName #>");
+        }
+        protected bool <#= CancelCommandPropertyName #>CanExecute(object param)
+        {
+            return true;
+        }
+        #endregion
+        #region <#= OkCommandPropertyName #>
+        private ICommand _<#= OkCommandPropertyName #>;
+        public ICommand <#= OkCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= OkCommandPropertyName #> ?? (_<#= OkCommandPropertyName #> = new Command((param) => <#= OkCommandPropertyName #>Action(param), (param) => <#= OkCommandPropertyName #>CanExecute(param)));
+            }
+        }
+        protected async void <#= OkCommandPropertyName #>Action(object param)
+        {
+            ValidateField(<#= UserNamePropertyName #>, "<#= UserNamePropertyName #>");
+            ValidateField(<#= PassWordPropertyName #>, "<#= PassWordPropertyName #>");
+            ValidateField(<#= ConfirmPassWordPropertyName #>, "<#= ConfirmPassWordPropertyName #>");
+            if (HasErrors) return;
+            <#= IRegisterModelClassName #> model = await _<#= AppLoginServicePropertyName #>.<#= RegisterMethodName #>(<#= UserNamePropertyName #> , <#= PassWordPropertyName #>, <#= ConfirmPassWordPropertyName #>);
+            if (model == null) return;
+            await _navigationService.NavigateAsync("<#= HomePageClassName #>");
+        }
+        protected bool <#= OkCommandPropertyName #>CanExecute(object param)
+        {
+            return true;
+        }
+        #endregion
+        #region <#= PassWordShowPropertyName #>Command
+        private ICommand _<#= PassWordShowPropertyName #>Command
+        public ICommand <#= PassWordShowPropertyName #>Command
+        {
+            get
+            {
+                return _<#= PassWordShowPropertyName #>Command ?? (_<#= PassWordShowPropertyName #>Command = new Command((param) => <#= PassWordShowPropertyName #>Action(param), (param) => <#= PassWordShowPropertyName #>CanExecute(param)));
+            }
+        }
+        protected void <#= PassWordShowPropertyName #>CommandAction(object param)
+        {
+            <#= PassWordIsPasswordPropertyName #> = ! <#= PassWordIsPasswordPropertyName #>;
+        }
+        protected bool <#= PassWordShowPropertyName #>CommandCanExecute(object param)
+        {
+            return true;
+        }
+        #endregion
+        #region <#= ConfirmPassWordShowPropertyName #>Command
+        private ICommand _<#= ConfirmPassWordShowPropertyName #>Command
+        public ICommand <#= ConfirmPassWordShowPropertyName #>Command
+        {
+            get
+            {
+                return _<#= ConfirmPassWordShowPropertyName #>Command ?? (_<#= ConfirmPassWordShowPropertyName #>Command = new Command((param) => <#= ConfirmPassWordShowPropertyName #>Action(param), (param) => <#= ConfirmPassWordShowPropertyName #>CanExecute(param)));
+            }
+        }
+        protected void <#= ConfirmPassWordShowPropertyName #>CommandAction(object param)
+        {
+            <#= ConfirmPassWordIsPasswordPropertyName #> = ! <#= ConfirmPassWordIsPasswordPropertyName #>;
+        }
+        protected bool <#= ConfirmPassWordShowPropertyName #>CommandCanExecute(object param)
+        {
+            return true;
+        }
+        #endregion
+        
+    }
+}
+
+<#+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+    string GetModelProjectName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileProject)) {
+            return result;
+        }
+        string[] fnArr = refItem.FileProject.Split(new char[] {'\\'}, 100, System.StringSplitOptions.None); 
+        string fn = fnArr[fnArr.Length - 1];
+
+        return fn.Replace(".csproj","");
+    }
+
+#>

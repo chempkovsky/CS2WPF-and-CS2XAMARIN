@@ -11,55 +11,35 @@
 <#@ import namespace="CS2WPF.Model.Serializable" #>
 <#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
-using System;
 using Xamarin.Forms;
+
 <#
 
-    string EformModeEnumFolder      = "00026-EformModeEnum.cs";
-    string EformModeEnumClassName   = GetModelClassName(Model, EformModeEnumFolder);
-    string EformModeEnumNameSpace   = GetModelNameSpace(Model, EformModeEnumFolder);
+    string RegisterUserPageFolder     = "00707-RegisterUserPage.xaml.cs";
+    string RegisterUserPageClassName  = GetModelClassName(Model, RegisterUserPageFolder);
+    string RegisterUserPageNameSpace  = GetModelNameSpace(Model, RegisterUserPageFolder);
 
-    string AddEformModeEnumToVisibilityConverterFolder      = "00172-AddEformModeEnumToVisibilityConverter.cs";
-    string AddEformModeEnumToVisibilityConverterClassName   = GetModelClassName(Model, AddEformModeEnumToVisibilityConverterFolder);
-    string AddEformModeEnumToVisibilityConverterNameSpace   = GetModelNameSpace(Model, AddEformModeEnumToVisibilityConverterFolder);
-    
+    List<string> nmSpaces = new List<string>();
+
 #>
-<#
-    if(AddEformModeEnumToVisibilityConverterNameSpace != EformModeEnumNameSpace)
-    {
+<# 
+    foreach(string ns in nmSpaces) {
 #>
-using <#= EformModeEnumNameSpace #>;
+using <#= ns #>;
 <#
     }
 #>
 
-namespace <#= AddEformModeEnumToVisibilityConverterNameSpace #> {
-//    [ValueConversion(typeof(<#= EformModeEnumClassName #>), typeof(Visibility))]
-    public class <#= AddEformModeEnumToVisibilityConverterClassName #>: IValueConverter
+namespace <#= RegisterUserPageNameSpace #> {
+    /// <summary>
+    /// Interaction logic for <#= RegisterUserPageClassName #>.xaml
+    /// </summary>
+    public partial class <#= RegisterUserPageClassName #>: ContentPage
     {
-        #region IValueConverter Members
-        public object Convert(object value, Type targetType, object parameter,
-            System.Globalization.CultureInfo culture)
+        public <#= RegisterUserPageClassName #>()
         {
-            //if (targetType != typeof(bool))
-            //    throw new InvalidOperationException("The target must be a bool");
-            if (value == null) return false;
-            if (!(value is <#= EformModeEnumClassName #>))
-                throw new InvalidOperationException("The source must be a <#= EformModeEnumClassName #>");
-            if((<#= EformModeEnumClassName #>)value == <#= EformModeEnumClassName #>.AddMode) {
-                return true;
-            } else {
-                return false;
-            }
+            InitializeComponent();
         }
-
-        public object ConvertBack(object value, Type targetType, object parameter,
-            System.Globalization.CultureInfo culture)
-        {
-            throw new NotSupportedException();
-        }
-
-        #endregion
     }
 }
 

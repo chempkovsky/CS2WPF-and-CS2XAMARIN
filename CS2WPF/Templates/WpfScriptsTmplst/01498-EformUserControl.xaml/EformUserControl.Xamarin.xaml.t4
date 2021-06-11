@@ -242,14 +242,20 @@
             </ScrollView>
         </Grid>
         <ActivityIndicator Grid.Row="1" IsRunning="{Binding BindingContext.<#= IsLoadingPropertyName #>, Mode=OneWay, Source={x:Reference eformUsrCntrlRootNode}}"/>
+        <ContentView ControlTemplate="{DynamicResource ctkForDel}" Grid.Row="2">
+            <ContentView.Resources>
+                <ResourceDictionary>
+
 <#
     for (int InputTypeId = 1; InputTypeId <= 3; InputTypeId++) {
         string convName= AddEformModeEnumToVisibilityConverterClassName;
-        if(InputTypeId == 2) { convName= UpdEformModeEnumToVisibilityConverterClassName; }
-        if(InputTypeId == 3) { convName= DelEformModeEnumToVisibilityConverterClassName; }
+        string controlTemplateKey = "ctkForAdd";
+        if(InputTypeId == 2) { convName= UpdEformModeEnumToVisibilityConverterClassName; controlTemplateKey = "ctkForUpd"; }
+        if(InputTypeId == 3) { convName= DelEformModeEnumToVisibilityConverterClassName; controlTemplateKey = "ctkForDel"; }
 #>
-        <StackLayout Orientation="Vertical"  Grid.Row="2"
-            IsVisible="{Binding BindingContext.<#= EformModeVMPropertyName #>, Mode=OneWay, Converter={StaticResource <#= convName #>}, Source={x:Reference eformUsrCntrlRootNode}}">
+                <ControlTemplate x:Key="<#= controlTemplateKey #>">
+                    <StackLayout Orientation="Vertical">
+                        
 <#
 
         bool isNewLine = false;
@@ -698,11 +704,33 @@
                     currGridFlexRow++;
                 }
 #>
-        </StackLayout>
+                    </StackLayout>
+                </ControlTemplate> 
+
 <#
     }
 #>
+            </ResourceDictionary>
+        </ContentView.Resources>
+            <ContentView.Triggers>
+<#
+    // "ctkForDel" is default so InputTypeId <= 2; (not 3)
+    for (int InputTypeId = 1; InputTypeId <= 2; InputTypeId++) {
+        string convName= AddEformModeEnumToVisibilityConverterClassName;
+        string controlTemplateKey = "ctkForAdd";
+        if(InputTypeId == 2) { convName= UpdEformModeEnumToVisibilityConverterClassName; controlTemplateKey = "ctkForUpd"; }
+        // "ctkForDel" is default
+        // if(InputTypeId == 3) { convName= DelEformModeEnumToVisibilityConverterClassName; controlTemplateKey = "ctkForDel"; }
+#>
 
+                <DataTrigger TargetType="ContentView" Binding="{Binding BindingContext.<#= EformModeVMPropertyName #>, Mode=OneWay, Converter={StaticResource <#= convName #>}, Source={x:Reference eformUsrCntrlRootNode}}" Value="True">
+                    <Setter Property="ControlTemplate" Value="{DynamicResource <#= controlTemplateKey #>}" />
+                </DataTrigger>
+<#
+    }
+#>
+            </ContentView.Triggers>
+        </ContentView>
         <StackLayout Orientation="Horizontal" Grid.Row="3"  Margin="8" IsVisible="{Binding <#= ShowSubmitPropertyName #>, Mode=OneWay,  Source={x:Reference eformUsrCntrlRootNode} }">
             <Button Text="Submit" Command="{Binding BindingContext.<#= SubmitCommandPropertyName #>, Source={x:Reference eformUsrCntrlRootNode}}" />
             <Button Text="Cancel" Command="{Binding BindingContext.<#= CancelCommandPropertyName #>, Source={x:Reference eformUsrCntrlRootNode}}" />
