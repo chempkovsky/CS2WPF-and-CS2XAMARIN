@@ -1,5 +1,5 @@
 ﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
-<#@ output extension="xaml" #>
+<#@ output extension="cs" #>
 <#@ assembly name="System.Core" #>
 <#@ import namespace="System" #>
 <#@ import namespace="System.Linq" #>
@@ -11,48 +11,46 @@
 <#@ import namespace="CS2WPF.Model.Serializable" #>
 <#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
-
+using Xamarin.Forms;
+using System.Windows.Input;
+using System.Collections.Generic;
 <#
 
-    string IconFontFolder      = "00178-IconFont.cs";
-    string IconFontClassName   = GetModelClassName(Model, IconFontFolder);
-    string IconFontNameSpace   = GetModelNameSpace(Model, IconFontFolder);
-    string IconFontNameProject = GetModelProjectName(Model, IconFontFolder);
+    string UserControlWithContainerMenuFolder       = "00628-UserControlWithContainerMenu.xaml.cs";
+    string UserControlWithContainerMenuClassName    = GetModelClassName(Model, UserControlWithContainerMenuFolder);
+    string UserControlWithContainerMenuNameSpace    = GetModelNameSpace(Model, UserControlWithContainerMenuFolder);
 
-    string AccessDeniedPageFolder     = "00679-AccessDeniedPage.xaml.cs";
-    string AccessDeniedPageClassName  = GetModelClassName(Model, AccessDeniedPageFolder);
-    string AccessDeniedPageNameSpace  = GetModelNameSpace(Model, AccessDeniedPageFolder);
-    string AccessDeniedPageProject    = GetModelProjectName(Model, AccessDeniedPageFolder);
+    string PageNotFoundUserControlFolder            = "00684-PageNotFoundUserControl.xaml.cs";
+    string PageNotFoundUserControlClassName         = GetModelClassName(Model, PageNotFoundUserControlFolder);
+    string PageNotFoundUserControlNameSpace         = GetModelNameSpace(Model, PageNotFoundUserControlFolder);
 
-    string AccessDeniedPageXamlFolder      = "00681-AccessDeniedPage.xaml";
-    string AccessDeniedPageXamlClassName   = GetModelClassName(Model, AccessDeniedPageXamlFolder);
-    string AccessDeniedPageXamlNameSpace   = GetModelNameSpace(Model, AccessDeniedPageXamlFolder);
-    string AccessDeniedPageXamlProject     = GetModelProjectName(Model, AccessDeniedPageXamlFolder);
-    
-    string IconFontPrefix = "clr-namespace:" + IconFontNameSpace;
-    if(IconFontNameProject != AccessDeniedPageProject) {
-        IconFontPrefix = IconFontPrefix + ";assembly=" + IconFontNameProject;
-    }
+
+    List<string> nmSpaces = new List<string>();
+    if ((PageNotFoundUserControlNameSpace != UserControlWithContainerMenuNameSpace) && (nmSpaces.IndexOf(UserControlWithContainerMenuNameSpace) < 0)) 
+        nmSpaces.Add(UserControlWithContainerMenuNameSpace);
 
 #>
+<# 
+    foreach(string ns in nmSpaces) {
+#>
+using <#= ns #>;
+<#
+    }
+#>
 
-<ContentPage x:Class="<#= AccessDeniedPageNameSpace #>.<#= AccessDeniedPageClassName #>"
-             xmlns="http://xamarin.com/schemas/2014/forms"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:prism="http://prismlibrary.com"
-             prism:ViewModelLocator.AutowireViewModel="True"
+namespace <#= PageNotFoundUserControlNameSpace #> {
+    /// <summary>
+    /// Interaction logic for <#= PageNotFoundUserControlClassName #>.xaml
+    /// </summary>
+    public partial class <#= PageNotFoundUserControlClassName #>: <#= UserControlWithContainerMenuClassName #>
+    {
+        public <#= PageNotFoundUserControlClassName #>()
+        {
+            InitializeComponent();
+        }
 
-             xmlns:fontIcons="<#= IconFontPrefix #>"
-
-             x:Name="accessDeniedCntrlRootNode">
-    <StackLayout HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" Orientation="Vertical">
-        <Label  FontFamily="CustomIconFontAlias" HorizontalOptions="Center" FontSize="Header"
-                Text="{x:Static fontIcons:<#= IconFontClassName #>.Pan_tool}"/>
-        <Label Text="Access Denied" HorizontalOptions="Center" FontSize="Title"/>
-    </StackLayout>
-    
-</ContentPage>
-
+    }
+}
 
 <#+
 
@@ -123,27 +121,6 @@
                 
         }
         return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
-    }
-    string GetModelProjectName(ModelViewSerializable model, string fileType) {
-        string result="";
-        if ((model == null) || string.IsNullOrEmpty(fileType)) {
-            return result;
-        }
-        if (model.CommonStaffs == null) {
-            return result;
-        }
-        CommonStaffSerializable refItem= 
-            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
-        if (refItem == null) {
-            return result;
-        }
-        if(string.IsNullOrEmpty(refItem.FileProject)) {
-            return result;
-        }
-        string[] fnArr = refItem.FileProject.Split(new char[] {'\\'}, 100, System.StringSplitOptions.None); 
-        string fn = fnArr[fnArr.Length - 1];
-
-        return fn.Replace(".csproj","");
     }
 
 #>

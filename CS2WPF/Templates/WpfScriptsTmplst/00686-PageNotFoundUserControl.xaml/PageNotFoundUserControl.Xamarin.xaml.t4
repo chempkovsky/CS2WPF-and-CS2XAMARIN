@@ -1,0 +1,204 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="xaml" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+
+<#
+
+    string IconFontFolder      = "00178-IconFont.cs";
+    string IconFontClassName   = GetModelClassName(Model, IconFontFolder);
+    string IconFontNameSpace   = GetModelNameSpace(Model, IconFontFolder);
+    string IconFontNameProject = GetModelProjectName(Model, IconFontFolder);
+
+    string UserControlWithContainerMenuFolder       = "00628-UserControlWithContainerMenu.xaml.cs";
+    string UserControlWithContainerMenuClassName    = GetModelClassName(Model, UserControlWithContainerMenuFolder);
+    string UserControlWithContainerMenuNameSpace    = GetModelNameSpace(Model, UserControlWithContainerMenuFolder);
+    string UserControlWithContainerMenuProject      = GetModelProjectName(Model, UserControlWithContainerMenuFolder);
+
+    string PageNotFoundUserControlFolder            = "00684-PageNotFoundUserControl.xaml.cs";
+    string PageNotFoundUserControlClassName         = GetModelClassName(Model, PageNotFoundUserControlFolder);
+    string PageNotFoundUserControlNameSpace         = GetModelNameSpace(Model, PageNotFoundUserControlFolder);
+    string PageNotFoundUserControlProject           = GetModelProjectName(Model, PageNotFoundUserControlFolder);
+
+    string PageNotFoundUserControlXamlFolder            = "00686-PageNotFoundUserControl.xaml";
+    string PageNotFoundUserControlXamlClassName         = GetModelClassName(Model, PageNotFoundUserControlXamlFolder);
+    string PageNotFoundUserControlXamlNameSpace         = GetModelNameSpace(Model, PageNotFoundUserControlXamlFolder);
+    string PageNotFoundUserControlXamlProject           = GetModelProjectName(Model, PageNotFoundUserControlXamlFolder);
+
+    string ShowBackBtnPropertyName                  = "ShowBackBtn";
+    string OnNavigationBackCommandPropertyName      = "OnNavigationBackCommand";
+    string ContainerMenuItemsPropertyName           = "ContainerMenuItems";
+    string OnContainerMenuItemsCommandPropertyName  = "OnContainerMenuItemsCommand";
+
+
+    string IconFontPrefix = "clr-namespace:" + IconFontNameSpace;
+    if(IconFontNameProject != PageNotFoundUserControlProject) {
+        IconFontPrefix = IconFontPrefix + ";assembly=" + IconFontNameProject;
+    }
+    string ucwcmPrefix = "clr-namespace:" + UserControlWithContainerMenuNameSpace;
+    if(UserControlWithContainerMenuProject != PageNotFoundUserControlProject) {
+        ucwcmPrefix = ucwcmPrefix + ";assembly=" + UserControlWithContainerMenuProject;
+    }
+
+#>
+
+<ucwcm:<#= UserControlWithContainerMenuClassName #> x:Class="<#= PageNotFoundUserControlNameSpace #>.<#= PageNotFoundUserControlClassName #>"
+             xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:prism="http://prismlibrary.com"
+             prism:ViewModelLocator.AutowireViewModel="True"
+
+             xmlns:fontIcons="<#= IconFontPrefix #>"
+             xmlns:ucwcm="<#= ucwcmPrefix #>"
+             
+
+             x:Name="accessDeniedCntrlRootNode">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <ScrollView Grid.Row="0" 
+            Orientation="Horizontal" VerticalScrollBarVisibility="Never" HorizontalScrollBarVisibility="Default" HorizontalOptions="End">
+            <StackLayout Orientation="Horizontal">
+                <Button WidthRequest="40" 
+                        IsVisible="{Binding Path=BindingContext.<#= ShowBackBtnPropertyName #>, Mode=OneWay, Source={x:Reference accessDeniedCntrlRootNode}}"
+                        Command="{Binding Path=BindingContext.<#= OnNavigationBackCommandPropertyName #>, Source={x:Reference accessDeniedCntrlRootNode}}"
+                        Text="{x:Static fontIcons:IconFont.Arrow_back}" FontFamily="CustomIconFontAlias" BackgroundColor="{DynamicResource IconButtonBackgroundColor}" 
+                        TextColor="{DynamicResource IconButtonPrimaryColor}" 
+                        FontSize="{OnPlatform iOS=Large, Android=Medium, UWP=Medium}">
+                </Button>
+                <StackLayout Orientation="Horizontal" 
+                                BindableLayout.ItemsSource="{Binding <#= ContainerMenuItemsPropertyName #>, Source={x:Reference accessDeniedCntrlRootNode}}">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate>
+                            <Button WidthRequest="40"
+                                Command="{Binding <#= OnContainerMenuItemsCommandPropertyName #>, Source={x:Reference accessDeniedCntrlRootNode}}"
+                                CommandParameter="{Binding}"
+                                IsEnabled="{Binding Enabled}"
+                                Text="{Binding IconName}" 
+                                FontFamily="CustomIconFontAlias" 
+                                BackgroundColor="{DynamicResource IconButtonBackgroundColor}" 
+                                TextColor="{Binding IconColor}" 
+                                FontSize="{OnPlatform iOS=Large, Android=Medium, UWP=Medium }"/>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </StackLayout>
+            </StackLayout>
+        </ScrollView>
+
+
+        <StackLayout Grid.Row="1" 
+                    HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" Orientation="Vertical">
+            <Label  FontFamily="CustomIconFontAlias" HorizontalOptions="Center" FontSize="Header"
+                    Text="{x:Static fontIcons:<#= IconFontClassName #>.Unpublished}"/>
+            <Label Text="Page Not Found" HorizontalOptions="Center" FontSize="Title"/>
+        </StackLayout>
+    </Grid>
+    
+</ucwcm:<#= UserControlWithContainerMenuClassName #>>
+
+
+<#+
+
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+    string GetModelProjectName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileProject)) {
+            return result;
+        }
+        string[] fnArr = refItem.FileProject.Split(new char[] {'\\'}, 100, System.StringSplitOptions.None); 
+        string fn = fnArr[fnArr.Length - 1];
+
+        return fn.Replace(".csproj","");
+    }
+
+#>

@@ -1,0 +1,198 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+using Xamarin.Forms;
+using System.Collections.Generic;
+using System.Windows.Input;
+
+<#
+
+    string ContentViewWithBCFeedbackFolder      = "00168-ContentViewWithBCFeedback.cs";
+    string ContentViewWithBCFeedbackClassName   = GetModelClassName(Model, ContentViewWithBCFeedbackFolder);
+    string ContentViewWithBCFeedbackNameSpace   = GetModelNameSpace(Model, ContentViewWithBCFeedbackFolder);
+
+    string IWebServiceFilterMenuInterfaceFolder      = "00206-IWebServiceFilterMenuInterface.cs";
+    string IWebServiceFilterMenuInterfaceClassName   = GetModelClassName(Model, IWebServiceFilterMenuInterfaceFolder);
+    string IWebServiceFilterMenuInterfaceNameSpace   = GetModelNameSpace(Model, IWebServiceFilterMenuInterfaceFolder);
+
+    string UserControlWithContainerMenuFolder       = "00628-UserControlWithContainerMenu.xaml.cs";
+    string UserControlWithContainerMenuClassName    = GetModelClassName(Model, UserControlWithContainerMenuFolder);
+    string UserControlWithContainerMenuNameSpace    = GetModelNameSpace(Model, UserControlWithContainerMenuFolder);
+
+    string ContainerMenuItemsPropertyName           = "ContainerMenuItems";
+    string ContainerMenuItemsCommandPropertyName    = "ContainerMenuItemsCommand";
+    string OnContainerMenuItemsCommandPropertyName  = "OnContainerMenuItemsCommand";
+
+
+    List<string> nmSpaces = new List<string>();
+    if ((UserControlWithContainerMenuNameSpace != IWebServiceFilterMenuInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterMenuInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IWebServiceFilterMenuInterfaceNameSpace);
+    if ((UserControlWithContainerMenuNameSpace != ContentViewWithBCFeedbackNameSpace) && (nmSpaces.IndexOf(ContentViewWithBCFeedbackNameSpace) < 0)) 
+        nmSpaces.Add(ContentViewWithBCFeedbackNameSpace);
+
+    
+#>
+<# 
+    foreach(string ns in nmSpaces) {
+#>
+using <#= ns #>;
+<#
+    }
+#>
+
+
+namespace <#= UserControlWithContainerMenuNameSpace #> {
+    /// <summary>
+    /// Interaction logic for <#= UserControlWithContainerMenuClassName #>.xaml
+    /// </summary>
+    public class <#= UserControlWithContainerMenuClassName #>: <#= ContentViewWithBCFeedbackClassName #>
+    {
+
+        #region <#= ContainerMenuItemsPropertyName #>
+        public static readonly BindableProperty <#= ContainerMenuItemsPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= ContainerMenuItemsPropertyName #>", typeof(IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>),
+                typeof(<#= UserControlWithContainerMenuClassName #>),
+                null);
+        public IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> <#= ContainerMenuItemsPropertyName #>
+        {
+            get
+            {
+                return (IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>)GetValue(<#= ContainerMenuItemsPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= ContainerMenuItemsPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= ContainerMenuItemsCommandPropertyName #>
+        private static void <#= ContainerMenuItemsCommandPropertyName #>Changed(BindableObject bindable, object oldValue, object newValue)
+        {
+            <#= UserControlWithContainerMenuClassName #> d = bindable as <#= UserControlWithContainerMenuClassName #>;
+            if (d != null)
+            {
+                if (d.<#= OnContainerMenuItemsCommandPropertyName #> != null)
+                {
+                    (d.<#= OnContainerMenuItemsCommandPropertyName #> as Command).ChangeCanExecute();
+                }
+            }
+        }
+        public static readonly BindableProperty <#= ContainerMenuItemsCommandPropertyName #>Property =
+            BindableProperty.Create(nameof(<#= ContainerMenuItemsCommandPropertyName #>), typeof(ICommand), 
+            typeof(<#= UserControlWithContainerMenuClassName #>), 
+            null, 
+            propertyChanged: <#= ContainerMenuItemsCommandPropertyName #>Changed);
+        public ICommand <#= ContainerMenuItemsCommandPropertyName #>
+        {
+            get { return (ICommand)GetValue(<#= ContainerMenuItemsCommandPropertyName #>Property); }
+            set { SetValue(<#= ContainerMenuItemsCommandPropertyName #>Property, value); }
+        }
+        #endregion
+        #region <#= OnContainerMenuItemsCommandPropertyName #>
+        protected ICommand _<#= OnContainerMenuItemsCommandPropertyName #> = null;
+        public ICommand <#= OnContainerMenuItemsCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= OnContainerMenuItemsCommandPropertyName #> ?? (_<#= OnContainerMenuItemsCommandPropertyName #> = new Command((p) => <#= OnContainerMenuItemsCommandPropertyName #>Execute(p), (p) => <#= OnContainerMenuItemsCommandPropertyName #>CanExecute(p)));
+            }
+        }
+        protected void <#= OnContainerMenuItemsCommandPropertyName #>Execute(object prm)
+        {
+            ICommand cmd = <#= ContainerMenuItemsCommandPropertyName #>;
+            if(cmd != null) {
+                if(cmd.CanExecute(prm)) {
+                    cmd.Execute(prm);
+                }
+            }
+        }
+        protected bool <#= OnContainerMenuItemsCommandPropertyName #>CanExecute(object p)
+        {
+            return (<#= ContainerMenuItemsCommandPropertyName #> != null); 
+        }
+        #endregion
+
+    }
+}
+
+<#+
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+#>
