@@ -14,43 +14,47 @@
 
 <#
 
-    string IconFontFolder      = "00178-IconFont.cs";
-    string IconFontClassName   = GetModelClassName(Model, IconFontFolder);
-    string IconFontNameSpace   = GetModelNameSpace(Model, IconFontFolder);
-    string IconFontNameProject = GetModelProjectName(Model, IconFontFolder);
+    string LogoutUserPageFolder     = "00719-LogoutUserPage.xaml.cs";
+    string LogoutUserPageClassName  = GetModelClassName(Model, LogoutUserPageFolder);
+    string LogoutUserPageNameSpace  = GetModelNameSpace(Model, LogoutUserPageFolder);
+    string LogoutUserPageProject    = GetModelProjectName(Model, LogoutUserPageFolder);
 
-    string HomePageFolder     = "00691-HomePage.xaml.cs";
-    string HomePageClassName  = GetModelClassName(Model, HomePageFolder);
-    string HomePageNameSpace  = GetModelNameSpace(Model, HomePageFolder);
-    string HomePageProject    = GetModelProjectName(Model, HomePageFolder);
+    string LogoutUserPageXamlFolder      = "00721-LogoutUserPage.xaml";
+    string LogoutUserPageXamlClassName   = GetModelClassName(Model, LogoutUserPageXamlFolder);
+    string LogoutUserPageXamlNameSpace   = GetModelNameSpace(Model, LogoutUserPageXamlFolder);
+    string LogoutUserPageXamlProject     = GetModelProjectName(Model, LogoutUserPageXamlFolder);
 
-    string HomePageXamlFolder      = "00693-HomePage.xaml";
-    string HomePageXamlClassName   = GetModelClassName(Model, HomePageXamlFolder);
-    string HomePageXamlNameSpace   = GetModelNameSpace(Model, HomePageXamlFolder);
-    string HomePageXamlProject     = GetModelProjectName(Model, HomePageXamlFolder);
-    
-    string IconFontPrefix = "clr-namespace:" + IconFontNameSpace;
-    if(IconFontNameProject != HomePageProject) {
-        IconFontPrefix = IconFontPrefix + ";assembly=" + IconFontNameProject;
-    }
+
+    string OkCommandPropertyName            = "OkCommand";
+    string CancelCommandPropertyName        = "CancelCommand";
+
+
 
 #>
 
-<ContentPage x:Class="<#= HomePageNameSpace #>.<#= HomePageClassName #>"
+<ContentPage x:Class="<#= LogoutUserPageNameSpace #>.<#= LogoutUserPageClassName #>"
              xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:prism="http://prismlibrary.com"
              prism:ViewModelLocator.AutowireViewModel="True"
 
-             xmlns:fontIcons="<#= IconFontPrefix #>"
 
-             x:Name="homeCntrlRootNode">
+             x:Name="logoutCntrlRootNode">
+
     <StackLayout HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" Orientation="Vertical">
-        <Label  FontFamily="CustomIconFontAlias" HorizontalOptions="Center" FontSize="Header"
-                Text="{x:Static fontIcons:<#= IconFontClassName #>.Home}"/>
-        <Label Text="Home page" HorizontalOptions="Center" FontSize="Title"/>
+
+        <Label FontSize="Title" Text="Logout User" HorizontalOptions="Center"/>
+
+        <StackLayout Orientation="Vertical" HorizontalOptions="Center" Margin="10,0,10,0">
+                <Label Text="Would you like to logout" HorizontalOptions="Center"/>
+
+                <StackLayout Orientation="Horizontal" Margin="8">
+                        <Button Text=" Ok "  Command="{Binding BindingContext.<#= OkCommandPropertyName #>, Mode=OneWay, Source={x:Reference logoutCntrlRootNode}}"/>
+                        <Button Text=" Cancel "  Command="{Binding BindingContext.<#= CancelCommandPropertyName #>, Mode=OneWay, Source={x:Reference logoutCntrlRootNode}}"/>
+                </StackLayout>
+
+        </StackLayout>
     </StackLayout>
-    
 </ContentPage>
 
 

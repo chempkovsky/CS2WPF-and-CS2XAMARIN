@@ -20,11 +20,17 @@ using Prism.Navigation;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Linq;
+using System.Net.Http.Headers;
 <#
 
-    string IRegisterModelFolder      = "00500-IRegisterModel.cs";
-    string IRegisterModelClassName   = GetModelClassName(Model, IRegisterModelFolder);
-    string IRegisterModelNameSpace   = GetModelNameSpace(Model, IRegisterModelFolder);
+    string IAppGlblSettingsServiceFolder      = "00080-IAppGlblSettingsService.cs";
+    string IAppGlblSettingsServiceClassName   = GetModelClassName(Model, IAppGlblSettingsServiceFolder);
+    string IAppGlblSettingsServiceNameSpace   = GetModelNameSpace(Model, IAppGlblSettingsServiceFolder);
+
+    string IBearerTokenModelFolder      = "00496-IBearerTokenModel.cs";
+    string IBearerTokenModelClassName   = GetModelClassName(Model, IBearerTokenModelFolder);
+    string IBearerTokenModelNameSpace   = GetModelNameSpace(Model, IBearerTokenModelFolder);
+
 
     string IAppGlblLoginServiceFolder      = "00508-IAppGlblLoginService.cs";
     string IAppGlblLoginServiceClassName   = GetModelClassName(Model, IAppGlblLoginServiceFolder);
@@ -35,20 +41,21 @@ using System.Linq;
     string HomePageClassName  = GetModelClassName(Model, HomePageFolder);
     string HomePageNameSpace  = GetModelNameSpace(Model, HomePageFolder);
 
-    string RegisterUserPageFolder               = "00707-RegisterUserPage.xaml.cs";
-    string RegisterUserPageClassName            = GetModelClassName(Model, RegisterUserPageFolder);
-    string RegisterUserPageNameSpace            = GetModelNameSpace(Model, RegisterUserPageFolder);
-    string RegisterUserPageProject              = GetModelProjectName(Model, RegisterUserPageFolder);
+    string LoginUserPageFolder     = "00713-LoginUserPage.xaml.cs";
+    string LoginUserPageClassName  = GetModelClassName(Model, LoginUserPageFolder);
+    string LoginUserPageNameSpace  = GetModelNameSpace(Model, LoginUserPageFolder);
+    string LoginUserPageProject    = GetModelProjectName(Model, LoginUserPageFolder);
 
-    string RegisterUserPageXamlFolder           = "00709-RegisterUserPage.xaml";
-    string RegisterUserPageXamlClassName        = GetModelClassName(Model, RegisterUserPageXamlFolder);
-    string RegisterUserPageXamlNameSpace        = GetModelNameSpace(Model, RegisterUserPageXamlFolder);
-    string RegisterUserPageXamlProject          = GetModelProjectName(Model, RegisterUserPageXamlFolder);
+    string LoginUserPageXamlFolder      = "00715-LoginUserPage.xaml";
+    string LoginUserPageXamlClassName   = GetModelClassName(Model, LoginUserPageXamlFolder);
+    string LoginUserPageXamlNameSpace   = GetModelNameSpace(Model, LoginUserPageXamlFolder);
+    string LoginUserPageXamlProject     = GetModelProjectName(Model, LoginUserPageXamlFolder);
 
-    string RegisterUserPageViewModelFolder      = "00711-RegisterUserPageViewModel.cs";
-    string RegisterUserPageViewModelClassName   = GetModelClassName(Model, RegisterUserPageViewModelFolder);
-    string RegisterUserPageViewModelNameSpace   = GetModelNameSpace(Model, RegisterUserPageViewModelFolder);
-    string RegisterUserPageViewModelProject     = GetModelProjectName(Model, RegisterUserPageViewModelFolder);
+    string LoginUserPageViewModelFolder      = "00717-LoginUserPageViewModel.cs";
+    string LoginUserPageViewModelClassName   = GetModelClassName(Model, LoginUserPageViewModelFolder);
+    string LoginUserPageViewModelNameSpace   = GetModelNameSpace(Model, LoginUserPageViewModelFolder);
+    string LoginUserPageViewModelProject     = GetModelProjectName(Model, LoginUserPageViewModelFolder);
+
 
     string UserNamePropertyName         = "UserName";
     string UserNameCaptionPropertyName  = "UserNameCaption";
@@ -63,11 +70,6 @@ using System.Linq;
     string PassWordIsPasswordPropertyName   = "PassWordIsPassword";
 
     string ConfirmPassWordPropertyName              = "ConfirmPassWord";
-    string ConfirmPassWordCaptionPropertyName       = "ConfirmPassWordCaption";
-    string ConfirmPassWordPropmptPropertyName       = "ConfirmPassWordPropmpt";
-    string ConfirmPassWordErrorPropertyName         = "ConfirmPassWordError";
-    string ConfirmPassWordShowPropertyName          = "ConfirmPassWordShow";
-    string ConfirmPassWordIsPasswordPropertyName    = "ConfirmPassWordIsPassword";
 
     string OkCommandPropertyName                    = "OkCommand";
     string CancelCommandPropertyName                = "CancelCommand";
@@ -75,14 +77,20 @@ using System.Linq;
     string ValueErrorSufix                          = "Error"; 
 
     string AppLoginServicePropertyName              = "GlblLoginSrv";
-    string RegisterMethodName                       = "Register";
+    string LoginMethodName                          = "Login";
+    string AppSettingServicePropertyName            = "GlblSettingsSrv";
+    string BuserNamePropertyName                    = "userName";
+    string Btoken_typePropertyName                  = "token_type";
+    string Baccess_tokenPropertyName                = "access_token";
 
 
     List<string> nmSpaces = new List<string>();
-    if ((RegisterUserPageViewModelNameSpace != IAppGlblLoginServiceNameSpace) && (nmSpaces.IndexOf(IAppGlblLoginServiceNameSpace) < 0)) 
+    if ((LoginUserPageViewModelNameSpace != IAppGlblLoginServiceNameSpace) && (nmSpaces.IndexOf(IAppGlblLoginServiceNameSpace) < 0)) 
         nmSpaces.Add(IAppGlblLoginServiceNameSpace);
-    if ((RegisterUserPageViewModelNameSpace != IRegisterModelNameSpace) && (nmSpaces.IndexOf(IRegisterModelNameSpace) < 0)) 
-        nmSpaces.Add(IRegisterModelNameSpace);
+    if ((LoginUserPageViewModelNameSpace != IBearerTokenModelNameSpace) && (nmSpaces.IndexOf(IBearerTokenModelNameSpace) < 0)) 
+        nmSpaces.Add(IBearerTokenModelNameSpace);
+    if ((LoginUserPageViewModelNameSpace != IAppGlblSettingsServiceNameSpace) && (nmSpaces.IndexOf(IAppGlblSettingsServiceNameSpace) < 0)) 
+        nmSpaces.Add(IAppGlblSettingsServiceNameSpace);
 
 #>
 <# 
@@ -95,28 +103,30 @@ using <#= ns #>;
 
 /*
 
-    "<#= RegisterUserPageViewModelClassName #>" UserControl is defined in the "<#= RegisterUserPageViewModelProject #>"-project.
-    In the file of IModule-class of "<#= RegisterUserPageViewModelProject #>"-project the following line of code must be inserted:
+    "<#= LoginUserPageViewModelClassName #>" UserControl is defined in the "<#= LoginUserPageViewModelProject #>"-project.
+    In the file of IModule-class of "<#= LoginUserPageViewModelProject #>"-project the following line of code must be inserted:
 
 
         public void RegisterTypes(IContainerRegistry containerRegistry)
         {
             ...
 
-            ViewModelLocationProvider.Register<<#= RegisterUserPageClassName #>, <#= RegisterUserPageViewModelClassName #>>();
-            containerRegistry.RegisterForNavigation<<#= RegisterUserPageClassName #>, <#= RegisterUserPageViewModelClassName #>>("<#= RegisterUserPageClassName #>");
+            ViewModelLocationProvider.Register<<#= LoginUserPageClassName #>, <#= LoginUserPageViewModelClassName #>>();
+            containerRegistry.RegisterForNavigation<<#= LoginUserPageClassName #>, <#= LoginUserPageViewModelClassName #>>("<#= LoginUserPageClassName #>");
             ...
         }
 
 */
 
-namespace <#= RegisterUserPageViewModelNameSpace #> {
-    public class <#= RegisterUserPageViewModelClassName #>: INotifyPropertyChanged, INotifyDataErrorInfo  
+namespace <#= LoginUserPageViewModelNameSpace #> {
+    public class <#= LoginUserPageViewModelClassName #>: INotifyPropertyChanged, INotifyDataErrorInfo  
     {
+        <#= IAppGlblSettingsServiceClassName #> _<#= AppSettingServicePropertyName #>;
         <#= IAppGlblLoginServiceClassName #> _<#= AppLoginServicePropertyName #>;
         protected INavigationService _navigationService;
-        public <#= RegisterUserPageViewModelClassName #>(<#= IAppGlblLoginServiceClassName #> <#= AppLoginServicePropertyName #>, INavigationService navigationService) {
+        public <#= LoginUserPageViewModelClassName #>(<#= IAppGlblLoginServiceClassName #> <#= AppLoginServicePropertyName #>, <#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName #>, INavigationService navigationService) {
             _<#= AppLoginServicePropertyName #> = <#= AppLoginServicePropertyName #>;
+            _<#= AppSettingServicePropertyName #> = <#= AppSettingServicePropertyName #>;
             _navigationService = navigationService;
         }
 
@@ -166,17 +176,6 @@ namespace <#= RegisterUserPageViewModelNameSpace #> {
                         ErrorMsg = "<#= PassWordPropertyName #> is a required filed";
                     } else if (stringValue.Length < 6) {
                         ErrorMsg = "<#= PassWordPropertyName #>.Length must be large than 5";
-                    } else if (<#= PassWordPropertyName #> != <#= ConfirmPassWordPropertyName #>) {
-                        ErrorMsg = "<#= PassWordPropertyName #> and <#= ConfirmPassWordPropertyName #> must be identical";
-                    }
-                    break;
-                case "<#= ConfirmPassWordPropertyName #>":
-                    if (string.IsNullOrEmpty(stringValue)) {
-                        ErrorMsg = "<#= ConfirmPassWordPropertyName #> is a required filed";
-                    } else if (stringValue.Length < 6) {
-                        ErrorMsg = "<#= ConfirmPassWordPropertyName #>.Length must be large than 5";
-                    } else if (<#= PassWordPropertyName #> != <#= ConfirmPassWordPropertyName #>) {
-                        ErrorMsg = "<#= PassWordPropertyName #> and <#= ConfirmPassWordPropertyName #> must be identical";
                     }
                     break;
                 default:
@@ -241,7 +240,6 @@ namespace <#= RegisterUserPageViewModelNameSpace #> {
                     _<#= PassWordPropertyName #> = value;
                     OnPropertyChanged();
                     ValidateField(value);
-                    ValidateField(<#= ConfirmPassWordPropertyName #>, "<#= ConfirmPassWordPropertyName #>");
                 }
             }
         }
@@ -250,28 +248,6 @@ namespace <#= RegisterUserPageViewModelNameSpace #> {
         }
         public string <#= PassWordCaptionPropertyName #> {
             get { return "Password"; }
-        }
-        #endregion
-        #region <#= ConfirmPassWordPropertyName #>
-        protected string _<#= ConfirmPassWordPropertyName #> = "";
-        public string <#= ConfirmPassWordPropertyName #> 
-        {
-            get { return _<#= ConfirmPassWordPropertyName #>; }
-            set
-            {
-                if (<#= ConfirmPassWordPropertyName #> != value) {
-                    _<#= ConfirmPassWordPropertyName #> = value;
-                    OnPropertyChanged();
-                    ValidateField(value);
-                    ValidateField(<#= PassWordPropertyName #>, "<#= PassWordPropertyName #>");
-                }
-            }
-        }
-        public string <#= ConfirmPassWordPropmptPropertyName #> {
-            get { return "Repeat Password"; }
-        }
-        public string <#= ConfirmPassWordCaptionPropertyName #> {
-            get { return "Confirm Password"; }
         }
         #endregion
         #region <#= UserNameErrorPropertyName #>
@@ -290,14 +266,6 @@ namespace <#= RegisterUserPageViewModelNameSpace #> {
             }
         }
         #endregion
-        #region <#= ConfirmPassWordErrorPropertyName #>
-        public string <#= ConfirmPassWordErrorPropertyName #> {
-            get 
-            {
-                return GetFirstError("<#= ConfirmPassWordPropertyName #>");
-            }
-        }
-        #endregion
         #region <#= PassWordIsPasswordPropertyName #>
         protected bool _<#= PassWordIsPasswordPropertyName #> = true;
         public bool <#= PassWordIsPasswordPropertyName #> 
@@ -307,20 +275,6 @@ namespace <#= RegisterUserPageViewModelNameSpace #> {
             {
                 if (<#= PassWordIsPasswordPropertyName #> != value) {
                     _<#= PassWordIsPasswordPropertyName #> = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-        #endregion
-        #region <#= ConfirmPassWordIsPasswordPropertyName #>
-        protected bool _<#= ConfirmPassWordIsPasswordPropertyName #> = true;
-        public bool <#= ConfirmPassWordIsPasswordPropertyName #> 
-        {
-            get { return _<#= ConfirmPassWordIsPasswordPropertyName #>; }
-            set
-            {
-                if (<#= ConfirmPassWordIsPasswordPropertyName #> != value) {
-                    _<#= ConfirmPassWordIsPasswordPropertyName #> = value;
                     OnPropertyChanged();
                 }
             }
@@ -357,10 +311,12 @@ namespace <#= RegisterUserPageViewModelNameSpace #> {
         {
             ValidateField(<#= UserNamePropertyName #>, "<#= UserNamePropertyName #>");
             ValidateField(<#= PassWordPropertyName #>, "<#= PassWordPropertyName #>");
-            ValidateField(<#= ConfirmPassWordPropertyName #>, "<#= ConfirmPassWordPropertyName #>");
             if (HasErrors) return;
-            <#= IRegisterModelClassName #> model = await _<#= AppLoginServicePropertyName #>.<#= RegisterMethodName #>(<#= UserNamePropertyName #> , <#= PassWordPropertyName #>, <#= ConfirmPassWordPropertyName #>);
+            <#= IBearerTokenModelClassName #> model = await _<#= AppLoginServicePropertyName #>.<#= LoginMethodName #>(<#= UserNamePropertyName #> , <#= PassWordPropertyName #>);
             if (model == null) return;
+            _<#= AppSettingServicePropertyName #>.AuthInfo = model;
+            _<#= AppSettingServicePropertyName #>.UserName = model.<#= BuserNamePropertyName #>;
+            _<#= AppSettingServicePropertyName #>.Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(model.<#= Btoken_typePropertyName #>, model.<#= Baccess_tokenPropertyName #>);
             await _navigationService.NavigateAsync("<#= HomePageClassName #>");
         }
         protected bool <#= OkCommandPropertyName #>CanExecute(object param)
@@ -382,24 +338,6 @@ namespace <#= RegisterUserPageViewModelNameSpace #> {
             <#= PassWordIsPasswordPropertyName #> = ! <#= PassWordIsPasswordPropertyName #>;
         }
         protected bool <#= PassWordShowPropertyName #>CanExecute(object param)
-        {
-            return true;
-        }
-        #endregion
-        #region <#= ConfirmPassWordShowPropertyName #>Command
-        private ICommand _<#= ConfirmPassWordShowPropertyName #>Command=null;
-        public ICommand <#= ConfirmPassWordShowPropertyName #>Command
-        {
-            get
-            {
-                return _<#= ConfirmPassWordShowPropertyName #>Command ?? (_<#= ConfirmPassWordShowPropertyName #>Command = new Command((param) => <#= ConfirmPassWordShowPropertyName #>Action(param), (param) => <#= ConfirmPassWordShowPropertyName #>CanExecute(param)));
-            }
-        }
-        protected void <#= ConfirmPassWordShowPropertyName #>Action(object param)
-        {
-            <#= ConfirmPassWordIsPasswordPropertyName #> = ! <#= ConfirmPassWordIsPasswordPropertyName #>;
-        }
-        protected bool <#= ConfirmPassWordShowPropertyName #>CanExecute(object param)
         {
             return true;
         }

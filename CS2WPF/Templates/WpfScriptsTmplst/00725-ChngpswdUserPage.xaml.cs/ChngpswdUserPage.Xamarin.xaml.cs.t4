@@ -1,5 +1,5 @@
 ﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
-<#@ output extension="xaml" #>
+<#@ output extension="cs" #>
 <#@ assembly name="System.Core" #>
 <#@ import namespace="System" #>
 <#@ import namespace="System.Linq" #>
@@ -11,48 +11,37 @@
 <#@ import namespace="CS2WPF.Model.Serializable" #>
 <#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+using Xamarin.Forms;
 
 <#
 
-    string IconFontFolder      = "00178-IconFont.cs";
-    string IconFontClassName   = GetModelClassName(Model, IconFontFolder);
-    string IconFontNameSpace   = GetModelNameSpace(Model, IconFontFolder);
-    string IconFontNameProject = GetModelProjectName(Model, IconFontFolder);
+    string ChngpswdUserPageFolder     = "00725-ChngpswdUserPage.xaml.cs";
+    string ChngpswdUserPageClassName  = GetModelClassName(Model, ChngpswdUserPageFolder);
+    string ChngpswdUserPageNameSpace  = GetModelNameSpace(Model, ChngpswdUserPageFolder);
 
-    string HomePageFolder     = "00691-HomePage.xaml.cs";
-    string HomePageClassName  = GetModelClassName(Model, HomePageFolder);
-    string HomePageNameSpace  = GetModelNameSpace(Model, HomePageFolder);
-    string HomePageProject    = GetModelProjectName(Model, HomePageFolder);
-
-    string HomePageXamlFolder      = "00693-HomePage.xaml";
-    string HomePageXamlClassName   = GetModelClassName(Model, HomePageXamlFolder);
-    string HomePageXamlNameSpace   = GetModelNameSpace(Model, HomePageXamlFolder);
-    string HomePageXamlProject     = GetModelProjectName(Model, HomePageXamlFolder);
-    
-    string IconFontPrefix = "clr-namespace:" + IconFontNameSpace;
-    if(IconFontNameProject != HomePageProject) {
-        IconFontPrefix = IconFontPrefix + ";assembly=" + IconFontNameProject;
-    }
+    List<string> nmSpaces = new List<string>();
 
 #>
+<# 
+    foreach(string ns in nmSpaces) {
+#>
+using <#= ns #>;
+<#
+    }
+#>
 
-<ContentPage x:Class="<#= HomePageNameSpace #>.<#= HomePageClassName #>"
-             xmlns="http://xamarin.com/schemas/2014/forms"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:prism="http://prismlibrary.com"
-             prism:ViewModelLocator.AutowireViewModel="True"
-
-             xmlns:fontIcons="<#= IconFontPrefix #>"
-
-             x:Name="homeCntrlRootNode">
-    <StackLayout HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" Orientation="Vertical">
-        <Label  FontFamily="CustomIconFontAlias" HorizontalOptions="Center" FontSize="Header"
-                Text="{x:Static fontIcons:<#= IconFontClassName #>.Home}"/>
-        <Label Text="Home page" HorizontalOptions="Center" FontSize="Title"/>
-    </StackLayout>
-    
-</ContentPage>
-
+namespace <#= ChngpswdUserPageNameSpace #> {
+    /// <summary>
+    /// Interaction logic for <#= ChngpswdUserPageClassName #>.xaml
+    /// </summary>
+    public partial class <#= ChngpswdUserPageClassName #>: ContentPage
+    {
+        public <#= ChngpswdUserPageClassName #>()
+        {
+            InitializeComponent();
+        }
+    }
+}
 
 <#+
 
@@ -123,27 +112,6 @@
                 
         }
         return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
-    }
-    string GetModelProjectName(ModelViewSerializable model, string fileType) {
-        string result="";
-        if ((model == null) || string.IsNullOrEmpty(fileType)) {
-            return result;
-        }
-        if (model.CommonStaffs == null) {
-            return result;
-        }
-        CommonStaffSerializable refItem= 
-            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
-        if (refItem == null) {
-            return result;
-        }
-        if(string.IsNullOrEmpty(refItem.FileProject)) {
-            return result;
-        }
-        string[] fnArr = refItem.FileProject.Split(new char[] {'\\'}, 100, System.StringSplitOptions.None); 
-        string fn = fnArr[fnArr.Length - 1];
-
-        return fn.Replace(".csproj","");
     }
 
 #>

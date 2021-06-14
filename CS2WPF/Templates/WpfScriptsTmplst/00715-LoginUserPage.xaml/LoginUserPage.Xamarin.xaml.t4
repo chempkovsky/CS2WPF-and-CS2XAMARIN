@@ -25,17 +25,16 @@
     string IconFontNameProject = GetModelProjectName(Model, IconFontFolder);
 
 
-    string RegisterUserPageFolder     = "00707-RegisterUserPage.xaml.cs";
-    string RegisterUserPageClassName  = GetModelClassName(Model, RegisterUserPageFolder);
-    string RegisterUserPageNameSpace  = GetModelNameSpace(Model, RegisterUserPageFolder);
-    string RegisterUserPageProject    = GetModelProjectName(Model, RegisterUserPageFolder);
+    string LoginUserPageFolder     = "00713-LoginUserPage.xaml.cs";
+    string LoginUserPageClassName  = GetModelClassName(Model, LoginUserPageFolder);
+    string LoginUserPageNameSpace  = GetModelNameSpace(Model, LoginUserPageFolder);
+    string LoginUserPageProject    = GetModelProjectName(Model, LoginUserPageFolder);
 
+    string LoginUserPageXamlFolder      = "00715-LoginUserPage.xaml";
+    string LoginUserPageXamlClassName   = GetModelClassName(Model, LoginUserPageXamlFolder);
+    string LoginUserPageXamlNameSpace   = GetModelNameSpace(Model, LoginUserPageXamlFolder);
+    string LoginUserPageXamlProject     = GetModelProjectName(Model, LoginUserPageXamlFolder);
 
-    string RegisterUserPageXamlFolder      = "00709-RegisterUserPage.xaml";
-    string RegisterUserPageXamlClassName   = GetModelClassName(Model, RegisterUserPageXamlFolder);
-    string RegisterUserPageXamlNameSpace   = GetModelNameSpace(Model, RegisterUserPageXamlFolder);
-    string RegisterUserPageXamlProject     = GetModelProjectName(Model, RegisterUserPageXamlFolder);
-    
     string UserNamePropertyName         = "UserName";
     string UserNameCaptionPropertyName  = "UserNameCaption";
     string UserNamePropmptPropertyName  = "UserNamePropmpt";
@@ -48,30 +47,23 @@
     string PassWordShowPropertyName         = "PassWordShow";
     string PassWordIsPasswordPropertyName   = "PassWordIsPassword";
 
-    string ConfirmPassWordPropertyName              = "ConfirmPassWord";
-    string ConfirmPassWordCaptionPropertyName       = "ConfirmPassWordCaption";
-    string ConfirmPassWordPropmptPropertyName       = "ConfirmPassWordPropmpt";
-    string ConfirmPassWordErrorPropertyName         = "ConfirmPassWordError";
-    string ConfirmPassWordShowPropertyName          = "ConfirmPassWordShow";
-    string ConfirmPassWordIsPasswordPropertyName    = "ConfirmPassWordIsPassword";
-
     string OkCommandPropertyName            = "OkCommand";
     string CancelCommandPropertyName        = "CancelCommand";
 
     string FontFamilyPropertyName                   = "CustomIconFontAlias";
 
     string IconFontPrefix = "clr-namespace:" + IconFontNameSpace;
-    if(IconFontNameProject != RegisterUserPageProject) {
+    if(IconFontNameProject != LoginUserPageProject) {
         IconFontPrefix = IconFontPrefix + ";assembly=" + IconFontNameProject;
     }
     string strnulltoboolPrefix = "clr-namespace:" + StringNullOrEmptyToBoolConverterNameSpace;
-    if(StringNullOrEmptyToBoolConverterProject != RegisterUserPageProject) {
+    if(StringNullOrEmptyToBoolConverterProject != LoginUserPageProject) {
         strnulltoboolPrefix = strnulltoboolPrefix + ";assembly=" + StringNullOrEmptyToBoolConverterProject;
     }
 
 #>
 
-<ContentPage x:Class="<#= RegisterUserPageNameSpace #>.<#= RegisterUserPageClassName #>"
+<ContentPage x:Class="<#= LoginUserPageNameSpace #>.<#= LoginUserPageClassName #>"
              xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:prism="http://prismlibrary.com"
@@ -80,27 +72,27 @@
              xmlns:fontIcons="<#= IconFontPrefix #>"
              xmlns:str2boolconv="<#= strnulltoboolPrefix #>"
 
-             x:Name="registerCntrlRootNode">
+             x:Name="loginCntrlRootNode">
     <ContentPage.Resources>
         <str2boolconv:<#= StringNullOrEmptyToBoolConverterClassName #> x:Key="StringNullOrEmptyToBoolConverter"/>
     </ContentPage.Resources>
 
     <StackLayout HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" Orientation="Vertical">
 
-        <Label FontSize="Title" Text="Register User" HorizontalOptions="Center"/>
+        <Label FontSize="Title" Text="Login User" HorizontalOptions="Center"/>
 
         <StackLayout Orientation="Vertical" HorizontalOptions="Center" Margin="10,0,10,0">
                 <StackLayout Orientation="Vertical">
-                    <Label FontSize="Caption" Text="{Binding BindingContext.<#= UserNameCaptionPropertyName #>, Mode=OneWay, Source={x:Reference registerCntrlRootNode}}" />
-                    <Entry Text="{Binding BindingContext.<#= UserNamePropertyName #>, Mode=TwoWay, Source={x:Reference registerCntrlRootNode}}"/>
+                    <Label FontSize="Caption" Text="{Binding BindingContext.<#= UserNameCaptionPropertyName #>, Mode=OneWay, Source={x:Reference loginCntrlRootNode}}" />
+                    <Entry Text="{Binding BindingContext.<#= UserNamePropertyName #>, Mode=TwoWay, Source={x:Reference loginCntrlRootNode}}"/>
                     <Label FontSize="Caption" 
-                            Text="{Binding BindingContext.<#= UserNamePropmptPropertyName #>, Mode=OneWay, Source={x:Reference registerCntrlRootNode}}"
+                            Text="{Binding BindingContext.<#= UserNamePropmptPropertyName #>, Mode=OneWay, Source={x:Reference loginCntrlRootNode}}"
                             Opacity="0.3"
                             TextColor="Default">
                         <Label.Triggers>
-                            <DataTrigger TargetType="Label" Binding="{Binding BindingContext.<#= UserNameErrorPropertyName #>, Converter={StaticResource StringNullOrEmptyToBoolConverter}, Source={x:Reference registerCntrlRootNode}}" Value="False">
+                            <DataTrigger TargetType="Label" Binding="{Binding BindingContext.<#= UserNameErrorPropertyName #>, Converter={StaticResource StringNullOrEmptyToBoolConverter}, Source={x:Reference loginCntrlRootNode}}" Value="False">
                                 <Setter Property="TextColor" Value="{x:DynamicResource ValidationErrorColor}" />
-                                <Setter Property="Text" Value="{Binding BindingContext.<#= UserNameErrorPropertyName #>, Mode=OneWay, Source={x:Reference registerCntrlRootNode}}"/>
+                                <Setter Property="Text" Value="{Binding BindingContext.<#= UserNameErrorPropertyName #>, Mode=OneWay, Source={x:Reference loginCntrlRootNode}}"/>
                                 <Setter Property="Opacity" Value="0.7" />
                             </DataTrigger>
                         </Label.Triggers>
@@ -109,71 +101,34 @@
 
 
                 <StackLayout Orientation="Vertical">
-                    <Label FontSize="Caption" Text="{Binding BindingContext.<#= PassWordCaptionPropertyName #>, Mode=OneWay, Source={x:Reference registerCntrlRootNode}}" />
+                    <Label FontSize="Caption" Text="{Binding BindingContext.<#= PassWordCaptionPropertyName #>, Mode=OneWay, Source={x:Reference loginCntrlRootNode}}" />
                     <Grid ColumnSpacing="0">
                         <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <Entry IsPassword="{Binding BindingContext.<#= PassWordIsPasswordPropertyName #>, Mode=TwoWay, Source={x:Reference registerCntrlRootNode}}"
-                                Text="{Binding BindingContext.<#= PassWordPropertyName #>, Mode=TwoWay, Source={x:Reference registerCntrlRootNode}}"/>
+                        <Entry IsPassword="{Binding BindingContext.<#= PassWordIsPasswordPropertyName #>, Mode=TwoWay, Source={x:Reference loginCntrlRootNode}}"
+                                Text="{Binding BindingContext.<#= PassWordPropertyName #>, Mode=TwoWay, Source={x:Reference loginCntrlRootNode}}"/>
                         <Button Grid.Column="1" WidthRequest="40"
-                                Command="{Binding BindingContext.<#= PassWordShowPropertyName #>Command, Mode=OneWay, Source={x:Reference registerCntrlRootNode}}"
+                                Command="{Binding BindingContext.<#= PassWordShowPropertyName #>Command, Mode=OneWay, Source={x:Reference loginCntrlRootNode}}"
                                 Text="{x:Static fontIcons:<#= IconFontClassName #>.Remove_red_eye}" FontFamily="<#= FontFamilyPropertyName #>" BackgroundColor="{DynamicResource IconButtonBackgroundColor}" 
                                 TextColor="{DynamicResource IconButtonPrimaryColor}" 
                                 FontSize="{OnPlatform iOS=Default, Android=Large, UWP=Default}">
                             <Button.Triggers>
-                                <DataTrigger TargetType="Button" Binding="{Binding BindingContext.<#= PassWordIsPasswordPropertyName #>, Source={x:Reference registerCntrlRootNode} }" Value="False">
+                                <DataTrigger TargetType="Button" Binding="{Binding BindingContext.<#= PassWordIsPasswordPropertyName #>, Source={x:Reference loginCntrlRootNode} }" Value="False">
                                     <Setter Property="TextColor" Value="{x:DynamicResource ValidationErrorColor}" />
                                 </DataTrigger>
                             </Button.Triggers>
                         </Button>
                     </Grid>
                     <Label FontSize="Caption" 
-                            Text="{Binding BindingContext.<#= PassWordPropmptPropertyName #>, Mode=OneWay, Source={x:Reference registerCntrlRootNode}}"
+                            Text="{Binding BindingContext.<#= PassWordPropmptPropertyName #>, Mode=OneWay, Source={x:Reference loginCntrlRootNode}}"
                             Opacity="0.3"
                             TextColor="Default">
                         <Label.Triggers>
-                            <DataTrigger TargetType="Label" Binding="{Binding BindingContext.<#= PassWordErrorPropertyName #>, Converter={StaticResource StringNullOrEmptyToBoolConverter}, Source={x:Reference registerCntrlRootNode}}" Value="False">
+                            <DataTrigger TargetType="Label" Binding="{Binding BindingContext.<#= PassWordErrorPropertyName #>, Converter={StaticResource StringNullOrEmptyToBoolConverter}, Source={x:Reference loginCntrlRootNode}}" Value="False">
                                 <Setter Property="TextColor" Value="{x:DynamicResource ValidationErrorColor}" />
-                                <Setter Property="Text" Value="{Binding BindingContext.<#= PassWordErrorPropertyName #>, Mode=OneWay, Source={x:Reference registerCntrlRootNode}}"/>
-                                <Setter Property="Opacity" Value="0.7" />
-                            </DataTrigger>
-                        </Label.Triggers>
-                    </Label>
-                </StackLayout>
-
-                <StackLayout Orientation="Vertical">
-                    <Label FontSize="Caption" Text="{Binding BindingContext.<#= ConfirmPassWordCaptionPropertyName #>, Mode=OneWay, Source={x:Reference registerCntrlRootNode}}" />
-                    <Grid ColumnSpacing="0">
-                        <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-
-                        <Entry Grid.Column="0" IsPassword="{Binding BindingContext.<#= ConfirmPassWordIsPasswordPropertyName #>, Mode=TwoWay, Source={x:Reference registerCntrlRootNode}}"
-                                Text="{Binding BindingContext.<#= ConfirmPassWordPropertyName #>, Mode=TwoWay, Source={x:Reference registerCntrlRootNode}}"/>
-                        <Button Grid.Column="1" WidthRequest="40"
-                                Command="{Binding BindingContext.<#= ConfirmPassWordShowPropertyName #>Command, Mode=OneWay, Source={x:Reference registerCntrlRootNode}}"
-                                Text="{x:Static fontIcons:<#= IconFontClassName #>.Remove_red_eye}" FontFamily="<#= FontFamilyPropertyName #>" BackgroundColor="{DynamicResource IconButtonBackgroundColor}" 
-                                TextColor="{DynamicResource IconButtonPrimaryColor}" 
-                                FontSize="{OnPlatform iOS=Default, Android=Large, UWP=Default}">
-                            <Button.Triggers>
-                                <DataTrigger TargetType="Button" Binding="{Binding BindingContext.<#= ConfirmPassWordIsPasswordPropertyName #>, Source={x:Reference registerCntrlRootNode}}" Value="False">
-                                    <Setter Property="TextColor" Value="{x:DynamicResource ValidationErrorColor}" />
-                                </DataTrigger>
-                            </Button.Triggers>
-                        </Button>
-                    </Grid>
-
-                    <Label FontSize="Caption" 
-                            Text="{Binding BindingContext.<#= ConfirmPassWordPropmptPropertyName #>, Mode=OneWay, Source={x:Reference registerCntrlRootNode}}"
-                            Opacity="0.3"
-                            TextColor="Default">
-                        <Label.Triggers>
-                            <DataTrigger TargetType="Label" Binding="{Binding BindingContext.<#= ConfirmPassWordErrorPropertyName #>, Converter={StaticResource StringNullOrEmptyToBoolConverter}, Source={x:Reference registerCntrlRootNode}}" Value="False">
-                                <Setter Property="TextColor" Value="{x:DynamicResource ValidationErrorColor}" />
-                                <Setter Property="Text" Value="{Binding BindingContext.<#= ConfirmPassWordErrorPropertyName #>, Mode=OneWay, Source={x:Reference registerCntrlRootNode}}"/>
+                                <Setter Property="Text" Value="{Binding BindingContext.<#= PassWordErrorPropertyName #>, Mode=OneWay, Source={x:Reference loginCntrlRootNode}}"/>
                                 <Setter Property="Opacity" Value="0.7" />
                             </DataTrigger>
                         </Label.Triggers>
@@ -182,8 +137,8 @@
 
 
                 <StackLayout Orientation="Horizontal" Margin="8">
-                        <Button Text=" Ok "  Command="{Binding BindingContext.<#= OkCommandPropertyName #>, Mode=OneWay, Source={x:Reference registerCntrlRootNode}}"/>
-                        <Button Text=" Cancel "  Command="{Binding BindingContext.<#= CancelCommandPropertyName #>, Mode=OneWay, Source={x:Reference registerCntrlRootNode}}"/>
+                        <Button Text=" Ok "  Command="{Binding BindingContext.<#= OkCommandPropertyName #>, Mode=OneWay, Source={x:Reference loginCntrlRootNode}}"/>
+                        <Button Text=" Cancel "  Command="{Binding BindingContext.<#= CancelCommandPropertyName #>, Mode=OneWay, Source={x:Reference loginCntrlRootNode}}"/>
                 </StackLayout>
 
         </StackLayout>

@@ -26,6 +26,10 @@ using System.Linq;
     string IRegisterModelClassName   = GetModelClassName(Model, IRegisterModelFolder);
     string IRegisterModelNameSpace   = GetModelNameSpace(Model, IRegisterModelFolder);
 
+    string IChangePasswordModelFolder      = "00504-IChangePasswordModel.cs";
+    string IChangePasswordModelClassName   = GetModelClassName(Model, IChangePasswordModelFolder);
+    string IChangePasswordModelNameSpace   = GetModelNameSpace(Model, IChangePasswordModelFolder);
+
     string IAppGlblLoginServiceFolder      = "00508-IAppGlblLoginService.cs";
     string IAppGlblLoginServiceClassName   = GetModelClassName(Model, IAppGlblLoginServiceFolder);
     string IAppGlblLoginServiceNameSpace   = GetModelNameSpace(Model, IAppGlblLoginServiceFolder);
@@ -35,25 +39,28 @@ using System.Linq;
     string HomePageClassName  = GetModelClassName(Model, HomePageFolder);
     string HomePageNameSpace  = GetModelNameSpace(Model, HomePageFolder);
 
-    string RegisterUserPageFolder               = "00707-RegisterUserPage.xaml.cs";
-    string RegisterUserPageClassName            = GetModelClassName(Model, RegisterUserPageFolder);
-    string RegisterUserPageNameSpace            = GetModelNameSpace(Model, RegisterUserPageFolder);
-    string RegisterUserPageProject              = GetModelProjectName(Model, RegisterUserPageFolder);
+    string ChngpswdUserPageFolder           = "00725-ChngpswdUserPage.xaml.cs";
+    string ChngpswdUserPageClassName        = GetModelClassName(Model, ChngpswdUserPageFolder);
+    string ChngpswdUserPageNameSpace        = GetModelNameSpace(Model, ChngpswdUserPageFolder);
+    string ChngpswdUserPageProject          = GetModelProjectName(Model, ChngpswdUserPageFolder);
 
-    string RegisterUserPageXamlFolder           = "00709-RegisterUserPage.xaml";
-    string RegisterUserPageXamlClassName        = GetModelClassName(Model, RegisterUserPageXamlFolder);
-    string RegisterUserPageXamlNameSpace        = GetModelNameSpace(Model, RegisterUserPageXamlFolder);
-    string RegisterUserPageXamlProject          = GetModelProjectName(Model, RegisterUserPageXamlFolder);
+    string ChngpswdUserPageXamlFolder       = "00727-ChngpswdUserPage.xaml";
+    string ChngpswdUserPageXamlClassName    = GetModelClassName(Model, ChngpswdUserPageXamlFolder);
+    string ChngpswdUserPageXamlNameSpace    = GetModelNameSpace(Model, ChngpswdUserPageXamlFolder);
+    string ChngpswdUserPageXamlProject      = GetModelProjectName(Model, ChngpswdUserPageXamlFolder);
 
-    string RegisterUserPageViewModelFolder      = "00711-RegisterUserPageViewModel.cs";
-    string RegisterUserPageViewModelClassName   = GetModelClassName(Model, RegisterUserPageViewModelFolder);
-    string RegisterUserPageViewModelNameSpace   = GetModelNameSpace(Model, RegisterUserPageViewModelFolder);
-    string RegisterUserPageViewModelProject     = GetModelProjectName(Model, RegisterUserPageViewModelFolder);
+    string ChngpswdUserPageViewModelFolder      = "00729-ChngpswdUserPageViewModel.cs";
+    string ChngpswdUserPageViewModelClassName   = GetModelClassName(Model, ChngpswdUserPageViewModelFolder);
+    string ChngpswdUserPageViewModelNameSpace   = GetModelNameSpace(Model, ChngpswdUserPageViewModelFolder);
+    string ChngpswdUserPageViewModelProject     = GetModelProjectName(Model, ChngpswdUserPageViewModelFolder);
 
-    string UserNamePropertyName         = "UserName";
-    string UserNameCaptionPropertyName  = "UserNameCaption";
-    string UserNamePropmptPropertyName  = "UserNamePropmpt";
-    string UserNameErrorPropertyName    = "UserNameError";
+
+    string OldPassWordPropertyName             = "OldPassWord";
+    string OldPassWordCaptionPropertyName      = "OldPassWordCaption";
+    string OldPassWordPropmptPropertyName      = "OldPassWordPropmpt";
+    string OldPassWordErrorPropertyName        = "OldPassWordError";
+    string OldPassWordShowPropertyName         = "OldPassWordShow";
+    string OldPassWordIsPasswordPropertyName   = "OldPassWordIsPassword";
 
     string PassWordPropertyName             = "PassWord";
     string PassWordCaptionPropertyName      = "PassWordCaption";
@@ -75,15 +82,17 @@ using System.Linq;
     string ValueErrorSufix                          = "Error"; 
 
     string AppLoginServicePropertyName              = "GlblLoginSrv";
-    string RegisterMethodName                       = "Register";
+    string ChangePasswordMethodName                 = "ChangePassword";
 
 
     List<string> nmSpaces = new List<string>();
-    if ((RegisterUserPageViewModelNameSpace != IAppGlblLoginServiceNameSpace) && (nmSpaces.IndexOf(IAppGlblLoginServiceNameSpace) < 0)) 
+    if ((ChngpswdUserPageViewModelNameSpace != IAppGlblLoginServiceNameSpace) && (nmSpaces.IndexOf(IAppGlblLoginServiceNameSpace) < 0)) 
         nmSpaces.Add(IAppGlblLoginServiceNameSpace);
-    if ((RegisterUserPageViewModelNameSpace != IRegisterModelNameSpace) && (nmSpaces.IndexOf(IRegisterModelNameSpace) < 0)) 
+    if ((ChngpswdUserPageViewModelNameSpace != IRegisterModelNameSpace) && (nmSpaces.IndexOf(IRegisterModelNameSpace) < 0)) 
         nmSpaces.Add(IRegisterModelNameSpace);
-
+    if ((ChngpswdUserPageViewModelNameSpace != IChangePasswordModelNameSpace) && (nmSpaces.IndexOf(IChangePasswordModelNameSpace) < 0)) 
+        nmSpaces.Add(IChangePasswordModelNameSpace);
+    
 #>
 <# 
     foreach(string ns in nmSpaces) {
@@ -95,27 +104,27 @@ using <#= ns #>;
 
 /*
 
-    "<#= RegisterUserPageViewModelClassName #>" UserControl is defined in the "<#= RegisterUserPageViewModelProject #>"-project.
-    In the file of IModule-class of "<#= RegisterUserPageViewModelProject #>"-project the following line of code must be inserted:
+    "<#= ChngpswdUserPageViewModelClassName #>" UserControl is defined in the "<#= ChngpswdUserPageViewModelProject #>"-project.
+    In the file of IModule-class of "<#= ChngpswdUserPageViewModelProject #>"-project the following line of code must be inserted:
 
 
         public void RegisterTypes(IContainerRegistry containerRegistry)
         {
             ...
 
-            ViewModelLocationProvider.Register<<#= RegisterUserPageClassName #>, <#= RegisterUserPageViewModelClassName #>>();
-            containerRegistry.RegisterForNavigation<<#= RegisterUserPageClassName #>, <#= RegisterUserPageViewModelClassName #>>("<#= RegisterUserPageClassName #>");
+            ViewModelLocationProvider.Register<<#= ChngpswdUserPageClassName #>, <#= ChngpswdUserPageViewModelClassName #>>();
+            containerRegistry.RegisterForNavigation<<#= ChngpswdUserPageClassName #>, <#= ChngpswdUserPageViewModelClassName #>>("<#= ChngpswdUserPageClassName #>");
             ...
         }
 
 */
 
-namespace <#= RegisterUserPageViewModelNameSpace #> {
-    public class <#= RegisterUserPageViewModelClassName #>: INotifyPropertyChanged, INotifyDataErrorInfo  
+namespace <#= ChngpswdUserPageViewModelNameSpace #> {
+    public class <#= ChngpswdUserPageViewModelClassName #>: INotifyPropertyChanged, INotifyDataErrorInfo  
     {
         <#= IAppGlblLoginServiceClassName #> _<#= AppLoginServicePropertyName #>;
         protected INavigationService _navigationService;
-        public <#= RegisterUserPageViewModelClassName #>(<#= IAppGlblLoginServiceClassName #> <#= AppLoginServicePropertyName #>, INavigationService navigationService) {
+        public <#= ChngpswdUserPageViewModelClassName #>(<#= IAppGlblLoginServiceClassName #> <#= AppLoginServicePropertyName #>, INavigationService navigationService) {
             _<#= AppLoginServicePropertyName #> = <#= AppLoginServicePropertyName #>;
             _navigationService = navigationService;
         }
@@ -154,11 +163,13 @@ namespace <#= RegisterUserPageViewModelNameSpace #> {
             string ErrorMsg = null;
             IList<string> rslt = null;
             switch(filedName) {
-                case "<#= UserNamePropertyName #>":
+            
+
+                case "<#= OldPassWordPropertyName #>":
                     if (string.IsNullOrEmpty(stringValue)) {
-                        ErrorMsg = "<#= UserNamePropertyName #> is a required filed";
-                    } else if (stringValue.Length < 3) {
-                        ErrorMsg = "<#= UserNamePropertyName #>.Length must be large than 2";
+                        ErrorMsg = "<#= OldPassWordPropertyName #> is a required filed";
+                    } else if (stringValue.Length < 6) {
+                        ErrorMsg = "<#= OldPassWordPropertyName #>.Length must be large than 5";
                     }
                     break;
                 case "<#= PassWordPropertyName #>":
@@ -208,26 +219,25 @@ namespace <#= RegisterUserPageViewModelNameSpace #> {
             return str==null ? "" : str;
         }
         #endregion
-
-        #region <#= UserNamePropertyName #>
-        protected string _<#= UserNamePropertyName #> = "";
-        public string <#= UserNamePropertyName #> 
+        #region <#= OldPassWordPropertyName #>
+        protected string _<#= OldPassWordPropertyName #> = "";
+        public string <#= OldPassWordPropertyName #> 
         {
-            get { return _<#= UserNamePropertyName #>; }
+            get { return _<#= OldPassWordPropertyName #>; }
             set
             {
-                if (<#= UserNamePropertyName #> != value) {
-                    _<#= UserNamePropertyName #> = value;
+                if (<#= OldPassWordPropertyName #> != value) {
+                    _<#= OldPassWordPropertyName #> = value;
                     OnPropertyChanged();
                     ValidateField(value);
                 }
             }
         }
-        public string <#= UserNamePropmptPropertyName #> {
-            get { return "Enter User Name"; }
+        public string <#= OldPassWordPropmptPropertyName #> {
+            get { return "Enter Old Password"; }
         }
-        public string <#= UserNameCaptionPropertyName #> {
-            get { return "User Name"; }
+        public string <#= OldPassWordCaptionPropertyName #> {
+            get { return "Old Password"; }
         }
         #endregion
         #region <#= PassWordPropertyName #>
@@ -274,11 +284,11 @@ namespace <#= RegisterUserPageViewModelNameSpace #> {
             get { return "Confirm Password"; }
         }
         #endregion
-        #region <#= UserNameErrorPropertyName #>
-        public string <#= UserNameErrorPropertyName #> {
+        #region <#= OldPassWordErrorPropertyName #>
+        public string <#= OldPassWordErrorPropertyName #> {
             get 
             {
-                return GetFirstError("<#= UserNamePropertyName #>");
+                return GetFirstError("<#= OldPassWordPropertyName #>");
             }
         }
         #endregion
@@ -295,6 +305,20 @@ namespace <#= RegisterUserPageViewModelNameSpace #> {
             get 
             {
                 return GetFirstError("<#= ConfirmPassWordPropertyName #>");
+            }
+        }
+        #endregion
+        #region <#= OldPassWordIsPasswordPropertyName #>
+        protected bool _<#= OldPassWordIsPasswordPropertyName #> = true;
+        public bool <#= OldPassWordIsPasswordPropertyName #> 
+        {
+            get { return _<#= OldPassWordIsPasswordPropertyName #>; }
+            set
+            {
+                if (<#= OldPassWordIsPasswordPropertyName #> != value) {
+                    _<#= OldPassWordIsPasswordPropertyName #> = value;
+                    OnPropertyChanged();
+                }
             }
         }
         #endregion
@@ -355,15 +379,33 @@ namespace <#= RegisterUserPageViewModelNameSpace #> {
         }
         protected async void <#= OkCommandPropertyName #>Action(object param)
         {
-            ValidateField(<#= UserNamePropertyName #>, "<#= UserNamePropertyName #>");
+            ValidateField(<#= OldPassWordPropertyName #>, "<#= OldPassWordPropertyName #>");
             ValidateField(<#= PassWordPropertyName #>, "<#= PassWordPropertyName #>");
             ValidateField(<#= ConfirmPassWordPropertyName #>, "<#= ConfirmPassWordPropertyName #>");
             if (HasErrors) return;
-            <#= IRegisterModelClassName #> model = await _<#= AppLoginServicePropertyName #>.<#= RegisterMethodName #>(<#= UserNamePropertyName #> , <#= PassWordPropertyName #>, <#= ConfirmPassWordPropertyName #>);
+            <#= IChangePasswordModelClassName #> model = await _<#= AppLoginServicePropertyName #>.<#= ChangePasswordMethodName #>(<#= OldPassWordPropertyName #>, <#= PassWordPropertyName #>, <#= ConfirmPassWordPropertyName #>);
             if (model == null) return;
             await _navigationService.NavigateAsync("<#= HomePageClassName #>");
         }
         protected bool <#= OkCommandPropertyName #>CanExecute(object param)
+        {
+            return true;
+        }
+        #endregion
+        #region <#= OldPassWordShowPropertyName #>Command
+        private ICommand _<#= OldPassWordShowPropertyName #>Command=null;
+        public ICommand <#= OldPassWordShowPropertyName #>Command
+        {
+            get
+            {
+                return _<#= OldPassWordShowPropertyName #>Command ?? (_<#= OldPassWordShowPropertyName #>Command = new Command((param) => <#= OldPassWordShowPropertyName #>Action(param), (param) => <#= OldPassWordShowPropertyName #>CanExecute(param)));
+            }
+        }
+        protected void <#= OldPassWordShowPropertyName #>Action(object param)
+        {
+            <#= OldPassWordIsPasswordPropertyName #> = ! <#= OldPassWordIsPasswordPropertyName #>;
+        }
+        protected bool <#= OldPassWordShowPropertyName #>CanExecute(object param)
         {
             return true;
         }
@@ -404,7 +446,6 @@ namespace <#= RegisterUserPageViewModelNameSpace #> {
             return true;
         }
         #endregion
-        
     }
 }
 

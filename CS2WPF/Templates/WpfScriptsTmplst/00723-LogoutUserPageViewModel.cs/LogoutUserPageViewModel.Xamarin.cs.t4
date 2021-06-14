@@ -1,0 +1,261 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+
+using System;
+using Xamarin.Forms;
+using System.ComponentModel;
+using System.Windows.Input;
+using Prism.Navigation;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using System.Linq;
+using System.Net.Http.Headers;
+<#
+
+    string IAppGlblSettingsServiceFolder      = "00080-IAppGlblSettingsService.cs";
+    string IAppGlblSettingsServiceClassName   = GetModelClassName(Model, IAppGlblSettingsServiceFolder);
+    string IAppGlblSettingsServiceNameSpace   = GetModelNameSpace(Model, IAppGlblSettingsServiceFolder);
+
+    string IBearerTokenModelFolder      = "00496-IBearerTokenModel.cs";
+    string IBearerTokenModelClassName   = GetModelClassName(Model, IBearerTokenModelFolder);
+    string IBearerTokenModelNameSpace   = GetModelNameSpace(Model, IBearerTokenModelFolder);
+
+
+    string IAppGlblLoginServiceFolder      = "00508-IAppGlblLoginService.cs";
+    string IAppGlblLoginServiceClassName   = GetModelClassName(Model, IAppGlblLoginServiceFolder);
+    string IAppGlblLoginServiceNameSpace   = GetModelNameSpace(Model, IAppGlblLoginServiceFolder);
+    string IAppGlblLoginServiceProject     = GetModelProjectName(Model, IAppGlblLoginServiceFolder);
+
+    string HomePageFolder     = "00691-HomePage.xaml.cs";
+    string HomePageClassName  = GetModelClassName(Model, HomePageFolder);
+    string HomePageNameSpace  = GetModelNameSpace(Model, HomePageFolder);
+
+    string LogoutUserPageFolder     = "00719-LogoutUserPage.xaml.cs";
+    string LogoutUserPageClassName  = GetModelClassName(Model, LogoutUserPageFolder);
+    string LogoutUserPageNameSpace  = GetModelNameSpace(Model, LogoutUserPageFolder);
+    string LogoutUserPageProject    = GetModelProjectName(Model, LogoutUserPageFolder);
+
+    string LogoutUserPageXamlFolder      = "00721-LogoutUserPage.xaml";
+    string LogoutUserPageXamlClassName   = GetModelClassName(Model, LogoutUserPageXamlFolder);
+    string LogoutUserPageXamlNameSpace   = GetModelNameSpace(Model, LogoutUserPageXamlFolder);
+    string LogoutUserPageXamlProject     = GetModelProjectName(Model, LogoutUserPageXamlFolder);
+
+    string LogoutUserPageViewModelFolder      = "00723-LogoutUserPageViewModel.cs";
+    string LogoutUserPageViewModelClassName   = GetModelClassName(Model, LogoutUserPageViewModelFolder);
+    string LogoutUserPageViewModelNameSpace   = GetModelNameSpace(Model, LogoutUserPageViewModelFolder);
+    string LogoutUserPageViewModelProject     = GetModelProjectName(Model, LogoutUserPageViewModelFolder);
+
+
+    string OkCommandPropertyName                    = "OkCommand";
+    string CancelCommandPropertyName                = "CancelCommand";
+
+    string LogoutMethodName                         = "Logout";
+
+
+    string AppLoginServicePropertyName              = "GlblLoginSrv";
+    string LoginMethodName                          = "Login";
+    string AppSettingServicePropertyName            = "GlblSettingsSrv";
+    string BuserNamePropertyName                    = "userName";
+    string Btoken_typePropertyName                  = "token_type";
+    string Baccess_tokenPropertyName                = "access_token";
+
+
+    List<string> nmSpaces = new List<string>();
+    if ((LogoutUserPageViewModelNameSpace != IAppGlblLoginServiceNameSpace) && (nmSpaces.IndexOf(IAppGlblLoginServiceNameSpace) < 0)) 
+        nmSpaces.Add(IAppGlblLoginServiceNameSpace);
+    if ((LogoutUserPageViewModelNameSpace != IBearerTokenModelNameSpace) && (nmSpaces.IndexOf(IBearerTokenModelNameSpace) < 0)) 
+        nmSpaces.Add(IBearerTokenModelNameSpace);
+    if ((LogoutUserPageViewModelNameSpace != IAppGlblSettingsServiceNameSpace) && (nmSpaces.IndexOf(IAppGlblSettingsServiceNameSpace) < 0)) 
+        nmSpaces.Add(IAppGlblSettingsServiceNameSpace);
+
+#>
+<# 
+    foreach(string ns in nmSpaces) {
+#>
+using <#= ns #>;
+<#
+    }
+#>
+
+/*
+
+    "<#= LogoutUserPageViewModelClassName #>" UserControl is defined in the "<#= LogoutUserPageViewModelProject #>"-project.
+    In the file of IModule-class of "<#= LogoutUserPageViewModelProject #>"-project the following line of code must be inserted:
+
+
+        public void RegisterTypes(IContainerRegistry containerRegistry)
+        {
+            ...
+
+            ViewModelLocationProvider.Register<<#= LogoutUserPageClassName #>, <#= LogoutUserPageViewModelClassName #>>();
+            containerRegistry.RegisterForNavigation<<#= LogoutUserPageClassName #>, <#= LogoutUserPageViewModelClassName #>>("<#= LogoutUserPageClassName #>");
+            ...
+        }
+
+*/
+
+namespace <#= LogoutUserPageViewModelNameSpace #> {
+    public class <#= LogoutUserPageViewModelClassName #>: INotifyPropertyChanged
+    {
+        <#= IAppGlblSettingsServiceClassName #> _<#= AppSettingServicePropertyName #>;
+        <#= IAppGlblLoginServiceClassName #> _<#= AppLoginServicePropertyName #>;
+        protected INavigationService _navigationService;
+        public <#= LogoutUserPageViewModelClassName #>(<#= IAppGlblLoginServiceClassName #> <#= AppLoginServicePropertyName #>, <#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName #>, INavigationService navigationService) {
+            _<#= AppLoginServicePropertyName #> = <#= AppLoginServicePropertyName #>;
+            _<#= AppSettingServicePropertyName #> = <#= AppSettingServicePropertyName #>;
+            _navigationService = navigationService;
+        }
+
+        #region INotifyPropertyChanged
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string name = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+        #endregion
+        #region <#= CancelCommandPropertyName #>
+        private ICommand _<#= CancelCommandPropertyName #>;
+        public ICommand <#= CancelCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= CancelCommandPropertyName #> ?? (_<#= CancelCommandPropertyName #> = new Command((param) => <#= CancelCommandPropertyName #>Action(param), (param) => <#= CancelCommandPropertyName #>CanExecute(param)));
+            }
+        }
+        protected async void <#= CancelCommandPropertyName #>Action(object param)
+        {
+            await _navigationService.NavigateAsync("<#= HomePageClassName #>");
+        }
+        protected bool <#= CancelCommandPropertyName #>CanExecute(object param)
+        {
+            return true;
+        }
+        #endregion
+        #region <#= OkCommandPropertyName #>
+        private ICommand _<#= OkCommandPropertyName #>;
+        public ICommand <#= OkCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= OkCommandPropertyName #> ?? (_<#= OkCommandPropertyName #> = new Command((param) => <#= OkCommandPropertyName #>Action(param), (param) => <#= OkCommandPropertyName #>CanExecute(param)));
+            }
+        }
+        protected async void <#= OkCommandPropertyName #>Action(object param)
+        {
+            bool model = await _<#= AppLoginServicePropertyName #>.<#= LogoutMethodName #>();
+            if (!model) return;
+            _<#= AppSettingServicePropertyName #>.AuthInfo = null;
+            _<#= AppSettingServicePropertyName #>.UserName = null;
+            _<#= AppSettingServicePropertyName #>.Client.DefaultRequestHeaders.Authorization = null;
+            await _navigationService.NavigateAsync("<#= HomePageClassName #>");
+        }
+        protected bool <#= OkCommandPropertyName #>CanExecute(object param)
+        {
+            return true;
+        }
+        #endregion
+    }
+}
+
+<#+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+    string GetModelProjectName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileProject)) {
+            return result;
+        }
+        string[] fnArr = refItem.FileProject.Split(new char[] {'\\'}, 100, System.StringSplitOptions.None); 
+        string fn = fnArr[fnArr.Length - 1];
+
+        return fn.Replace(".csproj","");
+    }
+
+#>
