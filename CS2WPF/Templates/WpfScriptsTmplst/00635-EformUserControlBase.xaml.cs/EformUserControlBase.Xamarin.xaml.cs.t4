@@ -26,10 +26,6 @@ using System.Windows.Input;
     string BindingContextFeedbackClassName          = GetModelClassName(Model, BindingContextFeedbackFolder);
     string BindingContextFeedbackNameSpace          = GetModelNameSpace(Model, BindingContextFeedbackFolder);
 
-    string ContentViewWithBCFeedbackFolder          = "00168-ContentViewWithBCFeedback.cs";
-    string ContentViewWithBCFeedbackClassName       = GetModelClassName(Model, ContentViewWithBCFeedbackFolder);
-    string ContentViewWithBCFeedbackNameSpace       = GetModelNameSpace(Model, ContentViewWithBCFeedbackFolder);
-
     string IEformViewModelInterfaceFolder           = "00199-IEformViewModelInterface.cs";
     string IEformViewModelInterfaceClassName        = GetModelClassName(Model, IEformViewModelInterfaceFolder);
     string IEformViewModelInterfaceNameSpace        = GetModelNameSpace(Model, IEformViewModelInterfaceFolder);
@@ -46,6 +42,9 @@ using System.Windows.Input;
     string IWebServiceFilterMenuInterfaceClassName   = GetModelClassName(Model, IWebServiceFilterMenuInterfaceFolder);
     string IWebServiceFilterMenuInterfaceNameSpace   = GetModelNameSpace(Model, IWebServiceFilterMenuInterfaceFolder);
 
+    string UserControlWithContainerMenuFolder       = "00628-UserControlWithContainerMenu.xaml.cs";
+    string UserControlWithContainerMenuClassName    = GetModelClassName(Model, UserControlWithContainerMenuFolder);
+    string UserControlWithContainerMenuNameSpace    = GetModelNameSpace(Model, UserControlWithContainerMenuFolder);
 
 
     string EformUserControlBaseFolder                = "00635-EformUserControlBase.xaml.cs";
@@ -56,10 +55,6 @@ using System.Windows.Input;
 
     string ShowSubmitPropertyName                   = "ShowSubmit";
     string SubmitCommandPropertyName                = "SubmitCommand";
-
-    string ContainerMenuItemsPropertyName           = "ContainerMenuItems";
-    string ContainerMenuItemsCommandPropertyName    = "ContainerMenuItemsCommand";
-    string OnContainerMenuItemsCommandPropertyName  = "OnContainerMenuItemsCommand";
 
     string HiddenFiltersPropertyName                = "HiddenFilters";
     string HiddenFiltersPropertyChangedPropertyName = "HiddenFiltersPropertyChanged";
@@ -89,10 +84,10 @@ using System.Windows.Input;
         nmSpaces.Add(IEformViewModelInterfaceNameSpace);
     if ((EformUserControlBaseNameSpace != IEformViewModelInterfaceNameSpace) && (nmSpaces.IndexOf(IBindingContextChangedNameSpace) < 0)) 
         nmSpaces.Add(IBindingContextChangedNameSpace);
-    if ((EformUserControlBaseNameSpace != ContentViewWithBCFeedbackNameSpace) && (nmSpaces.IndexOf(ContentViewWithBCFeedbackNameSpace) < 0)) 
-        nmSpaces.Add(ContentViewWithBCFeedbackNameSpace);
     if ((EformUserControlBaseNameSpace != BindingContextFeedbackNameSpace) && (nmSpaces.IndexOf(BindingContextFeedbackNameSpace) < 0)) 
         nmSpaces.Add(BindingContextFeedbackNameSpace);
+    if ((EformUserControlBaseNameSpace != UserControlWithContainerMenuNameSpace) && (nmSpaces.IndexOf(UserControlWithContainerMenuNameSpace) < 0)) 
+        nmSpaces.Add(UserControlWithContainerMenuNameSpace);
     
 #>
 <# 
@@ -108,7 +103,7 @@ namespace <#= EformUserControlBaseNameSpace #> {
     /// <summary>
     /// Interaction logic for <#= EformUserControlBaseClassName #>.xaml
     /// </summary>
-    public class <#= EformUserControlBaseClassName #>: <#= ContentViewWithBCFeedbackClassName #>
+    public class <#= EformUserControlBaseClassName #>: <#= UserControlWithContainerMenuClassName #>
     {
        // public <#= EformUserControlBaseClassName #>()
        // {
@@ -172,25 +167,6 @@ namespace <#= EformUserControlBaseNameSpace #> {
             set
             {
                 SetValue(<#= CaptionPropertyName #>Property, value);
-            }
-        }
-        #endregion
-
-        #region <#= ContainerMenuItemsPropertyName #>
-        public static readonly BindableProperty <#= ContainerMenuItemsPropertyName #>Property =
-                BindableProperty.Create(
-                "<#= ContainerMenuItemsPropertyName #>", typeof(IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>),
-                typeof(<#= EformUserControlBaseClassName #>),
-                null);
-        public IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> <#= ContainerMenuItemsPropertyName #>
-        {
-            get
-            {
-                return (IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>)GetValue(<#= ContainerMenuItemsPropertyName #>Property);
-            }
-            set
-            {
-                SetValue(<#= ContainerMenuItemsPropertyName #>Property, value);
             }
         }
         #endregion
@@ -298,54 +274,6 @@ namespace <#= EformUserControlBaseNameSpace #> {
             {
                 SetValue(<#= EformModePropertyName #>Property, value);
             }
-        }
-        #endregion
-
-        #region <#= ContainerMenuItemsCommandPropertyName #>
-        private static void <#= ContainerMenuItemsCommandPropertyName #>Changed(BindableObject bindable, object oldValue, object newValue)
-        {
-            <#= EformUserControlBaseClassName #> d = bindable as <#= EformUserControlBaseClassName #>;
-            if (d != null)
-            {
-                if (d.<#= OnContainerMenuItemsCommandPropertyName #> != null)
-                {
-                    (d.<#= OnContainerMenuItemsCommandPropertyName #> as Command).ChangeCanExecute();
-                }
-            }
-        }
-        public static readonly BindableProperty <#= ContainerMenuItemsCommandPropertyName #>Property =
-            BindableProperty.Create(nameof(<#= ContainerMenuItemsCommandPropertyName #>), typeof(ICommand), 
-            typeof(<#= EformUserControlBaseClassName #>), 
-            null, 
-            propertyChanged: <#= ContainerMenuItemsCommandPropertyName #>Changed);
-        public ICommand <#= ContainerMenuItemsCommandPropertyName #>
-        {
-            get { return (ICommand)GetValue(<#= ContainerMenuItemsCommandPropertyName #>Property); }
-            set { SetValue(<#= ContainerMenuItemsCommandPropertyName #>Property, value); }
-        }
-        #endregion
-
-        #region <#= OnContainerMenuItemsCommandPropertyName #>
-        protected ICommand _<#= OnContainerMenuItemsCommandPropertyName #> = null;
-        public ICommand <#= OnContainerMenuItemsCommandPropertyName #>
-        {
-            get
-            {
-                return _<#= OnContainerMenuItemsCommandPropertyName #> ?? (_<#= OnContainerMenuItemsCommandPropertyName #> = new Command((p) => <#= OnContainerMenuItemsCommandPropertyName #>Execute(p), (p) => <#= OnContainerMenuItemsCommandPropertyName #>CanExecute(p)));
-            }
-        }
-        protected void <#= OnContainerMenuItemsCommandPropertyName #>Execute(object prm)
-        {
-            ICommand cmd = <#= ContainerMenuItemsCommandPropertyName #>;
-            if(cmd != null) {
-                if(cmd.CanExecute(prm)) {
-                    cmd.Execute(prm);
-                }
-            }
-        }
-        protected bool <#= OnContainerMenuItemsCommandPropertyName #>CanExecute(object p)
-        {
-            return (<#= ContainerMenuItemsCommandPropertyName #> != null); 
         }
         #endregion
 

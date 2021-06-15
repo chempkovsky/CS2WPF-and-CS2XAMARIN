@@ -14,11 +14,18 @@
 using Xamarin.Forms;
 <#
 
-    string ReditPageFolder                           = "01817-ReditPage.xaml.cs";
-    string ReditPageClassName                        = GetModelClassName(Model, ReditPageFolder);
-    string ReditPageNameSpace                        = GetModelNameSpace(Model, ReditPageFolder);
+    string UserControlWithContainerMenuFolder       = "00628-UserControlWithContainerMenu.xaml.cs";
+    string UserControlWithContainerMenuClassName    = GetContextModelClassName(Context, UserControlWithContainerMenuFolder);
+    string UserControlWithContainerMenuNameSpace    = GetContextModelNameSpace(Context, UserControlWithContainerMenuFolder);
+    string UserControlWithContainerMenuProject      = GetContextModelProjectName(Context, UserControlWithContainerMenuFolder);
+
+    string RdlistUserControlFolder                  = "02016-RdlistUserControl.xaml.cs";
+    string RdlistUserControlClassName               = GetModelClassName(Model, RdlistUserControlFolder);
+    string RdlistUserControlNameSpace               = GetModelNameSpace(Model, RdlistUserControlFolder);
 
     List<string> nmSpaces = new List<string>();
+    if ((RdlistUserControlNameSpace != UserControlWithContainerMenuNameSpace) && (nmSpaces.IndexOf(UserControlWithContainerMenuNameSpace) < 0)) 
+        nmSpaces.Add(UserControlWithContainerMenuNameSpace);
     
 #>
 <# 
@@ -30,13 +37,13 @@ using <#= ns #>;
 #>
 
 
-namespace <#= ReditPageNameSpace #> {
+namespace <#= RdlistUserControlNameSpace #> {
     /// <summary>
-    /// Interaction logic for <#= ReditPageClassName #>.xaml
+    /// Interaction logic for <#= RdlistUserControlClassName #>.xaml
     /// </summary>
-    public partial class <#= ReditPageClassName #>: ContentPage
+    public partial class <#= RdlistUserControlClassName #>: <#= UserControlWithContainerMenuClassName  #>
     {
-        public <#= ReditPageClassName #>()
+        public <#= RdlistUserControlClassName #>()
         {
             InitializeComponent();
         }
@@ -52,6 +59,9 @@ namespace <#= ReditPageNameSpace #> {
     }
     string GetModelServiceName(ModelViewSerializable model) {
         return GetModelName(model) + "Service";
+    }
+    string GetModelName(ModelViewSerializable model) {
+        return FirstLetterToUpper(model.ViewName);
     }
     string GetFilterPropertyOperatorName(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model, string operatorSufix) {
         if (model.GenerateJSonAttribute) {
@@ -71,9 +81,6 @@ namespace <#= ReditPageNameSpace #> {
     }
     string GetInterfaceName(ModelViewSerializable model) {
         return "I"+GetModelName(model);
-    }
-    string GetModelName(ModelViewSerializable model) {
-        return FirstLetterToUpper(model.ViewName);
     }
     string GetModelNameSpace(ModelViewSerializable model, string fileType) {
         string result="";

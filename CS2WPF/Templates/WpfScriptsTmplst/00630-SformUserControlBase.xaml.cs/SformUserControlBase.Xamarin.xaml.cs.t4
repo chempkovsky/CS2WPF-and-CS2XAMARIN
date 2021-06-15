@@ -18,22 +18,17 @@ using System.Windows.Input;
 
 <#
 
-    string BindingContextFeedbackFolder      = "00166-BindingContextFeedback.cs";
-    string BindingContextFeedbackClassName   = GetModelClassName(Model, BindingContextFeedbackFolder);
-    string BindingContextFeedbackNameSpace   = GetModelNameSpace(Model, BindingContextFeedbackFolder);
+    string BindingContextFeedbackFolder         = "00166-BindingContextFeedback.cs";
+    string BindingContextFeedbackClassName      = GetModelClassName(Model, BindingContextFeedbackFolder);
+    string BindingContextFeedbackNameSpace      = GetModelNameSpace(Model, BindingContextFeedbackFolder);
 
-    string ContentViewWithBCFeedbackFolder      = "00168-ContentViewWithBCFeedback.cs";
-    string ContentViewWithBCFeedbackClassName   = GetModelClassName(Model, ContentViewWithBCFeedbackFolder);
-    string ContentViewWithBCFeedbackNameSpace   = GetModelNameSpace(Model, ContentViewWithBCFeedbackFolder);
+    string ISformViewModelInterfaceFolder       = "00198-ISformViewModelInterface.cs";
+    string ISformViewModelInterfaceClassName    = GetModelClassName(Model, ISformViewModelInterfaceFolder);
+    string ISformViewModelInterfaceNameSpace    = GetModelNameSpace(Model, ISformViewModelInterfaceFolder);
 
-
-    string ISformViewModelInterfaceFolder      = "00198-ISformViewModelInterface.cs";
-    string ISformViewModelInterfaceClassName   = GetModelClassName(Model, ISformViewModelInterfaceFolder);
-    string ISformViewModelInterfaceNameSpace   = GetModelNameSpace(Model, ISformViewModelInterfaceFolder);
-
-    string IBindingContextChangedFolder      = "00220-IBindingContextChanged.cs";
-    string IBindingContextChangedClassName   = GetModelClassName(Model, IBindingContextChangedFolder);
-    string IBindingContextChangedNameSpace   = GetModelNameSpace(Model, IBindingContextChangedFolder);
+    string IBindingContextChangedFolder         = "00220-IBindingContextChanged.cs";
+    string IBindingContextChangedClassName      = GetModelClassName(Model, IBindingContextChangedFolder);
+    string IBindingContextChangedNameSpace      = GetModelNameSpace(Model, IBindingContextChangedFolder);
 
 
     string IWebServiceFilterRsltInterfaceFolder      = "00204-IWebServiceFilterRsltInterface.cs";
@@ -43,6 +38,11 @@ using System.Windows.Input;
     string IWebServiceFilterMenuInterfaceFolder      = "00206-IWebServiceFilterMenuInterface.cs";
     string IWebServiceFilterMenuInterfaceClassName   = GetModelClassName(Model, IWebServiceFilterMenuInterfaceFolder);
     string IWebServiceFilterMenuInterfaceNameSpace   = GetModelNameSpace(Model, IWebServiceFilterMenuInterfaceFolder);
+
+    string UserControlWithContainerMenuFolder        = "00628-UserControlWithContainerMenu.xaml.cs";
+    string UserControlWithContainerMenuClassName     = GetModelClassName(Model, UserControlWithContainerMenuFolder);
+    string UserControlWithContainerMenuNameSpace     = GetModelNameSpace(Model, UserControlWithContainerMenuFolder);
+
 
     string SformUserControlBaseFolder               = "00630-SformUserControlBase.xaml.cs";
     string SformUserControlBaseClassName            = GetModelClassName(Model, SformUserControlBaseFolder);
@@ -59,19 +59,13 @@ using System.Windows.Input;
     string NavigationBackCommandPropertyName        = "NavigationBackCommand";
     string OnNavigationBackCommandPropertyName      = "OnNavigationBackCommand";
 
-
     string TableMenuItemsPropertyName               = "TableMenuItems";
     string TableMenuItemsPropertyChangedPropertyName= "TableMenuItemsPropertyChanged";
     string TableMenuItemsCommandPropertyName        = "TableMenuItemsCommand";
 
-
     string RowMenuItemsPropertyName                 = "RowMenuItems";
     string RowMenuItemsPropertyChangedPropertyName  = "RowMenuItemsPropertyChanged";
     string RowMenuItemsCommandPropertyName          = "RowMenuItemsCommand";
-
-    string ContainerMenuItemsPropertyName           = "ContainerMenuItems";
-    string ContainerMenuItemsCommandPropertyName    = "ContainerMenuItemsCommand";
-    string OnContainerMenuItemsCommandPropertyName  = "OnContainerMenuItemsCommand";
 
     string HiddenFiltersPropertyName                = "HiddenFilters";
     string HiddenFiltersPropertyChangedPropertyName = "HiddenFiltersPropertyChanged";
@@ -100,8 +94,8 @@ using System.Windows.Input;
         nmSpaces.Add(IBindingContextChangedNameSpace);
     if ((SformUserControlBaseNameSpace != ISformViewModelInterfaceNameSpace) && (nmSpaces.IndexOf(ISformViewModelInterfaceNameSpace) < 0)) 
         nmSpaces.Add(ISformViewModelInterfaceNameSpace);
-    if ((SformUserControlBaseNameSpace != ContentViewWithBCFeedbackNameSpace) && (nmSpaces.IndexOf(ContentViewWithBCFeedbackNameSpace) < 0)) 
-        nmSpaces.Add(ContentViewWithBCFeedbackNameSpace);
+    if ((SformUserControlBaseNameSpace != UserControlWithContainerMenuNameSpace) && (nmSpaces.IndexOf(UserControlWithContainerMenuNameSpace) < 0)) 
+        nmSpaces.Add(UserControlWithContainerMenuNameSpace);
     if ((SformUserControlBaseNameSpace != BindingContextFeedbackNameSpace) && (nmSpaces.IndexOf(BindingContextFeedbackNameSpace) < 0)) 
         nmSpaces.Add(BindingContextFeedbackNameSpace);
 
@@ -121,7 +115,7 @@ namespace <#= SformUserControlBaseNameSpace #> {
     /// <summary>
     /// Interaction logic for <#= SformUserControlBaseClassName #>.xaml
     /// </summary>
-    public class <#= SformUserControlBaseClassName #>: <#= ContentViewWithBCFeedbackClassName #>
+    public class <#= SformUserControlBaseClassName #>: <#= UserControlWithContainerMenuClassName #>
     {
 
         #region On<#= BindingContextFeedbackRefPropertyName #>
@@ -376,24 +370,6 @@ namespace <#= SformUserControlBaseNameSpace #> {
             }
         }
         #endregion
-        #region <#= ContainerMenuItemsPropertyName #>
-        public static readonly BindableProperty <#= ContainerMenuItemsPropertyName #>Property =
-                BindableProperty.Create(
-                "<#= ContainerMenuItemsPropertyName #>", typeof(IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>),
-                typeof(<#= SformUserControlBaseClassName #>),
-                null);
-        public IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> <#= ContainerMenuItemsPropertyName #>
-        {
-            get
-            {
-                return (IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>)GetValue(<#= ContainerMenuItemsPropertyName #>Property);
-            }
-            set
-            {
-                SetValue(<#= ContainerMenuItemsPropertyName #>Property, value);
-            }
-        }
-        #endregion
         #region <#= HiddenFiltersPropertyName #>
         private static async void <#= HiddenFiltersPropertyName #>Changed(BindableObject d, object oldValue, object newValue)
         {
@@ -439,59 +415,6 @@ namespace <#= SformUserControlBaseNameSpace #> {
 //                await bcl.<#= OnLoadedPropertyName #>(this);
 //            }
 //        }
-        #endregion
-        #region <#= ContainerMenuItemsCommandPropertyName #>
-        private static void <#= ContainerMenuItemsCommandPropertyName #>Changed(BindableObject bindable, object oldValue, object newValue)
-        {
-            <#= SformUserControlBaseClassName #> d = bindable as <#= SformUserControlBaseClassName #>;
-            if (d != null)
-            {
-                if (d.<#= OnContainerMenuItemsCommandPropertyName #> != null)
-                {
-                    (d.<#= OnContainerMenuItemsCommandPropertyName #> as Command).ChangeCanExecute();
-                }
-            }
-        }
-        public static readonly BindableProperty <#= ContainerMenuItemsCommandPropertyName #>Property =
-            BindableProperty.Create(nameof(<#= ContainerMenuItemsCommandPropertyName #>), typeof(ICommand), 
-            typeof(<#= SformUserControlBaseClassName #>), 
-            null, 
-            propertyChanged: <#= ContainerMenuItemsCommandPropertyName #>Changed);
-        public ICommand <#= ContainerMenuItemsCommandPropertyName #>
-        {
-            get { return (ICommand)GetValue(<#= ContainerMenuItemsCommandPropertyName #>Property); }
-            set { SetValue(<#= ContainerMenuItemsCommandPropertyName #>Property, value); }
-        }
-        #endregion
-        #region <#= OnContainerMenuItemsCommandPropertyName #>
-        protected ICommand _<#= OnContainerMenuItemsCommandPropertyName #> = null;
-        public ICommand <#= OnContainerMenuItemsCommandPropertyName #>
-        {
-            get
-            {
-                return _<#= OnContainerMenuItemsCommandPropertyName #> ?? (_<#= OnContainerMenuItemsCommandPropertyName #> = new Command((p) => <#= OnContainerMenuItemsCommandPropertyName #>Execute(p), (p) => <#= OnContainerMenuItemsCommandPropertyName #>CanExecute(p)));
-            }
-        }
-        protected void <#= OnContainerMenuItemsCommandPropertyName #>Execute(object prm)
-        {
-            ICommand cmd = <#= ContainerMenuItemsCommandPropertyName #>;
-            if(cmd != null) {
-                if(cmd.CanExecute(prm)) {
-                    cmd.Execute(prm);
-                }
-            }
-        }
-        protected bool <#= OnContainerMenuItemsCommandPropertyName #>CanExecute(object p)
-        {
-            return (<#= ContainerMenuItemsCommandPropertyName #> != null); 
-
-//
-//            ICommand cmd = <#= ContainerMenuItemsCommandPropertyName #>;
-//            if (cmd != null)
-//              return cmd.CanExecute(prm);
-//            else
-//              return false;
-        }
         #endregion
         #region <#= NavigationBackCommandPropertyName #>
         private static void <#= NavigationBackCommandPropertyName #>Changed(BindableObject bindable, object oldValue, object newValue)

@@ -80,7 +80,7 @@ using Prism.Navigation;
     string LformUserControlProject          = GetModelProjectName(Model, LformUserControlFolder);
 
 
-    string O2mPageFolder                   = "01697-O2mpPage.xaml.cs";
+    string O2mPageFolder                   = "01697-O2mPage.xaml.cs";
     string O2mPageClassName                = GetModelClassName(Model, O2mPageFolder);
     string O2mPageNameSpace                = GetModelNameSpace(Model, O2mPageFolder);
     string O2mPageProject                  = GetModelProjectName(Model, O2mPageFolder);
@@ -95,6 +95,7 @@ using Prism.Navigation;
     string RowMenuItemsPropertyName                 = "RowMenuItems";
     string RegionPropertyName                       = "Region";
     string RdlistPageRegionPropertyName             = "RdlistPageRegion";
+    string MasterRegionPropertyName                 = "MasterRegion";
     string DetailRegionPropertyName                 = "DetailRegion";
 
     string TableMenuItemsCommandPropertyName        = "TableMenuItemsCommand";
@@ -180,9 +181,9 @@ using <#= ns #>;
 /*
 
 <#
-    if(!IsInTheSameModule) {
+    if (LformUserControlProject != O2mPageProject) {
 #>
-    "<#= LformUserControlClassName #>"-UserControl is defined in the "<#= LformUserControlProject #>"-project.
+    "<#= LformUserControlClassName #>" UserControl is defined in the "<#= LformUserControlProject #>"-project.
     In the file of IModule-class of "<#= LformUserControlProject #>"-project the following line of code must be inserted:
 
         public void OnInitialized(IContainerProvider containerProvider)
@@ -193,14 +194,58 @@ using <#= ns #>;
             {
                 ...
                 // According to requirements of the "<#= O2mPageViewModelClassName #>.cs"-file of "<#= O2mPageProject #>"-project. 
-                regionManager.RegisterViewWithRegion("<#= LformUserControlClassName #><#= RdlistPageRegionPropertyName #>", typeof(<#= LformUserControlClassName #>));
+                regionManager.RegisterViewWithRegion("<#= LformUserControlClassName #><#= MasterRegionPropertyName #>", typeof(<#= LformUserControlClassName #>));
                 ...
             }
             ...
         }
-<#       
+<#
     }
 #>
+
+
+<#
+        foreach(string detailViewName in detailViews) {
+            ModelViewSerializable detailView = GetModelViewByName(Context, detailViewName);
+            if(detailView == null) {
+#>
+/////  can not find the view by Name <#= detailViewName #> 
+<#
+                continue;
+            }
+            string detailViewClassName = GetModelClassName(detailView, LformUserControlFolder);
+            if (string.IsNullOrEmpty(detailViewClassName)) {
+#>
+/////  can not find Lform User control for the view which named: <#= detailViewName #> 
+<#
+                continue;
+            }
+            string localLformUserControlProject  = GetModelProjectName(detailView, LformUserControlFolder);
+            if (localLformUserControlProject != O2mPageProject) {
+
+#>
+   
+    "<#= detailViewClassName #>" UserControl is defined in the "<#= localLformUserControlProject #>"-project.
+    In the file of IModule-class of "<#= localLformUserControlProject #>"-project the following line of code must be inserted:
+
+        public void OnInitialized(IContainerProvider containerProvider)
+        {
+            ...
+            IRegionManager regionManager = containerProvider.Resolve(typeof(IRegionManager)) as IRegionManager;
+            if (regionManager != null)
+            {
+                ...
+                // According to requirements of the "<#= O2mPageViewModelClassName #>.cs"-file of "<#= O2mPageProject #>"-project. 
+                regionManager.RegisterViewWithRegion("<#= detailViewClassName #><#= DetailRegionPropertyName #>", typeof(<#= detailViewClassName #>));
+                ...
+            }
+            ...
+        }
+<#
+            }
+        }
+#>
+
 
     "<#= O2mPageClassName #>" UserControl is defined in the "<#= O2mPageProject #>"-project.
     In the file of IModule-class of "<#= O2mPageProject #>"-project the following line of code must be inserted:

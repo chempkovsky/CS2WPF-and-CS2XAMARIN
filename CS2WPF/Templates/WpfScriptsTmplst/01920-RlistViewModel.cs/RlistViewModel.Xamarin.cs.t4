@@ -54,13 +54,13 @@ using Xamarin.Essentials;
     string WebServiceFilterMenuViewModelClassName   = GetContextModelClassName(Context, WebServiceFilterMenuViewModelFolder);
     string WebServiceFilterMenuViewModelNameSpace   = GetContextModelNameSpace(Context, WebServiceFilterMenuViewModelFolder);
 
-    string AccessDeniedPageFolder                   = "00679-AccessDeniedPage.xaml.cs";
-    string AccessDeniedPageClassName                = GetContextModelClassName(Context, AccessDeniedPageFolder);
-    string AccessDeniedPageNameSpace                = GetContextModelNameSpace(Context, AccessDeniedPageFolder);
+    string AccessDeniedUserControlFolder            = "00678-AccessDeniedUserControl.xaml.cs";
+    string AccessDeniedUserControlClassName         = GetModelClassName(Model, AccessDeniedUserControlFolder);
+    string AccessDeniedUserControlNameSpace         = GetModelNameSpace(Model, AccessDeniedUserControlFolder);
 
-    string PageNotFoundPageFolder                   = "00685-PageNotFoundPage.xaml.cs";
-    string PageNotFoundPageClassName                = GetContextModelClassName(Context, PageNotFoundPageFolder);
-    string PageNotFoundPageNameSpace                = GetContextModelNameSpace(Context, PageNotFoundPageFolder);
+    string PageNotFoundUserControlFolder            = "00684-PageNotFoundUserControl.xaml.cs";
+    string PageNotFoundUserControlClassName         = GetModelClassName(Model, PageNotFoundUserControlFolder);
+    string PageNotFoundUserControlNameSpace         = GetModelNameSpace(Model, PageNotFoundUserControlFolder);
 
     string modelInterfaceFolder                     = "01100-Interface.cs";
     string modelInterfaceClassName                  = GetInterfaceName(Model);
@@ -73,18 +73,18 @@ using Xamarin.Essentials;
     string SformUserControlProject          = GetModelProjectName(Model, SformUserControlFolder);
 
 
-    string ReditPageFolder                  = "01817-ReditPage.xaml.cs";
-    string ReditPageClassName               = GetModelClassName(Model, ReditPageFolder);
-    string ReditPageNameSpace               = GetModelNameSpace(Model, ReditPageFolder);
+    string ReditUserControlFolder           = "01816-ReditUserControl.xaml.cs";
+    string ReditUserControlClassName        = GetModelClassName(Model, ReditUserControlFolder);
+    string ReditUserControlNameSpace        = GetModelNameSpace(Model, ReditUserControlFolder);
 
-    string RlistPageFolder                  = "01917-RlistPage.xaml.cs";
-    string RlistPageClassName               = GetModelClassName(Model, RlistPageFolder);
-    string RlistPageNameSpace               = GetModelNameSpace(Model, RlistPageFolder);
-    string RlistPageProject                 = GetModelProjectName(Model, RlistPageFolder);
-    
-    string RlistPageViewModelFolder         = "01921-RlistPageViewModel.cs";
-    string RlistPageViewModelClassName      = GetModelClassName(Model, RlistPageViewModelFolder);
-    string RlistPageViewModelNameSpace      = GetModelNameSpace(Model, RlistPageViewModelFolder);
+    string RlistUserControlFolder           = "01916-RlistUserControl.xaml.cs";
+    string RlistUserControlClassName        = GetModelClassName(Model, RlistUserControlFolder);
+    string RlistUserControlNameSpace        = GetModelNameSpace(Model, RlistUserControlFolder);
+    string RlistUserControlProject          = GetModelProjectName(Model, RlistUserControlFolder);
+
+    string RlistViewModelFolder             = "01920-RlistViewModel.cs";
+    string RlistViewModelClassName          = GetModelClassName(Model, RlistViewModelFolder);
+    string RlistViewModelNameSpace          = GetModelNameSpace(Model, RlistViewModelFolder);
 
 
     string HiddenFiltersPropertyName                 = "HiddenFilters";
@@ -98,8 +98,8 @@ using Xamarin.Essentials;
     string RowMenuItemsPropertyChangedPropertyName   = "RowMenuItemsPropertyChanged";
 
 
-    string RegionPropertyName                        = "Region";
-    string RlistPageRegionPropertyName               = "RlistPageRegion";
+    string RegionPropertyName                   = "Region";
+    string RlistUserControlRegionPropertyName   = "RlistUserControlRegion";
 
 
     string FormRootServicePropertyName          = "FrmRootSrv";
@@ -146,30 +146,34 @@ using Xamarin.Essentials;
 
     string IsParentLoadedPropertyName           = "IsParentLoaded";
 
+    string CurrentNavigationContextPropertyName = "CurrentNavigationContext";
+    string ShowBackBtnPropertyName              = "ShowBackBtn";
+    string OnNavigationBackCommandPropertyName  = "OnNavigationBackCommand";
+
     List<string> detailViews = GetDetailViews(Model, Context, null);
     List<ModelViewPropertyOfVwSerializable> primKeys = GetModelPrimaryKeyProps(Model);
 
     List<string> nmSpaces = new List<string>();
-    if ((RlistPageViewModelNameSpace != IWebServiceFilterRsltInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace) < 0)) 
+    if ((RlistViewModelNameSpace != IWebServiceFilterRsltInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace) < 0)) 
         nmSpaces.Add(IWebServiceFilterRsltInterfaceNameSpace);
-    if ((RlistPageViewModelNameSpace != WebServiceFilterRsltViewModelNameSpace) && (nmSpaces.IndexOf(WebServiceFilterRsltViewModelNameSpace) < 0)) 
+    if ((RlistViewModelNameSpace != WebServiceFilterRsltViewModelNameSpace) && (nmSpaces.IndexOf(WebServiceFilterRsltViewModelNameSpace) < 0)) 
         nmSpaces.Add(WebServiceFilterRsltViewModelNameSpace);
-    if ((RlistPageViewModelNameSpace != IAppGlblSettingsServiceNameSpace) && (nmSpaces.IndexOf(IAppGlblSettingsServiceNameSpace) < 0)) 
+    if ((RlistViewModelNameSpace != IAppGlblSettingsServiceNameSpace) && (nmSpaces.IndexOf(IAppGlblSettingsServiceNameSpace) < 0)) 
         nmSpaces.Add(IAppGlblSettingsServiceNameSpace);
-    if ((RlistPageViewModelNameSpace != WebServiceFilterMenuViewModelNameSpace) && (nmSpaces.IndexOf(WebServiceFilterMenuViewModelNameSpace) < 0)) 
+    if ((RlistViewModelNameSpace != WebServiceFilterMenuViewModelNameSpace) && (nmSpaces.IndexOf(WebServiceFilterMenuViewModelNameSpace) < 0)) 
         nmSpaces.Add(WebServiceFilterMenuViewModelNameSpace);
-    if ((RlistPageViewModelNameSpace != IWebServiceFilterMenuInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterMenuInterfaceNameSpace) < 0)) 
+    if ((RlistViewModelNameSpace != IWebServiceFilterMenuInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterMenuInterfaceNameSpace) < 0)) 
         nmSpaces.Add(IWebServiceFilterMenuInterfaceNameSpace);
-    if ((RlistPageViewModelNameSpace != IWebServiceFilterMenuInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterMenuInterfaceNameSpace) < 0)) 
+    if ((RlistViewModelNameSpace != IWebServiceFilterMenuInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterMenuInterfaceNameSpace) < 0)) 
         nmSpaces.Add(IWebServiceFilterMenuInterfaceNameSpace);
-    if ((RlistPageViewModelNameSpace != EformModeEnumNameSpace) && (nmSpaces.IndexOf(EformModeEnumNameSpace) < 0)) 
+    if ((RlistViewModelNameSpace != EformModeEnumNameSpace) && (nmSpaces.IndexOf(EformModeEnumNameSpace) < 0)) 
         nmSpaces.Add(EformModeEnumNameSpace);
-    if ((RlistPageViewModelNameSpace != modelInterfaceNameSpace) && (nmSpaces.IndexOf(modelInterfaceNameSpace) < 0)) 
+    if ((RlistViewModelNameSpace != modelInterfaceNameSpace) && (nmSpaces.IndexOf(modelInterfaceNameSpace) < 0)) 
         nmSpaces.Add(modelInterfaceNameSpace);
-    if ((RlistPageViewModelNameSpace != ISformViewModelInterfaceNameSpace) && (nmSpaces.IndexOf(ISformViewModelInterfaceNameSpace) < 0)) 
+    if ((RlistViewModelNameSpace != ISformViewModelInterfaceNameSpace) && (nmSpaces.IndexOf(ISformViewModelInterfaceNameSpace) < 0)) 
         nmSpaces.Add(ISformViewModelInterfaceNameSpace);
 
-    bool IsInTheSameModule = (SformUserControlProject == RlistPageProject);
+    bool IsInTheSameModule = (SformUserControlProject == RlistUserControlProject);
     
     
 #>
@@ -195,8 +199,8 @@ using <#= ns #>;
             if (regionManager != null)
             {
                 ...
-                // According to requirements of the "<#= RlistPageViewModelClassName #>.cs"-file of "<#= RlistPageProject #>"-project. 
-                regionManager.RegisterViewWithRegion("<#= SformUserControlClassName #><#= RlistPageRegionPropertyName #>", typeof(<#= SformUserControlClassName #>));
+                // According to requirements of the "<#= RlistViewModelClassName #>.cs"-file of "<#= RlistUserControlProject #>"-project. 
+                regionManager.RegisterViewWithRegion("<#= SformUserControlClassName #><#= RlistUserControlRegionPropertyName #>", typeof(<#= SformUserControlClassName #>));
                 ...
             }
             ...
@@ -205,34 +209,31 @@ using <#= ns #>;
     }
 #>
 
-    "<#= RlistPageClassName #>" UserControl is defined in the "<#= RlistPageProject #>"-project.
-    In the file of IModule-class of "<#= RlistPageProject #>"-project the following line of code must be inserted:
+    "<#= RlistUserControlClassName #>" UserControl is defined in the "<#= RlistUserControlProject #>"-project.
+    In the file of IModule-class of "<#= RlistUserControlProject #>"-project the following line of code must be inserted:
 
         public void RegisterTypes(IContainerRegistry containerRegistry)
         {
             ...
-            // According to requirements of the "<#= RlistPageViewModelClassName #>.cs"-file of "<#= RlistPageProject #>"-project. 
-            ViewModelLocationProvider.Register<<#= RlistPageClassName #>, <#= RlistPageViewModelClassName #>>();
-            // According to requirements of the "<#= RlistPageViewModelClassName #>.cs"-file of "<#= RlistPageProject #>"-project. 
-            containerRegistry.RegisterForNavigation<<#= RlistPageClassName #>, <#= RlistPageViewModelClassName #>>("<#= RlistPageClassName #>");
-            // Only if you need to get an instance of controls, insert two lines below
-            // According to requirements of the "<#= RlistPageViewModelClassName #>.cs"-file of "<#= RlistPageProject #>"-project. 
-            // containerRegistry.Register<ContentPage, <#= RlistPageClassName #>>("<#= RlistPageClassName #>");
+            // According to requirements of the "<#= RlistViewModelClassName #>.cs"-file of "<#= RlistUserControlProject #>"-project. 
+            ViewModelLocationProvider.Register<<#= RlistUserControlClassName #>, <#= RlistViewModelClassName #>>();
+            // According to requirements of the "<#= RlistViewModelClassName #>.cs"-file of "<#= RlistUserControlProject #>"-project. 
+            containerRegistry.RegisterForRegionNavigation<<#= RlistUserControlClassName #>, <#= RlistViewModelClassName #>>("<#= RlistUserControlClassName #>");
+            // According to requirements of the "<#= RlistViewModelClassName #>.cs"-file of "<#= RlistUserControlProject #>"-project. 
+            containerRegistry.Register<ContentView, <#= RlistUserControlClassName #>>("<#= RlistUserControlClassName #>");
             ...
         }
 */
 
-namespace <#= RlistPageViewModelNameSpace #> {
+namespace <#= RlistViewModelNameSpace #> {
 
-    public class <#= RlistPageViewModelClassName #>: INotifyPropertyChanged, INavigationAware 
+    public class <#= RlistViewModelClassName #>: INotifyPropertyChanged, IRegionAware 
     {
         protected <#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName #>=null;
         protected <#= GetModelServiceInterfaceName(Model) #> <#= FormServicePrefix #><#= Model.ViewName #> = null;
-        protected INavigationService _navigationService;
-        public <#= RlistPageViewModelClassName #>(<#= GetModelServiceInterfaceName(Model) #> _<#= FormServicePrefix #><#= Model.ViewName #>, <#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName  #>, INavigationService navigationService) {
+        public <#= RlistViewModelClassName #>(<#= GetModelServiceInterfaceName(Model) #> _<#= FormServicePrefix #><#= Model.ViewName #>, <#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName  #>) {
             this.<#= AppSettingServicePropertyName #> = <#= AppSettingServicePropertyName #>;
             this.<#= FormServicePrefix #><#= Model.ViewName #> = _<#= FormServicePrefix #><#= Model.ViewName #>;
-            this._navigationService = navigationService;
             PermissionMask = <#= AppSettingServicePropertyName #>.GetViewModelMask("<#= Model.ViewName #>");
             _<#= TableMenuItemsPropertyName #> = GetDefault<#= TableMenuItemsPropertyName #>();
             _<#= RowMenuItemsPropertyName #> = GetDefault<#= RowMenuItemsPropertyName #>();
@@ -315,7 +316,7 @@ namespace <#= RlistPageViewModelNameSpace #> {
 <#
                 continue;
             }
-            string detailViewClassName = GetModelClassName(detailView, RlistPageFolder);
+            string detailViewClassName = GetModelClassName(detailView, RlistUserControlFolder);
             List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detailView, null);
             if (foreignKeys == null) continue;
             if (foreignKeys.Count < 1) continue;
@@ -389,20 +390,22 @@ namespace <#= RlistPageViewModelNameSpace #> {
         }
         #endregion
 
-        protected async Task OnNavigationResult(INavigationResult navResult) {
-            if (navResult.Success) return;
+        protected void OnNavigationResult(IRegionNavigationResult navResult) {
+            if (navResult.Result.HasValue) {
+                if (navResult.Result.Value) return;
+            }
             string navErrorMsg = "Unknown Navigation Error";
-            if (navResult.Exception != null)
+            if (navResult.Error != null)
             {
-                navErrorMsg = navResult.Exception.Message;
-                Exception inner = navResult.Exception.InnerException;
+                navErrorMsg = navResult.Error.Message;
+                Exception inner = navResult.Error.InnerException;
                 while (inner != null)
                 {
                     navErrorMsg = navErrorMsg + ": " + inner.Message;
                     inner = inner.InnerException;
                 }
             }
-            await _navigationService.NavigateAsync("<#= PageNotFoundPageClassName #>");
+            navResult.Context.NavigationService.RequestNavigate(new Uri("<#= PageNotFoundUserControlClassName #>", UriKind.Relative));
             <#= AppSettingServicePropertyName #>.ShowErrorMessage("Navigation Exception", navErrorMsg);
         }
 <#
@@ -414,17 +417,16 @@ namespace <#= RlistPageViewModelNameSpace #> {
 <#
                 continue;
             }
-            string detailViewClassName = GetModelClassName(detailView, RlistPageFolder);
+            string detailViewClassName = GetModelClassName(detailView, RlistUserControlFolder);
             List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detailView, null);
             if (foreignKeys == null) continue;
             if (foreignKeys.Count < 1) continue;
             foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
 #>
         #region <#= detailViewClassName #><#= foreignKey.NavigationName #>Command
-        public async Task <#= detailViewClassName #><#= foreignKey.NavigationName #>Command(<#= modelInterfaceClassName #> selected) { 
+        public void <#= detailViewClassName #><#= foreignKey.NavigationName #>Command(<#= modelInterfaceClassName #> selected) { 
             if (((<#= AppSettingServicePropertyName #>.GetViewModelMask("<#= detailView.ViewName #>") & 1) != 1 )) {
-                INavigationResult nr1 = await _navigationService.NavigateAsync("<#= AccessDeniedPageClassName #>");
-                await OnNavigationResult(nr1);
+                <#= CurrentNavigationContextPropertyName #>.NavigationService.RequestNavigate(new Uri("<#= AccessDeniedUserControlClassName #>", UriKind.Relative), OnNavigationResult);
                 return;
             }
             if(selected == null) return;
@@ -440,8 +442,7 @@ namespace <#= RlistPageViewModelNameSpace #> {
                         }
                     }
 #>
-            INavigationResult nr2 = await _navigationService.NavigateAsync("<#= detailViewClassName #>", navigationParameters);
-            await OnNavigationResult(nr2);
+            <#= CurrentNavigationContextPropertyName #>.NavigationService.RequestNavigate(new Uri("<#= detailViewClassName #>", UriKind.Relative), OnNavigationResult, navigationParameters);
         }
         #endregion
 <#
@@ -508,10 +509,9 @@ namespace <#= RlistPageViewModelNameSpace #> {
         }
         #endregion
         #region <#= SformAddItemCommandPropertyName #>
-        public async Task <#= SformAddItemCommandPropertyName #>() {
+        public void <#= SformAddItemCommandPropertyName #>() {
             if ((PermissionMask & 8) != 8) {
-                INavigationResult nr1 = await _navigationService.NavigateAsync("<#= AccessDeniedPageClassName #>");
-                await OnNavigationResult(nr1);
+                <#= CurrentNavigationContextPropertyName #>.NavigationService.RequestNavigate(new Uri("<#= AccessDeniedUserControlClassName #>", UriKind.Relative), OnNavigationResult);
                 return;
             }
 
@@ -520,8 +520,7 @@ namespace <#= RlistPageViewModelNameSpace #> {
                 navigationParameters.Add(hf.fltrName, hf.fltrValue);
             }
             navigationParameters.Add("<#= EformModeEnumClassName #>", <#= EformModeEnumClassName #>.AddMode);
-            INavigationResult nr2 = await _navigationService.NavigateAsync("<#= ReditPageClassName #>", navigationParameters);
-            await OnNavigationResult(nr2);
+            <#= CurrentNavigationContextPropertyName #>.NavigationService.RequestNavigate(new Uri("<#= ReditUserControlClassName #>", UriKind.Relative), OnNavigationResult, navigationParameters);
         }
         #endregion
         #region <#= TableMenuItemsCommandPropertyName #>
@@ -533,13 +532,13 @@ namespace <#= RlistPageViewModelNameSpace #> {
                 return _<#= TableMenuItemsCommandPropertyName #> ?? (_<#= TableMenuItemsCommandPropertyName #> = new Command((p) => <#= TableMenuItemsCommandPropertyName #>Execute(p), (p) => <#= TableMenuItemsCommandPropertyName #>CanExecute(p)));
             }
         }
-        protected async void <#= TableMenuItemsCommandPropertyName #>Execute(object prm)
+        protected void <#= TableMenuItemsCommandPropertyName #>Execute(object prm)
         {
             if(prm == null) return;
             <#= IWebServiceFilterMenuInterfaceClassName #> mi = prm as <#= IWebServiceFilterMenuInterfaceClassName #>;
             if (mi == null) return;
             if(mi.Id == "TableAddMI") {
-                await <#= SformAddItemCommandPropertyName #>();
+                <#= SformAddItemCommandPropertyName #>();
             }
         }
         protected bool <#= TableMenuItemsCommandPropertyName #>CanExecute(object prm)
@@ -550,11 +549,10 @@ namespace <#= RlistPageViewModelNameSpace #> {
 
 
         #region <#= SformUpdItemCommandPropertyName #>
-        public async Task <#= SformUpdItemCommandPropertyName #>(<#= modelInterfaceClassName #> selected) {
+        public void <#= SformUpdItemCommandPropertyName #>(<#= modelInterfaceClassName #> selected) {
             if (selected == null) return;
             if ((PermissionMask & 4) != 4) {
-                INavigationResult nr1 = await _navigationService.NavigateAsync("<#= AccessDeniedPageClassName #>");
-                await OnNavigationResult(nr1);
+                <#= CurrentNavigationContextPropertyName #>.NavigationService.RequestNavigate(new Uri("<#= AccessDeniedUserControlClassName #>", UriKind.Relative), OnNavigationResult);
                 return;
             }
 
@@ -570,16 +568,14 @@ namespace <#= RlistPageViewModelNameSpace #> {
 <#
             }
 #>
-            INavigationResult nr2 = await _navigationService.NavigateAsync("<#= ReditPageClassName #>", navigationParameters);
-            await OnNavigationResult(nr2);
+            <#= CurrentNavigationContextPropertyName #>.NavigationService.RequestNavigate(new Uri("<#= ReditUserControlClassName #>", UriKind.Relative), OnNavigationResult, navigationParameters);
         }
         #endregion
         #region <#= SformDelItemCommandPropertyName #>
-        public async Task <#= SformDelItemCommandPropertyName #>(<#= modelInterfaceClassName #> selected) {
+        public void <#= SformDelItemCommandPropertyName #>(<#= modelInterfaceClassName #> selected) {
             if (selected == null) return;
             if((PermissionMask & 2) != 2) {
-                INavigationResult nr1 = await _navigationService.NavigateAsync("<#= AccessDeniedPageClassName #>");
-                await OnNavigationResult(nr1);
+                <#= CurrentNavigationContextPropertyName #>.NavigationService.RequestNavigate(new Uri("<#= AccessDeniedUserControlClassName #>", UriKind.Relative), OnNavigationResult);
                 return;
             }
 
@@ -595,8 +591,7 @@ namespace <#= RlistPageViewModelNameSpace #> {
 <#
             }
 #>
-            INavigationResult nr2 = await _navigationService.NavigateAsync("<#= ReditPageClassName #>", navigationParameters);
-            await OnNavigationResult(nr2);
+            <#= CurrentNavigationContextPropertyName #>.NavigationService.RequestNavigate(new Uri("<#= ReditUserControlClassName #>", UriKind.Relative), OnNavigationResult, navigationParameters);
         }
         #endregion
         #region <#= RowMenuItemsCommandPropertyName #>
@@ -608,7 +603,7 @@ namespace <#= RlistPageViewModelNameSpace #> {
                 return _<#= RowMenuItemsCommandPropertyName #> ?? (_<#= RowMenuItemsCommandPropertyName #> = new Command((p) => <#= RowMenuItemsCommandPropertyName #>Execute(p), (p) => <#= RowMenuItemsCommandPropertyName #>CanExecute(p)));
             }
         }
-        protected async void <#= RowMenuItemsCommandPropertyName #>Execute(object prm)
+        protected void <#= RowMenuItemsCommandPropertyName #>Execute(object prm)
         {
             <#= IWebServiceFilterMenuInterfaceClassName #> mi = prm as <#= IWebServiceFilterMenuInterfaceClassName #>;
             if (mi == null) return;
@@ -616,10 +611,10 @@ namespace <#= RlistPageViewModelNameSpace #> {
             if (arow == null) return;
             switch(mi.Id) {
                 case "RowUpdMI":
-                    await <#= SformUpdItemCommandPropertyName #>(arow);
+                    <#= SformUpdItemCommandPropertyName #>(arow);
                     break;
                 case "RowDelMI":
-                    await <#= SformDelItemCommandPropertyName #>(arow);
+                    <#= SformDelItemCommandPropertyName #>(arow);
                     break;
 <#
         foreach(string detailViewName in detailViews) {
@@ -630,14 +625,14 @@ namespace <#= RlistPageViewModelNameSpace #> {
 <#
                 continue;
             }
-            string detailViewClassName = GetModelClassName(detailView, RlistPageFolder);
+            string detailViewClassName = GetModelClassName(detailView, RlistUserControlFolder);
             List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detailView, null);
             if (foreignKeys == null) continue;
             if (foreignKeys.Count < 1) continue;
             foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
 #>
                 case "<#= RowMIPrefixPropertyName #><#= detailViewClassName #><#= foreignKey.NavigationName #>":
-                    await <#= detailViewClassName #><#= foreignKey.NavigationName #>Command(arow);
+                    <#= detailViewClassName #><#= foreignKey.NavigationName #>Command(arow);
                     break;
 <#
             }
@@ -703,21 +698,35 @@ namespace <#= RlistPageViewModelNameSpace #> {
            }
        }
        #endregion
-       #region INavigationAware
-       public bool IsNavigationTarget(INavigationParameters prms) {
+       #region IRegionAware
+       INavigationContext <#= CurrentNavigationContextPropertyName #> = null;
+
+       public bool IsNavigationTarget(INavigationContext navigationContext) {
             return true;
        }
-       public void OnNavigatedFrom(INavigationParameters prms) {
-            
+       public void OnNavigatedFrom(INavigationContext navigationContext) {
+            <#= CurrentNavigationContextPropertyName #> = null;
        }
-       public void OnNavigatedTo(INavigationParameters prms) {
+       public void OnNavigatedTo(INavigationContext navigationContext) {
+            INavigationParameters prms = navigationContext.Parameters;
             PermissionMask = <#= AppSettingServicePropertyName #>.GetViewModelMask("<#= Model.ViewName #>");
             if ((PermissionMask & 1) != 1) {
-                throw new Exception("Access Denied to navigate <#= Model.ViewName #>");
+                if(navigationContext.NavigationService.Journal.CanGoBack) {
+                    // it should be intercepted by prev item in navigation chain
+                    throw new Exception("Access Denied to navigate <#= Model.ViewName #>");
+                } else {
+                    // this is a first item in navigation chain, so navigationContext.Parameters are not expected
+                    navigationContext.NavigationService.RequestNavigate(new Uri("<#= AccessDeniedUserControlClassName #>", UriKind.Relative), OnNavigationResult);
+                    return;
+                }
             }
+            <#= CurrentNavigationContextPropertyName #> = navigationContext;
+            OnPropertyChanged("<#= ShowBackBtnPropertyName #>");
+            (<#= OnNavigationBackCommandPropertyName #> as Command).ChangeCanExecute();
             <#= SformAfterAddItemPropertyName  #> = null; 
             <#= SformAfterUpdItemPropertyName  #> = null; 
             <#= SformAfterDelItemPropertyName  #> = null; 
+
             if(!<#= IsParentLoadedPropertyName #>) {
                 ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>> hf = new ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>();
 <#
@@ -814,6 +823,37 @@ namespace <#= RlistPageViewModelNameSpace #> {
             }
         }
         #endregion
+
+        #region <#= ShowBackBtnPropertyName #>
+        public bool <#= ShowBackBtnPropertyName #> {
+            get {
+                return (<#= CurrentNavigationContextPropertyName #> == null) ?  false : <#= CurrentNavigationContextPropertyName #>.NavigationService.Journal.CanGoBack;
+            }
+        }
+        #endregion
+        #region <#= OnNavigationBackCommandPropertyName #>
+        protected ICommand _<#= OnNavigationBackCommandPropertyName #> = null;
+        public ICommand <#= OnNavigationBackCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= OnNavigationBackCommandPropertyName #> ?? (_<#= OnNavigationBackCommandPropertyName #> = new Command(() => <#= OnNavigationBackCommandPropertyName #>Execute(), () => <#= OnNavigationBackCommandPropertyName #>CanExecute()));
+            }
+        }
+        protected void <#= OnNavigationBackCommandPropertyName #>Execute()
+        {
+            if (<#= CurrentNavigationContextPropertyName #> != null) {
+                if(<#= CurrentNavigationContextPropertyName #>.NavigationService.Journal.CanGoBack) {
+                    <#= CurrentNavigationContextPropertyName #>.NavigationService.Journal.GoBack();
+                }
+            }
+        }
+        protected bool <#= OnNavigationBackCommandPropertyName #>CanExecute()
+        {
+            return (<#= CurrentNavigationContextPropertyName #> == null) ?  false : <#= CurrentNavigationContextPropertyName #>.NavigationService.Journal.CanGoBack;
+        }
+        #endregion
+
     }
 }
 

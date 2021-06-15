@@ -19,21 +19,25 @@
     string ProxyUserControlNameSpace        = GetContextModelNameSpace(Context, ProxyUserControlFolder);
     string ProxyUserControlProject          = GetContextModelProjectName(Context, ProxyUserControlFolder);
 
+    string UserControlWithContainerMenuFolder       = "00628-UserControlWithContainerMenu.xaml.cs";
+    string UserControlWithContainerMenuClassName    = GetContextModelClassName(Context, UserControlWithContainerMenuFolder);
+    string UserControlWithContainerMenuNameSpace    = GetContextModelNameSpace(Context, UserControlWithContainerMenuFolder);
+    string UserControlWithContainerMenuProject      = GetContextModelProjectName(Context, UserControlWithContainerMenuFolder);
+
     string LformUserControlFolder           = "01596-LformUserControl.xaml.cs";
     string LformUserControlClassName        = GetModelClassName(Model, LformUserControlFolder);
     string LformUserControlNameSpace        = GetModelNameSpace(Model, LformUserControlFolder);
     string LformUserControlProject          = GetModelProjectName(Model, LformUserControlFolder);
     
-    string O2mPageFolder                    = "01697-O2mPage.xaml.cs";
-    string O2mPageClassName                 = GetModelClassName(Model, O2mPageFolder);
-    string O2mPageNameSpace                 = GetModelNameSpace(Model, O2mPageFolder);
-    string O2mPageProject                   = GetModelProjectName(Model, O2mPageFolder);
+    string O2mUserControlFolder             = "01696-O2mUserControl.xaml.cs";
+    string O2mUserControlClassName          = GetModelClassName(Model, O2mUserControlFolder);
+    string O2mUserControlNameSpace          = GetModelNameSpace(Model, O2mUserControlFolder);
+    string O2mUserControlProject            = GetModelProjectName(Model, O2mUserControlFolder);
 
-    string O2mPageXamlFolder                = "01699-O2mPage.xaml";
-    string O2mPageXamlClassName             = GetModelClassName(Model, O2mPageXamlFolder);
-    string O2mPageXamlNameSpace             = GetModelNameSpace(Model, O2mPageXamlFolder);
-    string O2mPageXamlProject               = GetModelProjectName(Model, O2mPageXamlFolder);
-
+    string O2mUserControlXamlFolder         = "01698-O2mUserControl.xaml";
+    string O2mUserControlXamlClassName      = GetModelClassName(Model, O2mUserControlXamlFolder);
+    string O2mUserControlXamlNameSpace      = GetModelNameSpace(Model, O2mUserControlXamlFolder);
+    string O2mUserControlXamlProject        = GetModelProjectName(Model, O2mUserControlXamlFolder);
 
     string CaptionPropertyName              = "Caption";
     string FilterHeightPropertyName         = "FilterHeight";
@@ -83,28 +87,36 @@
     string TemplateViewSuffixPropertyName           = "TemplateView"; 
 
     string IsParentLoadedPropertyName               = "IsParentLoaded";
+    string ContainerMenuItemsCommandPropertyName    = "ContainerMenuItemsCommand";
+    string OnContainerMenuItemsCommandPropertyName  = "OnContainerMenuItemsCommand";
+    string NavigationBackCommandPropertyName        = "NavigationBackCommand";
+    string OnNavigationBackCommandPropertyName      = "OnNavigationBackCommand";
 
     string proxyPrefix = "clr-namespace:" + ProxyUserControlNameSpace;
-    if(ProxyUserControlProject != O2mPageProject) {
+    if(ProxyUserControlProject != O2mUserControlProject) {
         proxyPrefix = proxyPrefix + ";assembly=" + ProxyUserControlProject;
     }
     string lformPrefix = "clr-namespace:" + LformUserControlNameSpace;
-    if(LformUserControlProject != O2mPageProject) {
+    if(LformUserControlProject != O2mUserControlProject) {
         lformPrefix = lformPrefix + ";assembly=" + LformUserControlProject;
     }
+    string ucwcmPrefix = "clr-namespace:" + UserControlWithContainerMenuNameSpace;
+    if(UserControlWithContainerMenuProject != O2mUserControlProject) {
+        ucwcmPrefix = ucwcmPrefix + ";assembly=" + UserControlWithContainerMenuProject;
+    }
 
-    bool IsInTheSameModule = (LformUserControlProject == O2mPageProject);
+    bool IsInTheSameModule = (LformUserControlProject == O2mUserControlProject);
 
     List<string> detailViews = GetDetailViews(Model, Context, null);
 
 #>
 
-<ContentPage x:Class="<#= O2mPageNameSpace #>.<#= O2mPageClassName #>"
+<ucwcm:<#= UserControlWithContainerMenuClassName #> x:Class="<#= O2mUserControlNameSpace #>.<#= O2mUserControlClassName #>"
              xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:prism="http://prismlibrary.com" 
              prism:ViewModelLocator.AutowireViewModel="True"
-
+             xmlns:ucwcm="<#= ucwcmPrefix #>"
 <#
     if(IsInTheSameModule) {
 #>
@@ -134,7 +146,7 @@
                 continue;
             }
             string localLformUserControlProject  = GetModelProjectName(detailView, LformUserControlFolder);
-            if (localLformUserControlProject == O2mPageProject)
+            if (localLformUserControlProject == O2mUserControlProject)
             {
                 string locallformPrefix = "clr-namespace:" + GetModelNameSpace(detailView, LformUserControlFolder);
 #>
@@ -182,12 +194,17 @@
 <#
     }
 #>
+            <#= ContainerMenuItemsPropertyName #>="{Binding <#= ContainerMenuItemsPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+            <#= ContainerMenuItemsCommandPropertyName #>="{Binding <#= OnContainerMenuItemsCommandPropertyName #>, Source={x:Reference o2mUsrCntrlRootNode}}"
+
+            <#= ShowBackBtnPropertyName #>="{Binding BindingContext.<#= ShowBackBtnPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+            <#= NavigationBackCommandPropertyName #>="{Binding BindingContext.<#= OnNavigationBackCommandPropertyName #>, Source={x:Reference o2mUsrCntrlRootNode}}"                                
+
             <#= CaptionPropertyName #>="{Binding BindingContext.<#= CaptionPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
             <#= FilterHeightPropertyName #>="{Binding BindingContext.<#= FilterHeightPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
             <#= ShowFilterPropertyName #>="True" 
             <#= ShowAddFilterBtnPropertyName #>="True" 
             <#= GridHeightPropertyName #>="{Binding BindingContext.<#= GridHeightPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
-            <#= ShowBackBtnPropertyName #>="False" 
             <#= HiddenFiltersPropertyName #>="{Binding BindingContext.<#= HiddenFiltersPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
             <#= SelectedRowCommandPropertyName #>="{Binding BindingContext.<#= SelectedRowCommandPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
             <#= TableMenuItemsCommandPropertyName #>="{Binding BindingContext.<#= TableMenuItemsCommandPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
@@ -241,7 +258,7 @@
                     <ControlTemplate x:Key="<#= detailViewClassName #><#= TemplateViewSuffixPropertyName #>">
 <#
 
-            if (localLformUserControlProject == O2mPageProject)
+            if (localLformUserControlProject == O2mUserControlProject)
             {
 #>
                         <lfrm<#= id #>:<#= GetModelClassName(detailView, LformUserControlFolder) #> 
@@ -317,7 +334,7 @@
             </ContentView.Triggers>
         </ContentView>
     </StackLayout>
-</ContentPage>
+</ucwcm:<#= UserControlWithContainerMenuClassName #>>
 
 
 <#+

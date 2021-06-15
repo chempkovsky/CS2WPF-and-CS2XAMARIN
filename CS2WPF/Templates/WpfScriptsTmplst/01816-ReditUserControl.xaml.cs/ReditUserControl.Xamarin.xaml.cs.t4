@@ -14,11 +14,18 @@
 using Xamarin.Forms;
 <#
 
-    string ReditPageFolder                           = "01817-ReditPage.xaml.cs";
-    string ReditPageClassName                        = GetModelClassName(Model, ReditPageFolder);
-    string ReditPageNameSpace                        = GetModelNameSpace(Model, ReditPageFolder);
+    string UserControlWithContainerMenuFolder       = "00628-UserControlWithContainerMenu.xaml.cs";
+    string UserControlWithContainerMenuClassName    = GetContextModelClassName(Context, UserControlWithContainerMenuFolder);
+    string UserControlWithContainerMenuNameSpace    = GetContextModelNameSpace(Context, UserControlWithContainerMenuFolder);
+    string UserControlWithContainerMenuProject      = GetContextModelProjectName(Context, UserControlWithContainerMenuFolder);
+
+    string ReditUserControlFolder                    = "01816-ReditUserControl.xaml.cs";
+    string ReditUserControlClassName                 = GetModelClassName(Model, ReditUserControlFolder);
+    string ReditUserControlNameSpace                 = GetModelNameSpace(Model, ReditUserControlFolder);
 
     List<string> nmSpaces = new List<string>();
+    if ((ReditUserControlClassName != UserControlWithContainerMenuNameSpace) && (nmSpaces.IndexOf(UserControlWithContainerMenuNameSpace) < 0)) 
+        nmSpaces.Add(UserControlWithContainerMenuNameSpace);
     
 #>
 <# 
@@ -30,13 +37,13 @@ using <#= ns #>;
 #>
 
 
-namespace <#= ReditPageNameSpace #> {
+namespace <#= ReditUserControlNameSpace #> {
     /// <summary>
-    /// Interaction logic for <#= ReditPageClassName #>.xaml
+    /// Interaction logic for <#= ReditUserControlClassName #>.xaml
     /// </summary>
-    public partial class <#= ReditPageClassName #>: ContentPage
+    public partial class <#= ReditUserControlClassName #>: <#= UserControlWithContainerMenuClassName  #>
     {
-        public <#= ReditPageClassName #>()
+        public <#= ReditUserControlClassName #>()
         {
             InitializeComponent();
         }

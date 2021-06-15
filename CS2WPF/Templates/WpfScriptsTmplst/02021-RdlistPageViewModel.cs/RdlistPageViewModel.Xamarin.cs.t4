@@ -496,7 +496,7 @@ namespace <#= RdlistPageViewModelNameSpace #> {
                 return _<#= TableMenuItemsCommandPropertyName #> ?? (_<#= TableMenuItemsCommandPropertyName #> = new Command((p) => <#= TableMenuItemsCommandPropertyName #>Execute(p), (p) => <#= TableMenuItemsCommandPropertyName #>CanExecute(p)));
             }
         }
-        protected async void <#= TableMenuItemsCommandPropertyName #>Execute(object prm)
+        protected void <#= TableMenuItemsCommandPropertyName #>Execute(object prm)
         {
         }
         protected bool <#= TableMenuItemsCommandPropertyName #>CanExecute(object prm)
@@ -621,40 +621,42 @@ namespace <#= RdlistPageViewModelNameSpace #> {
             <#= CanUpdPropertyName  #> = (PermissionMask & 4) == 4; 
             <#= CanDelPropertyName  #> = (PermissionMask & 2) == 2; 
 
-            ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>> hf = new ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>();
+            if(!<#= IsParentLoadedPropertyName #>) {
+                ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>> hf = new ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>();
 <#
             foreach(ModelViewPropertyOfVwSerializable sclrProp in Model.ScalarProperties) {
 #>          
-            if(prms.ContainsKey("<#= GetModelPropertyName(sclrProp, Model) #>")) {
-                    hf.Add(new <#= WebServiceFilterRsltViewModelClassName #>() {
-                        fltrName = "<#= GetModelPropertyName(sclrProp, Model) #>",
-                        fltrDataType = "<#= GetCCharpDatatype(sclrProp, Model) #>",
-                        fltrOperator = "eq",
-                        fltrValue = prms.GetValue<<#= GetPropertyTypeName(sclrProp) #>>("<#= GetModelPropertyName(sclrProp, Model) #>"),
-                        fltrError = null
-                    });
-            }
+                if(prms.ContainsKey("<#= GetModelPropertyName(sclrProp, Model) #>")) {
+                        hf.Add(new <#= WebServiceFilterRsltViewModelClassName #>() {
+                            fltrName = "<#= GetModelPropertyName(sclrProp, Model) #>",
+                            fltrDataType = "<#= GetCCharpDatatype(sclrProp, Model) #>",
+                            fltrOperator = "eq",
+                            fltrValue = prms.GetValue<<#= GetPropertyTypeName(sclrProp) #>>("<#= GetModelPropertyName(sclrProp, Model) #>"),
+                            fltrError = null
+                        });
+                }
 <#
             }
 #>          
-            ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>> chf = <#= HiddenFiltersPropertyName #> as ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>;
-            bool resetHF = chf.Count != hf.Count;
-            if ((!resetHF) && (hf.Count > 0)) {
-                foreach(<#= IWebServiceFilterRsltInterfaceClassName #> citm in chf) {
-                    <#= IWebServiceFilterRsltInterfaceClassName #> itm = hf.Where(h => h.fltrName == citm.fltrName).FirstOrDefault();
-                    if(itm == null)
-                    {
-                        resetHF = true;
-                        break;
+                ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>> chf = <#= HiddenFiltersPropertyName #> as ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>;
+                bool resetHF = chf.Count != hf.Count;
+                if ((!resetHF) && (hf.Count > 0)) {
+                    foreach(<#= IWebServiceFilterRsltInterfaceClassName #> citm in chf) {
+                        <#= IWebServiceFilterRsltInterfaceClassName #> itm = hf.Where(h => h.fltrName == citm.fltrName).FirstOrDefault();
+                        if(itm == null)
+                        {
+                            resetHF = true;
+                            break;
+                        }
+                        if (!(itm.fltrValue == citm.fltrValue))
+                        {
+                            resetHF = true;
+                            break;
+                        }
                     }
-                    if (!(itm.fltrValue == citm.fltrValue))
-                    {
-                        resetHF = true;
-                        break;
-                    }
-                }
-            } 
-            if (resetHF) { <#= HiddenFiltersPropertyName #> = hf; }
+                } 
+                if (resetHF) { <#= HiddenFiltersPropertyName #> = hf; }
+            }
             <#= IsParentLoadedPropertyName #> = true;
         }
         #endregion
