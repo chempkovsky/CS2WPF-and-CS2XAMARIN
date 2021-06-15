@@ -22,6 +22,9 @@ using Xamarin.Forms;
     string O2mUserControlClassName        = GetModelClassName(Model, O2mUserControlFolder);
     string O2mUserControlNameSpace        = GetModelNameSpace(Model, O2mUserControlFolder);
 
+    string GridHeightDetailPropertyName                     = "GridHeightDetail"; 
+    string FilterHeightDetailPropertyName                   = "FilterHeightDetail"; 
+
     List<string> nmSpaces = new List<string>();
     if ((O2mUserControlNameSpace != UserControlWithContainerMenuNameSpace) && (nmSpaces.IndexOf(UserControlWithContainerMenuNameSpace) < 0)) 
         nmSpaces.Add(UserControlWithContainerMenuNameSpace);
@@ -46,6 +49,45 @@ namespace <#= O2mUserControlNameSpace #> {
         {
             InitializeComponent();
         }
+
+        #region <#= GridHeightDetailPropertyName #>
+        public static readonly BindableProperty <#= GridHeightDetailPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= GridHeightDetailPropertyName #>", typeof(double),
+                typeof(<#= O2mUserControlClassName #>),
+                double.MaxValue);
+        public double <#= GridHeightDetailPropertyName #>
+        {
+            get
+            {
+                return (double)GetValue(<#= GridHeightDetailPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= GridHeightDetailPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= FilterHeightDetailPropertyName #>
+        public static readonly BindableProperty <#= FilterHeightDetailPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= FilterHeightDetailPropertyName #>", typeof(double),
+                typeof(<#= O2mUserControlClassName #>),
+                double.MaxValue);
+        public double <#= FilterHeightDetailPropertyName #>
+        {
+            get
+            {
+                return (double)GetValue(<#= FilterHeightDetailPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= FilterHeightDetailPropertyName #>Property, value);
+            }
+        }
+        #endregion
+
+
     }
 }
 
