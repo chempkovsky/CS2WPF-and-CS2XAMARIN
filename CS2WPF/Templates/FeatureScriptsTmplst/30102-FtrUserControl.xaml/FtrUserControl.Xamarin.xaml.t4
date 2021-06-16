@@ -40,6 +40,8 @@
 
     string CaptionPropertyName              = "Caption";
     string ContainerMenuItemsPropertyName   = "ContainerMenuItems";
+    string ContainerMenuItemsCommandPropertyName    = "ContainerMenuItemsCommand";
+    string OnContainerMenuItemsCommandPropertyName  = "OnContainerMenuItemsCommand";
 
 
     string FlexOnPropertyName               = "FlexOn";
@@ -112,14 +114,16 @@
             curItem++;
             if (curItem % 2 == 0) {
 #>
-        <Grid gridflex:GridFlex.HorizontalFlex="{Binding BindingContext.<#= FlexOnPropertyName #>, Mode=OneWay, Source={x:Reference fchrUsrCntrlRootNode}}">
+        <Grid gridflex:GridFlex.HorizontalFlex="{Binding BindingContext.<#= FlexOnPropertyName #>, Mode=OneWay, Source={x:Reference fchrUsrCntrlRootNode}}"
+            RowDefinitions="Auto,Auto" ColumnDefinitions="*">
 <#
             }
 #>
-            <prx:<#= ProxyUserControlClassName #> Margin="0 0 8 0"
+            <prx:<#= ProxyUserControlClassName #> Grid.Row="<#= curItem % 2  #>" Grid.Column="0"
                     IsVisible="{Binding BindingContext.<#= VisiblePrefixPropertyName #><#= modelClassName #>, Mode=OneWay, Source={x:Reference fchrUsrCntrlRootNode}}"
                     prism:RegionManager.RegionName="<#= modelClassName #><#= FtrUserControlClassName #>" 
                     <#= ContainerMenuItemsPropertyName #>="{Binding BindingContext.<#= ContainerMenuItemsPropertyName #><#= modelClassName #>, Mode=OneWay, Source={x:Reference fchrUsrCntrlRootNode}}"
+                    <#= ContainerMenuItemsCommandPropertyName #>="{Binding BindingContext.<#= OnContainerMenuItemsCommandPropertyName #>, Mode=OneWay, Source={x:Reference fchrUsrCntrlRootNode}}"
 <#
             if (!IsRouted) {
 #>

@@ -117,6 +117,7 @@
     string SelectedRowPropertyName="SelectedRow";
     string BindingContextFeedbackRefPropertyName = "BindingContextFeedbackRef";
 
+    string RadioGroupNamePropertyName               = "RadioGroupName";
 
     string wsfucPrefix = "clr-namespace:" + WebServiceFilterUserControlNameSpace;
     if(SformUserControlProject != WebServiceFilterUserControlProject) {
@@ -186,7 +187,8 @@
 <!--
             FilterOperators="{Binding FilterOperators, Source={x:Reference sformUsrCntrlRootNode}}"
 -->
-            <ActivityIndicator Grid.Row="1" IsRunning="{Binding BindingContext.IsInQuery, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"/>
+            <ActivityIndicator Grid.Row="1" IsVisible="{Binding BindingContext.IsInQuery, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
+                IsRunning="{Binding BindingContext.IsInQuery, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"/>
 
             <ScrollView Orientation="Horizontal" Grid.Row="2" HeightRequest="{Binding <#= GridHeightPropertyName #>, Source={x:Reference sformUsrCntrlRootNode}}">
                 <StackLayout   Orientation="Vertical"   Margin="0, 0, 0, 12" Spacing="0">
@@ -249,7 +251,7 @@
 #>
                     </FlexLayout>
                     <ScrollView Orientation="Vertical" Margin="0">
-                        <StackLayout RadioButtonGroup.SelectedValue="{Binding BindingContext.<#= SelectedRowPropertyName #>, Source={x:Reference sformUsrCntrlRootNode}}" RadioButtonGroup.GroupName="<#= SformUserControlClassName #>sformUsrCntrlRootNodeRadio"
+                        <StackLayout RadioButtonGroup.SelectedValue="{Binding BindingContext.<#= SelectedRowPropertyName #>, Source={x:Reference sformUsrCntrlRootNode}}" RadioButtonGroup.GroupName="{Binding <#= RadioGroupNamePropertyName #>, Source={x:Reference sformUsrCntrlRootNode}}"
                             BindableLayout.ItemsSource="{Binding BindingContext.<#= DataSourcePropertyName #>, Source={x:Reference sformUsrCntrlRootNode}}" Spacing="0" >
                             <BindableLayout.ItemTemplate>
                                 <DataTemplate>

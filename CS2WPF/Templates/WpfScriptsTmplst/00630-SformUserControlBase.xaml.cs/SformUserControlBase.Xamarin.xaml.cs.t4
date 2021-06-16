@@ -82,6 +82,7 @@ using System.Windows.Input;
     string SformAfterUpdItemCommandPropertyName     = "SformAfterUpdItemCommand";
     string SformAfterDelItemCommandPropertyName     = "SformAfterDelItemCommand";
 
+    string RadioGroupNamePropertyName               = "RadioGroupName";
 
     List<string> nmSpaces = new List<string>();
     if ((SformUserControlBaseNameSpace != IWebServiceFilterRsltInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace) < 0)) 
@@ -115,6 +116,10 @@ namespace <#= SformUserControlBaseNameSpace #> {
     /// </summary>
     public class <#= SformUserControlBaseClassName #>: <#= UserControlWithContainerMenuClassName #>
     {
+
+        string _<#= RadioGroupNamePropertyName #> = Guid.NewGuid().ToString("N");
+        public string <#= RadioGroupNamePropertyName #> { get { return _<#= RadioGroupNamePropertyName #>; } }
+
 
         #region On<#= BindingContextFeedbackRefPropertyName #>
         protected override void On<#= BindingContextFeedbackRefPropertyName #>(object v)
