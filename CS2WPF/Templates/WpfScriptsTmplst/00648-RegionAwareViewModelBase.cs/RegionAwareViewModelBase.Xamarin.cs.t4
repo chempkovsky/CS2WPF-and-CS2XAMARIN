@@ -1,0 +1,268 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+<#
+
+
+    string IRegionAwareViewModelInterfaceFolder     = "00646-IRegionAwareViewModelInterface.cs";
+    string IRegionAwareViewModelInterfaceClassName  = GetModelClassName(Model, IRegionAwareViewModelInterfaceFolder);
+    string IRegionAwareViewModelInterfaceNameSpace  = GetModelNameSpace(Model, IRegionAwareViewModelInterfaceFolder);
+
+    string RegionAwareViewModelBaseFolder     = "00648-RegionAwareViewModelBase.cs";
+    string RegionAwareViewModelBaseClassName  = GetModelClassName(Model, RegionAwareViewModelBaseFolder);
+    string RegionAwareViewModelBaseNameSpace  = GetModelNameSpace(Model, RegionAwareViewModelBaseFolder);
+
+    string FilterHeightPropertyName                 = "FilterHeight";
+    string GridHeightPropertyName                   = "GridHeight";
+    string ShowFilterPropertyName                   = "ShowFilter";
+    string ShowAddFilterBtnPropertyName             = "ShowAddFilterBtn";
+    string ShowBackBtnPropertyName                  = "ShowBackBtn";
+    string CanAddPropertyName                       = "CanAdd";
+    string CanUpdPropertyName                       = "CanUpdate";
+    string CanDelPropertyName                       = "CanDelete";
+    string CanAddParentPropertyName                 = "CanAddParent";
+    string CanUpdParentPropertyName                 = "CanUpdateParent";
+    string CanDelParentPropertyName                 = "CanDeleteParent";
+
+    string FilterHeightChangedPropertyName          = "FilterHeightChanged";
+    string GridHeightChangedPropertyName            = "GridHeightChanged";
+    string ShowFilterChangedPropertyName            = "ShowFilterChanged";
+    string ShowAddFilterBtnChangedPropertyName      = "ShowAddFilterBtnChanged";
+    string CanAddChangedPropertyName                = "CanAddChanged";
+    string CanUpdChangedPropertyName                = "CanUpdateChanged";
+    string CanDelChangedPropertyName                = "CanDeleteChanged";
+
+    string FilterHeightDetailPropertyName           = "FilterHeightDetail"; 
+    string GridHeightDetailPropertyName             = "GridHeightDetail"; 
+    string ShowFilterDetailPropertyName             = "ShowFilterDetail"; 
+    string ShowAddFilterBtnDetailPropertyName       = "ShowAddFilterBtnDetail"; 
+    string CanAddDetailPropertyName                 = "CanAddDetail"; 
+    string CanUpdDetailPropertyName                 = "CanUpdateDetail"; 
+    string CanDelDetailPropertyName                 = "CanDeleteDetail"; 
+    string CanAddDetailParentPropertyName           = "CanAddDetailParent"; 
+    string CanUpdDetailParentPropertyName           = "CanUpdateDetailParent"; 
+    string CanDelDetailParentPropertyName           = "CanDeleteDetailParent"; 
+
+    string FilterHeightDetailChangedPropertyName    = "FilterHeightDetailChanged"; 
+    string GridHeightDetailChangedPropertyName      = "GridHeightDetailChanged"; 
+    string ShowFilterDetailChangedPropertyName      = "ShowFilterDetailChanged"; 
+    string ShowAddFilterBtnDetailChangedPropertyName= "ShowAddFilterBtnDetailChanged"; 
+    string CanAddDetailChangedPropertyName          = "CanAddDetailChanged"; 
+    string CanUpdDetailChangedPropertyName          = "CanUpdateDetailChanged"; 
+    string CanDelDetailChangedPropertyName          = "CanDeleteDetailChanged"; 
+
+
+
+    List<string> nmSpaces = new List<string>();
+    if ((RegionAwareViewModelBaseNameSpace != IRegionAwareViewModelInterfaceNameSpace) && (nmSpaces.IndexOf(IRegionAwareViewModelInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IRegionAwareViewModelInterfaceNameSpace);
+
+
+#>
+<# 
+    foreach(string ns in nmSpaces) {
+#>
+using <#= ns #>;
+<#
+    }
+#>
+
+
+namespace <#= RegionAwareViewModelBaseNameSpace #> {
+    public class <#= RegionAwareViewModelBaseClassName #>: <#= IRegionAwareViewModelInterfaceClassName #>, INotifyPropertyChanged
+    {
+
+        #region INotifyPropertyChanged
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string name = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+        #endregion
+
+        #region <#= IRegionAwareViewModelInterfaceClassName #>
+        double _<#= FilterHeightPropertyName #> = -1d;
+        public double <#= FilterHeightPropertyName #> {
+            get { return _<#= FilterHeightPropertyName #>; }
+            set { if (_<#= FilterHeightPropertyName #> != value) { _<#= FilterHeightPropertyName #> = value; OnPropertyChanged();} }
+        }
+        public virtual void <#= FilterHeightChangedPropertyName #>(object Sender, double OldValue, double NewValue) {
+            <#= FilterHeightPropertyName #> = NewValue;
+        }
+        double _<#= GridHeightPropertyName #> = -1d;
+        public double <#= GridHeightPropertyName #> {
+            get { return _<#= GridHeightPropertyName #>; }
+            set { if (_<#= GridHeightPropertyName #> != value) { _<#= GridHeightPropertyName #> = value; OnPropertyChanged();} }
+        }
+        public virtual void <#= GridHeightChangedPropertyName #>(object Sender, double OldValue, double NewValue) {
+            <#= GridHeightPropertyName #> = NewValue;
+        }
+        bool _<#= ShowFilterPropertyName #> = false;
+        public bool <#= ShowFilterPropertyName #> {
+            get { return _<#= ShowFilterPropertyName #>; }
+            set { if (_<#= ShowFilterPropertyName #> != value) { _<#= ShowFilterPropertyName #> = value; OnPropertyChanged();} }
+        }
+        public virtual void <#= ShowFilterChangedPropertyName #>(object Sender, bool OldValue, bool NewValue) {
+            <#= ShowFilterPropertyName #> = NewValue;
+        }
+        bool _<#= ShowAddFilterBtnPropertyName #> = false;
+        public virtual bool <#= ShowAddFilterBtnPropertyName #> {
+            get { return _<#= ShowAddFilterBtnPropertyName #>; }
+            set { if (_<#= ShowAddFilterBtnPropertyName #> != value) { _<#= ShowAddFilterBtnPropertyName #> = value; OnPropertyChanged();} }
+        }
+        public virtual void <#= ShowAddFilterBtnChangedPropertyName #>(object Sender, bool OldValue, bool NewValue) {
+            <#= ShowAddFilterBtnPropertyName #> = NewValue;
+        }
+        protected bool <#= CanAddParentPropertyName #> = false;
+        public virtual void <#= CanAddChangedPropertyName #>(object Sender, bool OldValue, bool NewValue) {
+            <#= CanAddParentPropertyName #> = NewValue;
+            OnPropertyChanged("<#= CanAddPropertyName #>");
+        }
+        protected bool <#= CanUpdParentPropertyName #> = false;
+        public virtual void <#= CanUpdChangedPropertyName #>(object Sender, bool OldValue, bool NewValue) {
+            <#= CanUpdParentPropertyName #> = NewValue;
+            OnPropertyChanged("<#= CanUpdPropertyName #>");
+        }
+        protected bool <#= CanDelParentPropertyName #> = false;
+        public virtual void <#= CanDelChangedPropertyName #>(object Sender, bool OldValue, bool NewValue) {
+            <#= CanUpdParentPropertyName #> = NewValue;
+            OnPropertyChanged("<#= CanDelPropertyName #>");
+        }
+
+
+        double _<#= FilterHeightDetailPropertyName #> = -1d;
+        public double <#= FilterHeightDetailPropertyName #> {
+            get { return _<#= FilterHeightDetailPropertyName #>; }
+            set { if (_<#= FilterHeightDetailPropertyName #> != value) { _<#= FilterHeightDetailPropertyName #> = value; OnPropertyChanged();} }
+        }
+        public virtual void <#= FilterHeightDetailChangedPropertyName #>(object Sender, double OldValue, double NewValue) {
+            <#= FilterHeightDetailPropertyName #> = NewValue;
+        }
+        double _<#= GridHeightDetailPropertyName #> = -1d;
+        public double <#= GridHeightDetailPropertyName #> {
+            get { return _<#= GridHeightDetailPropertyName #>; }
+            set { if (_<#= GridHeightDetailPropertyName #> != value) { _<#= GridHeightDetailPropertyName #> = value; OnPropertyChanged();} }
+        }
+        public virtual void <#= GridHeightDetailChangedPropertyName #>(object Sender, double OldValue, double NewValue) {
+            <#= GridHeightDetailPropertyName #> = NewValue;
+        }
+        bool _<#= ShowFilterDetailPropertyName #> = false;
+        public bool <#= ShowFilterDetailPropertyName #> {
+            get { return _<#= ShowFilterDetailPropertyName #>; }
+            set { if (_<#= ShowFilterDetailPropertyName #> != value) { _<#= ShowFilterDetailPropertyName #> = value; OnPropertyChanged();} }
+        }
+        public virtual void <#= ShowFilterDetailChangedPropertyName #>(object Sender, bool OldValue, bool NewValue) {
+            <#= ShowFilterDetailPropertyName #> = NewValue;
+        }
+        bool _<#= ShowAddFilterBtnDetailPropertyName #> = false;
+        public bool <#= ShowAddFilterBtnDetailPropertyName #> {
+            get { return _<#= ShowAddFilterBtnDetailPropertyName #>; }
+            set { if (_<#= ShowAddFilterBtnDetailPropertyName #> != value) { _<#= ShowAddFilterBtnDetailPropertyName #> = value; OnPropertyChanged();} }
+        }
+        public virtual void <#= ShowAddFilterBtnDetailChangedPropertyName #>(object Sender, bool OldValue, bool NewValue) {
+            <#= ShowAddFilterBtnDetailPropertyName #> = NewValue;
+        }
+        protected bool <#= CanAddDetailParentPropertyName #> = false;
+        public virtual void <#= CanAddDetailChangedPropertyName #>(object Sender, bool OldValue, bool NewValue) {
+            <#= CanAddDetailParentPropertyName #> = NewValue;
+            OnPropertyChanged("<#= CanAddDetailPropertyName #>");
+        }
+        protected bool <#= CanUpdDetailParentPropertyName #> = false;
+        public virtual void <#= CanUpdDetailChangedPropertyName #>(object Sender, bool OldValue, bool NewValue) {
+            <#= CanUpdDetailParentPropertyName #> = NewValue;
+            OnPropertyChanged("<#= CanUpdDetailPropertyName #>");
+        }
+        protected bool <#= CanDelDetailParentPropertyName #> = false;
+        public virtual void <#= CanDelDetailChangedPropertyName #>(object Sender, bool OldValue, bool NewValue) {
+            <#= CanDelDetailParentPropertyName #> = NewValue;
+            OnPropertyChanged("<#= CanDelDetailPropertyName #>");
+        }
+        #endregion
+
+
+    }
+}
+
+
+<#+
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+#>

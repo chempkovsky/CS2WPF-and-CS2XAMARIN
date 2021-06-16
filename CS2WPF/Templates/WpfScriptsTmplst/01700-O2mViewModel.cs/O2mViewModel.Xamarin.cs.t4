@@ -61,6 +61,10 @@ using Prism.Navigation;
     string O2mListItemViewModelClassName            = GetContextModelClassName(Context, O2mListItemViewModelFolder);
     string O2mListItemViewModelNameSpace            = GetContextModelNameSpace(Context, O2mListItemViewModelFolder);
 
+    string RegionAwareViewModelBaseFolder           = "00648-RegionAwareViewModelBase.cs";
+    string RegionAwareViewModelBaseClassName        = GetContextModelClassName(Context, RegionAwareViewModelBaseFolder);
+    string RegionAwareViewModelBaseNameSpace        = GetContextModelNameSpace(Context, RegionAwareViewModelBaseFolder);
+
     string AccessDeniedUserControlFolder            = "00678-AccessDeniedUserControl.xaml.cs";
     string AccessDeniedUserControlClassName         = GetModelClassName(Model, AccessDeniedUserControlFolder);
     string AccessDeniedUserControlNameSpace         = GetModelNameSpace(Model, AccessDeniedUserControlFolder);
@@ -138,6 +142,13 @@ using Prism.Navigation;
     string ShowBackBtnPropertyName                  = "ShowBackBtn";
     string OnNavigationBackCommandPropertyName      = "OnNavigationBackCommand";
 
+    string CanAddDetailParentPropertyName           = "CanAddDetailParent"; 
+    string CanUpdDetailParentPropertyName           = "CanUpdateDetailParent"; 
+    string CanDelDetailParentPropertyName           = "CanDeleteDetailParent"; 
+    string CanAddParentPropertyName                 = "CanAddParent";
+    string CanUpdParentPropertyName                 = "CanUpdateParent";
+    string CanDelParentPropertyName                 = "CanDeleteParent";
+
     List<string> detailViews = GetDetailViews(Model, Context, null);
     List<ModelViewPropertyOfVwSerializable> primKeys = GetModelPrimaryKeyProps(Model);
 
@@ -164,6 +175,8 @@ using Prism.Navigation;
         nmSpaces.Add(IO2mListItemInterfaceNameSpace);
     if ((O2mViewModelNameSpace != O2mListItemViewModelNameSpace) && (nmSpaces.IndexOf(O2mListItemViewModelNameSpace) < 0)) 
         nmSpaces.Add(O2mListItemViewModelNameSpace);
+    if ((O2mViewModelNameSpace != RegionAwareViewModelBaseNameSpace) && (nmSpaces.IndexOf(RegionAwareViewModelBaseNameSpace) < 0)) 
+        nmSpaces.Add(RegionAwareViewModelBaseNameSpace);
     
     bool IsInTheSameModule = (LformUserControlProject == O2mUserControlProject);
     
@@ -263,7 +276,7 @@ using <#= ns #>;
 
 namespace <#= O2mViewModelNameSpace #> {
 
-    public class <#= O2mViewModelClassName #>: INotifyPropertyChanged, IRegionAware 
+    public class <#= O2mViewModelClassName #>: <#= RegionAwareViewModelBaseClassName #>, IRegionAware 
     {
         protected <#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName #>=null;
         protected <#= GetModelServiceInterfaceName(Model) #> <#= FormServicePrefix #><#= Model.ViewName #> = null;
@@ -276,15 +289,53 @@ namespace <#= O2mViewModelNameSpace #> {
             _<#= TableMenuItemsDetailPropertyName #> = GetDefault<#= TableMenuItemsDetailPropertyName #>();
             _<#= RowMenuItemsDetailPropertyName #> = GetDefault<#= RowMenuItemsDetailPropertyName #>();
         }
-        #region INotifyPropertyChanged
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void OnPropertyChanged([CallerMemberName] string name = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-        }
-        #endregion
 
         protected int PermissionMask = 0; 
+
+        public bool <#= CanAddPropertyName #>
+        { 
+            get
+            {
+                return ((PermissionMask & 8) == 8) && <#= CanAddParentPropertyName #>;
+            }
+        }
+        public bool <#= CanUpdPropertyName #>
+        { 
+            get
+            {
+                return ((PermissionMask & 4) == 4) && <#= CanUpdParentPropertyName #>;
+            }
+        }
+        public bool <#= CanDelPropertyName #>
+        { 
+            get
+            {
+                return ((PermissionMask & 2) == 2) && <#= CanDelParentPropertyName #>;
+            }
+        }
+
+        public bool <#= CanAddDetailPropertyName #>
+        { 
+            get
+            {
+                return <#= CanAddDetailParentPropertyName #> && ((PermissionMaskDetail & 8) == 8);
+            }
+        }
+        public bool <#= CanUpdDetailPropertyName #>
+        { 
+            get
+            {
+                return <#= CanUpdDetailParentPropertyName #> && ((PermissionMaskDetail & 4) == 4);
+            }
+        }
+        public bool <#= CanDelDetailPropertyName #>
+        { 
+            get
+            {
+                return <#= CanDelDetailParentPropertyName #> && ((PermissionMaskDetail & 2) == 2);
+            }
+        }
+
 
         #region <#= IsParentLoadedPropertyName #>
         bool _<#= IsParentLoadedPropertyName #> = false;
@@ -399,60 +450,6 @@ namespace <#= O2mViewModelNameSpace #> {
             navResult.Context.NavigationService.RequestNavigate(new Uri("<#= PageNotFoundUserControlClassName #>", UriKind.Relative));
             <#= AppSettingServicePropertyName #>.ShowErrorMessage("Navigation Exception", navErrorMsg);
         }
-        #region <#= CanAddPropertyName #>
-        protected bool _<#= CanAddPropertyName #> = false;
-        public bool <#= CanAddPropertyName #>
-        { 
-            get
-            {
-                return _<#= CanAddPropertyName #>;
-            }
-            set
-            {
-                if (_<#= CanAddPropertyName #> != value)
-                {
-                    _<#= CanAddPropertyName #> = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-        #endregion
-        #region <#= CanUpdPropertyName #>
-        protected bool _<#= CanUpdPropertyName #> = false;
-        public bool <#= CanUpdPropertyName #>
-        { 
-            get
-            {
-                return _<#= CanUpdPropertyName #>;
-            }
-            set
-            {
-                if (_<#= CanUpdPropertyName #> != value)
-                {
-                    _<#= CanUpdPropertyName #> = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-        #endregion
-        #region <#= CanDelPropertyName #>
-        protected object _<#= CanDelPropertyName #> = false;
-        public object <#= CanDelPropertyName #>
-        { 
-            get
-            {
-                return _<#= CanDelPropertyName #>;
-            }
-            set
-            {
-                if (_<#= CanDelPropertyName #> != value)
-                {
-                    _<#= CanDelPropertyName #> = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-        #endregion
         #region <#= TableMenuItemsCommandPropertyName #>
         protected ICommand _<#= TableMenuItemsCommandPropertyName #> = null;
         public ICommand <#= TableMenuItemsCommandPropertyName #>
@@ -552,9 +549,9 @@ namespace <#= O2mViewModelNameSpace #> {
             <#= CurrentNavigationContextPropertyName #> = navigationContext;
             OnPropertyChanged("<#= ShowBackBtnPropertyName #>");
             (<#= OnNavigationBackCommandPropertyName #> as Command).ChangeCanExecute();
-            <#= CanAddPropertyName  #> = (PermissionMask & 8) == 8; 
-            <#= CanUpdPropertyName  #> = (PermissionMask & 4) == 4; 
-            <#= CanDelPropertyName  #> = (PermissionMask & 2) == 2; 
+            OnPropertyChanged("<#= CanAddPropertyName  #>");
+            OnPropertyChanged("<#= CanUpdPropertyName  #>");
+            OnPropertyChanged("<#= CanDelPropertyName  #>");
 
             if(!<#= IsParentLoadedPropertyName #>) {
                 ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>> hf = new ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>();
@@ -739,33 +736,6 @@ namespace <#= O2mViewModelNameSpace #> {
         }
         #endregion
 
-        #region <#= CanAddDetailPropertyName #>
-        public bool <#= CanAddDetailPropertyName #>
-        { 
-            get
-            {
-                return (PermissionMaskDetail & 8) == 8;
-            }
-        }
-        #endregion
-        #region <#= CanUpdDetailPropertyName #>
-        public bool <#= CanUpdDetailPropertyName #>
-        { 
-            get
-            {
-                return (PermissionMaskDetail & 4) == 4;
-            }
-        }
-        #endregion
-        #region <#= CanDelDetailPropertyName #>
-        public object <#= CanDelDetailPropertyName #>
-        { 
-            get
-            {
-                return (PermissionMaskDetail & 2) == 2;
-            }
-        }
-        #endregion
 
         #region <#= IsDetailReadyPropertyName #>
         protected int PermissionMaskDetail = 0; 

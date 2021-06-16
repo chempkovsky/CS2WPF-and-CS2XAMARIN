@@ -14,18 +14,20 @@
 using Xamarin.Forms;
 <#
 
-    string UserControlWithContainerMenuFolder       = "00628-UserControlWithContainerMenu.xaml.cs";
-    string UserControlWithContainerMenuClassName    = GetContextModelClassName(Context, UserControlWithContainerMenuFolder);
-    string UserControlWithContainerMenuNameSpace    = GetContextModelNameSpace(Context, UserControlWithContainerMenuFolder);
-    string UserControlWithContainerMenuProject      = GetContextModelProjectName(Context, UserControlWithContainerMenuFolder);
+    string RegionAwareUserControlBaseFolder       = "00650-RegionAwareUserControlBase.xaml.cs";
+    string RegionAwareUserControlBaseClassName    = GetContextModelClassName(Context, RegionAwareUserControlBaseFolder);
+    string RegionAwareUserControlBaseNameSpace    = GetContextModelNameSpace(Context, RegionAwareUserControlBaseFolder);
+    string RegionAwareUserControlBaseProject      = GetContextModelProjectName(Context, RegionAwareUserControlBaseFolder);
 
     string RdlistUserControlFolder                  = "02016-RdlistUserControl.xaml.cs";
     string RdlistUserControlClassName               = GetModelClassName(Model, RdlistUserControlFolder);
     string RdlistUserControlNameSpace               = GetModelNameSpace(Model, RdlistUserControlFolder);
 
+    string OnLoadedPropertyName                     = "OnLoaded";
+
     List<string> nmSpaces = new List<string>();
-    if ((RdlistUserControlNameSpace != UserControlWithContainerMenuNameSpace) && (nmSpaces.IndexOf(UserControlWithContainerMenuNameSpace) < 0)) 
-        nmSpaces.Add(UserControlWithContainerMenuNameSpace);
+    if ((RdlistUserControlNameSpace != RegionAwareUserControlBaseNameSpace) && (nmSpaces.IndexOf(RegionAwareUserControlBaseNameSpace) < 0)) 
+        nmSpaces.Add(RegionAwareUserControlBaseNameSpace);
     
 #>
 <# 
@@ -41,11 +43,12 @@ namespace <#= RdlistUserControlNameSpace #> {
     /// <summary>
     /// Interaction logic for <#= RdlistUserControlClassName #>.xaml
     /// </summary>
-    public partial class <#= RdlistUserControlClassName #>: <#= UserControlWithContainerMenuClassName  #>
+    public partial class <#= RdlistUserControlClassName #>: <#= RegionAwareUserControlBaseClassName  #>
     {
         public <#= RdlistUserControlClassName #>()
         {
             InitializeComponent();
+            <#= OnLoadedPropertyName #>(); 
         }
     }
 }

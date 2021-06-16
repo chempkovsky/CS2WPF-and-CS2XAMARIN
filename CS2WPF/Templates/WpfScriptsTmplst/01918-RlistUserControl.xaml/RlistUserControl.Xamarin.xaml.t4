@@ -19,10 +19,10 @@
     string ProxyUserControlNameSpace        = GetContextModelNameSpace(Context, ProxyUserControlFolder);
     string ProxyUserControlProject          = GetContextModelProjectName(Context, ProxyUserControlFolder);
 
-    string UserControlWithContainerMenuFolder       = "00628-UserControlWithContainerMenu.xaml.cs";
-    string UserControlWithContainerMenuClassName    = GetContextModelClassName(Context, UserControlWithContainerMenuFolder);
-    string UserControlWithContainerMenuNameSpace    = GetContextModelNameSpace(Context, UserControlWithContainerMenuFolder);
-    string UserControlWithContainerMenuProject      = GetContextModelProjectName(Context, UserControlWithContainerMenuFolder);
+    string RegionAwareUserControlBaseFolder       = "00650-RegionAwareUserControlBase.xaml.cs";
+    string RegionAwareUserControlBaseClassName    = GetContextModelClassName(Context, RegionAwareUserControlBaseFolder);
+    string RegionAwareUserControlBaseNameSpace    = GetContextModelNameSpace(Context, RegionAwareUserControlBaseFolder);
+    string RegionAwareUserControlBaseProject      = GetContextModelProjectName(Context, RegionAwareUserControlBaseFolder);
 
     string SformUserControlFolder           = "01420-SformUserControl.xaml.cs";
     string SformUserControlClassName        = GetModelClassName(Model, SformUserControlFolder);
@@ -79,16 +79,16 @@
     if(SformUserControlProject != RlistUserControlProject) {
         sformPrefix = sformPrefix + ";assembly=" + SformUserControlProject;
     }
-    string ucwcmPrefix = "clr-namespace:" + UserControlWithContainerMenuNameSpace;
-    if(UserControlWithContainerMenuProject != RlistUserControlProject) {
-        ucwcmPrefix = ucwcmPrefix + ";assembly=" + UserControlWithContainerMenuProject;
+    string ucwcmPrefix = "clr-namespace:" + RegionAwareUserControlBaseNameSpace;
+    if(RegionAwareUserControlBaseProject != RlistUserControlProject) {
+        ucwcmPrefix = ucwcmPrefix + ";assembly=" + RegionAwareUserControlBaseProject;
     }
 
     bool IsInTheSameModule = (SformUserControlProject == RlistUserControlProject);
 
 #>
 
-<ucwcm:<#= UserControlWithContainerMenuClassName #> x:Class="<#= RlistUserControlNameSpace #>.<#= RlistUserControlClassName #>"
+<ucwcm:<#= RegionAwareUserControlBaseClassName #> x:Class="<#= RlistUserControlNameSpace #>.<#= RlistUserControlClassName #>"
              xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:prism="http://prismlibrary.com" 
@@ -129,8 +129,8 @@
 
             <#= CaptionPropertyName #>="{Binding BindingContext.<#= CaptionPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}" 
             <#= FilterHeightPropertyName #>="{Binding BindingContext.<#= FilterHeightPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}" 
-            <#= ShowFilterPropertyName #>="True" 
-            <#= ShowAddFilterBtnPropertyName #>="True" 
+            <#= ShowFilterPropertyName #>="{Binding BindingContext.<#= ShowFilterPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}" 
+            <#= ShowAddFilterBtnPropertyName #>="{Binding BindingContext.<#= ShowAddFilterBtnPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}" 
             <#= GridHeightPropertyName #>="{Binding BindingContext.<#= GridHeightPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}" 
             <#= HiddenFiltersPropertyName #>="{Binding BindingContext.<#= HiddenFiltersPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}" 
             <#= SelectedRowCommandPropertyName #>="{Binding BindingContext.<#= SelectedRowCommandPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}" 
@@ -143,7 +143,7 @@
             <#= RowMenuItemsPropertyName #>="{Binding BindingContext.<#= RowMenuItemsPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}" 
             <#= IsParentLoadedPropertyName #>="{Binding BindingContext.<#= IsParentLoadedPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}" 
             />
-</ucwcm:<#= UserControlWithContainerMenuClassName #>>
+</ucwcm:<#= RegionAwareUserControlBaseClassName #>>
 
 
 <#+

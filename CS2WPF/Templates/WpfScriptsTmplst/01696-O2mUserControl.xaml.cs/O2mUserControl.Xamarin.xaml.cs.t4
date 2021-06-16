@@ -13,21 +13,20 @@
 <#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
 using Xamarin.Forms;
 <#
-    string UserControlWithContainerMenuFolder       = "00628-UserControlWithContainerMenu.xaml.cs";
-    string UserControlWithContainerMenuClassName    = GetContextModelClassName(Context, UserControlWithContainerMenuFolder);
-    string UserControlWithContainerMenuNameSpace    = GetContextModelNameSpace(Context, UserControlWithContainerMenuFolder);
-    string UserControlWithContainerMenuProject      = GetContextModelProjectName(Context, UserControlWithContainerMenuFolder);
+    string RegionAwareUserControlBaseFolder       = "00650-RegionAwareUserControlBase.xaml.cs";
+    string RegionAwareUserControlBaseClassName    = GetContextModelClassName(Context, RegionAwareUserControlBaseFolder);
+    string RegionAwareUserControlBaseNameSpace    = GetContextModelNameSpace(Context, RegionAwareUserControlBaseFolder);
+    string RegionAwareUserControlBaseProject      = GetContextModelProjectName(Context, RegionAwareUserControlBaseFolder);
 
     string O2mUserControlFolder           = "01696-O2mUserControl.xaml.cs";
     string O2mUserControlClassName        = GetModelClassName(Model, O2mUserControlFolder);
     string O2mUserControlNameSpace        = GetModelNameSpace(Model, O2mUserControlFolder);
 
-    string GridHeightDetailPropertyName                     = "GridHeightDetail"; 
-    string FilterHeightDetailPropertyName                   = "FilterHeightDetail"; 
+    string OnLoadedPropertyName                     = "OnLoaded";
 
     List<string> nmSpaces = new List<string>();
-    if ((O2mUserControlNameSpace != UserControlWithContainerMenuNameSpace) && (nmSpaces.IndexOf(UserControlWithContainerMenuNameSpace) < 0)) 
-        nmSpaces.Add(UserControlWithContainerMenuNameSpace);
+    if ((O2mUserControlNameSpace != RegionAwareUserControlBaseNameSpace) && (nmSpaces.IndexOf(RegionAwareUserControlBaseNameSpace) < 0)) 
+        nmSpaces.Add(RegionAwareUserControlBaseNameSpace);
     
 #>
 <# 
@@ -43,49 +42,14 @@ namespace <#= O2mUserControlNameSpace #> {
     /// <summary>
     /// Interaction logic for <#= O2mUserControlClassName #>.xaml
     /// </summary>
-    public partial class <#= O2mUserControlClassName #>: <#= UserControlWithContainerMenuClassName  #>
+    public partial class <#= O2mUserControlClassName #>: <#= RegionAwareUserControlBaseClassName  #>
     {
         public <#= O2mUserControlClassName #>()
         {
             InitializeComponent();
+            <#= OnLoadedPropertyName #>(); 
         }
 
-        #region <#= GridHeightDetailPropertyName #>
-        public static readonly BindableProperty <#= GridHeightDetailPropertyName #>Property =
-                BindableProperty.Create(
-                "<#= GridHeightDetailPropertyName #>", typeof(double),
-                typeof(<#= O2mUserControlClassName #>),
-                double.MaxValue);
-        public double <#= GridHeightDetailPropertyName #>
-        {
-            get
-            {
-                return (double)GetValue(<#= GridHeightDetailPropertyName #>Property);
-            }
-            set
-            {
-                SetValue(<#= GridHeightDetailPropertyName #>Property, value);
-            }
-        }
-        #endregion
-        #region <#= FilterHeightDetailPropertyName #>
-        public static readonly BindableProperty <#= FilterHeightDetailPropertyName #>Property =
-                BindableProperty.Create(
-                "<#= FilterHeightDetailPropertyName #>", typeof(double),
-                typeof(<#= O2mUserControlClassName #>),
-                double.MaxValue);
-        public double <#= FilterHeightDetailPropertyName #>
-        {
-            get
-            {
-                return (double)GetValue(<#= FilterHeightDetailPropertyName #>Property);
-            }
-            set
-            {
-                SetValue(<#= FilterHeightDetailPropertyName #>Property, value);
-            }
-        }
-        #endregion
 
 
     }

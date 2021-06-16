@@ -1,0 +1,146 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+
+<#
+
+
+    string IRegionAwareViewModelInterfaceFolder     = "00646-IRegionAwareViewModelInterface.cs";
+    string IRegionAwareViewModelInterfaceClassName  = GetModelClassName(Model, IRegionAwareViewModelInterfaceFolder);
+    string IRegionAwareViewModelInterfaceNameSpace  = GetModelNameSpace(Model, IRegionAwareViewModelInterfaceFolder);
+
+
+    string FilterHeightChangedPropertyName          = "FilterHeightChanged";
+    string GridHeightChangedPropertyName            = "GridHeightChanged";
+    string ShowFilterChangedPropertyName            = "ShowFilterChanged";
+    string ShowAddFilterBtnChangedPropertyName      = "ShowAddFilterBtnChanged";
+
+    string CanAddChangedPropertyName                = "CanAddChanged";
+    string CanUpdChangedPropertyName                = "CanUpdateChanged";
+    string CanDelChangedPropertyName                = "CanDeleteChanged";
+
+    string FilterHeightDetailChangedPropertyName    = "FilterHeightDetailChanged"; 
+    string GridHeightDetailChangedPropertyName      = "GridHeightDetailChanged"; 
+    string ShowFilterDetailChangedPropertyName      = "ShowFilterDetailChanged"; 
+    string ShowAddFilterBtnDetailChangedPropertyName= "ShowAddFilterBtnDetailChanged"; 
+    string CanAddDetailChangedPropertyName          = "CanAddDetailChanged"; 
+    string CanUpdDetailChangedPropertyName          = "CanUpdateDetailChanged"; 
+    string CanDelDetailChangedPropertyName          = "CanDeleteDetailChanged"; 
+
+
+    List<string> nmSpaces = new List<string>();
+
+
+#>
+<# 
+    foreach(string ns in nmSpaces) {
+#>
+using <#= ns #>;
+<#
+    }
+#>
+
+
+namespace <#= IRegionAwareViewModelInterfaceNameSpace #> {
+    public interface <#= IRegionAwareViewModelInterfaceClassName #>
+    {
+        void <#= FilterHeightChangedPropertyName #>(object Sender, double OldValue, double NewValue);
+        void <#= GridHeightChangedPropertyName #>(object Sender, double OldValue, double NewValue);
+        void <#= ShowFilterChangedPropertyName #>(object Sender, bool OldValue, bool NewValue);
+        void <#= ShowAddFilterBtnChangedPropertyName #>(object Sender, bool OldValue, bool NewValue);
+        void <#= CanAddChangedPropertyName #>(object Sender, bool OldValue, bool NewValue);
+        void <#= CanUpdChangedPropertyName #>(object Sender, bool OldValue, bool NewValue);
+        void <#= CanDelChangedPropertyName #>(object Sender, bool OldValue, bool NewValue);
+
+
+        void <#= FilterHeightDetailChangedPropertyName #>(object Sender, double OldValue, double NewValue);
+        void <#= GridHeightDetailChangedPropertyName #>(object Sender, double OldValue, double NewValue);
+        void <#= ShowFilterDetailChangedPropertyName #>(object Sender, bool OldValue, bool NewValue);
+        void <#= ShowAddFilterBtnDetailChangedPropertyName #>(object Sender, bool OldValue, bool NewValue);
+        void <#= CanAddDetailChangedPropertyName #>(object Sender, bool OldValue, bool NewValue);
+        void <#= CanUpdDetailChangedPropertyName #>(object Sender, bool OldValue, bool NewValue);
+        void <#= CanDelDetailChangedPropertyName #>(object Sender, bool OldValue, bool NewValue);
+    }
+}
+
+
+<#+
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+#>

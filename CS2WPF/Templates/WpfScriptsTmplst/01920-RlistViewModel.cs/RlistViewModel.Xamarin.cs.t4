@@ -54,6 +54,10 @@ using Xamarin.Essentials;
     string WebServiceFilterMenuViewModelClassName   = GetContextModelClassName(Context, WebServiceFilterMenuViewModelFolder);
     string WebServiceFilterMenuViewModelNameSpace   = GetContextModelNameSpace(Context, WebServiceFilterMenuViewModelFolder);
 
+    string RegionAwareViewModelBaseFolder           = "00648-RegionAwareViewModelBase.cs";
+    string RegionAwareViewModelBaseClassName        = GetContextModelClassName(Context, RegionAwareViewModelBaseFolder);
+    string RegionAwareViewModelBaseNameSpace        = GetContextModelNameSpace(Context, RegionAwareViewModelBaseFolder);
+
     string AccessDeniedUserControlFolder            = "00678-AccessDeniedUserControl.xaml.cs";
     string AccessDeniedUserControlClassName         = GetModelClassName(Model, AccessDeniedUserControlFolder);
     string AccessDeniedUserControlNameSpace         = GetModelNameSpace(Model, AccessDeniedUserControlFolder);
@@ -150,6 +154,20 @@ using Xamarin.Essentials;
     string ShowBackBtnPropertyName              = "ShowBackBtn";
     string OnNavigationBackCommandPropertyName  = "OnNavigationBackCommand";
 
+    string CanAddPropertyName                   = "CanAdd";
+    string CanUpdPropertyName                   = "CanUpdate";
+    string CanDelPropertyName                   = "CanDelete";
+    string CanAddParentPropertyName             = "CanAddParent";
+    string CanUpdParentPropertyName             = "CanUpdateParent";
+    string CanDelParentPropertyName             = "CanDeleteParent";
+
+    string CanAddDetailPropertyName             = "CanAddDetail"; 
+    string CanUpdDetailPropertyName             = "CanUpdateDetail"; 
+    string CanDelDetailPropertyName             = "CanDeleteDetail"; 
+    string CanAddDetailParentPropertyName       = "CanAddDetailParent"; 
+    string CanUpdDetailParentPropertyName       = "CanUpdateDetailParent"; 
+    string CanDelDetailParentPropertyName       = "CanDeleteDetailParent"; 
+
     List<string> detailViews = GetDetailViews(Model, Context, null);
     List<ModelViewPropertyOfVwSerializable> primKeys = GetModelPrimaryKeyProps(Model);
 
@@ -172,6 +190,8 @@ using Xamarin.Essentials;
         nmSpaces.Add(modelInterfaceNameSpace);
     if ((RlistViewModelNameSpace != ISformViewModelInterfaceNameSpace) && (nmSpaces.IndexOf(ISformViewModelInterfaceNameSpace) < 0)) 
         nmSpaces.Add(ISformViewModelInterfaceNameSpace);
+    if ((RlistViewModelNameSpace != RegionAwareViewModelBaseNameSpace) && (nmSpaces.IndexOf(RegionAwareViewModelBaseNameSpace) < 0)) 
+        nmSpaces.Add(RegionAwareViewModelBaseNameSpace);
 
     bool IsInTheSameModule = (SformUserControlProject == RlistUserControlProject);
     
@@ -227,7 +247,7 @@ using <#= ns #>;
 
 namespace <#= RlistViewModelNameSpace #> {
 
-    public class <#= RlistViewModelClassName #>: INotifyPropertyChanged, IRegionAware 
+    public class <#= RlistViewModelClassName #>: <#= RegionAwareViewModelBaseClassName #>, IRegionAware 
     {
         protected <#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName #>=null;
         protected <#= GetModelServiceInterfaceName(Model) #> <#= FormServicePrefix #><#= Model.ViewName #> = null;
@@ -238,17 +258,53 @@ namespace <#= RlistViewModelNameSpace #> {
             _<#= TableMenuItemsPropertyName #> = GetDefault<#= TableMenuItemsPropertyName #>();
             _<#= RowMenuItemsPropertyName #> = GetDefault<#= RowMenuItemsPropertyName #>();
         }
-        #region INotifyPropertyChanged
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void OnPropertyChanged([CallerMemberName] string name = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-        }
-        #endregion
 
         protected int PermissionMask = 0; 
 
 
+        public bool <#= CanAddPropertyName #>
+        { 
+            get
+            {
+                return ((PermissionMask & 8) == 8) && <#= CanAddParentPropertyName #>;
+            }
+        }
+        public bool <#= CanUpdPropertyName #>
+        { 
+            get
+            {
+                return ((PermissionMask & 4) == 4) && <#= CanUpdParentPropertyName #>;
+            }
+        }
+        public bool <#= CanDelPropertyName #>
+        { 
+            get
+            {
+                return ((PermissionMask & 2) == 2) && <#= CanDelParentPropertyName #>;
+            }
+        }
+
+        public bool <#= CanAddDetailPropertyName #>
+        { 
+            get
+            {
+                return <#= CanAddDetailParentPropertyName #>;
+            }
+        }
+        public bool <#= CanUpdDetailPropertyName #>
+        { 
+            get
+            {
+                return <#= CanUpdDetailParentPropertyName #>;
+            }
+        }
+        public bool <#= CanDelDetailPropertyName #>
+        { 
+            get
+            {
+                return <#= CanDelDetailParentPropertyName #>;
+            }
+        }
 
         #region <#= CaptionPropertyName #>
         string _<#= CaptionPropertyName #> = "<#= Model.ViewName #>";
@@ -510,7 +566,7 @@ namespace <#= RlistViewModelNameSpace #> {
         #endregion
         #region <#= SformAddItemCommandPropertyName #>
         public void <#= SformAddItemCommandPropertyName #>() {
-            if ((PermissionMask & 8) != 8) {
+            if (!<#= CanAddPropertyName #>) {
                 <#= CurrentNavigationContextPropertyName #>.NavigationService.RequestNavigate(new Uri("<#= AccessDeniedUserControlClassName #>", UriKind.Relative), OnNavigationResult);
                 return;
             }
@@ -551,7 +607,7 @@ namespace <#= RlistViewModelNameSpace #> {
         #region <#= SformUpdItemCommandPropertyName #>
         public void <#= SformUpdItemCommandPropertyName #>(<#= modelInterfaceClassName #> selected) {
             if (selected == null) return;
-            if ((PermissionMask & 4) != 4) {
+            if (!<#= CanUpdPropertyName #>) {
                 <#= CurrentNavigationContextPropertyName #>.NavigationService.RequestNavigate(new Uri("<#= AccessDeniedUserControlClassName #>", UriKind.Relative), OnNavigationResult);
                 return;
             }
@@ -574,7 +630,7 @@ namespace <#= RlistViewModelNameSpace #> {
         #region <#= SformDelItemCommandPropertyName #>
         public void <#= SformDelItemCommandPropertyName #>(<#= modelInterfaceClassName #> selected) {
             if (selected == null) return;
-            if((PermissionMask & 2) != 2) {
+            if(!<#= CanDelPropertyName #>) {
                 <#= CurrentNavigationContextPropertyName #>.NavigationService.RequestNavigate(new Uri("<#= AccessDeniedUserControlClassName #>", UriKind.Relative), OnNavigationResult);
                 return;
             }

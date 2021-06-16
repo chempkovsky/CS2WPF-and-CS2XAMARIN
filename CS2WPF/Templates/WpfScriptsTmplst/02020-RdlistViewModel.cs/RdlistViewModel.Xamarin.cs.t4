@@ -53,6 +53,10 @@ using Prism.Navigation;
     string WebServiceFilterMenuViewModelClassName   = GetContextModelClassName(Context, WebServiceFilterMenuViewModelFolder);
     string WebServiceFilterMenuViewModelNameSpace   = GetContextModelNameSpace(Context, WebServiceFilterMenuViewModelFolder);
 
+    string RegionAwareViewModelBaseFolder           = "00648-RegionAwareViewModelBase.cs";
+    string RegionAwareViewModelBaseClassName        = GetContextModelClassName(Context, RegionAwareViewModelBaseFolder);
+    string RegionAwareViewModelBaseNameSpace        = GetContextModelNameSpace(Context, RegionAwareViewModelBaseFolder);
+
     string AccessDeniedUserControlFolder            = "00678-AccessDeniedUserControl.xaml.cs";
     string AccessDeniedUserControlClassName         = GetModelClassName(Model, AccessDeniedUserControlFolder);
     string AccessDeniedUserControlNameSpace         = GetModelNameSpace(Model, AccessDeniedUserControlFolder);
@@ -115,6 +119,16 @@ using Prism.Navigation;
     string CanAddPropertyName                   = "CanAdd";
     string CanUpdPropertyName                   = "CanUpdate";
     string CanDelPropertyName                   = "CanDelete";
+    string CanAddParentPropertyName             = "CanAddParent";
+    string CanUpdParentPropertyName             = "CanUpdateParent";
+    string CanDelParentPropertyName             = "CanDeleteParent";
+
+    string CanAddDetailPropertyName             = "CanAddDetail"; 
+    string CanUpdDetailPropertyName             = "CanUpdateDetail"; 
+    string CanDelDetailPropertyName             = "CanDeleteDetail"; 
+    string CanAddDetailParentPropertyName       = "CanAddDetailParent"; 
+    string CanUpdDetailParentPropertyName       = "CanUpdateDetailParent"; 
+    string CanDelDetailParentPropertyName       = "CanDeleteDetailParent"; 
 
     string FormControlModelPropertyName         = "FormControlModel";
     string CaptionPropertyName                  = "Caption";
@@ -133,6 +147,7 @@ using Prism.Navigation;
     string CurrentNavigationContextPropertyName = "CurrentNavigationContext";
     string ShowBackBtnPropertyName              = "ShowBackBtn";
     string OnNavigationBackCommandPropertyName  = "OnNavigationBackCommand";
+
 
     List<string> detailViews = GetDetailViews(Model, Context, null);
     List<ModelViewPropertyOfVwSerializable> primKeys = GetModelPrimaryKeyProps(Model);
@@ -156,6 +171,8 @@ using Prism.Navigation;
         nmSpaces.Add(modelInterfaceNameSpace);
     if ((RdlistViewModelNameSpace != ISformViewModelInterfaceNameSpace) && (nmSpaces.IndexOf(ISformViewModelInterfaceNameSpace) < 0)) 
         nmSpaces.Add(ISformViewModelInterfaceNameSpace);
+    if ((RdlistViewModelNameSpace != RegionAwareViewModelBaseNameSpace) && (nmSpaces.IndexOf(RegionAwareViewModelBaseNameSpace) < 0)) 
+        nmSpaces.Add(RegionAwareViewModelBaseNameSpace);
 
     bool IsInTheSameModule = (LformUserControlProject == RdlistUserControlProject);
     
@@ -211,7 +228,7 @@ using <#= ns #>;
 
 namespace <#= RdlistViewModelNameSpace #> {
 
-    public class <#= RdlistViewModelClassName #>: INotifyPropertyChanged, IRegionAware
+    public class <#= RdlistViewModelClassName #>: <#= RegionAwareViewModelBaseClassName #>, IRegionAware
     {
         protected <#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName #>=null;
         protected <#= GetModelServiceInterfaceName(Model) #> <#= FormServicePrefix #><#= Model.ViewName #> = null;
@@ -223,15 +240,52 @@ namespace <#= RdlistViewModelNameSpace #> {
             _<#= TableMenuItemsPropertyName #> = GetDefault<#= TableMenuItemsPropertyName #>();
             _<#= RowMenuItemsPropertyName #> = GetDefault<#= RowMenuItemsPropertyName #>();
         }
-        #region INotifyPropertyChanged
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void OnPropertyChanged([CallerMemberName] string name = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-        }
-        #endregion
 
         protected int PermissionMask = 0; 
+
+        public bool <#= CanAddPropertyName #>
+        { 
+            get
+            {
+                return ((PermissionMask & 8) == 8) && <#= CanAddParentPropertyName #>;
+            }
+        }
+        public bool <#= CanUpdPropertyName #>
+        { 
+            get
+            {
+                return ((PermissionMask & 4) == 4) && <#= CanUpdParentPropertyName #>;
+            }
+        }
+        public bool <#= CanDelPropertyName #>
+        { 
+            get
+            {
+                return ((PermissionMask & 2) == 2) && <#= CanDelParentPropertyName #>;
+            }
+        }
+
+        public bool <#= CanAddDetailPropertyName #>
+        { 
+            get
+            {
+                return <#= CanAddDetailParentPropertyName #>;
+            }
+        }
+        public bool <#= CanUpdDetailPropertyName #>
+        { 
+            get
+            {
+                return <#= CanUpdDetailParentPropertyName #>;
+            }
+        }
+        public bool <#= CanDelDetailPropertyName #>
+        { 
+            get
+            {
+                return <#= CanDelDetailParentPropertyName #>;
+            }
+        }
 
         #region <#= CaptionPropertyName #>
         string _<#= CaptionPropertyName #> = "<#= Model.ViewName #>";
@@ -431,60 +485,6 @@ namespace <#= RdlistViewModelNameSpace #> {
 
 
 
-        #region <#= CanAddPropertyName #>
-        protected bool _<#= CanAddPropertyName #> = false;
-        public bool <#= CanAddPropertyName #>
-        { 
-            get
-            {
-                return _<#= CanAddPropertyName #>;
-            }
-            set
-            {
-                if (_<#= CanAddPropertyName #> != value)
-                {
-                    _<#= CanAddPropertyName #> = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-        #endregion
-        #region <#= CanUpdPropertyName #>
-        protected bool _<#= CanUpdPropertyName #> = false;
-        public bool <#= CanUpdPropertyName #>
-        { 
-            get
-            {
-                return _<#= CanUpdPropertyName #>;
-            }
-            set
-            {
-                if (_<#= CanUpdPropertyName #> != value)
-                {
-                    _<#= CanUpdPropertyName #> = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-        #endregion
-        #region <#= CanDelPropertyName #>
-        protected object _<#= CanDelPropertyName #> = false;
-        public object <#= CanDelPropertyName #>
-        { 
-            get
-            {
-                return _<#= CanDelPropertyName #>;
-            }
-            set
-            {
-                if (_<#= CanDelPropertyName #> != value)
-                {
-                    _<#= CanDelPropertyName #> = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-        #endregion
         #region <#= TableMenuItemsCommandPropertyName #>
         protected ICommand _<#= TableMenuItemsCommandPropertyName #> = null;
         public ICommand <#= TableMenuItemsCommandPropertyName #>
@@ -628,9 +628,9 @@ namespace <#= RdlistViewModelNameSpace #> {
             <#= CurrentNavigationContextPropertyName #> = navigationContext;
             OnPropertyChanged("<#= ShowBackBtnPropertyName #>");
             (<#= OnNavigationBackCommandPropertyName #> as Command).ChangeCanExecute();
-            <#= CanAddPropertyName  #> = (PermissionMask & 8) == 8; 
-            <#= CanUpdPropertyName  #> = (PermissionMask & 4) == 4; 
-            <#= CanDelPropertyName  #> = (PermissionMask & 2) == 2; 
+            OnPropertyChanged("<#= CanAddPropertyName  #>");
+            OnPropertyChanged("<#= CanUpdPropertyName  #>");
+            OnPropertyChanged("<#= CanDelPropertyName  #>");
 
             if(!<#= IsParentLoadedPropertyName #>) {
                 ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>> hf = new ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>();

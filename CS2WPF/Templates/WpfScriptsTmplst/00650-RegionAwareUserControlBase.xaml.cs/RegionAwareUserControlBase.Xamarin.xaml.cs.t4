@@ -1,0 +1,670 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+using Xamarin.Forms;
+using System.Collections.Generic;
+using System.Windows.Input;
+<#
+    string IWebServiceFilterMenuInterfaceFolder      = "00206-IWebServiceFilterMenuInterface.cs";
+    string IWebServiceFilterMenuInterfaceClassName   = GetModelClassName(Model, IWebServiceFilterMenuInterfaceFolder);
+    string IWebServiceFilterMenuInterfaceNameSpace   = GetModelNameSpace(Model, IWebServiceFilterMenuInterfaceFolder);
+
+    string IRegionAwareViewModelInterfaceFolder     = "00646-IRegionAwareViewModelInterface.cs";
+    string IRegionAwareViewModelInterfaceClassName  = GetModelClassName(Model, IRegionAwareViewModelInterfaceFolder);
+    string IRegionAwareViewModelInterfaceNameSpace  = GetModelNameSpace(Model, IRegionAwareViewModelInterfaceFolder);
+
+
+    string RegionAwareUserControlBaseFolder       = "00650-RegionAwareUserControlBase.xaml.cs";
+    string RegionAwareUserControlBaseClassName    = GetModelClassName(Model, RegionAwareUserControlBaseFolder);
+    string RegionAwareUserControlBaseNameSpace    = GetModelNameSpace(Model, RegionAwareUserControlBaseFolder);
+
+
+    string ContainerMenuItemsPropertyName           = "ContainerMenuItems";
+    string ContainerMenuItemsCommandPropertyName    = "ContainerMenuItemsCommand";
+    string OnContainerMenuItemsCommandPropertyName  = "OnContainerMenuItemsCommand";
+
+    string FilterHeightPropertyName                 = "FilterHeight";
+    string GridHeightPropertyName                   = "GridHeight";
+    string ShowFilterPropertyName                   = "ShowFilter";
+    string ShowAddFilterBtnPropertyName             = "ShowAddFilterBtn";
+    string ShowBackBtnPropertyName                  = "ShowBackBtn";
+    string CanAddPropertyName                       = "CanAdd";
+    string CanUpdPropertyName                       = "CanUpdate";
+    string CanDelPropertyName                       = "CanDelete";
+
+    string FilterHeightChangedPropertyName          = "FilterHeightChanged";
+    string GridHeightChangedPropertyName            = "GridHeightChanged";
+    string ShowFilterChangedPropertyName            = "ShowFilterChanged";
+    string ShowAddFilterBtnChangedPropertyName      = "ShowAddFilterBtnChanged";
+    string CanAddChangedPropertyName                = "CanAddChanged";
+    string CanUpdChangedPropertyName                = "CanUpdateChanged";
+    string CanDelChangedPropertyName                = "CanDeleteChanged";
+
+    string FilterHeightDetailPropertyName           = "FilterHeightDetail"; 
+    string GridHeightDetailPropertyName             = "GridHeightDetail"; 
+    string ShowFilterDetailPropertyName             = "ShowFilterDetail"; 
+    string ShowAddFilterBtnDetailPropertyName       = "ShowAddFilterBtnDetail"; 
+    string CanAddDetailPropertyName                 = "CanAddDetail"; 
+    string CanUpdDetailPropertyName                 = "CanUpdateDetail"; 
+    string CanDelDetailPropertyName                 = "CanDeleteDetail"; 
+
+    string FilterHeightDetailChangedPropertyName    = "FilterHeightDetailChanged"; 
+    string GridHeightDetailChangedPropertyName      = "GridHeightDetailChanged"; 
+    string ShowFilterDetailChangedPropertyName      = "ShowFilterDetailChanged"; 
+    string ShowAddFilterBtnDetailChangedPropertyName= "ShowAddFilterBtnDetailChanged"; 
+    string CanAddDetailChangedPropertyName          = "CanAddDetailChanged"; 
+    string CanUpdDetailChangedPropertyName          = "CanUpdateDetailChanged"; 
+    string CanDelDetailChangedPropertyName          = "CanDeleteDetailChanged"; 
+
+    string OnLoadedPropertyName                     = "OnLoaded";
+
+    List<string> nmSpaces = new List<string>();
+    if ((RegionAwareUserControlBaseNameSpace != IRegionAwareViewModelInterfaceNameSpace) && (nmSpaces.IndexOf(IRegionAwareViewModelInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IRegionAwareViewModelInterfaceNameSpace);
+    if ((RegionAwareUserControlBaseNameSpace != IWebServiceFilterMenuInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterMenuInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IWebServiceFilterMenuInterfaceNameSpace);
+
+#>
+<# 
+    foreach(string ns in nmSpaces) {
+#>
+using <#= ns #>;
+<#
+    }
+#>
+
+namespace <#= RegionAwareUserControlBaseNameSpace #> {
+    /// <summary>
+    /// Interaction logic for <#= RegionAwareUserControlBaseClassName #>.xaml
+    /// </summary>
+    public class <#= RegionAwareUserControlBaseClassName #>: ContentView
+    {
+        // public <#= RegionAwareUserControlBaseClassName #>()
+        // {
+        //     InitializeComponent();
+        //     <#= OnLoadedPropertyName #>(); 
+        // }
+
+        #region <#= OnLoadedPropertyName #>
+        // "async void" is correct for this method
+        protected virtual void <#= OnLoadedPropertyName #>()
+        {
+            <#= IRegionAwareViewModelInterfaceClassName #> bc = BindingContext as <#= IRegionAwareViewModelInterfaceClassName #>;
+            if (bc != null)
+            {
+                bc.<#= FilterHeightChangedPropertyName #>(this, -1d, <#= FilterHeightPropertyName #>);
+                bc.<#= GridHeightChangedPropertyName #>(this, -1d, <#= GridHeightPropertyName #>);
+                bc.<#= ShowFilterChangedPropertyName #>(this, false, <#= ShowFilterPropertyName #>);
+                bc.<#= ShowAddFilterBtnChangedPropertyName #>(this, false, <#= ShowAddFilterBtnPropertyName #>);
+                bc.<#= CanAddChangedPropertyName #>(this, false, <#= CanAddPropertyName #>);
+                bc.<#= CanUpdChangedPropertyName #>(this, false, <#= CanUpdPropertyName #>);
+                bc.<#= CanDelChangedPropertyName #>(this, false, <#= CanDelPropertyName #>);
+
+                bc.<#= FilterHeightDetailChangedPropertyName #>(this, -1d, <#= FilterHeightDetailPropertyName #>);
+                bc.<#= GridHeightDetailChangedPropertyName #>(this, -1d, <#= GridHeightDetailPropertyName #>);
+                bc.<#= ShowFilterDetailChangedPropertyName #>(this, false, <#= ShowFilterDetailPropertyName #>);
+                bc.<#= ShowAddFilterBtnDetailChangedPropertyName #>(this, false, <#= ShowAddFilterBtnDetailPropertyName #>);
+                bc.<#= CanAddDetailChangedPropertyName #>(this, false, <#= CanAddDetailPropertyName #>);
+                bc.<#= CanUpdDetailChangedPropertyName #>(this, false, <#= CanUpdDetailPropertyName #>);
+                bc.<#= CanDelDetailChangedPropertyName #>(this, false, <#= CanDelDetailPropertyName #>);
+            }
+        }
+        #endregion
+
+        #region <#= ContainerMenuItemsPropertyName #>
+        public static readonly BindableProperty <#= ContainerMenuItemsPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= ContainerMenuItemsPropertyName #>", typeof(IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>),
+                typeof(<#= RegionAwareUserControlBaseClassName #>),
+                null);
+        public IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> <#= ContainerMenuItemsPropertyName #>
+        {
+            get
+            {
+                return (IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>)GetValue(<#= ContainerMenuItemsPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= ContainerMenuItemsPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= ContainerMenuItemsCommandPropertyName #>
+        private static void <#= ContainerMenuItemsCommandPropertyName #>Changed(BindableObject bindable, object oldValue, object newValue)
+        {
+            <#= RegionAwareUserControlBaseClassName #> d = bindable as <#= RegionAwareUserControlBaseClassName #>;
+            if (d != null)
+            {
+                if (d.<#= OnContainerMenuItemsCommandPropertyName #> != null)
+                {
+                    (d.<#= OnContainerMenuItemsCommandPropertyName #> as Command).ChangeCanExecute();
+                }
+            }
+        }
+        public static readonly BindableProperty <#= ContainerMenuItemsCommandPropertyName #>Property =
+            BindableProperty.Create(nameof(<#= ContainerMenuItemsCommandPropertyName #>), typeof(ICommand), 
+            typeof(<#= RegionAwareUserControlBaseClassName #>), 
+            null, 
+            propertyChanged: <#= ContainerMenuItemsCommandPropertyName #>Changed);
+        public ICommand <#= ContainerMenuItemsCommandPropertyName #>
+        {
+            get { return (ICommand)GetValue(<#= ContainerMenuItemsCommandPropertyName #>Property); }
+            set { SetValue(<#= ContainerMenuItemsCommandPropertyName #>Property, value); }
+        }
+        #endregion
+        #region <#= OnContainerMenuItemsCommandPropertyName #>
+        protected ICommand _<#= OnContainerMenuItemsCommandPropertyName #> = null;
+        public ICommand <#= OnContainerMenuItemsCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= OnContainerMenuItemsCommandPropertyName #> ?? (_<#= OnContainerMenuItemsCommandPropertyName #> = new Command((p) => <#= OnContainerMenuItemsCommandPropertyName #>Execute(p), (p) => <#= OnContainerMenuItemsCommandPropertyName #>CanExecute(p)));
+            }
+        }
+        protected void <#= OnContainerMenuItemsCommandPropertyName #>Execute(object prm)
+        {
+            ICommand cmd = <#= ContainerMenuItemsCommandPropertyName #>;
+            if(cmd != null) {
+                if(cmd.CanExecute(prm)) {
+                    cmd.Execute(prm);
+                }
+            }
+        }
+        protected bool <#= OnContainerMenuItemsCommandPropertyName #>CanExecute(object p)
+        {
+            return (<#= ContainerMenuItemsCommandPropertyName #> != null); 
+        }
+        #endregion
+
+        #region <#= FilterHeightPropertyName #>
+        private static void <#= FilterHeightPropertyName #>Changed(BindableObject d, object oldValue, object newValue)
+        {
+            <#= RegionAwareUserControlBaseClassName #> inst = d as <#= RegionAwareUserControlBaseClassName #>;
+            if (inst != null)
+            {
+                <#= IRegionAwareViewModelInterfaceClassName #> bc = inst.BindingContext as <#= IRegionAwareViewModelInterfaceClassName #>;
+                if ((bc != null) && (newValue is double) && (oldValue is double))
+                    bc.<#= FilterHeightChangedPropertyName #>(inst, (double)oldValue, (double)newValue);
+           }
+        }
+        public static readonly BindableProperty <#= FilterHeightPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= FilterHeightPropertyName #>", typeof(double),
+                typeof(<#= RegionAwareUserControlBaseClassName #>),
+                -1d, propertyChanged: <#= FilterHeightPropertyName #>Changed);
+        public double <#= FilterHeightPropertyName #>
+        {
+            get
+            {
+                return (double)GetValue(<#= FilterHeightPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= FilterHeightPropertyName #>Property, value);
+            }
+        }
+        #endregion
+
+        #region <#= GridHeightPropertyName #>
+        private static void <#= GridHeightPropertyName #>Changed(BindableObject d, object oldValue, object newValue)
+        {
+            <#= RegionAwareUserControlBaseClassName #> inst = d as <#= RegionAwareUserControlBaseClassName #>;
+            if (inst != null)
+            {
+                <#= IRegionAwareViewModelInterfaceClassName #> bc = inst.BindingContext as <#= IRegionAwareViewModelInterfaceClassName #>;
+                if ((bc != null) && (newValue is double) && (oldValue is double))
+                    bc.<#= GridHeightChangedPropertyName #>(inst, (double)oldValue, (double)newValue);
+           }
+        }
+        public static readonly BindableProperty <#= GridHeightPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= GridHeightPropertyName #>", typeof(double),
+                typeof(<#= RegionAwareUserControlBaseClassName #>),
+                -1d, propertyChanged: <#= GridHeightPropertyName #>Changed);
+        public double <#= GridHeightPropertyName #>
+        {
+            get
+            {
+                return (double)GetValue(<#= GridHeightPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= GridHeightPropertyName #>Property, value);
+            }
+        }
+        #endregion
+
+        #region <#= ShowFilterPropertyName #>
+        private static void <#= ShowFilterPropertyName #>Changed(BindableObject d, object oldValue, object newValue)
+        {
+            <#= RegionAwareUserControlBaseClassName #> inst = d as <#= RegionAwareUserControlBaseClassName #>;
+            if (inst != null)
+            {
+                <#= IRegionAwareViewModelInterfaceClassName #> bc = inst.BindingContext as <#= IRegionAwareViewModelInterfaceClassName #>;
+                if ((bc != null) && (newValue is bool) && (oldValue is bool))
+                    bc.<#= ShowFilterChangedPropertyName #>(inst, (bool)oldValue, (bool)newValue);
+           }
+        }
+        public static readonly BindableProperty <#= ShowFilterPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= ShowFilterPropertyName #>", typeof(bool),
+                typeof(<#= RegionAwareUserControlBaseClassName #>),
+                false, propertyChanged: <#= ShowFilterPropertyName #>Changed);
+        public bool <#= ShowFilterPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= ShowFilterPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= ShowFilterPropertyName #>Property, value);
+            }
+        }
+        #endregion
+
+        #region <#= ShowAddFilterBtnPropertyName #>
+        private static void <#= ShowAddFilterBtnPropertyName #>Changed(BindableObject d, object oldValue, object newValue)
+        {
+            <#= RegionAwareUserControlBaseClassName #> inst = d as <#= RegionAwareUserControlBaseClassName #>;
+            if (inst != null)
+            {
+                <#= IRegionAwareViewModelInterfaceClassName #> bc = inst.BindingContext as <#= IRegionAwareViewModelInterfaceClassName #>;
+                if ((bc != null) && (newValue is bool) && (oldValue is bool))
+                    bc.<#= ShowAddFilterBtnChangedPropertyName #>(inst, (bool)oldValue, (bool)newValue);
+           }
+        }
+        public static readonly BindableProperty <#= ShowAddFilterBtnPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= ShowAddFilterBtnPropertyName #>", typeof(bool),
+                typeof(<#= RegionAwareUserControlBaseClassName #>),
+                false, propertyChanged: <#= ShowAddFilterBtnPropertyName #>Changed);
+        public bool <#= ShowAddFilterBtnPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= ShowAddFilterBtnPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= ShowAddFilterBtnPropertyName #>Property, value);
+            }
+        }
+        #endregion
+
+
+        #region <#= CanAddPropertyName #>
+        private static void <#= CanAddPropertyName #>Changed(BindableObject d, object oldValue, object newValue)
+        {
+            <#= RegionAwareUserControlBaseClassName #> inst = d as <#= RegionAwareUserControlBaseClassName #>;
+            if (inst != null)
+            {
+                <#= IRegionAwareViewModelInterfaceClassName #> bc = inst.BindingContext as <#= IRegionAwareViewModelInterfaceClassName #>;
+                if ((bc != null) && (newValue is bool) && (oldValue is bool))
+                    bc.<#= CanAddChangedPropertyName #>(inst, (bool)oldValue, (bool)newValue);
+           }
+        }
+        public static readonly BindableProperty <#= CanAddPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= CanAddPropertyName #>", typeof(bool),
+                typeof(<#= RegionAwareUserControlBaseClassName #>),
+                false, propertyChanged: <#= CanAddPropertyName #>Changed);
+        public bool <#= CanAddPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= CanAddPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= CanAddPropertyName #>Property, value);
+            }
+        }
+        #endregion
+
+        #region <#= CanUpdPropertyName #>
+        private static void <#= CanUpdPropertyName #>Changed(BindableObject d, object oldValue, object newValue)
+        {
+            <#= RegionAwareUserControlBaseClassName #> inst = d as <#= RegionAwareUserControlBaseClassName #>;
+            if (inst != null)
+            {
+                <#= IRegionAwareViewModelInterfaceClassName #> bc = inst.BindingContext as <#= IRegionAwareViewModelInterfaceClassName #>;
+                if ((bc != null) && (newValue is bool) && (oldValue is bool))
+                    bc.<#= CanUpdChangedPropertyName #>(inst, (bool)oldValue, (bool)newValue);
+           }
+        }
+        public static readonly BindableProperty <#= CanUpdPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= CanUpdPropertyName #>", typeof(bool),
+                typeof(<#= RegionAwareUserControlBaseClassName #>),
+                false, propertyChanged: <#= CanUpdPropertyName #>Changed);
+        public bool <#= CanUpdPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= CanUpdPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= CanUpdPropertyName #>Property, value);
+            }
+        }
+        #endregion
+
+        #region <#= CanDelPropertyName #>
+        private static void <#= CanDelPropertyName #>Changed(BindableObject d, object oldValue, object newValue)
+        {
+            <#= RegionAwareUserControlBaseClassName #> inst = d as <#= RegionAwareUserControlBaseClassName #>;
+            if (inst != null)
+            {
+                <#= IRegionAwareViewModelInterfaceClassName #> bc = inst.BindingContext as <#= IRegionAwareViewModelInterfaceClassName #>;
+                if ((bc != null) && (newValue is bool) && (oldValue is bool))
+                    bc.<#= CanDelChangedPropertyName #>(inst, (bool)oldValue, (bool)newValue);
+           }
+        }
+        public static readonly BindableProperty <#= CanDelPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= CanDelPropertyName #>", typeof(bool),
+                typeof(<#= RegionAwareUserControlBaseClassName #>),
+                false, propertyChanged: <#= CanDelPropertyName #>Changed);
+        public bool <#= CanDelPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= CanDelPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= CanDelPropertyName #>Property, value);
+            }
+        }
+        #endregion
+
+        #region <#= FilterHeightDetailPropertyName #>
+        private static void <#= FilterHeightDetailPropertyName #>Changed(BindableObject d, object oldValue, object newValue)
+        {
+            <#= RegionAwareUserControlBaseClassName #> inst = d as <#= RegionAwareUserControlBaseClassName #>;
+            if (inst != null)
+            {
+                <#= IRegionAwareViewModelInterfaceClassName #> bc = inst.BindingContext as <#= IRegionAwareViewModelInterfaceClassName #>;
+                if ((bc != null) && (newValue is double) && (oldValue is double))
+                    bc.<#= FilterHeightDetailChangedPropertyName #>(inst, (double)oldValue, (double)newValue);
+           }
+        }
+        public static readonly BindableProperty <#= FilterHeightDetailPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= FilterHeightDetailPropertyName #>", typeof(double),
+                typeof(<#= RegionAwareUserControlBaseClassName #>),
+                -1d, propertyChanged: <#= FilterHeightDetailPropertyName #>Changed);
+        public double <#= FilterHeightDetailPropertyName #>
+        {
+            get
+            {
+                return (double)GetValue(<#= FilterHeightDetailPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= FilterHeightDetailPropertyName #>Property, value);
+            }
+        }
+        #endregion
+
+        #region <#= GridHeightDetailPropertyName #>
+        private static void <#= GridHeightDetailPropertyName #>Changed(BindableObject d, object oldValue, object newValue)
+        {
+            <#= RegionAwareUserControlBaseClassName #> inst = d as <#= RegionAwareUserControlBaseClassName #>;
+            if (inst != null)
+            {
+                <#= IRegionAwareViewModelInterfaceClassName #> bc = inst.BindingContext as <#= IRegionAwareViewModelInterfaceClassName #>;
+                if ((bc != null) && (newValue is double) && (oldValue is double))
+                    bc.<#= GridHeightDetailChangedPropertyName #>(inst, (double)oldValue, (double)newValue);
+           }
+        }
+        public static readonly BindableProperty <#= GridHeightDetailPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= GridHeightDetailPropertyName #>", typeof(double),
+                typeof(<#= RegionAwareUserControlBaseClassName #>),
+                -1d, propertyChanged: <#= GridHeightDetailPropertyName #>Changed);
+        public double <#= GridHeightDetailPropertyName #>
+        {
+            get
+            {
+                return (double)GetValue(<#= GridHeightDetailPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= GridHeightDetailPropertyName #>Property, value);
+            }
+        }
+        #endregion
+
+        #region <#= ShowFilterDetailPropertyName #>
+        private static void <#= ShowFilterDetailPropertyName #>Changed(BindableObject d, object oldValue, object newValue)
+        {
+            <#= RegionAwareUserControlBaseClassName #> inst = d as <#= RegionAwareUserControlBaseClassName #>;
+            if (inst != null)
+            {
+                <#= IRegionAwareViewModelInterfaceClassName #> bc = inst.BindingContext as <#= IRegionAwareViewModelInterfaceClassName #>;
+                if ((bc != null) && (newValue is bool) && (oldValue is bool))
+                    bc.<#= ShowFilterDetailChangedPropertyName #>(inst, (bool)oldValue, (bool)newValue);
+           }
+        }
+        public static readonly BindableProperty <#= ShowFilterDetailPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= ShowFilterDetailPropertyName #>", typeof(bool),
+                typeof(<#= RegionAwareUserControlBaseClassName #>),
+                false, propertyChanged: <#= ShowFilterDetailPropertyName #>Changed);
+        public bool <#= ShowFilterDetailPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= ShowFilterDetailPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= ShowFilterDetailPropertyName #>Property, value);
+            }
+        }
+        #endregion
+
+        #region <#= ShowAddFilterBtnDetailPropertyName #>
+        private static void <#= ShowAddFilterBtnDetailPropertyName #>Changed(BindableObject d, object oldValue, object newValue)
+        {
+            <#= RegionAwareUserControlBaseClassName #> inst = d as <#= RegionAwareUserControlBaseClassName #>;
+            if (inst != null)
+            {
+                <#= IRegionAwareViewModelInterfaceClassName #> bc = inst.BindingContext as <#= IRegionAwareViewModelInterfaceClassName #>;
+                if ((bc != null) && (newValue is bool) && (oldValue is bool))
+                    bc.<#= ShowAddFilterBtnDetailChangedPropertyName #>(inst, (bool)oldValue, (bool)newValue);
+           }
+        }
+        public static readonly BindableProperty <#= ShowAddFilterBtnDetailPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= ShowAddFilterBtnDetailPropertyName #>", typeof(bool),
+                typeof(<#= RegionAwareUserControlBaseClassName #>),
+                false, propertyChanged: <#= ShowAddFilterBtnDetailPropertyName #>Changed);
+        public bool <#= ShowAddFilterBtnDetailPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= ShowAddFilterBtnDetailPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= ShowAddFilterBtnDetailPropertyName #>Property, value);
+            }
+        }
+        #endregion
+
+        #region <#= CanAddDetailPropertyName #>
+        private static void <#= CanAddDetailPropertyName #>Changed(BindableObject d, object oldValue, object newValue)
+        {
+            <#= RegionAwareUserControlBaseClassName #> inst = d as <#= RegionAwareUserControlBaseClassName #>;
+            if (inst != null)
+            {
+                <#= IRegionAwareViewModelInterfaceClassName #> bc = inst.BindingContext as <#= IRegionAwareViewModelInterfaceClassName #>;
+                if ((bc != null) && (newValue is bool) && (oldValue is bool))
+                    bc.<#= CanAddDetailChangedPropertyName #>(inst, (bool)oldValue, (bool)newValue);
+           }
+        }
+        public static readonly BindableProperty <#= CanAddDetailPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= CanAddDetailPropertyName #>", typeof(bool),
+                typeof(<#= RegionAwareUserControlBaseClassName #>),
+                false, propertyChanged: <#= CanAddDetailPropertyName #>Changed);
+        public bool <#= CanAddDetailPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= CanAddDetailPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= CanAddDetailPropertyName #>Property, value);
+            }
+        }
+        #endregion
+
+        #region <#= CanUpdDetailPropertyName #>
+        private static void <#= CanUpdDetailPropertyName #>Changed(BindableObject d, object oldValue, object newValue)
+        {
+            <#= RegionAwareUserControlBaseClassName #> inst = d as <#= RegionAwareUserControlBaseClassName #>;
+            if (inst != null)
+            {
+                <#= IRegionAwareViewModelInterfaceClassName #> bc = inst.BindingContext as <#= IRegionAwareViewModelInterfaceClassName #>;
+                if ((bc != null) && (newValue is bool) && (oldValue is bool))
+                    bc.<#= CanUpdDetailChangedPropertyName #>(inst, (bool)oldValue, (bool)newValue);
+           }
+        }
+        public static readonly BindableProperty <#= CanUpdDetailPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= CanUpdDetailPropertyName #>", typeof(bool),
+                typeof(<#= RegionAwareUserControlBaseClassName #>),
+                false, propertyChanged: <#= CanUpdDetailPropertyName #>Changed);
+        public bool <#= CanUpdDetailPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= CanUpdDetailPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= CanUpdDetailPropertyName #>Property, value);
+            }
+        }
+        #endregion
+
+        #region <#= CanDelDetailPropertyName #>
+        private static void <#= CanDelDetailPropertyName #>Changed(BindableObject d, object oldValue, object newValue)
+        {
+            <#= RegionAwareUserControlBaseClassName #> inst = d as <#= RegionAwareUserControlBaseClassName #>;
+            if (inst != null)
+            {
+                <#= IRegionAwareViewModelInterfaceClassName #> bc = inst.BindingContext as <#= IRegionAwareViewModelInterfaceClassName #>;
+                if ((bc != null) && (newValue is bool) && (oldValue is bool))
+                    bc.<#= CanDelDetailChangedPropertyName #>(inst, (bool)oldValue, (bool)newValue);
+           }
+        }
+        public static readonly BindableProperty <#= CanDelDetailPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= CanDelDetailPropertyName #>", typeof(bool),
+                typeof(<#= RegionAwareUserControlBaseClassName #>),
+                false, propertyChanged: <#= CanDelDetailPropertyName #>Changed);
+        public bool <#= CanDelDetailPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= CanDelDetailPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= CanDelDetailPropertyName #>Property, value);
+            }
+        }
+        #endregion
+
+    }
+}
+
+<#+
+
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+
+#>

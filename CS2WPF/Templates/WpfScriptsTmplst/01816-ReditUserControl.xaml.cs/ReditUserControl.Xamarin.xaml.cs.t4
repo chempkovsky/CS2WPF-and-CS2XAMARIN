@@ -14,18 +14,20 @@
 using Xamarin.Forms;
 <#
 
-    string UserControlWithContainerMenuFolder       = "00628-UserControlWithContainerMenu.xaml.cs";
-    string UserControlWithContainerMenuClassName    = GetContextModelClassName(Context, UserControlWithContainerMenuFolder);
-    string UserControlWithContainerMenuNameSpace    = GetContextModelNameSpace(Context, UserControlWithContainerMenuFolder);
-    string UserControlWithContainerMenuProject      = GetContextModelProjectName(Context, UserControlWithContainerMenuFolder);
+    string RegionAwareUserControlBaseFolder       = "00650-RegionAwareUserControlBase.xaml.cs";
+    string RegionAwareUserControlBaseClassName    = GetContextModelClassName(Context, RegionAwareUserControlBaseFolder);
+    string RegionAwareUserControlBaseNameSpace    = GetContextModelNameSpace(Context, RegionAwareUserControlBaseFolder);
+    string RegionAwareUserControlBaseProject      = GetContextModelProjectName(Context, RegionAwareUserControlBaseFolder);
 
     string ReditUserControlFolder                    = "01816-ReditUserControl.xaml.cs";
     string ReditUserControlClassName                 = GetModelClassName(Model, ReditUserControlFolder);
     string ReditUserControlNameSpace                 = GetModelNameSpace(Model, ReditUserControlFolder);
 
+    string OnLoadedPropertyName                     = "OnLoaded";
+
     List<string> nmSpaces = new List<string>();
-    if ((ReditUserControlClassName != UserControlWithContainerMenuNameSpace) && (nmSpaces.IndexOf(UserControlWithContainerMenuNameSpace) < 0)) 
-        nmSpaces.Add(UserControlWithContainerMenuNameSpace);
+    if ((ReditUserControlClassName != RegionAwareUserControlBaseNameSpace) && (nmSpaces.IndexOf(RegionAwareUserControlBaseNameSpace) < 0)) 
+        nmSpaces.Add(RegionAwareUserControlBaseNameSpace);
     
 #>
 <# 
@@ -41,11 +43,12 @@ namespace <#= ReditUserControlNameSpace #> {
     /// <summary>
     /// Interaction logic for <#= ReditUserControlClassName #>.xaml
     /// </summary>
-    public partial class <#= ReditUserControlClassName #>: <#= UserControlWithContainerMenuClassName  #>
+    public partial class <#= ReditUserControlClassName #>: <#= RegionAwareUserControlBaseClassName  #>
     {
         public <#= ReditUserControlClassName #>()
         {
             InitializeComponent();
+            <#= OnLoadedPropertyName #>(); 
         }
     }
 }

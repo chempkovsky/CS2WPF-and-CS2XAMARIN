@@ -51,6 +51,10 @@ using Xamarin.Essentials;
     string WebServiceFilterMenuViewModelClassName   = GetContextModelClassName(Context, WebServiceFilterMenuViewModelFolder);
     string WebServiceFilterMenuViewModelNameSpace   = GetContextModelNameSpace(Context, WebServiceFilterMenuViewModelFolder);
 
+    string RegionAwareViewModelBaseFolder           = "00648-RegionAwareViewModelBase.cs";
+    string RegionAwareViewModelBaseClassName        = GetContextModelClassName(Context, RegionAwareViewModelBaseFolder);
+    string RegionAwareViewModelBaseNameSpace        = GetContextModelNameSpace(Context, RegionAwareViewModelBaseFolder);
+
 
     string modelInterfaceFolder                     = "01100-Interface.cs";
     string modelInterfaceClassName                  = GetInterfaceName(Model);
@@ -112,6 +116,20 @@ using Xamarin.Essentials;
     string CancelCommandPropertyName            = "CancelCommand";
     string IsParentLoadedPropertyName           = "IsParentLoaded";
     
+    string CanAddPropertyName                   = "CanAdd";
+    string CanUpdPropertyName                   = "CanUpdate";
+    string CanDelPropertyName                   = "CanDelete";
+    string CanAddParentPropertyName             = "CanAddParent";
+    string CanUpdParentPropertyName             = "CanUpdateParent";
+    string CanDelParentPropertyName             = "CanDeleteParent";
+
+    string CanAddDetailPropertyName             = "CanAddDetail"; 
+    string CanUpdDetailPropertyName             = "CanUpdateDetail"; 
+    string CanDelDetailPropertyName             = "CanDeleteDetail"; 
+    string CanAddDetailParentPropertyName       = "CanAddDetailParent"; 
+    string CanUpdDetailParentPropertyName       = "CanUpdateDetailParent"; 
+    string CanDelDetailParentPropertyName       = "CanDeleteDetailParent"; 
+
     string CurrentNavigationContextPropertyName = "CurrentNavigationContext";
 
     List<string> detailViews = GetDetailViews(Model, Context, null);
@@ -135,7 +153,9 @@ using Xamarin.Essentials;
         nmSpaces.Add(EformModeEnumNameSpace);
     if ((ReditViewModelNameSpace != modelInterfaceNameSpace) && (nmSpaces.IndexOf(modelInterfaceNameSpace) < 0)) 
         nmSpaces.Add(modelInterfaceNameSpace);
-
+    if ((ReditViewModelNameSpace != RegionAwareViewModelBaseNameSpace) && (nmSpaces.IndexOf(RegionAwareViewModelBaseNameSpace) < 0)) 
+        nmSpaces.Add(RegionAwareViewModelBaseNameSpace);
+    
     bool IsInTheSameModule = (EformUserControlProject == ReditUserControlProject);
     
     
@@ -190,7 +210,7 @@ using <#= ns #>;
 */
 
 namespace <#= ReditViewModelNameSpace #> {
-    public class <#= ReditViewModelClassName #>: INotifyPropertyChanged, IRegionAware 
+    public class <#= ReditViewModelClassName #>: <#= RegionAwareViewModelBaseClassName #>, IRegionAware 
     {
         protected <#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName #>=null;
         protected <#= GetModelServiceInterfaceName(Model) #> <#= FormServicePrefix #><#= Model.ViewName #> = null;
@@ -200,13 +220,6 @@ namespace <#= ReditViewModelNameSpace #> {
             this.<#= FormServicePrefix #><#= Model.ViewName #> = _<#= FormServicePrefix #><#= Model.ViewName #>;
             PermissionMask = <#= AppSettingServicePropertyName #>.GetViewModelMask("<#= Model.ViewName #>");
         }
-        #region INotifyPropertyChanged
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void OnPropertyChanged([CallerMemberName] string name = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-        }
-        #endregion
 
 
         protected int PermissionMask = 0; 
@@ -216,7 +229,49 @@ namespace <#= ReditViewModelNameSpace #> {
         protected <#= modelInterfaceClassName #> modelToReturn = null;
 
 
+        public bool <#= CanAddPropertyName #>
+        { 
+            get
+            {
+                return ((PermissionMask & 8) == 8) && <#= CanAddParentPropertyName #>;
+            }
+        }
+        public bool <#= CanUpdPropertyName #>
+        { 
+            get
+            {
+                return ((PermissionMask & 4) == 4) && <#= CanUpdParentPropertyName #>;
+            }
+        }
+        public bool <#= CanDelPropertyName #>
+        { 
+            get
+            {
+                return ((PermissionMask & 2) == 2) && <#= CanDelParentPropertyName #>;
+            }
+        }
 
+        public bool <#= CanAddDetailPropertyName #>
+        { 
+            get
+            {
+                return <#= CanAddDetailParentPropertyName #>;
+            }
+        }
+        public bool <#= CanUpdDetailPropertyName #>
+        { 
+            get
+            {
+                return <#= CanUpdDetailParentPropertyName #>;
+            }
+        }
+        public bool <#= CanDelDetailPropertyName #>
+        { 
+            get
+            {
+                return <#= CanDelDetailParentPropertyName #>;
+            }
+        }
 
         #region <#= CaptionPropertyName #>
         string _<#= CaptionPropertyName #> = "Delete item for <#= Model.ViewName #>";
@@ -331,11 +386,11 @@ namespace <#= ReditViewModelNameSpace #> {
             if(prms.ContainsKey("<#= EformModeEnumClassName #>")) {
                 modeToCheck = prms.GetValue<<#= EformModeEnumClassName #>>("<#= EformModeEnumClassName #>");
             }
-            if ((modeToCheck == <#= EformModeEnumClassName #>.DeleteMode) && ((<#= AppSettingServicePropertyName #>.GetViewModelMask("<#= Model.ViewName #>") & 2) != 2 )) {
+            if ((modeToCheck == <#= EformModeEnumClassName #>.DeleteMode) && (!<#= CanDelPropertyName #>)) {
                 throw new Exception("Access denied to delete <#= Model.ViewName #>");
-            } else if ((modeToCheck == <#= EformModeEnumClassName #>.UpdateMode) && ((<#= AppSettingServicePropertyName #>.GetViewModelMask("<#= Model.ViewName #>") & 4) != 4 )) {
+            } else if ((modeToCheck == <#= EformModeEnumClassName #>.UpdateMode) && (!<#= CanUpdPropertyName #>)) {
                 throw new Exception("Access denied to update <#= Model.ViewName #>");
-            } else if ((modeToCheck == <#= EformModeEnumClassName #>.AddMode) && ((<#= AppSettingServicePropertyName #>.GetViewModelMask("<#= Model.ViewName #>") & 8) != 8 )) {
+            } else if ((modeToCheck == <#= EformModeEnumClassName #>.AddMode) && (!<#= CanAddPropertyName #>)) {
                 throw new Exception("Access denied to add <#= Model.ViewName #>");
             }
             <#= CurrentNavigationContextPropertyName #> = navigationContext;

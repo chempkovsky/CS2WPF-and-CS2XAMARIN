@@ -19,10 +19,10 @@
     string ProxyUserControlNameSpace        = GetContextModelNameSpace(Context, ProxyUserControlFolder);
     string ProxyUserControlProject          = GetContextModelProjectName(Context, ProxyUserControlFolder);
 
-    string UserControlWithContainerMenuFolder       = "00628-UserControlWithContainerMenu.xaml.cs";
-    string UserControlWithContainerMenuClassName    = GetContextModelClassName(Context, UserControlWithContainerMenuFolder);
-    string UserControlWithContainerMenuNameSpace    = GetContextModelNameSpace(Context, UserControlWithContainerMenuFolder);
-    string UserControlWithContainerMenuProject      = GetContextModelProjectName(Context, UserControlWithContainerMenuFolder);
+    string RegionAwareUserControlBaseFolder       = "00650-RegionAwareUserControlBase.xaml.cs";
+    string RegionAwareUserControlBaseClassName    = GetContextModelClassName(Context, RegionAwareUserControlBaseFolder);
+    string RegionAwareUserControlBaseNameSpace    = GetContextModelNameSpace(Context, RegionAwareUserControlBaseFolder);
+    string RegionAwareUserControlBaseProject      = GetContextModelProjectName(Context, RegionAwareUserControlBaseFolder);
 
     string LformUserControlFolder           = "01596-LformUserControl.xaml.cs";
     string LformUserControlClassName        = GetModelClassName(Model, LformUserControlFolder);
@@ -74,6 +74,8 @@
     string GridHeightDetailPropertyName             = "GridHeightDetail"; 
     string FilterHeightDetailPropertyName           = "FilterHeightDetail"; 
 
+    string ShowAddFilterBtnDetailPropertyName       = "ShowAddFilterBtnDetail"; 
+    string ShowFilterDetailPropertyName             = "ShowFilterDetail"; 
    
     string RegionPropertyName                       = "Region";
     string MasterRegionPropertyName                 = "MasterRegion";
@@ -100,9 +102,9 @@
     if(LformUserControlProject != O2mUserControlProject) {
         lformPrefix = lformPrefix + ";assembly=" + LformUserControlProject;
     }
-    string ucwcmPrefix = "clr-namespace:" + UserControlWithContainerMenuNameSpace;
-    if(UserControlWithContainerMenuProject != O2mUserControlProject) {
-        ucwcmPrefix = ucwcmPrefix + ";assembly=" + UserControlWithContainerMenuProject;
+    string ucwcmPrefix = "clr-namespace:" + RegionAwareUserControlBaseNameSpace;
+    if(RegionAwareUserControlBaseProject != O2mUserControlProject) {
+        ucwcmPrefix = ucwcmPrefix + ";assembly=" + RegionAwareUserControlBaseProject;
     }
 
     bool IsInTheSameModule = (LformUserControlProject == O2mUserControlProject);
@@ -111,7 +113,7 @@
 
 #>
 
-<ucwcm:<#= UserControlWithContainerMenuClassName #> x:Class="<#= O2mUserControlNameSpace #>.<#= O2mUserControlClassName #>"
+<ucwcm:<#= RegionAwareUserControlBaseClassName #> x:Class="<#= O2mUserControlNameSpace #>.<#= O2mUserControlClassName #>"
              xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:prism="http://prismlibrary.com" 
@@ -201,11 +203,11 @@
             <#= NavigationBackCommandPropertyName #>="{Binding BindingContext.<#= OnNavigationBackCommandPropertyName #>, Source={x:Reference o2mUsrCntrlRootNode}}"                                
 
             <#= CaptionPropertyName #>="{Binding BindingContext.<#= CaptionPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
-            <#= FilterHeightPropertyName #>="{Binding <#= FilterHeightPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
-            <#= ShowFilterPropertyName #>="True" 
-            <#= ShowAddFilterBtnPropertyName #>="True" 
+            <#= FilterHeightPropertyName #>="{Binding BindingContext.<#= FilterHeightPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+            <#= ShowFilterPropertyName #>="{Binding BindingContext.<#= ShowFilterPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+            <#= ShowAddFilterBtnPropertyName #>="{Binding BindingContext.<#= ShowAddFilterBtnPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
             <#= GridHeightPropertyName #>="{Binding <#= GridHeightPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
-            <#= HiddenFiltersPropertyName #>="{Binding <#= HiddenFiltersPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+            <#= HiddenFiltersPropertyName #>="{Binding BindingContext.<#= HiddenFiltersPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
             <#= SelectedRowCommandPropertyName #>="{Binding BindingContext.<#= SelectedRowCommandPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
             <#= TableMenuItemsCommandPropertyName #>="{Binding BindingContext.<#= TableMenuItemsCommandPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
             <#= RowMenuItemsCommandPropertyName #>="{Binding BindingContext.<#= RowMenuItemsCommandPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
@@ -272,10 +274,10 @@
             }
 #>
                             <#= CaptionPropertyName #>="{Binding BindingContext.<#= SelectedDetailsListItemPropertyName #>.<#= CaptionPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
-                            <#= FilterHeightPropertyName #>="{Binding <#= FilterHeightDetailPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
-                            <#= ShowFilterPropertyName #>="True" 
-                            <#= ShowAddFilterBtnPropertyName #>="True" 
-                            <#= GridHeightPropertyName #>="{Binding <#= GridHeightDetailPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+                            <#= FilterHeightPropertyName #>="{Binding BindingContext.<#= FilterHeightDetailPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+                            <#= ShowFilterPropertyName #>="{Binding BindingContext.<#= ShowFilterDetailPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+                            <#= ShowAddFilterBtnPropertyName #>="{Binding BindingContext.<#= ShowAddFilterBtnDetailPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+                            <#= GridHeightPropertyName #>="{Binding BindingContext.<#= GridHeightDetailPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
                             <#= ShowBackBtnPropertyName #>="False" 
                             <#= HiddenFiltersPropertyName #>="{Binding BindingContext.<#= HiddenFiltersDetailPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
                             <#= SelectedRowCommandPropertyName #>="{Binding BindingContext.<#= SelectedRowCommandDetailPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
@@ -334,7 +336,7 @@
             </ContentView.Triggers>
         </ContentView>
     </StackLayout>
-</ucwcm:<#= UserControlWithContainerMenuClassName #>>
+</ucwcm:<#= RegionAwareUserControlBaseClassName #>>
 
 
 <#+
