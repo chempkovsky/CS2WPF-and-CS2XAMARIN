@@ -30,6 +30,8 @@ using Prism.Services.Dialogs;
     string IWebServiceFilterRsltInterfaceClassName      = GetModelClassName(Model, IWebServiceFilterRsltInterfaceFolder);
     string IWebServiceFilterRsltInterfaceNameSpace      = GetModelNameSpace(Model, IWebServiceFilterRsltInterfaceFolder);
 
+    string SformUserControlXamlFolder      = "01421-SformUserControl.xaml";
+
     string SdlgViewModelBaseFolder                      = "00633-SdlgViewModelBase.cs";
     string SdlgViewModelBaseClassName                   = GetModelClassName(Model, SdlgViewModelBaseFolder);
     string SdlgViewModelBaseNameSpace                   = GetModelNameSpace(Model, SdlgViewModelBaseFolder);
@@ -46,6 +48,11 @@ using Prism.Services.Dialogs;
     string OnSelectedRowCommandPropertyName         = "OnSelectedRowCommand";
     string SelectedItemPropertyName                 = "SelectedItem";
     string IsParentLoadedPropertyName               = "IsParentLoaded";
+
+    string DefaultGridHeightMethodName          = "DefaultGridHeight";
+    string DefaultFilterHeightMethodName        = "DefaultFilterHeight";
+    string ExpandedGridHeightMethodName         = "ExpandedGridHeight";
+    string ExpandedFilterHeightMethodName       = "ExpandedFilterHeight";
 
     List<string> nmSpaces = new List<string>();
     if ((SdlgViewModelBaseNameSpace != IWebServiceFilterRsltInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace) < 0)) 
@@ -68,10 +75,8 @@ namespace <#= SdlgViewModelBaseNameSpace #> {
         protected <#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName #>=null;
         public <#= SdlgViewModelBaseClassName #>(<#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName  #>) {
             this.<#= AppSettingServicePropertyName #> = <#= AppSettingServicePropertyName #>;
-            //if(this.<#= AppSettingServicePropertyName #> != null) {
-            //    _<#= FilterHeightPropertyName #> = 3 * this.<#= AppSettingServicePropertyName #>.FilterHeightFactor + this.<#= AppSettingServicePropertyName #>.FilterHeightAddition;
-            //    _<#= GridHeightPropertyName #> = 10 * this.<#= AppSettingServicePropertyName #>.TableHeightFactor + this.<#= AppSettingServicePropertyName #>.TableHeightAddition;
-            //}
+            _<#= FilterHeightPropertyName #> = this.<#= AppSettingServicePropertyName #>.<#= DefaultFilterHeightMethodName #>("<#= SformUserControlXamlFolder #>");
+            _<#= GridHeightPropertyName #> = this.<#= AppSettingServicePropertyName #>.<#= DefaultGridHeightMethodName #>("<#= SformUserControlXamlFolder #>");
         }
         #region INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;

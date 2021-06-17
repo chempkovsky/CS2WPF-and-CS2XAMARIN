@@ -41,6 +41,10 @@ using System.Windows.Input;
     string IBindingContextChangedClassName          = GetModelClassName(Model, IBindingContextChangedFolder);
     string IBindingContextChangedNameSpace          = GetModelNameSpace(Model, IBindingContextChangedFolder);
 
+    string INotifiedByParentInterfaceFolder         = "00618-INotifiedByParentInterface.cs";
+    string INotifiedByParentInterfaceClassName      = GetModelClassName(Model, INotifiedByParentInterfaceFolder);
+    string INotifiedByParentInterfaceNameSpace      = GetModelNameSpace(Model, INotifiedByParentInterfaceFolder);
+
     string UserControlWithContainerMenuFolder       = "00628-UserControlWithContainerMenu.xaml.cs";
     string UserControlWithContainerMenuClassName    = GetModelClassName(Model, UserControlWithContainerMenuFolder);
     string UserControlWithContainerMenuNameSpace    = GetModelNameSpace(Model, UserControlWithContainerMenuFolder);
@@ -106,6 +110,8 @@ using System.Windows.Input;
         nmSpaces.Add(ILformViewModelInterfaceNameSpace);
     if ((LformUserControlBaseNameSpace != BindingContextFeedbackNameSpace) && (nmSpaces.IndexOf(BindingContextFeedbackNameSpace) < 0)) 
         nmSpaces.Add(BindingContextFeedbackNameSpace);
+    if ((LformUserControlBaseNameSpace != INotifiedByParentInterfaceNameSpace) && (nmSpaces.IndexOf(INotifiedByParentInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(INotifiedByParentInterfaceNameSpace);
     
     foreach(string ns in nmSpaces) {
 #>
@@ -119,7 +125,7 @@ namespace <#= LformUserControlBaseNameSpace #> {
     /// <summary>
     /// Interaction logic for <#= LformUserControlBaseClassName #>.xaml
     /// </summary>
-    public class <#= LformUserControlBaseClassName #>: <#= UserControlWithContainerMenuClassName #>
+    public class <#= LformUserControlBaseClassName #>: <#= UserControlWithContainerMenuClassName #>, <#= INotifiedByParentInterfaceClassName #>
     {
         //public <#= LformUserControlBaseClassName #>()
         //{

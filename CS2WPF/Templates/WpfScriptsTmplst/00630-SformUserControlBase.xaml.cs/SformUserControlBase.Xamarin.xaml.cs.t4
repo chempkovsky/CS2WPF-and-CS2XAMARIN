@@ -39,6 +39,10 @@ using System.Windows.Input;
     string IWebServiceFilterMenuInterfaceClassName   = GetModelClassName(Model, IWebServiceFilterMenuInterfaceFolder);
     string IWebServiceFilterMenuInterfaceNameSpace   = GetModelNameSpace(Model, IWebServiceFilterMenuInterfaceFolder);
 
+    string INotifiedByParentInterfaceFolder      = "00618-INotifiedByParentInterface.cs";
+    string INotifiedByParentInterfaceClassName   = GetModelClassName(Model, INotifiedByParentInterfaceFolder);
+    string INotifiedByParentInterfaceNameSpace   = GetModelNameSpace(Model, INotifiedByParentInterfaceFolder);
+
     string UserControlWithContainerMenuFolder        = "00628-UserControlWithContainerMenu.xaml.cs";
     string UserControlWithContainerMenuClassName     = GetModelClassName(Model, UserControlWithContainerMenuFolder);
     string UserControlWithContainerMenuNameSpace     = GetModelNameSpace(Model, UserControlWithContainerMenuFolder);
@@ -97,7 +101,9 @@ using System.Windows.Input;
         nmSpaces.Add(UserControlWithContainerMenuNameSpace);
     if ((SformUserControlBaseNameSpace != BindingContextFeedbackNameSpace) && (nmSpaces.IndexOf(BindingContextFeedbackNameSpace) < 0)) 
         nmSpaces.Add(BindingContextFeedbackNameSpace);
-
+    if ((SformUserControlBaseNameSpace != INotifiedByParentInterfaceNameSpace) && (nmSpaces.IndexOf(INotifiedByParentInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(INotifiedByParentInterfaceNameSpace);
+    
     
 
 #>
@@ -114,7 +120,7 @@ namespace <#= SformUserControlBaseNameSpace #> {
     /// <summary>
     /// Interaction logic for <#= SformUserControlBaseClassName #>.xaml
     /// </summary>
-    public class <#= SformUserControlBaseClassName #>: <#= UserControlWithContainerMenuClassName #>
+    public class <#= SformUserControlBaseClassName #>: <#= UserControlWithContainerMenuClassName #>, <#= INotifiedByParentInterfaceClassName #>
     {
 
         string _<#= RadioGroupNamePropertyName #> = Guid.NewGuid().ToString("N");

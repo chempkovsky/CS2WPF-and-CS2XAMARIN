@@ -82,6 +82,11 @@ using Xamarin.Essentials;
     string RlistPageNameSpace               = GetModelNameSpace(Model, RlistPageFolder);
     string RlistPageProject                 = GetModelProjectName(Model, RlistPageFolder);
     
+    string RlistPageXamlFolder              = "01919-RlistPage.xaml";
+    string RlistPageXamlClassName           = GetModelClassName(Model, RlistPageXamlFolder);
+    string RlistPageXamlNameSpace           = GetModelNameSpace(Model, RlistPageXamlFolder);
+    string RlistPageXamlProject             = GetModelProjectName(Model, RlistPageXamlFolder);
+
     string RlistPageViewModelFolder         = "01921-RlistPageViewModel.cs";
     string RlistPageViewModelClassName      = GetModelClassName(Model, RlistPageViewModelFolder);
     string RlistPageViewModelNameSpace      = GetModelNameSpace(Model, RlistPageViewModelFolder);
@@ -145,6 +150,11 @@ using Xamarin.Essentials;
     string GridHeightPropertyName               = "GridHeight";
 
     string IsParentLoadedPropertyName           = "IsParentLoaded";
+
+    string DefaultGridHeightMethodName              = "DefaultGridHeight";
+    string DefaultFilterHeightMethodName            = "DefaultFilterHeight";
+    string ExpandedGridHeightMethodName             = "ExpandedGridHeight";
+    string ExpandedFilterHeightMethodName           = "ExpandedFilterHeight";
 
     List<string> detailViews = GetDetailViews(Model, Context, null);
     List<ModelViewPropertyOfVwSerializable> primKeys = GetModelPrimaryKeyProps(Model);
@@ -236,6 +246,8 @@ namespace <#= RlistPageViewModelNameSpace #> {
             PermissionMask = <#= AppSettingServicePropertyName #>.GetViewModelMask("<#= Model.ViewName #>");
             _<#= TableMenuItemsPropertyName #> = GetDefault<#= TableMenuItemsPropertyName #>();
             _<#= RowMenuItemsPropertyName #> = GetDefault<#= RowMenuItemsPropertyName #>();
+            _<#= GridHeightPropertyName #> = this.<#= AppSettingServicePropertyName #>.<#= ExpandedGridHeightMethodName #>("<#= RlistPageXamlFolder #>");
+            _<#= FilterHeightPropertyName #> = this.<#= AppSettingServicePropertyName #>.<#= ExpandedFilterHeightMethodName #>("<#= RlistPageXamlFolder #>");
         }
         #region INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;

@@ -29,6 +29,12 @@ using System.Net.Http.Headers;
     
     string getAuthInfoHeaderMethodName          = "GetAuthInfoHeader";
     string ShowErrorMethodName                  = "ShowErrorMessage";
+
+    string DefaultGridHeightMethodName          = "DefaultGridHeight";
+    string DefaultFilterHeightMethodName        = "DefaultFilterHeight";
+    string ExpandedGridHeightMethodName         = "ExpandedGridHeight";
+    string ExpandedFilterHeightMethodName       = "ExpandedFilterHeight";
+
 #>
 <#
     if(IAppGlblSettingsServiceNameSpace != AppGlblSettingsServiceNameSpace)
@@ -55,9 +61,58 @@ namespace <#= AppGlblSettingsServiceNameSpace #> {
     public class <#= AppGlblSettingsServiceClassName #>: <#= IAppGlblSettingsServiceClassName #>
     {
         double _FilterHeightAddition = 0;
-        double _FilterHeightFactor = 65;
-        double _TableHeightAddition = 22;
-        double _TableHeightFactor = 21;
+        double _FilterHeightFactor = 70;
+        double _TableHeightAddition = 33.8;
+        double _TableHeightFactor = 33.6;
+
+        public double DefaultGridRows(string fileType) {
+            switch(fileType) {
+                case "01698-O2mUserControl.xaml":
+                case "01699-O2mPage.xaml":
+                    return 5d;
+                default:
+                    return 6d;
+            }
+        }
+        public double DefaultFilterRows(string fileType) {
+            switch(fileType) {
+                case "01698-O2mUserControl.xaml":
+                case "01699-O2mPage.xaml":
+                    return 1d;
+                default:
+                    return 1d;
+            }
+        }
+        public double ExpandedGridRows(string fileType) {
+            switch(fileType) {
+                case "01698-O2mUserControl.xaml":
+                case "01699-O2mPage.xaml":
+                    return 5d;
+                default:
+                    return 19d;
+            }
+        }
+        public double ExpandedFilterRows(string fileType) {
+            switch(fileType) {
+                case "01698-O2mUserControl.xaml":
+                case "01699-O2mPage.xaml":
+                    return 1d;
+                default:
+                    return 2d;
+            }
+        }
+        public double DefaultGridHeight(string fileType) {
+            return DefaultGridRows(fileType) * TableHeightFactor + TableHeightAddition;
+        }
+        public double DefaultFilterHeight(string fileType) {
+            return DefaultFilterRows(fileType) * FilterHeightFactor + FilterHeightAddition;
+        }
+        public double ExpandedGridHeight(string fileType) {
+            return ExpandedGridRows(fileType) * TableHeightFactor + TableHeightAddition;
+        }
+        public double ExpandedFilterHeight(string fileType) {
+            return ExpandedFilterRows(fileType) * FilterHeightFactor + FilterHeightAddition;
+        }
 
         public double FilterHeightAddition
         {

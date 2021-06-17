@@ -13,6 +13,7 @@
 <#@ parameter type="CS2WPF.Model.Serializable.FeatureContextSerializable" name="FeatureContext" #>
 <#@ parameter type="CS2WPF.Model.Serializable.FeatureSerializable" name="Feature" #>
 <#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+using System;
 using Xamarin.Forms;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -22,6 +23,9 @@ using Prism.Ioc;
 using Prism.Regions;
 using Prism.Navigation;
 using System.Windows.Input;
+using Prism.Regions.Navigation;
+using Xamarin.Essentials;
+using System.Threading.Tasks;
 
 <#
 
@@ -40,6 +44,10 @@ using System.Windows.Input;
     string WebServiceFilterMenuFolder                = "00216-WebServiceFilterMenu.cs";
     string WebServiceFilterMenuClassName             = GetContextModelClassName(Context, WebServiceFilterMenuFolder);
     string WebServiceFilterMenuNameSpace             = GetContextModelNameSpace(Context, WebServiceFilterMenuFolder);
+
+    string INotifiedByParentInterfaceFolder          = "00618-INotifiedByParentInterface.cs";
+    string INotifiedByParentInterfaceClassName       = GetContextModelClassName(Context, INotifiedByParentInterfaceFolder);
+    string INotifiedByParentInterfaceNameSpace       = GetContextModelNameSpace(Context, INotifiedByParentInterfaceFolder);
 
     string AccessDeniedUserControlFolder             = "00678-AccessDeniedUserControl.xaml.cs";
     string AccessDeniedUserControlClassName          = GetContextModelClassName(Context, AccessDeniedUserControlFolder);
@@ -68,6 +76,12 @@ using System.Windows.Input;
     string ContainerMenuItemsPropertyName            = "ContainerMenuItems";
     string OnContainerMenuItemsCommandPropertyName   = "OnContainerMenuItemsCommand";
     string ExpandCollapseCommandPropertyName         = "ExpandCollapseCommand";
+    string IsParentLoadedPropertyName                = "IsParentLoaded";
+
+    string DefaultGridHeightMethodName              = "DefaultGridHeight";
+    string DefaultFilterHeightMethodName            = "DefaultFilterHeight";
+    string ExpandedGridHeightMethodName             = "ExpandedGridHeight";
+    string ExpandedFilterHeightMethodName           = "ExpandedFilterHeight";
 
     List<string> nmSpaces = new List<string>();
     if ((FtrViewModelNameSpace != IWebServiceFilterMenuInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterMenuInterfaceNameSpace) < 0)) 
@@ -78,6 +92,8 @@ using System.Windows.Input;
         nmSpaces.Add(IAppGlblSettingsServiceNameSpace);
     if ((FtrViewModelNameSpace != IconFontNameSpace) && (nmSpaces.IndexOf(IconFontNameSpace) < 0)) 
         nmSpaces.Add(IconFontNameSpace);
+    if ((FtrViewModelNameSpace != INotifiedByParentInterfaceNameSpace) && (nmSpaces.IndexOf(INotifiedByParentInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(INotifiedByParentInterfaceNameSpace);
 
     
 #>
@@ -133,7 +149,7 @@ namespace <#= FtrViewModelNameSpace #> {
                 continue;
             }
             AllowedFileTypeSerializable allowedFileTypeSerializable = GetAllowedFileType(AllowedFileTypes, featureItemSerializable.FileType);
-            if (allowedFileTypeSerializable == null) {
+            if (allowedFileTypeSerializable == null)  {
 #>
 // Error: Could not find <#= featureItemSerializable.FileType #> Allowed File Type
 <#
@@ -141,8 +157,10 @@ namespace <#= FtrViewModelNameSpace #> {
             }
             string modelClassName = GetModelClassName(modelViewSerializable, featureItemSerializable.FileType);
 #>
-//            _<#= FilterHeightPropertyName #><#= modelClassName #> = <#= allowedFileTypeSerializable.DefaultFilterMaxHeight #> * _<#= AppSettingServicePropertyName #>.FilterHeightFactor + _<#= AppSettingServicePropertyName #>.FilterHeightAddition;
-//            _<#= GridHeightPropertyName #><#= modelClassName #> = <#= allowedFileTypeSerializable.DefaultMaxHeight #> * _<#= AppSettingServicePropertyName #>.TableHeightFactor + _<#= AppSettingServicePropertyName #>.TableHeightAddition;
+            _<#= FilterHeightPropertyName #><#= modelClassName #> = _<#= AppSettingServicePropertyName #>.<#= DefaultFilterHeightMethodName #>("<#= featureItemSerializable.FileType #>");
+            _<#= GridHeightPropertyName #><#= modelClassName #> = _<#= AppSettingServicePropertyName #>.<#= DefaultGridHeightMethodName #>("<#= featureItemSerializable.FileType #>");
+            //_<#= FilterHeightPropertyName #><#= modelClassName #> = <#= allowedFileTypeSerializable.DefaultFilterMaxHeight #> * _<#= AppSettingServicePropertyName #>.FilterHeightFactor + _<#= AppSettingServicePropertyName #>.FilterHeightAddition;
+            //_<#= GridHeightPropertyName #><#= modelClassName #> = <#= allowedFileTypeSerializable.DefaultMaxHeight #> * _<#= AppSettingServicePropertyName #>.TableHeightFactor + _<#= AppSettingServicePropertyName #>.TableHeightAddition;
 <#
         }
 #>
@@ -163,7 +181,24 @@ namespace <#= FtrViewModelNameSpace #> {
             if(!<#= IsOnLoadedCalledPropertyName #>) OnLoaded();
         }
         #endregion
-
+        #region OnNavigationResult
+        protected void OnNavigationResult(IRegionNavigationResult navResult) {
+                if(navResult.Result.HasValue) { if(navResult.Result.Value) return; }
+                string navErrorMsg = "Unknown Navigation Error";
+                if (navResult.Error != null)
+                {
+                    navErrorMsg = navResult.Error.Message;
+                    Exception inner = navResult.Error.InnerException;
+                    while (inner != null)
+                    {
+                        navErrorMsg = navErrorMsg + ": " + inner.Message;
+                        inner = inner.InnerException;
+                    }
+                }
+                navResult.Context.NavigationService.RequestNavigate(new Uri("<#= PageNotFoundUserControlClassName #>", UriKind.Absolute));
+                _<#= AppSettingServicePropertyName #>.ShowErrorMessage("Navigation Exception", navErrorMsg);
+        }
+        #endregion
         #region OnLoaded
         protected bool <#= IsOnLoadedCalledPropertyName #> = false;
         private void OnLoaded()
@@ -173,6 +208,7 @@ namespace <#= FtrViewModelNameSpace #> {
                 <#= IsOnLoadedCalledPropertyName #> = true;
                 ContentView uc = null;
                 IRegionManager rm = null;
+                <#= INotifiedByParentInterfaceClassName #> nbp = null;
 <#
         foreach(FeatureItemSerializable featureItemSerializable in Feature.FeatureItems) {
             ModelViewSerializable modelViewSerializable = GetModelViewByName(Context, featureItemSerializable.ViewName);
@@ -189,12 +225,38 @@ namespace <#= FtrViewModelNameSpace #> {
                 continue;
             }
             string modelClassName = GetModelClassName(modelViewSerializable, featureItemSerializable.FileType);
-            
+            if (isRoutedItem(AllowedFileTypes, featureItemSerializable.FileType)) {
 #>
-                uc = _containerProvider.Resolve<ContentView>("<#= modelClassName #>");
-                rm = _regionManager.Regions["<#= modelClassName #><#= FtrUserControlClassName #>"].Add(uc, null, true);
-                _regionManager.Regions["<#= modelClassName #><#= FtrUserControlClassName #>"].Activate(uc);
+                //suc = _containerProvider.Resolve<IScopedRegionNavigationUserControlInterface>();
+                //suc.ScopedRegionManager = _regionManager.Regions["<#= modelClassName #><#= FtrUserControlClassName #>"].Add(suc, null, true);
+                //suc.RequestNavigateSource = "<#= modelClassName #>";
+                //_regionManager.Regions["<#= modelClassName #><#= FtrUserControlClassName #>"].Activate(suc);
+                _regionManager.RequestNavigate("<#= modelClassName #><#= FtrUserControlClassName #>", "<#= modelClassName #>", OnNavigationResult);
 <#
+            } else {
+#>
+                if ((_<#= AppSettingServicePropertyName #>.GetViewModelMask("<#= modelViewSerializable.ViewName #>") & 1) == 1) {
+                    uc = _containerProvider.Resolve<ContentView>("<#= modelClassName #>");
+                    rm = _regionManager.Regions["<#= modelClassName #><#= FtrUserControlClassName #>"].Add(uc, null, true);
+                    _regionManager.Regions["<#= modelClassName #><#= FtrUserControlClassName #>"].Activate(uc);
+                    nbp = uc as <#= INotifiedByParentInterfaceClassName #>;
+                    if(nbp != null) {
+                        Task.Run(()=>
+                            MainThread.BeginInvokeOnMainThread(() =>
+                            {
+                                nbp.<#= IsParentLoadedPropertyName #> = true;
+                            }));
+                    }
+                } else {
+                    _regionManager.RequestNavigate("<#= modelClassName #><#= FtrUserControlClassName #>", "<#= AccessDeniedUserControlClassName #>", OnNavigationResult);
+                    //suc = _containerProvider.Resolve<IScopedRegionNavigationUserControlInterface>();
+                    //suc.ScopedRegionManager = _regionManager.Regions["<#= modelClassName #><#= FtrUserControlClassName #>"].Add(suc, null, true);
+                    //suc.RequestNavigateSource = "<#= AccessDeniedUserControlClassName #>";
+                    //_regionManager.Regions["<#= modelClassName #><#= FtrUserControlClassName #>"].Activate(suc);
+                }
+<#
+
+            }
         }
 #>
             }
@@ -348,10 +410,10 @@ namespace <#= FtrViewModelNameSpace #> {
             string modelClassName = GetModelClassName(modelViewSerializable, featureItemSerializable.FileType);
 #>
             _<#= VisiblePrefixPropertyName #><#= modelClassName #> = !IsAllCollapsed; OnPropertyChanged("<#= VisiblePrefixPropertyName #><#= modelClassName #>");
-            <#= FilterHeightPropertyName #><#= modelClassName #> = 
-                <#= allowedFileTypeSerializable.DefaultFilterMaxHeight #> * _<#= AppSettingServicePropertyName #>.FilterHeightFactor + _<#= AppSettingServicePropertyName #>.FilterHeightAddition;
-            <#= GridHeightPropertyName #><#= modelClassName #> = 
-                <#= allowedFileTypeSerializable.DefaultMaxHeight #> * _<#= AppSettingServicePropertyName #>.TableHeightFactor + _<#= AppSettingServicePropertyName #>.TableHeightAddition;
+            <#= FilterHeightPropertyName #><#= modelClassName #> = _<#= AppSettingServicePropertyName #>.<#= DefaultFilterHeightMethodName #>("<#= featureItemSerializable.FileType #>");
+                // <#= allowedFileTypeSerializable.DefaultFilterMaxHeight #> * _<#= AppSettingServicePropertyName #>.FilterHeightFactor + _<#= AppSettingServicePropertyName #>.FilterHeightAddition;
+            <#= GridHeightPropertyName #><#= modelClassName #> = _<#= AppSettingServicePropertyName #>.<#= DefaultGridHeightMethodName #>("<#= featureItemSerializable.FileType #>");
+                // <#= allowedFileTypeSerializable.DefaultMaxHeight #> * _<#= AppSettingServicePropertyName #>.TableHeightFactor + _<#= AppSettingServicePropertyName #>.TableHeightAddition;
 <#
         }
 #>
@@ -383,10 +445,10 @@ namespace <#= FtrViewModelNameSpace #> {
 #>
                     case "<#= modelClassName #>": 
                         _<#= VisiblePrefixPropertyName #><#= modelClassName #> = true; OnPropertyChanged("<#= VisiblePrefixPropertyName #><#= modelClassName #>");
-//                        <#= FilterHeightPropertyName #><#= modelClassName #> = 
-//                            <#= allowedFileTypeSerializable.ExpandFilterMaxHeight #> * _<#= AppSettingServicePropertyName #>.FilterHeightFactor + _<#= AppSettingServicePropertyName #>.FilterHeightAddition;
-//                        <#= GridHeightPropertyName #><#= modelClassName #> = 
-//                            <#= allowedFileTypeSerializable.ExpandMaxHeight #> * _<#= AppSettingServicePropertyName #>.TableHeightFactor + _<#= AppSettingServicePropertyName #>.TableHeightAddition;
+                        <#= FilterHeightPropertyName #><#= modelClassName #> = _<#= AppSettingServicePropertyName #>.<#= ExpandedFilterHeightMethodName #>("<#= featureItemSerializable.FileType #>");
+                            // <#= allowedFileTypeSerializable.ExpandFilterMaxHeight #> * _<#= AppSettingServicePropertyName #>.FilterHeightFactor + _<#= AppSettingServicePropertyName #>.FilterHeightAddition;
+                        <#= GridHeightPropertyName #><#= modelClassName #> = _<#= AppSettingServicePropertyName #>.<#= ExpandedGridHeightMethodName #>("<#= featureItemSerializable.FileType #>");
+                            // <#= allowedFileTypeSerializable.ExpandMaxHeight #> * _<#= AppSettingServicePropertyName #>.TableHeightFactor + _<#= AppSettingServicePropertyName #>.TableHeightAddition;
                         break;
 <#
         }

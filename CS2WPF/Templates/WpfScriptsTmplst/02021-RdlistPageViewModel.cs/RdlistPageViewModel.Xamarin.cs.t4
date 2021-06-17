@@ -81,6 +81,11 @@ using Prism.Navigation;
     string RdlistPageNameSpace               = GetModelNameSpace(Model, RdlistPageFolder);
     string RdlistPageProject                 = GetModelProjectName(Model, RdlistPageFolder);
     
+    string RdlistPageXamlFolder              = "02019-RdlistPage.xaml";
+    string RdlistPageXamlClassName           = GetModelClassName(Model, RdlistPageXamlFolder);
+    string RdlistPageXamlNameSpace           = GetModelNameSpace(Model, RdlistPageXamlFolder);
+    string RdlistPageXamlProject             = GetModelProjectName(Model, RdlistPageXamlFolder);
+
     string RdlistPageViewModelFolder        = "02021-RdlistPageViewModel.cs";
     string RdlistPageViewModelClassName     = GetModelClassName(Model, RdlistPageViewModelFolder);
     string RdlistPageViewModelNameSpace     = GetModelNameSpace(Model, RdlistPageViewModelFolder);
@@ -133,6 +138,13 @@ using Prism.Navigation;
 
     string FilterHeightPropertyName             = "FilterHeight";
     string GridHeightPropertyName               = "GridHeight";
+
+    string DefaultGridHeightMethodName          = "DefaultGridHeight";
+    string DefaultFilterHeightMethodName        = "DefaultFilterHeight";
+    string ExpandedGridHeightMethodName         = "ExpandedGridHeight";
+    string ExpandedFilterHeightMethodName       = "ExpandedFilterHeight";
+
+
 
     List<string> detailViews = GetDetailViews(Model, Context, null);
     List<ModelViewPropertyOfVwSerializable> primKeys = GetModelPrimaryKeyProps(Model);
@@ -224,6 +236,8 @@ namespace <#= RdlistPageViewModelNameSpace #> {
             PermissionMask = <#= AppSettingServicePropertyName #>.GetViewModelMask("<#= Model.ViewName #>");
             _<#= TableMenuItemsPropertyName #> = GetDefault<#= TableMenuItemsPropertyName #>();
             _<#= RowMenuItemsPropertyName #> = GetDefault<#= RowMenuItemsPropertyName #>();
+            _<#= GridHeightPropertyName #> = this.<#= AppSettingServicePropertyName #>.<#= ExpandedGridHeightMethodName #>("<#= RdlistPageXamlFolder #>");
+            _<#= FilterHeightPropertyName #> = this.<#= AppSettingServicePropertyName #>.<#= ExpandedFilterHeightMethodName #>("<#= RdlistPageXamlFolder #>");
         }
         #region INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;

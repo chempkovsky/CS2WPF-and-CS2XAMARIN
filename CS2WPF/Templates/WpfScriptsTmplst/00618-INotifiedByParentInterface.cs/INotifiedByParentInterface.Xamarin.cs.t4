@@ -11,49 +11,21 @@
 <#@ import namespace="CS2WPF.Model.Serializable" #>
 <#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
-using System;
-using System.Collections.Generic;
-using System.Net.Http;
+
 <#
 
-    string IAppGlblSettingsServiceFolder      = "00080-IAppGlblSettingsService.cs";
-    string IAppGlblSettingsServiceClassName   = GetModelClassName(Model, IAppGlblSettingsServiceFolder);
-    string IAppGlblSettingsServiceNameSpace   = GetModelNameSpace(Model, IAppGlblSettingsServiceFolder);
+    string INotifiedByParentInterfaceFolder      = "00618-INotifiedByParentInterface.cs";
+    string INotifiedByParentInterfaceClassName   = GetModelClassName(Model, INotifiedByParentInterfaceFolder);
+    string INotifiedByParentInterfaceNameSpace   = GetModelNameSpace(Model, INotifiedByParentInterfaceFolder);
     
-    string ShowErrorMethodName                  = "ShowErrorMessage";
+    string IsParentLoadedPropertyName            = "IsParentLoaded";
 
 #>
 
-namespace <#= IAppGlblSettingsServiceNameSpace #> {
-    public interface  <#= IAppGlblSettingsServiceClassName #>
+namespace <#= INotifiedByParentInterfaceNameSpace #> {
+    public interface <#= INotifiedByParentInterfaceClassName #>
     {
-        double FilterHeightAddition { get; set; }
-        double FilterHeightFactor { get; set; }
-        double TableHeightAddition { get; set; }
-        double TableHeightFactor { get; set; }
-        event Action<object, string> OnMessageNotification;
-        event Action<object, string> OnUserChangedNotification;
-        string GetWebApiPrefix(string ViewName);
-        string GetSecurityWebApiPrefix();
-        double getDialogWidth(string ViewName);
-        string UserName { get; set; }
-        object AuthInfo { get; set; }
-        List<KeyValuePair<string, string>> GetAuthInfoHeader();
-        int[] Permissions { get; set; }
-        int[] GetEmptyPermissions();
-        int GetViewModelMask(string vwModel);
-        int GetDashBrdMask(string dshBrd);
-        HttpClient Client  { get; }
-        void <#= ShowErrorMethodName #>(string errorType, string errorMsg);
-
-        double DefaultGridRows(string fileType);
-        double DefaultFilterRows(string fileType);
-        double ExpandedGridRows(string fileType);
-        double ExpandedFilterRows(string fileType);
-        double DefaultGridHeight(string fileType);
-        double DefaultFilterHeight(string fileType);
-        double ExpandedGridHeight(string fileType);
-        double ExpandedFilterHeight(string fileType);
+        bool  <#= IsParentLoadedPropertyName #> { get; set; }
     }
 }
 

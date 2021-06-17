@@ -31,6 +31,8 @@ using Prism.Services.Dialogs;
     string IWebServiceFilterRsltInterfaceClassName  = GetModelClassName(Model, IWebServiceFilterRsltInterfaceFolder);
     string IWebServiceFilterRsltInterfaceNameSpace  = GetModelNameSpace(Model, IWebServiceFilterRsltInterfaceFolder);
 
+    string LformUserControlXamlFolder      = "01598-LformUserControl.xaml";
+
     string LdlgViewModelBaseFolder                  = "00643-LdlgViewModelBase.cs";
     string LdlgViewModelBaseClassName               = GetModelClassName(Model, LdlgViewModelBaseFolder);
     string LdlgViewModelBaseNameSpace               = GetModelNameSpace(Model, LdlgViewModelBaseFolder);
@@ -59,6 +61,10 @@ using Prism.Services.Dialogs;
     string OnSelectedRowCommandPropertyName     = "OnSelectedRowCommand";
     string IsParentLoadedPropertyName           = "IsParentLoaded";
 
+    string DefaultGridHeightMethodName          = "DefaultGridHeight";
+    string DefaultFilterHeightMethodName        = "DefaultFilterHeight";
+    string ExpandedGridHeightMethodName         = "ExpandedGridHeight";
+    string ExpandedFilterHeightMethodName       = "ExpandedFilterHeight";
 
 
     List<string> nmSpaces = new List<string>();
@@ -87,6 +93,8 @@ namespace <#= LdlgViewModelBaseNameSpace #> {
 
             this.<#= AppSettingServicePropertyName #> = <#= AppSettingServicePropertyName #>;
             this._dialogService = dialogService;
+            _<#= FilterHeightPropertyName #> = this.<#= AppSettingServicePropertyName #>.<#= DefaultFilterHeightMethodName #>("<#= LformUserControlXamlFolder #>");
+            _<#= GridHeightPropertyName #> = this.<#= AppSettingServicePropertyName #>.<#= DefaultGridHeightMethodName #>("<#= LformUserControlXamlFolder #>");
 
         }
         #region INotifyPropertyChanged

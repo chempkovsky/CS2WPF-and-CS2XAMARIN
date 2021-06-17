@@ -79,6 +79,10 @@ using Prism.Navigation;
     string LformUserControlNameSpace        = GetModelNameSpace(Model, LformUserControlFolder);
     string LformUserControlProject          = GetModelProjectName(Model, LformUserControlFolder);
 
+    string O2mPageXamlFolder                = "01699-O2mPage.xaml";
+    string O2mPageXamlClassName             = GetModelClassName(Model, O2mPageXamlFolder);
+    string O2mPageXamlNameSpace             = GetModelNameSpace(Model, O2mPageXamlFolder);
+    string O2mPageXamlProject               = GetModelProjectName(Model, O2mPageXamlFolder);
 
     string O2mPageFolder                   = "01697-O2mPage.xaml.cs";
     string O2mPageClassName                = GetModelClassName(Model, O2mPageFolder);
@@ -138,6 +142,11 @@ using Prism.Navigation;
     string ForeignKeyDetailsName                    = "ForeignKeyDetails";
 
     string IsParentLoadedPropertyName               = "IsParentLoaded";
+
+    string DefaultGridHeightMethodName              = "DefaultGridHeight";
+    string DefaultFilterHeightMethodName            = "DefaultFilterHeight";
+    string ExpandedGridHeightMethodName             = "ExpandedGridHeight";
+    string ExpandedFilterHeightMethodName           = "ExpandedFilterHeight";
 
 
     List<string> detailViews = GetDetailViews(Model, Context, null);
@@ -280,7 +289,10 @@ namespace <#= O2mPageViewModelNameSpace #> {
             _<#= RowMenuItemsPropertyName #> = GetDefault<#= RowMenuItemsPropertyName #>();
             _<#= TableMenuItemsDetailPropertyName #> = GetDefault<#= TableMenuItemsDetailPropertyName #>();
             _<#= RowMenuItemsDetailPropertyName #> = GetDefault<#= RowMenuItemsDetailPropertyName #>();
-            
+            _<#= GridHeightPropertyName #> = this.<#= AppSettingServicePropertyName #>.<#= ExpandedGridHeightMethodName #>("<#= O2mPageXamlFolder #>");
+            _<#= FilterHeightPropertyName #> = this.<#= AppSettingServicePropertyName #>.<#= ExpandedFilterHeightMethodName #>("<#= O2mPageXamlFolder #>");
+            _<#= GridHeightDetailPropertyName #> = this.<#= AppSettingServicePropertyName #>.<#= ExpandedGridHeightMethodName #>("<#= O2mPageXamlFolder #>");
+            _<#= FilterHeightDetailPropertyName #> = this.<#= AppSettingServicePropertyName #>.<#= ExpandedFilterHeightMethodName #>("<#= O2mPageXamlFolder #>");  
         }
         #region INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;

@@ -42,6 +42,10 @@ using System.Windows.Input;
     string IWebServiceFilterMenuInterfaceClassName   = GetModelClassName(Model, IWebServiceFilterMenuInterfaceFolder);
     string IWebServiceFilterMenuInterfaceNameSpace   = GetModelNameSpace(Model, IWebServiceFilterMenuInterfaceFolder);
 
+    string INotifiedByParentInterfaceFolder         = "00618-INotifiedByParentInterface.cs";
+    string INotifiedByParentInterfaceClassName      = GetModelClassName(Model, INotifiedByParentInterfaceFolder);
+    string INotifiedByParentInterfaceNameSpace      = GetModelNameSpace(Model, INotifiedByParentInterfaceFolder);
+
     string UserControlWithContainerMenuFolder       = "00628-UserControlWithContainerMenu.xaml.cs";
     string UserControlWithContainerMenuClassName    = GetModelClassName(Model, UserControlWithContainerMenuFolder);
     string UserControlWithContainerMenuNameSpace    = GetModelNameSpace(Model, UserControlWithContainerMenuFolder);
@@ -88,6 +92,8 @@ using System.Windows.Input;
         nmSpaces.Add(BindingContextFeedbackNameSpace);
     if ((EformUserControlBaseNameSpace != UserControlWithContainerMenuNameSpace) && (nmSpaces.IndexOf(UserControlWithContainerMenuNameSpace) < 0)) 
         nmSpaces.Add(UserControlWithContainerMenuNameSpace);
+    if ((EformUserControlBaseNameSpace != INotifiedByParentInterfaceNameSpace) && (nmSpaces.IndexOf(INotifiedByParentInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(INotifiedByParentInterfaceNameSpace);
     
 #>
 <# 
@@ -103,7 +109,7 @@ namespace <#= EformUserControlBaseNameSpace #> {
     /// <summary>
     /// Interaction logic for <#= EformUserControlBaseClassName #>.xaml
     /// </summary>
-    public class <#= EformUserControlBaseClassName #>: <#= UserControlWithContainerMenuClassName #>
+    public class <#= EformUserControlBaseClassName #>: <#= UserControlWithContainerMenuClassName #>, <#= INotifiedByParentInterfaceClassName #>
     {
        // public <#= EformUserControlBaseClassName #>()
        // {
