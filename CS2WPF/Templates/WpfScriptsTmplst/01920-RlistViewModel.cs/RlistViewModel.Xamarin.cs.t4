@@ -741,8 +741,14 @@ namespace <#= RlistViewModelNameSpace #> {
                 }
             }
             <#= CurrentNavigationContextPropertyName #> = navigationContext;
-            OnPropertyChanged("<#= ShowBackBtnPropertyName #>");
-            (<#= OnNavigationBackCommandPropertyName #> as Command).ChangeCanExecute();
+            Task.Run(() =>
+            {
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    OnPropertyChanged("<#= ShowBackBtnPropertyName #>");
+                    (<#= OnNavigationBackCommandPropertyName #> as Command).ChangeCanExecute();
+                });
+            });
             <#= SformAfterAddItemPropertyName  #> = null; 
             <#= SformAfterUpdItemPropertyName  #> = null; 
             <#= SformAfterDelItemPropertyName  #> = null; 
