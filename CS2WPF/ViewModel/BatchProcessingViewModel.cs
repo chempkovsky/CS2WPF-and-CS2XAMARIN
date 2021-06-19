@@ -1,4 +1,5 @@
-﻿using CS2WPF.Helpers.BatchProcess;
+﻿using CS2WPF.Helpers;
+using CS2WPF.Helpers.BatchProcess;
 using CS2WPF.Helpers.UI;
 using CS2WPF.Model;
 using CS2WPF.Model.BatchProcess;
@@ -26,6 +27,7 @@ namespace CS2WPF.ViewModel
     public class BatchProcessingViewModel : NotifyPropertyChangedViewModel
     {
         protected DTE2 Dte;
+        protected PrismModuleModifier prismModuleModifier;
         protected ITextTemplating TextTemplating;
         protected IVsThreadedWaitDialogFactory DialogFactory;
         protected DbContextSerializable _SerializableDbContext = null;
@@ -68,13 +70,14 @@ namespace CS2WPF.ViewModel
 
         }
 
-        public BatchProcessingViewModel(DTE2 dte, ITextTemplating textTemplating, IVsThreadedWaitDialogFactory dialogFactory, string t4RootFolder, string batchRootFolder)
+        public BatchProcessingViewModel(PrismModuleModifier prismModuleModifier, DTE2 dte, ITextTemplating textTemplating, IVsThreadedWaitDialogFactory dialogFactory, string t4RootFolder, string batchRootFolder)
         {
             this.Dte = dte;
             this.TextTemplating = textTemplating;
             this.T4RootFolder = t4RootFolder;
             this.BatchRootFolder = batchRootFolder;
             this.DialogFactory = dialogFactory;
+            this.prismModuleModifier = prismModuleModifier;
         }
         public string DestinationProjectRootFolder { get; set; }
         public string DestinationProjectName { get; set; }
@@ -285,7 +288,7 @@ namespace CS2WPF.ViewModel
                                                                     batchItem.GeneratorType, FileName);
                     }
                     sb.AppendLine("        Batch Item: Generating Code");
-                    GeneratorBatchStep generatorBatchStep = BatchSettingsHelper.DoGenerateViewModel(Dte, TextTemplating, tmpltPath, SerializableDbContext, ShallowCopy, DefaultProjectNameSpace);
+                    GeneratorBatchStep generatorBatchStep = BatchSettingsHelper.DoGenerateViewModel(prismModuleModifier, Dte, TextTemplating, tmpltPath, SerializableDbContext, ShallowCopy, DefaultProjectNameSpace);
                     if (!string.IsNullOrEmpty(generatorBatchStep.GenerateError))
                     {
                         throw new Exception(generatorBatchStep.GenerateError);

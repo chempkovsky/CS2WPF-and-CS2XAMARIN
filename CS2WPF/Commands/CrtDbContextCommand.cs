@@ -3,6 +3,7 @@ using System.ComponentModel.Design;
 using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
+using CS2WPF.Helpers;
 using CS2WPF.View;
 using CS2WPF.ViewModel;
 using EnvDTE80;
@@ -106,7 +107,7 @@ namespace CS2WPF.Commands
         private void Execute(object sender, EventArgs e)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
-            MainWindowDbContext dataContext = new MainWindowDbContext(dTE2, TextTemplating, DialogFactory);
+            MainWindowDbContext dataContext = new MainWindowDbContext(new PrismModuleModifier(dTE2), dTE2, TextTemplating, DialogFactory);
             WindowCS2WPF mainWin = new WindowCS2WPF(dataContext); //uiShell, dTE2, TextTemplating);
             //get the owner of this dialog
             IntPtr hwnd;

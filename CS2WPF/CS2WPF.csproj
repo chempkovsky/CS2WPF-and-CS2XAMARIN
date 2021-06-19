@@ -61,6 +61,8 @@
     <Compile Include="Helpers\IsReadyNotificationService.cs" />
     <Compile Include="Helpers\ModelViewHelper.cs" />
     <Compile Include="Helpers\OnModelCreatingAnalyzerHelper.cs" />
+    <Compile Include="Helpers\PrismModuleAnalyzerHelper.cs" />
+    <Compile Include="Helpers\PrismModuleModifier.cs" />
     <Compile Include="Helpers\TemplatePathHelper.cs" />
     <Compile Include="Helpers\UI\ButtonClickedNotificationService.cs" />
     <Compile Include="Helpers\UI\CommandHandler.cs" />
@@ -611,8 +613,8 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Templates\WpfScriptsTmplst\00626-ScopedRegionNavigationViewModel.cs\Readme.html">
-      <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="Templates\WpfScriptsTmplst\00678-AccessDeniedUserControl.xaml.cs\Readme.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -676,6 +678,7 @@
     </Content>
     <Content Include="Templates\WpfScriptsTmplst\00693-HomePage.xaml\Readme.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="Templates\WpfScriptsTmplst\00694-HomeViewModel.cs\Readme.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -683,6 +686,7 @@
     </Content>
     <Content Include="Templates\WpfScriptsTmplst\00695-HomePageViewModel.cs\Readme.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="Templates\WpfScriptsTmplst\00696-MainWindow.xaml.cs\Readme.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -1506,7 +1510,6 @@
     <Content Include="Templates\WpfScriptsTmplst\01440-SdlgViewModel.cs\SdlgViewModel.cs.t4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
-      <FormatOutput>False</FormatOutput>
     </Content>
     <Content Include="Templates\WpfScriptsTmplst\01496-EformUserControl.xaml.cs\EformUserControl.xaml.cs.t4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -1699,7 +1702,6 @@
     <Content Include="Templates\WpfScriptsTmplst\00288-NavigationProxyUserControl.xaml\NavigationProxyUserControl.xaml.t4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
-      <FormatOutput>True</FormatOutput>
     </Content>
     <Content Include="Templates\WpfScriptsTmplst\00290-NavigationProxyUserControlRegionAdapter.cs\NavigationProxyUserControlRegionAdapter.cs.t4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -2220,7 +2222,6 @@
     <Content Include="Templates\WpfScriptsTmplst\00288-NavigationProxyUserControl.xaml\NavigationProxyUserControl.Xamarin.xaml.t4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
-      <FormatOutput>True</FormatOutput>
     </Content>
     <Content Include="Templates\WpfScriptsTmplst\00286-NavigationProxyUserControl.xaml.cs\NavigationProxyUserControl.Xamarin.xaml.cs.t4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -2240,6 +2241,7 @@
     </Content>
     <Content Include="Templates\WpfScriptsTmplst\00220-IBindingContextChanged.cs\IBindingContextChanged.Xamarin.cs.t4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="Templates\WpfScriptsTmplst\00198-ISformViewModelInterface.cs\ISformViewModelInterface.Xamarin.cs.t4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -2259,7 +2261,6 @@
     </Content>
     <Content Include="Templates\WpfScriptsTmplst\00630-SformUserControlBase.xaml.cs\SformUserControlBase.Xamarin.xaml.cs.t4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <FormatOutput>False</FormatOutput>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="Templates\BatchScriptsTmplst\00000-ContextLevelTmplts\00010-ContextLevelCommonServicesModuleBatch.Xamarin.json">
@@ -2272,15 +2273,14 @@
     </Content>
     <Content Include="Templates\WpfScriptsTmplst\00080-IAppGlblSettingsService.cs\IAppGlblSettingsService.Xamarin.cs.t4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="Templates\WpfScriptsTmplst\00284-ProxyUserControlRegionAdapter.cs\ProxyUserControlRegionAdapter.Xamarin.cs.t4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <FormatOutput>True</FormatOutput>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="Templates\WpfScriptsTmplst\01436-SdlgUserControl.xaml.cs\SdlgUserControl.Xamarin.xaml.cs.t4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <FormatOutput>False</FormatOutput>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="Templates\WpfScriptsTmplst\01438-SdlgUserControl.xaml\SdlgUserControl.Xamarin.xaml.t4">
@@ -2289,7 +2289,6 @@
     </Content>
     <Content Include="Templates\WpfScriptsTmplst\01440-SdlgViewModel.cs\SdlgViewModel.Xamarin.cs.t4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <FormatOutput>False</FormatOutput>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="Templates\WpfScriptsTmplst\01496-EformUserControl.xaml.cs\EformUserControl.Xamarin.xaml.cs.t4">
@@ -2311,8 +2310,6 @@
     <Content Include="Templates\WpfScriptsTmplst\01500-EformViewModel.cs\EformViewModel.Xamarin.cs.t4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
-      <Parameters>&lt;%3fxml version="1.0" encoding="utf-16"%3f&gt;
-&lt;ArrayOfParameterStorage xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" /&gt;</Parameters>
     </Content>
     <Content Include="Templates\WpfScriptsTmplst\01516-EdlgUserControl.xaml.cs\EdlgUserControl.Xamarin.xaml.cs.t4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -2320,9 +2317,11 @@
     </Content>
     <Content Include="Templates\WpfScriptsTmplst\01518-EdlgUserControl.xaml\EdlgUserControl.Xamarin.xaml.t4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="Templates\WpfScriptsTmplst\01520-EdlgViewModel.cs\EdlgViewModel.Xamarin.cs.t4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="Templates\BatchScriptsTmplst\01000-ViewModelLevelTmplts\01500-Eform.Xamarin.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -2342,9 +2341,11 @@
     </Content>
     <Content Include="Templates\WpfScriptsTmplst\01598-LformUserControl.xaml\LformUserControl.Xamarin.xaml.t4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="Templates\WpfScriptsTmplst\00197-ILformViewModelInterface.cs\ILformViewModelInterface.Xamarin.cs.t4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="Templates\WpfScriptsTmplst\01600-LformViewModel.cs\LformViewModel.Xamarin.cs.t4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -2392,6 +2393,7 @@
     </Content>
     <Content Include="Templates\WpfScriptsTmplst\00693-HomePage.xaml\HomePage.Xamarin.xaml.t4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="Templates\WpfScriptsTmplst\00695-HomePageViewModel.cs\HomePageViewModel.Xamarin.cs.t4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -2427,7 +2429,6 @@
     </Content>
     <Content Include="Templates\WpfScriptsTmplst\01819-ReditPage.xaml\ReditPage.Xamarin.xaml.t4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <FormatOutput>False</FormatOutput>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="Templates\WpfScriptsTmplst\01821-ReditPageViewModel.cs\ReditPageViewModel.Xamarin.cs.t4">
@@ -2496,7 +2497,6 @@
     </Content>
     <Content Include="Templates\WpfScriptsTmplst\00711-RegisterUserPageViewModel.cs\RegisterUserPageViewModel.Xamarin.cs.t4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <FormatOutput>False</FormatOutput>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="Templates\WpfScriptsTmplst\00713-LoginUserPage.xaml.cs\LoginUserPage.Xamarin.xaml.cs.t4">
@@ -2517,12 +2517,10 @@
     </Content>
     <Content Include="Templates\WpfScriptsTmplst\00721-LogoutUserPage.xaml\LogoutUserPage.Xamarin.xaml.t4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <FormatOutput>False</FormatOutput>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="Templates\WpfScriptsTmplst\00723-LogoutUserPageViewModel.cs\LogoutUserPageViewModel.Xamarin.cs.t4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <FormatOutput>False</FormatOutput>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="Templates\WpfScriptsTmplst\00725-ChngpswdUserPage.xaml.cs\ChngpswdUserPage.Xamarin.xaml.cs.t4">
@@ -2563,6 +2561,7 @@
     </Content>
     <Content Include="Templates\WpfScriptsTmplst\00688-PageNotFoundViewModel.cs\PageNotFoundViewModel.Xamarin.cs.t4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="Templates\WpfScriptsTmplst\01816-ReditUserControl.xaml.cs\ReditUserControl.Xamarin.xaml.cs.t4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -2587,7 +2586,6 @@
     <Content Include="Templates\WpfScriptsTmplst\01918-RlistUserControl.xaml\RlistUserControl.Xamarin.xaml.t4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
-      <TransformOnBuild>False</TransformOnBuild>
     </Content>
     <Content Include="Templates\WpfScriptsTmplst\01920-RlistViewModel.cs\RlistViewModel.Xamarin.cs.t4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -2627,6 +2625,7 @@
     </Content>
     <Content Include="Templates\BatchScriptsTmplst\01000-ViewModelLevelTmplts\02020-Rdlist.Xamarin.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="Templates\FeatureScriptsTmplst\30100-FtrUserControl.xaml.cs\FtrUserControl.Xamarin.xaml.cs.t4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -2656,6 +2655,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
+    <Content Include="Templates\WpfScriptsTmplst\01820.0-ReditViewModel.cs\ReditViewModel.Xamarin.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
@@ -2672,12 +2674,12 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp">
-      <Version>3.9.0</Version>
+      <Version>3.10.0</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.SDK" Version="16.10.31321.278" ExcludeAssets="runtime">
       <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="17.0.1597">
+    <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="17.0.1600">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>

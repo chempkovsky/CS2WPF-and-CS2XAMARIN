@@ -26,7 +26,7 @@ namespace CS2WPF.ViewModel
 
         
 
-        public void DoGenerateViewModel(DTE2 Dte, ITextTemplating textTemplating, string T4TempatePath, DbContextSerializable SerializableDbContext, ModelViewSerializable model, string defaultProjectNameSpace = null)
+        public void DoGenerateViewModel(PrismModuleModifier prismModuleModifier, DTE2 Dte, ITextTemplating textTemplating, string T4TempatePath, DbContextSerializable SerializableDbContext, ModelViewSerializable model, string defaultProjectNameSpace = null)
         {
             
             this.GenerateText = "";
@@ -42,7 +42,7 @@ namespace CS2WPF.ViewModel
             textTemplatingSessionHost.Session["Model"] = GeneratedModelView;
             textTemplatingSessionHost.Session["Context"] = SerializableDbContext;
             textTemplatingSessionHost.Session["DefaultProjectNameSpace"] = string.IsNullOrEmpty( defaultProjectNameSpace) ? "" : defaultProjectNameSpace;
-
+            textTemplatingSessionHost.Session["PrismModifier"] = prismModuleModifier;
             if (string.IsNullOrEmpty(GenText))
             {
                 this.GenerateText = textTemplating.ProcessTemplate(T4TempatePath, File.ReadAllText(T4TempatePath), tpCallback);

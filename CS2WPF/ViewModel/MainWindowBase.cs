@@ -23,15 +23,17 @@ namespace CS2WPF.ViewModel
     {
         #region Fieds
         protected DTE2 Dte;
+        protected PrismModuleModifier prismModuleModifier;
         protected ITextTemplating TextTemplating;
         protected IVsThreadedWaitDialogFactory DialogFactory;
         protected UserControlInvitation InvitationUC = null;
         #endregion
 
-        public MainWindowBase(DTE2 dte, ITextTemplating textTemplating, IVsThreadedWaitDialogFactory dialogFactory)
+        public MainWindowBase(PrismModuleModifier prismModuleModifier, DTE2 dte, ITextTemplating textTemplating, IVsThreadedWaitDialogFactory dialogFactory)
         {
             CancelClicked = new ButtonClickedNotificationService();
             this.Dte = dte;
+            this.prismModuleModifier = prismModuleModifier;
             this.TextTemplating = textTemplating;
             this.DialogFactory = dialogFactory;
             try

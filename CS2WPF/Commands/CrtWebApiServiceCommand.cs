@@ -3,6 +3,7 @@ using System.ComponentModel.Design;
 using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
+using CS2WPF.Helpers;
 using CS2WPF.View;
 using CS2WPF.ViewModel;
 using EnvDTE80;
@@ -105,7 +106,7 @@ namespace CS2WPF.Commands
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            MainWindowVm2WebApi dataContext = new MainWindowVm2WebApi(dTE2, TextTemplating, DialogFactory);
+            MainWindowVm2WebApi dataContext = new MainWindowVm2WebApi(new PrismModuleModifier(dTE2), dTE2, TextTemplating, DialogFactory);
             WindowCS2WPF mainWin = new WindowCS2WPF(dataContext); //uiShell, dTE2, TextTemplating);
             //get the owner of this dialog
             IntPtr hwnd;

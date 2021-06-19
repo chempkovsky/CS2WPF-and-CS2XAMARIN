@@ -24,7 +24,7 @@ namespace CS2WPF.ViewModel
         UserControlCreateWebApi CreateWebApiUC = null;
         #endregion
 
-        public MainWindowVm2WebApi(DTE2 dte, ITextTemplating textTemplating, IVsThreadedWaitDialogFactory dialogFactory) : base(dte, textTemplating, dialogFactory)
+        public MainWindowVm2WebApi(PrismModuleModifier prismModuleModifier, DTE2 dte, ITextTemplating textTemplating, IVsThreadedWaitDialogFactory dialogFactory) : base(prismModuleModifier, dte, textTemplating, dialogFactory)
         {
             InvitationViewModel InvitationVM = new InvitationViewModel();
             InvitationVM.WizardName = "#3 WebApi Wizard";
@@ -167,7 +167,7 @@ namespace CS2WPF.ViewModel
                     try
                     {
                         (GenerateUC.DataContext as GenerateCommonStaffViewModel)
-                            .DoGenerateViewModel(Dte, TextTemplating,
+                            .DoGenerateViewModel(prismModuleModifier, Dte, TextTemplating,
                             (T4EditorUC.DataContext as T4EditorViewModel).T4TempatePath,
                             (CreateWebApiUC.DataContext as CreateWebApiViewModel).SerializableDbContext,
                             (CreateWebApiUC.DataContext as CreateWebApiViewModel).GetSelectedModelShallowCopy());

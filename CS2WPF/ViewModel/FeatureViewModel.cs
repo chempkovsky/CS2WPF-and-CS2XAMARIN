@@ -17,6 +17,7 @@ using CS2WPF.Helpers;
 
 namespace CS2WPF.ViewModel
 {
+    #pragma warning disable VSTHRD010
     public class FeatureViewModel : IsReadyViewModel
     {
 

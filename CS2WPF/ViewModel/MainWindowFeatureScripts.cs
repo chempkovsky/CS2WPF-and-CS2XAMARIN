@@ -26,7 +26,7 @@ namespace CS2WPF.ViewModel
         UserControlFeature FeatureUC = null;
         UserControlSelectFeatureFolder SelectFeatureFolderUC = null;
         #endregion
-        public MainWindowFeatureScripts(DTE2 dte, ITextTemplating textTemplating, IVsThreadedWaitDialogFactory dialogFactory) : base(dte, textTemplating, dialogFactory)
+        public MainWindowFeatureScripts(PrismModuleModifier prismModuleModifier, DTE2 dte, ITextTemplating textTemplating, IVsThreadedWaitDialogFactory dialogFactory) : base(prismModuleModifier, dte, textTemplating, dialogFactory)
         {
             InvitationViewModel InvitationVM = new InvitationViewModel();
             InvitationVM.WizardName = "#5 Feature Scripts Wizard";

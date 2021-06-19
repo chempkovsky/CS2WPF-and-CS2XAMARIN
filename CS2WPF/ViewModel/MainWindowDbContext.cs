@@ -35,7 +35,7 @@ namespace CS2WPF.ViewModel
 
 
 
-        public MainWindowDbContext(DTE2 dte, ITextTemplating textTemplating, IVsThreadedWaitDialogFactory dialogFactory) : base(dte, textTemplating, dialogFactory)
+        public MainWindowDbContext(PrismModuleModifier prismModuleModifier, DTE2 dte, ITextTemplating textTemplating, IVsThreadedWaitDialogFactory dialogFactory) : base(prismModuleModifier, dte, textTemplating, dialogFactory)
         {
             Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
             InvitationViewModel InvitationVM = new InvitationViewModel();

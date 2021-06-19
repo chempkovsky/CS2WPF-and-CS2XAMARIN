@@ -18,7 +18,7 @@ namespace CS2WPF.ViewModel
         {
             
         }
-        public void DoGenerateViewModel(DTE2 Dte, ITextTemplating textTemplating, SelectedItem DestinationSelectedItem, string T4TempatePath, ModelView modelView)
+        public void DoGenerateViewModel(PrismModuleModifier prismModuleModifier, DTE2 Dte, ITextTemplating textTemplating, SelectedItem DestinationSelectedItem, string T4TempatePath, ModelView modelView)
         {
             this.GenerateText = "";
             this.GenerateError = "";
@@ -32,6 +32,7 @@ namespace CS2WPF.ViewModel
             textTemplatingSessionHost.Session = textTemplatingSessionHost.CreateSession();
             TPCallback tpCallback = new TPCallback();
             textTemplatingSessionHost.Session["Model"] = GeneratedModelView;
+            textTemplatingSessionHost.Session["PrismModifier"] = prismModuleModifier;
             if (string.IsNullOrEmpty(GenText))
             {
                 this.GenerateText = textTemplating.ProcessTemplate(T4TempatePath, File.ReadAllText(T4TempatePath), tpCallback);

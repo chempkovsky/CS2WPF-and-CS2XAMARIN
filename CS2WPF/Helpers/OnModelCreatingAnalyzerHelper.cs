@@ -1,6 +1,5 @@
 ﻿using CS2WPF.Model.AnalyzeOnModelCreating;
 using EnvDTE;
-using EnvDTE80;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -18,43 +17,66 @@ namespace CS2WPF.Helpers
     public static class OnModelCreatingAnalyzerHelper
     {
         
-        public static MethodDeclarationSyntax GetOnModelCreatingParameterName(this SyntaxNode root, string parameterType1, string parameterType2, out string parameterName)
+        public static LocalFunctionStatementSyntax GetOnModelCreatingParameterName(this SyntaxNode root, string parameterType1, string parameterType2, out string parameterName)
         {
             parameterName = null;
             if ((root == null) || string.IsNullOrEmpty(parameterType1) || string.IsNullOrEmpty(parameterType2)) return null;
+            GlobalStatementSyntax globalStatementSyntax = null;
+            LocalFunctionStatementSyntax localFunctionStatementSyntax = null;
             foreach (SyntaxNode nd in root.ChildNodes())
             {
-                if (nd.Kind() != SyntaxKind.MethodDeclaration) continue;
-                MethodDeclarationSyntax methodDeclaration = nd as MethodDeclarationSyntax;
-                if (methodDeclaration == null) { continue; }
-                // method name
-                if (methodDeclaration.Identifier == null) continue;
-                if (methodDeclaration.Identifier.ValueText != "OnModelCreating") continue;
-                // method return type
-                if (methodDeclaration.ReturnType == null) continue;
-                if (methodDeclaration.ReturnType.Kind() != SyntaxKind.PredefinedType) continue;
-                PredefinedTypeSyntax predefinedType = methodDeclaration.ReturnType as PredefinedTypeSyntax;
-                if (predefinedType == null) continue;
-                if (predefinedType.Keyword.Kind() != SyntaxKind.VoidKeyword) continue;
-                // method modifiers
-                if (methodDeclaration.Modifiers == null) continue;
-                if (methodDeclaration.Modifiers.Count != 2) continue;
-                if (!(methodDeclaration.Modifiers.Any(SyntaxKind.OverrideKeyword) && methodDeclaration.Modifiers.Any(SyntaxKind.ProtectedKeyword))) continue;
-                // method parameters
-                if (methodDeclaration.ParameterList == null) continue;
-                if (methodDeclaration.ParameterList.Parameters == null) continue;
-                if (methodDeclaration.ParameterList.Parameters.Count != 1) continue;
-                ParameterSyntax parameterSyntax = methodDeclaration.ParameterList.Parameters[0];
-                if (parameterSyntax.Type == null) continue;
-                if ((parameterSyntax.Type.Kind() != SyntaxKind.IdentifierName) &&
-                    (parameterSyntax.Type.Kind() != SyntaxKind.QualifiedName)) continue;
-                string parameterTypeName = parameterSyntax.Type.ToString();
-                if (string.IsNullOrEmpty(parameterTypeName)) continue;
-                if ((!parameterTypeName.Contains(parameterType1)) && (!parameterTypeName.Contains(parameterType1))) continue;
-                parameterName = parameterSyntax.Identifier.ValueText;
-                return methodDeclaration;
+                if (nd.Kind() == SyntaxKind.GlobalStatement)
+                {
+                    globalStatementSyntax = nd as GlobalStatementSyntax;
+                    break;
+                }
+                if (nd.Kind() == SyntaxKind.LocalFunctionStatement)
+                {
+                    localFunctionStatementSyntax = nd as LocalFunctionStatementSyntax;
+                    break;
+                }
             }
-            return null;
+            if ((localFunctionStatementSyntax == null) && (globalStatementSyntax != null))
+            {
+                foreach (SyntaxNode nd in globalStatementSyntax.ChildNodes())
+                {
+                    SyntaxKind k = nd.Kind();
+                    if (nd.Kind() == SyntaxKind.LocalFunctionStatement)
+                    {
+                        localFunctionStatementSyntax = nd as LocalFunctionStatementSyntax;
+                        break;
+                    }
+                }
+            }
+            if (localFunctionStatementSyntax == null) return null;
+
+
+                // method name
+                if (localFunctionStatementSyntax.Identifier == null) return null;
+            if (localFunctionStatementSyntax.Identifier.ValueText != "OnModelCreating") return null;
+            // method return type
+            if (localFunctionStatementSyntax.ReturnType == null) return null;
+            if (localFunctionStatementSyntax.ReturnType.Kind() != SyntaxKind.PredefinedType) return null;
+            PredefinedTypeSyntax predefinedType = localFunctionStatementSyntax.ReturnType as PredefinedTypeSyntax;
+                if (predefinedType == null) return null;
+            if (predefinedType.Keyword.Kind() != SyntaxKind.VoidKeyword) return null;
+            // method modifiers
+            if (localFunctionStatementSyntax.Modifiers == null) return null;
+            if (localFunctionStatementSyntax.Modifiers.Count != 2) return null;
+            if (!(localFunctionStatementSyntax.Modifiers.Any(SyntaxKind.OverrideKeyword) && localFunctionStatementSyntax.Modifiers.Any(SyntaxKind.ProtectedKeyword))) return null;
+            // method parameters
+            if (localFunctionStatementSyntax.ParameterList == null) return null;
+            if (localFunctionStatementSyntax.ParameterList.Parameters == null) return null;
+            if (localFunctionStatementSyntax.ParameterList.Parameters.Count != 1) return null;
+            ParameterSyntax parameterSyntax = localFunctionStatementSyntax.ParameterList.Parameters[0];
+                if (parameterSyntax.Type == null) return null;
+            if ((parameterSyntax.Type.Kind() != SyntaxKind.IdentifierName) &&
+                    (parameterSyntax.Type.Kind() != SyntaxKind.QualifiedName)) return null;
+            string parameterTypeName = parameterSyntax.Type.ToString();
+                if (string.IsNullOrEmpty(parameterTypeName)) return null;
+            if ((!parameterTypeName.Contains(parameterType1)) && (!parameterTypeName.Contains(parameterType2))) return null;
+            parameterName = parameterSyntax.Identifier.ValueText;
+                return localFunctionStatementSyntax;
         }
         public static void DoAnalyze(this string src, List<FluentAPIEntityNode> entityNodes)
         {
@@ -76,62 +98,69 @@ namespace CS2WPF.Helpers
                 return;
             }
 
-            //if (root.Kind() != SyntaxKind.CompilationUnit)
-            //{
-            //    // "Error: Parse expects CompilationUnit. Input text should contain complete definition of the method.";
-            //    return;
-            //}
-            //if (!(root is MethodDeclarationSyntax))
-            //{
-            //    // "Error: Parse expects MethodDeclarationSyntax. Input text should contain complete definition of the method.";
-            //    return;
-            //}
-
-            MethodDeclarationSyntax methodDeclaration = null;
-            string parameterName = "";
+            GlobalStatementSyntax globalStatementSyntax = null;
+            LocalFunctionStatementSyntax localFunctionStatementSyntax = null;
             foreach (SyntaxNode nd in root.ChildNodes())
             {
-                if (nd.Kind() != SyntaxKind.MethodDeclaration) continue;
-                methodDeclaration = nd as MethodDeclarationSyntax;
-                if (methodDeclaration == null) { continue; }
-                // method name
-                if (methodDeclaration.Identifier == null) continue;
-                if (methodDeclaration.Identifier.ValueText != "OnModelCreating") continue;
-                // method return type
-                if (methodDeclaration.ReturnType == null) continue;
-                if (methodDeclaration.ReturnType.Kind() != SyntaxKind.PredefinedType) continue;
-                PredefinedTypeSyntax predefinedType = methodDeclaration.ReturnType as PredefinedTypeSyntax;
-                if (predefinedType == null) continue;
-                if (predefinedType.Keyword.Kind() != SyntaxKind.VoidKeyword) continue;
-                // method modifiers
-                if (methodDeclaration.Modifiers == null) continue;
-                if (methodDeclaration.Modifiers.Count != 2) continue;
-                if (!(methodDeclaration.Modifiers.Any(SyntaxKind.OverrideKeyword) && methodDeclaration.Modifiers.Any(SyntaxKind.ProtectedKeyword))) continue;
-                // method parameters
-                if (methodDeclaration.ParameterList == null) continue;
-                if (methodDeclaration.ParameterList.Parameters == null) continue;
-                if (methodDeclaration.ParameterList.Parameters.Count != 1) continue;
-                ParameterSyntax parameterSyntax = methodDeclaration.ParameterList.Parameters[0];
-                if (parameterSyntax.Type == null) continue;
-                if ((parameterSyntax.Type.Kind() != SyntaxKind.IdentifierName) &&
-                    (parameterSyntax.Type.Kind() != SyntaxKind.QualifiedName)) continue;
-                string parameterTypeName = parameterSyntax.Type.ToString();
-                if (string.IsNullOrEmpty(parameterTypeName)) continue;
-                if ((!parameterTypeName.Contains("DbModelBuilder")) && (!parameterTypeName.Contains("ModelBuilder"))) continue;
-                parameterName = parameterSyntax.Identifier.ValueText;
-                break;
+                if (nd.Kind() == SyntaxKind.GlobalStatement)
+                {
+                    globalStatementSyntax = nd as GlobalStatementSyntax;
+                    break;
+                }
+                if (nd.Kind() == SyntaxKind.LocalFunctionStatement)
+                {
+                    localFunctionStatementSyntax = nd as LocalFunctionStatementSyntax;
+                    break;
+                }
             }
+            if ((localFunctionStatementSyntax == null) && (globalStatementSyntax != null))
+            {
+                foreach (SyntaxNode nd in globalStatementSyntax.ChildNodes())
+                {
+                    SyntaxKind k = nd.Kind();
+                    if (nd.Kind() == SyntaxKind.LocalFunctionStatement)
+                    {
+                        localFunctionStatementSyntax = nd as LocalFunctionStatementSyntax;
+                        break;
+                    }
+                }
+            }
+            if (localFunctionStatementSyntax == null) return;
+            // method name
+            if (localFunctionStatementSyntax.Identifier == null) return;
+            if (localFunctionStatementSyntax.Identifier.ValueText != "OnModelCreating") return;
+            // method return type
+            if (localFunctionStatementSyntax.ReturnType == null) return;
+            if (localFunctionStatementSyntax.ReturnType.Kind() != SyntaxKind.PredefinedType) return;
+            PredefinedTypeSyntax predefinedType = localFunctionStatementSyntax.ReturnType as PredefinedTypeSyntax;
+            if (predefinedType == null) return;
+            if (predefinedType.Keyword.Kind() != SyntaxKind.VoidKeyword) return;
+            // method modifiers
+            if (localFunctionStatementSyntax.Modifiers == null) return;
+            if (localFunctionStatementSyntax.Modifiers.Count != 2) return;
+            if (!(localFunctionStatementSyntax.Modifiers.Any(SyntaxKind.OverrideKeyword) && localFunctionStatementSyntax.Modifiers.Any(SyntaxKind.ProtectedKeyword))) return;
+            // method parameters
+            if (localFunctionStatementSyntax.ParameterList == null) return;
+            if (localFunctionStatementSyntax.ParameterList.Parameters == null) return;
+            if (localFunctionStatementSyntax.ParameterList.Parameters.Count != 1) return;
+            ParameterSyntax parameterSyntax = localFunctionStatementSyntax.ParameterList.Parameters[0];
+            if (parameterSyntax.Type == null) return;
+            if ((parameterSyntax.Type.Kind() != SyntaxKind.IdentifierName) && (parameterSyntax.Type.Kind() != SyntaxKind.QualifiedName)) return;
+            string parameterTypeName = parameterSyntax.Type.ToString();
+            if (string.IsNullOrEmpty(parameterTypeName)) return;
+            if ((!parameterTypeName.Contains("DbModelBuilder")) && (!parameterTypeName.Contains("ModelBuilder"))) return;
+            string parameterName = parameterSyntax.Identifier.ValueText;
             if (string.IsNullOrEmpty(parameterName))
             {
                 //    // "Error: Could not find method Protected Override void OnModelCreating(DbModelBuilder ...).";
                 return;
             }
-            if (methodDeclaration.Body == null)
+            if (localFunctionStatementSyntax.Body == null)
             {
                 // "Error: OnModelCreating-body is not defined.";
                 return;
             }
-            foreach (StatementSyntax ss in methodDeclaration.Body.Statements)
+            foreach (StatementSyntax ss in localFunctionStatementSyntax.Body.Statements)
             {
                 if (ss.Kind() != SyntaxKind.ExpressionStatement) continue;
                 ExpressionStatementSyntax expressionStatementSyntax = ss as ExpressionStatementSyntax;
@@ -148,7 +177,6 @@ namespace CS2WPF.Helpers
                     entityNodes.Add(faen);
                 }
             }
-            // return null
             return;
         }
         public static string InvocationExpressionRootName(this ExpressionSyntax invocation)
@@ -421,7 +449,7 @@ namespace CS2WPF.Helpers
             {
                 return null;
             }
-            MethodDeclarationSyntax methodDeclaration =
+            LocalFunctionStatementSyntax methodDeclaration =
                 root.GetOnModelCreatingParameterName("DbModelBuilder", "ModelBuilder", out string parameterName);
             if ((methodDeclaration == null) || string.IsNullOrEmpty(parameterName)) return null;
             if (methodDeclaration.Body == null)
@@ -464,7 +492,7 @@ namespace CS2WPF.Helpers
             {
                 return;
             }
-            MethodDeclarationSyntax methodDeclaration =
+            LocalFunctionStatementSyntax methodDeclaration =
                 root.GetOnModelCreatingParameterName("DbModelBuilder", "ModelBuilder", out string parameterName);
             if ((methodDeclaration == null) || string.IsNullOrEmpty(parameterName)) return;
             if (methodDeclaration.Body == null)
@@ -523,7 +551,7 @@ namespace CS2WPF.Helpers
             {
                 return;
             }
-            MethodDeclarationSyntax methodDeclaration =
+            LocalFunctionStatementSyntax methodDeclaration =
                 root.GetOnModelCreatingParameterName("DbModelBuilder", "ModelBuilder", out string parameterName);
             if ((methodDeclaration == null) || string.IsNullOrEmpty(parameterName)) return;
             if (methodDeclaration.Body == null)

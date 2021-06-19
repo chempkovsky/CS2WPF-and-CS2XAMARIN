@@ -27,7 +27,7 @@ namespace CS2WPF.ViewModel
         UserControlCreateWebApi CreateWebApiUC = null;
         UserControlSelectFolder SelectFolderUC = null;
         #endregion
-        public MainWindowWpfScripts(DTE2 dte, ITextTemplating textTemplating, IVsThreadedWaitDialogFactory dialogFactory) : base(dte, textTemplating, dialogFactory)
+        public MainWindowWpfScripts(PrismModuleModifier prismModuleModifier, DTE2 dte, ITextTemplating textTemplating, IVsThreadedWaitDialogFactory dialogFactory) : base(prismModuleModifier, dte, textTemplating, dialogFactory)
         {
             InvitationViewModel InvitationVM = new InvitationViewModel();
             InvitationVM.WizardName = "#4 Wpf Forms Wizard";
@@ -409,7 +409,7 @@ namespace CS2WPF.ViewModel
                     {
 
                         (GenerateUC.DataContext as GenerateCommonStaffViewModel)
-                            .DoGenerateViewModel(Dte, TextTemplating,
+                            .DoGenerateViewModel(prismModuleModifier, Dte, TextTemplating,
                             (T4EditorUC.DataContext as T4EditorViewModel).T4TempatePath,
                             (CreateWebApiUC.DataContext as CreateWebApiViewModel).SerializableDbContext,
                             (CreateWebApiUC.DataContext as CreateWebApiViewModel).GetSelectedModelCommonShallowCopy(

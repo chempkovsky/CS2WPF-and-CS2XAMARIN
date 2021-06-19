@@ -315,7 +315,7 @@ namespace CS2WPF.ViewModel
         {
             if (dlgContext == null)
             {
-                dlgContext = new BatchProcessingViewModel(this.Dte, this.TextTemplating, this.DialogFactory, this.T4RootFolder, this.BatchRootFolder);
+                dlgContext = new BatchProcessingViewModel(new PrismModuleModifier(this.Dte), this.Dte, this.TextTemplating, this.DialogFactory, this.T4RootFolder, this.BatchRootFolder);
             }
             dlgContext.DestinationProjectRootFolder = this.DestinationProjectRootFolder;
             dlgContext.DestinationFolder = this.DestinationFolder;

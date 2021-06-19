@@ -30,7 +30,7 @@ namespace CS2WPF.Helpers.BatchProcess
             string jsonString = System.IO.File.ReadAllText(fileName);
             return ReadBatchSettingsFromString(jsonString);
         }
-        public static GeneratorBatchStep DoGenerateViewModel(DTE2 Dte, ITextTemplating textTemplating, string T4TempatePath, DbContextSerializable SerializableDbContext, ModelViewSerializable model, string defaultProjectNameSpace = null)
+        public static GeneratorBatchStep DoGenerateViewModel(PrismModuleModifier prismModuleModifier, DTE2 Dte, ITextTemplating textTemplating, string T4TempatePath, DbContextSerializable SerializableDbContext, ModelViewSerializable model, string defaultProjectNameSpace = null)
         {
             GeneratorBatchStep result = new GeneratorBatchStep()
             {
@@ -49,6 +49,7 @@ namespace CS2WPF.Helpers.BatchProcess
             textTemplatingSessionHost.Session["Model"] = model;
             textTemplatingSessionHost.Session["Context"] = SerializableDbContext;
             textTemplatingSessionHost.Session["DefaultProjectNameSpace"] = string.IsNullOrEmpty(defaultProjectNameSpace) ? "" : defaultProjectNameSpace;
+            textTemplatingSessionHost.Session["PrismModifier"] = prismModuleModifier;
             result.GenerateText = textTemplating.ProcessTemplate(T4TempatePath, File.ReadAllText(result.T4TempatePath), tpCallback);
             result.FileExtension = tpCallback.FileExtension;
             if (tpCallback.ProcessingErrors != null)

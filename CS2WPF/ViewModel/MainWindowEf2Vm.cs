@@ -35,7 +35,7 @@ namespace CS2WPF.ViewModel
 
 
 
-        public MainWindowEf2Vm(DTE2 dte, ITextTemplating textTemplating, IVsThreadedWaitDialogFactory dialogFactory) : base(dte, textTemplating, dialogFactory)
+        public MainWindowEf2Vm(PrismModuleModifier prismModuleModifier, DTE2 dte, ITextTemplating textTemplating, IVsThreadedWaitDialogFactory dialogFactory) : base(prismModuleModifier, dte, textTemplating, dialogFactory)
         {
             Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
             InvitationViewModel InvitationVM = new InvitationViewModel();
@@ -293,7 +293,7 @@ namespace CS2WPF.ViewModel
                     {
                         (CreateViewUC.DataContext as CreateViewViewModel).SelectedModel.RootEntityDbContextPropertyName =
                             (CreateViewUC.DataContext as CreateViewViewModel).DestinationDbSetProppertyName;
-                        (GenerateUC.DataContext as GenerateViewModel).DoGenerateViewModel(Dte, TextTemplating, null,
+                        (GenerateUC.DataContext as GenerateViewModel).DoGenerateViewModel(prismModuleModifier, Dte, TextTemplating, null,
                             (T4EditorUC.DataContext as T4EditorViewModel).T4TempatePath,
                             (CreateViewUC.DataContext as CreateViewViewModel).SelectedModel);
                         NextBtnEnabled = true;
