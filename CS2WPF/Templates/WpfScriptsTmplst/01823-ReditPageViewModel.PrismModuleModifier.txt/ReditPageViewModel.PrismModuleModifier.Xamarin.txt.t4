@@ -1,33 +1,19 @@
 ﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ template language="C#" HostSpecific="True" Debug="True" #>
 <#@ output extension="cs" #>
 <#@ assembly name="System.Core" #>
-<#@ assembly name="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\PublicAssemblies\EnvDTE.dll" #>
-<#@ assembly name="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\PublicAssemblies\EnvDTE80.dll" #>
 <#@ import namespace="System" #>
 <#@ import namespace="System.Linq" #>
 <#@ import namespace="System.Collections" #>
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.Text" #>
-<#@ import namespace="EnvDTE" #>
-<#@ import namespace="EnvDTE80" #>
 <#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Helpers" #>
 <#@ import namespace="CS2WPF.Model" #>
 <#@ import namespace="CS2WPF.Model.Serializable" #>
 <#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
-<#@ parameter type="EnvDTE80.DTE2" name="DTE2ref" #>
-using System;
-using Xamarin.Forms;
-using System.Linq;
-using System.ComponentModel;
-using Prism.Regions.Navigation;
-using System.Windows.Input;
-using System.Collections.ObjectModel;
-using System.Threading.Tasks;
-using System.Runtime.CompilerServices;
-using System.Collections.Generic;
-using Prism.Navigation;
-using Xamarin.Essentials;
+<#@ parameter type="CS2WPF.Helpers.PrismModuleModifier"  name="PrismModifier" #>
 
 <#
 
@@ -55,14 +41,13 @@ using Xamarin.Essentials;
     string WebServiceFilterMenuViewModelClassName   = GetContextModelClassName(Context, WebServiceFilterMenuViewModelFolder);
     string WebServiceFilterMenuViewModelNameSpace   = GetContextModelNameSpace(Context, WebServiceFilterMenuViewModelFolder);
 
-    string RegionAwareViewModelBaseFolder           = "00648-RegionAwareViewModelBase.cs";
-    string RegionAwareViewModelBaseClassName        = GetContextModelClassName(Context, RegionAwareViewModelBaseFolder);
-    string RegionAwareViewModelBaseNameSpace        = GetContextModelNameSpace(Context, RegionAwareViewModelBaseFolder);
-
 
     string modelInterfaceFolder                     = "01100-Interface.cs";
     string modelInterfaceClassName                  = GetInterfaceName(Model);
     string modelInterfaceNameSpace                  = GetModelNameSpace(Model, modelInterfaceFolder);
+
+
+
 
     string EformUserControlFolder                   = "01496-EformUserControl.xaml.cs";
     string EformUserControlClassName                = GetModelClassName(Model, EformUserControlFolder);
@@ -70,16 +55,16 @@ using Xamarin.Essentials;
     string EformUserControlProject                  = GetModelProjectName(Model, EformUserControlFolder);
 
 
-    string ReditUserControlFolder                   = "01816-ReditUserControl.xaml.cs";
-    string ReditUserControlClassName                = GetModelClassName(Model, ReditUserControlFolder);
-    string ReditUserControlNameSpace                = GetModelNameSpace(Model, ReditUserControlFolder);
-    string ReditUserControlProject                  = GetModelProjectName(Model, ReditUserControlFolder);
+    string ReditPageFolder                          = "01817-ReditPage.xaml.cs";
+    string ReditPageClassName                       = GetModelClassName(Model, ReditPageFolder);
+    string ReditPageNameSpace                       = GetModelNameSpace(Model, ReditPageFolder);
+    string ReditPageProject                         = GetModelProjectName(Model, ReditPageFolder);
 
-    string ReditViewModelFolder                     = "01820-ReditViewModel.cs";
-    string ReditViewModelClassName                  = GetModelClassName(Model, ReditViewModelFolder);
-    string ReditViewModelNameSpace                  = GetModelNameSpace(Model, ReditViewModelFolder);
-    string ReditViewModelProject                    = GetModelProjectName(Model, ReditViewModelFolder);
-
+    
+    string ReditPageViewModelFolder                 = "01821-ReditPageViewModel.cs";
+    string ReditPageViewModelClassName              = GetModelClassName(Model, ReditPageViewModelFolder);
+    string ReditPageViewModelNameSpace              = GetModelNameSpace(Model, ReditPageViewModelFolder);
+    string ReditPageViewModelProject                = GetModelProjectName(Model, ReditPageViewModelFolder);
 
     string HiddenFiltersPropertyName                = "HiddenFilters";
     string OnHiddenFiltersChangedPropertyName       = "OnHiddenFiltersChanged";
@@ -90,8 +75,8 @@ using Xamarin.Essentials;
     string IsOnLoadedCalledPropertyName         = "IsOnLoadedCalled";
     string IsCanceledPropertyName               = "IsCanceled";
 
-    string RegionPropertyName                       = "Region";
-    string ReditReditUserControlRegionPropertyName  = "ReditUserControlRegion";
+    string RegionPropertyName                   = "Region";
+    string ReditPageRegionPropertyName          = "ReditPageRegion";
 
     string DisplayLabelProperty                 = "Name";
     string DisplayHintProperty                  = "Prompt";
@@ -120,233 +105,181 @@ using Xamarin.Essentials;
     string CancelCommandPropertyName            = "CancelCommand";
     string IsParentLoadedPropertyName           = "IsParentLoaded";
     
-    string CanAddPropertyName                   = "CanAdd";
-    string CanUpdPropertyName                   = "CanUpdate";
-    string CanDelPropertyName                   = "CanDelete";
-    string CanAddParentPropertyName             = "CanAddParent";
-    string CanUpdParentPropertyName             = "CanUpdateParent";
-    string CanDelParentPropertyName             = "CanDeleteParent";
-
-    string CanAddDetailPropertyName             = "CanAddDetail"; 
-    string CanUpdDetailPropertyName             = "CanUpdateDetail"; 
-    string CanDelDetailPropertyName             = "CanDeleteDetail"; 
-    string CanAddDetailParentPropertyName       = "CanAddDetailParent"; 
-    string CanUpdDetailParentPropertyName       = "CanUpdateDetailParent"; 
-    string CanDelDetailParentPropertyName       = "CanDeleteDetailParent"; 
-
-    string CurrentNavigationContextPropertyName = "CurrentNavigationContext";
 
     List<string> detailViews = GetDetailViews(Model, Context, null);
     List<ModelViewPropertyOfVwSerializable> primKeys = GetModelPrimaryKeyProps(Model);
 
 
     List<string> nmSpaces = new List<string>();
-    if ((ReditViewModelNameSpace != IWebServiceFilterRsltInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace) < 0)) 
+    if ((ReditPageViewModelNameSpace != IWebServiceFilterRsltInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace) < 0)) 
         nmSpaces.Add(IWebServiceFilterRsltInterfaceNameSpace);
-    if ((ReditViewModelNameSpace != WebServiceFilterRsltViewModelNameSpace) && (nmSpaces.IndexOf(WebServiceFilterRsltViewModelNameSpace) < 0)) 
+    if ((ReditPageViewModelNameSpace != WebServiceFilterRsltViewModelNameSpace) && (nmSpaces.IndexOf(WebServiceFilterRsltViewModelNameSpace) < 0)) 
         nmSpaces.Add(WebServiceFilterRsltViewModelNameSpace);
-    if ((ReditViewModelNameSpace != IAppGlblSettingsServiceNameSpace) && (nmSpaces.IndexOf(IAppGlblSettingsServiceNameSpace) < 0)) 
+    if ((ReditPageViewModelNameSpace != IAppGlblSettingsServiceNameSpace) && (nmSpaces.IndexOf(IAppGlblSettingsServiceNameSpace) < 0)) 
         nmSpaces.Add(IAppGlblSettingsServiceNameSpace);
-    if ((ReditViewModelNameSpace != WebServiceFilterMenuViewModelNameSpace) && (nmSpaces.IndexOf(WebServiceFilterMenuViewModelNameSpace) < 0)) 
+    if ((ReditPageViewModelNameSpace != WebServiceFilterMenuViewModelNameSpace) && (nmSpaces.IndexOf(WebServiceFilterMenuViewModelNameSpace) < 0)) 
         nmSpaces.Add(WebServiceFilterMenuViewModelNameSpace);
-    if ((ReditViewModelNameSpace != IWebServiceFilterMenuInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterMenuInterfaceNameSpace) < 0)) 
+    if ((ReditPageViewModelNameSpace != IWebServiceFilterMenuInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterMenuInterfaceNameSpace) < 0)) 
         nmSpaces.Add(IWebServiceFilterMenuInterfaceNameSpace);
-    if ((ReditViewModelNameSpace != IWebServiceFilterMenuInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterMenuInterfaceNameSpace) < 0)) 
+    if ((ReditPageViewModelNameSpace != IWebServiceFilterMenuInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterMenuInterfaceNameSpace) < 0)) 
         nmSpaces.Add(IWebServiceFilterMenuInterfaceNameSpace);
-    if ((ReditViewModelNameSpace != EformModeEnumNameSpace) && (nmSpaces.IndexOf(EformModeEnumNameSpace) < 0)) 
+    if ((ReditPageViewModelNameSpace != EformModeEnumNameSpace) && (nmSpaces.IndexOf(EformModeEnumNameSpace) < 0)) 
         nmSpaces.Add(EformModeEnumNameSpace);
-    if ((ReditViewModelNameSpace != modelInterfaceNameSpace) && (nmSpaces.IndexOf(modelInterfaceNameSpace) < 0)) 
+    if ((ReditPageViewModelNameSpace != modelInterfaceNameSpace) && (nmSpaces.IndexOf(modelInterfaceNameSpace) < 0)) 
         nmSpaces.Add(modelInterfaceNameSpace);
-    if ((ReditViewModelNameSpace != RegionAwareViewModelBaseNameSpace) && (nmSpaces.IndexOf(RegionAwareViewModelBaseNameSpace) < 0)) 
-        nmSpaces.Add(RegionAwareViewModelBaseNameSpace);
-    
-    bool IsInTheSameModule = (EformUserControlProject == ReditUserControlProject);
+
+    bool IsInTheSameModule = (EformUserControlProject == ReditPageProject);
     
     
 #>
+/*
 
-<# 
-    foreach(string ns in nmSpaces) {
-#>
-using <#= ns #>;
 <#
-    }
+    string result ;
+    int insertionCount = 0;
+    if(!IsInTheSameModule) {
+        insertionCount++;
+#>
+    "<#= EformUserControlClassName #>"-UserControl is defined in the "<#= EformUserControlProject #>"-project.
+    In the file of IModule-class of "<#= EformUserControlProject #>"-project the following line of code must be inserted:
 
-    List<Project> listOfProjects = new List<Project>();
-    CollectProjects(DTE2ref, listOfProjects);
-    Project aPrj = null;
-    string modelProjectUniqueName = GetModelProjectUniqueName(Model, ReditViewModelFolder);
-#>
-
-<#= modelProjectUniqueName #>
-//======================================
-<#
-    foreach(Project p in listOfProjects) {
-#>
-p.Kind = <#= p.Kind #>
-p.Name = <#= p.Name #>
-p.UniqueName=<#= p.UniqueName #>
-//-------------------------
-<#
-        if (string.Compare( modelProjectUniqueName, p.UniqueName, true) == 0) {
-            aPrj = p;
+        public void OnInitialized(IContainerProvider containerProvider)
+        {
+            ...
+            IRegionManager regionManager = containerProvider.Resolve(typeof(IRegionManager)) as IRegionManager;
+            if (regionManager != null)
+            {
+                ...
+                // According to requirements of the "<#= ReditPageViewModelClassName #>.cs"-file of "<#= ReditPageViewModelProject #>"-project. 
+                regionManager.RegisterViewWithRegion("<#= EformUserControlClassName #><#= ReditPageRegionPropertyName #>", typeof(<#= EformUserControlClassName #>));
+                ...
+            }
+            ...
         }
-    }
-    if(aPrj != null) {
-#>
-/////////////////////////////
-<#= aPrj.UniqueName #>
-/////////////////////////////
+<#= insertionCount #>. Insertion the line : regionManager.RegisterViewWithRegion("<#= EformUserControlClassName #><#= ReditPageRegionPropertyName #>", typeof(<#= EformUserControlClassName #>));
 <#
+{
+    string EformUserControlNameSpaceAndClassName            = EformUserControlNameSpace + "." + EformUserControlClassName;
+    string destProjectName                                  = GetModelProjectUniqueName(Model, EformUserControlFolder);
+    string destImplementedInterface                         = "Prism.Modularity.IModule";
+    string destMethodName                                   = "OnInitialized";
+    string[] destMethodParamTypes                           = new string[] {"Prism.Ioc.IContainerProvider"};
+    string destMethodAccessType                             = "public";
+    string destMethodParamTypeForVar                        = "Prism.Ioc.IContainerProvider";
+    string invocationVarType                                = "Prism.Regions.IRegionManager";
+    string invocationMethodName                             = "RegisterViewWithRegion";
+    string[] invocationGenerics                             = new string[]{};
+    string[] invocationParams                               = new string[]{"\"" + EformUserControlClassName + ReditPageRegionPropertyName  +"\"", "typeof("+EformUserControlNameSpaceAndClassName+")"};
+    result = PrismModifier.UpdateMethodWithVarIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType, destMethodParamTypeForVar,
+                        invocationVarType, invocationMethodName, invocationGenerics, invocationParams);
+}
+#>
+Result: <#= result #>
+
+<#       
     }
-    string interfaceName = "Prism.Modularity.IModule";
-    EnvDTE.CodeClass ccout = CollectProjectClasses(aPrj, interfaceName);
-    if(ccout != null) {
 #>
-<#= ccout.FullName #>
-<#
 
-#>
-/////////////////////////////
-<#= cei.FullName #>
-/////////////////////////////
+
+    "<#= ReditPageClassName #>" UserControl is defined in the "<#= ReditPageProject #>"-project.
+    In the file of IModule-class of "<#= ReditPageProject #>"-project the following line of code must be inserted:
+
+        public void RegisterTypes(IContainerRegistry containerRegistry)
+        {
+            ...
+            // According to requirements of the "<#= ReditPageViewModelClassName #>.cs"-file of "<#= ReditPageViewModelProject #>"-project. 
+            ViewModelLocationProvider.Register<<#= ReditPageClassName #>, <#= ReditPageViewModelClassName #>>();
+            // According to requirements of the "<#= ReditPageViewModelClassName #>.cs"-file of "<#= ReditPageViewModelProject #>"-project. 
+            containerRegistry.RegisterForNavigation<<#= ReditPageClassName #>, <#= ReditPageViewModelClassName #>>("<#= ReditPageClassName #>");
+            // Only if you need to get an instance of controls, insert two lines below
+            // According to requirements of the "<#= ReditPageViewModelClassName #>.cs"-file of "<#= ReditPageViewModelProject #>"-project. 
+            // containerRegistry.Register<ContentPage, <#= ReditPageClassName #>>("<#= ReditPageClassName #>");
+            ...
+        }
+2.1. Insertion the line : ViewModelLocationProvider.Register<<#= ReditPageClassName #>, <#= ReditPageViewModelClassName #>>();
 <#
+    {
+    string ReditPageNameSpaceAndClassName                   = ReditPageNameSpace + "." + ReditPageClassName;
+    string ReditPageViewModelNameSpaceAndClassName          = ReditPageViewModelNameSpace + "." + ReditPageViewModelClassName;
+    string destProjectName                                  = GetModelProjectUniqueName(Model, ReditPageFolder);
+    string destImplementedInterface                         = "Prism.Modularity.IModule";
+    string destMethodName                                   = "RegisterTypes";
+    string[] destMethodParamTypes                           = new string[] {"Prism.Ioc.IContainerRegistry"};
+    string destMethodAccessType                             = "public";
+    string invocationClassType                              = "Prism.Mvvm.ViewModelLocationProvider";
+    string invocationMethodName                             = "Register";
+    string[] invocationGenerics                             = new string[]{ReditPageNameSpaceAndClassName, ReditPageViewModelNameSpaceAndClassName};
+    string[] invocationParams                               = new string[]{};
+    result = PrismModifier.UpdateMethodWithClassIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType,
+                        invocationClassType, invocationMethodName, invocationGenerics, invocationParams);
     }
 #>
+Result: <#= result #>
 
+2.2. Insertion the line : containerRegistry.RegisterForNavigation<<#= ReditPageClassName #>, <#= ReditPageViewModelClassName #>>("<#= ReditPageClassName #>");
+<#
+{
+    string ReditPageNameSpaceAndClassName                   = ReditPageNameSpace + "." + ReditPageClassName;
+    string ReditPageViewModelNameSpaceAndClassName          = ReditPageViewModelNameSpace + "." + ReditPageViewModelClassName;
+    string destProjectName                                  = GetModelProjectUniqueName(Model, ReditPageFolder);
+    string destImplementedInterface                         = "Prism.Modularity.IModule";
+    string destMethodName                                   = "RegisterTypes";
+    string[] destMethodParamTypes                           = new string[] {"Prism.Ioc.IContainerRegistry"};
+    string destMethodAccessType                             = "public";
+    string invocationParamType                              = "Prism.Ioc.IContainerRegistry";
+    string invocationMethodName                             = "RegisterForNavigation";
+    string[] invocationGenerics                             = new string[]{ReditPageNameSpaceAndClassName,ReditPageViewModelNameSpaceAndClassName};
+    string[] invocationParams                               = new string[]{"\"" + ReditPageClassName + "\""};
+    result = PrismModifier.UpdateMethodWithParamIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType,
+                        invocationParamType, invocationMethodName, invocationGenerics, invocationParams);
+}
+#>
+Result: <#= result #>
 
+2.3. Insertion the line : containerRegistry.Register<ContentPage, <#= ReditPageClassName #>>("<#= ReditPageClassName #>");
+<#
+{
+    string ReditPageNameSpaceAndClassName                   = ReditPageNameSpace + "." + ReditPageClassName;
+    string ReditPageViewModelNameSpaceAndClassName          = ReditPageViewModelNameSpace + "." + ReditPageViewModelClassName;
+    string destProjectName                                  = GetModelProjectUniqueName(Model, ReditPageFolder);
+    string destImplementedInterface                         = "Prism.Modularity.IModule";
+    string destMethodName                                   = "RegisterTypes";
+    string[] destMethodParamTypes                           = new string[] {"Prism.Ioc.IContainerRegistry"};
+    string destMethodAccessType                             = "public";
+    string invocationParamType                              = "Prism.Ioc.IContainerRegistry";
+    string invocationMethodName                             = "Register";
+    string[] invocationGenerics                             = new string[]{"Xamarin.Forms.ContentPage",ReditPageNameSpaceAndClassName};
+    string[] invocationParams                               = new string[]{"\"" + ReditPageClassName + "\""};
+    result = PrismModifier.UpdateMethodWithParamIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType,
+                        invocationParamType, invocationMethodName, invocationGenerics, invocationParams);
+}
+#>
+Result: <#= result #>
 
+*/
 
 
 
 
 <#+
-
-        EnvDTE.CodeClass CollectProjectClasses(EnvDTE.Project  prj, string interfaceName)
-        {
-            if ((prj == null) || (interfaceName == null)) return null;
-            if (prj.CodeModel == null) return null;
-            foreach (EnvDTE.CodeElement ce in prj.CodeModel.CodeElements)
-            {
-                if (ce.Kind == EnvDTE.vsCMElement.vsCMElementClass)
-                {
-                    if (ce.InfoLocation == vsCMInfoLocation.vsCMInfoLocationProject)
-                    {
-                        foreach(EnvDTE.CodeElement cei in ((EnvDTE.CodeClass)ce).ImplementedInterfaces)
-                        {
-                            if(string.Compare(cei.FullName , interfaceName) == 0) {
-                                return (EnvDTE.CodeClass)ce;
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    if (ce.Kind == EnvDTE.vsCMElement.vsCMElementNamespace)
-                    {
-                        EnvDTE.CodeClass cc = InternalCollectProjectClasses((EnvDTE.CodeNamespace)ce, interfaceName);
-                        if (cc!= null) return cc;
-                    }
-                }
-            }
-            return null;
+    string GetModelProjectUniqueName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
         }
-
-        EnvDTE.CodeClass InternalCollectProjectClasses(EnvDTE.CodeNamespace parentCodeNamespace, string interfaceName)
-        {
-            if ((parentCodeNamespace == null) || (interfaceName == null)) return null;
-            foreach (EnvDTE.CodeElement ce in parentCodeNamespace.Members)
-            {
-                if (ce.Kind == EnvDTE.vsCMElement.vsCMElementClass)
-                {
-                    if (ce.InfoLocation == vsCMInfoLocation.vsCMInfoLocationProject)
-                    {
-                        foreach(EnvDTE.CodeElement cei in ((EnvDTE.CodeClass)ce).ImplementedInterfaces)
-                        {
-                            if(string.Compare(cei.FullName , interfaceName) == 0) {
-                                return (EnvDTE.CodeClass)ce;
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    if (ce.Kind == EnvDTE.vsCMElement.vsCMElementNamespace)
-                    {
-                        CodeClass cc = InternalCollectProjectClasses((EnvDTE.CodeNamespace)ce, interfaceName);
-                        if (cc!= null) return cc;
-                    }
-                }
-            }
-            return null;
+        if (model.CommonStaffs == null) {
+            return result;
         }
-
-        string GetModelProjectUniqueName(ModelViewSerializable model, string fileType) {
-            string result="";
-            if ((model == null) || string.IsNullOrEmpty(fileType)) {
-                return result;
-            }
-            if (model.CommonStaffs == null) {
-                return result;
-            }
-            CommonStaffSerializable refItem= 
-                model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
-            if (refItem == null) {
-                return result;
-            }
-            if(string.IsNullOrEmpty(refItem.FileProject)) {
-                return result;
-            }
-            return refItem.FileProject;
-       }
-
-        void CollectNestedProjects(Project parentPrj, List<Project> listOfProjects)
-        {
-            if ((parentPrj == null) || (listOfProjects == null)) return;
-            if (string.Compare(parentPrj.Kind, ProjectKinds.vsProjectKindSolutionFolder) != 0)
-            {
-                return;
-            }
-            for (var i = 1; i <= parentPrj.ProjectItems.Count; i++)
-            {
-                Project subProject = parentPrj.ProjectItems.Item(i).SubProject;
-                if (subProject == null)
-                {
-                    continue;
-                }
-
-                // If this is another solution folder, do a recursive call, otherwise add
-                if (subProject.Kind == ProjectKinds.vsProjectKindSolutionFolder)
-                {
-                    CollectNestedProjects(subProject, listOfProjects);
-                }
-                else
-                {
-                    listOfProjects.Add(subProject);
-                }
-            }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
         }
-        void CollectProjects(EnvDTE80.DTE2 Dte, List<Project> listOfProjects)
-        {
-            if ((Dte == null) || (listOfProjects == null)) return;
-            foreach (Project p in Dte.Solution.Projects)
-            {
-                if (string.Compare(p.Kind, ProjectKinds.vsProjectKindSolutionFolder) == 0)
-                {
-                    CollectNestedProjects(p, listOfProjects);
-                }
-                else
-                {
-                    listOfProjects.Add(p);
-                }
-            }
+        if(string.IsNullOrEmpty(refItem.FileProject)) {
+            return result;
         }
-
-
-
-
-
-
+        return refItem.FileProject;
+    }
 
     string GetFilterPropertyOperatorName(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model, string operatorSufix) {
         if (model.GenerateJSonAttribute) {

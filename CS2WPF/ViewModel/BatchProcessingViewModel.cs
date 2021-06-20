@@ -24,6 +24,7 @@ using System.Windows.Input;
 
 namespace CS2WPF.ViewModel
 {
+#pragma warning disable VSTHRD010
     public class BatchProcessingViewModel : NotifyPropertyChangedViewModel
     {
         protected DTE2 Dte;

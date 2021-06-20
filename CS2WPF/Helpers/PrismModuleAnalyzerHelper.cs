@@ -181,8 +181,6 @@ namespace CS2WPF.Helpers
         {
             //            Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
             if ((codeFunction == null) || string.IsNullOrEmpty(typeName)) return null;
-            string[] typeParts = typeName.Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries);
-            string shortTypeName = typeParts[typeParts.Length - 1];
             string buff = codeFunction.StartPoint.CreateEditPoint().GetText(codeFunction.EndPoint);
             SyntaxTree tree = CSharpSyntaxTree.ParseText(buff);
             SyntaxNode root = tree.GetRoot();
@@ -228,10 +226,8 @@ namespace CS2WPF.Helpers
                 if (lds == null) continue;
                 VariableDeclarationSyntax vds = lds.Declaration as VariableDeclarationSyntax;
                 if (vds == null) continue;
-                IdentifierNameSyntax ins = vds.Type as IdentifierNameSyntax;
-                if (ins == null) continue;
-                if (ins.Identifier == null) continue;
-                if ((string.Compare(typeName, ins.Identifier.ValueText) != 0) && (string.Compare(shortTypeName, ins.Identifier.ValueText) != 0)) continue;
+                if (vds.Type == null) continue;
+                if (!IsEqualClassNames(vds.Type.ToString(), typeName)) continue;
                 if (vds.Variables == null) continue;
                 foreach (VariableDeclaratorSyntax vdsItm in vds.Variables)
                 {
@@ -331,6 +327,63 @@ namespace CS2WPF.Helpers
             }
             return true;
         }
+        public static bool IsEqualTypeOfExpressions(this TypeOfExpressionSyntax typeOfExpressionSyntax, string typeOfString)
+        {
+            if ((typeOfExpressionSyntax == null) || string.IsNullOrEmpty(typeOfString)) return false;
+            if (typeOfExpressionSyntax.Type == null) return false;
+            SyntaxTree tree = CSharpSyntaxTree.ParseText(typeOfString);
+            SyntaxNode root = tree.GetRoot();
+            GlobalStatementSyntax gss = null;
+            TypeOfExpressionSyntax typeOfExpressionSyntax2 = null;
+            foreach (SyntaxNode nd in root.ChildNodes())
+            {
+                if (nd.Kind() == SyntaxKind.GlobalStatement)
+                {
+                    gss = nd as GlobalStatementSyntax;
+                    break;
+                }
+                if (nd.Kind() == SyntaxKind.TypeOfExpression)
+                {
+                    typeOfExpressionSyntax2 = nd as TypeOfExpressionSyntax;
+                    break;
+                }
+            }
+            if ((typeOfExpressionSyntax2 == null) && (gss != null))
+            {
+                foreach (SyntaxNode nd in gss.ChildNodes())
+                {
+                    SyntaxKind k = nd.Kind();
+                    if (k == SyntaxKind.TypeOfExpression)
+                    {
+                        typeOfExpressionSyntax2 = nd as TypeOfExpressionSyntax;
+                        break;
+                    }
+                    else if (k == SyntaxKind.ExpressionStatement)
+                    {
+                        ExpressionStatementSyntax expressionStatementSyntax = nd as ExpressionStatementSyntax;
+                        if (expressionStatementSyntax != null)
+                        {
+                            if (expressionStatementSyntax.Expression != null)
+                            {
+                                if (expressionStatementSyntax.Expression.Kind() == SyntaxKind.TypeOfExpression)
+                                {
+                                    typeOfExpressionSyntax2 = expressionStatementSyntax.Expression as TypeOfExpressionSyntax;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+
+            if (typeOfExpressionSyntax2 != null)
+            {
+                if (typeOfExpressionSyntax2.Type != null)
+                    return IsEqualClassNames(typeOfExpressionSyntax2.Type.ToString(), typeOfExpressionSyntax.Type.ToString());
+            }
+            return false;
+        }
         public static bool IsExist(this CodeFunction codeFunction, string invocationIdentifierName, string invocationMethodName, string[] invocationGenerics, string[] invocationParams)
         {
             //            Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
@@ -398,13 +451,19 @@ namespace CS2WPF.Helpers
                     foreach (ArgumentSyntax argumentSyntax in iess.ArgumentList.Arguments)
                     {
                         // argumentSyntax.Expression
-                        if (argumentSyntax.Expression == null) continue;
-                        if (argumentSyntax.Expression.Kind() != SyntaxKind.StringLiteralExpression) continue;
-                        LiteralExpressionSyntax literalExpressionSyntax = argumentSyntax.Expression as LiteralExpressionSyntax;
-                        if (literalExpressionSyntax == null) continue;
-                        string sss = literalExpressionSyntax.ToString();
-                        if (!string.Equals(invocationParams[i], literalExpressionSyntax.ToString())) continue;
-                        i++;
+                        if (argumentSyntax.Expression.Kind() == SyntaxKind.StringLiteralExpression)
+                        {
+                            LiteralExpressionSyntax literalExpressionSyntax = argumentSyntax.Expression as LiteralExpressionSyntax;
+                            if (literalExpressionSyntax == null) continue;
+                            if (!string.Equals(invocationParams[i], literalExpressionSyntax.ToString())) continue;
+                            i++;
+                        }
+                        else if (argumentSyntax.Expression.Kind() == SyntaxKind.TypeOfExpression)
+                        {
+                            TypeOfExpressionSyntax typeOfExpressionSyntax = argumentSyntax.Expression as TypeOfExpressionSyntax;
+                            if (typeOfExpressionSyntax == null) continue;
+                            if (typeOfExpressionSyntax.IsEqualTypeOfExpressions(invocationParams[i])) i++;
+                        }
                     }
                     if (i != invocationParams.Length) continue;
                 }
@@ -420,9 +479,11 @@ namespace CS2WPF.Helpers
                     if (!PrismModuleAnalyzerHelper.IsEqualClassNames(invocationIdentifierName, expressionSyntax.ToString())) continue;
                     SimpleNameSyntax simpleNameSyntax = memberAccessExpressionSyntax.Name;
                     if (simpleNameSyntax == null) continue;
-                    if (simpleNameSyntax.Kind() != SyntaxKind.GenericName) continue;
+                    SyntaxKind simpleNameSyntaxKind = simpleNameSyntax.Kind();
+                    if ((simpleNameSyntaxKind != SyntaxKind.GenericName) && (simpleNameSyntaxKind != SyntaxKind.IdentifierName)) continue;
                     if (simpleNameSyntax.Identifier == null) continue;
                     if (!invocationMethodName.Equals(simpleNameSyntax.Identifier.ValueText)) continue;
+                    if ((simpleNameSyntaxKind != SyntaxKind.GenericName) && (invocationGenerics.Length < 1)) return true;
                     GenericNameSyntax genericNameSyntax = simpleNameSyntax as GenericNameSyntax;
                     if ((genericNameSyntax == null) && (invocationGenerics.Length > 0)) continue;
                     if (genericNameSyntax != null)
@@ -438,7 +499,6 @@ namespace CS2WPF.Helpers
                             i++;
                         }
                         if (i == invocationGenerics.Length) return true;
-
                     }
                 }
 
