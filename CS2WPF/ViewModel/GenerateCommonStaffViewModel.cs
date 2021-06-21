@@ -61,7 +61,8 @@ namespace CS2WPF.ViewModel
             }
             IsReady.DoNotify(this, string.IsNullOrEmpty(this.GenerateError));
         }
-        public void DoGenerateFeature(DTE2 Dte, ITextTemplating textTemplating, string T4TempatePath, DbContextSerializable SerializableDbContext, FeatureContextSerializable SerializableFeatureContext, FeatureSerializable feature, AllowedFileTypesSerializable AllowedFileTypes, string defaultProjectNameSpace = null)
+
+        public void DoGenerateFeature(PrismModuleModifier prismModuleModifier, DTE2 Dte, ITextTemplating textTemplating, string T4TempatePath, DbContextSerializable SerializableDbContext, FeatureContextSerializable SerializableFeatureContext, FeatureSerializable feature, AllowedFileTypesSerializable AllowedFileTypes, string defaultProjectNameSpace = null)
         {
 
             this.GenerateText = "";
@@ -79,6 +80,7 @@ namespace CS2WPF.ViewModel
             textTemplatingSessionHost.Session["FeatureContext"] = SerializableFeatureContext;
             textTemplatingSessionHost.Session["Context"] = SerializableDbContext;
             textTemplatingSessionHost.Session["DefaultProjectNameSpace"] = string.IsNullOrEmpty(defaultProjectNameSpace) ? "" : defaultProjectNameSpace;
+            textTemplatingSessionHost.Session["PrismModifier"] = prismModuleModifier;
 
             if (string.IsNullOrEmpty(GenText))
             {

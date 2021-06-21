@@ -204,7 +204,7 @@ namespace CS2WPF.ViewModel
                     try
                     {
                         (GenerateUC.DataContext as GenerateCommonStaffViewModel)
-                            .DoGenerateFeature(Dte, TextTemplating,
+                            .DoGenerateFeature(prismModuleModifier, Dte, TextTemplating,
                             (T4EditorUC.DataContext as T4EditorViewModel).T4TempatePath,
                             (SelectFeatureFolderUC.DataContext as SelectFeatureFolderViewModel).SerializableDbContext,
                             (SelectFeatureFolderUC.DataContext as SelectFeatureFolderViewModel).SerializableFeatureContext,
