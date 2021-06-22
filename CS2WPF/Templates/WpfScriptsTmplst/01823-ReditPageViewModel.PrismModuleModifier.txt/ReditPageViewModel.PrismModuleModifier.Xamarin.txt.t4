@@ -1,6 +1,6 @@
 ﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
 <#@ template language="C#" HostSpecific="True" Debug="True" #>
-<#@ output extension="cs" #>
+<#@ output extension="jsonpmm2txt" #>
 <#@ assembly name="System.Core" #>
 <#@ import namespace="System" #>
 <#@ import namespace="System.Linq" #>
@@ -8,13 +8,10 @@
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.Text" #>
 <#@ import namespace="CS2WPF" #>
-<#@ import namespace="CS2WPF.Helpers" #>
 <#@ import namespace="CS2WPF.Model" #>
 <#@ import namespace="CS2WPF.Model.Serializable" #>
 <#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
-<#@ parameter type="CS2WPF.Helpers.PrismModuleModifier"  name="PrismModifier" #>
-
 <#
 
     string EformModeEnumFolder                      = "00026-EformModeEnum.cs";
@@ -132,31 +129,32 @@
     
     
 #>
-/*
+{
+"PrismMMMCallItems": [
+
 
 <#
-    string result ;
-    int insertionCount = 0;
     if(!IsInTheSameModule) {
-        insertionCount++;
 #>
-    "<#= EformUserControlClassName #>"-UserControl is defined in the "<#= EformUserControlProject #>"-project.
-    In the file of IModule-class of "<#= EformUserControlProject #>"-project the following line of code must be inserted:
-
-        public void OnInitialized(IContainerProvider containerProvider)
-        {
-            ...
-            IRegionManager regionManager = containerProvider.Resolve(typeof(IRegionManager)) as IRegionManager;
-            if (regionManager != null)
-            {
-                ...
-                // According to requirements of the "<#= ReditPageViewModelClassName #>.cs"-file of "<#= ReditPageViewModelProject #>"-project. 
-                regionManager.RegisterViewWithRegion("<#= EformUserControlClassName #><#= ReditPageRegionPropertyName #>", typeof(<#= EformUserControlClassName #>));
-                ...
-            }
-            ...
-        }
-<#= insertionCount #>. Insertion the line : regionManager.RegisterViewWithRegion("<#= EformUserControlClassName #><#= ReditPageRegionPropertyName #>", typeof(<#= EformUserControlClassName #>));
+    {
+    "Description": [
+    '"<#= EformUserControlClassName #>"-UserControl is defined in the "<#= EformUserControlProject #>"-project.',
+    'In the file of IModule-class of "<#= EformUserControlProject #>"-project the following line of code must be inserted:',
+    ' ',
+    '    public void OnInitialized(IContainerProvider containerProvider)',
+    '    {',
+    '        ...',
+    '        IRegionManager regionManager = containerProvider.Resolve(typeof(IRegionManager)) as IRegionManager;',
+    '        if (regionManager != null)',
+    '        {',
+    '            ...',
+    '            // According to requirements of the "<#= ReditPageViewModelClassName #>.cs"-file of "<#= ReditPageViewModelProject #>"-project. ',
+    '            regionManager.RegisterViewWithRegion("<#= EformUserControlClassName #><#= ReditPageRegionPropertyName #>", typeof(<#= EformUserControlClassName #>));',
+    '            ...',
+    '        }',
+    '        ...',
+    '    }'
+    ],
 <#
 {
     string EformUserControlNameSpaceAndClassName            = EformUserControlNameSpace + "." + EformUserControlClassName;
@@ -170,33 +168,47 @@
     string invocationMethodName                             = "RegisterViewWithRegion";
     string[] invocationGenerics                             = new string[]{};
     string[] invocationParams                               = new string[]{"\"" + EformUserControlClassName + ReditPageRegionPropertyName  +"\"", "typeof("+EformUserControlNameSpaceAndClassName+")"};
-    result = PrismModifier.UpdateMethodWithVarIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType, destMethodParamTypeForVar,
-                        invocationVarType, invocationMethodName, invocationGenerics, invocationParams);
-}
+    //result = PrismModifier.UpdateMethodWithVarIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType, destMethodParamTypeForVar,
+    //                    invocationVarType, invocationMethodName, invocationGenerics, invocationParams);
 #>
-Result: <#= result #>
+    "MethodName": 'UpdateMethodWithVarIdentifier',
+    "DestProjectName": '<#= destProjectName #>',
+    "DestImplementedInterface": '<#= destImplementedInterface #>',
+    "DestMethodName": '<#= destMethodName #>',
+    "DestMethodParamTypes": ['<#= destMethodParamTypes[0] #>'],
+    "DestMethodAccessType": '<#= destMethodAccessType #>',
+    "DestMethodParamTypeForVar": '<#= destMethodParamTypeForVar #>',
+    "InvocationVarType": '<#= invocationVarType #>',
+    "InvocationParamType": '',
+    "InvocationClassType": '',
+    "InvocationMethodName": '<#= invocationMethodName #>',
+    "InvocationGenerics": [],
+    "InvocationParams": ['<#= invocationParams[0] #>','<#= invocationParams[1] #>'],
+    "StepDescription": 'Insertion the line : regionManager.RegisterViewWithRegion("<#= EformUserControlClassName #><#= ReditPageRegionPropertyName #>", typeof(<#= EformUserControlClassName #>));'
+    },
+<#
 
-<#       
+}
     }
 #>
-
-
-    "<#= ReditPageClassName #>" UserControl is defined in the "<#= ReditPageProject #>"-project.
-    In the file of IModule-class of "<#= ReditPageProject #>"-project the following line of code must be inserted:
-
-        public void RegisterTypes(IContainerRegistry containerRegistry)
-        {
-            ...
-            // According to requirements of the "<#= ReditPageViewModelClassName #>.cs"-file of "<#= ReditPageViewModelProject #>"-project. 
-            ViewModelLocationProvider.Register<<#= ReditPageClassName #>, <#= ReditPageViewModelClassName #>>();
-            // According to requirements of the "<#= ReditPageViewModelClassName #>.cs"-file of "<#= ReditPageViewModelProject #>"-project. 
-            containerRegistry.RegisterForNavigation<<#= ReditPageClassName #>, <#= ReditPageViewModelClassName #>>("<#= ReditPageClassName #>");
-            // Only if you need to get an instance of controls, insert two lines below
-            // According to requirements of the "<#= ReditPageViewModelClassName #>.cs"-file of "<#= ReditPageViewModelProject #>"-project. 
-            // containerRegistry.Register<ContentPage, <#= ReditPageClassName #>>("<#= ReditPageClassName #>");
-            ...
-        }
-2.1. Insertion the line : ViewModelLocationProvider.Register<<#= ReditPageClassName #>, <#= ReditPageViewModelClassName #>>();
+    {
+    "Description": [
+    '"<#= ReditPageClassName #>" UserControl is defined in the "<#= ReditPageProject #>"-project.',
+    'In the file of IModule-class of "<#= ReditPageProject #>"-project the following line of code must be inserted:',
+    ' ',
+    '    public void RegisterTypes(IContainerRegistry containerRegistry)',
+    '    {',
+    '        ...',
+    '        // According to requirements of the "<#= ReditPageViewModelClassName #>.cs"-file of "<#= ReditPageViewModelProject #>"-project. ',
+    '        ViewModelLocationProvider.Register<<#= ReditPageClassName #>, <#= ReditPageViewModelClassName #>>();',
+    '        // According to requirements of the "<#= ReditPageViewModelClassName #>.cs"-file of "<#= ReditPageViewModelProject #>"-project. ',
+    '        containerRegistry.RegisterForNavigation<<#= ReditPageClassName #>, <#= ReditPageViewModelClassName #>>("<#= ReditPageClassName #>");',
+    '        // Only if you need to get an instance of controls, insert two lines below',
+    '        // According to requirements of the "<#= ReditPageViewModelClassName #>.cs"-file of "<#= ReditPageViewModelProject #>"-project. ',
+    '        // containerRegistry.Register<ContentPage, <#= ReditPageClassName #>>("<#= ReditPageClassName #>");',
+    '        ...',
+    '    }'
+    ],
 <#
     {
     string ReditPageNameSpaceAndClassName                   = ReditPageNameSpace + "." + ReditPageClassName;
@@ -210,14 +222,27 @@ Result: <#= result #>
     string invocationMethodName                             = "Register";
     string[] invocationGenerics                             = new string[]{ReditPageNameSpaceAndClassName, ReditPageViewModelNameSpaceAndClassName};
     string[] invocationParams                               = new string[]{};
-    result = PrismModifier.UpdateMethodWithClassIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType,
-                        invocationClassType, invocationMethodName, invocationGenerics, invocationParams);
-    }
+    //result = PrismModifier.UpdateMethodWithClassIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType,
+    //                    invocationClassType, invocationMethodName, invocationGenerics, invocationParams);
 #>
-Result: <#= result #>
-
-2.2. Insertion the line : containerRegistry.RegisterForNavigation<<#= ReditPageClassName #>, <#= ReditPageViewModelClassName #>>("<#= ReditPageClassName #>");
+    "MethodName": 'UpdateMethodWithClassIdentifier',
+    "DestProjectName": '<#= destProjectName #>',
+    "DestImplementedInterface": '<#= destImplementedInterface #>',
+    "DestMethodName": '<#= destMethodName #>',
+    "DestMethodParamTypes": ['<#= destMethodParamTypes[0] #>'],
+    "DestMethodAccessType": '<#= destMethodAccessType #>',
+    "DestMethodParamTypeForVar": '',
+    "InvocationVarType": '',
+    "InvocationParamType": '',
+    "InvocationClassType": '<#= invocationClassType #>',
+    "InvocationMethodName": '<#= invocationMethodName #>',
+    "InvocationGenerics": ['<#= invocationGenerics[0] #>','<#= invocationGenerics[1] #>'],
+    "InvocationParams": [],
+    "StepDescription": 'Insertion the line : ViewModelLocationProvider.Register<<#= ReditPageClassName #>, <#= ReditPageViewModelClassName #>>();'
+    },
 <#
+
+    }
 {
     string ReditPageNameSpaceAndClassName                   = ReditPageNameSpace + "." + ReditPageClassName;
     string ReditPageViewModelNameSpaceAndClassName          = ReditPageViewModelNameSpace + "." + ReditPageViewModelClassName;
@@ -230,14 +255,28 @@ Result: <#= result #>
     string invocationMethodName                             = "RegisterForNavigation";
     string[] invocationGenerics                             = new string[]{ReditPageNameSpaceAndClassName,ReditPageViewModelNameSpaceAndClassName};
     string[] invocationParams                               = new string[]{"\"" + ReditPageClassName + "\""};
-    result = PrismModifier.UpdateMethodWithParamIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType,
-                        invocationParamType, invocationMethodName, invocationGenerics, invocationParams);
-}
-#>
-Result: <#= result #>
-
-2.3. Insertion the line : containerRegistry.Register<ContentPage, <#= ReditPageClassName #>>("<#= ReditPageClassName #>");
+    //result = PrismModifier.UpdateMethodWithParamIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType,
+    //                    invocationParamType, invocationMethodName, invocationGenerics, invocationParams);
+#>  
+   {
+    "Description": [],
+    "MethodName": 'UpdateMethodWithParamIdentifier',
+    "DestProjectName": '<#= destProjectName #>',
+    "DestImplementedInterface": '<#= destImplementedInterface #>',
+    "DestMethodName": '<#= destMethodName #>',
+    "DestMethodParamTypes": ['<#= destMethodParamTypes[0] #>'],
+    "DestMethodAccessType": '<#= destMethodAccessType #>',
+    "DestMethodParamTypeForVar": '',
+    "InvocationVarType": '',
+    "InvocationParamType": '<#= invocationParamType #>',
+    "InvocationClassType": '',
+    "InvocationMethodName": '<#= invocationMethodName #>',
+    "InvocationGenerics": ['<#= invocationGenerics[0] #>','<#= invocationGenerics[1] #>'],
+    "InvocationParams": ['<#= invocationParams[0]  #>'],
+    "StepDescription": 'Insertion the line : containerRegistry.RegisterForNavigation<<#= ReditPageClassName #>, <#= ReditPageViewModelClassName #>>("<#= ReditPageClassName #>");'
+    },
 <#
+}
 {
     string ReditPageNameSpaceAndClassName                   = ReditPageNameSpace + "." + ReditPageClassName;
     string ReditPageViewModelNameSpaceAndClassName          = ReditPageViewModelNameSpace + "." + ReditPageViewModelClassName;
@@ -250,13 +289,31 @@ Result: <#= result #>
     string invocationMethodName                             = "Register";
     string[] invocationGenerics                             = new string[]{"Xamarin.Forms.ContentPage",ReditPageNameSpaceAndClassName};
     string[] invocationParams                               = new string[]{"\"" + ReditPageClassName + "\""};
-    result = PrismModifier.UpdateMethodWithParamIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType,
-                        invocationParamType, invocationMethodName, invocationGenerics, invocationParams);
+//    result = PrismModifier.UpdateMethodWithParamIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType,
+//                        invocationParamType, invocationMethodName, invocationGenerics, invocationParams);
+#>  
+   {
+    "Description": [],
+    "MethodName": 'UpdateMethodWithParamIdentifier',
+    "DestProjectName": '<#= destProjectName #>',
+    "DestImplementedInterface": '<#= destImplementedInterface #>',
+    "DestMethodName": '<#= destMethodName #>',
+    "DestMethodParamTypes": ['<#= destMethodParamTypes[0] #>'],
+    "DestMethodAccessType": '<#= destMethodAccessType #>',
+    "DestMethodParamTypeForVar": '',
+    "InvocationVarType": '',
+    "InvocationParamType": '<#= invocationParamType #>',
+    "InvocationClassType": '',
+    "InvocationMethodName": '<#= invocationMethodName #>',
+    "InvocationGenerics": ['<#= invocationGenerics[0] #>','<#= invocationGenerics[1] #>'],
+    "InvocationParams": ['<#= invocationParams[0]  #>'],
+    "StepDescription": 'Insertion the line : containerRegistry.Register<ContentPage, <#= ReditPageClassName #>>("<#= ReditPageClassName #>");'
+    },
+<#
 }
 #>
-Result: <#= result #>
-
-*/
+    ]
+}
 
 
 
@@ -278,7 +335,7 @@ Result: <#= result #>
         if(string.IsNullOrEmpty(refItem.FileProject)) {
             return result;
         }
-        return refItem.FileProject;
+        return refItem.FileProject.Replace(@"\", @"\\");
     }
 
     string GetFilterPropertyOperatorName(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model, string operatorSufix) {

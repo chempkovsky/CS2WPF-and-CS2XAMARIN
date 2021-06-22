@@ -1,5 +1,5 @@
 ﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
-<#@ output extension="txt" #>
+<#@ output extension="jsonpmm2txt" #>
 <#@ assembly name="System.Core" #>
 <#@ import namespace="System" #>
 <#@ import namespace="System.Linq" #>
@@ -7,14 +7,12 @@
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.Text" #>
 <#@ import namespace="CS2WPF" #>
-<#@ import namespace="CS2WPF.Helpers" #>
 <#@ import namespace="CS2WPF.Model" #>
 <#@ import namespace="CS2WPF.Model.Serializable" #>
 <#@ parameter type="CS2WPF.Model.Serializable.AllowedFileTypesSerializable" name="AllowedFileTypes" #>
 <#@ parameter type="CS2WPF.Model.Serializable.FeatureContextSerializable" name="FeatureContext" #>
 <#@ parameter type="CS2WPF.Model.Serializable.FeatureSerializable" name="Feature" #>
 <#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
-<#@ parameter type="CS2WPF.Helpers.PrismModuleModifier"  name="PrismModifier" #>
 <#
 
     string IAppGlblSettingsServiceFolder             = "00080-IAppGlblSettingsService.cs";
@@ -86,22 +84,24 @@
     
 #>
 
-/*
-
-    "<#= FtrViewModelClassName #>" UserControl is defined in the "<#= FtrViewModelProject #>"-project.
-    In the file of IModule-class of "<#= FtrViewModelProject #>"-project the following line of code must be inserted:
-
-        public void RegisterTypes(IContainerRegistry containerRegistry)
-        {
-            ...
-            // According to requirements of the "<#= FtrViewModelClassName #>.cs"-file of "<#= FtrViewModelProject #>"-project. 
-            ViewModelLocationProvider.Register<<#= FtrUserControlClassName #>, <#= FtrViewModelClassName #>>();
-            // According to requirements of the "<#= FtrViewModelClassName #>.cs"-file of "<#= FtrViewModelProject #>"-project. 
-            containerRegistry.RegisterForNavigation<<#= FtrUserControlClassName #>, <#= FtrViewModelClassName #>>("<#= FtrUserControlClassName #>");
-            ...
-        }
-2.1. Insertion the line : ViewModelLocationProvider.Register<<#= FtrUserControlClassName #>, <#= FtrViewModelClassName #>>();
-<#
+{
+"PrismMMMCallItems": [
+    {
+    "Description": [
+    '"<#= FtrViewModelClassName #>" UserControl is defined in the "<#= FtrViewModelProject #>"-project.',
+    'In the file of IModule-class of "<#= FtrViewModelProject #>"-project the following line of code must be inserted:',
+    ' ',
+    '    public void RegisterTypes(IContainerRegistry containerRegistry)',
+    '    {',
+    '        ...',
+    '        // According to requirements of the "<#= FtrViewModelClassName #>.cs"-file of "<#= FtrViewModelProject #>"-project. ',
+    '        ViewModelLocationProvider.Register<<#= FtrUserControlClassName #>, <#= FtrViewModelClassName #>>();',
+    '        // According to requirements of the "<#= FtrViewModelClassName #>.cs"-file of "<#= FtrViewModelProject #>"-project. ',
+    '        containerRegistry.RegisterForNavigation<<#= FtrUserControlClassName #>, <#= FtrViewModelClassName #>>("<#= FtrUserControlClassName #>");',
+    '        ...',
+    '    }',
+    ],
+<#  
     string result ;
     {
     string FtrUserControlNameSpaceAndClassName              = FtrUserControlNameSpace + "." + FtrUserControlClassName;
@@ -115,14 +115,27 @@
     string invocationMethodName                             = "Register";
     string[] invocationGenerics                             = new string[]{FtrUserControlNameSpaceAndClassName, FtrViewModelNameSpaceAndClassName};
     string[] invocationParams                               = new string[]{};
-    result = PrismModifier.UpdateMethodWithClassIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType,
-                        invocationClassType, invocationMethodName, invocationGenerics, invocationParams);
-    }
+    //result = PrismModifier.UpdateMethodWithClassIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType,
+    //                    invocationClassType, invocationMethodName, invocationGenerics, invocationParams);
 #>
-Result: <#= result #>
-
-2.2. Insertion the line : containerRegistry.RegisterForNavigation<<#= FtrUserControlClassName #>, <#= FtrViewModelClassName #>>("<#= FtrUserControlClassName #>");
+    "MethodName": 'UpdateMethodWithClassIdentifier',
+    "DestProjectName": '<#= destProjectName #>',
+    "DestImplementedInterface": '<#= destImplementedInterface #>',
+    "DestMethodName": '<#= destMethodName #>',
+    "DestMethodParamTypes": ['<#= destMethodParamTypes[0] #>'],
+    "DestMethodAccessType": '<#= destMethodAccessType #>',
+    "DestMethodParamTypeForVar": '',
+    "InvocationVarType": '',
+    "InvocationParamType": '',
+    "InvocationClassType": '<#= invocationClassType #>',
+    "InvocationMethodName": '<#= invocationMethodName #>',
+    "InvocationGenerics": ['<#= invocationGenerics[0] #>','<#= invocationGenerics[1] #>'],
+    "InvocationParams": [],
+    "StepDescription": 'Insertion the line : ViewModelLocationProvider.Register<<#= FtrUserControlClassName #>, <#= FtrViewModelClassName #>>();'
+    },
 <#
+
+    }
 {
     string FtrUserControlNameSpaceAndClassName              = FtrUserControlNameSpace + "." + FtrUserControlClassName;
     string FtrViewModelNameSpaceAndClassName                = FtrViewModelNameSpace + "." + FtrViewModelClassName;
@@ -135,13 +148,31 @@ Result: <#= result #>
     string invocationMethodName                             = "RegisterForNavigation";
     string[] invocationGenerics                             = new string[]{FtrUserControlNameSpaceAndClassName, FtrViewModelNameSpaceAndClassName};
     string[] invocationParams                               = new string[]{"\"" + FtrUserControlClassName + "\""};
-    result = PrismModifier.UpdateMethodWithParamIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType,
-                        invocationParamType, invocationMethodName, invocationGenerics, invocationParams);
+    //result = PrismModifier.UpdateMethodWithParamIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType,
+    //                    invocationParamType, invocationMethodName, invocationGenerics, invocationParams);
+#>  
+   {
+    "Description": [],
+    "MethodName": 'UpdateMethodWithParamIdentifier',
+    "DestProjectName": '<#= destProjectName #>',
+    "DestImplementedInterface": '<#= destImplementedInterface #>',
+    "DestMethodName": '<#= destMethodName #>',
+    "DestMethodParamTypes": ['<#= destMethodParamTypes[0] #>'],
+    "DestMethodAccessType": '<#= destMethodAccessType #>',
+    "DestMethodParamTypeForVar": '',
+    "InvocationVarType": '',
+    "InvocationParamType": '<#= invocationParamType #>',
+    "InvocationClassType": '',
+    "InvocationMethodName": '<#= invocationMethodName #>',
+    "InvocationGenerics": ['<#= invocationGenerics[0] #>','<#= invocationGenerics[1] #>'],
+    "InvocationParams": ['<#= invocationParams[0]  #>'],
+    "StepDescription": 'Insertion the line : containerRegistry.RegisterForNavigation<<#= FtrUserControlClassName #>, <#= FtrViewModelClassName #>>("<#= FtrUserControlClassName #>");'
+    },
+<#
 }
 #>
-Result: <#= result #>
-
-*/
+    ]
+}
 
 <#+
 
@@ -161,7 +192,7 @@ Result: <#= result #>
         if(string.IsNullOrEmpty(refItem.FileProject)) {
             return result;
         }
-        return refItem.FileProject;
+        return refItem.FileProject.Replace(@"\", @"\\");
     }
 
     string GetRtOutletName(ModelViewSerializable model) {

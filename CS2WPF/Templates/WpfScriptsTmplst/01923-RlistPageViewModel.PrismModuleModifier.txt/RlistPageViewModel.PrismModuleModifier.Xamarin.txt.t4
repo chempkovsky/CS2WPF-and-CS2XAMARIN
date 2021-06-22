@@ -1,5 +1,5 @@
 ﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
-<#@ output extension="txt" #>
+<#@ output extension="jsonpmm2txt" #>
 <#@ assembly name="System.Core" #>
 <#@ import namespace="System" #>
 <#@ import namespace="System.Linq" #>
@@ -7,12 +7,10 @@
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.Text" #>
 <#@ import namespace="CS2WPF" #>
-<#@ import namespace="CS2WPF.Helpers" #>
 <#@ import namespace="CS2WPF.Model" #>
 <#@ import namespace="CS2WPF.Model.Serializable" #>
 <#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
-<#@ parameter type="CS2WPF.Helpers.PrismModuleModifier"  name="PrismModifier" #>
 <#
 
     string EformModeEnumFolder                      = "00026-EformModeEnum.cs";
@@ -172,31 +170,31 @@
     
     
 #>
-/*
+{
+"PrismMMMCallItems": [
 
 <#
-    string result ;
-    int insertionCount = 0;
     if(!IsInTheSameModule) {
-        insertionCount++;
 #>
-    "<#= SformUserControlClassName #>"-UserControl is defined in the "<#= SformUserControlProject #>"-project.
-    In the file of IModule-class of "<#= SformUserControlProject #>"-project the following line of code must be inserted:
-
-        public void OnInitialized(IContainerProvider containerProvider)
-        {
-            ...
-            IRegionManager regionManager = containerProvider.Resolve(typeof(IRegionManager)) as IRegionManager;
-            if (regionManager != null)
-            {
-                ...
-                // According to requirements of the "<#= RlistPageViewModelClassName #>.cs"-file of "<#= RlistPageProject #>"-project. 
-                regionManager.RegisterViewWithRegion("<#= SformUserControlClassName #><#= RlistPageRegionPropertyName #>", typeof(<#= SformUserControlClassName #>));
-                ...
-            }
-            ...
-        }
-<#= insertionCount #>. Insertion the line : regionManager.RegisterViewWithRegion("<#= SformUserControlClassName #><#= RlistPageRegionPropertyName #>", typeof(<#= SformUserControlClassName #>));
+    {
+    "Description": [
+    '"<#= SformUserControlClassName #>"-UserControl is defined in the "<#= SformUserControlProject #>"-project.',
+    'In the file of IModule-class of "<#= SformUserControlProject #>"-project the following line of code must be inserted:',
+    ' ',
+    '    public void OnInitialized(IContainerProvider containerProvider)',
+    '    {',
+    '        ...',
+    '        IRegionManager regionManager = containerProvider.Resolve(typeof(IRegionManager)) as IRegionManager;',
+    '        if (regionManager != null)',
+    '        {',
+    '            ...',
+    '            // According to requirements of the "<#= RlistPageViewModelClassName #>.cs"-file of "<#= RlistPageProject #>"-project. ',
+    '            regionManager.RegisterViewWithRegion("<#= SformUserControlClassName #><#= RlistPageRegionPropertyName #>", typeof(<#= SformUserControlClassName #>));',
+    '            ...',
+    '        }',
+    '        ...',
+    '    }',
+    ],
 <#
 {
     string SformUserControlNameSpaceAndClassName            = SformUserControlNameSpace + "." + SformUserControlClassName;
@@ -210,32 +208,47 @@
     string invocationMethodName                             = "RegisterViewWithRegion";
     string[] invocationGenerics                             = new string[]{};
     string[] invocationParams                               = new string[]{"\"" + SformUserControlClassName + RlistPageRegionPropertyName  +"\"", "typeof("+SformUserControlNameSpaceAndClassName+")"};
-    result = PrismModifier.UpdateMethodWithVarIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType, destMethodParamTypeForVar,
-                        invocationVarType, invocationMethodName, invocationGenerics, invocationParams);
-}
+    //result = PrismModifier.UpdateMethodWithVarIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType, destMethodParamTypeForVar,
+    //                    invocationVarType, invocationMethodName, invocationGenerics, invocationParams);
 #>
-Result: <#= result #>
+    "MethodName": 'UpdateMethodWithVarIdentifier',
+    "DestProjectName": '<#= destProjectName #>',
+    "DestImplementedInterface": '<#= destImplementedInterface #>',
+    "DestMethodName": '<#= destMethodName #>',
+    "DestMethodParamTypes": ['<#= destMethodParamTypes[0] #>'],
+    "DestMethodAccessType": '<#= destMethodAccessType #>',
+    "DestMethodParamTypeForVar": '<#= destMethodParamTypeForVar #>',
+    "InvocationVarType": '<#= invocationVarType #>',
+    "InvocationParamType": '',
+    "InvocationClassType": '',
+    "InvocationMethodName": '<#= invocationMethodName #>',
+    "InvocationGenerics": [],
+    "InvocationParams": ['<#= invocationParams[0] #>','<#= invocationParams[1] #>'],
+    "StepDescription": 'Insertion the line : regionManager.RegisterViewWithRegion("<#= SformUserControlClassName #><#= RlistPageRegionPropertyName #>", typeof(<#= SformUserControlClassName #>));'
+    },
+<#
 
-<#       
+}
     }
 #>
-
-    "<#= RlistPageClassName #>" UserControl is defined in the "<#= RlistPageProject #>"-project.
-    In the file of IModule-class of "<#= RlistPageProject #>"-project the following line of code must be inserted:
-
-        public void RegisterTypes(IContainerRegistry containerRegistry)
-        {
-            ...
-            // According to requirements of the "<#= RlistPageViewModelClassName #>.cs"-file of "<#= RlistPageProject #>"-project. 
-            ViewModelLocationProvider.Register<<#= RlistPageClassName #>, <#= RlistPageViewModelClassName #>>();
-            // According to requirements of the "<#= RlistPageViewModelClassName #>.cs"-file of "<#= RlistPageProject #>"-project. 
-            containerRegistry.RegisterForNavigation<<#= RlistPageClassName #>, <#= RlistPageViewModelClassName #>>("<#= RlistPageClassName #>");
-            // Only if you need to get an instance of controls, insert two lines below
-            // According to requirements of the "<#= RlistPageViewModelClassName #>.cs"-file of "<#= RlistPageProject #>"-project. 
-            // containerRegistry.Register<ContentPage, <#= RlistPageClassName #>>("<#= RlistPageClassName #>");
-            ...
-        }
-2.1. Insertion the line : ViewModelLocationProvider.Register<<#= RlistPageClassName #>, <#= RlistPageViewModelClassName #>>();
+    {
+    "Description": [
+    '"<#= RlistPageClassName #>" UserControl is defined in the "<#= RlistPageProject #>"-project.',
+    'In the file of IModule-class of "<#= RlistPageProject #>"-project the following line of code must be inserted:',
+    ' ',
+    '    public void RegisterTypes(IContainerRegistry containerRegistry)',
+    '    {',
+    '        ...',
+    '        // According to requirements of the "<#= RlistPageViewModelClassName #>.cs"-file of "<#= RlistPageProject #>"-project. ',
+    '        ViewModelLocationProvider.Register<<#= RlistPageClassName #>, <#= RlistPageViewModelClassName #>>();',
+    '        // According to requirements of the "<#= RlistPageViewModelClassName #>.cs"-file of "<#= RlistPageProject #>"-project. ',
+    '        containerRegistry.RegisterForNavigation<<#= RlistPageClassName #>, <#= RlistPageViewModelClassName #>>("<#= RlistPageClassName #>");',
+    '        // Only if you need to get an instance of controls, insert two lines below',
+    '        // According to requirements of the "<#= RlistPageViewModelClassName #>.cs"-file of "<#= RlistPageProject #>"-project. ',
+    '        // containerRegistry.Register<ContentPage, <#= RlistPageClassName #>>("<#= RlistPageClassName #>");',
+    '        ...',
+    '    }',
+    ],
 <#
     {
     string RlistPageNameSpaceAndClassName                   = RlistPageNameSpace + "." + RlistPageClassName;
@@ -249,14 +262,27 @@ Result: <#= result #>
     string invocationMethodName                             = "Register";
     string[] invocationGenerics                             = new string[]{RlistPageNameSpaceAndClassName, RlistPageViewModelNameSpaceAndClassName};
     string[] invocationParams                               = new string[]{};
-    result = PrismModifier.UpdateMethodWithClassIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType,
-                        invocationClassType, invocationMethodName, invocationGenerics, invocationParams);
-    }
+    //result = PrismModifier.UpdateMethodWithClassIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType,
+    //                    invocationClassType, invocationMethodName, invocationGenerics, invocationParams);
 #>
-Result: <#= result #>
-
-2.2. Insertion the line : containerRegistry.RegisterForNavigation<<#= RlistPageClassName #>, <#= RlistPageViewModelClassName #>>("<#= RlistPageClassName #>");
+    "MethodName": 'UpdateMethodWithClassIdentifier',
+    "DestProjectName": '<#= destProjectName #>',
+    "DestImplementedInterface": '<#= destImplementedInterface #>',
+    "DestMethodName": '<#= destMethodName #>',
+    "DestMethodParamTypes": ['<#= destMethodParamTypes[0] #>'],
+    "DestMethodAccessType": '<#= destMethodAccessType #>',
+    "DestMethodParamTypeForVar": '',
+    "InvocationVarType": '',
+    "InvocationParamType": '',
+    "InvocationClassType": '<#= invocationClassType #>',
+    "InvocationMethodName": '<#= invocationMethodName #>',
+    "InvocationGenerics": ['<#= invocationGenerics[0] #>','<#= invocationGenerics[1] #>'],
+    "InvocationParams": [],
+    "StepDescription": 'Insertion the line : ViewModelLocationProvider.Register<<#= RlistPageClassName #>, <#= RlistPageViewModelClassName #>>();'
+    },
 <#
+
+    }
 {
     string RlistPageNameSpaceAndClassName                   = RlistPageNameSpace + "." + RlistPageClassName;
     string RlistPageViewModelNameSpaceAndClassName          = RlistPageViewModelNameSpace + "." + RlistPageViewModelClassName;
@@ -269,14 +295,28 @@ Result: <#= result #>
     string invocationMethodName                             = "RegisterForNavigation";
     string[] invocationGenerics                             = new string[]{RlistPageNameSpaceAndClassName,RlistPageViewModelNameSpaceAndClassName};
     string[] invocationParams                               = new string[]{"\"" + RlistPageClassName + "\""};
-    result = PrismModifier.UpdateMethodWithParamIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType,
-                        invocationParamType, invocationMethodName, invocationGenerics, invocationParams);
-}
-#>
-Result: <#= result #>
-
-2.3. Insertion the line : containerRegistry.Register<ContentPage, <#= RlistPageClassName #>>("<#= RlistPageClassName #>");
+    //result = PrismModifier.UpdateMethodWithParamIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType,
+    //                    invocationParamType, invocationMethodName, invocationGenerics, invocationParams);
+#>  
+   {
+    "Description": [],
+    "MethodName": 'UpdateMethodWithParamIdentifier',
+    "DestProjectName": '<#= destProjectName #>',
+    "DestImplementedInterface": '<#= destImplementedInterface #>',
+    "DestMethodName": '<#= destMethodName #>',
+    "DestMethodParamTypes": ['<#= destMethodParamTypes[0] #>'],
+    "DestMethodAccessType": '<#= destMethodAccessType #>',
+    "DestMethodParamTypeForVar": '',
+    "InvocationVarType": '',
+    "InvocationParamType": '<#= invocationParamType #>',
+    "InvocationClassType": '',
+    "InvocationMethodName": '<#= invocationMethodName #>',
+    "InvocationGenerics": ['<#= invocationGenerics[0] #>','<#= invocationGenerics[1] #>'],
+    "InvocationParams": ['<#= invocationParams[0]  #>'],
+    "StepDescription": 'Insertion the line : containerRegistry.RegisterForNavigation<<#= RlistPageClassName #>, <#= RlistPageViewModelClassName #>>("<#= RlistPageClassName #>");'
+    },
 <#
+}
 {
     string RlistPageNameSpaceAndClassName                   = RlistPageNameSpace + "." + RlistPageClassName;
     string RlistPageViewModelNameSpaceAndClassName          = RlistPageViewModelNameSpace + "." + RlistPageViewModelClassName;
@@ -289,15 +329,31 @@ Result: <#= result #>
     string invocationMethodName                             = "Register";
     string[] invocationGenerics                             = new string[]{"Xamarin.Forms.ContentPage",RlistPageNameSpaceAndClassName};
     string[] invocationParams                               = new string[]{"\"" + RlistPageClassName + "\""};
-    result = PrismModifier.UpdateMethodWithParamIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType,
-                        invocationParamType, invocationMethodName, invocationGenerics, invocationParams);
+    //result = PrismModifier.UpdateMethodWithParamIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType,
+    //                    invocationParamType, invocationMethodName, invocationGenerics, invocationParams);
+#>  
+   {
+    "Description": [],
+    "MethodName": 'UpdateMethodWithParamIdentifier',
+    "DestProjectName": '<#= destProjectName #>',
+    "DestImplementedInterface": '<#= destImplementedInterface #>',
+    "DestMethodName": '<#= destMethodName #>',
+    "DestMethodParamTypes": ['<#= destMethodParamTypes[0] #>'],
+    "DestMethodAccessType": '<#= destMethodAccessType #>',
+    "DestMethodParamTypeForVar": '',
+    "InvocationVarType": '',
+    "InvocationParamType": '<#= invocationParamType #>',
+    "InvocationClassType": '',
+    "InvocationMethodName": '<#= invocationMethodName #>',
+    "InvocationGenerics": ['<#= invocationGenerics[0] #>','<#= invocationGenerics[1] #>'],
+    "InvocationParams": ['<#= invocationParams[0]  #>'],
+    "StepDescription": 'Insertion the line : containerRegistry.Register<ContentPage, <#= RlistPageClassName #>>("<#= RlistPageClassName #>");'
+    },
+<#
 }
 #>
-Result: <#= result #>
-
-
-*/
-
+    ]
+}
 
 
 
@@ -318,7 +374,7 @@ Result: <#= result #>
         if(string.IsNullOrEmpty(refItem.FileProject)) {
             return result;
         }
-        return refItem.FileProject;
+        return refItem.FileProject.Replace(@"\", @"\\");
     }
 
     string GetFilterPropertyOperatorName(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model, string operatorSufix) {

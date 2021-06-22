@@ -1,5 +1,5 @@
 ﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
-<#@ output extension="txt" #>
+<#@ output extension="jsonpmm2txt" #>
 <#@ assembly name="System.Core" #>
 <#@ import namespace="System" #>
 <#@ import namespace="System.Linq" #>
@@ -7,12 +7,10 @@
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.Text" #>
 <#@ import namespace="CS2WPF" #>
-<#@ import namespace="CS2WPF.Helpers" #>
 <#@ import namespace="CS2WPF.Model" #>
 <#@ import namespace="CS2WPF.Model.Serializable" #>
 <#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
-<#@ parameter type="CS2WPF.Helpers.PrismModuleModifier"  name="PrismModifier" #>
 <#
 
     string IAppGlblSettingsServiceFolder      = "00080-IAppGlblSettingsService.cs";
@@ -146,19 +144,21 @@
         nmSpaces.Add(modelFilterNameSpace);
 
 #>
-/*
-    In the file of IModule-class of the project for the current service the following lines of code must be inserted:
-
-        public void RegisterTypes(IContainerRegistry containerRegistry)
-        {
-            ...
-            containerRegistry.Register<<#= modelServiceInterfaceClassName #>, <#= modelServiceClassName #>>();
-            ...
-        }
-
-1. Insertion the line : containerRegistry.Register<<#= modelServiceInterfaceClassName #>, <#= modelServiceClassName #>>();
-<#
-string result ;
+{
+"PrismMMMCallItems": [
+    {
+    "Description": [
+    'In the file of IModule-class of the project for the current service the following lines of code must be inserted:',
+    ' ',
+    '    public void RegisterTypes(IContainerRegistry containerRegistry)',
+    '    {',
+    '        ...',
+    '        containerRegistry.Register<<#= modelServiceInterfaceClassName #>, <#= modelServiceClassName #>>();',
+    '        ...',
+    '    }'
+    ],
+    
+<#  
 {
     string modelServiceInterfaceNameSpaceAndClassName       = modelServiceInterfaceNameSpace + "." + modelServiceInterfaceClassName;
     string modelServiceNameSpaceAndClassName                = modelServiceNameSpace + "." + modelServiceClassName;
@@ -169,15 +169,34 @@ string result ;
     string destMethodAccessType                             = "public";
     string invocationParamType                              = "Prism.Ioc.IContainerRegistry";
     string invocationMethodName                             = "Register";
-    string[] invocationGenerics                             = new string[]{modelServiceInterfaceNameSpaceAndClassName,modelServiceNameSpaceAndClassName};
+    string[] invocationGenerics                             = new string[]{modelServiceInterfaceNameSpaceAndClassName, modelServiceNameSpaceAndClassName};
     string[] invocationParams                               = new string[]{};
-    result = PrismModifier.UpdateMethodWithParamIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType,
-                        invocationParamType, invocationMethodName, invocationGenerics, invocationParams);
+    //result = PrismModifier.UpdateMethodWithParamIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType,
+    //                    invocationParamType, invocationMethodName, invocationGenerics, invocationParams);
+#>  
+   {
+    "Description": [],
+    "MethodName": 'UpdateMethodWithParamIdentifier',
+    "DestProjectName": '<#= destProjectName #>',
+    "DestImplementedInterface": '<#= destImplementedInterface #>',
+    "DestMethodName": '<#= destMethodName #>',
+    "DestMethodParamTypes": ['<#= destMethodParamTypes[0] #>'],
+    "DestMethodAccessType": '<#= destMethodAccessType #>',
+    "DestMethodParamTypeForVar": '',
+    "InvocationVarType": '',
+    "InvocationParamType": '<#= invocationParamType #>',
+    "InvocationClassType": '',
+    "InvocationMethodName": '<#= invocationMethodName #>',
+    "InvocationGenerics": ['<#= invocationGenerics[0] #>','<#= invocationGenerics[1] #>'],
+    "InvocationParams": [],
+    "StepDescription": 'Insertion the line : containerRegistry.Register<<#= modelServiceInterfaceClassName #>, <#= modelServiceClassName #>>();'
+    },
+<#
+
 }
 #>
-Result: <#= result #>
-
-*/
+    ]
+}
 
 <#+
     string GetModelProjectUniqueName(ModelViewSerializable model, string fileType) {
@@ -196,7 +215,7 @@ Result: <#= result #>
         if(string.IsNullOrEmpty(refItem.FileProject)) {
             return result;
         }
-        return refItem.FileProject;
+        return refItem.FileProject.Replace(@"\", @"\\");
     }
 
     string GetModelPageName(ModelViewSerializable model) {

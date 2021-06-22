@@ -1,5 +1,5 @@
 ﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
-<#@ output extension="txt" #>
+<#@ output extension="jsonpmm2txt" #>
 <#@ assembly name="System.Core" #>
 <#@ import namespace="System" #>
 <#@ import namespace="System.Linq" #>
@@ -7,12 +7,11 @@
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.Text" #>
 <#@ import namespace="CS2WPF" #>
-<#@ import namespace="CS2WPF.Helpers" #>
 <#@ import namespace="CS2WPF.Model" #>
 <#@ import namespace="CS2WPF.Model.Serializable" #>
 <#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
-<#@ parameter type="CS2WPF.Helpers.PrismModuleModifier"  name="PrismModifier" #>
+
 <#
 
     string EformModeEnumFolder                      = "00026-EformModeEnum.cs";
@@ -89,31 +88,33 @@
     
 #>
 
-/*
+{
+"PrismMMMCallItems": [
 
 <#
-int insertionCount = 0;
-string result ;
     if(!IsInTheSameModule) {
-        insertionCount++;
 #>
-    "<#= EformUserControlClassName #>"-UserControl is defined in the "<#= EformUserControlProject #>"-project.
-    In the file of IModule-class of "<#= EformUserControlProject #>"-project the following line of code must be inserted:
+    {
+    "Description": [
+    '"<#= EformUserControlClassName #>"-UserControl is defined in the "<#= EformUserControlProject #>"-project.',
+    'In the file of IModule-class of "<#= EformUserControlProject #>"-project the following line of code must be inserted:',
+    ' ',
+    '    public void OnInitialized(IContainerProvider containerProvider)',
+    '    {',
+    '        ...',
+    '        IRegionManager regionManager = containerProvider.Resolve(typeof(IRegionManager)) as IRegionManager;',
+    '        if (regionManager != null)',
+    '        {',
+    '            ...',
+    '            // According to requirements of the "<#= EdlgViewModelClassName #>.cs"-file of "<#= EdlgViewModelProject #>"-project. ',
+    '            regionManager.RegisterViewWithRegion("<#= EformUserControlClassName #><#= DialogRegionPropertyName #>", typeof(<#= EformUserControlClassName #>));',
+    '            ...',
+    '        }',
+    '        ...',
+    '    }'
+    ],
 
-        public void OnInitialized(IContainerProvider containerProvider)
-        {
-            ...
-            IRegionManager regionManager = containerProvider.Resolve(typeof(IRegionManager)) as IRegionManager;
-            if (regionManager != null)
-            {
-                ...
-                // According to requirements of the "<#= EdlgViewModelClassName #>.cs"-file of "<#= EdlgViewModelProject #>"-project. 
-                regionManager.RegisterViewWithRegion("<#= EformUserControlClassName #><#= DialogRegionPropertyName #>", typeof(<#= EformUserControlClassName #>));
-                ...
-            }
-            ...
-        }
-<#= insertionCount #>. Insertion the line : regionManager.RegisterViewWithRegion("<#= EformUserControlClassName #><#= DialogRegionPropertyName #>", typeof(<#= EformUserControlClassName #>));
+ 
 <#
 {
     string EformUserControlNameSpaceAndClassName            = EformUserControlNameSpace + "." + EformUserControlClassName;
@@ -127,29 +128,44 @@ string result ;
     string invocationMethodName                             = "RegisterViewWithRegion";
     string[] invocationGenerics                             = new string[]{};
     string[] invocationParams                               = new string[]{"\"" + EformUserControlClassName + DialogRegionPropertyName  +"\"", "typeof("+EformUserControlNameSpaceAndClassName+")"};
-    result = PrismModifier.UpdateMethodWithVarIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType, destMethodParamTypeForVar,
-                        invocationVarType, invocationMethodName, invocationGenerics, invocationParams);
+    //result = PrismModifier.UpdateMethodWithVarIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType, destMethodParamTypeForVar,
+    //                    invocationVarType, invocationMethodName, invocationGenerics, invocationParams);
+#>
+    "MethodName": 'UpdateMethodWithVarIdentifier',
+    "DestProjectName": '<#= destProjectName #>',
+    "DestImplementedInterface": '<#= destImplementedInterface #>',
+    "DestMethodName": '<#= destMethodName #>',
+    "DestMethodParamTypes": ['Prism.Ioc.IContainerProvider'],
+    "DestMethodAccessType": '<#= destMethodAccessType #>',
+    "DestMethodParamTypeForVar": '<#= destMethodParamTypeForVar #>',
+    "InvocationVarType": '<#= invocationVarType #>',
+    "InvocationParamType": '',
+    "InvocationClassType": '',
+    "InvocationMethodName": '<#= invocationMethodName #>',
+    "InvocationGenerics": [],
+    "InvocationParams": ['<#= invocationParams[0] #>','<#= invocationParams[1] #>'],
+    "StepDescription": 'Insertion the line : regionManager.RegisterViewWithRegion("<#= EformUserControlClassName #><#= DialogRegionPropertyName #>", typeof(<#= EformUserControlClassName #>));'
+    },
+<#
+
 }
-#>
-Result: <#= result #>
-
-<#       
     }
-    insertionCount++;
 #>
 
-
-    "<#= EdlgUserControlClassName #>" UserControl is defined in the "<#= EdlgUserControlProject #>"-project.
-    In the file of IModule-class of "<#= EdlgUserControlProject #>"-project the following line of code must be inserted:
-
-        public void RegisterTypes(IContainerRegistry containerRegistry)
-        {
-            ...
-            // According to requirements of the "<#= EdlgViewModelClassName #>.cs"-file of "<#= EdlgViewModelProject #>"-project. 
-            containerRegistry.RegisterDialog<<#= EdlgUserControlClassName #>, <#= EdlgViewModelBaseClassName #>>("<#= EdlgViewModelClassName #>");
-            ...
-        }
-<#= insertionCount #>. Insertion the line : containerRegistry.RegisterDialog<<#= EdlgUserControlClassName #>, <#= EdlgViewModelBaseClassName #>>("<#= EdlgViewModelClassName #>");
+    {
+    "Description": [
+    '"<#= EdlgUserControlClassName #>" UserControl is defined in the "<#= EdlgUserControlProject #>"-project.',
+    'In the file of IModule-class of "<#= EdlgUserControlProject #>"-project the following line of code must be inserted:',
+    ' ',
+    '    public void RegisterTypes(IContainerRegistry containerRegistry)',
+    '    {',
+    '        ...',
+    '        // According to requirements of the "<#= EdlgViewModelClassName #>.cs"-file of "<#= EdlgViewModelProject #>"-project. ',
+    '        containerRegistry.RegisterDialog<<#= EdlgUserControlClassName #>, <#= EdlgViewModelBaseClassName #>>("<#= EdlgViewModelClassName #>");',
+    '        ...',
+    '    }',
+    ],
+ 
 <#
 {
     string EdlgUserControlClassNameNameSpaceAndClassName    = EdlgUserControlNameSpace + "." + EdlgUserControlClassName;
@@ -163,13 +179,29 @@ Result: <#= result #>
     string invocationMethodName                             = "RegisterDialog";
     string[] invocationGenerics                             = new string[]{EdlgUserControlClassNameNameSpaceAndClassName,EdlgViewModelBaseNameSpaceAndClassName};
     string[] invocationParams                               = new string[]{"\"" + EdlgViewModelClassName +"\""};
-    result = PrismModifier.UpdateMethodWithParamIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType,
-                        invocationParamType, invocationMethodName, invocationGenerics, invocationParams);
+    //result = PrismModifier.UpdateMethodWithParamIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType,
+    //                    invocationParamType, invocationMethodName, invocationGenerics, invocationParams);
+#>
+    "MethodName": 'UpdateMethodWithParamIdentifier',
+    "DestProjectName": '<#= destProjectName #>',
+    "DestImplementedInterface": '<#= destImplementedInterface #>',
+    "DestMethodName": '<#= destMethodName #>',
+    "DestMethodParamTypes": ['<#= destMethodParamTypes[0] #>'],
+    "DestMethodAccessType": '<#= destMethodAccessType #>',
+    "DestMethodParamTypeForVar": '',
+    "InvocationVarType": '',
+    "InvocationParamType": '<#= invocationParamType #>',
+    "InvocationClassType": '',
+    "InvocationMethodName": '<#= invocationMethodName #>',
+    "InvocationGenerics": ['<#= invocationGenerics[0] #>', '<#= invocationGenerics[1] #>'],
+    "InvocationParams": ['<#= invocationParams[0] #>'],
+    "StepDescription": 'Insertion the line : containerRegistry.RegisterDialog<<#= EdlgUserControlClassName #>, <#= EdlgViewModelBaseClassName #>>("<#= EdlgViewModelClassName #>");'
+    },
+<#
 }
 #>
-Result: <#= result #>
-
-*/
+    ]
+}
 
 
 <#+
@@ -189,7 +221,7 @@ Result: <#= result #>
         if(string.IsNullOrEmpty(refItem.FileProject)) {
             return result;
         }
-        return refItem.FileProject;
+        return refItem.FileProject.Replace(@"\", @"\\");
     }
 
     string GetFilterPropertyOperatorName(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model, string operatorSufix) {

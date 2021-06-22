@@ -1,5 +1,5 @@
 ﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
-<#@ output extension="txt" #>
+<#@ output extension="jsonpmm2txt" #>
 <#@ assembly name="System.Core" #>
 <#@ import namespace="System" #>
 <#@ import namespace="System.Linq" #>
@@ -7,12 +7,10 @@
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.Text" #>
 <#@ import namespace="CS2WPF" #>
-<#@ import namespace="CS2WPF.Helpers" #>
 <#@ import namespace="CS2WPF.Model" #>
 <#@ import namespace="CS2WPF.Model.Serializable" #>
 <#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
-<#@ parameter type="CS2WPF.Helpers.PrismModuleModifier"  name="PrismModifier" #>
 <#
 
     string EformModeEnumFolder                      = "00026-EformModeEnum.cs";
@@ -288,10 +286,11 @@
     }
 
 #>
-/*
+{
+"PrismMMMCallItems": [
 
 <#
-string result ;
+
     {
         List<string> searchViewNames= new List<string>();
         foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) {
@@ -304,7 +303,6 @@ string result ;
                 }
             }
         }
-        int insertionCount = 0;
         foreach(string searchViewName in searchViewNames) {
             ModelViewSerializable searchView = GetModelByName(Context, searchViewName);
             string localSdlgUserControlFolder       = "01436-SdlgUserControl.xaml.cs";
@@ -315,22 +313,21 @@ string result ;
             string localSdlgViewModelClassName      = GetModelClassName(searchView, localSdlgViewModelFolder);
             string localSdlgViewModelNameSpace      = GetModelNameSpace(searchView, localSdlgViewModelFolder);
             string localSdlgViewModelProject        = GetModelProjectName(searchView, localSdlgViewModelFolder);
-            insertionCount++;
 #>
-
-        Reminder:
-        "<#= localSdlgUserControlClassName #>" UserControl is defined in the "<#= localSdlgUserControlProject #>"-project.
-        In the file of IModule-class of "<#= localSdlgUserControlProject #>"-project the following line of code must be inserted:
-
-            public void RegisterTypes(IContainerRegistry containerRegistry)
-            {
-                ...
-                // According to requirements of the "<#= localSdlgViewModelClassName #>.cs"-file of "<#= localSdlgViewModelProject #>"-project. 
-                containerRegistry.RegisterDialog<<#= localSdlgUserControlClassName #>, <#= SdlgViewModelBaseClassName #>>("<#= localSdlgViewModelClassName #>");
-                ...
-            }
-
-<#= insertionCount #>. Insertion the line : containerRegistry.RegisterDialog<<#= localSdlgUserControlClassName #>, <#= SdlgViewModelBaseClassName #>>("<#= localSdlgViewModelClassName #>");
+    {
+    "Description": [
+       ' Reminder:',
+       ' "<#= localSdlgUserControlClassName #>" UserControl is defined in the "<#= localSdlgUserControlProject #>"-project.',
+       ' In the file of IModule-class of "<#= localSdlgUserControlProject #>"-project the following line of code must be inserted:',
+       ' ',
+       '     public void RegisterTypes(IContainerRegistry containerRegistry)',
+       '     {',
+       '         ...',
+       '         // According to requirements of the "<#= localSdlgViewModelClassName #>.cs"-file of "<#= localSdlgViewModelProject #>"-project. ',
+       '         containerRegistry.RegisterDialog<<#= localSdlgUserControlClassName #>, <#= SdlgViewModelBaseClassName #>>("<#= localSdlgViewModelClassName #>");',
+       '         ...',
+       '     }',
+    ],
 <#
 {
     string localSdlgUserControlClassNameNameSpaceAndClassName   = localSdlgUserControlNameSpace + "." + localSdlgUserControlClassName;
@@ -344,32 +341,49 @@ string result ;
     string invocationMethodName                                 = "RegisterDialog";
     string[] invocationGenerics                                 = new string[]{localSdlgUserControlClassNameNameSpaceAndClassName,SdlgViewModelBaseNameSpaceAndClassName};
     string[] invocationParams                                   = new string[]{"\"" + localSdlgViewModelClassName +"\""};
-    result = PrismModifier.UpdateMethodWithParamIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType,
-                        invocationParamType, invocationMethodName, invocationGenerics, invocationParams);
-}
+    //result = PrismModifier.UpdateMethodWithParamIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType,
+    //                    invocationParamType, invocationMethodName, invocationGenerics, invocationParams);
 #>
-Result: <#= result #>
-
+    "MethodName": 'UpdateMethodWithParamIdentifier',
+    "DestProjectName": '<#= destProjectName #>',
+    "DestImplementedInterface": '<#= destImplementedInterface #>',
+    "DestMethodName": '<#= destMethodName #>',
+    "DestMethodParamTypes": ['<#= destMethodParamTypes[0] #>'],
+    "DestMethodAccessType": '<#= destMethodAccessType #>',
+    "DestMethodParamTypeForVar": '',
+    "InvocationVarType": '',
+    "InvocationParamType": '<#= invocationParamType #>',
+    "InvocationClassType": '',
+    "InvocationMethodName": '<#= invocationMethodName #>',
+    "InvocationGenerics": ['<#= invocationGenerics[0] #>', '<#= invocationGenerics[1] #>'],
+    "InvocationParams": ['<#= invocationParams[0] #>'],
+    "StepDescription": 'Insertion the line : containerRegistry.RegisterDialog<<#= localSdlgUserControlClassName #>, <#= SdlgViewModelBaseClassName #>>("<#= localSdlgViewModelClassName #>");'
+    },
 <#
+}
         }
     }
 #>
 
 
+    {
+    "Description": [
 
-    "<#= EformUserControlClassName #>" UserControl is defined in the "<#= EformUserControlProject #>"-project.
-    In the file of IModule-class of "<#= EformUserControlProject #>"-project the following line of code must be inserted:
+    '"<#= EformUserControlClassName #>" UserControl is defined in the "<#= EformUserControlProject #>"-project.',
+    'In the file of IModule-class of "<#= EformUserControlProject #>"-project the following line of code must be inserted:',
+    ' ',
+    '    public void RegisterTypes(IContainerRegistry containerRegistry)',
+    '    {',
+    '        ...',
+    '        // According to requirements of the "<#= EformViewModelClassName #>.cs"-file of "<#= EformViewModelProject #>"-project. ',
+    '        ViewModelLocationProvider.Register<<#= EformUserControlClassName #>, <#= EformViewModelClassName #>>();',
+    '        // According to requirements of the "<#= EformViewModelClassName #>.cs"-file of "<#= EformViewModelProject #>"-project. ',
+    '        containerRegistry.Register<ContentView, <#= EformUserControlClassName #>>("<#= EformUserControlClassName #>");',
+    '        ...',
+    '    }'
+    ],
+    
 
-        public void RegisterTypes(IContainerRegistry containerRegistry)
-        {
-            ...
-            // According to requirements of the "<#= EformViewModelClassName #>.cs"-file of "<#= EformViewModelProject #>"-project. 
-            ViewModelLocationProvider.Register<<#= EformUserControlClassName #>, <#= EformViewModelClassName #>>();
-            // According to requirements of the "<#= EformViewModelClassName #>.cs"-file of "<#= EformViewModelProject #>"-project. 
-            containerRegistry.Register<ContentView, <#= EformUserControlClassName #>>("<#= EformUserControlClassName #>");
-            ...
-        }
-2.1. Insertion the line : ViewModelLocationProvider.Register<<#= EformUserControlClassName #>, <#= EformViewModelClassName #>>();
 <#
     {
     string EformUserControlNameSpaceAndClassName            = EformUserControlNameSpace + "." + EformUserControlClassName;
@@ -383,13 +397,29 @@ Result: <#= result #>
     string invocationMethodName                             = "Register";
     string[] invocationGenerics                             = new string[]{EformUserControlNameSpaceAndClassName, EformViewModelNameSpaceAndClassName};
     string[] invocationParams                               = new string[]{};
-    result = PrismModifier.UpdateMethodWithClassIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType,
-                        invocationClassType, invocationMethodName, invocationGenerics, invocationParams);
+    //result = PrismModifier.UpdateMethodWithClassIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType,
+    //                    invocationClassType, invocationMethodName, invocationGenerics, invocationParams);
+#>
+    "MethodName": 'UpdateMethodWithClassIdentifier',
+    "DestProjectName": '<#= destProjectName #>',
+    "DestImplementedInterface": '<#= destImplementedInterface #>',
+    "DestMethodName": '<#= destMethodName #>',
+    "DestMethodParamTypes": ['<#= destMethodParamTypes[0] #>'],
+    "DestMethodAccessType": '<#= destMethodAccessType #>',
+    "DestMethodParamTypeForVar": '',
+    "InvocationVarType": '',
+    "InvocationParamType": '',
+    "InvocationClassType": '<#= invocationClassType #>',
+    "InvocationMethodName": '<#= invocationMethodName #>',
+    "InvocationGenerics": ['<#= invocationGenerics[0] #>','<#= invocationGenerics[1] #>'],
+    "InvocationParams": [],
+    "StepDescription": 'Insertion the line : ViewModelLocationProvider.Register<<#= EformUserControlClassName #>, <#= EformViewModelClassName #>>();'
+    },
+<#
     }
 #>
-Result: <#= result #>
 
-2.2. Insertion the line : containerRegistry.Register<ContentView, <#= EformUserControlClassName #>>("<#= EformUserControlClassName #>");
+
 <#
 {
     string EformUserControlNameSpaceAndClassName            = EformUserControlNameSpace + "." + EformUserControlClassName;
@@ -403,13 +433,32 @@ Result: <#= result #>
     string invocationMethodName                             = "Register";
     string[] invocationGenerics                             = new string[]{"Xamarin.Forms.ContentView",EformUserControlNameSpaceAndClassName};
     string[] invocationParams                               = new string[]{"\""+ EformUserControlClassName +"\""};
-    result = PrismModifier.UpdateMethodWithParamIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType,
-                        invocationParamType, invocationMethodName, invocationGenerics, invocationParams);
+    //result = PrismModifier.UpdateMethodWithParamIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType,
+    //                    invocationParamType, invocationMethodName, invocationGenerics, invocationParams);
+#>  
+   {
+    "Description": [],
+    "MethodName": 'UpdateMethodWithParamIdentifier',
+    "DestProjectName": '<#= destProjectName #>',
+    "DestImplementedInterface": '<#= destImplementedInterface #>',
+    "DestMethodName": '<#= destMethodName #>',
+    "DestMethodParamTypes": ['<#= destMethodParamTypes[0] #>'],
+    "DestMethodAccessType": '<#= destMethodAccessType #>',
+    "DestMethodParamTypeForVar": '',
+    "InvocationVarType": '',
+    "InvocationParamType": '<#= invocationParamType #>',
+    "InvocationClassType": '',
+    "InvocationMethodName": '<#= invocationMethodName #>',
+    "InvocationGenerics": ['<#= invocationGenerics[0] #>','<#= invocationGenerics[1] #>'],
+    "InvocationParams": ['<#= invocationParams[0]  #>'],
+    "StepDescription": 'Insertion the line : containerRegistry.Register<ContentView, <#= SformUserControlClassName #>>("<#= SformUserControlClassName #>");'
+    },
+<#
+
 }
 #>
-Result: <#= result #>
-
-*/
+    ]
+}
 
 
 <#+

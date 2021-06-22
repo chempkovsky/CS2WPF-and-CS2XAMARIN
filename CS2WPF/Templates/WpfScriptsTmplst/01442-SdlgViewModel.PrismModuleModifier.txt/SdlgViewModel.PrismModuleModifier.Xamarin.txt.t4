@@ -1,5 +1,5 @@
 ﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
-<#@ output extension="txt" #>
+<#@ output extension="jsonpmm2txt" #>
 <#@ assembly name="System.Core" #>
 <#@ import namespace="System" #>
 <#@ import namespace="System.Linq" #>
@@ -7,12 +7,10 @@
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.Text" #>
 <#@ import namespace="CS2WPF" #>
-<#@ import namespace="CS2WPF.Helpers" #>
 <#@ import namespace="CS2WPF.Model" #>
 <#@ import namespace="CS2WPF.Model.Serializable" #>
 <#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
-<#@ parameter type="CS2WPF.Helpers.PrismModuleModifier"  name="PrismModifier" #>
 <#
 
     string IAppGlblSettingsServiceFolder                = "00080-IAppGlblSettingsService.cs";
@@ -68,31 +66,33 @@
     
     
 #>
-/*
+{
+"PrismMMMCallItems": [
+
 
 <#
-int insertionCount = 0;
-string result ;
     if(!IsInTheSameModule) {
-        insertionCount++;
 #>
-    "<#= SformUserControlClassName #>"-UserControl is defined in the "<#= SformUserControlProject #>"-project.
-    In the file of IModule-class of "<#= SformUserControlProject #>"-project the following line of code must be inserted:
+    {
+    "Description": [
+    '"<#= SformUserControlClassName #>"-UserControl is defined in the "<#= SformUserControlProject #>"-project.',
+    'In the file of IModule-class of "<#= SformUserControlProject #>"-project the following line of code must be inserted:',
+    ' ',
+    '    public void OnInitialized(IContainerProvider containerProvider)',
+    '    {',
+    '        ...',
+    '        IRegionManager regionManager = containerProvider.Resolve(typeof(IRegionManager)) as IRegionManager;',
+    '        if (regionManager != null)',
+    '        {',
+    '            ...',
+    '            // According to requirements of the "<#= SdlgViewModelClassName #>.cs"-file of "<#= SdlgViewModelProject #>"-project. ',
+    '            regionManager.RegisterViewWithRegion("<#= SformUserControlClassName #><#= DialogRegionPropertyName #>", typeof(<#= SformUserControlClassName #>));',
+    '            ...',
+    '        }',
+    '        ...',
+    '    }',
+    ],
 
-        public void OnInitialized(IContainerProvider containerProvider)
-        {
-            ...
-            IRegionManager regionManager = containerProvider.Resolve(typeof(IRegionManager)) as IRegionManager;
-            if (regionManager != null)
-            {
-                ...
-                // According to requirements of the "<#= SdlgViewModelClassName #>.cs"-file of "<#= SdlgViewModelProject #>"-project. 
-                regionManager.RegisterViewWithRegion("<#= SformUserControlClassName #><#= DialogRegionPropertyName #>", typeof(<#= SformUserControlClassName #>));
-                ...
-            }
-            ...
-        }
-<#= insertionCount #>. Insertion the line : regionManager.RegisterViewWithRegion("<#= SformUserControlClassName #><#= DialogRegionPropertyName #>", typeof(<#= SformUserControlClassName #>));
 <#
 {
     string SformUserControlNameSpaceAndClassName            = SformUserControlNameSpace + "." + SformUserControlClassName;
@@ -106,29 +106,44 @@ string result ;
     string invocationMethodName                             = "RegisterViewWithRegion";
     string[] invocationGenerics                             = new string[]{};
     string[] invocationParams                               = new string[]{"\"" + SformUserControlClassName + DialogRegionPropertyName  +"\"", "typeof("+SformUserControlNameSpaceAndClassName+")"};
-    result = PrismModifier.UpdateMethodWithVarIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType, destMethodParamTypeForVar,
-                        invocationVarType, invocationMethodName, invocationGenerics, invocationParams);
+    //result = PrismModifier.UpdateMethodWithVarIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType, destMethodParamTypeForVar,
+    //                    invocationVarType, invocationMethodName, invocationGenerics, invocationParams);
+#>
+    "MethodName": 'UpdateMethodWithVarIdentifier',
+    "DestProjectName": '<#= destProjectName #>',
+    "DestImplementedInterface": '<#= destImplementedInterface #>',
+    "DestMethodName": '<#= destMethodName #>',
+    "DestMethodParamTypes": ['Prism.Ioc.IContainerProvider'],
+    "DestMethodAccessType": '<#= destMethodAccessType #>',
+    "DestMethodParamTypeForVar": '<#= destMethodParamTypeForVar #>',
+    "InvocationVarType": '<#= invocationVarType #>',
+    "InvocationParamType": '',
+    "InvocationClassType": '',
+    "InvocationMethodName": '<#= invocationMethodName #>',
+    "InvocationGenerics": [],
+    "InvocationParams": ['<#= invocationParams[0] #>','<#= invocationParams[1] #>'],
+    "StepDescription": 'Insertion the line : regionManager.RegisterViewWithRegion("<#= SformUserControlClassName #><#= DialogRegionPropertyName #>", typeof(<#= SformUserControlClassName #>));'
+    },
+<#
+
 }
+    } // end of if(!IsInTheSameModule) {
+    
 #>
-Result: <#= result #>
+    {
+    "Description": [
+    '"<#= SdlgUserControlClassName #>" UserControl is defined in the "<#= SdlgUserControlProject #>"-project.',
+    'In the file of IModule-class of "<#= SdlgUserControlProject #>"-project the following line of code must be inserted:',
+    ' ',
+    '    public void RegisterTypes(IContainerRegistry containerRegistry)',
+    '    {',
+    '        ...',
+    '        // According to requirements of the "<#= SdlgViewModelClassName #>.cs"-file of "<#= SdlgViewModelProject #>"-project. ',
+    '        containerRegistry.RegisterDialog<<#= SdlgUserControlClassName #>, <#= SdlgViewModelBaseClassName #>>("<#= SdlgViewModelClassName #>");',
+    '        ...',
+    '    }',
+    ],
 
-
-<#       
-    }
-    insertionCount++;
-#>
-
-    "<#= SdlgUserControlClassName #>" UserControl is defined in the "<#= SdlgUserControlProject #>"-project.
-    In the file of IModule-class of "<#= SdlgUserControlProject #>"-project the following line of code must be inserted:
-
-        public void RegisterTypes(IContainerRegistry containerRegistry)
-        {
-            ...
-            // According to requirements of the "<#= SdlgViewModelClassName #>.cs"-file of "<#= SdlgViewModelProject #>"-project. 
-            containerRegistry.RegisterDialog<<#= SdlgUserControlClassName #>, <#= SdlgViewModelBaseClassName #>>("<#= SdlgViewModelClassName #>");
-            ...
-        }
-<#= insertionCount #>. Insertion the line : containerRegistry.RegisterDialog<<#= SdlgUserControlClassName #>, <#= SdlgViewModelBaseClassName #>>("<#= SdlgViewModelClassName #>");
 <#
 {
     string SdlgUserControlClassNameNameSpaceAndClassName    = SdlgUserControlNameSpace + "." + SdlgUserControlClassName;
@@ -142,13 +157,29 @@ Result: <#= result #>
     string invocationMethodName                             = "RegisterDialog";
     string[] invocationGenerics                             = new string[]{SdlgUserControlClassNameNameSpaceAndClassName,SdlgViewModelBaseNameSpaceAndClassName};
     string[] invocationParams                               = new string[]{"\"" + SdlgViewModelClassName +"\""};
-    result = PrismModifier.UpdateMethodWithParamIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType,
-                        invocationParamType, invocationMethodName, invocationGenerics, invocationParams);
+    //result = PrismModifier.UpdateMethodWithParamIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType,
+    //                    invocationParamType, invocationMethodName, invocationGenerics, invocationParams);
+#>
+    "MethodName": 'UpdateMethodWithParamIdentifier',
+    "DestProjectName": '<#= destProjectName #>',
+    "DestImplementedInterface": '<#= destImplementedInterface #>',
+    "DestMethodName": '<#= destMethodName #>',
+    "DestMethodParamTypes": ['<#= destMethodParamTypes[0] #>'],
+    "DestMethodAccessType": '<#= destMethodAccessType #>',
+    "DestMethodParamTypeForVar": '',
+    "InvocationVarType": '',
+    "InvocationParamType": '<#= invocationParamType #>',
+    "InvocationClassType": '',
+    "InvocationMethodName": '<#= invocationMethodName #>',
+    "InvocationGenerics": ['<#= invocationGenerics[0] #>', '<#= invocationGenerics[1] #>'],
+    "InvocationParams": ['<#= invocationParams[0] #>'],
+    "StepDescription": 'Insertion the line : containerRegistry.RegisterDialog<<#= SdlgUserControlClassName #>, <#= SdlgViewModelBaseClassName #>>("<#= SdlgViewModelClassName #>");'
+    },
+<#
 }
 #>
-Result: <#= result #>
-
-*/
+    ]
+}
 
 
 <#+
@@ -169,7 +200,7 @@ Result: <#= result #>
         if(string.IsNullOrEmpty(refItem.FileProject)) {
             return result;
         }
-        return refItem.FileProject;
+        return refItem.FileProject.Replace(@"\", @"\\");
     }
 
     string GetFilterPropertyOperatorName(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model, string operatorSufix) {

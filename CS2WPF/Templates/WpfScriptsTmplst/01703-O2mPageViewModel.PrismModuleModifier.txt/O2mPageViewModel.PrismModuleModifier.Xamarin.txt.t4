@@ -1,5 +1,5 @@
 ﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
-<#@ output extension="txt" #>
+<#@ output extension="jsonpmm2txt" #>
 <#@ assembly name="System.Core" #>
 <#@ import namespace="System" #>
 <#@ import namespace="System.Linq" #>
@@ -7,13 +7,10 @@
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.Text" #>
 <#@ import namespace="CS2WPF" #>
-<#@ import namespace="CS2WPF.Helpers" #>
 <#@ import namespace="CS2WPF.Model" #>
 <#@ import namespace="CS2WPF.Model.Serializable" #>
 <#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
-<#@ parameter type="CS2WPF.Helpers.PrismModuleModifier"  name="PrismModifier" #>
-
 <#
 
     string EformModeEnumFolder                      = "00026-EformModeEnum.cs";
@@ -171,31 +168,33 @@
     
     
 #>
-/*
+{
+"PrismMMMCallItems": [
 
 <#
-    string result ;
-    int insertionCount = 0;
     if (LformUserControlProject != O2mPageProject) {
-        insertionCount++;
 #>
-    "<#= LformUserControlClassName #>" UserControl is defined in the "<#= LformUserControlProject #>"-project.
-    In the file of IModule-class of "<#= LformUserControlProject #>"-project the following line of code must be inserted:
+    {
+    "Description": [
 
-        public void OnInitialized(IContainerProvider containerProvider)
-        {
-            ...
-            IRegionManager regionManager = containerProvider.Resolve(typeof(IRegionManager)) as IRegionManager;
-            if (regionManager != null)
-            {
-                ...
-                // According to requirements of the "<#= O2mPageViewModelClassName #>.cs"-file of "<#= O2mPageProject #>"-project. 
-                regionManager.RegisterViewWithRegion("<#= LformUserControlClassName #><#= MasterRegionPropertyName #>", typeof(<#= LformUserControlClassName #>));
-                ...
-            }
-            ...
-        }
-<#= insertionCount #>. Insertion the line : regionManager.RegisterViewWithRegion("<#= LformUserControlClassName #><#= MasterRegionPropertyName #>", typeof(<#= LformUserControlClassName #>));
+    '"<#= LformUserControlClassName #>" UserControl is defined in the "<#= LformUserControlProject #>"-project.',
+    'In the file of IModule-class of "<#= LformUserControlProject #>"-project the following line of code must be inserted:',
+    ' ',
+    '    public void OnInitialized(IContainerProvider containerProvider)',
+    '    {',
+    '        ...',
+    '        IRegionManager regionManager = containerProvider.Resolve(typeof(IRegionManager)) as IRegionManager;',
+    '        if (regionManager != null)',
+    '        {',
+    '            ...',
+    '            // According to requirements of the "<#= O2mPageViewModelClassName #>.cs"-file of "<#= O2mPageProject #>"-project. ',
+    '            regionManager.RegisterViewWithRegion("<#= LformUserControlClassName #><#= MasterRegionPropertyName #>", typeof(<#= LformUserControlClassName #>));',
+    '            ...',
+    '        }',
+    '        ...',
+    '    }'
+    ],
+
 <#
 {
     string LformUserControlNameSpaceAndClassName            = LformUserControlNameSpace + "." + LformUserControlClassName;
@@ -209,18 +208,28 @@
     string invocationMethodName                             = "RegisterViewWithRegion";
     string[] invocationGenerics                             = new string[]{};
     string[] invocationParams                               = new string[]{"\"" + LformUserControlClassName + MasterRegionPropertyName  +"\"", "typeof("+LformUserControlNameSpaceAndClassName+")"};
-    result = PrismModifier.UpdateMethodWithVarIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType, destMethodParamTypeForVar,
-                        invocationVarType, invocationMethodName, invocationGenerics, invocationParams);
+    //result = PrismModifier.UpdateMethodWithVarIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType, destMethodParamTypeForVar,
+    //                    invocationVarType, invocationMethodName, invocationGenerics, invocationParams);
+#>
+    "MethodName": 'UpdateMethodWithVarIdentifier',
+    "DestProjectName": '<#= destProjectName #>',
+    "DestImplementedInterface": '<#= destImplementedInterface #>',
+    "DestMethodName": '<#= destMethodName #>',
+    "DestMethodParamTypes": ['<#= destMethodParamTypes[0] #>'],
+    "DestMethodAccessType": '<#= destMethodAccessType #>',
+    "DestMethodParamTypeForVar": '<#= destMethodParamTypeForVar #>',
+    "InvocationVarType": '<#= invocationVarType #>',
+    "InvocationParamType": '',
+    "InvocationClassType": '',
+    "InvocationMethodName": '<#= invocationMethodName #>',
+    "InvocationGenerics": [],
+    "InvocationParams": ['<#= invocationParams[0] #>','<#= invocationParams[1] #>'],
+    "StepDescription": 'Insertion the line : regionManager.RegisterViewWithRegion("<#= LformUserControlClassName #><#= MasterRegionPropertyName #>", typeof(<#= LformUserControlClassName #>));'
+    },
+<#
+
 }
-#>
-Result: <#= result #>
-
-<#
     }
-#>
-
-
-<#
         foreach(string detailViewName in detailViews) {
             ModelViewSerializable detailView = GetModelViewByName(Context, detailViewName);
             if(detailView == null) {
@@ -241,24 +250,26 @@ Result: <#= result #>
             if (localLformUserControlProject != O2mPageProject) {
 
 #>
-   
-    "<#= detailViewClassName #>" UserControl is defined in the "<#= localLformUserControlProject #>"-project.
-    In the file of IModule-class of "<#= localLformUserControlProject #>"-project the following line of code must be inserted:
+    {
+    "Description": [
+    '"<#= detailViewClassName #>" UserControl is defined in the "<#= localLformUserControlProject #>"-project.',
+    'In the file of IModule-class of "<#= localLformUserControlProject #>"-project the following line of code must be inserted:',
+    ' ',
+    '    public void OnInitialized(IContainerProvider containerProvider)',
+    '    {',
+    '        ...',
+    '        IRegionManager regionManager = containerProvider.Resolve(typeof(IRegionManager)) as IRegionManager;',
+    '        if (regionManager != null)',
+    '        {',
+    '            ...',
+    '            // According to requirements of the "<#= O2mPageViewModelClassName #>.cs"-file of "<#= O2mPageProject #>"-project. ',
+    '            regionManager.RegisterViewWithRegion("<#= detailViewClassName #><#= DetailRegionPropertyName #>", typeof(<#= detailViewClassName #>));',
+    '            ...',
+    '        }',
+    '        ...',
+    '    }'
+    ],
 
-        public void OnInitialized(IContainerProvider containerProvider)
-        {
-            ...
-            IRegionManager regionManager = containerProvider.Resolve(typeof(IRegionManager)) as IRegionManager;
-            if (regionManager != null)
-            {
-                ...
-                // According to requirements of the "<#= O2mPageViewModelClassName #>.cs"-file of "<#= O2mPageProject #>"-project. 
-                regionManager.RegisterViewWithRegion("<#= detailViewClassName #><#= DetailRegionPropertyName #>", typeof(<#= detailViewClassName #>));
-                ...
-            }
-            ...
-        }
-<#= insertionCount #>. Insertion the line : regionManager.RegisterViewWithRegion("<#= detailViewClassName #><#= DetailRegionPropertyName #>", typeof(<#= detailViewClassName #>));
 <#
 {
     string detailViewNameSpaceAndClassName                  = detailViewNameSpace + "." + detailViewClassName;
@@ -272,34 +283,50 @@ Result: <#= result #>
     string invocationMethodName                             = "RegisterViewWithRegion";
     string[] invocationGenerics                             = new string[]{};
     string[] invocationParams                               = new string[]{"\"" + detailViewClassName + DetailRegionPropertyName  +"\"", "typeof("+detailViewNameSpaceAndClassName+")"};
-    result = PrismModifier.UpdateMethodWithVarIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType, destMethodParamTypeForVar,
-                        invocationVarType, invocationMethodName, invocationGenerics, invocationParams);
-}
+    //result = PrismModifier.UpdateMethodWithVarIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType, destMethodParamTypeForVar,
+    //                    invocationVarType, invocationMethodName, invocationGenerics, invocationParams);
 #>
-Result: <#= result #>
-
+    "MethodName": 'UpdateMethodWithVarIdentifier',
+    "DestProjectName": '<#= destProjectName #>',
+    "DestImplementedInterface": '<#= destImplementedInterface #>',
+    "DestMethodName": '<#= destMethodName #>',
+    "DestMethodParamTypes": ['Prism.Ioc.IContainerProvider'],
+    "DestMethodAccessType": '<#= destMethodAccessType #>',
+    "DestMethodParamTypeForVar": '<#= destMethodParamTypeForVar #>',
+    "InvocationVarType": '<#= invocationVarType #>',
+    "InvocationParamType": '',
+    "InvocationClassType": '',
+    "InvocationMethodName": '<#= invocationMethodName #>',
+    "InvocationGenerics": [],
+    "InvocationParams": ['<#= invocationParams[0] #>','<#= invocationParams[1] #>'],
+    "StepDescription": 'Insertion the line : regionManager.RegisterViewWithRegion("<#= detailViewClassName #><#= DetailRegionPropertyName #>", typeof(<#= detailViewClassName #>));'
+    },
 <#
+
+}
             }
         }
 #>
 
+    {
+    "Description": [
+    '"<#= O2mPageClassName #>" UserControl is defined in the "<#= O2mPageProject #>"-project.',
+    'In the file of IModule-class of "<#= O2mPageProject #>"-project the following line of code must be inserted:',
+    ' ',
+    '    public void RegisterTypes(IContainerRegistry containerRegistry)',
+    '    {',
+    '        ...',
+    '        // According to requirements of the "<#= O2mPageViewModelClassName #>.cs"-file of "<#= O2mPageProject #>"-project. ',
+    '        ViewModelLocationProvider.Register<<#= O2mPageClassName #>, <#= O2mPageViewModelClassName #>>();',
+    '        // According to requirements of the "<#= O2mPageViewModelClassName #>.cs"-file of "<#= O2mPageProject #>"-project. ',
+    '        containerRegistry.RegisterForNavigation<<#= O2mPageClassName #>, <#= O2mPageViewModelClassName #>>("<#= O2mPageClassName #>");',
+    '        // Only if you need to get an instance of controls, insert two lines below',
+    '        // According to requirements of the "<#= O2mPageViewModelClassName #>.cs"-file of "<#= O2mPageProject #>"-project. ',
+    '        // containerRegistry.Register<ContentPage, <#= O2mPageClassName #>>("<#= O2mPageClassName #>");',
+    '        ...',
+    '    }',
+    ],
 
-    "<#= O2mPageClassName #>" UserControl is defined in the "<#= O2mPageProject #>"-project.
-    In the file of IModule-class of "<#= O2mPageProject #>"-project the following line of code must be inserted:
-
-        public void RegisterTypes(IContainerRegistry containerRegistry)
-        {
-            ...
-            // According to requirements of the "<#= O2mPageViewModelClassName #>.cs"-file of "<#= O2mPageProject #>"-project. 
-            ViewModelLocationProvider.Register<<#= O2mPageClassName #>, <#= O2mPageViewModelClassName #>>();
-            // According to requirements of the "<#= O2mPageViewModelClassName #>.cs"-file of "<#= O2mPageProject #>"-project. 
-            containerRegistry.RegisterForNavigation<<#= O2mPageClassName #>, <#= O2mPageViewModelClassName #>>("<#= O2mPageClassName #>");
-            // Only if you need to get an instance of controls, insert two lines below
-            // According to requirements of the "<#= O2mPageViewModelClassName #>.cs"-file of "<#= O2mPageProject #>"-project. 
-            // containerRegistry.Register<ContentPage, <#= O2mPageClassName #>>("<#= O2mPageClassName #>");
-            ...
-        }
-2.1. Insertion the line : ViewModelLocationProvider.Register<<#= O2mPageClassName #>, <#= O2mPageViewModelClassName #>>();
 <#
     {
     string O2mPageNameSpaceAndClassName                     = O2mPageNameSpace + "." + O2mPageClassName;
@@ -313,14 +340,27 @@ Result: <#= result #>
     string invocationMethodName                             = "Register";
     string[] invocationGenerics                             = new string[]{O2mPageNameSpaceAndClassName, O2mPageViewModelNameSpaceAndClassName};
     string[] invocationParams                               = new string[]{};
-    result = PrismModifier.UpdateMethodWithClassIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType,
-                        invocationClassType, invocationMethodName, invocationGenerics, invocationParams);
-    }
+    //result = PrismModifier.UpdateMethodWithClassIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType,
+    //                    invocationClassType, invocationMethodName, invocationGenerics, invocationParams);
 #>
-Result: <#= result #>
-
-2.2. Insertion the line : containerRegistry.RegisterForNavigation<<#= O2mPageClassName #>, <#= O2mPageViewModelClassName #>>("<#= O2mPageClassName #>");
+    "MethodName": 'UpdateMethodWithClassIdentifier',
+    "DestProjectName": '<#= destProjectName #>',
+    "DestImplementedInterface": '<#= destImplementedInterface #>',
+    "DestMethodName": '<#= destMethodName #>',
+    "DestMethodParamTypes": ['<#= destMethodParamTypes[0] #>'],
+    "DestMethodAccessType": '<#= destMethodAccessType #>',
+    "DestMethodParamTypeForVar": '',
+    "InvocationVarType": '',
+    "InvocationParamType": '',
+    "InvocationClassType": '<#= invocationClassType #>',
+    "InvocationMethodName": '<#= invocationMethodName #>',
+    "InvocationGenerics": ['<#= invocationGenerics[0] #>','<#= invocationGenerics[1] #>'],
+    "InvocationParams": [],
+    "StepDescription": 'Insertion the line : ViewModelLocationProvider.Register<<#= O2mPageClassName #>, <#= O2mPageViewModelClassName #>>();'
+    },
 <#
+
+    }
 {
     string O2mPageNameSpaceAndClassName                     = O2mPageNameSpace + "." + O2mPageClassName;
     string O2mPageViewModelNameSpaceAndClassName                = O2mPageViewModelNameSpace + "." + O2mPageViewModelClassName;
@@ -331,16 +371,31 @@ Result: <#= result #>
     string destMethodAccessType                             = "public";
     string invocationParamType                              = "Prism.Ioc.IContainerRegistry";
     string invocationMethodName                             = "RegisterForNavigation";
-    string[] invocationGenerics                             = new string[]{O2mPageNameSpaceAndClassName,O2mPageViewModelNameSpaceAndClassName};
+    string[] invocationGenerics                             = new string[]{O2mPageNameSpaceAndClassName, O2mPageViewModelNameSpaceAndClassName};
     string[] invocationParams                               = new string[]{"\"" + O2mPageClassName + "\""};
-    result = PrismModifier.UpdateMethodWithParamIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType,
-                        invocationParamType, invocationMethodName, invocationGenerics, invocationParams);
-}
-#>
-Result: <#= result #>
-
-2.3. Insertion the line : containerRegistry.Register<ContentPage, <#= O2mPageClassName #>>("<#= O2mPageClassName #>");
+    //result = PrismModifier.UpdateMethodWithParamIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType,
+    //                    invocationParamType, invocationMethodName, invocationGenerics, invocationParams);
+#>  
+   {
+    "Description": [],
+    "MethodName": 'UpdateMethodWithParamIdentifier',
+    "DestProjectName": '<#= destProjectName #>',
+    "DestImplementedInterface": '<#= destImplementedInterface #>',
+    "DestMethodName": '<#= destMethodName #>',
+    "DestMethodParamTypes": ['<#= destMethodParamTypes[0] #>'],
+    "DestMethodAccessType": '<#= destMethodAccessType #>',
+    "DestMethodParamTypeForVar": '',
+    "InvocationVarType": '',
+    "InvocationParamType": '<#= invocationParamType #>',
+    "InvocationClassType": '',
+    "InvocationMethodName": '<#= invocationMethodName #>',
+    "InvocationGenerics": ['<#= invocationGenerics[0] #>','<#= invocationGenerics[1] #>'],
+    "InvocationParams": ['<#= invocationParams[0]  #>'],
+    "StepDescription": 'Insertion the line : containerRegistry.RegisterForNavigation<<#= O2mPageClassName #>, <#= O2mPageViewModelClassName #>>("<#= O2mPageClassName #>");'
+    },
 <#
+
+}
 {
     string O2mPageNameSpaceAndClassName                     = O2mPageNameSpace + "." + O2mPageClassName;
     string O2mPageViewModelNameSpaceAndClassName            = O2mPageViewModelNameSpace + "." + O2mPageViewModelClassName;
@@ -353,15 +408,32 @@ Result: <#= result #>
     string invocationMethodName                             = "Register";
     string[] invocationGenerics                             = new string[]{"Xamarin.Forms.ContentPage",O2mPageNameSpaceAndClassName};
     string[] invocationParams                               = new string[]{"\"" + O2mPageClassName + "\""};
-    result = PrismModifier.UpdateMethodWithParamIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType,
-                        invocationParamType, invocationMethodName, invocationGenerics, invocationParams);
+    //result = PrismModifier.UpdateMethodWithParamIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType,
+    //                    invocationParamType, invocationMethodName, invocationGenerics, invocationParams);
+#>  
+   {
+    "Description": [],
+    "MethodName": 'UpdateMethodWithParamIdentifier',
+    "DestProjectName": '<#= destProjectName #>',
+    "DestImplementedInterface": '<#= destImplementedInterface #>',
+    "DestMethodName": '<#= destMethodName #>',
+    "DestMethodParamTypes": ['<#= destMethodParamTypes[0] #>'],
+    "DestMethodAccessType": '<#= destMethodAccessType #>',
+    "DestMethodParamTypeForVar": '',
+    "InvocationVarType": '',
+    "InvocationParamType": '<#= invocationParamType #>',
+    "InvocationClassType": '',
+    "InvocationMethodName": '<#= invocationMethodName #>',
+    "InvocationGenerics": ['<#= invocationGenerics[0] #>', '<#= invocationGenerics[1] #>'],
+    "InvocationParams": ['<#= invocationParams[0]  #>'],
+    "StepDescription": 'Insertion the line : containerRegistry.Register<ContentPage, <#= O2mPageClassName #>>("<#= O2mPageClassName #>");'
+    },
+<#
+
 }
 #>
-Result: <#= result #>
-
-*/
-
-
+    ]
+}
 
 
 <#+
@@ -381,7 +453,7 @@ Result: <#= result #>
         if(string.IsNullOrEmpty(refItem.FileProject)) {
             return result;
         }
-        return refItem.FileProject;
+        return refItem.FileProject.Replace(@"\", @"\\");
     }
 
     string GetFilterPropertyOperatorName(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model, string operatorSufix) {
