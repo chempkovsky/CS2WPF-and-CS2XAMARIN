@@ -451,7 +451,7 @@
     "InvocationMethodName": '<#= invocationMethodName #>',
     "InvocationGenerics": ['<#= invocationGenerics[0] #>','<#= invocationGenerics[1] #>'],
     "InvocationParams": ['<#= invocationParams[0]  #>'],
-    "StepDescription": 'Insertion the line : containerRegistry.Register<ContentView, <#= SformUserControlClassName #>>("<#= SformUserControlClassName #>");'
+    "StepDescription": 'Insertion the line : containerRegistry.Register<ContentView, <#= EformUserControlClassName #>>("<#= EformUserControlClassName #>");'
     },
 <#
 
@@ -478,7 +478,7 @@
         if(string.IsNullOrEmpty(refItem.FileProject)) {
             return result;
         }
-        return refItem.FileProject;
+        return refItem.FileProject.Replace(@"\", @"\\");
     }
 
     string GetFilterPropertyOperatorName(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model, string operatorSufix) {
