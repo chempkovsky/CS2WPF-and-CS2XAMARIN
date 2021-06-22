@@ -210,7 +210,7 @@
             </Picker>
         </StackLayout>
 
-        <ContentView ControlTemplate="{DynamicResource NoMasterRowIsSelectedView}">
+        <ContentView ControlTemplate="{StaticResource NoMasterRowIsSelectedView}">
             <ContentView.Resources>
                 <ResourceDictionary>
                     <ControlTemplate x:Key="NoMasterRowIsSelectedView">
@@ -309,12 +309,18 @@
                             <BindingCondition Binding="{Binding BindingContext.<#= SelectedDetailsListItemPropertyName #>.<#= RegionPropertyName #>, Source={x:Reference o2mUsrCntrlRootNode}}" Value="<#= detailViewClassName #><#= DetailRegionPropertyName #>"/>
                             <BindingCondition Binding="{Binding BindingContext.<#= IsDetailReadyPropertyName #>, Source={x:Reference o2mUsrCntrlRootNode}}" Value="True"/>
                         </MultiTrigger.Conditions>
-                        <Setter Property="ControlTemplate" Value="{DynamicResource <#= detailViewClassName #><#= TemplateViewSuffixPropertyName #>}" />
+                        <Setter Property="ControlTemplate" Value="{StaticResource <#= detailViewClassName #><#= TemplateViewSuffixPropertyName #>}" />
                     </MultiTrigger>
 <#
         }
     }
 #>
+                    <MultiTrigger TargetType="ContentView">
+                        <MultiTrigger.Conditions>
+                            <BindingCondition Binding="{Binding BindingContext.<#= IsDetailReadyPropertyName #>, Source={x:Reference o2mUsrCntrlRootNode}}" Value="False"/>
+                        </MultiTrigger.Conditions>
+                        <Setter Property="ControlTemplate" Value="{StaticResource NoMasterRowIsSelectedView}" />
+                    </MultiTrigger>
             </ContentView.Triggers>
         </ContentView>
     </StackLayout>

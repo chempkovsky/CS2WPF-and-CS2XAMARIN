@@ -4,18 +4,14 @@ using EnvDTE80;
 using Newtonsoft.Json;
 using Microsoft.VisualStudio.TextTemplating;
 using Microsoft.VisualStudio.TextTemplating.VSHost;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using CS2WPF.Model.Serializable;
 using CS2WPF.TemplateProcessingHelpers;
 using System.IO;
 using System.Text.RegularExpressions;
 using CS2WPF.Model;
 using System.Collections.ObjectModel;
-using CS2WPF.Model.Serializable.UI;
 
 namespace CS2WPF.Helpers.BatchProcess
 {
@@ -39,7 +35,8 @@ namespace CS2WPF.Helpers.BatchProcess
                 FileExtension = "",
                 T4TempatePath = T4TempatePath,
             };
-            if ((model == null) || (SerializableDbContext == null)) {
+            if ((model == null) || (SerializableDbContext == null))
+            {
                 result.GenerateError = "Model and/or Context is not defined";
                 return result;
             }
@@ -49,7 +46,7 @@ namespace CS2WPF.Helpers.BatchProcess
             textTemplatingSessionHost.Session["Model"] = model;
             textTemplatingSessionHost.Session["Context"] = SerializableDbContext;
             textTemplatingSessionHost.Session["DefaultProjectNameSpace"] = string.IsNullOrEmpty(defaultProjectNameSpace) ? "" : defaultProjectNameSpace;
-            textTemplatingSessionHost.Session["PrismModifier"] = prismModuleModifier;
+            // textTemplatingSessionHost.Session["PrismModifier"] = prismModuleModifier;
             result.GenerateText = textTemplating.ProcessTemplate(T4TempatePath, File.ReadAllText(result.T4TempatePath), tpCallback);
             result.FileExtension = tpCallback.FileExtension;
             if (tpCallback.ProcessingErrors != null)
@@ -57,6 +54,14 @@ namespace CS2WPF.Helpers.BatchProcess
                 foreach (TPError tpError in tpCallback.ProcessingErrors)
                 {
                     result.GenerateError += tpError.ToString() + "\n";
+                }
+            }
+            if (string.IsNullOrEmpty(result.GenerateError))
+            {
+                if (string.Compare(result.FileExtension, ".jsonpmm2txt", true) == 0)
+                {
+                    result.FileExtension = ".txt";
+                    result.GenerateText = prismModuleModifier.ExecuteJsonScript(result.GenerateText);
                 }
             }
             return result;
@@ -74,7 +79,8 @@ namespace CS2WPF.Helpers.BatchProcess
                 result =
                     Regex.Replace(src.Substring(0, firstDelim), @"\B[A-Z]", m => "-" + m.ToString().ToLower()).ToLower() +
                     src.Substring(firstDelim);
-            } else
+            }
+            else
             {
                 result =
                     Regex.Replace(src, @"\B[A-Z]", m => "-" + m.ToString().ToLower()).ToLower();
@@ -94,7 +100,7 @@ namespace CS2WPF.Helpers.BatchProcess
                 return srcStr;
             }
         }
-        public static ModelViewSerializable GetSelectedModelCommonShallowCopy(ModelViewSerializable SelectedModel, 
+        public static ModelViewSerializable GetSelectedModelCommonShallowCopy(ModelViewSerializable SelectedModel,
                                             ObservableCollection<ModelViewUIFormProperty> UIFormProperties,
                                             ObservableCollection<ModelViewUIListProperty> UIListProperties,
                                             string DestinationProject, string DefaultProjectNameSpace, string DestinationFolder, string DestinationSubFolder,
@@ -136,12 +142,13 @@ namespace CS2WPF.Helpers.BatchProcess
             if (string.IsNullOrEmpty(DestinationSubFolder))
             {
                 commonStaffItem.FileFolder = DestinationFolder;
-            } else
+            }
+            else
             {
                 commonStaffItem.FileFolder = Path.Combine(DestinationFolder, DestinationSubFolder);
             }
 
-            
+
             if (UIFormProperties != null)
             {
                 result.UIFormProperties = new List<ModelViewUIFormPropertySerializable>();
@@ -150,12 +157,12 @@ namespace CS2WPF.Helpers.BatchProcess
                     result.UIFormProperties.Add(srcProp.ModelViewUIFormPropertyAssignTo(new ModelViewUIFormPropertySerializable()));
                 }
             }
-            if(result.UIFormProperties == null)
+            if (result.UIFormProperties == null)
             {
                 result.UIFormProperties = new List<ModelViewUIFormPropertySerializable>();
             }
 
-            
+
             if (UIListProperties != null)
             {
                 result.UIListProperties = new List<ModelViewUIListPropertySerializable>();
@@ -172,7 +179,7 @@ namespace CS2WPF.Helpers.BatchProcess
             return result;
         }
 
-        public static void UpdateDbContext(DTE2 Dte, Project DestinationProject, SolutionCodeElement SelectedDbContext, DbContextSerializable dbContextSerializable, ModelViewSerializable modelViewSerializable, 
+        public static void UpdateDbContext(DTE2 Dte, Project DestinationProject, SolutionCodeElement SelectedDbContext, DbContextSerializable dbContextSerializable, ModelViewSerializable modelViewSerializable,
                                         string ContextItemViewName, string T4SelectedFolder,
                                         string DestinationProjectRootFolder,
                                         string DestinationFolder,
@@ -248,7 +255,8 @@ namespace CS2WPF.Helpers.BatchProcess
                 FlNm = Path.Combine(
                 DestinationProjectRootFolder,
                 DestinationFolder);
-            } else
+            }
+            else
             {
                 FlNm = Path.Combine(
                 DestinationProjectRootFolder,

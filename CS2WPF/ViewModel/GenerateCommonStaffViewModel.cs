@@ -1,38 +1,29 @@
 ﻿using CS2WPF.Helpers;
-using CS2WPF.Model;
 using CS2WPF.Model.Serializable;
 using CS2WPF.TemplateProcessingHelpers;
-using EnvDTE;
 using EnvDTE80;
 using Microsoft.VisualStudio.TextTemplating;
 using Microsoft.VisualStudio.TextTemplating.VSHost;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CS2WPF.ViewModel
 {
     public class GenerateCommonStaffViewModel : BaseGenerateViewModel
     {
-        public GenerateCommonStaffViewModel(): base()
+        public GenerateCommonStaffViewModel() : base()
         {
-            
+
         }
 
-        
+
 
         public void DoGenerateViewModel(PrismModuleModifier prismModuleModifier, DTE2 Dte, ITextTemplating textTemplating, string T4TempatePath, DbContextSerializable SerializableDbContext, ModelViewSerializable model, string defaultProjectNameSpace = null)
         {
-            
+
             this.GenerateText = "";
             this.GenerateError = "";
             IsReady.DoNotify(this, false);
-            if((model == null) || (SerializableDbContext == null)) return;
+            if ((model == null) || (SerializableDbContext == null)) return;
             GeneratedModelView = model;
 
             ITextTemplatingSessionHost textTemplatingSessionHost = (ITextTemplatingSessionHost)textTemplating;
@@ -41,8 +32,8 @@ namespace CS2WPF.ViewModel
 
             textTemplatingSessionHost.Session["Model"] = GeneratedModelView;
             textTemplatingSessionHost.Session["Context"] = SerializableDbContext;
-            textTemplatingSessionHost.Session["DefaultProjectNameSpace"] = string.IsNullOrEmpty( defaultProjectNameSpace) ? "" : defaultProjectNameSpace;
-            textTemplatingSessionHost.Session["PrismModifier"] = prismModuleModifier;
+            textTemplatingSessionHost.Session["DefaultProjectNameSpace"] = string.IsNullOrEmpty(defaultProjectNameSpace) ? "" : defaultProjectNameSpace;
+            // textTemplatingSessionHost.Session["PrismModifier"] = prismModuleModifier;
             if (string.IsNullOrEmpty(GenText))
             {
                 this.GenerateText = textTemplating.ProcessTemplate(T4TempatePath, File.ReadAllText(T4TempatePath), tpCallback);
@@ -59,6 +50,15 @@ namespace CS2WPF.ViewModel
                     this.GenerateError += tpError.ToString() + "\n";
                 }
             }
+            if (string.IsNullOrEmpty(this.GenerateError))
+            {
+                if (string.Compare(FileExtension, ".jsonpmm2txt", true) == 0)
+                {
+                    FileExtension = ".txt";
+                    this.GenerateText = prismModuleModifier.ExecuteJsonScript(this.GenerateText);
+                }
+            }
+
             IsReady.DoNotify(this, string.IsNullOrEmpty(this.GenerateError));
         }
 
@@ -80,7 +80,7 @@ namespace CS2WPF.ViewModel
             textTemplatingSessionHost.Session["FeatureContext"] = SerializableFeatureContext;
             textTemplatingSessionHost.Session["Context"] = SerializableDbContext;
             textTemplatingSessionHost.Session["DefaultProjectNameSpace"] = string.IsNullOrEmpty(defaultProjectNameSpace) ? "" : defaultProjectNameSpace;
-            textTemplatingSessionHost.Session["PrismModifier"] = prismModuleModifier;
+            //textTemplatingSessionHost.Session["PrismModifier"] = prismModuleModifier;
 
             if (string.IsNullOrEmpty(GenText))
             {
@@ -98,6 +98,15 @@ namespace CS2WPF.ViewModel
                     this.GenerateError += tpError.ToString() + "\n";
                 }
             }
+            if (string.IsNullOrEmpty(this.GenerateError))
+            {
+                if (string.Compare(FileExtension, ".jsonpmm2txt", true) == 0)
+                {
+                    FileExtension = ".txt";
+                    this.GenerateText = prismModuleModifier.ExecuteJsonScript(this.GenerateText);
+                }
+            }
+
             IsReady.DoNotify(this, string.IsNullOrEmpty(this.GenerateError));
         }
 

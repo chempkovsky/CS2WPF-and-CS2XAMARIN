@@ -6,17 +6,16 @@ using EnvDTE;
 using EnvDTE80;
 using Microsoft.VisualStudio.TextTemplating;
 using Microsoft.VisualStudio.TextTemplating.VSHost;
-using System.ComponentModel;
 using System.IO;
-using System.Runtime.CompilerServices;
+
 
 namespace CS2WPF.ViewModel
 {
     public class GenerateViewModel : BaseGenerateViewModel
     {
-        public GenerateViewModel(): base()
+        public GenerateViewModel() : base()
         {
-            
+
         }
         public void DoGenerateViewModel(PrismModuleModifier prismModuleModifier, DTE2 Dte, ITextTemplating textTemplating, SelectedItem DestinationSelectedItem, string T4TempatePath, ModelView modelView)
         {
@@ -32,7 +31,7 @@ namespace CS2WPF.ViewModel
             textTemplatingSessionHost.Session = textTemplatingSessionHost.CreateSession();
             TPCallback tpCallback = new TPCallback();
             textTemplatingSessionHost.Session["Model"] = GeneratedModelView;
-            textTemplatingSessionHost.Session["PrismModifier"] = prismModuleModifier;
+            //textTemplatingSessionHost.Session["PrismModifier"] = prismModuleModifier;
             if (string.IsNullOrEmpty(GenText))
             {
                 this.GenerateText = textTemplating.ProcessTemplate(T4TempatePath, File.ReadAllText(T4TempatePath), tpCallback);
@@ -42,10 +41,19 @@ namespace CS2WPF.ViewModel
                 this.GenerateText = textTemplating.ProcessTemplate(T4TempatePath, GenText, tpCallback);
             }
             FileExtension = tpCallback.FileExtension;
-            if (tpCallback.ProcessingErrors != null) {
+            if (tpCallback.ProcessingErrors != null)
+            {
                 foreach (TPError tpError in tpCallback.ProcessingErrors)
                 {
                     this.GenerateError = tpError.ToString() + "\n";
+                }
+            }
+            if (string.IsNullOrEmpty(this.GenerateError))
+            {
+                if (string.Compare(FileExtension, ".jsonpmm2txt", true) == 0)
+                {
+                    FileExtension = ".txt";
+                    this.GenerateText = prismModuleModifier.ExecuteJsonScript(this.GenerateText);
                 }
             }
             IsReady.DoNotify(this, string.IsNullOrEmpty(this.GenerateError));

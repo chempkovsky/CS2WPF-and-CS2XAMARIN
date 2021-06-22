@@ -1,11 +1,15 @@
-﻿using EnvDTE;
+﻿using CS2WPF.Model.Serializable;
+using EnvDTE;
 using EnvDTE80;
+using Microsoft.VisualStudio.Shell;
+using Newtonsoft.Json;
 using System;
 using System.Linq;
+using System.Text;
 
 namespace CS2WPF.Helpers
 {
-    [Serializable]
+    
     public class PrismModuleModifier
     {
         protected DTE2 _Dte;
@@ -18,6 +22,7 @@ namespace CS2WPF.Helpers
             string destProjectName, string destImplementedInterface, string destMethodName, string[] destMethodParamTypes, string destMethodAccessType,
             string invocationParamType, string invocationMethodName, string[] invocationGenerics, string[] invocationParams)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             if (string.IsNullOrEmpty(destProjectName)) return "Error: destProjectName is not defined";
             if (string.IsNullOrEmpty(destImplementedInterface)) return "Error: destImplementedInterface is not defined";
             if (string.IsNullOrEmpty(destMethodName)) return "Error: destMethodName is not defined";
@@ -77,6 +82,7 @@ namespace CS2WPF.Helpers
             string destProjectName, string destImplementedInterface, string destMethodName, string[] destMethodParamTypes, string destMethodAccessType,
             string invocationClassType, string invocationMethodName, string[] invocationGenerics, string[] invocationParams)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             if (string.IsNullOrEmpty(destProjectName)) return "Error: destProjectName is not defined";
             if (string.IsNullOrEmpty(destImplementedInterface)) return "Error: destImplementedInterface is not defined";
             if (string.IsNullOrEmpty(destMethodName)) return "Error: destMethodName is not defined";
@@ -125,6 +131,7 @@ namespace CS2WPF.Helpers
             string destProjectName, string destImplementedInterface, string destMethodName, string[] destMethodParamTypes, string destMethodAccessType, string destMethodParamTypeForVar,
             string invocationVarType, string invocationMethodName, string[] invocationGenerics, string[] invocationParams)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             if (string.IsNullOrEmpty(destProjectName)) return "Error: destProjectName is not defined";
             if (string.IsNullOrEmpty(destImplementedInterface)) return "Error: destImplementedInterface is not defined";
             if (string.IsNullOrEmpty(destMethodName)) return "Error: destMethodName is not defined";
@@ -185,6 +192,125 @@ namespace CS2WPF.Helpers
             string lineOfCode = PrismModuleAnalyzerHelper.GenerateLineOfCode(varName, invocationMethodName, invocationGenerics, invocationParams);
             if (codeFunction.InsertToBody(lineOfCode, true)) return "Ok";
             return "Error: internal error. Can not insert line of code into the end of body of the destMethodName";
+        }
+
+        public StringBuilder FormatOutput(StringBuilder sb, PrismMMMCallItemSerializable stepItm)
+        {
+            StringBuilder result = null;
+            if (sb == null) result = new StringBuilder(); else result = sb;
+            result.AppendLine("");
+            if (stepItm != null)
+            {
+                if (stepItm.Description != null)
+                {
+                    foreach (string s in stepItm.Description) result.AppendLine(s);
+                }
+                if (stepItm.StepDescription != null) result.AppendLine(stepItm.StepDescription);
+                result.AppendLine("Result:");
+                if (string.IsNullOrEmpty(stepItm.Result)) result.AppendLine("Result is not defined"); else result.AppendLine(stepItm.Result);
+            }
+            return result;
+        }
+        public string ExecuteJsonScript(string jsonScript)
+        {
+            StringBuilder sb;
+            if (string.IsNullOrEmpty(jsonScript)) sb = new StringBuilder(); else sb = new StringBuilder(jsonScript);
+            sb.AppendLine("==============================================================================");
+            sb.AppendLine("Deserialize json Script");
+            PrismMMMCallsListSerializable steps = null;
+            try
+            {
+                steps = JsonConvert.DeserializeObject<PrismMMMCallsListSerializable>(jsonScript);
+                sb.AppendLine("Deserialize json Script: Done");
+                if (steps == null)
+                {
+                    sb.AppendLine("Result:");
+                    sb.AppendLine(" The list of PrismMMMCallsListSerializable steps is epmty.");
+                    return sb.ToString();
+                }
+                if (steps.PrismMMMCallItems == null)
+                {
+                    sb.AppendLine("Result:");
+                    sb.AppendLine(" The list of PrismMMMCallsListSerializable steps is epmty.");
+                    return sb.ToString();
+                }
+                if (steps.PrismMMMCallItems.Count < 1)
+                {
+                    sb.AppendLine("Result:");
+                    sb.AppendLine(" The list of PrismMMMCallsListSerializable steps is epmty.");
+                    return sb.ToString();
+                }
+            }
+            catch (Exception e)
+            {
+                sb.AppendLine("Error:");
+                sb.AppendLine(e.Message);
+                return sb.ToString();
+            }
+            foreach (PrismMMMCallItemSerializable stepItm in steps.PrismMMMCallItems)
+            {
+                switch (stepItm.MethodName)
+                {
+                    case "UpdateMethodWithParamIdentifier":
+                        try
+                        {
+                            stepItm.Result =
+                                UpdateMethodWithParamIdentifier(
+                                    stepItm.DestProjectName, stepItm.DestImplementedInterface, stepItm.DestMethodName,
+                                    stepItm.DestMethodParamTypes == null ? new string[] { } : stepItm.DestMethodParamTypes,
+                                    stepItm.DestMethodAccessType,
+                                    stepItm.InvocationParamType, stepItm.InvocationMethodName,
+                                    stepItm.InvocationGenerics == null ? new string[] { } : stepItm.InvocationGenerics,
+                                    stepItm.InvocationParams == null ? new string[] { } : stepItm.InvocationParams);
+                        }
+                        catch (Exception e)
+                        {
+                            stepItm.Result = "Exception thrown: " + e.Message;
+                        }
+                        break;
+                    case "UpdateMethodWithClassIdentifier":
+                        try
+                        {
+                            stepItm.Result =
+                            UpdateMethodWithClassIdentifier(
+                                stepItm.DestProjectName, stepItm.DestImplementedInterface, stepItm.DestMethodName,
+                                stepItm.DestMethodParamTypes == null ? new string[] { } : stepItm.DestMethodParamTypes,
+                                stepItm.DestMethodAccessType,
+                                stepItm.InvocationClassType, stepItm.InvocationMethodName,
+                                stepItm.InvocationGenerics == null ? new string[] { } : stepItm.InvocationGenerics,
+                                stepItm.InvocationParams == null ? new string[] { } : stepItm.InvocationParams);
+                        }
+                        catch (Exception e)
+                        {
+                            stepItm.Result = "Exception thrown: " + e.Message;
+                        }
+                        break;
+                    case "UpdateMethodWithVarIdentifier":
+                        try
+                        {
+                            stepItm.Result =
+                            UpdateMethodWithVarIdentifier(
+                                stepItm.DestProjectName, stepItm.DestImplementedInterface, stepItm.DestMethodName,
+                                stepItm.DestMethodParamTypes == null ? new string[] { } : stepItm.DestMethodParamTypes,
+                                stepItm.DestMethodAccessType,
+                                stepItm.DestMethodParamTypeForVar, stepItm.InvocationVarType,
+                                stepItm.InvocationMethodName,
+                                stepItm.InvocationGenerics == null ? new string[] { } : stepItm.InvocationGenerics,
+                                stepItm.InvocationParams == null ? new string[] { } : stepItm.InvocationParams);
+                        }
+                        catch (Exception e)
+                        {
+                            stepItm.Result = "Exception thrown: " + e.Message;
+                        }
+                        break;
+                    default:
+                        stepItm.Result = "Error: Unknown MethodName";
+                        break;
+                }
+                sb = FormatOutput(sb, stepItm);
+            }
+
+            return sb.ToString();
         }
     }
 }
