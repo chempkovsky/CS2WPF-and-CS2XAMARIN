@@ -260,7 +260,7 @@ namespace <#= LformViewModelBaseNameSpace #> {
         #region <#= TableMenuItemsPropertyChangedPropertyName #>
         protected ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>> GetDefault<#= TableMenuItemsVMPropertyName #>() {
             return new ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>>()  {
-                new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "TableAddMI", Caption="Add Item", IconName="TablePlus", IconColor=Color.Default, Enabled=true, Data=null},
+                new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "TableAddMI", Caption="Add Item", IconName="TablePlus", IconColor=Color.Default, Enabled=true, Data=null, Command = <#= TableMenuItemsCommandPropertyName #>},
             };
         }
         public void <#= TableMenuItemsPropertyChangedPropertyName #>(object Sender, object OldValue, object NewValue) {
@@ -268,7 +268,7 @@ namespace <#= LformViewModelBaseNameSpace #> {
             IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> intmis = NewValue as IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>;
             if(intmis != null) {
                 foreach(<#= IWebServiceFilterMenuInterfaceClassName #> tmi  in intmis) {
-                    tmis.Add( new <#= WebServiceFilterMenuViewModelClassName #>() {Id = tmi.Id, Caption=tmi.Caption,  IconName=tmi.IconName, IconColor=tmi.IconColor, Enabled=tmi.Enabled, Data=tmi.Data, FeedbackData=tmi.FeedbackData });
+                    tmis.Add( new <#= WebServiceFilterMenuViewModelClassName #>() {Id = tmi.Id, Caption=tmi.Caption,  IconName=tmi.IconName, IconColor=tmi.IconColor, Enabled=tmi.Enabled, Data=tmi.Data, FeedbackData=tmi.FeedbackData, Command = tmi.Command });
                 }
             }
             <#= TableMenuItemsVMPropertyName #> = tmis;
@@ -295,8 +295,8 @@ namespace <#= LformViewModelBaseNameSpace #> {
         #region <#= RowMenuItemsPropertyChangedPropertyName #>
         protected ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>> GetDefault<#= RowMenuItemsVMPropertyName #>() {
             return new ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>>()  {
-                new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "RowUpdMI", Caption="Update item", IconName="TableEdit", IconColor=Color.Default, Enabled=true, Data=null},
-                new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "RowDelMI", Caption="Delete item", IconName="TableRemove", IconColor=Color.Default, Enabled=true, Data=null},
+                new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "RowUpdMI", Caption="Update item", IconName="TableEdit", IconColor=Color.Default, Enabled=true, Data=null, Command = <#= RowMenuItemsCommandPropertyName #>},
+                new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "RowDelMI", Caption="Delete item", IconName="TableRemove", IconColor=Color.Default, Enabled=true, Data=null, Command = <#= RowMenuItemsCommandPropertyName #>},
             };
         }
         public void <#= RowMenuItemsPropertyChangedPropertyName #>(object Sender, object OldValue, object NewValue) {
@@ -305,7 +305,7 @@ namespace <#= LformViewModelBaseNameSpace #> {
             intmis = NewValue as IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>;
             if(intmis != null) {
                 foreach(<#= IWebServiceFilterMenuInterfaceClassName #> tmi  in intmis) {
-                    tmis.Add( new <#= WebServiceFilterMenuViewModelClassName #>() {Id = tmi.Id, Caption=tmi.Caption,  IconName=tmi.IconName, IconColor=tmi.IconColor, Enabled=tmi.Enabled, Data=tmi.Data, FeedbackData=tmi.FeedbackData });
+                    tmis.Add( new <#= WebServiceFilterMenuViewModelClassName #>() {Id = tmi.Id, Caption=tmi.Caption,  IconName=tmi.IconName, IconColor=tmi.IconColor, Enabled=tmi.Enabled, Data=tmi.Data, FeedbackData=tmi.FeedbackData, Command=tmi.Command });
                 }
             }
             <#= RowMenuItemsVMPropertyName #> = tmis;
@@ -388,6 +388,12 @@ namespace <#= LformViewModelBaseNameSpace #> {
         }
         protected bool <#= TableMenuItemsCommandPropertyName #>CanExecute(object p)
         {
+            <#= WebServiceFilterMenuViewModelClassName #> mi = p as <#= WebServiceFilterMenuViewModelClassName #>;
+            if(mi != null) {
+                if(mi.Id == "TableAddMI") {
+                    return <#= CanAddVMPropertyName #>;
+                }
+            }
             return true; 
         }
         #endregion
@@ -445,6 +451,15 @@ namespace <#= LformViewModelBaseNameSpace #> {
             };
         }
         protected bool <#= RowMenuItemsCommandPropertyName #>CanExecute(object p) {
+            <#= WebServiceFilterMenuViewModelClassName #> mi = p as <#= WebServiceFilterMenuViewModelClassName #>;
+            if(mi != null) {
+                if(mi.Id == "RowUpdMI") {
+                    return <#= CanUpdVMPropertyName #>;
+                }
+                if(mi.Id == "RowDelMI") {
+                    return <#= CanDelVMPropertyName #>;
+                }
+            }
             return true;
         }
         #endregion

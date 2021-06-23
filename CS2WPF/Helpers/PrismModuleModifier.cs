@@ -9,7 +9,7 @@ using System.Text;
 
 namespace CS2WPF.Helpers
 {
-    
+
     public class PrismModuleModifier
     {
         protected DTE2 _Dte;
@@ -62,8 +62,21 @@ namespace CS2WPF.Helpers
             Project project = _Dte.ProjectByName(destProjectName);
             if (project == null) return "Error: Cannot find project by destProjectName=[" + destProjectName + "]";
             CodeClass codeClass = project.ProjectClassByImplementedInterfaceName(destImplementedInterface);
+            if (codeClass == null)
+            {
+                if (!project.Saved) project.Save();
+                codeClass = project.ProjectClassByImplementedInterfaceName(destImplementedInterface);
+            }
             if (codeClass == null) return "Error: Cannot find project class by destImplementedInterface=[" + destImplementedInterface + "]";
             CodeFunction codeFunction = codeClass.CodeClassMethodByName(destMethodName, methodAccess, destMethodParamTypes);
+            if (codeFunction == null)
+            {
+                if (codeClass.ProjectItem != null)
+                {
+                    codeClass.ProjectItem.Save();
+                }
+                codeFunction = codeClass.CodeClassMethodByName(destMethodName, methodAccess, destMethodParamTypes);
+            }
             if (codeFunction == null) return "Error: Cannot find project class method by destMethodParamTypes, destMethodAccessType, destMethodName";
             string[] prms = codeFunction.GetMethodParameterNames();
             if (prms == null) return "Error: internal error. Can not get destination method params";
@@ -119,8 +132,21 @@ namespace CS2WPF.Helpers
             Project project = _Dte.ProjectByName(destProjectName);
             if (project == null) return "Error: Cannot find project by destProjectName=[" + destProjectName + "]";
             CodeClass codeClass = project.ProjectClassByImplementedInterfaceName(destImplementedInterface);
+            if (codeClass == null)
+            {
+                if (!project.Saved) project.Save();
+                codeClass = project.ProjectClassByImplementedInterfaceName(destImplementedInterface);
+            }
             if (codeClass == null) return "Error: Cannot find project class by destImplementedInterface=[" + destImplementedInterface + "]";
             CodeFunction codeFunction = codeClass.CodeClassMethodByName(destMethodName, methodAccess, destMethodParamTypes);
+            if (codeFunction == null)
+            {
+                if (codeClass.ProjectItem != null)
+                {
+                    codeClass.ProjectItem.Save();
+                }
+                codeFunction = codeClass.CodeClassMethodByName(destMethodName, methodAccess, destMethodParamTypes);
+            }
             if (codeFunction == null) return "Error: Cannot find project class method by destMethodParamTypes, destMethodAccessType, destMethodName";
             if (codeFunction.IsExist(invocationClassType, invocationMethodName, invocationGenerics, invocationParams)) return "Ok";
             string lineOfCode = PrismModuleAnalyzerHelper.GenerateLineOfCode(invocationClassType, invocationMethodName, invocationGenerics, invocationParams);
@@ -170,8 +196,21 @@ namespace CS2WPF.Helpers
             Project project = _Dte.ProjectByName(destProjectName);
             if (project == null) return "Error: Cannot find project by destProjectName=[" + destProjectName + "]";
             CodeClass codeClass = project.ProjectClassByImplementedInterfaceName(destImplementedInterface);
+            if (codeClass == null)
+            {
+                if (!project.Saved) project.Save();
+                codeClass = project.ProjectClassByImplementedInterfaceName(destImplementedInterface);
+            }
             if (codeClass == null) return "Error: Cannot find project class by destImplementedInterface=[" + destImplementedInterface + "]";
             CodeFunction codeFunction = codeClass.CodeClassMethodByName(destMethodName, methodAccess, destMethodParamTypes);
+            if (codeFunction == null)
+            {
+                if (codeClass.ProjectItem != null)
+                {
+                    codeClass.ProjectItem.Save();
+                }
+                codeFunction = codeClass.CodeClassMethodByName(destMethodName, methodAccess, destMethodParamTypes);
+            }
             if (codeFunction == null) return "Error: Cannot find project class method by destMethodParamTypes, destMethodAccessType, destMethodName";
             string varName = codeFunction.GetVariableOfType(invocationVarType);
             if (string.IsNullOrEmpty(varName))

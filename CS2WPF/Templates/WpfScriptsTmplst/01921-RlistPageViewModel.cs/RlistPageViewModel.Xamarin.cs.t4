@@ -316,8 +316,8 @@ namespace <#= RlistPageViewModelNameSpace #> {
         #region <#= RowMenuItemsPropertyName #>
         protected ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>> GetDefault<#= RowMenuItemsPropertyName #>() {
             return new ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>>()  {
-                new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "RowUpdMI", Caption="Update item", IconName="TableEdit", IconColor=Color.Default, Enabled=true, Data=null},
-                new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "RowDelMI", Caption="Delete item", IconName="TableRemove", IconColor=Color.Default, Enabled=true, Data=null},
+                new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "RowUpdMI", Caption="Update item", IconName="TableEdit", IconColor=Color.Default, Enabled=true, Data=null, Command = <#= RowMenuItemsCommandPropertyName #>},
+                new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "RowDelMI", Caption="Delete item", IconName="TableRemove", IconColor=Color.Default, Enabled=true, Data=null, Command = <#= RowMenuItemsCommandPropertyName #>},
 <#
         foreach(string detailViewName in detailViews) {
             ModelViewSerializable detailView = GetModelViewByName(Context, detailViewName);
@@ -333,7 +333,7 @@ namespace <#= RlistPageViewModelNameSpace #> {
             if (foreignKeys.Count < 1) continue;
             foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
 #>
-                new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "<#= RowMIPrefixPropertyName #><#= detailViewClassName #><#= foreignKey.NavigationName #>", <#= CaptionPropertyName #>="<#= detailViewName #>: <#= foreignKey.NavigationName #>", IconName="ArrowRightBold", IconColor=Color.Default, Enabled=true, Data=null, FeedbackData=null},
+                new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "<#= RowMIPrefixPropertyName #><#= detailViewClassName #><#= foreignKey.NavigationName #>", <#= CaptionPropertyName #>="<#= detailViewName #>: <#= foreignKey.NavigationName #>", IconName="ArrowRightBold", IconColor=Color.Default, Enabled=true, Data=null, FeedbackData=null, Command = <#= RowMenuItemsCommandPropertyName #>},
 <#
             }
         }
@@ -361,7 +361,7 @@ namespace <#= RlistPageViewModelNameSpace #> {
         #region <#= TableMenuItemsPropertyName #>
         protected ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>> GetDefault<#= TableMenuItemsPropertyName #>() {
             return new ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>>()  {
-                new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "TableAddMI", Caption="Add Item", IconName="TablePlus", IconColor=Color.Default, Enabled=true, Data=null},
+                new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "TableAddMI", Caption="Add Item", IconName="TablePlus", IconColor=Color.Default, Enabled=true, Data=null, Command = <#= TableMenuItemsCommandPropertyName #>},
             };
         }
         protected IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> _<#= TableMenuItemsPropertyName #> = null;
@@ -556,7 +556,13 @@ namespace <#= RlistPageViewModelNameSpace #> {
         }
         protected bool <#= TableMenuItemsCommandPropertyName #>CanExecute(object prm)
         {
-            return true; 
+            <#= IWebServiceFilterMenuInterfaceClassName #> mi = prm as <#= IWebServiceFilterMenuInterfaceClassName #>;
+            if (mi != null) {
+                if(mi.Id == "TableAddMI") {
+                    return ((PermissionMask & 8) == 8);
+                }
+            }
+            return false; 
         }
         #endregion
 
@@ -662,7 +668,40 @@ namespace <#= RlistPageViewModelNameSpace #> {
         }
         protected bool <#= RowMenuItemsCommandPropertyName #>CanExecute(object prm)
         {
-            return true; 
+            <#= IWebServiceFilterMenuInterfaceClassName #> mi = prm as <#= IWebServiceFilterMenuInterfaceClassName #>;
+            if (mi != null) {
+                switch(mi.Id) {
+                    case "RowUpdMI":
+                        return ((PermissionMask & 4) == 4);
+                    case "RowDelMI":
+                        return ((PermissionMask & 2) == 2);
+<#
+        foreach(string detailViewName in detailViews) {
+            ModelViewSerializable detailView = GetModelViewByName(Context, detailViewName);
+            if(detailView == null) {
+#>
+///// can not find the view by Name <#= detailViewName #>
+<#
+                continue;
+            }
+            string detailViewClassName = GetModelClassName(detailView, RlistPageFolder);
+            List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detailView, null);
+            if (foreignKeys == null) continue;
+            if (foreignKeys.Count < 1) continue;
+            foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
+#>
+                    case "<#= RowMIPrefixPropertyName #><#= detailViewClassName #><#= foreignKey.NavigationName #>":
+                        return ((<#= AppSettingServicePropertyName #>.GetViewModelMask("<#= detailView.ViewName #>") & 1) == 1 );
+<#
+            }
+        }
+
+#>
+                    default:
+                        break;
+                }
+            }
+            return false; 
         }
         #endregion
 

@@ -120,9 +120,13 @@ namespace <#= UserControlWithContainerMenuNameSpace #> {
                 }
             }
         }
-        protected bool <#= OnContainerMenuItemsCommandPropertyName #>CanExecute(object p)
+        protected bool <#= OnContainerMenuItemsCommandPropertyName #>CanExecute(object prm)
         {
-            return (<#= ContainerMenuItemsCommandPropertyName #> != null); 
+            ICommand cmd = <#= ContainerMenuItemsCommandPropertyName #>;
+            if (cmd != null) {
+                return cmd.CanExecute(prm);
+            }
+            return false;
         }
         #endregion
         #region <#= FilterHeightPropertyName #>

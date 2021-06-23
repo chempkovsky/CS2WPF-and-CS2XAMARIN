@@ -80,7 +80,15 @@ namespace <#= NullableDatePickerUWPRendererNameSpace #> {
 
         protected override void OnElementPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == <#= NullableDatePickerClassName #>.NullableDateProperty.PropertyName || e.PropertyName == Xamarin.Forms.DatePicker.FormatProperty.PropertyName)
+            if (e.PropertyName == <#= NullableDatePickerClassName #>.NullableDateProperty.PropertyName) {
+                var entry = (<#= NullableDatePickerClassName #>)this.Element;
+                if (entry != null)
+                {
+                    this.datePicker.Date = entry.NullableDate;
+                }
+
+            }
+            if (e.PropertyName == Xamarin.Forms.DatePicker.FormatProperty.PropertyName)
             {
                 var entry = (<#= NullableDatePickerClassName #>)this.Element;
                 ((Command)cancelButton.Command).ChangeCanExecute();

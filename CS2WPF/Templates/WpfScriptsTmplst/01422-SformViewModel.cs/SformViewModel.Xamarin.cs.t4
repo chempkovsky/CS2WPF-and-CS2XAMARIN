@@ -429,7 +429,7 @@ namespace <#= SformViewModelNameSpace #> {
             IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> intmis = NewValue as IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>;
             if(intmis != null) {
                 foreach(<#= IWebServiceFilterMenuInterfaceClassName #> tmi  in intmis) {
-                    tmis.Add( new <#= WebServiceFilterMenuViewModelClassName #>() {Id = tmi.Id, Caption=tmi.Caption,  IconName=tmi.IconName, IconColor=tmi.IconColor, Enabled=tmi.Enabled, Data=tmi.Data });
+                    tmis.Add( new <#= WebServiceFilterMenuViewModelClassName #>() {Id = tmi.Id, Caption=tmi.Caption,  IconName=tmi.IconName, IconColor=tmi.IconColor, Enabled=tmi.Enabled, Data=tmi.Data, Command = tmi.Command});
                 }
             }
             <#= RowMenuItemsPropertyName #> = tmis;
@@ -465,7 +465,10 @@ namespace <#= SformViewModelNameSpace #> {
         {
             List<string> lst = new List<string>();
             foreach(<#= IWebServiceFilterMenuInterfaceClassName #> mi in <#= RowMenuItemsPropertyName #>) {
-                lst.Add(mi.Caption);
+                if (mi.Command != null) {
+                    mi.FeedbackData = prm;
+                    if(mi.Command.CanExecute(mi)) lst.Add(mi.Caption);
+                } else lst.Add(mi.Caption);
             }
             string action = await Application.Current.MainPage.DisplayActionSheet("Row commands:", "Cancel", null, lst.ToArray());
             foreach(<#= IWebServiceFilterMenuInterfaceClassName #> mi in <#= RowMenuItemsPropertyName #>) {
@@ -491,8 +494,8 @@ namespace <#= SformViewModelNameSpace #> {
         #region <#= TableMenuItemsVMPropertyName #>
         protected ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>> GetDefault<#= TableMenuItemsVMPropertyName #>() {
             return new ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>>()  {
-                new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "TableRefreshMI", Caption="Refresh table", IconName=<#= IconFontClassName #>.Refresh, IconColor=Color.Default, Enabled=true, Data=null},
-                new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "TableSettingsMI", Caption="Table columns", IconName=<#= IconFontClassName #>.Settings, IconColor=Color.Default, Enabled=true, Data=null},
+                new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "TableRefreshMI", Caption="Refresh table", IconName=<#= IconFontClassName #>.Refresh, IconColor=Color.Default, Enabled=true, Data=null, Command = <#= TableMenuItemsCommandPropertyName #>},
+                new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "TableSettingsMI", Caption="Table columns", IconName=<#= IconFontClassName #>.Settings, IconColor=Color.Default, Enabled=true, Data=null, Command = <#= TableMenuItemsCommandPropertyName #>},
             };
         }
         public void <#= TableMenuItemsPropertyChangedPropertyName #>(object Sender, object OldValue, object NewValue) {
@@ -500,7 +503,7 @@ namespace <#= SformViewModelNameSpace #> {
             IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> intmis = NewValue as IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>;
             if(intmis != null) {
                 foreach(<#= IWebServiceFilterMenuInterfaceClassName #> tmi  in intmis) {
-                    tmis.Add( new <#= WebServiceFilterMenuViewModelClassName #>() {Id = tmi.Id, Caption=tmi.Caption,  IconName=tmi.IconName, IconColor=tmi.IconColor, Enabled=tmi.Enabled, Data=tmi.Data});
+                    tmis.Add( new <#= WebServiceFilterMenuViewModelClassName #>() {Id = tmi.Id, Caption=tmi.Caption,  IconName=tmi.IconName, IconColor=tmi.IconColor, Enabled=tmi.Enabled, Data=tmi.Data, Command = tmi.Command});
                 }
             }
             <#= TableMenuItemsVMPropertyName #> = tmis;
@@ -536,7 +539,9 @@ namespace <#= SformViewModelNameSpace #> {
         {
             List<string> lst = new List<string>();
             foreach(<#= IWebServiceFilterMenuInterfaceClassName #> mi in <#= TableMenuItemsVMPropertyName #>) {
-                lst.Add(mi.Caption);
+                if (mi.Command != null) {
+                    if(mi.Command.CanExecute(mi)) lst.Add(mi.Caption);
+                } else lst.Add(mi.Caption);
             }
             string action = await Application.Current.MainPage.DisplayActionSheet("Table commands:", "Cancel", null, lst.ToArray());
             foreach(<#= IWebServiceFilterMenuInterfaceClassName #> mi in <#= TableMenuItemsVMPropertyName #>) {

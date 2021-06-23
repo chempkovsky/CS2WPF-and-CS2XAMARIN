@@ -292,7 +292,23 @@
                                             IsVisible="{Binding BindingContext.<#= SelectedColumnsPropertyName #>[<#= cntr #>].IsChecked, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
                                             FlexLayout.Basis="<#= FlexLayoutBasis #>">
                                             <Label  TextColor="{DynamicResource DataGridBodyTextColor}"
-                                                FlexLayout.Basis="200" Text="{Binding <#= GetModelPropertyNameEx2(modelViewUIListPropertySerializable, Model) #>}" />
+                                                FlexLayout.Basis="200" 
+<#
+                if (IsDateInput(modelViewUIListPropertySerializable, Model)) { 
+#>
+                                                Text="{Binding <#= GetModelPropertyNameEx2(modelViewUIListPropertySerializable, Model) #>, StringFormat='{0:d}'}" 
+<#
+                } else if (IsCurrencyInput(modelViewUIListPropertySerializable, Model)) {
+#>
+                                                Text="{Binding <#= GetModelPropertyNameEx2(modelViewUIListPropertySerializable, Model) #>, StringFormat='{0:C2}'}" 
+<#
+                } else {
+#>
+                                                Text="{Binding <#= GetModelPropertyNameEx2(modelViewUIListPropertySerializable, Model) #>}" 
+<#
+                }
+#>
+                                                />
                                         </Frame>
 <#
         }
