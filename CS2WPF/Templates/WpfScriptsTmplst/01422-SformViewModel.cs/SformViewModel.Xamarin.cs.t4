@@ -23,6 +23,7 @@ using System.Linq;
 using Prism.Mvvm;
 using Prism.Services.Dialogs;
 using System.Threading.Tasks;
+using Xamarin.Essentials;
 
 <#
     string IAppGlblSettingsServiceFolder      = "00080-IAppGlblSettingsService.cs";
@@ -183,6 +184,7 @@ using System.Threading.Tasks;
     string UIDispatcherInvokePropertyName           = "Application.Current.Dispatcher.Invoke";
     string BindingContextFeedbackRefPropertyName    = "BindingContextFeedbackRef";
 
+    string InternalContentProperty                  = "InternalContent";
 
     List<string> nmSpaces = new List<string>();
     if ((SformViewModelNameSpace != IWebServiceFilterDefInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterDefInterfaceNameSpace) < 0)) 
@@ -313,6 +315,23 @@ namespace <#= SformViewModelNameSpace #> {
         protected bool <#= IsOnLoadedCalledPropertyName #> = false;
         protected IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>> <#= CurrentFilterPropertyName #> = null;
 
+        #region <#= InternalContentProperty #>
+        int _<#= InternalContentProperty #> = 0;
+        protected void <#= InternalContentProperty #>Changed()
+        {
+            if (_<#= InternalContentProperty #> < 10) _<#= InternalContentProperty #>++; else _<#= InternalContentProperty #> = 0;
+            MainThread.InvokeOnMainThreadAsync(async () =>
+            {
+                await Task.Delay(1);
+                this.OnPropertyChanged("<#= InternalContentProperty #>");
+            });
+        }
+        public int <#= InternalContentProperty #>
+        {
+            get { return _<#= InternalContentProperty #>; }
+        }
+        #endregion
+
         #region <#= DataSourcePropertyName #>
         protected IEnumerable<<#= modelInterfaceClassName #>> _<#= DataSourcePropertyName #> = new ObservableCollection<<#= modelInterfaceClassName #>>();
         public IEnumerable<<#= modelInterfaceClassName #>> <#= DataSourcePropertyName #>
@@ -327,6 +346,7 @@ namespace <#= SformViewModelNameSpace #> {
                 {
                     _<#= DataSourcePropertyName #> = value;
                     OnPropertyChanged();
+                    <#= InternalContentProperty #>Changed();
                 }
             }
         }
@@ -928,6 +948,7 @@ namespace <#= SformViewModelNameSpace #> {
                 }
                 <#= DataSourcePropertyName #> = ds;
                 <#= SelectedRowPropertyName #> = <#= DataSourcePropertyName #>?.FirstOrDefault();
+                <#= InternalContentProperty #>Changed();
             }
             <#= IsInQueryPropertyName #> = false;
         }
@@ -938,6 +959,7 @@ namespace <#= SformViewModelNameSpace #> {
             if(prm == null) return;
             ObservableCollection<<#= modelInterfaceClassName #>> ds = <#= DataSourcePropertyName #> as ObservableCollection<<#= modelInterfaceClassName #>>;
             ds.Add(<#= FormRootServicePropertyName #>.<#= CopyToModelNotifyMethodName #>(prm, null));
+            <#= InternalContentProperty #>Changed();
         }
         #endregion
         #region <#= SformAfterUpdItemCommandPropertyName #>
@@ -977,6 +999,7 @@ namespace <#= SformViewModelNameSpace #> {
             } else {
                 ds.Add(<#= FormRootServicePropertyName #>.<#= CopyToModelNotifyMethodName #>(prm, null));
             }
+            <#= InternalContentProperty #>Changed();
         }
         #endregion
         #region <#= SformAfterDelItemCommandPropertyName #>
@@ -987,6 +1010,7 @@ namespace <#= SformViewModelNameSpace #> {
             int indx = ds.IndexOf(prm);
             if (indx > -1) {
                 ds.RemoveAt(indx);
+                <#= InternalContentProperty #>Changed();
                 return;
             }
 <#
@@ -1017,6 +1041,7 @@ namespace <#= SformViewModelNameSpace #> {
                 indx = ds.IndexOf(rw);
                 if (indx > -1) {
                     ds.RemoveAt(indx);
+                    <#= InternalContentProperty #>Changed();
                     return;
                 }
             }

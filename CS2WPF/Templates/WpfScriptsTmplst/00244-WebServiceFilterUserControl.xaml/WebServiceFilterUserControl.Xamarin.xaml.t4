@@ -18,6 +18,16 @@
     string gridFlexModelNameSpace   = GetModelNameSpace(Model, gridFlexModelFolder);
     string gridFlexModelProject     = GetModelProjectName(Model, gridFlexModelFolder);
 
+    string InternalContentChangedFolder     = "00102-InternalContentChanged.cs";
+    string InternalContentChangedClassName  = GetModelClassName(Model, InternalContentChangedFolder);
+    string InternalContentChangedNameSpace  = GetModelNameSpace(Model, InternalContentChangedFolder);
+    string InternalContentChangedProject    = GetModelProjectName(Model, InternalContentChangedFolder);
+
+    string MaxScrollViewHeightFolder        = "00104-MaxScrollViewHeight.cs";
+    string MaxScrollViewHeightClassName     = GetModelClassName(Model, MaxScrollViewHeightFolder);
+    string MaxScrollViewHeightNameSpace     = GetModelNameSpace(Model, MaxScrollViewHeightFolder);
+    string MaxScrollViewHeightProject       = GetModelProjectName(Model, MaxScrollViewHeightFolder);
+
 
     string RoutedCommandExtFolder      = "00224-RoutedCommandExt.cs";
     string RoutedCommandExtClassName   = GetModelClassName(Model, RoutedCommandExtFolder);
@@ -91,6 +101,8 @@
     string OnRemoveWebServiceFilterItemCommandPropertyName = "OnRemoveWebServiceFilterItemCommand";
     string OnContainerMenuItemsCommandPropertyName = "OnContainerMenuItemsCommand";
     ////////////////////////////////
+    string InternalContentProperty           = "InternalContent";
+    string MaxHeightProperty                 = "MaxHeight";
 
 
     string IconFontPrefix = "clr-namespace:" + IconFontNameSpace;
@@ -121,8 +133,17 @@
     if(gridFlexModelProject != WebServiceFilterItemUserControlXamlProject) {
         gridflexPrefix = gridflexPrefix + ";assembly=" + gridFlexModelProject;
     }
+    string InternalContentPrefix = "clr-namespace:" + InternalContentChangedNameSpace;
+    if(InternalContentChangedProject != WebServiceFilterItemUserControlXamlProject) {
+        InternalContentPrefix = InternalContentPrefix + ";assembly=" + InternalContentChangedProject;
+    }
+    string MaxScrollViewHeightPrefix = "clr-namespace:" + MaxScrollViewHeightNameSpace;
+    if(MaxScrollViewHeightProject != WebServiceFilterItemUserControlXamlProject) {
+        MaxScrollViewHeightPrefix = MaxScrollViewHeightPrefix + ";assembly=" + MaxScrollViewHeightProject;
+    }
 
 
+    
 #>
 <?xml version="1.0" encoding="UTF-8"?>
 <ContentView x:Class="<#= WebServiceFilterUserControlNameSpace #>.<#= WebServiceFilterUserControlClassName #>"
@@ -131,6 +152,8 @@
              xmlns:fltitm="<#= fltitmPrefix #>"
              xmlns:gridflex="<#= gridflexPrefix #>"
              xmlns:fontIcons="<#= IconFontPrefix #>"
+             xmlns:intcntxt="<#= InternalContentPrefix #>"
+             xmlns:maxscrlvw="<#= MaxScrollViewHeightPrefix #>"
              x:Name="fltrUsrCntrlRootNode">
     <StackLayout Orientation="Vertical">
         <Grid gridflex:<#= gridFlexModelClassName #>.HorizontalFlex="true"
@@ -186,7 +209,9 @@
                 </StackLayout>
             </ScrollView>
         </Grid>
-        <ScrollView Orientation="Vertical" VerticalScrollBarVisibility="Default" HeightRequest="{Binding <#= FilterHeightPropertyName #>, Source={x:Reference fltrUsrCntrlRootNode}}">
+        <ScrollView Orientation="Vertical" VerticalScrollBarVisibility="Default" 
+                    intcntxt:<#= InternalContentChangedClassName #>.<#= InternalContentProperty #>="{Binding <#= InternalContentProperty #>, Source={x:Reference fltrUsrCntrlRootNode}}"
+                    maxscrlvw:<#= MaxScrollViewHeightClassName #>.<#= MaxHeightProperty #>="{Binding FilterHeight, Source={x:Reference fltrUsrCntrlRootNode}}">
             <StackLayout BindableLayout.ItemsSource="{Binding <#= FiltersPropertyName #>, Source={x:Reference fltrUsrCntrlRootNode}}" >
                 <BindableLayout.ItemTemplate>
                     <DataTemplate>

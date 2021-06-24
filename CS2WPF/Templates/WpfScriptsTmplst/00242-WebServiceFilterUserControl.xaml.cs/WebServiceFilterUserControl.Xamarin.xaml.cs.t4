@@ -16,6 +16,8 @@ using System.Windows.Input;
 using System.Collections.ObjectModel;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
+using Xamarin.Essentials;
+using System.Threading.Tasks;
 
 <#
     string commandHelperModelFolder      = "00140-CommandHelper.cs";
@@ -95,6 +97,7 @@ using Xamarin.Forms.Xaml;
     string OnContainerMenuItemsCommandPropertyName = "OnContainerMenuItemsCommand";
 
     ////////////////////////////////
+    string InternalContentProperty           = "InternalContent";
 
 
     List<string> nmSpaces = new List<string>();
@@ -233,6 +236,7 @@ namespace <#= WebServiceFilterUserControlNameSpace #> {
         protected void <#= OnAddWebServiceFilterItemCommandPropertyName #>Execute()
         {
             Filters.Add(new <#= WebServiceFilterRsltViewModelClassName #>());
+            <#= InternalContentProperty #>Changed();
         }
         protected bool <#= OnAddWebServiceFilterItemCommandPropertyName #>CanExecute()
         {
@@ -270,6 +274,23 @@ namespace <#= WebServiceFilterUserControlNameSpace #> {
             }
         }
         #endregion
+        
+        #region <#= InternalContentProperty #>
+        int _<#= InternalContentProperty #> = 0;
+        protected void <#= InternalContentProperty #>Changed()
+        {
+            if (_<#= InternalContentProperty #> < 10) _<#= InternalContentProperty #>++; else _<#= InternalContentProperty #> = 0;
+            MainThread.InvokeOnMainThreadAsync(async () =>
+            {
+                await Task.Delay(1);
+                this.OnPropertyChanged("<#= InternalContentProperty #>");
+            });
+        }
+        public int <#= InternalContentProperty #>
+        {
+            get { return _<#= InternalContentProperty #>; }
+        }
+        #endregion
         #region <#= FilterOperatorsPropertyName #>
         public static readonly BindableProperty <#= FilterOperatorsPropertyName #>Property =
                 BindableProperty.Create(
@@ -303,6 +324,7 @@ namespace <#= WebServiceFilterUserControlNameSpace #> {
             {
                 inst.Filters.Clear();
                 inst.Filters.Add(new WebServiceFilterRsltViewModel());
+                inst.<#= InternalContentProperty #>Changed();
             }
         }
         public static readonly BindableProperty <#= FilterDefinitionsPropertyName #>Property =
@@ -448,6 +470,7 @@ namespace <#= WebServiceFilterUserControlNameSpace #> {
             if (Filters.Count < 1)
             {
                 Filters.Add(new <#= WebServiceFilterRsltViewModelClassName #>());
+                <#= InternalContentProperty #>Changed();
                 return;
             }
             if (Filters.Count < 2)
@@ -458,6 +481,7 @@ namespace <#= WebServiceFilterUserControlNameSpace #> {
             if (itm != null)
             {
                 Filters.Remove(itm);
+                <#= InternalContentProperty #>Changed();
             }
         }
         protected bool <#= OnRemoveWebServiceFilterItemCommandPropertyName #>CanExecute(object prm)
@@ -478,6 +502,7 @@ namespace <#= WebServiceFilterUserControlNameSpace #> {
         {
             Filters.Clear();
             Filters.Add(new <#= WebServiceFilterRsltViewModelClassName #>());
+            <#= InternalContentProperty #>Changed();
         }
         private bool <#= OnRemoveAllWebServiceFilterItemCommandPropertyName #>CanExecute() {
             return  true;

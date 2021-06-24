@@ -1,0 +1,172 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+using Xamarin.Forms;
+using System.ComponentModel;
+<#
+
+    string MaxScrollViewHeightFolder        = "00104-MaxScrollViewHeight.cs";
+    string MaxScrollViewHeightClassName     = GetModelClassName(Model, MaxScrollViewHeightFolder);
+    string MaxScrollViewHeightNameSpace     = GetModelNameSpace(Model, MaxScrollViewHeightFolder);
+    
+    string MaxHeightProperty                = "MaxHeight";
+    string InternalContentProperty          = "InternalContent";
+
+#>
+
+namespace <#= MaxScrollViewHeightNameSpace #> {
+    public static class <#= MaxScrollViewHeightClassName #>
+    {
+        public static readonly BindableProperty <#= MaxHeightProperty #>Property =
+             BindableProperty.CreateAttached(
+                 "<#= MaxHeightProperty #>", typeof(double), typeof(<#= MaxScrollViewHeightClassName #>),
+                 -1d, propertyChanged: <#= MaxHeightProperty #>Changed);
+        public static double Get<#= MaxHeightProperty #>(BindableObject obj)
+        {
+            
+            return (double)obj.GetValue(<#= MaxHeightProperty #>Property);
+        }
+
+        public static void Set<#= MaxHeightProperty #>(BindableObject obj, object value)
+        {
+            obj.SetValue(<#= MaxHeightProperty #>Property, value);
+        }
+        public static void <#= MaxHeightProperty #>Changed(BindableObject obj, object oldValue, object newValue) {
+            double nv = -1;
+            if (newValue is double)
+            {
+                nv = (double)newValue;
+            }
+            if (obj is ScrollView)
+            {
+                ScrollView sw = obj as ScrollView;
+                if(nv != -1) {
+                    sw.PropertyChanged += PropertyChangedEventHandler;
+                }
+                else
+                {
+                    sw.PropertyChanged -= PropertyChangedEventHandler;
+                    sw.HeightRequest = -1;
+                    UpdateScrollViewSetting(sw);
+                }
+            }
+        }
+        public static void UpdateScrollViewSetting(ScrollView sw)
+        {
+            double maxHeight = Get<#= MaxHeightProperty #>(sw);
+            if (maxHeight <= 0)
+            {
+                if (sw.HeightRequest >= 0) sw.HeightRequest = -1;
+                return;
+            }
+            if (sw.Content == null)
+            {
+                if (sw.HeightRequest >= 0) sw.HeightRequest = -1;
+                return;
+            }
+            double contentHeight = sw.Content.Height;
+            if (contentHeight > maxHeight) {
+                if(sw.HeightRequest != maxHeight) { sw.HeightRequest = maxHeight; }
+                return;
+            }
+            if(sw.Height > maxHeight) { sw.HeightRequest = maxHeight; return; }
+            sw.HeightRequest = -1;
+        }
+        public static void PropertyChangedEventHandler(object sender, PropertyChangedEventArgs e)
+        {
+            if ((e.PropertyName == "<#= InternalContentProperty #>") || (e.PropertyName == "Height") || (e.PropertyName == "Width")) 
+            {
+                if (sender != null)
+                {
+                    if (sender is ScrollView)
+                    {
+                        UpdateScrollViewSetting(sender as ScrollView);
+                    }
+                }
+            }
+        }
+    }
+}
+
+<#+
+
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+
+#>
