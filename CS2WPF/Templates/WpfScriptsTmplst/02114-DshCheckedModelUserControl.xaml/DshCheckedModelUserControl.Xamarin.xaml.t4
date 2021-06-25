@@ -29,10 +29,12 @@
     string MaxScrollViewHeightNameSpace     = GetContextModelNameSpace(Context, MaxScrollViewHeightFolder);
     string MaxScrollViewHeightProject       = GetContextModelProjectName(Context, MaxScrollViewHeightFolder);
 
+
     string IconFontFolder      = "00178-IconFont.cs";
     string IconFontClassName   = GetContextModelClassName(Context, IconFontFolder);
     string IconFontNameSpace   = GetContextModelNameSpace(Context, IconFontFolder);
     string IconFontNameProject = GetContextModelProjectName(Context, IconFontFolder);
+
 
     string WebServiceFilterUserControlFolder      = "00242-WebServiceFilterUserControl.xaml.cs";
     string WebServiceFilterUserControlClassName   = GetContextModelClassName(Context, WebServiceFilterUserControlFolder);
@@ -44,25 +46,25 @@
     string TablePaginationUserControlNameSpace   = GetContextModelNameSpace(Context, TablePaginationUserControlFolder);
     string TablePaginationUserControlProject     = GetContextModelProjectName(Context, TablePaginationUserControlFolder);
 
+
+
     string SformUserControlBaseFolder      = "00630-SformUserControlBase.xaml.cs";
     string SformUserControlBaseClassName   = GetContextModelClassName(Context, SformUserControlBaseFolder);
     string SformUserControlBaseNameSpace   = GetContextModelNameSpace(Context, SformUserControlBaseFolder);
     string SformUserControlBaseProject     = GetContextModelProjectName(Context, SformUserControlBaseFolder);
 
-    string SformUserControlFolder           = "01420-SformUserControl.xaml.cs";
-    string SformUserControlClassName        = GetModelClassName(Model, SformUserControlFolder);
-    string SformUserControlNameSpace        = GetModelNameSpace(Model, SformUserControlFolder);
-    string SformUserControlProject          = GetModelProjectName(Model, SformUserControlFolder);
 
 
 
+    string DshCheckedModelUserControlFolder         = "02112-DshCheckedModelUserControl.xaml.cs";
+    string DshCheckedModelUserControlClassName      = GetModelClassName(Model, DshCheckedModelUserControlFolder);
+    string DshCheckedModelUserControlNameSpace      = GetModelNameSpace(Model, DshCheckedModelUserControlFolder);
+    string DshCheckedModelUserControlProject        = GetModelProjectName(Model, DshCheckedModelUserControlFolder);
 
-    string SformUserControlXamlFolder      = "01421-SformUserControl.xaml";
-    string SformUserControlXamlClassName   = GetModelClassName(Model, SformUserControlXamlFolder);
-    string SformUserControlXamlNameSpace   = GetModelNameSpace(Model, SformUserControlXamlFolder);
-    string SformUserControlXamlProject     = GetModelProjectName(Model, SformUserControlXamlFolder);
-    
-
+    string DshCheckedModelUserControlXamlFolder      = "02114-DshCheckedModelUserControl.xaml";
+    string DshCheckedModelUserControlXamlClassName   = GetModelClassName(Model, DshCheckedModelUserControlXamlFolder);
+    string DshCheckedModelUserControlXamlNameSpace   = GetModelNameSpace(Model, DshCheckedModelUserControlXamlFolder);
+    string DshCheckedModelUserControlXamlProject     = GetModelProjectName(Model, DshCheckedModelUserControlXamlFolder);
 
     string CaptionPropertyName = "Caption";
     string ShowFilterPropertyName = "ShowFilter";
@@ -127,64 +129,67 @@
     string SelectedRowPropertyName="SelectedRow";
     string BindingContextFeedbackRefPropertyName = "BindingContextFeedbackRef";
 
-    string RadioGroupNamePropertyName        = "RadioGroupName";
+    string RadioGroupNamePropertyName           = "RadioGroupName";
+    string InternalContentProperty              = "InternalContent";
+    string MaxHeightProperty                    = "MaxHeight";
 
-    string InternalContentProperty           = "InternalContent";
-    string MaxHeightProperty                 = "MaxHeight";
+    string PermissionChangedCommandPropertyName         = "PermissionChangedCommand";
+    string IsPermissionEditablePropertyName             = "IsPermissionEditable";
+    string AddPrmPropertyName                           = "AddPrm";
+    string UpdPrmPropertyName                           = "UpdPrm";
+    string DelPrmPropertyName                           = "DelPrm";
+    string SelPrmPropertyName                           = "SelPrm";
 
     string wsfucPrefix = "clr-namespace:" + WebServiceFilterUserControlNameSpace;
-    if(SformUserControlProject != WebServiceFilterUserControlProject) {
+    if(DshCheckedModelUserControlProject != WebServiceFilterUserControlProject) {
         wsfucPrefix = wsfucPrefix + ";assembly=" + WebServiceFilterUserControlProject;
     }
     string tpgnucPrefix = "clr-namespace:" + TablePaginationUserControlNameSpace;
-    if(SformUserControlProject != TablePaginationUserControlProject) {
+    if(DshCheckedModelUserControlProject != TablePaginationUserControlProject) {
         tpgnucPrefix = tpgnucPrefix + ";assembly=" + TablePaginationUserControlProject;
     }
     string invboolcnvPrefix = "clr-namespace:" + InverseBooleanConverterNameSpace;
-    if(SformUserControlProject != InverseBooleanConverterProject) {
+    if(DshCheckedModelUserControlProject != InverseBooleanConverterProject) {
         invboolcnvPrefix = invboolcnvPrefix + ";assembly=" + InverseBooleanConverterProject;
     }
-    string IconFontPrefix = "clr-namespace:" + IconFontNameSpace;
-    if(SformUserControlProject != IconFontNameProject) {
-        IconFontPrefix = IconFontPrefix + ";assembly=" + IconFontNameProject;
-    }
     string sfrmBasePrefix = "clr-namespace:" + SformUserControlBaseNameSpace;
-    if(SformUserControlProject != SformUserControlBaseProject) {
+    if(DshCheckedModelUserControlProject != SformUserControlBaseProject) {
         sfrmBasePrefix = sfrmBasePrefix + ";assembly=" + SformUserControlBaseProject;
     }
+    string IconFontPrefix = "clr-namespace:" + IconFontNameSpace;
+    if(DshCheckedModelUserControlProject != IconFontNameProject) {
+        IconFontPrefix = IconFontPrefix + ";assembly=" + IconFontNameProject;
+    }
     string InternalContentPrefix = "clr-namespace:" + InternalContentChangedNameSpace;
-    if(SformUserControlProject != InternalContentChangedProject) {
+    if(DshCheckedModelUserControlProject != InternalContentChangedProject) {
         InternalContentPrefix = InternalContentPrefix + ";assembly=" + InternalContentChangedProject;
     }
     string MaxScrollViewHeightPrefix = "clr-namespace:" + MaxScrollViewHeightNameSpace;
-    if(SformUserControlProject != MaxScrollViewHeightProject) {
+    if(DshCheckedModelUserControlProject != MaxScrollViewHeightProject) {
         MaxScrollViewHeightPrefix = MaxScrollViewHeightPrefix + ";assembly=" + MaxScrollViewHeightProject;
     }
 
 #>
 
-<sfrmbs:<#= SformUserControlBaseClassName #> 
-             x:Class="<#= SformUserControlNameSpace #>.<#= SformUserControlClassName #>"
+<sfrmbs:<#= SformUserControlBaseClassName #>  x:Class="<#= DshCheckedModelUserControlNameSpace #>.<#= DshCheckedModelUserControlClassName #>"
              xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Name="sformUsrCntrlRootNode"
-
              xmlns:prism="http://prismlibrary.com"
              prism:ViewModelLocator.AutowireViewModel="True"
 
-             xmlns:sfrmbs="<#= sfrmBasePrefix #>" 
              xmlns:wsfuc="<#= wsfucPrefix #>" 
-             xmlns:fontIcons="<#= IconFontPrefix #>"
              xmlns:tpgnuc="<#= tpgnucPrefix #>" 
-             xmlns:invboolcnv="<#= invboolcnvPrefix #>"
+             xmlns:sfrmbs="<#= sfrmBasePrefix #>" 
+             xmlns:invboolcnv="<#= invboolcnvPrefix #>" 
+             xmlns:fontIcons="<#= IconFontPrefix #>"
              xmlns:intcntxt="<#= InternalContentPrefix #>"
              xmlns:maxscrlvw="<#= MaxScrollViewHeightPrefix #>"
 
-             <#= BindingContextFeedbackRefPropertyName #>="{Binding BindingContext.<#= BindingContextFeedbackRefPropertyName #>, Source={x:Reference sformUsrCntrlRootNode}}"
-            >
+             x:Name="chckdModelUsrCntrlRootNode">
     <sfrmbs:<#= SformUserControlBaseClassName #>.Resources>
         <invboolcnv:<#= InverseBooleanConverterClassName #> x:Key="<#= InverseBooleanConverterClassName #>"/>
     </sfrmbs:<#= SformUserControlBaseClassName #>.Resources>
+
     <ScrollView Orientation="Vertical" VerticalOptions="FillAndExpand">
         <Grid>
             <Grid.RowDefinitions>
@@ -195,36 +200,41 @@
             </Grid.RowDefinitions>
 
             <wsfuc:<#= WebServiceFilterUserControlClassName #> Grid.Row="0" 
-                IsVisible="{Binding <#= ShowFilterPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
-                IsEnabled="{Binding BindingContext.<#= IsInQueryPropertyName #>, Mode=OneWay, Converter={StaticResource <#= InverseBooleanConverterClassName #>}, Source={x:Reference sformUsrCntrlRootNode}}"
-                <#= CaptionPropertyName #>="{Binding <#= CaptionPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
-                <#= ShowBackBtnPropertyName #>="{Binding <#= ShowBackBtnPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
-                <#= ShowAddFilterBtnPropertyName #>="{Binding <#= ShowAddFilterBtnPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
-                <#= HiddenFiltersPropertyName #>="{Binding BindingContext.<#= HiddenFiltersVMPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
-                <#= FilterDefinitionsPropertyName #>="{Binding BindingContext.<#= FilterDefinitionsPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
-                <#= ContainerMenuItemsPropertyName #>="{Binding <#= ContainerMenuItemsPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
-                <#= FilterHeightPropertyName #>="{Binding <#= FilterHeightPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
-                <#= ContainerMenuItemsCommandPropertyName #>="{Binding <#= OnContainerMenuItemsCommandPropertyName #>, Source={x:Reference sformUsrCntrlRootNode}}"
-                <#= NavigationBackCommandPropertyName #>="{Binding <#= OnNavigationBackCommandPropertyName #>, Source={x:Reference sformUsrCntrlRootNode}}"   
-                <#= FilterCommandPropertyName #>="{Binding BindingContext.<#= ApplyFilterCommandPropertyName #>, Source={x:Reference sformUsrCntrlRootNode} }"
+                IsVisible="{Binding <#= ShowFilterPropertyName #>, Mode=OneWay, Source={x:Reference chckdModelUsrCntrlRootNode}}"
+                IsEnabled="{Binding BindingContext.<#= IsInQueryPropertyName #>, Mode=OneWay, Converter={StaticResource <#= InverseBooleanConverterClassName #>}, Source={x:Reference chckdModelUsrCntrlRootNode}}"
+                <#= CaptionPropertyName #>="{Binding <#= CaptionPropertyName #>, Mode=OneWay, Source={x:Reference chckdModelUsrCntrlRootNode}}"
+                <#= ShowBackBtnPropertyName #>="{Binding <#= ShowBackBtnPropertyName #>, Mode=OneWay, Source={x:Reference chckdModelUsrCntrlRootNode}}"
+                <#= ShowAddFilterBtnPropertyName #>="{Binding <#= ShowAddFilterBtnPropertyName #>, Mode=OneWay, Source={x:Reference chckdModelUsrCntrlRootNode}}"
+                <#= HiddenFiltersPropertyName #>="{Binding BindingContext.<#= HiddenFiltersVMPropertyName #>, Mode=OneWay, Source={x:Reference chckdModelUsrCntrlRootNode}}"
+                <#= FilterDefinitionsPropertyName #>="{Binding BindingContext.<#= FilterDefinitionsPropertyName #>, Mode=OneWay, Source={x:Reference chckdModelUsrCntrlRootNode}}"
+                <#= ContainerMenuItemsPropertyName #>="{Binding <#= ContainerMenuItemsPropertyName #>, Mode=OneWay, Source={x:Reference chckdModelUsrCntrlRootNode}}"
+                <#= FilterHeightPropertyName #>="{Binding <#= FilterHeightPropertyName #>, Mode=OneWay, Source={x:Reference chckdModelUsrCntrlRootNode}}"
+                <#= ContainerMenuItemsCommandPropertyName #>="{Binding <#= OnContainerMenuItemsCommandPropertyName #>, Source={x:Reference chckdModelUsrCntrlRootNode}}"
+                <#= NavigationBackCommandPropertyName #>="{Binding <#= OnNavigationBackCommandPropertyName #>, Source={x:Reference chckdModelUsrCntrlRootNode}}"   
+                <#= FilterCommandPropertyName #>="{Binding BindingContext.<#= ApplyFilterCommandPropertyName #>, Source={x:Reference chckdModelUsrCntrlRootNode} }"
                 />
-<!--
-            FilterOperators="{Binding FilterOperators, Source={x:Reference sformUsrCntrlRootNode}}"
--->
-            <ActivityIndicator Grid.Row="1" IsVisible="{Binding BindingContext.IsInQuery, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
-                IsRunning="{Binding BindingContext.IsInQuery, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"/>
+
+            <ActivityIndicator Grid.Row="1" IsVisible="{Binding BindingContext.IsInQuery, Mode=OneWay, Source={x:Reference chckdModelUsrCntrlRootNode}}"
+                    IsRunning="{Binding BindingContext.IsInQuery, Mode=OneWay, Source={x:Reference chckdModelUsrCntrlRootNode}}"/>
 
             <ScrollView Orientation="Horizontal" Grid.Row="2" 
-                    intcntxt:<#= InternalContentChangedClassName #>.<#= InternalContentProperty #>="{Binding BindingContext.<#= InternalContentProperty #>, Source={x:Reference sformUsrCntrlRootNode}}"
-                    maxscrlvw:<#= MaxScrollViewHeightClassName #>.<#= MaxHeightProperty #>="{Binding <#= GridHeightPropertyName #>, Source={x:Reference sformUsrCntrlRootNode}}">
+                    intcntxt:<#= InternalContentChangedClassName #>.<#= InternalContentProperty #>="{Binding BindingContext.<#= InternalContentProperty #>, Source={x:Reference chckdModelUsrCntrlRootNode}}"
+                    maxscrlvw:<#= MaxScrollViewHeightClassName #>.<#= MaxHeightProperty #>="{Binding <#= GridHeightPropertyName #>, Source={x:Reference chckdModelUsrCntrlRootNode}}">
                 <StackLayout   Orientation="Vertical"   Margin="0, 0, 0, 12" Spacing="0">
                     <FlexLayout Direction="Row"  HorizontalOptions="StartAndExpand" JustifyContent="Start">
                         <Frame  OutlineColor="{DynamicResource DataGridLineColor}" 
                                 BackgroundColor="{DynamicResource DataGridHeaderBackGroundColor}" 
                                 Padding="2, 2, 2, 2" FlexLayout.Basis="64" CornerRadius="0" >
                             <Button Text="{x:Static fontIcons:<#= IconFontClassName #>.More_vert}" FontFamily="<#= FontFamilyPropertyName #>" BackgroundColor="Transparent" 
-                                Command="{Binding BindingContext.<#= TableMenuItemsCommandPropertyName #>, Source={x:Reference sformUsrCntrlRootNode}}"/>
+                                Command="{Binding BindingContext.<#= TableMenuItemsCommandPropertyName #>, Source={x:Reference chckdModelUsrCntrlRootNode}}"/>
                         </Frame>
+                        <Frame OutlineColor="{DynamicResource DataGridLineColor}" 
+                            BackgroundColor="{DynamicResource DataGridHeaderBackGroundColor}" 
+                            Padding="8, 8, 2, 2" CornerRadius="0"
+                            FlexLayout.Basis="40" >
+                            <Label TextColor="{DynamicResource DataGridHeaderTextColor}" Text="Can Sel" />
+                        </Frame>
+
 <#
     {
         int cntr= 0; 
@@ -239,7 +249,7 @@
                         <Frame OutlineColor="{DynamicResource DataGridLineColor}" 
                             BackgroundColor="{DynamicResource DataGridHeaderBackGroundColor}" 
                             Padding="8, 8, 2, 2" CornerRadius="0"
-                            IsVisible="{Binding BindingContext.<#= SelectedColumnsPropertyName #>[<#= cntr #>].IsChecked, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
+                            IsVisible="{Binding BindingContext.<#= SelectedColumnsPropertyName #>[<#= cntr #>].IsChecked, Mode=OneWay, Source={x:Reference chckdModelUsrCntrlRootNode}}"
                             FlexLayout.Basis="<#= FlexLayoutBasis #>" >
 <#
             if (IsSortable) { 
@@ -249,17 +259,17 @@
                                     Text="<#= GetDisplayAttributeValueString2(modelViewUIListPropertySerializable, Model, ShortNameLabelProperty) #>" />
                                 <Label Text="" FontFamily="CustomIconFontAlias" >
                                     <Label.Triggers>
-                                        <DataTrigger TargetType="Label" Binding="{Binding BindingContext.<#= CurrentSortInfoPropertyName #>, Source={x:Reference sformUsrCntrlRootNode}}" Value="<#= GetModelPropertyNameEx2(modelViewUIListPropertySerializable, Model) #> asc">
+                                        <DataTrigger TargetType="Label" Binding="{Binding BindingContext.<#= CurrentSortInfoPropertyName #>, Source={x:Reference chckdModelUsrCntrlRootNode}}" Value="<#= GetModelPropertyNameEx2(modelViewUIListPropertySerializable, Model) #> asc">
                                             <Setter Property="Text" Value="{x:Static fontIcons:IconFont.Expand_less}"/>
                                         </DataTrigger>
-                                        <DataTrigger TargetType="Label" Binding="{Binding BindingContext.<#= CurrentSortInfoPropertyName #>, Source={x:Reference sformUsrCntrlRootNode}}" Value="<#= GetModelPropertyNameEx2(modelViewUIListPropertySerializable, Model) #> desc">
+                                        <DataTrigger TargetType="Label" Binding="{Binding BindingContext.<#= CurrentSortInfoPropertyName #>, Source={x:Reference chckdModelUsrCntrlRootNode}}" Value="<#= GetModelPropertyNameEx2(modelViewUIListPropertySerializable, Model) #> desc">
                                             <Setter Property="Text" Value="{x:Static fontIcons:IconFont.Expand_more}"/>
                                         </DataTrigger>
                                     </Label.Triggers>
                                 </Label>
                             </StackLayout>
                             <Frame.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding BindingContext.<#= OnSortCommandPropertyName #>, Source={x:Reference sformUsrCntrlRootNode}}" CommandParameter="<#= GetModelPropertyNameEx2(modelViewUIListPropertySerializable, Model) #>"/>
+                                <TapGestureRecognizer Command="{Binding BindingContext.<#= OnSortCommandPropertyName #>, Source={x:Reference chckdModelUsrCntrlRootNode}}" CommandParameter="<#= GetModelPropertyNameEx2(modelViewUIListPropertySerializable, Model) #>"/>
                             </Frame.GestureRecognizers>
 <#
             } else {
@@ -277,8 +287,8 @@
 #>
                     </FlexLayout>
                     <ScrollView Orientation="Vertical" Margin="0">
-                        <StackLayout RadioButtonGroup.SelectedValue="{Binding BindingContext.<#= SelectedRowPropertyName #>, Source={x:Reference sformUsrCntrlRootNode}}" RadioButtonGroup.GroupName="{Binding <#= RadioGroupNamePropertyName #>, Source={x:Reference sformUsrCntrlRootNode}}"
-                            BindableLayout.ItemsSource="{Binding BindingContext.<#= DataSourcePropertyName #>, Source={x:Reference sformUsrCntrlRootNode}}" Spacing="0" >
+                        <StackLayout RadioButtonGroup.SelectedValue="{Binding BindingContext.<#= SelectedRowPropertyName #>, Source={x:Reference chckdModelUsrCntrlRootNode}}" RadioButtonGroup.GroupName="{Binding <#= RadioGroupNamePropertyName #>, Source={x:Reference chckdModelUsrCntrlRootNode}}"
+                            BindableLayout.ItemsSource="{Binding BindingContext.<#= DataSourcePropertyName #>, Source={x:Reference chckdModelUsrCntrlRootNode}}" Spacing="0" >
                             <BindableLayout.ItemTemplate>
                                 <DataTemplate>
                                     <FlexLayout   Direction="Row"   HorizontalOptions="StartAndExpand" JustifyContent="Start">
@@ -289,8 +299,21 @@
                                                 <RadioButton WidthRequest="20" Value="{Binding .}"/>
                                                 <Button WidthRequest="40"
                                                         Text="{x:Static fontIcons:IconFont.More_vert}" FontFamily="CustomIconFontAlias" BackgroundColor="Transparent" 
-                                                        Command="{Binding BindingContext.<#= RowMenuItemsCommandPropertyName #>, Source={x:Reference sformUsrCntrlRootNode}}" CommandParameter="{Binding .}"/>
+                                                        Command="{Binding BindingContext.<#= RowMenuItemsCommandPropertyName #>, Source={x:Reference chckdModelUsrCntrlRootNode}}" CommandParameter="{Binding .}"/>
                                             </StackLayout>
+                                        </Frame>
+                                        <Frame OutlineColor="{DynamicResource DataGridLineColor}" 
+                                            BackgroundColor="{DynamicResource DataGridBodyBackgroundColor}" 
+                                            Padding="8, 0, 2, 0" CornerRadius="0" 
+                                            FlexLayout.Basis="40">
+                                            <CheckBox IsChecked="{Binding <#= SelPrmPropertyName #>}"  IsEnabled="{Binding  <#= IsPermissionEditablePropertyName #>, Mode=OneWay, Source={x:Reference chckdModelUsrCntrlRootNode}}">
+                                                <CheckBox.GestureRecognizers>
+                                                    <TapGestureRecognizer 
+                                                        Command="{Binding BindingContext.<#= PermissionChangedCommandPropertyName #>, Source={x:Reference chckdModelUsrCntrlRootNode}}" 
+                                                        CommandParameter="{Binding .}"
+                                                       />
+                                                </CheckBox.GestureRecognizers>
+                                            </CheckBox>
                                         </Frame>
 <#
     {
@@ -305,9 +328,9 @@
                                         <Frame OutlineColor="{DynamicResource DataGridLineColor}" 
                                             BackgroundColor="{DynamicResource DataGridBodyBackgroundColor}" 
                                             Padding="8, 0, 2, 0" CornerRadius="0" 
-                                            IsVisible="{Binding BindingContext.<#= SelectedColumnsPropertyName #>[<#= cntr #>].IsChecked, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
+                                            IsVisible="{Binding BindingContext.<#= SelectedColumnsPropertyName #>[<#= cntr #>].IsChecked, Mode=OneWay, Source={x:Reference chckdModelUsrCntrlRootNode}}"
                                             FlexLayout.Basis="<#= FlexLayoutBasis #>">
-                                            <CheckBox IsChecked="{Binding <#= GetModelPropertyNameEx2(modelViewUIListPropertySerializable, Model) #>}"  IsEnabled="False"/>
+                                            <CheckBox  IsChecked="{Binding <#= GetModelPropertyNameEx2(modelViewUIListPropertySerializable, Model) #>}"  IsEnabled="False"/>
                                         </Frame>
 <#
         } else {
@@ -315,7 +338,7 @@
                                         <Frame OutlineColor="{DynamicResource DataGridLineColor}" 
                                             BackgroundColor="{DynamicResource DataGridBodyBackgroundColor}" 
                                             Padding="8, 0, 2, 0" CornerRadius="0"  
-                                            IsVisible="{Binding BindingContext.<#= SelectedColumnsPropertyName #>[<#= cntr #>].IsChecked, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
+                                            IsVisible="{Binding BindingContext.<#= SelectedColumnsPropertyName #>[<#= cntr #>].IsChecked, Mode=OneWay, Source={x:Reference chckdModelUsrCntrlRootNode}}"
                                             FlexLayout.Basis="<#= FlexLayoutBasis #>">
                                             <Label  TextColor="{DynamicResource DataGridBodyTextColor}"
 <#
@@ -348,20 +371,18 @@
                     </ScrollView>
                 </StackLayout>
             </ScrollView>
-
-
             <tpgnuc:<#= TablePaginationUserControlClassName #> Grid.Row="3"
-                <#= TotalCountPropertyName #>="{Binding BindingContext.<#= TotalCountPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
-                <#= CurrentPagePropertyName #>="{Binding BindingContext.<#= CurrentPagePropertyName #>, Mode=TwoWay, Source={x:Reference sformUsrCntrlRootNode}}"
-                <#= RowsPerPagePropertyName #>="{Binding BindingContext.<#= RowsPerPagePropertyName #>, Mode=TwoWay, Source={x:Reference sformUsrCntrlRootNode}}"
-                <#= RowsPerPageOptionsPropertyName #>="{Binding BindingContext.<#= RowsPerPageOptionsPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
-                IsEnabled="{Binding BindingContext.<#= IsInQueryPropertyName #>, Mode=OneWay,  Converter={StaticResource <#= InverseBooleanConverterClassName #>}, Source={x:Reference sformUsrCntrlRootNode}}"
-                <#= CurrentPageChangedCommandPropertyName #>="{Binding BindingContext.<#= OnCurrentPageChangedCommandPropertyName #>, Source={x:Reference sformUsrCntrlRootNode}}"
-                <#= RowsPerPageChangedCommandPropertyName #>="{Binding BindingContext.<#= OnRowsPerPageChangedCommandPropertyName #>, Source={x:Reference sformUsrCntrlRootNode}}"
+                <#= TotalCountPropertyName #>="{Binding BindingContext.<#= TotalCountPropertyName #>, Mode=OneWay, Source={x:Reference chckdModelUsrCntrlRootNode}}"
+                <#= CurrentPagePropertyName #>="{Binding BindingContext.<#= CurrentPagePropertyName #>, Mode=TwoWay, Source={x:Reference chckdModelUsrCntrlRootNode}}"
+                <#= RowsPerPagePropertyName #>="{Binding BindingContext.<#= RowsPerPagePropertyName #>, Mode=TwoWay, Source={x:Reference chckdModelUsrCntrlRootNode}}"
+                <#= RowsPerPageOptionsPropertyName #>="{Binding BindingContext.<#= RowsPerPageOptionsPropertyName #>, Mode=OneWay, Source={x:Reference chckdModelUsrCntrlRootNode}}"
+                IsEnabled="{Binding BindingContext.<#= IsInQueryPropertyName #>, Mode=OneWay,  Converter={StaticResource <#= InverseBooleanConverterClassName #>}, Source={x:Reference chckdModelUsrCntrlRootNode}}"
+                <#= CurrentPageChangedCommandPropertyName #>="{Binding BindingContext.<#= OnCurrentPageChangedCommandPropertyName #>, Source={x:Reference chckdModelUsrCntrlRootNode}}"
+                <#= RowsPerPageChangedCommandPropertyName #>="{Binding BindingContext.<#= OnRowsPerPageChangedCommandPropertyName #>, Source={x:Reference chckdModelUsrCntrlRootNode}}"
                 />
         </Grid>
     </ScrollView>
-</sfrmbs:<#= SformUserControlBaseClassName #>>
+</sfrmbs:<#= SformUserControlBaseClassName #> >
 
 
 <#+
@@ -586,26 +607,6 @@
             return char.ToLower(str[0]) + str.Substring(1);
         return str.ToUpper();
     }
-    string GetUnNamedAtributeValue(ModelViewPropertyOfVwSerializable sclrProp, string attrName) {
-        if(sclrProp != null) {
-            if (sclrProp.Attributes != null) {
-                ModelViewAttributeSerializable modelViewAttributeSerializable =
-                    sclrProp.Attributes.Where(a => a.AttrName == attrName).FirstOrDefault();
-                if(modelViewAttributeSerializable != null) {
-                    if (modelViewAttributeSerializable.VaueProperties != null) {
-                    
-                        ModelViewAttributePropertySerializable modelViewAttributePropertySerializable =
-                            modelViewAttributeSerializable.VaueProperties.Where(p => (string.IsNullOrEmpty(p.PropName) || (p.PropName == "..."))).FirstOrDefault();
-                        if (modelViewAttributePropertySerializable != null) {
-                            return modelViewAttributePropertySerializable.PropValue;
-                        }
-                    }
-                }
-            }
-        }
-        return null;                
-    }
-
     bool IsBooleanInput(ModelViewUIListPropertySerializable prop, ModelViewSerializable model) {
         if((prop == null) || (model == null)) return false;
         ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
@@ -614,66 +615,6 @@
             return false;
         }
         return"System.Boolean".Equals(sclrProp.UnderlyingTypeName) || "Boolean".Equals(sclrProp.UnderlyingTypeName) || "bool".Equals(sclrProp.UnderlyingTypeName);
-    }
-    bool IsStringInput(ModelViewUIListPropertySerializable prop, ModelViewSerializable model) {
-        if((prop == null) || (model == null)) return false;
-        ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
-        if (sclrProp == null)
-        {
-            return false;
-        }
-        return ("System.String".Equals(sclrProp.UnderlyingTypeName) || "String".Equals(sclrProp.UnderlyingTypeName) || "string".Equals(sclrProp.UnderlyingTypeName));
-    }
-    string GetMaxLen(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
-        if ((prop == null) || (model == null)) return "null";
-        if( prop.UnderlyingTypeName.ToLower() == "system.string" ) {
-            string propValue = GetUnNamedAtributeValue(prop, "StringLength");
-            if(!string.IsNullOrEmpty(propValue)) {
-                propValue = propValue.Replace("\"", "");
-                if(!string.IsNullOrEmpty(propValue)) {
-                    return propValue;
-                }
-            }
-            propValue = GetUnNamedAtributeValue(prop, "MaxLength");
-            if(!string.IsNullOrEmpty(propValue)) {
-                propValue = propValue.Replace("\"", "");
-                if(!string.IsNullOrEmpty(propValue)) {
-                    return propValue;
-                }
-            }
-        }
-        return "null";
-    }
-    string GetMaxLenEx(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model) {
-        if ((prop == null) || (model == null)) return "null";
-        ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
-        return GetMaxLen(sclrProp, model);
-    }
-    string GetMaxLenEx2(ModelViewUIListPropertySerializable prop, ModelViewSerializable model) {
-        if ((prop == null) || (model == null)) return "null";
-        ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
-        return GetMaxLen(sclrProp, model);
-    }
-    int  GetGridColumnWidth(ModelViewUIListPropertySerializable prop, ModelViewSerializable model) {
-        string s = GetDisplayAttributeValueString2(prop, model, "ShortName");
-        if(string.IsNullOrEmpty(s)) return 100;
-        int sl = s.Length;
-        if(IsBooleanInput(prop, model)) {
-            return sl > 3 ? sl*12 : 40;
-        }
-        if(IsDateInput(prop, model)) {
-            return sl > 20 ? sl*12 : 250;
-        }
-        if(IsStringInput(prop, model)) {
-            s = GetMaxLenEx2(prop, model);
-            int sl1 = 0;
-            if(int.TryParse(s, out sl1)) {
-                if(sl1 > 40) sl1 = 40;
-                return sl > sl1 ? sl*12 : sl1*12;
-            }
-            return sl > 35 ? sl*12 : 350;
-        }
-        return sl > 20 ? sl*12 : 250;
     }
     bool hasSortHeader(ModelViewUIListPropertySerializable modelViewUIListPropertySerializable, ModelViewSerializable model) {
         if ((model == null) || (modelViewUIListPropertySerializable == null)) {
@@ -698,6 +639,27 @@
     string GetModelPropertyNameEx2(ModelViewUIListPropertySerializable prop, ModelViewSerializable model) {
         ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
         return GetModelPropertyName(sclrProp, model);
+    }
+    int  GetGridColumnWidth(ModelViewUIListPropertySerializable prop, ModelViewSerializable model) {
+        string s = GetDisplayAttributeValueString2(prop, model, "ShortName");
+        if(string.IsNullOrEmpty(s)) return 100;
+        int sl = s.Length;
+        if(IsBooleanInput(prop, model)) {
+            return sl > 3 ? sl*12 : 40;
+        }
+        if(IsDateInput(prop, model)) {
+            return sl > 20 ? sl*12 : 250;
+        }
+        if(IsStringInput(prop, model)) {
+            s = GetMaxLenEx2(prop, model);
+            int sl1 = 0;
+            if(int.TryParse(s, out sl1)) {
+                if(sl1 > 40) sl1 = 40;
+                return sl > sl1 ? sl*12 : sl1*12;
+            }
+            return sl > 35 ? sl*12 : 350;
+        }
+        return sl > 20 ? sl*12 : 250;
     }
     bool IsDateTimeInput(ModelViewUIListPropertySerializable prop, ModelViewSerializable model) {
         if((prop == null) || (model == null)) return false;
@@ -725,7 +687,60 @@
         if(string.IsNullOrEmpty(rsltStr)) return false;
         return (rsltStr.IndexOf("Currency", StringComparison.CurrentCultureIgnoreCase) >= 0); 
     }
+    bool IsStringInput(ModelViewUIListPropertySerializable prop, ModelViewSerializable model) {
+        if((prop == null) || (model == null)) return false;
+        ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
+        if (sclrProp == null)
+        {
+            return false;
+        }
+        return ("System.String".Equals(sclrProp.UnderlyingTypeName) || "String".Equals(sclrProp.UnderlyingTypeName) || "string".Equals(sclrProp.UnderlyingTypeName));
+    }
+    string GetMaxLenEx2(ModelViewUIListPropertySerializable prop, ModelViewSerializable model) {
+        if ((prop == null) || (model == null)) return "null";
+        ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
+        return GetMaxLen(sclrProp, model);
+    }
     string GetAtributeUnNamedValue(ModelViewPropertyOfVwSerializable sclrProp, string attrName) {
+        if(sclrProp != null) {
+            if (sclrProp.Attributes != null) {
+                ModelViewAttributeSerializable modelViewAttributeSerializable =
+                    sclrProp.Attributes.Where(a => a.AttrName == attrName).FirstOrDefault();
+                if(modelViewAttributeSerializable != null) {
+                    if (modelViewAttributeSerializable.VaueProperties != null) {
+                    
+                        ModelViewAttributePropertySerializable modelViewAttributePropertySerializable =
+                            modelViewAttributeSerializable.VaueProperties.Where(p => (string.IsNullOrEmpty(p.PropName) || (p.PropName == "..."))).FirstOrDefault();
+                        if (modelViewAttributePropertySerializable != null) {
+                            return modelViewAttributePropertySerializable.PropValue;
+                        }
+                    }
+                }
+            }
+        }
+        return null;                
+    }
+    string GetMaxLen(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+        if ((prop == null) || (model == null)) return "null";
+        if( prop.UnderlyingTypeName.ToLower() == "system.string" ) {
+            string propValue = GetUnNamedAtributeValue(prop, "StringLength");
+            if(!string.IsNullOrEmpty(propValue)) {
+                propValue = propValue.Replace("\"", "");
+                if(!string.IsNullOrEmpty(propValue)) {
+                    return propValue;
+                }
+            }
+            propValue = GetUnNamedAtributeValue(prop, "MaxLength");
+            if(!string.IsNullOrEmpty(propValue)) {
+                propValue = propValue.Replace("\"", "");
+                if(!string.IsNullOrEmpty(propValue)) {
+                    return propValue;
+                }
+            }
+        }
+        return "null";
+    }
+    string GetUnNamedAtributeValue(ModelViewPropertyOfVwSerializable sclrProp, string attrName) {
         if(sclrProp != null) {
             if (sclrProp.Attributes != null) {
                 ModelViewAttributeSerializable modelViewAttributeSerializable =

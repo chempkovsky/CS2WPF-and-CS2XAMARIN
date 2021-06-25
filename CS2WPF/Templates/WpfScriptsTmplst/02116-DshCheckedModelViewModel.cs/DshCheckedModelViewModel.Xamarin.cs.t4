@@ -12,6 +12,7 @@
 <#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
 using System;
+using Xamarin.Forms;
 using System.Windows;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -22,17 +23,25 @@ using System.Linq;
 using Prism.Mvvm;
 using Prism.Services.Dialogs;
 using System.Threading.Tasks;
-using System.Windows.Controls.Primitives;
-using System.Windows.Controls;
+using Xamarin.Essentials;
 
 <#
     string IAppGlblSettingsServiceFolder      = "00080-IAppGlblSettingsService.cs";
     string IAppGlblSettingsServiceClassName   = GetContextModelClassName(Context, IAppGlblSettingsServiceFolder);
     string IAppGlblSettingsServiceNameSpace   = GetContextModelNameSpace(Context, IAppGlblSettingsServiceFolder);
 
-    string commandHelperModelFolder      = "00140-CommandHelper.cs";
-    string commandHelperModelClassName   = GetContextModelClassName(Context, commandHelperModelFolder);
-    string commandHelperModelNameSpace   = GetContextModelNameSpace(Context, commandHelperModelFolder);
+    string BindingContextFeedbackFolder      = "00166-BindingContextFeedback.cs";
+    string BindingContextFeedbackClassName   = GetContextModelClassName(Context, BindingContextFeedbackFolder);
+    string BindingContextFeedbackNameSpace   = GetContextModelNameSpace(Context, BindingContextFeedbackFolder);
+
+
+    string IconFontFolder      = "00178-IconFont.cs";
+    string IconFontClassName   = GetContextModelClassName(Context, IconFontFolder);
+    string IconFontNameSpace   = GetContextModelNameSpace(Context, IconFontFolder);
+
+    string IPermissionVectorInterfaceFolder      = "00195-IPermissionVectorInterface.cs";
+    string IPermissionVectorInterfaceClassName   = GetContextModelClassName(Context, IPermissionVectorInterfaceFolder);
+    string IPermissionVectorInterfaceNameSpace   = GetContextModelNameSpace(Context, IPermissionVectorInterfaceFolder);
 
     string ISformViewModelInterfaceFolder      = "00198-ISformViewModelInterface.cs";
     string ISformViewModelInterfaceClassName   = GetContextModelClassName(Context, ISformViewModelInterfaceFolder);
@@ -62,13 +71,14 @@ using System.Windows.Controls;
     string WebServiceFilterMenuViewModelClassName   = GetContextModelClassName(Context, WebServiceFilterMenuViewModelFolder);
     string WebServiceFilterMenuViewModelNameSpace   = GetContextModelNameSpace(Context, WebServiceFilterMenuViewModelFolder);
 
-    string RoutedEventExtFolder                     = "00222-RoutedEventExt.cs";
-    string RoutedEventExtClassName                  = GetContextModelClassName(Context, RoutedEventExtFolder);
-    string RoutedEventExtNameSpace                  = GetContextModelNameSpace(Context, RoutedEventExtFolder);
+    string ValueChangedCmdParamFolder               = "00218-ValueChangedCmdParam.cs";
+    string ValueChangedCmdParamClassName            = GetContextModelClassName(Context, ValueChangedCmdParamFolder);
+    string ValueChangedCmdParamNameSpace            = GetContextModelNameSpace(Context, ValueChangedCmdParamFolder);
 
-    string RoutedCommandExtFolder      = "00224-RoutedCommandExt.cs";
-    string RoutedCommandExtClassName   = GetContextModelClassName(Context, RoutedCommandExtFolder);
-    string RoutedCommandExtNameSpace   = GetContextModelNameSpace(Context, RoutedCommandExtFolder);
+
+    string IBindingContextChangedFolder      = "00220-IBindingContextChanged.cs";
+    string IBindingContextChangedClassName   = GetContextModelClassName(Context, IBindingContextChangedFolder);
+    string IBindingContextChangedNameSpace   = GetContextModelNameSpace(Context, IBindingContextChangedFolder);
 
     string TablePaginationUserControlFolder      = "00252-TablePaginationUserControl.xaml.cs";
     string TablePaginationUserControlClassName   = GetContextModelClassName(Context, TablePaginationUserControlFolder);
@@ -87,6 +97,10 @@ using System.Windows.Controls;
     string modelInterfaceClassName      = GetInterfaceName(Model);
     string modelInterfaceNameSpace      = GetModelNameSpace(Model, modelInterfaceFolder);
 
+    string DshPermissionNotifyInterfaceFolder      = "01124-DshPermissionNotifyInterface.cs";
+    string DshPermissionNotifyInterfaceClassName   = GetModelPermissionNotifyInterfaceName(Model);
+    string DshPermissionNotifyInterfaceNameSpace   = GetModelNameSpace(Model, DshPermissionNotifyInterfaceFolder);
+
     string modelPageInterfaceFolder         = "01200-Page.interface.cs";
     string modelPageInterfaceClassName      = GetPageInterfaceName(Model);
     string modelPageInterfaceNameSpace      = GetModelNameSpace(Model, modelPageInterfaceFolder);
@@ -103,22 +117,18 @@ using System.Windows.Controls;
     string modelServiceInterfaceClassName    = GetModelServiceInterfaceName(Model);
     string modelServiceInterfaceNameSpace    = GetModelNameSpace(Model, modelServiceInterfaceFolder);
 
-    string PermissionNotifyInterfaceFolder      = "01114-PermissionNotifyInterface.cs";
-    string PermissionNotifyInterfaceClassName   = GetModelPermissionNotifyInterfaceName(Model);
-    string PermissionNotifyInterfaceNameSpace   = GetModelNameSpace(Model, PermissionNotifyInterfaceFolder);
+    string ServiceCopyDshPermissionInterfaceFolder       = "01412-ServiceCopyDshPermission.interface.cs";
+    string ServiceCopyDshPermissionInterfaceClassName    = GetModelServiceCopyPermissionInterfaceName(Model);
+    string ServiceCopyDshPermissionInterfaceNameSpace    = GetModelNameSpace(Model, ServiceCopyDshPermissionInterfaceFolder);
 
-    string ServiceCopyPermissionInterfaceFolder       = "01408-ServiceCopyPermission.interface.cs";
-    string ServiceCopyPermissionInterfaceClassName    = GetModelServiceCopyPermissionInterfaceName(Model);
-    string ServiceCopyPermissionInterfaceNameSpace    = GetModelNameSpace(Model, ServiceCopyPermissionInterfaceFolder);
+    string DshCheckedModelUserControlFolder        = "02112-DshCheckedModelUserControl.xaml.cs";
+    string DshCheckedModelUserControlClassName     = GetModelClassName(Model, DshCheckedModelUserControlFolder);
+    string DshCheckedModelUserControlNameSpace     = GetModelNameSpace(Model, DshCheckedModelUserControlFolder);
+    string DshCheckedModelUserControlProject       = GetModelProjectName(Model, DshCheckedModelUserControlFolder);
 
-    string CheckedModelUserControlFolder        = "02102-CheckedModelUserControl.xaml.cs";
-    string CheckedModelUserControlClassName     = GetModelClassName(Model, CheckedModelUserControlFolder);
-    string CheckedModelUserControlNameSpace     = GetModelNameSpace(Model, CheckedModelUserControlFolder);
-    string CheckedModelUserControlProject       = GetModelProjectName(Model, CheckedModelUserControlFolder);
-
-    string CheckedModelViewModelFolder          = "02106-CheckedModelViewModel.cs";
-    string CheckedModelViewModelClassName       = GetModelClassName(Model, CheckedModelViewModelFolder);
-    string CheckedModelViewModelNameSpace       = GetModelNameSpace(Model, CheckedModelViewModelFolder);
+    string DshCheckedModelViewModelFolder          = "02116-DshCheckedModelViewModel.cs";
+    string DshCheckedModelViewModelClassName       = GetModelClassName(Model, DshCheckedModelViewModelFolder);
+    string DshCheckedModelViewModelNameSpace       = GetModelNameSpace(Model, DshCheckedModelViewModelFolder);
 
     string CurrentFilterPropertyName                    = "CurrentFilter";
     string FilterDefinitionsPropertyName                = "FilterDefinitions";
@@ -130,10 +140,12 @@ using System.Windows.Controls;
     string TableMenuItemsVMPropertyName                 = "TableMenuItemsVM"; // correct:  to exclude HResult=0x800703E9 System.StackOverflowException
     string OnTableMenuItemsChangedPropertyName          = "OnTableMenuItemsChanged";
     string TableMenuItemsPropertyChangedPropertyName    = "TableMenuItemsPropertyChanged";
+    string TableMenuItemsCommandPropertyName            = "TableMenuItemsCommand";
 
     string RowMenuItemsPropertyName                     = "RowMenuItemsVM";   // correct:  to exclude HResult=0x800703E9 System.StackOverflowException
     string OnRowMenuItemsChangedPropertyName            = "OnRowMenuItemsChanged";
     string RowMenuItemsPropertyChangedPropertyName      = "RowMenuItemsPropertyChanged";
+    string RowMenuItemsCommandPropertyName              = "RowMenuItemsCommand";
 
     string ApplyFilterCommandPropertyName = "ApplyFilterCommand";
 
@@ -141,60 +153,65 @@ using System.Windows.Controls;
 
     string IsInQueryPropertyName                = "IsInQuery";
     string IsOnLoadedCalledPropertyName         = "IsOnLoadedCalled";
+    string OnLoadedPropertyName                 = "OnLoaded";
 
     string RowsPerPageOptionsPropertyName = "RowsPerPageOptions";
-    string RowsPerPagePropertyName = "RowsPerPage";
     string TotalCountPropertyName = "TotalCount";
-    string CurrentPagePropertyName = "CurrentPage";
-    string RowsPerPageDefaultPropertyName = "10";
     string DataSourcePropertyName = "DataSource";
-    string RoutedEventHandlersPropertyName = "RoutedEventHandlers";
-    string RoutedCommandHandlersPropertyName = "RoutedCommandHandlers";
     string RefreshSformCommandPropertyName = "RefreshSformCommand";
     string SelectColumnsCommandPropertyName = "SelectColumnsCommand";
     string SelectedColumnsPropertyName = "SelectedColumns";
     string SformSelectionChangedPropertyName = "SformSelectionChanged";
-    string PermissionChangedCommandPropertyName         = "PermissionChangedCommand";
-    string PermissionVectorChangedCommandPropertyName   = "PermissionVectorChangedCommand";
-    string PermissionVectorPropertyChangedPropertyName  = "PermissionVectorPropertyChanged";
-
-
     string RegionPropertyName = "Region";
     string SformSelectionChangedCommandPropertyName = "SformSelectionChangedCommand";
-    string SelectedGridItemPropertyName             = "SelectedGridItem";
-
     string CopyToModelMethodName            = "CopyToModel";
     string CopyToModelNotifyMethodName      = "CopyToModelNotify";
 
-    string PermissionsPropertyName                  = "Permissions";
-    string OnPermissionsMethodName                  = "OnPermissions";
-    string GetEmptyPermissionsMethodName            = "GetEmptyPermissions";
-    string CopyToModelPermissionNotifyMethodName    = "CopyToModelPermissionNotify";
-    string CopyToModelPermissionMethodName          = "CopyToModelPermission";
+    string CurrentSortInfoPropertyName = "CurrentSortInfo";
+    string OnSortCommandPropertyName = "OnSortCommand";
 
+    string CurrentPagePropertyName = "CurrentPage";
+    string OnCurrentPageChangedCommandPropertyName="OnCurrentPageChangedCommand";
+
+    string RowsPerPagePropertyName = "RowsPerPage";
+    string RowsPerPageDefaultPropertyName = "10";
+    string OnRowsPerPageChangedCommandPropertyName="OnRowsPerPageChangedCommand";
+
+    string SelectedRowPropertyName="SelectedRow";
 
     string DisplayLabelProperty     = "Name";
     string DisplayHintProperty      = "Prompt";
 
     string FormRootServicePropertyName      = "FrmRootSrv";
-    string CopyPermsServicePropertyName     = "CopyPermsSrv";
     string AppSettingServicePropertyName    = "GlblSettingsSrv";
     string FilterOperatorSuffix             = "Oprtr";
     string GetWithFilterMethodName          = "getwithfilter";
     string ColumnSelectorDlgPropertyName    = "ColumnSelectorDlg";
 
-    string SformAfterAddItemCommandPropertyName = "SformAfterAddItemCommand";
-    string SformAfterUpdItemCommandPropertyName = "SformAfterUpdItemCommand";
-    string SformAfterDelItemCommandPropertyName = "SformAfterDelItemCommand";
-    string SformLoadedCommandPropertyName       = "SformLoadedCommand";
-    string UIDispatcherInvokePropertyName       = "Application.Current.Dispatcher.Invoke";
+    string SformAfterAddItemCommandPropertyName     = "SformAfterAddItemCommand";
+    string SformAfterUpdItemCommandPropertyName     = "SformAfterUpdItemCommand";
+    string SformAfterDelItemCommandPropertyName     = "SformAfterDelItemCommand";
+    string SformLoadedCommandPropertyName           = "SformLoadedCommand";
+    string UIDispatcherInvokePropertyName           = "Application.Current.Dispatcher.Invoke";
+    string BindingContextFeedbackRefPropertyName    = "BindingContextFeedbackRef";
 
-    string AddPrmPropertyName                    = "AddPrm";
-    string UpdPrmPropertyName                    = "UpdPrm";
-    string DelPrmPropertyName                    = "DelPrm";
-    string SelPrmPropertyName                    = "SelPrm";
+    string InternalContentProperty                  = "InternalContent";
 
-    string PrimKeyPropertyName                    = "";
+    string IsPermissionEditablePropertyName                 = "IsPermissionEditable";
+    string IsPermissionEditablePropertyChangedPropertyName  = "IsPermissionEditablePropertyChanged";
+    string PermissionVectorPropertyChangedPropertyName      = "PermissionVectorPropertyChanged";
+    string PermissionChangedCommandPropertyName             = "PermissionChangedCommand";
+    string GetEmptyPermissionsMethodName                    = "GetEmptyPermissions";
+    string CopyToModelPermissionNotifyMethodName            = "CopyToModelPermissionNotify";
+    string CopyToModelPermissionMethodName                  = "CopyToModelPermission";
+    string CopyPermsServicePropertyName                     = "CopyPermsSrv";
+    string OnPermissionsMethodName                          = "OnPermissions";
+    string PermissionsPropertyName                          = "Permissions";
+    string AddPrmPropertyName                               = "AddPrm";
+    string UpdPrmPropertyName                               = "UpdPrm";
+    string DelPrmPropertyName                               = "DelPrm";
+    string SelPrmPropertyName                               = "SelPrm";
+    string PrimKeyPropertyName                              = "";
 
     List<ModelViewPropertyOfVwSerializable> primKeys= new List<ModelViewPropertyOfVwSerializable>();
     {
@@ -245,45 +262,49 @@ using System.Windows.Controls;
 
 
     List<string> nmSpaces = new List<string>();
-    if ((CheckedModelViewModelNameSpace != commandHelperModelNameSpace) && (nmSpaces.IndexOf(commandHelperModelNameSpace) < 0)) 
-        nmSpaces.Add(commandHelperModelNameSpace);
-    if ((CheckedModelViewModelNameSpace != IWebServiceFilterDefInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterDefInterfaceNameSpace) < 0)) 
+    if ((DshCheckedModelViewModelNameSpace != IWebServiceFilterDefInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterDefInterfaceNameSpace) < 0)) 
         nmSpaces.Add(IWebServiceFilterDefInterfaceNameSpace);
-    if ((CheckedModelViewModelNameSpace != IWebServiceFilterRsltInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace) < 0)) 
+    if ((DshCheckedModelViewModelNameSpace != IWebServiceFilterRsltInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace) < 0)) 
         nmSpaces.Add(IWebServiceFilterRsltInterfaceNameSpace);
-    if ((CheckedModelViewModelNameSpace != WebServiceFilterRsltViewModelNameSpace) && (nmSpaces.IndexOf(WebServiceFilterRsltViewModelNameSpace) < 0)) 
+    if ((DshCheckedModelViewModelNameSpace != WebServiceFilterRsltViewModelNameSpace) && (nmSpaces.IndexOf(WebServiceFilterRsltViewModelNameSpace) < 0)) 
         nmSpaces.Add(WebServiceFilterRsltViewModelNameSpace);
-    if ((CheckedModelViewModelNameSpace != WebServiceFilterDefViewModelNameSpace) && (nmSpaces.IndexOf(WebServiceFilterDefViewModelNameSpace) < 0)) 
+    if ((DshCheckedModelViewModelNameSpace != WebServiceFilterDefViewModelNameSpace) && (nmSpaces.IndexOf(WebServiceFilterDefViewModelNameSpace) < 0)) 
         nmSpaces.Add(WebServiceFilterDefViewModelNameSpace);
-    if ((CheckedModelViewModelNameSpace != modelServiceInterfaceNameSpace) && (nmSpaces.IndexOf(modelServiceInterfaceNameSpace) < 0)) 
+    if ((DshCheckedModelViewModelNameSpace != modelServiceInterfaceNameSpace) && (nmSpaces.IndexOf(modelServiceInterfaceNameSpace) < 0)) 
         nmSpaces.Add(modelServiceInterfaceNameSpace);
-    if ((CheckedModelViewModelNameSpace != IAppGlblSettingsServiceNameSpace) && (nmSpaces.IndexOf(IAppGlblSettingsServiceNameSpace) < 0)) 
+    if ((DshCheckedModelViewModelNameSpace != IAppGlblSettingsServiceNameSpace) && (nmSpaces.IndexOf(IAppGlblSettingsServiceNameSpace) < 0)) 
         nmSpaces.Add(IAppGlblSettingsServiceNameSpace);
-    if ((CheckedModelViewModelNameSpace != RoutedEventExtNameSpace) && (nmSpaces.IndexOf(RoutedEventExtNameSpace) < 0)) 
-        nmSpaces.Add(RoutedEventExtNameSpace);
-    if ((CheckedModelViewModelNameSpace != WebServiceFilterMenuViewModelNameSpace) && (nmSpaces.IndexOf(WebServiceFilterMenuViewModelNameSpace) < 0)) 
+    if ((DshCheckedModelViewModelNameSpace != WebServiceFilterMenuViewModelNameSpace) && (nmSpaces.IndexOf(WebServiceFilterMenuViewModelNameSpace) < 0)) 
         nmSpaces.Add(WebServiceFilterMenuViewModelNameSpace);
-    if ((CheckedModelViewModelNameSpace != IWebServiceFilterMenuInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterMenuInterfaceNameSpace) < 0)) 
+    if ((DshCheckedModelViewModelNameSpace != IWebServiceFilterMenuInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterMenuInterfaceNameSpace) < 0)) 
         nmSpaces.Add(IWebServiceFilterMenuInterfaceNameSpace);
-    if ((CheckedModelViewModelNameSpace != IWebServiceFilterMenuInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterMenuInterfaceNameSpace) < 0)) 
+    if ((DshCheckedModelViewModelNameSpace != IWebServiceFilterMenuInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterMenuInterfaceNameSpace) < 0)) 
         nmSpaces.Add(IWebServiceFilterMenuInterfaceNameSpace);
-    if ((CheckedModelViewModelNameSpace != RoutedCommandExtNameSpace) && (nmSpaces.IndexOf(RoutedCommandExtNameSpace) < 0)) 
-        nmSpaces.Add(RoutedCommandExtNameSpace);
-    if ((CheckedModelViewModelNameSpace != IColumnSelectorItemDefInterfaceNameSpace) && (nmSpaces.IndexOf(IColumnSelectorItemDefInterfaceNameSpace) < 0)) 
+    if ((DshCheckedModelViewModelNameSpace != IColumnSelectorItemDefInterfaceNameSpace) && (nmSpaces.IndexOf(IColumnSelectorItemDefInterfaceNameSpace) < 0)) 
         nmSpaces.Add(IColumnSelectorItemDefInterfaceNameSpace);
-    if ((CheckedModelViewModelNameSpace != ColumnSelectorItemDefViewModelNameSpace) && (nmSpaces.IndexOf(ColumnSelectorItemDefViewModelNameSpace) < 0)) 
+    if ((DshCheckedModelViewModelNameSpace != ColumnSelectorItemDefViewModelNameSpace) && (nmSpaces.IndexOf(ColumnSelectorItemDefViewModelNameSpace) < 0)) 
         nmSpaces.Add(ColumnSelectorItemDefViewModelNameSpace);
-    if ((CheckedModelViewModelNameSpace != TablePaginationUserControlNameSpace) && (nmSpaces.IndexOf(TablePaginationUserControlNameSpace) < 0)) 
+    if ((DshCheckedModelViewModelNameSpace != TablePaginationUserControlNameSpace) && (nmSpaces.IndexOf(TablePaginationUserControlNameSpace) < 0)) 
         nmSpaces.Add(TablePaginationUserControlNameSpace);
-    if ((CheckedModelViewModelNameSpace != ISformViewModelInterfaceNameSpace) && (nmSpaces.IndexOf(ISformViewModelInterfaceNameSpace) < 0)) 
+    if ((DshCheckedModelViewModelNameSpace != ISformViewModelInterfaceNameSpace) && (nmSpaces.IndexOf(ISformViewModelInterfaceNameSpace) < 0)) 
         nmSpaces.Add(ISformViewModelInterfaceNameSpace);
-    if ((CheckedModelViewModelNameSpace != ServiceCopyPermissionInterfaceNameSpace) && (nmSpaces.IndexOf(ServiceCopyPermissionInterfaceNameSpace) < 0)) 
-        nmSpaces.Add(ServiceCopyPermissionInterfaceNameSpace);
-    if ((CheckedModelViewModelNameSpace != PermissionNotifyInterfaceNameSpace) && (nmSpaces.IndexOf(PermissionNotifyInterfaceNameSpace) < 0)) 
-        nmSpaces.Add(PermissionNotifyInterfaceNameSpace);
+    if ((DshCheckedModelViewModelNameSpace != IBindingContextChangedNameSpace) && (nmSpaces.IndexOf(IBindingContextChangedNameSpace) < 0)) 
+        nmSpaces.Add(IBindingContextChangedNameSpace);
+    if ((DshCheckedModelViewModelNameSpace != IconFontNameSpace) && (nmSpaces.IndexOf(IconFontNameSpace) < 0)) 
+        nmSpaces.Add(IconFontNameSpace);
+    if ((DshCheckedModelViewModelNameSpace != ValueChangedCmdParamNameSpace) && (nmSpaces.IndexOf(ValueChangedCmdParamNameSpace) < 0)) 
+        nmSpaces.Add(ValueChangedCmdParamNameSpace);
+    if ((DshCheckedModelViewModelNameSpace != BindingContextFeedbackNameSpace) && (nmSpaces.IndexOf(BindingContextFeedbackNameSpace) < 0)) 
+        nmSpaces.Add(BindingContextFeedbackNameSpace);
+    if ((DshCheckedModelViewModelNameSpace != IPermissionVectorInterfaceNameSpace) && (nmSpaces.IndexOf(IPermissionVectorInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IPermissionVectorInterfaceNameSpace);
+    if ((DshCheckedModelViewModelNameSpace != DshPermissionNotifyInterfaceNameSpace) && (nmSpaces.IndexOf(DshPermissionNotifyInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(DshPermissionNotifyInterfaceNameSpace);
+    if ((DshCheckedModelViewModelNameSpace != ServiceCopyDshPermissionInterfaceNameSpace) && (nmSpaces.IndexOf(ServiceCopyDshPermissionInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(ServiceCopyDshPermissionInterfaceNameSpace);
+    
+    
 
-    
-    
 #>
 <# 
     foreach(string ns in nmSpaces) {
@@ -294,16 +315,16 @@ using <#= ns #>;
 #>
 /*
 
-    "<#= CheckedModelUserControlClassName #>" UserControl is defined in the "<#= CheckedModelUserControlProject #>"-project.
-    In the file of IModule-class of "<#= CheckedModelUserControlProject #>"-project the following line of code must be inserted:
+    "<#= DshCheckedModelUserControlClassName #>" UserControl is defined in the "<#= DshCheckedModelUserControlProject #>"-project.
+    In the file of IModule-class of "<#= DshCheckedModelUserControlProject #>"-project the following line of code must be inserted:
 
         public void RegisterTypes(IContainerRegistry containerRegistry)
         {
             ...
-            // According to requirements of the "<#= CheckedModelViewModelClassName #>.cs"-file of "<#= CheckedModelViewModelClassName #>"-project. 
-            ViewModelLocationProvider.Register<<#= CheckedModelUserControlClassName #>, <#= CheckedModelViewModelClassName #>>();
-            // According to requirements of the "<#= CheckedModelViewModelClassName #>.cs"-file of "<#= CheckedModelUserControlProject #>"-project. 
-            containerRegistry.Register<UserControl, <#= CheckedModelUserControlClassName #>>("<#= CheckedModelUserControlClassName #>");
+            // According to requirements of the "<#= DshCheckedModelViewModelClassName #>.cs"-file of "<#= DshCheckedModelUserControlProject #>"-project. 
+            ViewModelLocationProvider.Register<<#= DshCheckedModelUserControlClassName #>, <#= DshCheckedModelViewModelClassName #>>();
+            // According to requirements of the "<#= DshCheckedModelViewModelClassName #>.cs"-file of "<#= DshCheckedModelUserControlProject #>"-project. 
+            containerRegistry.Register<ContentView, <#= DshCheckedModelUserControlClassName #>>("<#= DshCheckedModelUserControlClassName #>");
             ...
         }
 
@@ -317,53 +338,18 @@ using <#= ns #>;
     }
 #>
 
-namespace <#= CheckedModelViewModelNameSpace #> {
-    public class <#= CheckedModelViewModelClassName #>: INotifyPropertyChanged
+namespace <#= DshCheckedModelViewModelNameSpace #> {
+    public class <#= DshCheckedModelViewModelClassName #>: INotifyPropertyChanged, <#= ISformViewModelInterfaceClassName #>, <#= IBindingContextChangedClassName #>, <#= IPermissionVectorInterfaceClassName #>
     {
         protected <#= modelServiceInterfaceClassName #> <#= FormRootServicePropertyName #>=null;
         protected <#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName #>=null;
-        protected <#= ServiceCopyPermissionInterfaceClassName #> <#= CopyPermsServicePropertyName #> = null;
         protected IDialogService _dialogService=null;
-        public <#= CheckedModelViewModelClassName #>(<#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName  #>, <#= modelServiceInterfaceClassName #> <#= FormRootServicePropertyName #>, <#= ServiceCopyPermissionInterfaceClassName #> <#= CopyPermsServicePropertyName #> ,IDialogService dialogService) {
+        protected <#= ServiceCopyDshPermissionInterfaceClassName #> <#= CopyPermsServicePropertyName #> = null;
+        public <#= DshCheckedModelViewModelClassName #>(<#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName  #>, <#= modelServiceInterfaceClassName #> <#= FormRootServicePropertyName #>, <#= ServiceCopyDshPermissionInterfaceClassName #> <#= CopyPermsServicePropertyName #>, IDialogService dialogService) {
             this.<#= AppSettingServicePropertyName #> = <#= AppSettingServicePropertyName #>;
             this.<#= FormRootServicePropertyName #> = <#= FormRootServicePropertyName #>;
             this.<#= CopyPermsServicePropertyName #> = <#= CopyPermsServicePropertyName #>;
             this._dialogService = dialogService;
-            ObservableCollection<ValueTuple<RoutedEvent, Delegate, bool>> rehs = new ObservableCollection<ValueTuple<RoutedEvent, Delegate, bool>>();
-            rehs.Add((<#= RoutedEventExtClassName #>.<#= HiddenFiltersPropertyChangedPropertyName #>Event, 
-                new RoutedPropertyChangedEventHandler<IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>>(this.<#= OnHiddenFiltersChangedPropertyName #>), false));
-            rehs.Add((<#= RoutedEventExtClassName #>.<#= TableMenuItemsPropertyChangedPropertyName #>Event, 
-                new RoutedPropertyChangedEventHandler<IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>>(this.<#= OnTableMenuItemsChangedPropertyName #>), false));
-            rehs.Add((<#= RoutedEventExtClassName #>.<#= RowMenuItemsPropertyChangedPropertyName #>Event, 
-                new RoutedPropertyChangedEventHandler<IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>>(this.<#= OnRowMenuItemsChangedPropertyName #>), false));
-            rehs.Add((<#= TablePaginationUserControlClassName #>.<#= RowsPerPagePropertyName #>ChangedEvent,
-                new RoutedPropertyChangedEventHandler<Nullable<int>>(this.On<#= RowsPerPagePropertyName #>Changed), false));
-            rehs.Add((<#= TablePaginationUserControlClassName #>.<#= CurrentPagePropertyName #>ChangedEvent,
-                new RoutedPropertyChangedEventHandler<Nullable<int>>(this.On<#= CurrentPagePropertyName #>Changed), false));
-            rehs.Add((<#= RoutedEventExtClassName #>.<#= DataGridSortingChangedPropertyName #>Event,
-                new RoutedPropertyChangedEventHandler<Nullable<SortDescription>>(this.OnSortChangedAsync), false));
-            rehs.Add((<#= RoutedEventExtClassName #>.<#= PermissionVectorPropertyChangedPropertyName #>Event,
-                new RoutedPropertyChangedEventHandler<int[]>(this.On<#= PermissionVectorPropertyChangedPropertyName #>), false));
-            rehs.Add((Selector.SelectionChangedEvent,
-                new SelectionChangedEventHandler(OnSelectionChanged), false));
-
-            rehs.Add((FrameworkElement.LoadedEvent, 
-                new RoutedEventHandler(this.OnLoaded), false));
-            _<#= RoutedEventHandlersPropertyName #> = rehs;
-
-            CommandBindingCollection cbsc = new CommandBindingCollection();
-            CommandBinding cb = new CommandBinding(<#= RoutedCommandExtClassName #>.<#= RefreshSformCommandPropertyName #>, new ExecutedRoutedEventHandler(this.Executed<#= RefreshSformCommandPropertyName #>), new CanExecuteRoutedEventHandler(CanExecute<#= RefreshSformCommandPropertyName #>));
-            cbsc.Add(cb);
-            cb = new CommandBinding(<#= RoutedCommandExtClassName #>.<#= SelectColumnsCommandPropertyName #>, new ExecutedRoutedEventHandler(this.Executed<#= SelectColumnsCommandPropertyName #>), new CanExecuteRoutedEventHandler(CanExecute<#= SelectColumnsCommandPropertyName #>));
-            cbsc.Add(cb);
-            cb = new CommandBinding(<#= RoutedCommandExtClassName #>.<#= ApplyFilterCommandPropertyName #>, new ExecutedRoutedEventHandler(this.Executed<#= ApplyFilterCommandPropertyName #>), new CanExecuteRoutedEventHandler(CanExecute<#= ApplyFilterCommandPropertyName #>));
-            cbsc.Add(cb);
-            cb = new CommandBinding(<#= RoutedCommandExtClassName #>.<#= PermissionChangedCommandPropertyName #>, new ExecutedRoutedEventHandler(this.Executed<#= PermissionChangedCommandPropertyName #>), new CanExecuteRoutedEventHandler(CanExecute<#= PermissionChangedCommandPropertyName #>));
-            cbsc.Add(cb);
-
-
-
-            _<#= RoutedCommandHandlersPropertyName #> = cbsc;
             _<#= TableMenuItemsVMPropertyName #> = GetDefault<#= TableMenuItemsVMPropertyName #>();
         }
         #region INotifyPropertyChanged
@@ -374,33 +360,171 @@ namespace <#= CheckedModelViewModelNameSpace #> {
         }
         #endregion
 
-        public void OnSelectionChanged(object sender, SelectionChangedEventArgs e) {
-            if ((e.OriginalSource is DataGrid) && (sender is UIElement))
-            {
-                e.Handled = true;
-                // (sender as UIElement).RaiseEvent(new SelectionChangedEventArgs(<#= RoutedEventExtClassName #>.<#= SformSelectionChangedPropertyName #>Event, e.RemovedItems, e.AddedItems));
-                Tuple<string, System.Collections.IList, System.Collections.IList> itm = new Tuple<string, System.Collections.IList, System.Collections.IList>("<#= modelInterfaceClassName #>", e.RemovedItems, e.AddedItems);
-                <#= RoutedCommandExtClassName #>.<#= SformSelectionChangedCommandPropertyName  #>.Execute(itm, (sender as UIElement));
-            }
-        }    
 
-        private async void OnLoaded(object sender, RoutedEventArgs e)
+        object _<#= BindingContextFeedbackRefPropertyName #> = null;
+        public object <#= BindingContextFeedbackRefPropertyName #> {
+            get { return _<#= BindingContextFeedbackRefPropertyName #>; }
+            set { 
+                if(_<#= BindingContextFeedbackRefPropertyName #> != value) {
+                    _<#= BindingContextFeedbackRefPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        #region <#= PermissionsPropertyName #>
+        protected int[] _<#= PermissionsPropertyName #> = null;
+        public int[] <#= PermissionsPropertyName #> 
         {
-            e.Handled = true;
-            if(!<#= IsOnLoadedCalledPropertyName #>) {
-                <#= UIDispatcherInvokePropertyName #>(() => {
-                    <#= RoutedCommandExtClassName #>.<#= SformLoadedCommandPropertyName  #>.Execute(this, sender as IInputElement);
-                });
-                <#= IsOnLoadedCalledPropertyName #> = true;
-                await onFilter();
+            get 
+            { 
+                if (_<#= PermissionsPropertyName #> == null) _<#= PermissionsPropertyName #> = <#= AppSettingServicePropertyName #>.<#= GetEmptyPermissionsMethodName #>();
+                return _<#= PermissionsPropertyName #>; 
+            }
+            set 
+            {
+                if(_<#= PermissionsPropertyName #> != value) {
+                    _<#= PermissionsPropertyName #> = value;
+                    <#= OnPermissionsMethodName #>();
+                    <#= InternalContentProperty #>Changed();
+                }
+            }
+        }
+        public void <#= OnPermissionsMethodName #>() {
+            if (!<#= IsOnLoadedCalledPropertyName #>) return;
+            int lng = <#= PermissionsPropertyName #>.Length;
+            foreach(<#= DshPermissionNotifyInterfaceClassName #> dsItem in <#= DataSourcePropertyName #>)
+            {
+                int rid = dsItem.<#= PrimKeyPropertyName #> / 31;
+                if(rid < lng-14) {
+                    int sft = (dsItem.<#= PrimKeyPropertyName #> - rid * 31);
+                    int irslt = (<#= PermissionsPropertyName #>[rid+14]) >> sft;
+                    dsItem.<#= SelPrmPropertyName #> = (irslt & 1) == 1;
+                } else {
+                    dsItem.<#= SelPrmPropertyName #> = false;
+                }
+            }
+        }
+        #endregion
+        #region <#= IsPermissionEditablePropertyName #>
+        public bool _<#= IsPermissionEditablePropertyName #> = false;
+        public bool <#= IsPermissionEditablePropertyName #> {
+            get { return _<#= IsPermissionEditablePropertyName #>;}
+            set { 
+                if (_<#= IsPermissionEditablePropertyName #> != value) {
+                    _<#= SelectedRowPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+
+        #region <#= PermissionChangedCommandPropertyName #>
+        protected ICommand _<#= PermissionChangedCommandPropertyName #> = null;
+        public ICommand <#= PermissionChangedCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= PermissionChangedCommandPropertyName #> ?? (_<#= PermissionChangedCommandPropertyName #> = new Command((prm) => <#= PermissionChangedCommandPropertyName #>Execute(prm), (prm) => <#= PermissionChangedCommandPropertyName #>CanExecute(prm)));
+            }
+        }
+        protected void <#= PermissionChangedCommandPropertyName #>Execute(object prm)
+        {
+            if(!<#= IsPermissionEditablePropertyName #>) return;
+            <#= DshPermissionNotifyInterfaceClassName #> selItem = prm as <#= DshPermissionNotifyInterfaceClassName #>;
+            if(selItem == null) return;
+            int lng = <#= PermissionsPropertyName #>.Length;
+            int rid = selItem.<#= PrimKeyPropertyName #> / 7;
+            if(rid < lng-14) {
+                int sft = (selItem.<#= PrimKeyPropertyName #> - rid * 31);
+                if(selItem.<#= SelPrmPropertyName #>) {
+                    <#= PermissionsPropertyName #>[rid+14] = <#= PermissionsPropertyName #>[rid+14] | (1 << sft);
+                } else {
+                    <#= PermissionsPropertyName #>[rid+14] = ~((~(<#= PermissionsPropertyName #>[rid+14])) | (1 << sft));
+                }
+                <#= BindingContextFeedbackRefPropertyName #> = new <#= BindingContextFeedbackClassName #>() {
+		            BcfName = "<#= PermissionChangedCommandPropertyName #>",
+		            BcfData = _<#= PermissionsPropertyName #>
+                }; 
+            }
+        }
+        protected bool <#= PermissionChangedCommandPropertyName #>CanExecute(object prm)
+        {
+            return (!<#= IsInQueryPropertyName #>) && <#= IsPermissionEditablePropertyName #>;
+        }
+        #endregion
+
+        #region <#= IPermissionVectorInterfaceClassName #>
+        public void <#= PermissionVectorPropertyChangedPropertyName #>(object Sender, object OldValue, object NewValue) {
+            if(NewValue == null) {
+                <#= PermissionsPropertyName #> = <#= AppSettingServicePropertyName #>.<#= GetEmptyPermissionsMethodName #>();
+            } else if (NewValue.GetType().IsArray && typeof(int).IsAssignableFrom(NewValue.GetType().GetElementType())) {
+                <#= PermissionsPropertyName #>  = (int[])NewValue;
+            } else {
+                <#= PermissionsPropertyName #> = <#= AppSettingServicePropertyName #>.<#= GetEmptyPermissionsMethodName #>();
+            }
+        }
+        public void <#= IsPermissionEditablePropertyChangedPropertyName #>(object Sender, object OldValue, object NewValue) {
+            if(NewValue is bool)
+                <#= IsPermissionEditablePropertyName #> = (bool)NewValue;
+            else 
+                <#= IsPermissionEditablePropertyName #> = false;
+        }
+        #endregion
+
+        #region <#= SelectedRowPropertyName #>
+        public object _<#= SelectedRowPropertyName #> = null;
+        public object <#= SelectedRowPropertyName #> {
+            get { return _<#= SelectedRowPropertyName #>;}
+            set { 
+                if (_<#= SelectedRowPropertyName #> != value) {
+                    _<#= SelectedRowPropertyName #> = value;
+                    OnPropertyChanged();
+                    <#= BindingContextFeedbackRefPropertyName #> = new <#= BindingContextFeedbackClassName #>() {
+		                BcfName = "<#= SelectedRowPropertyName #>",
+		                BcfData = _<#= SelectedRowPropertyName #>
+                    };
+                }
+            }
+        }
+        #endregion
+
+
+        public async Task <#= OnLoadedPropertyName #>(object sender, object newValue)
+        {
+            if (newValue is bool) {
+                bool v = (bool)newValue;
+                if ((!<#= IsOnLoadedCalledPropertyName #>) && v) {
+                    <#= IsOnLoadedCalledPropertyName #> = true;
+                    await onFilter();
+                } else {
+                    <#= IsOnLoadedCalledPropertyName #> = v;
+                }
             }
         }
         protected bool <#= IsOnLoadedCalledPropertyName #> = false;
         protected IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>> <#= CurrentFilterPropertyName #> = null;
 
+        #region <#= InternalContentProperty #>
+        int _<#= InternalContentProperty #> = 0;
+        protected void <#= InternalContentProperty #>Changed()
+        {
+            if (_<#= InternalContentProperty #> < 10) _<#= InternalContentProperty #>++; else _<#= InternalContentProperty #> = 0;
+            MainThread.InvokeOnMainThreadAsync(async () =>
+            {
+                await Task.Delay(1);
+                this.OnPropertyChanged("<#= InternalContentProperty #>");
+            });
+        }
+        public int <#= InternalContentProperty #>
+        {
+            get { return _<#= InternalContentProperty #>; }
+        }
+        #endregion
+
         #region <#= DataSourcePropertyName #>
-        protected IEnumerable<<#= PermissionNotifyInterfaceClassName #>> _<#= DataSourcePropertyName #> = new ObservableCollection<<#= PermissionNotifyInterfaceClassName #>>();
-        public IEnumerable<<#= PermissionNotifyInterfaceClassName #>> <#= DataSourcePropertyName #>
+        protected IEnumerable<<#= DshPermissionNotifyInterfaceClassName #>> _<#= DataSourcePropertyName #> = new ObservableCollection<<#= DshPermissionNotifyInterfaceClassName #>>();
+        public IEnumerable<<#= DshPermissionNotifyInterfaceClassName #>> <#= DataSourcePropertyName #>
         { 
             get
             {
@@ -412,71 +536,34 @@ namespace <#= CheckedModelViewModelNameSpace #> {
                 {
                     _<#= DataSourcePropertyName #> = value;
                     OnPropertyChanged();
+                    <#= InternalContentProperty #>Changed();
                 }
             }
         }
         #endregion
-
-        #region <#= RoutedEventHandlersPropertyName #>
-        protected IEnumerable<ValueTuple<RoutedEvent, Delegate, bool>> _<#= RoutedEventHandlersPropertyName #> = null;
-        public IEnumerable<ValueTuple<RoutedEvent, Delegate, bool>> <#= RoutedEventHandlersPropertyName #>
-        { 
-            get
-            {
-                return _<#= RoutedEventHandlersPropertyName #>;
-            }
-            set
-            {
-                if (_<#= RoutedEventHandlersPropertyName #> != value)
-                {
-                    _<#= RoutedEventHandlersPropertyName #> = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-        #endregion
-
-        #region <#= RoutedCommandHandlersPropertyName #>
-        protected CommandBindingCollection _<#= RoutedCommandHandlersPropertyName #> = null;
-        public CommandBindingCollection <#= RoutedCommandHandlersPropertyName #>
-        { 
-            get
-            {
-                return _<#= RoutedCommandHandlersPropertyName #>;
-            }
-            set
-            {
-                if (_<#= RoutedCommandHandlersPropertyName #> != value)
-                {
-                    _<#= RoutedCommandHandlersPropertyName #> = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-        #endregion
-
         #region <#= ApplyFilterCommandPropertyName #>
-        public async void Executed<#= ApplyFilterCommandPropertyName #>(object sender, ExecutedRoutedEventArgs e) {
-            e.Handled = true;
-            <#= CurrentFilterPropertyName #> = e.Parameter as IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>;
+        protected ICommand _<#= ApplyFilterCommandPropertyName #> = null;
+        public ICommand <#= ApplyFilterCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= ApplyFilterCommandPropertyName #> ?? (_<#= ApplyFilterCommandPropertyName #> = new Command((prm) => <#= ApplyFilterCommandPropertyName #>Execute(prm), (prm) => <#= ApplyFilterCommandPropertyName #>CanExecute(prm)));
+            }
+        }
+        protected async void <#= ApplyFilterCommandPropertyName #>Execute(object prm)
+        {
+            <#= CurrentFilterPropertyName #> = prm as IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>;
             Actual<#= CurrentPagePropertyName #> = 0;
             await onFilter();
         }
-        public void CanExecute<#= ApplyFilterCommandPropertyName #>(object sender, CanExecuteRoutedEventArgs e) {
-            e.Handled = true;
-            e.CanExecute = !<#= IsInQueryPropertyName #>;
+        protected bool <#= ApplyFilterCommandPropertyName #>CanExecute(object prm)
+        {
+            return !<#= IsInQueryPropertyName #>;
         }
         #endregion
-
-
         #region <#= RefreshSformCommandPropertyName #>
-        public async void Executed<#= RefreshSformCommandPropertyName #>(object sender, ExecutedRoutedEventArgs e) {
-            e.Handled = true;
+        public async void <#= RefreshSformCommandPropertyName #>() {
             await onFilter();
-        }
-        public void CanExecute<#= RefreshSformCommandPropertyName #>(object sender, CanExecuteRoutedEventArgs e) {
-            e.Handled = true;
-            e.CanExecute = !<#= IsInQueryPropertyName #>;
         }
         #endregion
         
@@ -522,7 +609,10 @@ namespace <#= CheckedModelViewModelNameSpace #> {
         #region <#= SelectColumnsCommandPropertyName #>
         protected void <#= SelectColumnsCommandPropertyName #>Callback(IDialogResult rslt)
         {
-            if(rslt.Result != ButtonResult.OK) return;
+            if ((!rslt.Parameters.ContainsKey("Result")) || (!rslt.Parameters.ContainsKey("Columns"))) return;
+            bool aResult =  rslt.Parameters["Result"] is bool;
+            if(aResult) aResult = (bool)rslt.Parameters["Result"];
+            if (!aResult) return;
             if(rslt.Parameters.ContainsKey("Columns")) {
                 IEnumerable<<#= IColumnSelectorItemDefInterfaceClassName #>> clms = rslt.Parameters.GetValue<IEnumerable<<#= IColumnSelectorItemDefInterfaceClassName #>>>("Columns");
                 foreach(<#= IColumnSelectorItemDefInterfaceClassName #> c in clms) {
@@ -531,8 +621,7 @@ namespace <#= CheckedModelViewModelNameSpace #> {
                 }
             }
         }
-        public void Executed<#= SelectColumnsCommandPropertyName #>(object sender, ExecutedRoutedEventArgs e) {
-            e.Handled = true;
+        public void <#= SelectColumnsCommandPropertyName #>() {
             ObservableCollection<<#= IColumnSelectorItemDefInterfaceClassName #>> columns = new ObservableCollection<<#= IColumnSelectorItemDefInterfaceClassName #>>();
             foreach(<#= IColumnSelectorItemDefInterfaceClassName #> sc  in <#= SelectedColumnsPropertyName #>) {
                 columns.Add( new <#= ColumnSelectorItemDefViewModelClassName #>() {Name = sc.Name, Caption=sc.Caption, IsChecked=sc.IsChecked });
@@ -542,24 +631,15 @@ namespace <#= CheckedModelViewModelNameSpace #> {
             prms.Add("Columns", columns);
             this._dialogService.ShowDialog("<#= ColumnSelectorDlgPropertyName #>", prms, <#= SelectColumnsCommandPropertyName #>Callback);
         }
-        public void CanExecute<#= SelectColumnsCommandPropertyName #>(object sender, CanExecuteRoutedEventArgs e) {
-            e.Handled = true;
-            e.CanExecute = !<#= IsInQueryPropertyName #>;
-        }
         #endregion
 
-        #region <#= RowMenuItemsPropertyName #>
-        protected void <#= OnRowMenuItemsChangedPropertyName #>(object sender, RoutedPropertyChangedEventArgs<IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>> evarg) {
-            evarg.Handled = true;
+        #region <#= RowMenuItemsPropertyChangedPropertyName #>
+        public void <#= RowMenuItemsPropertyChangedPropertyName #>(object Sender, object OldValue, object NewValue) {
             ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>> tmis = new ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>>();
-            IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> intmis = null;
-            if(evarg != null) {
-                evarg.Handled = true;
-                intmis = evarg.NewValue as IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>;
-            }
+            IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> intmis = NewValue as IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>;
             if(intmis != null) {
                 foreach(<#= IWebServiceFilterMenuInterfaceClassName #> tmi  in intmis) {
-                    tmis.Add( new <#= WebServiceFilterMenuViewModelClassName #>() {Id = tmi.Id, Caption=tmi.Caption,  IconName=tmi.IconName, IconColor=tmi.IconColor, Enabled=tmi.Enabled, Data=tmi.Data, Command=tmi.Command });
+                    tmis.Add( new <#= WebServiceFilterMenuViewModelClassName #>() {Id = tmi.Id, Caption=tmi.Caption,  IconName=tmi.IconName, IconColor=tmi.IconColor, Enabled=tmi.Enabled, Data=tmi.Data, Command = tmi.Command});
                 }
             }
             <#= RowMenuItemsPropertyName #> = tmis;
@@ -577,28 +657,63 @@ namespace <#= CheckedModelViewModelNameSpace #> {
                 {
                     _<#= RowMenuItemsPropertyName #> = value;
                     OnPropertyChanged();
+                    (<#= RowMenuItemsCommandPropertyName #> as Command).ChangeCanExecute();
                 }
             }
         }
+        #endregion
+        #region <#= RowMenuItemsCommandPropertyName  #>
+        protected ICommand _<#= RowMenuItemsCommandPropertyName #> = null;
+        public ICommand <#= RowMenuItemsCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= RowMenuItemsCommandPropertyName #> ?? (_<#= RowMenuItemsCommandPropertyName #> = new Command((prm) => <#= RowMenuItemsCommandPropertyName #>Execute(prm), (prm) => <#= RowMenuItemsCommandPropertyName #>CanExecute(prm)));
+            }
+        }
+        protected async void <#= RowMenuItemsCommandPropertyName #>Execute(object prm)
+        {
+            List<string> lst = new List<string>();
+            foreach(<#= IWebServiceFilterMenuInterfaceClassName #> mi in <#= RowMenuItemsPropertyName #>) {
+                if (mi.Command != null) {
+                    mi.FeedbackData = prm;
+                    if(mi.Command.CanExecute(mi)) lst.Add(mi.Caption);
+                } else lst.Add(mi.Caption);
+            }
+            string action = await Application.Current.MainPage.DisplayActionSheet("Row commands:", "Cancel", null, lst.ToArray());
+            foreach(<#= IWebServiceFilterMenuInterfaceClassName #> mi in <#= RowMenuItemsPropertyName #>) {
+                if(mi.Caption == action) {
+                    <#= IWebServiceFilterMenuInterfaceClassName #> miToSend = new <#= WebServiceFilterMenuViewModelClassName #>() {Id = mi.Id, Caption = mi.Caption,  IconName = mi.IconName, IconColor = mi.IconColor, Enabled = mi.Enabled, Data = mi.Data,  FeedbackData = prm};
+                    <#= BindingContextFeedbackRefPropertyName #> = new <#= BindingContextFeedbackClassName #>() {
+		                BcfName = "<#= RowMenuItemsCommandPropertyName #>",
+		                BcfData = miToSend
+                    };
+                    return;
+                }
+            }
+        }
+        protected bool <#= RowMenuItemsCommandPropertyName #>CanExecute(object prm)
+        {
+            bool rslt = (<#= RowMenuItemsPropertyName #> != null);
+            if (rslt) rslt = <#= RowMenuItemsPropertyName #>.Any();
+            return rslt;
+        }
+
         #endregion
 
         #region <#= TableMenuItemsVMPropertyName #>
         protected ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>> GetDefault<#= TableMenuItemsVMPropertyName #>() {
             return new ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>>()  {
-                new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "TableRefreshMI", Caption="Refresh table", IconName="TableRefresh", IconColor="Primary", Enabled=true, Data=null, Command=<#= RoutedCommandExtClassName #>.<#= RefreshSformCommandPropertyName #>},
-                new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "TableSettingsMI", Caption="Table columns", IconName="TableCog", IconColor="Primary", Enabled=true, Data=null, Command=<#= RoutedCommandExtClassName #>.<#= SelectColumnsCommandPropertyName #>},
+                new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "TableRefreshMI", Caption="Refresh table", IconName=<#= IconFontClassName #>.Refresh, IconColor=Color.Default, Enabled=true, Data=null, Command = <#= TableMenuItemsCommandPropertyName #>},
+                new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "TableSettingsMI", Caption="Table columns", IconName=<#= IconFontClassName #>.Settings, IconColor=Color.Default, Enabled=true, Data=null, Command = <#= TableMenuItemsCommandPropertyName #>},
             };
         }
-        protected void <#= OnTableMenuItemsChangedPropertyName #>(object sender, RoutedPropertyChangedEventArgs<IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>> evarg) {
+        public void <#= TableMenuItemsPropertyChangedPropertyName #>(object Sender, object OldValue, object NewValue) {
             ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>> tmis = GetDefault<#= TableMenuItemsVMPropertyName #>();
-            IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> intmis = null;
-            if(evarg != null) {
-                evarg.Handled = true;
-                intmis = evarg.NewValue as IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>;
-            }
+            IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> intmis = NewValue as IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>;
             if(intmis != null) {
                 foreach(<#= IWebServiceFilterMenuInterfaceClassName #> tmi  in intmis) {
-                    tmis.Add( new <#= WebServiceFilterMenuViewModelClassName #>() {Id = tmi.Id, Caption=tmi.Caption,  IconName=tmi.IconName, IconColor=tmi.IconColor, Enabled=tmi.Enabled, Data=tmi.Data, Command=tmi.Command });
+                    tmis.Add( new <#= WebServiceFilterMenuViewModelClassName #>() {Id = tmi.Id, Caption=tmi.Caption,  IconName=tmi.IconName, IconColor=tmi.IconColor, Enabled=tmi.Enabled, Data=tmi.Data, Command = tmi.Command});
                 }
             }
             <#= TableMenuItemsVMPropertyName #> = tmis;
@@ -621,14 +736,53 @@ namespace <#= CheckedModelViewModelNameSpace #> {
         }
         #endregion
 
-        #region <#= HiddenFiltersVMPropertyName #>
-        protected async void <#= OnHiddenFiltersChangedPropertyName #>(object sender, RoutedPropertyChangedEventArgs<IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>> evarg)
+        #region <#= TableMenuItemsCommandPropertyName #>
+        protected ICommand _<#= TableMenuItemsCommandPropertyName #> = null;
+        public ICommand <#= TableMenuItemsCommandPropertyName #>
         {
-            IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>> hfs = null;
-            if(evarg != null) {
-                evarg.Handled = true;
-                hfs = evarg.NewValue as IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>;
+            get
+            {
+                return _<#= TableMenuItemsCommandPropertyName #> ?? (_<#= TableMenuItemsCommandPropertyName #> = new Command(() => <#= TableMenuItemsCommandPropertyName #>Execute(), () => <#= TableMenuItemsCommandPropertyName #>CanExecute()));
             }
+        }
+        protected async void <#= TableMenuItemsCommandPropertyName #>Execute()
+        {
+            List<string> lst = new List<string>();
+            foreach(<#= IWebServiceFilterMenuInterfaceClassName #> mi in <#= TableMenuItemsVMPropertyName #>) {
+                if (mi.Command != null) {
+                    if(mi.Command.CanExecute(mi)) lst.Add(mi.Caption);
+                } else lst.Add(mi.Caption);
+            }
+            string action = await Application.Current.MainPage.DisplayActionSheet("Table commands:", "Cancel", null, lst.ToArray());
+            foreach(<#= IWebServiceFilterMenuInterfaceClassName #> mi in <#= TableMenuItemsVMPropertyName #>) {
+                if(mi.Caption == action) {
+                    if(mi.Id == "TableRefreshMI") {
+                        <#= RefreshSformCommandPropertyName #>();
+                    } else if(mi.Id == "TableSettingsMI") {
+                        <#= SelectColumnsCommandPropertyName #>();
+                    } else {
+                        <#= BindingContextFeedbackRefPropertyName #> = new <#= BindingContextFeedbackClassName #>() {
+		                    BcfName = "<#= TableMenuItemsCommandPropertyName #>",
+		                    BcfData = mi
+                        };
+                    };
+                    return;
+                }
+            }
+        }
+        protected bool <#= TableMenuItemsCommandPropertyName #>CanExecute()
+        {
+            return true;
+        }
+        #endregion
+
+
+
+
+        #region <#= HiddenFiltersVMPropertyName #>
+        public async Task <#= HiddenFiltersPropertyChangedPropertyName #>(object Sender, object OldValue, object NewValue)
+        {
+            IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>> hfs = NewValue as IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>;
             ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>> newhfs = new ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>();
             if(hfs != null) {
                 foreach(<#= IWebServiceFilterRsltInterfaceClassName #> hf  in hfs) {
@@ -774,7 +928,7 @@ namespace <#= CheckedModelViewModelNameSpace #> {
         #endregion
 
         #region <#= RowsPerPageOptionsPropertyName #>
-        protected IEnumerable<int> _<#= RowsPerPageOptionsPropertyName #> = new ObservableCollection<int>() {10,25,50,100,150};
+        protected IEnumerable<int> _<#= RowsPerPageOptionsPropertyName #> = new ObservableCollection<int>() {10,25,50,100};
         public IEnumerable<int> <#= RowsPerPageOptionsPropertyName #> {
             get { return _<#= RowsPerPageOptionsPropertyName #>; }
             set { if(_<#= RowsPerPageOptionsPropertyName #> != value) { _<#= RowsPerPageOptionsPropertyName #> = value; OnPropertyChanged(); } }
@@ -810,21 +964,10 @@ namespace <#= CheckedModelViewModelNameSpace #> {
                 } 
             }
         }
-        protected async void On<#= CurrentPagePropertyName #>Changed(object sender, RoutedPropertyChangedEventArgs<Nullable<int>> evarg)
-        {
-            evarg.Handled = true;
-            if (evarg.NewValue.HasValue)
-            {
-                if (Actual<#= CurrentPagePropertyName #> != evarg.NewValue.Value)
-                {
-                    await onFilter();
-                }
-            }
-        }
         #endregion
 
         #region <#= RowsPerPagePropertyName #>
-        protected int _Actual<#= RowsPerPagePropertyName #> = 100;
+        protected int _Actual<#= RowsPerPagePropertyName #> = 10;
         protected int Actual<#= RowsPerPagePropertyName #>
         {
             get { return _Actual<#= RowsPerPagePropertyName #>; }
@@ -843,56 +986,105 @@ namespace <#= CheckedModelViewModelNameSpace #> {
             get { return _<#= RowsPerPagePropertyName #>; }
             set { 
                 if(_<#= RowsPerPagePropertyName #> != value) { 
+                    bool cpc = _<#= CurrentPagePropertyName #> != 0;
                     _<#= CurrentPagePropertyName #> = 0;
-                    OnPropertyChanged("<#= CurrentPagePropertyName #>"); 
                     _<#= RowsPerPagePropertyName #> = value; 
                     OnPropertyChanged(); 
+                    if(cpc) OnPropertyChanged("<#= CurrentPagePropertyName #>"); 
                 } 
             }
         }
-        protected async void On<#= RowsPerPagePropertyName #>Changed(object sender, RoutedPropertyChangedEventArgs<Nullable<int>> evarg)
+        #endregion
+
+        #region <#= OnRowsPerPageChangedCommandPropertyName #>
+        protected ICommand _<#= OnRowsPerPageChangedCommandPropertyName #> = null;
+        public ICommand <#= OnRowsPerPageChangedCommandPropertyName #>
         {
-            evarg.Handled = true;
-            if (evarg.NewValue.HasValue)
+            get
             {
-                if(Actual<#= RowsPerPagePropertyName #> != evarg.NewValue.Value)
+                return _<#= OnRowsPerPageChangedCommandPropertyName #> ?? (_<#= OnRowsPerPageChangedCommandPropertyName #> = new Command((prm) => <#= OnRowsPerPageChangedCommandPropertyName #>Execute(prm), (prm) => <#= OnRowsPerPageChangedCommandPropertyName #>CanExecute(prm)));
+            }
+        }
+        protected async void <#= OnRowsPerPageChangedCommandPropertyName #>Execute(object prm)
+        {
+            <#= ValueChangedCmdParamClassName #><int> val = prm as <#= ValueChangedCmdParamClassName #><int>;
+            if (val != null) {
+                if (Actual<#= RowsPerPagePropertyName #> != val.NewVal)
                 {
                     await onFilter();
                 }
             }
         }
-        #endregion
-
-        #region Sort
-        protected string CurrentSortColumn = "";
-        protected string CurrentSortdirection  = "";
-        protected async void OnSortChangedAsync(object sender, RoutedPropertyChangedEventArgs<Nullable<SortDescription>> evarg)
+        protected bool <#= OnRowsPerPageChangedCommandPropertyName #>CanExecute(object prm)
         {
-            if (evarg == null)
-            {
-                CurrentSortColumn = "";
-                CurrentSortdirection  = "";
-            } else
-            {
-                evarg.Handled = true;
-                Nullable<SortDescription> nv = evarg.NewValue as Nullable<SortDescription>;
-                if (nv.HasValue)
-                {
-                    CurrentSortColumn = nv.Value.PropertyName;
-                    if(nv.Value.Direction == ListSortDirection.Descending)
-                        CurrentSortdirection = "desc";
-                    else
-                        CurrentSortdirection = "asc";
-                } else
-                {
-                    CurrentSortColumn = "";
-                    CurrentSortdirection = "";
-                }
-            }
-            await onFilter();
+            return true;
         }
         #endregion
 
+        #region <#= OnCurrentPageChangedCommandPropertyName #>
+        protected ICommand _<#= OnCurrentPageChangedCommandPropertyName #> = null;
+        public ICommand <#= OnCurrentPageChangedCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= OnCurrentPageChangedCommandPropertyName #> ?? (_<#= OnCurrentPageChangedCommandPropertyName #> = new Command((prm) => <#= OnCurrentPageChangedCommandPropertyName #>Execute(prm), (prm) => <#= OnCurrentPageChangedCommandPropertyName #>CanExecute(prm)));
+            }
+        }
+        protected async void <#= OnCurrentPageChangedCommandPropertyName #>Execute(object prm)
+        {
+            <#= ValueChangedCmdParamClassName #><int> val = prm as <#= ValueChangedCmdParamClassName #><int>;
+            if (val != null) {
+                if (Actual<#= CurrentPagePropertyName #> != val.NewVal)
+                {
+                    await onFilter();
+                }
+            }
+        }
+        protected bool <#= OnCurrentPageChangedCommandPropertyName #>CanExecute(object prm)
+        {
+            return true;
+        }
+        #endregion
+
+
+        #region Sort
+        public string <#= CurrentSortInfoPropertyName #> {
+            get { 
+                if(string.IsNullOrEmpty(CurrentSortColumn)) return null;
+                return CurrentSortColumn + " " + CurrentSortdirection;
+            }
+        }
+        protected string CurrentSortColumn = "";
+        protected string CurrentSortdirection  = "";
+        protected ICommand _<#= OnSortCommandPropertyName #> = null;
+        public ICommand <#= OnSortCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= OnSortCommandPropertyName #> ?? (_<#= OnSortCommandPropertyName #> = new Command((prm) => <#= OnSortCommandPropertyName #>Execute(prm), (prm) => <#= OnSortCommandPropertyName #>CanExecute(prm)));
+            }
+        }
+        protected async void <#= OnSortCommandPropertyName #>Execute(object prm)
+        {
+            string val = prm as string;
+            if(string.IsNullOrEmpty(val)) return;
+            if (val != CurrentSortColumn) {
+                CurrentSortColumn = val;
+                CurrentSortdirection  = "";
+            }
+            if (CurrentSortdirection  == "")
+                CurrentSortdirection  = "asc";
+            else if (CurrentSortdirection  == "asc")
+                CurrentSortdirection = "desc";
+            else CurrentSortdirection = "";
+            OnPropertyChanged("<#= CurrentSortInfoPropertyName #>"); 
+            await onFilter();
+        }
+        protected bool <#= OnSortCommandPropertyName #>CanExecute(object prm)
+        {
+            return true;
+        }
+        #endregion
         #region Filter
         protected async Task onFilter() {
             if ((<#= IsInQueryPropertyName #>) || (!<#= IsOnLoadedCalledPropertyName #>)) return;
@@ -937,144 +1129,124 @@ namespace <#= CheckedModelViewModelNameSpace #> {
                 Actual<#= RowsPerPagePropertyName #> = rslt.pagesize;
                 Actual<#= CurrentPagePropertyName #> = rslt.page;
                 <#= TotalCountPropertyName #> = rslt.total; 
-                ObservableCollection<<#= PermissionNotifyInterfaceClassName #>> ds = <#= DataSourcePropertyName #> as ObservableCollection<<#= PermissionNotifyInterfaceClassName #>>;
-                if (ds == null) { ds = new ObservableCollection<<#= PermissionNotifyInterfaceClassName #>>(); } else { ds.Clear(); }
+                ObservableCollection<<#= DshPermissionNotifyInterfaceClassName #>> ds = <#= DataSourcePropertyName #> as ObservableCollection<<#= DshPermissionNotifyInterfaceClassName #>>;
+                if (ds == null) { ds = new ObservableCollection<<#= DshPermissionNotifyInterfaceClassName #>>(); } else { ds.Clear(); }
                 if(rslt.items != null) {
                     int lng = <#= PermissionsPropertyName #>.Length;
                     foreach(<#= modelInterfaceClassName #> itm in rslt.items) {
-                        <#= PermissionNotifyInterfaceClassName #> dsItem = <#= CopyPermsServicePropertyName #>.<#= CopyToModelPermissionNotifyMethodName #>(itm, null);
-                        int rid = dsItem.<#= PrimKeyPropertyName #> / 7;
-                        if(rid < lng) {
-                            int sft = (dsItem.<#= PrimKeyPropertyName #> - rid * 7) * 4;
-                            int irslt = (<#= PermissionsPropertyName #>[rid]) >> sft;
+                        <#= DshPermissionNotifyInterfaceClassName #> dsItem = <#= CopyPermsServicePropertyName #>.<#= CopyToModelPermissionNotifyMethodName #>(itm, null);
+                        int rid = dsItem.<#= PrimKeyPropertyName #> / 31;
+                        if(rid < lng-14) {
+                            int sft = (dsItem.<#= PrimKeyPropertyName #> - rid * 31);
+                            int irslt = (<#= PermissionsPropertyName #>[rid+14]) >> sft;
                             dsItem.<#= SelPrmPropertyName #> = (irslt & 1) == 1;
-                            dsItem.<#= DelPrmPropertyName #> = (irslt & 2) == 2;
-                            dsItem.<#= UpdPrmPropertyName #> = (irslt & 4) == 4;
-                            dsItem.<#= AddPrmPropertyName #> = (irslt & 8) == 8;
                         } else {
                             dsItem.<#= SelPrmPropertyName #> = false;
-                            dsItem.<#= DelPrmPropertyName #> = false;
-                            dsItem.<#= UpdPrmPropertyName #> = false;
-                            dsItem.<#= AddPrmPropertyName #> = false;
                         }
                         ds.Add(dsItem);
                     }
                 }
                 <#= DataSourcePropertyName #> = ds;
-                <#= SelectedGridItemPropertyName #> = null;
+                <#= SelectedRowPropertyName #> = <#= DataSourcePropertyName #>?.FirstOrDefault();
+                <#= InternalContentProperty #>Changed();
             }
             <#= IsInQueryPropertyName #> = false;
         }
         #endregion
-
-        #region <#= PermissionsPropertyName #>
-        protected int[] _<#= PermissionsPropertyName #> = null;
-        public int[] <#= PermissionsPropertyName #> 
-        {
-            get 
-            { 
-                if (_<#= PermissionsPropertyName #> == null) _<#= PermissionsPropertyName #> = <#= AppSettingServicePropertyName #>.<#= GetEmptyPermissionsMethodName #>();
-                return _<#= PermissionsPropertyName #>; 
+        #region <#= SformAfterAddItemCommandPropertyName #>
+        public void <#= SformAfterAddItemCommandPropertyName #>(object sender, object item) {
+            <#= modelInterfaceClassName #> prm = item as  <#= modelInterfaceClassName #>;
+            if(prm == null) return;
+            ObservableCollection<<#= modelInterfaceClassName #>> ds = <#= DataSourcePropertyName #> as ObservableCollection<<#= modelInterfaceClassName #>>;
+            ds.Add(<#= FormRootServicePropertyName #>.<#= CopyToModelNotifyMethodName #>(prm, null));
+            <#= InternalContentProperty #>Changed();
+        }
+        #endregion
+        #region <#= SformAfterUpdItemCommandPropertyName #>
+        public void <#= SformAfterUpdItemCommandPropertyName #>(object sender, object item) {
+            <#= modelInterfaceClassName #> prm = item as  <#= modelInterfaceClassName #>;
+            if(prm == null) return;
+            ObservableCollection<<#= modelInterfaceClassName #>> ds = <#= DataSourcePropertyName #> as ObservableCollection<<#= modelInterfaceClassName #>>;
+            if (ds.IndexOf(prm) > -1) {
+                return;
             }
-            set 
-            {
-                if(_<#= PermissionsPropertyName #> != value) {
-                    _<#= PermissionsPropertyName #> = value;
-                    <#= OnPermissionsMethodName #>();
-                }
+<#
+    {
+        List<ModelViewPropertyOfVwSerializable> primKeyProps = GetModelPrimaryKeyProps(Model);
+#>
+            <#= modelInterfaceClassName #> rw = ds.Where(d => 
+<#
+        bool isNotFirst= false;
+        foreach(ModelViewPropertyOfVwSerializable pkpModelViewPropertyOfVwSerializable in primKeyProps) {
+            if(isNotFirst) {
+#>
+                    && (d.<#= GetModelPropertyName(pkpModelViewPropertyOfVwSerializable, Model) #> == prm.<#= GetModelPropertyName(pkpModelViewPropertyOfVwSerializable, Model) #>)
+<#
+            } else {
+                isNotFirst = true;
+#>
+                        (d.<#= GetModelPropertyName(pkpModelViewPropertyOfVwSerializable, Model) #> == prm.<#= GetModelPropertyName(pkpModelViewPropertyOfVwSerializable, Model) #>)
+<#
             }
         }
-        public void <#= OnPermissionsMethodName #>() {
-            int lng = <#= PermissionsPropertyName #>.Length;
-            foreach(<#= PermissionNotifyInterfaceClassName #> dsItem in <#= DataSourcePropertyName #>)
-            {
-                int rid = dsItem.<#= PrimKeyPropertyName #> / 7;
-                if(rid < lng) {
-                    int sft = (dsItem.<#= PrimKeyPropertyName #> - rid * 7) * 4;
-                    int irslt = (<#= PermissionsPropertyName #>[rid]) >> sft;
-                    dsItem.<#= SelPrmPropertyName #> = (irslt & 1) == 1;
-                    dsItem.<#= DelPrmPropertyName #> = (irslt & 2) == 2;
-                    dsItem.<#= UpdPrmPropertyName #> = (irslt & 4) == 4;
-                    dsItem.<#= AddPrmPropertyName #> = (irslt & 8) == 8;
-                } else {
-                    dsItem.<#= SelPrmPropertyName #> = false;
-                    dsItem.<#= DelPrmPropertyName #> = false;
-                    dsItem.<#= UpdPrmPropertyName #> = false;
-                    dsItem.<#= AddPrmPropertyName #> = false;
+#>
+                    ).FirstOrDefault();
+<#
+    }
+#>
+            if (rw != null) {
+                <#= FormRootServicePropertyName #>.<#= CopyToModelMethodName #>(prm, rw);
+            } else {
+                ds.Add(<#= FormRootServicePropertyName #>.<#= CopyToModelNotifyMethodName #>(prm, null));
+            }
+            <#= InternalContentProperty #>Changed();
+        }
+        #endregion
+        #region <#= SformAfterDelItemCommandPropertyName #>
+        public void <#= SformAfterDelItemCommandPropertyName #>(object sender, object item) {
+            <#= modelInterfaceClassName #> prm = item as  <#= modelInterfaceClassName #>;
+            if(prm == null) return;
+            ObservableCollection<<#= modelInterfaceClassName #>> ds = <#= DataSourcePropertyName #> as ObservableCollection<<#= modelInterfaceClassName #>>;
+            int indx = ds.IndexOf(prm);
+            if (indx > -1) {
+                ds.RemoveAt(indx);
+                <#= InternalContentProperty #>Changed();
+                return;
+            }
+<#
+    {
+        List<ModelViewPropertyOfVwSerializable> primKeyProps = GetModelPrimaryKeyProps(Model);
+#>
+            <#= modelInterfaceClassName #> rw = ds.Where(d => 
+<#
+        bool isNotFirst= false;
+        foreach(ModelViewPropertyOfVwSerializable pkpModelViewPropertyOfVwSerializable in primKeyProps) {
+            if(isNotFirst) {
+#>
+                    && (d.<#= GetModelPropertyName(pkpModelViewPropertyOfVwSerializable, Model) #> == prm.<#= GetModelPropertyName(pkpModelViewPropertyOfVwSerializable, Model) #>)
+<#
+            } else {
+                isNotFirst = true;
+#>
+                        (d.<#= GetModelPropertyName(pkpModelViewPropertyOfVwSerializable, Model) #> == prm.<#= GetModelPropertyName(pkpModelViewPropertyOfVwSerializable, Model) #>)
+<#
+            }
+        }
+#>
+                    ).FirstOrDefault();
+<#
+    }
+#>
+            if (rw != null) {
+                indx = ds.IndexOf(rw);
+                if (indx > -1) {
+                    ds.RemoveAt(indx);
+                    <#= InternalContentProperty #>Changed();
+                    return;
                 }
             }
         }
         #endregion
-
-        #region <#= PermissionVectorPropertyChangedPropertyName #>
-        protected void On<#= PermissionVectorPropertyChangedPropertyName #>(object sender, RoutedPropertyChangedEventArgs<int[]> evarg)
-        {
-            evarg.Handled = true;
-            <#= PermissionsPropertyName #> = evarg.NewValue;
-        }
-        #endregion
-
-        #region <#= SelectedGridItemPropertyName #>
-        protected <#= PermissionNotifyInterfaceClassName #> _<#= SelectedGridItemPropertyName #> = null;
-        public <#= PermissionNotifyInterfaceClassName #> <#= SelectedGridItemPropertyName #> {
-            get { return _<#= SelectedGridItemPropertyName #>; }
-            set {
-                if(_<#= SelectedGridItemPropertyName #> != value) {
-                    _<#= SelectedGridItemPropertyName #> = value;
-                    OnPropertyChanged(); 
-                }
-            }
-        }
-        #endregion
-
-        #region <#= PermissionChangedCommandPropertyName #>
-        public void Executed<#= PermissionChangedCommandPropertyName #>(object sender, ExecutedRoutedEventArgs e) {
-            e.Handled = true;
-            if (<#= SelectedGridItemPropertyName #> == null) return;
-            int lng = <#= PermissionsPropertyName #>.Length;
-            int rid = <#= SelectedGridItemPropertyName #>.<#= PrimKeyPropertyName #> / 7;
-            if(rid < lng) {
-                int sft = (<#= SelectedGridItemPropertyName #>.<#= PrimKeyPropertyName #> - rid * 7) * 4;
-                if(<#= SelectedGridItemPropertyName #>.<#= SelPrmPropertyName #>) {
-                    <#= PermissionsPropertyName #>[rid] = <#= PermissionsPropertyName #>[rid] | (1 << sft);
-                } else {
-                    <#= PermissionsPropertyName #>[rid] = ~((~(<#= PermissionsPropertyName #>[rid])) | (1 << sft));
-                }
-                if (<#= SelectedGridItemPropertyName #>.<#= DelPrmPropertyName #>)
-                {
-                    <#= PermissionsPropertyName #>[rid] = <#= PermissionsPropertyName #>[rid] | (2 << sft);
-                }
-                else
-                {
-                    <#= PermissionsPropertyName #>[rid] = ~((~(<#= PermissionsPropertyName #>[rid])) | (2 << sft));
-                }
-                if (<#= SelectedGridItemPropertyName #>.<#= UpdPrmPropertyName #>)
-                {
-                    <#= PermissionsPropertyName #>[rid] = <#= PermissionsPropertyName #>[rid] | (4 << sft);
-                }
-                else
-                {
-                    <#= PermissionsPropertyName #>[rid] = ~((~(<#= PermissionsPropertyName #>[rid])) | (4 << sft));
-                }
-                if (<#= SelectedGridItemPropertyName #>.<#= AddPrmPropertyName #>)
-                {
-                    <#= PermissionsPropertyName #>[rid] = <#= PermissionsPropertyName #>[rid] | (8 << sft);
-                }
-                else
-                {
-                    <#= PermissionsPropertyName #>[rid] = ~((~(<#= PermissionsPropertyName #>[rid])) | (8 << sft));
-                }
-                <#= RoutedCommandExtClassName #>.<#= PermissionVectorChangedCommandPropertyName  #>.Execute(<#= PermissionsPropertyName #>, (sender as UIElement));
-            }
-        }
-        public void CanExecute<#= PermissionChangedCommandPropertyName #>(object sender, CanExecuteRoutedEventArgs e)
-        {
-            e.Handled = true;
-            e.CanExecute = true;
-        }
-        #endregion
-
-        
     }
 }
 
@@ -1091,7 +1263,6 @@ namespace <#= CheckedModelViewModelNameSpace #> {
     string GetModelServiceCopyPermissionInterfaceName(ModelViewSerializable model) {
         return "I" + GetModelServiceCopyPermissionName(model);
     }
-
     string GetFilterPropertyOperatorName(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model, string operatorSufix) {
         if (model.GenerateJSonAttribute) {
             return prop.JsonPropertyName + operatorSufix;
@@ -1099,6 +1270,7 @@ namespace <#= CheckedModelViewModelNameSpace #> {
             return FirstLetterToLower(prop.ViewPropertyName) + operatorSufix;
         }
     }
+
     string GetFilterInterfaceName(ModelViewSerializable model) {
         return "I" + GetFilterName(model);
     }
@@ -1149,7 +1321,6 @@ namespace <#= CheckedModelViewModelNameSpace #> {
         }
         return defaultNameSpace + delim + filePath;
     }
-
     string GetModelClassName(ModelViewSerializable model, string fileType) {
         string result="";
         if ((model == null) || string.IsNullOrEmpty(fileType)) {

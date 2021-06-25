@@ -111,6 +111,8 @@ using System.Windows.Input;
     string ShowAddFilterBtnDetailPropertyName       = "ShowAddFilterBtnDetail"; 
     string IsPermissionEditablePropertyName         = "IsPermissionEditable";
     string PermissionVectorPropertyName             = "PermissionVector";
+    string PermissionChangedCommandPropertyName     = "PermissionChangedCommand";
+    string OnPermissionChangedCommandPropertyName   = "OnPermissionChangedCommand";
 
 
     List<string> nmSpaces = new List<string>();
@@ -1218,6 +1220,48 @@ namespace <#= ProxyUserControlNameSpace #> {
             {
                 SetValue(<#= PermissionVectorPropertyName #>Property, value);
             }
+        }
+        #endregion
+
+        #region <#= PermissionChangedCommandPropertyName #>
+        public static readonly BindableProperty <#= PermissionChangedCommandPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= PermissionChangedCommandPropertyName #>", typeof(ICommand),
+                typeof(<#= ProxyUserControlClassName #>),
+                null);
+        public ICommand <#= PermissionChangedCommandPropertyName #>
+        {
+            get
+            {
+                return (ICommand)GetValue(<#= PermissionChangedCommandPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= PermissionChangedCommandPropertyName #>Property, value);
+            }
+        }
+        #endregion
+        #region <#= OnPermissionChangedCommandPropertyName #>
+        protected ICommand _<#= OnPermissionChangedCommandPropertyName #> = null;
+        public ICommand <#= OnPermissionChangedCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= OnPermissionChangedCommandPropertyName #> ?? (_<#= OnPermissionChangedCommandPropertyName #> = new Command((p) => <#= OnPermissionChangedCommandPropertyName #>Execute(p), (p) => <#= OnPermissionChangedCommandPropertyName #>CanExecute(p)));
+            }
+        }
+        protected void <#= OnPermissionChangedCommandPropertyName #>Execute(object prm)
+        {
+            ICommand cmd = <#= PermissionChangedCommandPropertyName #>;
+            if(cmd != null) {
+                if(cmd.CanExecute(prm)) {
+                    cmd.Execute(prm);
+                }
+            }
+        }
+        protected bool <#= OnPermissionChangedCommandPropertyName #>CanExecute(object p)
+        {
+            return (<#= PermissionChangedCommandPropertyName #> != null); 
         }
         #endregion
 

@@ -1,0 +1,962 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="jsonpmm2txt" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+<#
+    string IAppGlblSettingsServiceFolder      = "00080-IAppGlblSettingsService.cs";
+    string IAppGlblSettingsServiceClassName   = GetContextModelClassName(Context, IAppGlblSettingsServiceFolder);
+    string IAppGlblSettingsServiceNameSpace   = GetContextModelNameSpace(Context, IAppGlblSettingsServiceFolder);
+
+    string BindingContextFeedbackFolder      = "00166-BindingContextFeedback.cs";
+    string BindingContextFeedbackClassName   = GetContextModelClassName(Context, BindingContextFeedbackFolder);
+    string BindingContextFeedbackNameSpace   = GetContextModelNameSpace(Context, BindingContextFeedbackFolder);
+
+
+    string IconFontFolder      = "00178-IconFont.cs";
+    string IconFontClassName   = GetContextModelClassName(Context, IconFontFolder);
+    string IconFontNameSpace   = GetContextModelNameSpace(Context, IconFontFolder);
+
+    string IPermissionVectorInterfaceFolder      = "00195-IPermissionVectorInterface.cs";
+    string IPermissionVectorInterfaceClassName   = GetContextModelClassName(Context, IPermissionVectorInterfaceFolder);
+    string IPermissionVectorInterfaceNameSpace   = GetContextModelNameSpace(Context, IPermissionVectorInterfaceFolder);
+
+    string ISformViewModelInterfaceFolder      = "00198-ISformViewModelInterface.cs";
+    string ISformViewModelInterfaceClassName   = GetContextModelClassName(Context, ISformViewModelInterfaceFolder);
+    string ISformViewModelInterfaceNameSpace   = GetContextModelNameSpace(Context, ISformViewModelInterfaceFolder);
+
+    string IWebServiceFilterDefInterfaceFolder      = "00200-IWebServiceFilterDefInterface.cs";
+    string IWebServiceFilterDefInterfaceClassName   = GetContextModelClassName(Context, IWebServiceFilterDefInterfaceFolder);
+    string IWebServiceFilterDefInterfaceNameSpace   = GetContextModelNameSpace(Context, IWebServiceFilterDefInterfaceFolder);
+
+    string IWebServiceFilterRsltInterfaceFolder      = "00204-IWebServiceFilterRsltInterface.cs";
+    string IWebServiceFilterRsltInterfaceClassName   = GetContextModelClassName(Context, IWebServiceFilterRsltInterfaceFolder);
+    string IWebServiceFilterRsltInterfaceNameSpace   = GetContextModelNameSpace(Context, IWebServiceFilterRsltInterfaceFolder);
+
+    string IWebServiceFilterMenuInterfaceFolder      = "00206-IWebServiceFilterMenuInterface.cs";
+    string IWebServiceFilterMenuInterfaceClassName   = GetContextModelClassName(Context, IWebServiceFilterMenuInterfaceFolder);
+    string IWebServiceFilterMenuInterfaceNameSpace   = GetContextModelNameSpace(Context, IWebServiceFilterMenuInterfaceFolder);
+
+    string WebServiceFilterRsltViewModelFolder      = "00215-WebServiceFilterRsltViewModel.cs";
+    string WebServiceFilterRsltViewModelClassName   = GetContextModelClassName(Context, WebServiceFilterRsltViewModelFolder);
+    string WebServiceFilterRsltViewModelNameSpace   = GetContextModelNameSpace(Context, WebServiceFilterRsltViewModelFolder);
+
+    string WebServiceFilterDefViewModelFolder      = "00211-WebServiceFilterDefViewModel.cs";
+    string WebServiceFilterDefViewModelClassName   = GetContextModelClassName(Context, WebServiceFilterDefViewModelFolder);
+    string WebServiceFilterDefViewModelNameSpace   = GetContextModelNameSpace(Context, WebServiceFilterDefViewModelFolder);
+
+    string WebServiceFilterMenuViewModelFolder      = "00217-WebServiceFilterMenuViewModel.cs";
+    string WebServiceFilterMenuViewModelClassName   = GetContextModelClassName(Context, WebServiceFilterMenuViewModelFolder);
+    string WebServiceFilterMenuViewModelNameSpace   = GetContextModelNameSpace(Context, WebServiceFilterMenuViewModelFolder);
+
+    string ValueChangedCmdParamFolder               = "00218-ValueChangedCmdParam.cs";
+    string ValueChangedCmdParamClassName            = GetContextModelClassName(Context, ValueChangedCmdParamFolder);
+    string ValueChangedCmdParamNameSpace            = GetContextModelNameSpace(Context, ValueChangedCmdParamFolder);
+
+
+    string IBindingContextChangedFolder      = "00220-IBindingContextChanged.cs";
+    string IBindingContextChangedClassName   = GetContextModelClassName(Context, IBindingContextChangedFolder);
+    string IBindingContextChangedNameSpace   = GetContextModelNameSpace(Context, IBindingContextChangedFolder);
+
+    string TablePaginationUserControlFolder      = "00252-TablePaginationUserControl.xaml.cs";
+    string TablePaginationUserControlClassName   = GetContextModelClassName(Context, TablePaginationUserControlFolder);
+    string TablePaginationUserControlNameSpace   = GetContextModelNameSpace(Context, TablePaginationUserControlFolder);
+
+    string IColumnSelectorItemDefInterfaceFolder      = "00258-IColumnSelectorItemDefInterface.cs";
+    string IColumnSelectorItemDefInterfaceClassName   = GetContextModelClassName(Context, IColumnSelectorItemDefInterfaceFolder);
+    string IColumnSelectorItemDefInterfaceNameSpace   = GetContextModelNameSpace(Context, IColumnSelectorItemDefInterfaceFolder);
+
+    string ColumnSelectorItemDefViewModelFolder      = "00262-ColumnSelectorItemDefViewModel.cs";
+    string ColumnSelectorItemDefViewModelClassName   = GetContextModelClassName(Context, ColumnSelectorItemDefViewModelFolder);
+    string ColumnSelectorItemDefViewModelNameSpace   = GetContextModelNameSpace(Context, ColumnSelectorItemDefViewModelFolder);
+
+
+    string modelInterfaceFolder         = "01100-Interface.cs";
+    string modelInterfaceClassName      = GetInterfaceName(Model);
+    string modelInterfaceNameSpace      = GetModelNameSpace(Model, modelInterfaceFolder);
+
+    string DshPermissionNotifyInterfaceFolder      = "01124-DshPermissionNotifyInterface.cs";
+    string DshPermissionNotifyInterfaceClassName   = GetModelPermissionNotifyInterfaceName(Model);
+    string DshPermissionNotifyInterfaceNameSpace   = GetModelNameSpace(Model, DshPermissionNotifyInterfaceFolder);
+
+    string modelPageInterfaceFolder         = "01200-Page.interface.cs";
+    string modelPageInterfaceClassName      = GetPageInterfaceName(Model);
+    string modelPageInterfaceNameSpace      = GetModelNameSpace(Model, modelPageInterfaceFolder);
+
+    string modelFilterInterfaceFolder       = "01300-Filter.interface.cs";
+    string modelFilterInterfaceClassName    = GetFilterInterfaceName(Model);
+    string modelFilterInterfaceNameSpace    = GetModelNameSpace(Model, modelFilterInterfaceFolder);
+
+    string modelFilterFolder                = "01302-Filter.model.cs";
+    string modelFilterClassName             = GetFilterName(Model);
+    string modelFilterNameSpace             = GetModelNameSpace(Model, modelFilterFolder);
+
+    string modelServiceInterfaceFolder       = "01400-Service.interface.cs";
+    string modelServiceInterfaceClassName    = GetModelServiceInterfaceName(Model);
+    string modelServiceInterfaceNameSpace    = GetModelNameSpace(Model, modelServiceInterfaceFolder);
+
+    string ServiceCopyDshPermissionInterfaceFolder       = "01412-ServiceCopyDshPermission.interface.cs";
+    string ServiceCopyDshPermissionInterfaceClassName    = GetModelServiceCopyPermissionInterfaceName(Model);
+    string ServiceCopyDshPermissionInterfaceNameSpace    = GetModelNameSpace(Model, ServiceCopyDshPermissionInterfaceFolder);
+
+    string DshCheckedModelUserControlFolder        = "02112-DshCheckedModelUserControl.xaml.cs";
+    string DshCheckedModelUserControlClassName     = GetModelClassName(Model, DshCheckedModelUserControlFolder);
+    string DshCheckedModelUserControlNameSpace     = GetModelNameSpace(Model, DshCheckedModelUserControlFolder);
+    string DshCheckedModelUserControlProject       = GetModelProjectName(Model, DshCheckedModelUserControlFolder);
+
+    string DshCheckedModelViewModelFolder          = "02116-DshCheckedModelViewModel.cs";
+    string DshCheckedModelViewModelClassName       = GetModelClassName(Model, DshCheckedModelViewModelFolder);
+    string DshCheckedModelViewModelNameSpace       = GetModelNameSpace(Model, DshCheckedModelViewModelFolder);
+
+    string CurrentFilterPropertyName                    = "CurrentFilter";
+    string FilterDefinitionsPropertyName                = "FilterDefinitions";
+
+    string HiddenFiltersVMPropertyName                  = "HiddenFiltersVM"; // correct:  to exclude HResult=0x800703E9 System.StackOverflowException
+    string OnHiddenFiltersChangedPropertyName           = "OnHiddenFiltersChanged";
+    string HiddenFiltersPropertyChangedPropertyName     = "HiddenFiltersPropertyChanged";
+
+    string TableMenuItemsVMPropertyName                 = "TableMenuItemsVM"; // correct:  to exclude HResult=0x800703E9 System.StackOverflowException
+    string OnTableMenuItemsChangedPropertyName          = "OnTableMenuItemsChanged";
+    string TableMenuItemsPropertyChangedPropertyName    = "TableMenuItemsPropertyChanged";
+    string TableMenuItemsCommandPropertyName            = "TableMenuItemsCommand";
+
+    string RowMenuItemsPropertyName                     = "RowMenuItemsVM";   // correct:  to exclude HResult=0x800703E9 System.StackOverflowException
+    string OnRowMenuItemsChangedPropertyName            = "OnRowMenuItemsChanged";
+    string RowMenuItemsPropertyChangedPropertyName      = "RowMenuItemsPropertyChanged";
+    string RowMenuItemsCommandPropertyName              = "RowMenuItemsCommand";
+
+    string ApplyFilterCommandPropertyName = "ApplyFilterCommand";
+
+    string DataGridSortingChangedPropertyName = "DataGridSortingChanged";
+
+    string IsInQueryPropertyName                = "IsInQuery";
+    string IsOnLoadedCalledPropertyName         = "IsOnLoadedCalled";
+    string OnLoadedPropertyName                 = "OnLoaded";
+
+    string RowsPerPageOptionsPropertyName = "RowsPerPageOptions";
+    string TotalCountPropertyName = "TotalCount";
+    string DataSourcePropertyName = "DataSource";
+    string RefreshSformCommandPropertyName = "RefreshSformCommand";
+    string SelectColumnsCommandPropertyName = "SelectColumnsCommand";
+    string SelectedColumnsPropertyName = "SelectedColumns";
+    string SformSelectionChangedPropertyName = "SformSelectionChanged";
+    string RegionPropertyName = "Region";
+    string SformSelectionChangedCommandPropertyName = "SformSelectionChangedCommand";
+    string CopyToModelMethodName            = "CopyToModel";
+    string CopyToModelNotifyMethodName      = "CopyToModelNotify";
+
+    string CurrentSortInfoPropertyName = "CurrentSortInfo";
+    string OnSortCommandPropertyName = "OnSortCommand";
+
+    string CurrentPagePropertyName = "CurrentPage";
+    string OnCurrentPageChangedCommandPropertyName="OnCurrentPageChangedCommand";
+
+    string RowsPerPagePropertyName = "RowsPerPage";
+    string RowsPerPageDefaultPropertyName = "10";
+    string OnRowsPerPageChangedCommandPropertyName="OnRowsPerPageChangedCommand";
+
+    string SelectedRowPropertyName="SelectedRow";
+
+    string DisplayLabelProperty     = "Name";
+    string DisplayHintProperty      = "Prompt";
+
+    string FormRootServicePropertyName      = "FrmRootSrv";
+    string AppSettingServicePropertyName    = "GlblSettingsSrv";
+    string FilterOperatorSuffix             = "Oprtr";
+    string GetWithFilterMethodName          = "getwithfilter";
+    string ColumnSelectorDlgPropertyName    = "ColumnSelectorDlg";
+
+    string SformAfterAddItemCommandPropertyName     = "SformAfterAddItemCommand";
+    string SformAfterUpdItemCommandPropertyName     = "SformAfterUpdItemCommand";
+    string SformAfterDelItemCommandPropertyName     = "SformAfterDelItemCommand";
+    string SformLoadedCommandPropertyName           = "SformLoadedCommand";
+    string UIDispatcherInvokePropertyName           = "Application.Current.Dispatcher.Invoke";
+    string BindingContextFeedbackRefPropertyName    = "BindingContextFeedbackRef";
+
+    string InternalContentProperty                  = "InternalContent";
+
+    string IsPermissionEditablePropertyName                 = "IsPermissionEditable";
+    string IsPermissionEditablePropertyChangedPropertyName  = "IsPermissionEditablePropertyChanged";
+    string PermissionVectorPropertyChangedPropertyName      = "PermissionVectorPropertyChanged";
+    string PermissionChangedCommandPropertyName             = "PermissionChangedCommand";
+    string GetEmptyPermissionsMethodName                    = "GetEmptyPermissions";
+    string CopyToModelPermissionNotifyMethodName            = "CopyToModelPermissionNotify";
+    string CopyToModelPermissionMethodName                  = "CopyToModelPermission";
+    string CopyPermsServicePropertyName                     = "CopyPermsSrv";
+    string OnPermissionsMethodName                          = "OnPermissions";
+    string PermissionsPropertyName                          = "Permissions";
+    string AddPrmPropertyName                               = "AddPrm";
+    string UpdPrmPropertyName                               = "UpdPrm";
+    string DelPrmPropertyName                               = "DelPrm";
+    string SelPrmPropertyName                               = "SelPrm";
+    string PrimKeyPropertyName                              = "";
+
+    List<ModelViewPropertyOfVwSerializable> primKeys= new List<ModelViewPropertyOfVwSerializable>();
+    {
+        // collect primkey props
+        if ((Model.PrimaryKeyProperties != null) && (Model.ScalarProperties != null)) {
+            foreach(ModelViewKeyPropertySerializable pk in Model.PrimaryKeyProperties) {
+                ModelViewPropertyOfVwSerializable scProp= 
+                    Model.ScalarProperties.Where(p => ((p.OriginalPropertyName == pk.OriginalPropertyName) && (string.IsNullOrEmpty(p.ForeignKeyNameChain)))).FirstOrDefault();
+                if(scProp == null) {
+                    if (Model.ForeignKeys != null) {
+                        foreach(ModelViewForeignKeySerializable fk in Model.ForeignKeys) {
+                            if ((fk.ForeignKeyProps != null) && (fk.PrincipalKeyProps != null)) {
+                                int cnt = fk.ForeignKeyProps.Count;
+                                if (cnt < fk.PrincipalKeyProps.Count)
+                                {
+                                    cnt = fk.PrincipalKeyProps.Count;
+                                }
+                                for(int i = 0; i < cnt; i++)
+                                {
+                                    if(fk.ForeignKeyProps[i].OriginalPropertyName == pk.OriginalPropertyName)
+                                    {
+                                        scProp=
+                                            Model.ScalarProperties.Where(p =>
+                                            ((p.OriginalPropertyName == fk.PrincipalKeyProps[i].OriginalPropertyName) && (p.ForeignKeyNameChain == fk.NavigationName))).FirstOrDefault();
+                                    }
+                                    if(scProp != null) {
+                                        break;
+                                    }
+                                }
+                            }
+                            if(scProp != null) {
+                                break;
+                            }
+                        }
+                    }
+                }
+                if(scProp != null) {
+                    primKeys.Add(scProp);
+                }
+            }
+        }
+        foreach(ModelViewPropertyOfVwSerializable pk in primKeys) {
+            if (IsPropInteger(pk)) {
+                PrimKeyPropertyName = GetModelPropertyName(pk, Model);
+            }
+        }
+    }
+
+
+    List<string> nmSpaces = new List<string>();
+    if ((DshCheckedModelViewModelNameSpace != IWebServiceFilterDefInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterDefInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IWebServiceFilterDefInterfaceNameSpace);
+    if ((DshCheckedModelViewModelNameSpace != IWebServiceFilterRsltInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IWebServiceFilterRsltInterfaceNameSpace);
+    if ((DshCheckedModelViewModelNameSpace != WebServiceFilterRsltViewModelNameSpace) && (nmSpaces.IndexOf(WebServiceFilterRsltViewModelNameSpace) < 0)) 
+        nmSpaces.Add(WebServiceFilterRsltViewModelNameSpace);
+    if ((DshCheckedModelViewModelNameSpace != WebServiceFilterDefViewModelNameSpace) && (nmSpaces.IndexOf(WebServiceFilterDefViewModelNameSpace) < 0)) 
+        nmSpaces.Add(WebServiceFilterDefViewModelNameSpace);
+    if ((DshCheckedModelViewModelNameSpace != modelServiceInterfaceNameSpace) && (nmSpaces.IndexOf(modelServiceInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(modelServiceInterfaceNameSpace);
+    if ((DshCheckedModelViewModelNameSpace != IAppGlblSettingsServiceNameSpace) && (nmSpaces.IndexOf(IAppGlblSettingsServiceNameSpace) < 0)) 
+        nmSpaces.Add(IAppGlblSettingsServiceNameSpace);
+    if ((DshCheckedModelViewModelNameSpace != WebServiceFilterMenuViewModelNameSpace) && (nmSpaces.IndexOf(WebServiceFilterMenuViewModelNameSpace) < 0)) 
+        nmSpaces.Add(WebServiceFilterMenuViewModelNameSpace);
+    if ((DshCheckedModelViewModelNameSpace != IWebServiceFilterMenuInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterMenuInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IWebServiceFilterMenuInterfaceNameSpace);
+    if ((DshCheckedModelViewModelNameSpace != IWebServiceFilterMenuInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterMenuInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IWebServiceFilterMenuInterfaceNameSpace);
+    if ((DshCheckedModelViewModelNameSpace != IColumnSelectorItemDefInterfaceNameSpace) && (nmSpaces.IndexOf(IColumnSelectorItemDefInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IColumnSelectorItemDefInterfaceNameSpace);
+    if ((DshCheckedModelViewModelNameSpace != ColumnSelectorItemDefViewModelNameSpace) && (nmSpaces.IndexOf(ColumnSelectorItemDefViewModelNameSpace) < 0)) 
+        nmSpaces.Add(ColumnSelectorItemDefViewModelNameSpace);
+    if ((DshCheckedModelViewModelNameSpace != TablePaginationUserControlNameSpace) && (nmSpaces.IndexOf(TablePaginationUserControlNameSpace) < 0)) 
+        nmSpaces.Add(TablePaginationUserControlNameSpace);
+    if ((DshCheckedModelViewModelNameSpace != ISformViewModelInterfaceNameSpace) && (nmSpaces.IndexOf(ISformViewModelInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(ISformViewModelInterfaceNameSpace);
+    if ((DshCheckedModelViewModelNameSpace != IBindingContextChangedNameSpace) && (nmSpaces.IndexOf(IBindingContextChangedNameSpace) < 0)) 
+        nmSpaces.Add(IBindingContextChangedNameSpace);
+    if ((DshCheckedModelViewModelNameSpace != IconFontNameSpace) && (nmSpaces.IndexOf(IconFontNameSpace) < 0)) 
+        nmSpaces.Add(IconFontNameSpace);
+    if ((DshCheckedModelViewModelNameSpace != ValueChangedCmdParamNameSpace) && (nmSpaces.IndexOf(ValueChangedCmdParamNameSpace) < 0)) 
+        nmSpaces.Add(ValueChangedCmdParamNameSpace);
+    if ((DshCheckedModelViewModelNameSpace != BindingContextFeedbackNameSpace) && (nmSpaces.IndexOf(BindingContextFeedbackNameSpace) < 0)) 
+        nmSpaces.Add(BindingContextFeedbackNameSpace);
+    if ((DshCheckedModelViewModelNameSpace != IPermissionVectorInterfaceNameSpace) && (nmSpaces.IndexOf(IPermissionVectorInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IPermissionVectorInterfaceNameSpace);
+    if ((DshCheckedModelViewModelNameSpace != DshPermissionNotifyInterfaceNameSpace) && (nmSpaces.IndexOf(DshPermissionNotifyInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(DshPermissionNotifyInterfaceNameSpace);
+    if ((DshCheckedModelViewModelNameSpace != ServiceCopyDshPermissionInterfaceNameSpace) && (nmSpaces.IndexOf(ServiceCopyDshPermissionInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(ServiceCopyDshPermissionInterfaceNameSpace);
+    
+    
+
+#>
+{
+"PrismMMMCallItems": [
+    {
+    "Description": [
+    '"<#= DshCheckedModelUserControlClassName #>" UserControl is defined in the "<#= DshCheckedModelUserControlProject #>"-project.',
+    'In the file of IModule-class of "<#= DshCheckedModelUserControlProject #>"-project the following line of code must be inserted:',
+    '    public void RegisterTypes(IContainerRegistry containerRegistry)',
+    '    {',
+    '        ...',
+    '        // According to requirements of the "<#= DshCheckedModelViewModelClassName #>.cs"-file of "<#= DshCheckedModelUserControlProject #>"-project. ',
+    '        ViewModelLocationProvider.Register<<#= DshCheckedModelUserControlClassName #>, <#= DshCheckedModelViewModelClassName #>>();',
+    '        // According to requirements of the "<#= DshCheckedModelViewModelClassName #>.cs"-file of "<#= DshCheckedModelUserControlProject #>"-project. ',
+    '        containerRegistry.Register<ContentView, <#= DshCheckedModelUserControlClassName #>>("<#= DshCheckedModelUserControlClassName #>");',
+    '        ...',
+    '    }',
+    ],
+<#
+{
+    string DshCheckedModelUserControlNameSpaceAndClassName     = DshCheckedModelUserControlNameSpace + "." + DshCheckedModelUserControlClassName;
+    string DshCheckedModelViewModelNameSpaceAndClassName       = DshCheckedModelViewModelNameSpace + "." + DshCheckedModelViewModelClassName;
+    string destProjectName                                  = GetModelProjectUniqueName(Model, DshCheckedModelUserControlFolder);
+    string destImplementedInterface                         = "Prism.Modularity.IModule";
+    string destMethodName                                   = "RegisterTypes";
+    string[] destMethodParamTypes                           = new string[] {"Prism.Ioc.IContainerRegistry"};
+    string destMethodAccessType                             = "public";
+    string invocationClassType                              = "Prism.Mvvm.ViewModelLocationProvider";
+    string invocationMethodName                             = "Register";
+    string[] invocationGenerics                             = new string[]{DshCheckedModelUserControlNameSpaceAndClassName, DshCheckedModelViewModelNameSpaceAndClassName};
+    string[] invocationParams                               = new string[]{};
+    //result = PrismModifier.UpdateMethodWithClassIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType,
+    //                    invocationClassType, invocationMethodName, invocationGenerics, invocationParams);
+#>
+    "MethodName": 'UpdateMethodWithClassIdentifier',
+    "DestProjectName": '<#= destProjectName #>',
+    "DestImplementedInterface": '<#= destImplementedInterface #>',
+    "DestMethodName": '<#= destMethodName #>',
+    "DestMethodParamTypes": ['<#= destMethodParamTypes[0] #>'],
+    "DestMethodAccessType": '<#= destMethodAccessType #>',
+    "DestMethodParamTypeForVar": '',
+    "InvocationVarType": '',
+    "InvocationParamType": '',
+    "InvocationClassType": '<#= invocationClassType #>',
+    "InvocationMethodName": '<#= invocationMethodName #>',
+    "InvocationGenerics": ['<#= invocationGenerics[0] #>','<#= invocationGenerics[1] #>'],
+    "InvocationParams": [],
+    "StepDescription": 'Insertion the line : ViewModelLocationProvider.Register<<#= DshCheckedModelUserControlClassName #>, <#= DshCheckedModelViewModelClassName #>>();'
+    },
+<#
+}
+{
+    string DshCheckedModelUserControlNameSpaceAndClassName     = DshCheckedModelUserControlNameSpace + "." + DshCheckedModelUserControlClassName;
+    string DshCheckedModelViewModelNameSpaceAndClassName       = DshCheckedModelViewModelNameSpace + "." + DshCheckedModelViewModelClassName;
+    string destProjectName                                  = GetModelProjectUniqueName(Model, DshCheckedModelUserControlFolder);
+    string destImplementedInterface                         = "Prism.Modularity.IModule";
+    string destMethodName                                   = "RegisterTypes";
+    string[] destMethodParamTypes                           = new string[] {"Prism.Ioc.IContainerRegistry"};
+    string destMethodAccessType                             = "public";
+    string invocationParamType                              = "Prism.Ioc.IContainerRegistry";
+    string invocationMethodName                             = "Register";
+    string[] invocationGenerics                             = new string[]{"Xamarin.Forms.ContentView",DshCheckedModelUserControlNameSpaceAndClassName};
+    string[] invocationParams                               = new string[]{"\""+ DshCheckedModelUserControlClassName +"\""};
+    //result = PrismModifier.UpdateMethodWithParamIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType,
+    //                    invocationParamType, invocationMethodName, invocationGenerics, invocationParams);
+#>  
+   {
+    "Description": [],
+    "MethodName": 'UpdateMethodWithParamIdentifier',
+    "DestProjectName": '<#= destProjectName #>',
+    "DestImplementedInterface": '<#= destImplementedInterface #>',
+    "DestMethodName": '<#= destMethodName #>',
+    "DestMethodParamTypes": ['<#= destMethodParamTypes[0] #>'],
+    "DestMethodAccessType": '<#= destMethodAccessType #>',
+    "DestMethodParamTypeForVar": '',
+    "InvocationVarType": '',
+    "InvocationParamType": '<#= invocationParamType #>',
+    "InvocationClassType": '',
+    "InvocationMethodName": '<#= invocationMethodName #>',
+    "InvocationGenerics": ['<#= invocationGenerics[0] #>','<#= invocationGenerics[1] #>'],
+    "InvocationParams": ['<#= invocationParams[0]  #>'],
+    "StepDescription": 'Insertion the line : containerRegistry.Register<ContentView, <#= DshCheckedModelUserControlClassName #>>("<#= DshCheckedModelUserControlClassName #>");'
+    },
+<#
+}
+#>
+    ]
+}
+
+
+<#+
+    string GetModelProjectUniqueName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileProject)) {
+            return result;
+        }
+        return refItem.FileProject.Replace(@"\", @"\\");
+    }
+
+    string GetModelPermissionNotifyInterfaceName(ModelViewSerializable model) {
+        return "I"+ GetModelPermissionNotifyName(model);
+    }
+    string GetModelPermissionNotifyName(ModelViewSerializable model) {
+        return GetModelName(model) + "PermissionNotify";
+    }
+    string GetModelServiceCopyPermissionName(ModelViewSerializable model) {
+        return GetModelServiceName(model) + "CopyPermission";
+    }
+    string GetModelServiceCopyPermissionInterfaceName(ModelViewSerializable model) {
+        return "I" + GetModelServiceCopyPermissionName(model);
+    }
+    string GetFilterPropertyOperatorName(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model, string operatorSufix) {
+        if (model.GenerateJSonAttribute) {
+            return prop.JsonPropertyName + operatorSufix;
+        } else {
+            return FirstLetterToLower(prop.ViewPropertyName) + operatorSufix;
+        }
+    }
+
+    string GetFilterInterfaceName(ModelViewSerializable model) {
+        return "I" + GetFilterName(model);
+    }
+    string GetFilterName(ModelViewSerializable model) {
+        return GetModelName(model) + "Filter";
+    }
+    string GetPageInterfaceName(ModelViewSerializable model) {
+        return "I"+model.PageViewName;
+    }
+
+    string GetModelServiceInterfaceName(ModelViewSerializable model) {
+        return "I" + GetModelServiceName(model);
+    }
+    string GetModelServiceName(ModelViewSerializable model) {
+        return GetModelName(model) + "Service";
+    }
+    string GetInterfaceName(ModelViewSerializable model) {
+        return "I"+GetModelName(model);
+    }
+    string GetModelName(ModelViewSerializable model) {
+        return FirstLetterToUpper(model.ViewName);
+    }
+
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+    string GetContextModelNameSpace(DbContextSerializable context, string fileType) {
+        string result="";
+        if ((context == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (context.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            context.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+    string GetContextModelClassName(DbContextSerializable context, string fileType) {
+        string result="";
+        if ((context == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (context.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            context.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+
+    public string FirstLetterToUpper(string str)
+    {
+        if (str == null)
+            return null;
+        if (str.Length > 1)
+            return char.ToUpper(str[0]) + str.Substring(1);
+        return str.ToUpper();
+    }
+    public string FirstLetterToLower(string str)
+    {
+        if (str == null)
+            return null;
+        if (str.Length > 1)
+            return char.ToLower(str[0]) + str.Substring(1);
+        return str.ToUpper();
+    }
+    string GetPropertyTypeName(ModelViewPropertyOfVwSerializable prop)
+    {
+        if("System.String".Equals(prop.UnderlyingTypeName, System.StringComparison.OrdinalIgnoreCase)) {
+            return prop.UnderlyingTypeName;
+        }
+        if(prop.IsNullable || (!prop.IsRequiredInView)) {
+            return prop.UnderlyingTypeName + " ?";
+        }
+        return prop.UnderlyingTypeName;
+    }
+    string GetModelPropertyName(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+        if (model.GenerateJSonAttribute) {
+            return prop.ViewPropertyName;
+        } else {
+            return FirstLetterToLower(prop.ViewPropertyName);
+        }
+    }
+    string GetCCharpDatatype(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+        if ((prop == null) || (model == null)) return "";
+        return prop.UnderlyingTypeName.ToLower().Replace("system.", "");
+    }
+    string GetCCharpDatatypeEx(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model) {
+        if ((prop == null) || (model == null)) return "";
+        ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
+        return GetCCharpDatatype(sclrProp, model);
+    }
+    string GetCCharpDatatypeEx2(ModelViewUIListPropertySerializable prop, ModelViewSerializable model) {
+        if ((prop == null) || (model == null)) return "";
+        ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
+        return GetCCharpDatatype(sclrProp, model);
+    }
+    string GetDisplayAttributeValueString(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model, string propName) {
+            if (prop == null)
+            {
+                return "";
+            }
+            if(prop.Attributes == null)
+            {
+                return prop.ViewPropertyName;
+            }
+            ModelViewAttributeSerializable attr =
+                prop.Attributes.Where(a => a.AttrName == "Display").FirstOrDefault();
+            if (attr == null)
+            {
+                return prop.ViewPropertyName;
+            }
+            if (attr.VaueProperties == null)
+            {
+                return prop.ViewPropertyName;
+            }
+            ModelViewAttributePropertySerializable attrProp = 
+                attr.VaueProperties.Where(v => v.PropName == propName).FirstOrDefault();
+            if (attrProp == null)
+            {
+                return prop.ViewPropertyName;
+            }
+            if (string.IsNullOrEmpty( attrProp.PropValue ) )
+            {
+                return prop.ViewPropertyName;
+            } else
+            {
+                char[] charsToTrim = { '"', ' '};
+                return attrProp.PropValue.Trim(charsToTrim);
+            }
+    }
+
+    string GetDisplayAttributeValueStringEx(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model, string propName) {
+            if ((prop == null) || (model == null)) {
+                return "";
+            }
+            if(model.ScalarProperties == null) {
+                return "";
+            }
+            ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
+            return GetDisplayAttributeValueString(sclrProp, model, propName);
+    }
+    string GetDisplayAttributeValueStringEx2(ModelViewUIListPropertySerializable prop, ModelViewSerializable model, string propName) {
+            if ((prop == null) || (model == null)) {
+                return "";
+            }
+            if(model.ScalarProperties == null) {
+                return "";
+            }
+            ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
+            return GetDisplayAttributeValueString(sclrProp, model, propName);
+    }
+    string GetMaxLen(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+        if ((prop == null) || (model == null)) return "null";
+        if( prop.UnderlyingTypeName.ToLower() == "system.string" ) {
+            string propValue = GetUnNamedAtributeValue(prop, "StringLength");
+            if(!string.IsNullOrEmpty(propValue)) {
+                propValue = propValue.Replace("\"", "");
+                if(!string.IsNullOrEmpty(propValue)) {
+                    return propValue;
+                }
+            }
+            propValue = GetUnNamedAtributeValue(prop, "MaxLength");
+            if(!string.IsNullOrEmpty(propValue)) {
+                propValue = propValue.Replace("\"", "");
+                if(!string.IsNullOrEmpty(propValue)) {
+                    return propValue;
+                }
+            }
+        }
+        return "null";
+    }
+    string GetMaxLenEx(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model) {
+        if ((prop == null) || (model == null)) return "null";
+        ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
+        return GetMaxLen(sclrProp, model);
+    }
+    string GetMaxLenEx2(ModelViewUIListPropertySerializable prop, ModelViewSerializable model) {
+        if ((prop == null) || (model == null)) return "null";
+        ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
+        return GetMaxLen(sclrProp, model);
+    }
+    string GetMinVal(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+        if ((prop == null) || (model == null)) return "null";
+        string propValue = GetAtributeValueByNo(prop, "IntegerValidator", 0);
+        if(!string.IsNullOrEmpty(propValue)) {
+            propValue = propValue.Replace("\"", "");
+            if(!string.IsNullOrEmpty(propValue)) {
+                return propValue;
+            }
+        }
+        if (prop.UnderlyingTypeName.ToLower() == "system.datetime") {
+            propValue = GetAtributeValueByNo(prop, "Range", 1);
+            if(!string.IsNullOrEmpty(propValue)) {
+                propValue = propValue.Replace("\"", "");
+                if(!string.IsNullOrEmpty(propValue)) {
+                    return "new Date(\"" + propValue + "\")";
+                }
+            }
+        } else {
+            propValue = GetAtributeValueByNo(prop, "Range", 0);
+            if(!string.IsNullOrEmpty(propValue)) {
+                propValue = propValue.Replace("\"", "");
+                if(!string.IsNullOrEmpty(propValue)) {
+                    return propValue;
+                }
+            }
+        }
+        return "null";
+    }
+    string GetMaxVal(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+        if ((prop == null) || (model == null)) return "null";
+        string propValue = GetAtributeValueByNo(prop, "IntegerValidator", 1);
+        if(!string.IsNullOrEmpty(propValue)) {
+            propValue = propValue.Replace("\"", "");
+            if(!string.IsNullOrEmpty(propValue)) {
+                return propValue;
+            }
+        }
+        if (prop.UnderlyingTypeName.ToLower() == "system.datetime") {
+            propValue = GetAtributeValueByNo(prop, "Range", 2);
+            if(!string.IsNullOrEmpty(propValue)) {
+                propValue = propValue.Replace("\"", "");
+                if(!string.IsNullOrEmpty(propValue)) {
+                    return "new Date(\"" + propValue + "\")";
+                }
+            }
+        } else {
+            propValue = GetAtributeValueByNo(prop, "Range", 1);
+            if(!string.IsNullOrEmpty(propValue)) {
+                propValue = propValue.Replace("\"", "");
+                if(!string.IsNullOrEmpty(propValue)) {
+                    return propValue;
+                }
+            }
+        }
+        return "null";
+    }
+    string GetMaxValEx(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model) {
+        if ((prop == null) || (model == null)) return "null";
+        ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
+        return GetMinVal(sclrProp, model);
+    }
+    string GetMaxValEx2(ModelViewUIListPropertySerializable prop, ModelViewSerializable model) {
+        if ((prop == null) || (model == null)) return "null";
+        ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
+        return GetMaxVal(sclrProp, model);
+    }
+    string GetUnNamedAtributeValue(ModelViewPropertyOfVwSerializable sclrProp, string attrName) {
+        if(sclrProp != null) {
+            if (sclrProp.Attributes != null) {
+                ModelViewAttributeSerializable modelViewAttributeSerializable =
+                    sclrProp.Attributes.Where(a => a.AttrName == attrName).FirstOrDefault();
+                if(modelViewAttributeSerializable != null) {
+                    if (modelViewAttributeSerializable.VaueProperties != null) {
+                    
+                        ModelViewAttributePropertySerializable modelViewAttributePropertySerializable =
+                            modelViewAttributeSerializable.VaueProperties.Where(p => (string.IsNullOrEmpty(p.PropName) || (p.PropName == "..."))).FirstOrDefault();
+                        if (modelViewAttributePropertySerializable != null) {
+                            return modelViewAttributePropertySerializable.PropValue;
+                        }
+                    }
+                }
+            }
+        }
+        return null;                
+    }
+    string GetAtributeValueByNo(ModelViewPropertyOfVwSerializable sclrProp, string attrName, int itemNo) {
+        if(itemNo > -1) {
+            if(sclrProp != null) {
+                if (sclrProp.Attributes != null) {
+                    ModelViewAttributeSerializable modelViewAttributeSerializable =
+                        sclrProp.Attributes.Where(a => a.AttrName == attrName).FirstOrDefault();
+                    if(modelViewAttributeSerializable != null) {
+                        if (modelViewAttributeSerializable.VaueProperties != null) {
+                            if(modelViewAttributeSerializable.VaueProperties.Count > itemNo) {
+                                return modelViewAttributeSerializable.VaueProperties[itemNo].PropValue;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return null;                
+    }
+    List<ModelViewPropertyOfVwSerializable> GetPropsByForeignKey(ModelViewSerializable model, ModelViewForeignKeySerializable foreignKey) {
+        List<ModelViewPropertyOfVwSerializable> result= new List<ModelViewPropertyOfVwSerializable>();
+        if ((model == null) || (foreignKey == null)) {
+            return result;
+        }
+        if (foreignKey.PrincipalKeyProps == null || foreignKey.ForeignKeyProps == null || model.ScalarProperties == null) {
+            return result;
+        }
+        if ((foreignKey.PrincipalKeyProps.Count != foreignKey.ForeignKeyProps.Count) || (foreignKey.ForeignKeyProps.Count < 1)) {
+            return result;
+        }
+        foreach(ModelViewKeyPropertySerializable fkProp in foreignKey.PrincipalKeyProps) {
+            ModelViewPropertyOfVwSerializable prop = 
+                model.ScalarProperties.Where(p => (p.OriginalPropertyName == fkProp.OriginalPropertyName) && (foreignKey.NavigationName == p.ForeignKeyNameChain)).FirstOrDefault();
+            if (prop != null) {
+                result.Add(prop);
+            }
+        }
+        foreach(ModelViewKeyPropertySerializable fkProp in foreignKey.ForeignKeyProps) {
+            ModelViewPropertyOfVwSerializable prop = 
+                model.ScalarProperties.Where(p => (p.OriginalPropertyName == fkProp.OriginalPropertyName) && string.IsNullOrEmpty(p.ForeignKeyNameChain)).FirstOrDefault();
+            if (prop != null) {
+                result.Add(prop);
+            }
+        }
+        return result;
+    }
+    string GetDisplayAttributeValueString2(ModelViewUIListPropertySerializable prop, ModelViewSerializable model, string propName) {
+            ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
+            if (sclrProp == null)
+            {
+                return prop.ViewPropertyName;
+            }
+            if(sclrProp.Attributes == null)
+            {
+                return prop.ViewPropertyName;
+            }
+            ModelViewAttributeSerializable attr =
+                sclrProp.Attributes.Where(a => a.AttrName == "Display").FirstOrDefault();
+            if (attr == null)
+            {
+                return prop.ViewPropertyName;
+            }
+            if (attr.VaueProperties == null)
+            {
+                return prop.ViewPropertyName;
+            }
+            ModelViewAttributePropertySerializable attrProp = 
+                attr.VaueProperties.Where(v => v.PropName == propName).FirstOrDefault();
+            if (attrProp == null)
+            {
+                return prop.ViewPropertyName;
+            }
+            if (string.IsNullOrEmpty( attrProp.PropValue ) )
+            {
+                return prop.ViewPropertyName;
+            } else
+            {
+                char[] charsToTrim = { '"', ' '};
+                return attrProp.PropValue.Trim(charsToTrim);
+            }
+    }
+    string GetModelPropertyNameEx(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model) {
+        ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
+        return GetModelPropertyName(sclrProp, model);
+    }
+    string GetModelPropertyNameEx2(ModelViewUIListPropertySerializable prop, ModelViewSerializable model) {
+        ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
+        return GetModelPropertyName(sclrProp, model);
+    }
+    List<ModelViewPropertyOfVwSerializable> GetModelPrimaryKeyProps(ModelViewSerializable model) {
+        List<ModelViewPropertyOfVwSerializable> result = new List<ModelViewPropertyOfVwSerializable>();
+        if (model == null)
+        {
+            return result;
+        }
+        if ((model.PrimaryKeyProperties == null) || (model.ScalarProperties == null)) {
+            return result;
+        }
+        foreach(ModelViewKeyPropertySerializable modelViewKeyPropertySerializable in model.PrimaryKeyProperties) {
+            ModelViewPropertyOfVwSerializable prop =
+                model.ScalarProperties.Where(p => p.ViewPropertyName == modelViewKeyPropertySerializable.ViewPropertyName).FirstOrDefault();
+            if(prop != null) {
+                result.Add(prop);
+            } else {
+                if(model.ForeignKeys != null) {
+                    foreach(ModelViewForeignKeySerializable modelViewForeignKeySerializable in model.ForeignKeys) {
+                        if ((modelViewForeignKeySerializable.PrincipalKeyProps != null) && (modelViewForeignKeySerializable.ForeignKeyProps != null)) {
+                            for(int i = 0; i < modelViewForeignKeySerializable.ForeignKeyProps.Count; i++) {
+                                if(modelViewForeignKeySerializable.ForeignKeyProps[i].OriginalPropertyName == modelViewKeyPropertySerializable.OriginalPropertyName ) {
+                                    if(i < modelViewForeignKeySerializable.PrincipalKeyProps.Count) {
+                                        prop =
+                                        model.ScalarProperties.Where(p => 
+                                            (p.OriginalPropertyName == modelViewForeignKeySerializable.PrincipalKeyProps[i].OriginalPropertyName)
+                                            &&
+                                            (p.ForeignKeyName == modelViewForeignKeySerializable.NavigationName)
+                                        ).FirstOrDefault();
+                                    }
+                                }
+                                if(prop != null) break;
+                            }
+                        }
+                        if(prop != null) break;
+                    }
+                    if(prop != null) {
+                        result.Add(prop);
+                    }
+                }
+            }
+        }
+        return result;
+    }
+    string GetModelProjectName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileProject)) {
+            return result;
+        }
+        string[] fnArr = refItem.FileProject.Split(new char[] {'\\'}, 100, System.StringSplitOptions.None); 
+        string fn = fnArr[fnArr.Length - 1];
+
+        return fn.Replace(".csproj","");
+    }
+    bool IsPropInteger(ModelViewPropertyOfVwSerializable prop) {
+        if(prop == null) return false;
+        if(string.IsNullOrEmpty( prop.TypeFullName )) return false;
+        string tpNm = prop.TypeFullName.ToLower();
+        return 
+            "system.int16".Equals(tpNm) ||
+            "system.int32".Equals(tpNm) ||
+            "system.int64".Equals(tpNm) ||
+            "system.uint16".Equals(tpNm) ||
+            "system.uint32".Equals(tpNm) ||
+            "system.uint64".Equals(tpNm);
+    }
+
+#>

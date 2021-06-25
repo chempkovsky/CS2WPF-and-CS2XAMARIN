@@ -96,6 +96,8 @@ using Prism.Regions.Behaviors;
     string CanDelDetailPropertyName = "CanDeleteDetail"; 
     string IsPermissionEditablePropertyName = "IsPermissionEditable";
     string PermissionVectorPropertyName     = "PermissionVector";
+    string PermissionChangedCommandPropertyName     = "PermissionChangedCommand";
+    string OnPermissionChangedCommandPropertyName   = "OnPermissionChangedCommand";
 
 
 #>
@@ -214,10 +216,10 @@ namespace <#= ProxyUserControlRegionAdapterNameSpace #> {
                             ClearBinding(element, regionTarget, "<#= CanAddDetailPropertyName #>");
                             ClearBinding(element, regionTarget, "<#= CanUpdDetailPropertyName #>");
                             ClearBinding(element, regionTarget, "<#= CanDelDetailPropertyName #>");
-/*
+
                             ClearBinding(element, regionTarget, "<#= IsPermissionEditablePropertyName #>");
                             ClearBinding(element, regionTarget, "<#= PermissionVectorPropertyName #>");
-*/
+                            ClearBinding(element, regionTarget, "<#= PermissionChangedCommandPropertyName #>");
 
                             if (regionTarget.Content == element) regionTarget.Content = null;
                         }
@@ -273,11 +275,13 @@ namespace <#= ProxyUserControlRegionAdapterNameSpace #> {
                             SetBinding(element, regionTarget, BindingMode.OneWay, "<#= CanAddDetailPropertyName #>"                     , "<#= CanAddDetailPropertyName #>"          );
                             SetBinding(element, regionTarget, BindingMode.OneWay, "<#= CanUpdDetailPropertyName #>"                     , "<#= CanUpdDetailPropertyName #>"          );
                             SetBinding(element, regionTarget, BindingMode.OneWay, "<#= CanDelDetailPropertyName #>"                     , "<#= CanDelDetailPropertyName #>"          );
-/*
 
-                            SetBinding(element, regionTarget, BindingMode.OneWay, "<#= IsPermissionEditablePropertyName #>");
-                            SetBinding(element, regionTarget, BindingMode.OneWay, "<#= PermissionVectorPropertyName #>");
-  */                          
+
+                            SetBinding(element, regionTarget, BindingMode.OneWay, "<#= IsPermissionEditablePropertyName #>"             , "<#= IsPermissionEditablePropertyName #>"   );
+                            SetBinding(element, regionTarget, BindingMode.OneWay, "<#= PermissionVectorPropertyName #>"                 , "<#= PermissionVectorPropertyName #>"       );
+                            SetBinding(element, regionTarget, BindingMode.OneWay, "<#= PermissionChangedCommandPropertyName #>"         ,"<#= OnPermissionChangedCommandPropertyName #>");
+
+
                         }
                     }
                 }

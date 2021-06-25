@@ -1,0 +1,329 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="jsonpmm2txt" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+<#
+
+
+    string modelInterfaceFolder                         = "01100-Interface.cs";
+    string modelInterfaceClassName                      = GetInterfaceName(Model);
+    string modelInterfaceNameSpace                      = GetModelNameSpace(Model, modelInterfaceFolder);
+
+    string PermissionInterfaceFolder                    = "01110-PermissionInterface.cs";
+    string PermissionInterfaceClassName                 = GetModelPermissionInterfaceName(Model);
+    string PermissionInterfaceNameSpace                 = GetModelNameSpace(Model, PermissionInterfaceFolder);
+
+    string PermissionFolder                             = "01112-Permission.cs";
+    string PermissionClassName                          = GetModelPermissionName(Model);
+    string PermissionNameSpace                          = GetModelNameSpace(Model, PermissionFolder);
+
+    string PermissionNotifyInterfaceFolder              = "01114-PermissionNotifyInterface.cs";
+    string PermissionNotifyInterfaceClassName           = GetModelPermissionNotifyInterfaceName(Model);
+    string PermissionNotifyInterfaceNameSpace           = GetModelNameSpace(Model, PermissionNotifyInterfaceFolder);
+
+    string PermissionNotifyFolder                       = "01116-PermissionNotify.cs";
+    string PermissionNotifyClassName                    = GetModelPermissionNotifyName(Model);
+    string PermissionNotifyNameSpace                    = GetModelNameSpace(Model, PermissionNotifyFolder);
+
+    string modelServiceInterfaceFolder                  = "01400-Service.interface.cs";
+    string modelServiceInterfaceClassName               = GetModelServiceInterfaceName(Model);
+    string modelServiceInterfaceNameSpace               = GetModelNameSpace(Model, modelServiceInterfaceFolder);
+
+    string ServiceCopyPermissionInterfaceFolder         = "01408-ServiceCopyPermission.interface.cs";
+    string ServiceCopyPermissionInterfaceClassName      = GetModelServiceCopyPermissionInterfaceName(Model);
+    string ServiceCopyPermissionInterfaceNameSpace      = GetModelNameSpace(Model, ServiceCopyPermissionInterfaceFolder);
+
+    string ServiceCopyPermissionFolder                  = "01410-ServiceCopyPermission.cs";
+    string ServiceCopyPermissionClassName               = GetModelServiceCopyPermissionName(Model);
+    string ServiceCopyPermissionNameSpace               = GetModelNameSpace(Model, modelServiceInterfaceFolder);
+
+    string CopyToModelMethodName            = "CopyToModel";
+    string CopyToModelNotifyMethodName      = "CopyToModelNotify";
+    string FormRootServicePropertyName      = "FrmRootSrv";
+
+    string CopyToModelPermissionNotifyMethodName = "CopyToModelPermissionNotify";
+    string CopyToModelPermissionMethodName = "CopyToModelPermission";
+
+
+    List<string> nmSpaces = new List<string>();
+    if ((ServiceCopyPermissionNameSpace != ServiceCopyPermissionInterfaceNameSpace) && (nmSpaces.IndexOf(ServiceCopyPermissionInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(ServiceCopyPermissionInterfaceNameSpace);
+    if ((ServiceCopyPermissionNameSpace != modelInterfaceNameSpace) && (nmSpaces.IndexOf(modelInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(modelInterfaceNameSpace);
+    if ((ServiceCopyPermissionNameSpace != PermissionNotifyInterfaceNameSpace) && (nmSpaces.IndexOf(PermissionNotifyInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(PermissionNotifyInterfaceNameSpace);
+    if ((ServiceCopyPermissionNameSpace != PermissionInterfaceNameSpace) && (nmSpaces.IndexOf(PermissionInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(PermissionInterfaceNameSpace);
+    if ((ServiceCopyPermissionNameSpace != PermissionNameSpace) && (nmSpaces.IndexOf(PermissionNameSpace) < 0)) 
+        nmSpaces.Add(PermissionNameSpace);
+    if ((ServiceCopyPermissionNameSpace != PermissionNotifyNameSpace) && (nmSpaces.IndexOf(PermissionNotifyNameSpace) < 0)) 
+        nmSpaces.Add(PermissionNotifyNameSpace);
+    if ((ServiceCopyPermissionNameSpace != modelServiceInterfaceNameSpace) && (nmSpaces.IndexOf(modelServiceInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(modelServiceInterfaceNameSpace);
+
+
+
+
+#>
+{
+"PrismMMMCallItems": [
+    {
+    "Description": [
+    'In the file of IModule-class of the project for the current service the following lines of code must be inserted:',
+    '    public void RegisterTypes(IContainerRegistry containerRegistry)',
+    '    {',
+    '        ...',
+    '        containerRegistry.Register<<#= ServiceCopyPermissionInterfaceClassName #>, <#= ServiceCopyPermissionClassName #>>();',
+    '        ...',
+    '    }',
+    ],
+    
+<#  
+{
+    string ServiceCopyPermissionInterfaceNameSpaceAndClassName       = ServiceCopyPermissionInterfaceNameSpace + "." + ServiceCopyPermissionInterfaceClassName;
+    string ServiceCopyPermissionNameSpaceAndClassName                = ServiceCopyPermissionNameSpace + "." + ServiceCopyPermissionClassName;
+    string destProjectName                                  = GetModelProjectUniqueName(Model, ServiceCopyPermissionFolder);
+    string destImplementedInterface                         = "Prism.Modularity.IModule";
+    string destMethodName                                   = "RegisterTypes";
+    string[] destMethodParamTypes                           = new string[] {"Prism.Ioc.IContainerRegistry"};
+    string destMethodAccessType                             = "public";
+    string invocationParamType                              = "Prism.Ioc.IContainerRegistry";
+    string invocationMethodName                             = "Register";
+    string[] invocationGenerics                             = new string[]{ServiceCopyPermissionInterfaceNameSpaceAndClassName, ServiceCopyPermissionNameSpaceAndClassName};
+    string[] invocationParams                               = new string[]{};
+    //result = PrismModifier.UpdateMethodWithParamIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType,
+    //                    invocationParamType, invocationMethodName, invocationGenerics, invocationParams);
+#>  
+    "MethodName": 'UpdateMethodWithParamIdentifier',
+    "DestProjectName": '<#= destProjectName #>',
+    "DestImplementedInterface": '<#= destImplementedInterface #>',
+    "DestMethodName": '<#= destMethodName #>',
+    "DestMethodParamTypes": ['<#= destMethodParamTypes[0] #>'],
+    "DestMethodAccessType": '<#= destMethodAccessType #>',
+    "DestMethodParamTypeForVar": '',
+    "InvocationVarType": '',
+    "InvocationParamType": '<#= invocationParamType #>',
+    "InvocationClassType": '',
+    "InvocationMethodName": '<#= invocationMethodName #>',
+    "InvocationGenerics": ['<#= invocationGenerics[0] #>','<#= invocationGenerics[1] #>'],
+    "InvocationParams": [],
+    "StepDescription": 'Insertion the line : containerRegistry.Register<<#= ServiceCopyPermissionInterfaceClassName #>, <#= ServiceCopyPermissionClassName #>>();'
+    },
+<#
+
+}
+#>
+    ]
+}
+
+
+
+
+<#+
+    string GetModelProjectUniqueName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileProject)) {
+            return result;
+        }
+        return refItem.FileProject.Replace(@"\", @"\\");
+    }
+
+    string GetModelPermissionInterfaceName(ModelViewSerializable model) {
+        return "I"+ GetModelPermissionName(model);
+    }
+    string GetModelPermissionName(ModelViewSerializable model) {
+        return GetModelName(model) + "Permission";
+    }
+    string GetModelPermissionNotifyInterfaceName(ModelViewSerializable model) {
+        return "I"+ GetModelPermissionNotifyName(model);
+    }
+    string GetModelPermissionNotifyName(ModelViewSerializable model) {
+        return GetModelName(model) + "PermissionNotify";
+    }
+
+    string GetModelServiceInterfaceName(ModelViewSerializable model) {
+        return "I" + GetModelServiceName(model);
+    }
+    string GetModelServiceName(ModelViewSerializable model) {
+        return GetModelName(model) + "Service";
+    }
+    string GetModelServiceCopyPermissionName(ModelViewSerializable model) {
+        return GetModelServiceName(model) + "CopyPermission";
+    }
+    string GetModelServiceCopyPermissionInterfaceName(ModelViewSerializable model) {
+        return "I" + GetModelServiceCopyPermissionName(model);
+    }
+
+    string GetFilterPropertyOperatorName(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model, string operatorSufix) {
+        if (model.GenerateJSonAttribute) {
+            return prop.JsonPropertyName + operatorSufix;
+        } else {
+            return FirstLetterToLower(prop.ViewPropertyName) + operatorSufix;
+        }
+    }
+    string GetFilterInterfaceName(ModelViewSerializable model) {
+        return "I" + GetFilterName(model);
+    }
+    string GetFilterName(ModelViewSerializable model) {
+        return GetModelName(model) + "Filter";
+    }
+    string GetPageInterfaceName(ModelViewSerializable model) {
+        return "I"+model.PageViewName;
+    }
+    string GetInterfaceName(ModelViewSerializable model) {
+        return "I"+GetModelName(model);
+    }
+    string GetNotifyInterfaceName(ModelViewSerializable model) {
+        return GetInterfaceName(model) + "Notify";
+    }
+    string GetModelName(ModelViewSerializable model) {
+        return FirstLetterToUpper(model.ViewName);
+    }
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+    public string FirstLetterToUpper(string str)
+    {
+        if (str == null)
+            return null;
+        if (str.Length > 1)
+            return char.ToUpper(str[0]) + str.Substring(1);
+        return str.ToUpper();
+    }
+    public string FirstLetterToLower(string str)
+    {
+        if (str == null)
+            return null;
+        if (str.Length > 1)
+            return char.ToLower(str[0]) + str.Substring(1);
+        return str.ToUpper();
+    }
+    string GetModelPropertyName(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+        if (model.GenerateJSonAttribute) {
+            return prop.ViewPropertyName;
+        } else {
+            return FirstLetterToLower(prop.ViewPropertyName);
+        }
+    }
+    string AttribToString(ModelViewAttributeSerializable attr) {
+        if(attr == null) return "";
+        string result= "[" + attr.AttrName; 
+        if (attr.VaueProperties == null) {
+            return result + "]";
+        }
+        if (attr.VaueProperties.Count < 1) {
+            return result + "]";
+        }
+        result = result + "(";
+        bool insComma= false;
+        foreach(ModelViewAttributePropertySerializable valProp in attr.VaueProperties) {
+            if (insComma) {
+                result =  result + ",";
+            } else {
+                insComma = true;
+            }
+            if(! string.IsNullOrEmpty(valProp.PropName) ) {
+                if (! valProp.PropName.Contains("...") ) {
+                    result =  result + valProp.PropName + "=";
+                }
+            }
+            result =  result + valProp.PropValue;
+        }
+        return result + ")]";
+    }
+    string GetPropertyTypeName(ModelViewPropertyOfVwSerializable prop)
+    {
+        if("System.String".Equals(prop.UnderlyingTypeName, System.StringComparison.OrdinalIgnoreCase)) {
+            return prop.UnderlyingTypeName;
+        }
+        if(prop.IsNullable || (!prop.IsRequiredInView)) {
+            return prop.UnderlyingTypeName + " ?";
+        }
+        return prop.UnderlyingTypeName;
+    }
+
+#>

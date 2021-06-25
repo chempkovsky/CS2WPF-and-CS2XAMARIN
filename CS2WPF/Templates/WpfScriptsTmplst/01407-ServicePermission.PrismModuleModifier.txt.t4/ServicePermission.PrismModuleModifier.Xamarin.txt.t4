@@ -1,0 +1,551 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="jsonpmm2txt" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+<#
+
+    string IAppGlblSettingsServiceFolder      = "00080-IAppGlblSettingsService.cs";
+    string IAppGlblSettingsServiceClassName   = GetContextModelClassName(Context, IAppGlblSettingsServiceFolder);
+    string IAppGlblSettingsServiceNameSpace   = GetContextModelNameSpace(Context, IAppGlblSettingsServiceFolder);
+
+
+    string modelInterfaceFolder             = "01100-Interface.cs";
+    string modelInterfaceClassName          = GetInterfaceName(Model);
+    string modelInterfaceNameSpace          = GetModelNameSpace(Model, modelInterfaceFolder);
+
+    string modelFolder                      = "01102-Model.cs";
+    string modelClassName                   = GetModelName(Model);
+    string modelNameSpace                   = GetModelNameSpace(Model, modelFolder);
+
+    string NotifyInterfaceFolder            = "01104-NotifyInterface.cs";
+    string NotifyInterfaceClassName         = GetNotifyInterfaceName(Model);
+    string NotifyInterfaceNameSpace         = GetModelNameSpace(Model, NotifyInterfaceFolder);
+
+    string ModelNotifyFolder                = "01106-ModelNotify.cs";
+    string ModelNotifyClassName             = GetModelNotifyName(Model);
+    string ModelNotifyNameSpace             = GetModelNameSpace(Model, ModelNotifyFolder);
+
+    string modelPageInterfaceFolder         = "01200-Page.interface.cs";
+    string modelPageInterfaceClassName      = GetPageInterfaceName(Model);
+    string modelPageInterfaceNameSpace      = GetModelNameSpace(Model, modelPageInterfaceFolder);
+
+    string modelPageFolder                  = "01202-Page.model.cs";
+    string modelPageClassName               = GetModelPageName(Model);
+    string modelPageNameSpace               = GetModelNameSpace(Model, modelPageFolder);
+
+    string modelFilterInterfaceFolder       = "01300-Filter.interface.cs";
+    string modelFilterInterfaceClassName    = GetFilterInterfaceName(Model);
+    string modelFilterInterfaceNameSpace    = GetModelNameSpace(Model, modelFilterInterfaceFolder);
+
+    string modelFilterFolder                = "01302-Filter.model.cs";
+    string modelFilterClassName             = GetFilterName(Model);
+    string modelFilterNameSpace             = GetModelNameSpace(Model, modelFilterFolder);
+
+
+    string ServicePermissionInterfaceFolder       = "01404-ServicePermission.interface.cs";
+    string ServicePermissionInterfaceClassName    = GetModelServicePermissionInterfaceName(Model);
+    string ServicePermissionInterfaceNameSpace    = GetModelNameSpace(Model, ServicePermissionInterfaceFolder);
+
+    string ServicePermissionFolder                = "01406-ServicePermission.cs";
+    string ServicePermissionClassName             = GetModelServicePermissionName(Model);
+    string ServicePermissionNameSpace             = GetModelNameSpace(Model, ServicePermissionFolder);
+
+
+
+    string FilterOperatorSuffix = "Oprtr";
+    string EqualOperator = "eq";
+    string getAuthInfoHeaderMethodName      = "GetAuthInfoHeader";
+    string ShowErrorMethodName              = "ShowErrorMessage";
+
+
+    string GetAllMethodName                 = "getall";
+    string GetWithFilterMethodName          = "getwithfilter";
+    string GetOneMethodName                 = "getone";
+    string UpdateOneMethodName              = "updateone";
+    string AddOneMethodName                 = "addone";
+    string DeleteOneMethodName              = "deleteone";
+    string CopyToModelMethodName            = "CopyToModel";
+    string CopyToModelNotifyMethodName      = "CopyToModelNotify";
+    string AppSettingServicePropertyName    = "appGlblSettings";
+    string GetCurrUserMasksMethodName       = "getcurrusermasks";
+    string src2arrayMethodName              = "src2array";
+
+
+
+    List<string> nmSpaces = new List<string>();
+    if (ServicePermissionNameSpace != modelInterfaceNameSpace) nmSpaces.Add(modelInterfaceNameSpace);
+    if ((ServicePermissionNameSpace != modelPageInterfaceNameSpace) && (nmSpaces.IndexOf(modelPageInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(modelPageInterfaceNameSpace);
+    if ((ServicePermissionNameSpace != modelFilterInterfaceNameSpace) && (nmSpaces.IndexOf(modelFilterInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(modelFilterInterfaceNameSpace);
+    if ((ServicePermissionNameSpace != ServicePermissionInterfaceNameSpace) && (nmSpaces.IndexOf(ServicePermissionInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(ServicePermissionInterfaceNameSpace);
+    if ((ServicePermissionNameSpace != modelNameSpace) && (nmSpaces.IndexOf(modelNameSpace) < 0)) 
+        nmSpaces.Add(modelNameSpace);
+    if ((ServicePermissionNameSpace != modelPageNameSpace) && (nmSpaces.IndexOf(modelPageNameSpace) < 0)) 
+        nmSpaces.Add(modelPageNameSpace);
+    if ((ServicePermissionNameSpace != IAppGlblSettingsServiceNameSpace) && (nmSpaces.IndexOf(IAppGlblSettingsServiceNameSpace) < 0)) 
+        nmSpaces.Add(IAppGlblSettingsServiceNameSpace);
+    if ((ServicePermissionNameSpace != ModelNotifyNameSpace) && (nmSpaces.IndexOf(ModelNotifyNameSpace) < 0)) 
+        nmSpaces.Add(ModelNotifyNameSpace);
+    if ((ServicePermissionNameSpace != NotifyInterfaceNameSpace) && (nmSpaces.IndexOf(NotifyInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(NotifyInterfaceNameSpace);
+    if ((ServicePermissionNameSpace != modelFilterNameSpace) && (nmSpaces.IndexOf(modelFilterNameSpace) < 0)) 
+        nmSpaces.Add(modelFilterNameSpace);
+
+#>
+{
+"PrismMMMCallItems": [
+    {
+    "Description": [
+    'In the file of IModule-class of the project for the current service the following lines of code must be inserted:',
+    '    public void RegisterTypes(IContainerRegistry containerRegistry)',
+    '    {',
+    '        ...',
+    '        containerRegistry.Register<<#= ServicePermissionInterfaceClassName #>, <#= ServicePermissionClassName #>>();',
+    '        ...',
+    '    }',
+    ],
+
+<#  
+{
+    string ServicePermissionInterfaceNameSpaceAndClassName       = ServicePermissionInterfaceNameSpace + "." + ServicePermissionInterfaceClassName;
+    string ServicePermissionNameSpaceAndClassName                = ServicePermissionNameSpace + "." + ServicePermissionClassName;
+    string destProjectName                                  = GetModelProjectUniqueName(Model, ServicePermissionFolder);
+    string destImplementedInterface                         = "Prism.Modularity.IModule";
+    string destMethodName                                   = "RegisterTypes";
+    string[] destMethodParamTypes                           = new string[] {"Prism.Ioc.IContainerRegistry"};
+    string destMethodAccessType                             = "public";
+    string invocationParamType                              = "Prism.Ioc.IContainerRegistry";
+    string invocationMethodName                             = "Register";
+    string[] invocationGenerics                             = new string[]{ServicePermissionInterfaceNameSpaceAndClassName, ServicePermissionNameSpaceAndClassName};
+    string[] invocationParams                               = new string[]{};
+    //result = PrismModifier.UpdateMethodWithParamIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType,
+    //                    invocationParamType, invocationMethodName, invocationGenerics, invocationParams);
+#>  
+    "MethodName": 'UpdateMethodWithParamIdentifier',
+    "DestProjectName": '<#= destProjectName #>',
+    "DestImplementedInterface": '<#= destImplementedInterface #>',
+    "DestMethodName": '<#= destMethodName #>',
+    "DestMethodParamTypes": ['<#= destMethodParamTypes[0] #>'],
+    "DestMethodAccessType": '<#= destMethodAccessType #>',
+    "DestMethodParamTypeForVar": '',
+    "InvocationVarType": '',
+    "InvocationParamType": '<#= invocationParamType #>',
+    "InvocationClassType": '',
+    "InvocationMethodName": '<#= invocationMethodName #>',
+    "InvocationGenerics": ['<#= invocationGenerics[0] #>','<#= invocationGenerics[1] #>'],
+    "InvocationParams": [],
+    "StepDescription": 'Insertion the line : containerRegistry.Register<<#= ServicePermissionInterfaceClassName #>, <#= ServicePermissionClassName #>>();'
+    },
+<#
+
+}
+#>
+    ]
+}
+
+
+<#+
+    string GetModelProjectUniqueName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileProject)) {
+            return result;
+        }
+        return refItem.FileProject.Replace(@"\", @"\\");
+    }
+
+    string GetModelPageName(ModelViewSerializable model) {
+        return FirstLetterToUpper(model.PageViewName);
+    }
+    string GetModelServicePermissionInterfaceName(ModelViewSerializable model) {
+        return "I" + GetModelServicePermissionName(model);
+    }
+    string GetModelServiceInterfaceName(ModelViewSerializable model) {
+        return "I" + GetModelServiceName(model);
+    }
+    string GetModelServicePermissionName(ModelViewSerializable model) {
+        return GetModelServiceName(model) + "Permission";
+    }
+    string GetModelServiceName(ModelViewSerializable model) {
+        return GetModelName(model) + "Service";
+    }
+    string GetFilterPropertyOperatorName(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model, string operatorSufix) {
+        if (model.GenerateJSonAttribute) {
+            return prop.JsonPropertyName + operatorSufix;
+        } else {
+            return FirstLetterToLower(prop.ViewPropertyName) + operatorSufix;
+        }
+    }
+    string GetFilterInterfaceName(ModelViewSerializable model) {
+        return "I" + GetFilterName(model);
+    }
+    string GetFilterName(ModelViewSerializable model) {
+        return GetModelName(model) + "Filter";
+    }
+    string GetPageInterfaceName(ModelViewSerializable model) {
+        return "I"+model.PageViewName;
+    }
+    string GetInterfaceName(ModelViewSerializable model) {
+        return "I"+GetModelName(model);
+    }
+    string GetNotifyInterfaceName(ModelViewSerializable model) {
+        return GetInterfaceName(model) + "Notify";
+    }
+    string GetModelName(ModelViewSerializable model) {
+        return FirstLetterToUpper(model.ViewName);
+    }
+    string GetModelNotifyName(ModelViewSerializable model) {
+        return GetModelName(model) + "Notify";
+    }
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+    public string FirstLetterToUpper(string str)
+    {
+        if (str == null)
+            return null;
+        if (str.Length > 1)
+            return char.ToUpper(str[0]) + str.Substring(1);
+        return str.ToUpper();
+    }
+    public string FirstLetterToLower(string str)
+    {
+        if (str == null)
+            return null;
+        if (str.Length > 1)
+            return char.ToLower(str[0]) + str.Substring(1);
+        return str.ToUpper();
+    }
+    string GetModelPropertyName(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+        if (model.GenerateJSonAttribute) {
+            return prop.ViewPropertyName;
+        } else {
+            return FirstLetterToLower(prop.ViewPropertyName);
+        }
+    }
+    string AttribToString(ModelViewAttributeSerializable attr) {
+        if(attr == null) return "";
+        string result= "[" + attr.AttrName; 
+        if (attr.VaueProperties == null) {
+            return result + "]";
+        }
+        if (attr.VaueProperties.Count < 1) {
+            return result + "]";
+        }
+        result = result + "(";
+        bool insComma= false;
+        foreach(ModelViewAttributePropertySerializable valProp in attr.VaueProperties) {
+            if (insComma) {
+                result =  result + ",";
+            } else {
+                insComma = true;
+            }
+            if(! string.IsNullOrEmpty(valProp.PropName) ) {
+                if (! valProp.PropName.Contains("...") ) {
+                    result =  result + valProp.PropName + "=";
+                }
+            }
+            result =  result + valProp.PropValue;
+        }
+        return result + ")]";
+    }
+    string GetPropertyTypeName(ModelViewPropertyOfVwSerializable prop)
+    {
+        if("System.String".Equals(prop.UnderlyingTypeName, System.StringComparison.OrdinalIgnoreCase)) {
+            return prop.UnderlyingTypeName;
+        }
+        if(prop.IsNullable || (!prop.IsRequiredInView)) {
+            return prop.UnderlyingTypeName + " ?";
+        }
+        return prop.UnderlyingTypeName;
+    }
+    string GetWebApiServicePrefix(ModelViewSerializable model) {
+        string result = model.WebApiServiceName;
+        if( !string.IsNullOrEmpty( result ) ) {
+            if(result.EndsWith("Controller")) {
+                result = result.Substring(0, result.LastIndexOf("Controller"));
+            }
+            result = result.ToLower();
+        }
+        return result;
+    }
+    bool HasAtributeWithValue(ModelViewPropertyOfVwSerializable sclrProp, string attrName, string attrVal) {
+        if ((sclrProp != null) && (!string.IsNullOrEmpty(attrName)) && (!string.IsNullOrEmpty(attrVal)) ) {
+            if (sclrProp.Attributes != null) {
+                foreach(ModelViewAttributeSerializable a in sclrProp.Attributes) {
+                    if (attrName.Equals(a.AttrName, StringComparison.InvariantCultureIgnoreCase)) {
+                        if (a.VaueProperties != null) {
+                            foreach(ModelViewAttributePropertySerializable v in a.VaueProperties) {
+                                if(!string.IsNullOrEmpty( v.PropValue )) {
+                                    if(v.PropValue.ToLower().Contains(attrVal)) {
+                                        return true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    bool HasAtribute(ModelViewPropertyOfVwSerializable sclrProp, string attrName) {
+        if ((sclrProp != null) && (!string.IsNullOrEmpty(attrName))) {
+            if (sclrProp.Attributes != null) {
+                foreach(ModelViewAttributeSerializable a in sclrProp.Attributes) {
+                    if (attrName.Equals(a.AttrName, StringComparison.InvariantCultureIgnoreCase)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    bool HasFluentAtributeWithValue(ModelViewPropertyOfVwSerializable sclrProp, string attrName, string attrVal) {
+        if ((sclrProp != null) && (!string.IsNullOrEmpty(attrName)) && (!string.IsNullOrEmpty(attrVal)) ) {
+            if (sclrProp.FAPIAttributes != null) {
+                foreach(ModelViewFAPIAttributeSerializable a in sclrProp.FAPIAttributes) {
+                    if (attrName.Equals(a.AttrName, StringComparison.InvariantCultureIgnoreCase)) {
+                        if (a.VaueProperties != null) {
+                            foreach(ModelViewFAPIAttributePropertySerializable v in a.VaueProperties) {
+                                if(!string.IsNullOrEmpty( v.PropValue )) {
+                                    if(v.PropValue.ToLower().Contains(attrVal)) {
+                                        return true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    bool HasFluentAtribute(ModelViewPropertyOfVwSerializable sclrProp, string[] attrName) {
+        if ((sclrProp != null) && (attrName != null)  ) {
+            if ((sclrProp.FAPIAttributes != null) && (attrName.Length > 0)) {
+                return sclrProp.FAPIAttributes.Any(a => attrName.Contains(a.AttrName));
+            }
+        }
+        return false;
+    }
+    bool IsIdentityProperty(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+        if (HasAtribute(prop, "ConcurrencyCheck") || HasAtribute(prop, "Timestamp")) {
+            return true;
+        }
+        if (HasAtributeWithValue(prop, "DatabaseGenerated", "identity") || HasAtributeWithValue(prop, "DatabaseGenerated", "computed")) {
+            return true;
+        }
+        if(HasFluentAtribute(prop, new string[] {"UseSqlServerIdentityColumn", "ForSqlServerUseSequenceHiLo", "ValueGeneratedOnAdd", "ValueGeneratedOnAddOrUpdate", "IsConcurrencyToken", "IsRowVersion"} )) {
+            return true;
+        }
+        return HasFluentAtributeWithValue(prop, "HasDatabaseGeneratedOption", "identity") || HasFluentAtributeWithValue(prop, "HasDatabaseGeneratedOption", "computed");
+    }
+    List<ModelViewPropertyOfVwSerializable> GetDatabaseGeneratedProp(ModelViewSerializable model) {
+        List<ModelViewPropertyOfVwSerializable> rslt = new List<ModelViewPropertyOfVwSerializable>();
+        if(model == null) return null;
+        if(model.ScalarProperties == null) return null;
+        foreach(ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable in model.ScalarProperties) {
+            if(IsIdentityProperty(modelViewPropertyOfVwSerializable, model)) {
+                rslt.Add(modelViewPropertyOfVwSerializable);
+            }
+        }
+        return rslt;
+    }
+    string GetDefaultVal(ModelViewPropertyOfVwSerializable prop) {
+        if(prop == null) {
+            return "0";
+        }
+        string result = "";
+        switch(prop.UnderlyingTypeName.ToLower()) {
+            case "system.boolean": 
+                result =  "false";
+                break;
+            case "system.guid":
+            case "system.string":
+                result =  "\"0\"";
+                break;
+            default:
+                result =  "0";
+                break;
+        }
+        return result;
+    }
+    string GetContextModelNameSpace(DbContextSerializable context, string fileType) {
+        string result="";
+        if ((context == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (context.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            context.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+    string GetContextModelClassName(DbContextSerializable context, string fileType) {
+        string result="";
+        if ((context == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (context.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            context.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+    bool IsPropertyNullable(ModelViewPropertyOfVwSerializable prop) {
+        if("System.String".Equals(prop.UnderlyingTypeName, System.StringComparison.OrdinalIgnoreCase)) {
+            return true;
+        }
+        return (prop.IsNullable || (!prop.IsRequiredInView)); 
+    }
+    bool IsPropertyTypeNullable(ModelViewPropertyOfVwSerializable prop) {
+        if("System.String".Equals(prop.UnderlyingTypeName, System.StringComparison.OrdinalIgnoreCase)) {
+            return true;
+        }
+        return prop.IsNullable; 
+    }
+    bool IsPropInteger(ModelViewPropertyOfVwSerializable prop) {
+        if(prop == null) return false;
+        if(string.IsNullOrEmpty( prop.TypeFullName )) return false;
+        string tpNm = prop.TypeFullName.ToLower();
+        return 
+            "system.int16".Equals(tpNm) ||
+            "system.int32".Equals(tpNm) ||
+            "system.int64".Equals(tpNm) ||
+            "system.uint16".Equals(tpNm) ||
+            "system.uint32".Equals(tpNm) ||
+            "system.uint64".Equals(tpNm);
+    }
+
+#>
