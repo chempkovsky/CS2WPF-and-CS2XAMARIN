@@ -256,6 +256,7 @@ namespace <#= ProxyUserControlNameSpace #> {
             <#= ProxyUserControlClassName #> d = bindable as <#= ProxyUserControlClassName #>;
             if (d != null)
             {
+                if(d.Parent == null) return;
                 (d.<#= OnNavigationBackCommandPropertyName #> as Command).ChangeCanExecute();
             }
         }
@@ -323,6 +324,7 @@ namespace <#= ProxyUserControlNameSpace #> {
             <#= ProxyUserControlClassName #> d = bindable as <#= ProxyUserControlClassName #>;
             if (d != null)
             {
+                if(d.Parent == null) return;
                 (d.<#= OnTableMenuItemsCommandPropertyName #> as Command).ChangeCanExecute();
             }
         }
@@ -397,6 +399,7 @@ namespace <#= ProxyUserControlNameSpace #> {
             <#= ProxyUserControlClassName #> d = bindable as <#= ProxyUserControlClassName #>;
             if (d != null)
             {
+                if(d.Parent == null) return;
                 (d.<#= OnRowMenuItemsCommandPropertyName #> as Command).ChangeCanExecute();
             }
         }
@@ -471,6 +474,7 @@ namespace <#= ProxyUserControlNameSpace #> {
             <#= ProxyUserControlClassName #> d = bindable as <#= ProxyUserControlClassName #>;
             if (d != null)
             {
+                if(d.Parent == null) return;
                 (d.<#= OnContainerMenuItemsCommandPropertyName #> as Command).ChangeCanExecute();
             }
         }
@@ -521,6 +525,7 @@ namespace <#= ProxyUserControlNameSpace #> {
             <#= ProxyUserControlClassName #> d = bindable as <#= ProxyUserControlClassName #>;
             if (d != null)
             {
+                if(d.Parent == null) return;
                 (d.<#= OnSelectedRowCommandPropertyName #> as Command).ChangeCanExecute();
             }
         }
@@ -650,6 +655,7 @@ namespace <#= ProxyUserControlNameSpace #> {
             <#= ProxyUserControlClassName #> d = bindable as <#= ProxyUserControlClassName #>;
             if (d != null)
             {
+                if(d.Parent == null) return;
                 if (d.<#= OnSubmitCommandPropertyName #> != null)
                 {
                     (d.<#= OnSubmitCommandPropertyName #> as Command).ChangeCanExecute();
@@ -698,6 +704,7 @@ namespace <#= ProxyUserControlNameSpace #> {
             <#= ProxyUserControlClassName #> d = bindable as <#= ProxyUserControlClassName #>;
             if (d != null)
             {
+                if(d.Parent == null) return;
                 if (d.<#= OnCancelCommandPropertyName #> != null)
                 {
                     (d.<#= OnCancelCommandPropertyName #> as Command).ChangeCanExecute();
@@ -1057,7 +1064,7 @@ namespace <#= ProxyUserControlNameSpace #> {
                 BindableProperty.Create(
                 "<#= FilterHeightDetailPropertyName #>", typeof(double),
                 typeof(<#= ProxyUserControlClassName #>),
-                double.MaxValue);
+                -1d);
         public double <#= FilterHeightDetailPropertyName #>
         {
             get
@@ -1114,7 +1121,7 @@ namespace <#= ProxyUserControlNameSpace #> {
                 BindableProperty.Create(
                 "<#= GridHeightDetailPropertyName #>", typeof(double),
                 typeof(<#= ProxyUserControlClassName #>),
-                double.MaxValue);
+                -1d);
         public double <#= GridHeightDetailPropertyName #>
         {
             get
@@ -1264,6 +1271,34 @@ namespace <#= ProxyUserControlNameSpace #> {
             return (<#= PermissionChangedCommandPropertyName #> != null); 
         }
         #endregion
+        protected override void OnParentSet()
+        {
+            base.OnParentSet();
+            if (Parent == null) {
+                <#= NavigationBackCommandPropertyName #> = null;
+                <#= TableMenuItemsPropertyName #> = null;
+                <#= TableMenuItemsCommandPropertyName #> = null;
+                <#= RowMenuItemsPropertyName #> = null;
+                <#= RowMenuItemsCommandPropertyName #> = null;
+                <#= ContainerMenuItemsPropertyName #> = null;
+                <#= ContainerMenuItemsCommandPropertyName #> = null;
+                <#= SelectedRowCommandPropertyName #> = null;
+                <#= HiddenFiltersPropertyName #> = null;
+                <#= SformAfterAddItemPropertyName #> = null;
+                <#= SformAfterUpdItemPropertyName #> = null;
+                <#= SformAfterDelItemPropertyName #> = null;
+                <#= SubmitCommandPropertyName #> = null;
+                <#= CancelCommandPropertyName #> = null;
+                <#= FormControlModelPropertyName #> = null;
+                <#= SformAfterAddItemCommandPropertyName #> = null;
+                <#= SformAfterUpdItemCommandPropertyName #> = null;
+                <#= SformAfterDelItemCommandPropertyName #> = null;
+                <#= HiddenFiltersDetailPropertyName #> = null;
+                <#= RowMenuItemsDetailPropertyName #> = null;
+                <#= TableMenuItemsDetailPropertyName #> = null;
+                <#= PermissionChangedCommandPropertyName #> = null;
+            }
+        }
 
     }
 }

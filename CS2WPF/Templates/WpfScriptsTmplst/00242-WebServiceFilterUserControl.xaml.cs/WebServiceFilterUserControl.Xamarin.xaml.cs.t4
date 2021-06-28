@@ -322,6 +322,7 @@ namespace <#= WebServiceFilterUserControlNameSpace #> {
             <#= WebServiceFilterUserControlClassName #> inst = d as <#= WebServiceFilterUserControlClassName #>;
             if (inst != null)
             {
+                if(inst.Parent == null) return;
                 inst.Filters.Clear();
                 inst.Filters.Add(new WebServiceFilterRsltViewModel());
                 inst.<#= InternalContentProperty #>Changed();
@@ -581,6 +582,21 @@ namespace <#= WebServiceFilterUserControlNameSpace #> {
             }
         }
         #endregion
+        protected override void OnParentSet()
+        {
+            base.OnParentSet();
+            if (Parent == null) {
+                <#= HiddenFiltersPropertyName #> = null;
+                <#= FiltersPropertyName #> = null;
+                <#= NavigationBackCommandPropertyName #> = null;
+                // <#= FilterOperatorsPropertyName #> = null;
+                <#= FilterDefinitionsPropertyName #> = null;
+                <#= ContainerMenuItemsPropertyName #> = null;
+                <#= FilterCommandPropertyName #> = null;
+                <#= ContainerMenuItemsCommandPropertyName #> = null;
+            }
+        }
+
     }
 }
 

@@ -293,6 +293,7 @@ namespace <#= SformUserControlBaseNameSpace #> {
             <#= SformUserControlBaseClassName #> inst = d as <#= SformUserControlBaseClassName #>;
             if (inst != null)
             {
+                if(inst.Parent == null) return;
                 <#= ISformViewModelInterfaceClassName #> bc = inst.BindingContext as <#= ISformViewModelInterfaceClassName #>;
                 if(bc != null)
                     bc.<#= TableMenuItemsPropertyChangedPropertyName #>(inst, oldValue, newValue);
@@ -321,6 +322,7 @@ namespace <#= SformUserControlBaseNameSpace #> {
             <#= SformUserControlBaseClassName #> inst = d as <#= SformUserControlBaseClassName #>;
             if (inst != null)
             {
+                if(inst.Parent == null) return;
                 <#= ISformViewModelInterfaceClassName #> bc = inst.BindingContext as <#= ISformViewModelInterfaceClassName #>;
                 if(bc != null)
                     bc.<#= RowMenuItemsPropertyChangedPropertyName #>(inst, oldValue, newValue);
@@ -349,6 +351,7 @@ namespace <#= SformUserControlBaseNameSpace #> {
             <#= SformUserControlBaseClassName #> inst = d as <#= SformUserControlBaseClassName #>;
             if (inst != null)
             {
+                if(inst.Parent == null) return;
                 <#= ISformViewModelInterfaceClassName #> bc = inst.BindingContext as <#= ISformViewModelInterfaceClassName #>;
                 if(bc != null)
                     await bc.<#= HiddenFiltersPropertyChangedPropertyName #>(inst, oldValue, newValue);
@@ -395,6 +398,7 @@ namespace <#= SformUserControlBaseNameSpace #> {
             <#= SformUserControlBaseClassName #> d = bindable as <#= SformUserControlBaseClassName #>;
             if (d != null)
             {
+                if(d.Parent == null) return;
                 if (d.<#= OnNavigationBackCommandPropertyName #> != null)
                 {
                     (d.<#= OnNavigationBackCommandPropertyName #> as Command).ChangeCanExecute();
@@ -447,6 +451,7 @@ namespace <#= SformUserControlBaseNameSpace #> {
             <#= SformUserControlBaseClassName #> d = bindable as <#= SformUserControlBaseClassName #>;
             if (d != null)
             {
+                if(d.Parent == null) return;
                 <#= ISformViewModelInterfaceClassName #> bc = d.BindingContext as <#= ISformViewModelInterfaceClassName #>;
                 if (bc != null)
                 {
@@ -477,6 +482,7 @@ namespace <#= SformUserControlBaseNameSpace #> {
             <#= SformUserControlBaseClassName #> d = bindable as <#= SformUserControlBaseClassName #>;
             if (d != null)
             {
+                if(d.Parent == null) return;
                 <#= ISformViewModelInterfaceClassName #> bc = d.BindingContext as <#= ISformViewModelInterfaceClassName #>;
                 if (bc != null)
                 {
@@ -507,6 +513,7 @@ namespace <#= SformUserControlBaseNameSpace #> {
             <#= SformUserControlBaseClassName #> d = bindable as <#= SformUserControlBaseClassName #>;
             if (d != null)
             {
+                if(d.Parent == null) return;
                 <#= ISformViewModelInterfaceClassName #> bc = d.BindingContext as <#= ISformViewModelInterfaceClassName #>;
                 if (bc != null)
                 {
@@ -537,6 +544,7 @@ namespace <#= SformUserControlBaseNameSpace #> {
             <#= SformUserControlBaseClassName #> d = bindable as <#= SformUserControlBaseClassName #>;
             if (d != null)
             {
+                if(d.Parent == null) return;
                <#= IBindingContextChangedClassName #> bcl = d.BindingContext as <#= IBindingContextChangedClassName #>;
                 if (bcl != null)
                 {
@@ -562,6 +570,22 @@ namespace <#= SformUserControlBaseNameSpace #> {
         }
         #endregion
 
+        protected override void OnParentSet()
+        {
+            base.OnParentSet();
+            if (Parent == null) {
+                <#= TableMenuItemsCommandPropertyName #> = null;
+                <#= RowMenuItemsCommandPropertyName #> = null;
+                <#= SelectedRowCommandPropertyName #> = null;
+                <#= TableMenuItemsPropertyName #> = null;
+                <#= RowMenuItemsPropertyName #> = null;
+                <#= HiddenFiltersPropertyName #> = null;
+                <#= NavigationBackCommandPropertyName #> = null;
+                <#= SformAfterAddItemPropertyName #> = null;
+                <#= SformAfterUpdItemPropertyName #> = null;
+                <#= SformAfterDelItemPropertyName #> = null;
+            }
+        }
 
 
 
