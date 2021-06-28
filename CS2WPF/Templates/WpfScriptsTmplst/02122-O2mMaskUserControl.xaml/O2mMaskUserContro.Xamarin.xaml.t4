@@ -29,15 +29,16 @@
     string LformUserControlNameSpace        = GetModelNameSpace(Model, LformUserControlFolder);
     string LformUserControlProject          = GetModelProjectName(Model, LformUserControlFolder);
     
-    string O2mUserControlFolder             = "01696-O2mUserControl.xaml.cs";
-    string O2mUserControlClassName          = GetModelClassName(Model, O2mUserControlFolder);
-    string O2mUserControlNameSpace          = GetModelNameSpace(Model, O2mUserControlFolder);
-    string O2mUserControlProject            = GetModelProjectName(Model, O2mUserControlFolder);
+    string O2mMaskUserControlFolder                 = "02120-O2mMaskUserControl.xaml.cs";
+    string O2mMaskUserControlClassName              = GetModelClassName(Model, O2mMaskUserControlFolder);
+    string O2mMaskUserControlNameSpace              = GetModelNameSpace(Model, O2mMaskUserControlFolder);
+    string O2mMaskUserControlProject                = GetModelProjectName(Model, O2mMaskUserControlFolder);
 
-    string O2mUserControlXamlFolder         = "01698-O2mUserControl.xaml";
-    string O2mUserControlXamlClassName      = GetModelClassName(Model, O2mUserControlXamlFolder);
-    string O2mUserControlXamlNameSpace      = GetModelNameSpace(Model, O2mUserControlXamlFolder);
-    string O2mUserControlXamlProject        = GetModelProjectName(Model, O2mUserControlXamlFolder);
+    string O2mMaskUserControlXamlFolder             = "02122-O2mMaskUserControl.xaml";
+    string O2mMaskUserControlXamlClassName          = GetModelClassName(Model, O2mMaskUserControlXamlFolder);
+    string O2mMaskUserControlXamlNameSpace          = GetModelNameSpace(Model, O2mMaskUserControlXamlFolder);
+    string O2mMaskUserControlXamlProject            = GetModelProjectName(Model, O2mMaskUserControlXamlFolder);
+
 
     string CaptionPropertyName              = "Caption";
     string FilterHeightPropertyName         = "FilterHeight";
@@ -94,26 +95,78 @@
     string NavigationBackCommandPropertyName        = "NavigationBackCommand";
     string OnNavigationBackCommandPropertyName      = "OnNavigationBackCommand";
 
+    string IsPermissionEditablePropertyName             = "IsPermissionEditable";
+    string PermissionVectorPropertyName                 = "PermissionVector";
+    string PermissionChangedCommandPropertyName         = "PermissionChangedCommand";
+    string ParentContainerMenuItemsPropertyName         = "ParentContainerMenuItems";
+    string OnParentContainerMenuItemsCommandPropertyName= "OnParentContainerMenuItemsCommand";
+    string ParentIsPermissionEditablePropertyName       = "ParentIsPermissionEditable";
+    string ParentPermissionVectorPropertyName           = "ParentPermissionVector";
+
+    string MaskSuffixPropertyName                   = "mask";
+    string MaskEntityName                           = Model.RootEntityClassName + MaskSuffixPropertyName;
+    ModelViewSerializable  MaskModel                = Context.ModelViews.Where(m => m.RootEntityClassName == MaskEntityName).FirstOrDefault();
+    if(MaskModel == null) {
+        throw new Exception("Could not find MaskModel for selected " + Model.ViewName);
+    }
+    string CheckedModelViewModelFolder          = "02106-CheckedModelViewModel.cs";
+    ModelViewSerializable  CheckedModel         = Context.ModelViews.Where(m => m.CommonStaffs.Any(c => c.FileType == CheckedModelViewModelFolder)).FirstOrDefault();
+    if(CheckedModel == null) {
+        throw new Exception("Could not find Checked Model for selected " + Model.ViewName);
+    }
+    string DshCheckedModelViewModelFolder          = "02116-DshCheckedModelViewModel.cs";
+    ModelViewSerializable  CheckedDashboard        = Context.ModelViews.Where(m => m.CommonStaffs.Any(c => c.FileType == DshCheckedModelViewModelFolder)).FirstOrDefault();
+    if(CheckedDashboard == null) {
+        throw new Exception("Could not find Checked Dashboard for selected " + Model.ViewName);
+    }
+
+    string EformUserControlFolder                   = "01496-EformUserControl.xaml.cs";
+    string EformUserControlClassName                = GetModelClassName(MaskModel, EformUserControlFolder);
+    string EformUserControlNameSpace                = GetModelNameSpace(MaskModel, EformUserControlFolder);
+    string EformUserControlProject                  = GetModelProjectName(MaskModel, EformUserControlFolder);
+
+    string CheckedModelUserControlFolder            = "02102-CheckedModelUserControl.xaml.cs";
+    string CheckedModelUserControlClassName         = GetModelClassName(CheckedModel, CheckedModelUserControlFolder);
+    string CheckedModelUserControlNameSpace         = GetModelNameSpace(CheckedModel, CheckedModelUserControlFolder);
+    string CheckedModelUserControlProject           = GetModelProjectName(CheckedModel, CheckedModelUserControlFolder);
+
+    string DshCheckedModelUserControlFolder         = "02112-DshCheckedModelUserControl.xaml.cs";
+    string DshCheckedModelUserControlClassName      = GetModelClassName(CheckedDashboard, DshCheckedModelUserControlFolder);
+    string DshCheckedModelUserControlNameSpace      = GetModelNameSpace(CheckedDashboard, DshCheckedModelUserControlFolder);
+    string DshCheckedModelUserControlProject        = GetModelProjectName(CheckedDashboard, DshCheckedModelUserControlFolder);
+
     string proxyPrefix = "clr-namespace:" + ProxyUserControlNameSpace;
-    if(ProxyUserControlProject != O2mUserControlProject) {
+    if(ProxyUserControlProject != O2mMaskUserControlProject) {
         proxyPrefix = proxyPrefix + ";assembly=" + ProxyUserControlProject;
     }
     string lformPrefix = "clr-namespace:" + LformUserControlNameSpace;
-    if(LformUserControlProject != O2mUserControlProject) {
+    if(LformUserControlProject != O2mMaskUserControlProject) {
         lformPrefix = lformPrefix + ";assembly=" + LformUserControlProject;
     }
     string ucwcmPrefix = "clr-namespace:" + RegionAwareUserControlBaseNameSpace;
-    if(RegionAwareUserControlBaseProject != O2mUserControlProject) {
+    if(RegionAwareUserControlBaseProject != O2mMaskUserControlProject) {
         ucwcmPrefix = ucwcmPrefix + ";assembly=" + RegionAwareUserControlBaseProject;
     }
+    string chkmdPrefix = "clr-namespace:" + CheckedModelUserControlNameSpace;
+    if(CheckedModelUserControlProject != O2mMaskUserControlProject) {
+        chkmdPrefix = chkmdPrefix + ";assembly=" + CheckedModelUserControlProject;
+    }
+    string chkdshPrefix = "clr-namespace:" + DshCheckedModelUserControlNameSpace;
+    if(DshCheckedModelUserControlProject != O2mMaskUserControlProject) {
+        chkdshPrefix = chkdshPrefix + ";assembly=" + DshCheckedModelUserControlProject;
+    }
+    string eformPrefix = "clr-namespace:" + EformUserControlNameSpace;
+    if(EformUserControlProject != O2mMaskUserControlProject) {
+        eformPrefix = eformPrefix + ";assembly=" + EformUserControlProject;
+    }
 
-    bool IsInTheSameModule = (LformUserControlProject == O2mUserControlProject);
 
-    List<string> detailViews = GetDetailViews(Model, Context, null);
+    bool IsInTheSameModule = (LformUserControlProject == O2mMaskUserControlProject);
+
 
 #>
 
-<ucwcm:<#= RegionAwareUserControlBaseClassName #> x:Class="<#= O2mUserControlNameSpace #>.<#= O2mUserControlClassName #>"
+<ucwcm:<#= RegionAwareUserControlBaseClassName #> x:Class="<#= O2mMaskUserControlNameSpace #>.<#= O2mMaskUserControlClassName #>"
              xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:prism="http://prismlibrary.com" 
@@ -132,57 +185,31 @@
 #>
 
 <#
-    {
-        int id = -1;
-        foreach(string detailViewName in detailViews) {
-            id++;
-            ModelViewSerializable detailView = GetModelViewByName(Context, detailViewName);
-            if(detailView == null) {
+    if (EformUserControlProject == O2mMaskUserControlProject) {
 #>
-<!--  can not find the view by Name <#= detailViewName #> -->
+             xmlns:efrm="<#= eformPrefix #>" 
 <#
-                continue;
-            }
-            string detailViewClassName = GetModelClassName(detailView, LformUserControlFolder);
-            if (string.IsNullOrEmpty(detailViewClassName)) {
-                continue;
-            }
-            string localLformUserControlProject  = GetModelProjectName(detailView, LformUserControlFolder);
-            if (localLformUserControlProject == O2mUserControlProject)
-            {
-                string locallformPrefix = "clr-namespace:" + GetModelNameSpace(detailView, LformUserControlFolder);
+    }
 #>
-             xmlns:lfrm<#= id #>="<#= locallformPrefix #>" 
 <#
-            }
-        }
+    if (CheckedModelUserControlProject == O2mMaskUserControlProject) {
+#>
+             xmlns:chkmd="<#= chkmdPrefix #>" 
+<#
+    }
+#>
+<#
+    if (DshCheckedModelUserControlProject == O2mMaskUserControlProject) {
+#>
+             xmlns:chkdsh="<#= chkdshPrefix #>" 
+<#
     }
 #>
 
 
-             x:Name="o2mUsrCntrlRootNode"
+             x:Name="o2mMaskRootControl"
              >
     <StackLayout>
-<#
-    {
-        int id = -1;
-        foreach(string detailViewName in detailViews) {
-            id++;
-            ModelViewSerializable detailView = GetModelViewByName(Context, detailViewName);
-            if(detailView == null) {
-                continue;
-            }
-            string detailViewClassName = GetModelClassName(detailView, LformUserControlFolder);
-            if (string.IsNullOrEmpty(detailViewClassName)) {
-#>
-<!--  can not find Lform User control for the view which named: <#= detailViewName #> -->
-<#
-                continue;
-            }
-        }
-    }
-#>
-
 
 <#
     if(IsInTheSameModule) {
@@ -196,35 +223,35 @@
 <#
     }
 #>
-            <#= ContainerMenuItemsPropertyName #>="{Binding <#= ContainerMenuItemsPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
-            <#= ContainerMenuItemsCommandPropertyName #>="{Binding <#= OnContainerMenuItemsCommandPropertyName #>, Source={x:Reference o2mUsrCntrlRootNode}}"
+            <#= ContainerMenuItemsPropertyName #>="{Binding <#= ContainerMenuItemsPropertyName #>, Mode=OneWay, Source={x:Reference o2mMaskRootControl}}" 
+            <#= ContainerMenuItemsCommandPropertyName #>="{Binding <#= OnContainerMenuItemsCommandPropertyName #>, Source={x:Reference o2mMaskRootControl}}"
 
-            <#= ShowBackBtnPropertyName #>="{Binding BindingContext.<#= ShowBackBtnPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
-            <#= NavigationBackCommandPropertyName #>="{Binding BindingContext.<#= OnNavigationBackCommandPropertyName #>, Source={x:Reference o2mUsrCntrlRootNode}}"                                
+            <#= ShowBackBtnPropertyName #>="{Binding BindingContext.<#= ShowBackBtnPropertyName #>, Mode=OneWay, Source={x:Reference o2mMaskRootControl}}" 
+            <#= NavigationBackCommandPropertyName #>="{Binding BindingContext.<#= OnNavigationBackCommandPropertyName #>, Source={x:Reference o2mMaskRootControl}}"                                
 
-            <#= CaptionPropertyName #>="{Binding BindingContext.<#= CaptionPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
-            <#= FilterHeightPropertyName #>="{Binding BindingContext.<#= FilterHeightPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
-            <#= ShowFilterPropertyName #>="{Binding BindingContext.<#= ShowFilterPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
-            <#= ShowAddFilterBtnPropertyName #>="{Binding BindingContext.<#= ShowAddFilterBtnPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
-            <#= GridHeightPropertyName #>="{Binding <#= GridHeightPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
-            <#= HiddenFiltersPropertyName #>="{Binding BindingContext.<#= HiddenFiltersPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
-            <#= SelectedRowCommandPropertyName #>="{Binding BindingContext.<#= SelectedRowCommandPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
-            <#= TableMenuItemsCommandPropertyName #>="{Binding BindingContext.<#= TableMenuItemsCommandPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
-            <#= RowMenuItemsCommandPropertyName #>="{Binding BindingContext.<#= RowMenuItemsCommandPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
-            <#= TableMenuItemsPropertyName #>="{Binding BindingContext.<#= TableMenuItemsPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
-            <#= RowMenuItemsPropertyName #>="{Binding BindingContext.<#= RowMenuItemsPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
-            <#= CanAddPropertyName #>="{Binding BindingContext.<#= CanAddPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
-            <#= CanUpdPropertyName #>="{Binding BindingContext.<#= CanUpdPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
-            <#= CanDelPropertyName #>="{Binding BindingContext.<#= CanDelPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
-            <#= IsParentLoadedPropertyName #>="{Binding BindingContext.<#= IsParentLoadedPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+            <#= CaptionPropertyName #>="{Binding BindingContext.<#= CaptionPropertyName #>, Mode=OneWay, Source={x:Reference o2mMaskRootControl}}" 
+            <#= FilterHeightPropertyName #>="{Binding BindingContext.<#= FilterHeightPropertyName #>, Mode=OneWay, Source={x:Reference o2mMaskRootControl}}" 
+            <#= ShowFilterPropertyName #>="{Binding BindingContext.<#= ShowFilterPropertyName #>, Mode=OneWay, Source={x:Reference o2mMaskRootControl}}" 
+            <#= ShowAddFilterBtnPropertyName #>="{Binding BindingContext.<#= ShowAddFilterBtnPropertyName #>, Mode=OneWay, Source={x:Reference o2mMaskRootControl}}" 
+            <#= GridHeightPropertyName #>="{Binding <#= GridHeightPropertyName #>, Mode=OneWay, Source={x:Reference o2mMaskRootControl}}" 
+            <#= HiddenFiltersPropertyName #>="{Binding BindingContext.<#= HiddenFiltersPropertyName #>, Mode=OneWay, Source={x:Reference o2mMaskRootControl}}" 
+            <#= SelectedRowCommandPropertyName #>="{Binding BindingContext.<#= SelectedRowCommandPropertyName #>, Mode=OneWay, Source={x:Reference o2mMaskRootControl}}" 
+            <#= TableMenuItemsCommandPropertyName #>="{Binding BindingContext.<#= TableMenuItemsCommandPropertyName #>, Mode=OneWay, Source={x:Reference o2mMaskRootControl}}" 
+            <#= RowMenuItemsCommandPropertyName #>="{Binding BindingContext.<#= RowMenuItemsCommandPropertyName #>, Mode=OneWay, Source={x:Reference o2mMaskRootControl}}" 
+            <#= TableMenuItemsPropertyName #>="{Binding BindingContext.<#= TableMenuItemsPropertyName #>, Mode=OneWay, Source={x:Reference o2mMaskRootControl}}" 
+            <#= RowMenuItemsPropertyName #>="{Binding BindingContext.<#= RowMenuItemsPropertyName #>, Mode=OneWay, Source={x:Reference o2mMaskRootControl}}" 
+            <#= CanAddPropertyName #>="{Binding BindingContext.<#= CanAddPropertyName #>, Mode=OneWay, Source={x:Reference o2mMaskRootControl}}" 
+            <#= CanUpdPropertyName #>="{Binding BindingContext.<#= CanUpdPropertyName #>, Mode=OneWay, Source={x:Reference o2mMaskRootControl}}" 
+            <#= CanDelPropertyName #>="{Binding BindingContext.<#= CanDelPropertyName #>, Mode=OneWay, Source={x:Reference o2mMaskRootControl}}" 
+            <#= IsParentLoadedPropertyName #>="{Binding BindingContext.<#= IsParentLoadedPropertyName #>, Mode=OneWay, Source={x:Reference o2mMaskRootControl}}" 
             
             />
 
         <StackLayout>
             <Label Text="Selected detail"/>
-            <Picker ItemsSource="{Binding BindingContext.<#= DetailsListPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+            <Picker ItemsSource="{Binding BindingContext.<#= DetailsListPropertyName #>, Mode=OneWay, Source={x:Reference o2mMaskRootControl}}" 
                     ItemDisplayBinding="{Binding <#= CaptionPropertyName #>}" 
-                    SelectedItem="{Binding BindingContext.<#= SelectedDetailsListItemPropertyName #>, Source={x:Reference o2mUsrCntrlRootNode}, Mode=TwoWay}">
+                    SelectedItem="{Binding BindingContext.<#= SelectedDetailsListItemPropertyName #>, Source={x:Reference o2mMaskRootControl}, Mode=TwoWay}">
             </Picker>
         </StackLayout>
 
@@ -234,108 +261,86 @@
                     <ControlTemplate x:Key="NoMasterRowIsSelectedView">
                             <Label Text="Master row not selected or access denied for detail" />
                     </ControlTemplate> 
-<#
-    {
-        int id = -1;
-        foreach(string detailViewName in detailViews) {
-            id++;
-            ModelViewSerializable detailView = GetModelViewByName(Context, detailViewName);
-            string detailViewClassName = GetModelClassName(detailView, LformUserControlFolder);
-            if(detailView == null) {
-#>
-<!--  can not find the view by Name <#= detailViewName #> -->
-<#
-                continue;
-            }
-            string localDetailViewClassName = GetModelClassName(detailView, LformUserControlFolder);
-            if (string.IsNullOrEmpty(localDetailViewClassName)) {
-#>
-<!--  can not find Lform User control for the view which named: <#= detailViewName #> -->
-<#
-                continue;
-            }
-
-            string localLformUserControlProject  = GetModelProjectName(detailView, LformUserControlFolder);
-#>
-                    <ControlTemplate x:Key="<#= detailViewClassName #><#= TemplateViewSuffixPropertyName #>">
+                    <ControlTemplate x:Key="<#= CheckedModelUserControlClassName #><#= TemplateViewSuffixPropertyName #>">
 <#
 
-            if (localLformUserControlProject == O2mUserControlProject)
+            if (CheckedModelUserControlProject == O2mMaskUserControlProject)
             {
 #>
-                        <lfrm<#= id #>:<#= GetModelClassName(detailView, LformUserControlFolder) #> 
+                        <chkmd:<#= CheckedModelUserControlClassName #> 
 <#
             } else {
-            // reset RegionPropertyName
 #>
                         <prx:<#= ProxyUserControlClassName #> 
-                            prism:RegionManager.RegionName="<#= detailViewClassName #><#= DetailRegionPropertyName #>"
+                            prism:RegionManager.RegionName="<#= CheckedModelUserControlClassName #><#= DetailRegionPropertyName #>"
 <#
             }
 #>
-                            <#= CaptionPropertyName #>="{Binding BindingContext.<#= SelectedDetailsListItemPropertyName #>.<#= CaptionPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
-                            <#= FilterHeightPropertyName #>="{Binding BindingContext.<#= FilterHeightDetailPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
-                            <#= ShowFilterPropertyName #>="{Binding BindingContext.<#= ShowFilterDetailPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
-                            <#= ShowAddFilterBtnPropertyName #>="{Binding BindingContext.<#= ShowAddFilterBtnDetailPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
-                            <#= GridHeightPropertyName #>="{Binding BindingContext.<#= GridHeightDetailPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+                            <#= ContainerMenuItemsPropertyName #>="{Binding BindingContext.<#= ParentContainerMenuItemsPropertyName #>, Mode=OneWay, Source={x:Reference o2mMaskRootControl}}" 
+                            <#= ContainerMenuItemsCommandPropertyName #>="{Binding BindingContext.<#= OnParentContainerMenuItemsCommandPropertyName #>, Source={x:Reference o2mMaskRootControl}}"
+                            <#= CaptionPropertyName #>="{Binding BindingContext.<#= SelectedDetailsListItemPropertyName #>.<#= CaptionPropertyName #>, Mode=OneWay, Source={x:Reference o2mMaskRootControl}}" 
+                            <#= FilterHeightPropertyName #>="{Binding BindingContext.<#= FilterHeightDetailPropertyName #>, Mode=OneWay, Source={x:Reference o2mMaskRootControl}}" 
+                            <#= ShowFilterPropertyName #>="{Binding BindingContext.<#= ShowFilterDetailPropertyName #>, Mode=OneWay, Source={x:Reference o2mMaskRootControl}}" 
+                            <#= ShowAddFilterBtnPropertyName #>="{Binding BindingContext.<#= ShowAddFilterBtnDetailPropertyName #>, Mode=OneWay, Source={x:Reference o2mMaskRootControl}}" 
+                            <#= GridHeightPropertyName #>="{Binding BindingContext.<#= GridHeightDetailPropertyName #>, Mode=OneWay, Source={x:Reference o2mMaskRootControl}}" 
                             <#= ShowBackBtnPropertyName #>="False" 
-                            <#= HiddenFiltersPropertyName #>="{Binding BindingContext.<#= HiddenFiltersDetailPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
-                            <#= SelectedRowCommandPropertyName #>="{Binding BindingContext.<#= SelectedRowCommandDetailPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
-                            <#= TableMenuItemsCommandPropertyName #>="{Binding BindingContext.<#= TableMenuItemsCommandDetailPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
-                            <#= RowMenuItemsCommandPropertyName #>="{Binding BindingContext.<#= RowMenuItemsCommandDetailPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
-                            <#= TableMenuItemsPropertyName #>="{Binding BindingContext.<#= TableMenuItemsDetailPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
-                            <#= RowMenuItemsPropertyName #>="{Binding BindingContext.<#= RowMenuItemsDetailPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
-                            <#= CanAddPropertyName #>="{Binding BindingContext.<#= CanAddDetailPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
-                            <#= CanUpdPropertyName #>="{Binding BindingContext.<#= CanUpdDetailPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
-                            <#= CanDelPropertyName #>="{Binding BindingContext.<#= CanDelDetailPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
-                            <#= IsParentLoadedPropertyName #>="{Binding BindingContext.<#= IsDetailReadyPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+                            <#= IsPermissionEditablePropertyName #>="{Binding BindingContext.<#= ParentIsPermissionEditablePropertyName #>, Mode=OneWay, Source={x:Reference o2mMaskRootControl}}" 
+                            <#= PermissionVectorPropertyName #>="{Binding BindingContext.<#= ParentPermissionVectorPropertyName #>, Mode=OneWay, Source={x:Reference o2mMaskRootControl}}" 
+                            <#= PermissionChangedCommandPropertyName #>="{Binding BindingContext.<#= PermissionChangedCommandPropertyName #>, Mode=OneWay, Source={x:Reference o2mMaskRootControl}}" 
+                            <#= IsParentLoadedPropertyName #>="{Binding BindingContext.<#= IsDetailReadyPropertyName #>, Mode=OneWay, Source={x:Reference o2mMaskRootControl}}" 
+                            />
+                    </ControlTemplate>
+                    <ControlTemplate x:Key="<#= DshCheckedModelUserControlClassName #><#= TemplateViewSuffixPropertyName #>">
+<#
+
+            if (DshCheckedModelUserControlProject == O2mMaskUserControlProject)
+            {
+#>
+                        <chkdsh:<#= DshCheckedModelUserControlClassName #> 
+<#
+            } else {
+#>
+                        <prx:<#= ProxyUserControlClassName #> 
+                            prism:RegionManager.RegionName="<#= DshCheckedModelUserControlClassName #><#= DetailRegionPropertyName #>"
+<#
+            }
+#>
+
+                            <#= ContainerMenuItemsPropertyName #>="{Binding BindingContext.<#= ParentContainerMenuItemsPropertyName #>, Mode=OneWay, Source={x:Reference o2mMaskRootControl}}" 
+                            <#= ContainerMenuItemsCommandPropertyName #>="{Binding BindingContext.<#= OnParentContainerMenuItemsCommandPropertyName #>, Source={x:Reference o2mMaskRootControl}}"
+                            <#= CaptionPropertyName #>="{Binding BindingContext.<#= SelectedDetailsListItemPropertyName #>.<#= CaptionPropertyName #>, Mode=OneWay, Source={x:Reference o2mMaskRootControl}}" 
+                            <#= FilterHeightPropertyName #>="{Binding BindingContext.<#= FilterHeightDetailPropertyName #>, Mode=OneWay, Source={x:Reference o2mMaskRootControl}}" 
+                            <#= ShowFilterPropertyName #>="{Binding BindingContext.<#= ShowFilterDetailPropertyName #>, Mode=OneWay, Source={x:Reference o2mMaskRootControl}}" 
+                            <#= ShowAddFilterBtnPropertyName #>="{Binding BindingContext.<#= ShowAddFilterBtnDetailPropertyName #>, Mode=OneWay, Source={x:Reference o2mMaskRootControl}}" 
+                            <#= GridHeightPropertyName #>="{Binding BindingContext.<#= GridHeightDetailPropertyName #>, Mode=OneWay, Source={x:Reference o2mMaskRootControl}}" 
+                            <#= ShowBackBtnPropertyName #>="False" 
+                            <#= IsPermissionEditablePropertyName #>="{Binding BindingContext.<#= ParentIsPermissionEditablePropertyName #>, Mode=OneWay, Source={x:Reference o2mMaskRootControl}}" 
+                            <#= PermissionVectorPropertyName #>="{Binding BindingContext.<#= ParentPermissionVectorPropertyName #>, Mode=OneWay, Source={x:Reference o2mMaskRootControl}}" 
+                            <#= PermissionChangedCommandPropertyName #>="{Binding BindingContext.<#= PermissionChangedCommandPropertyName #>, Mode=OneWay, Source={x:Reference o2mMaskRootControl}}" 
+                            <#= IsParentLoadedPropertyName #>="{Binding BindingContext.<#= IsDetailReadyPropertyName #>, Mode=OneWay, Source={x:Reference o2mMaskRootControl}}" 
                             />
                     </ControlTemplate>
 
-<#
-        }
-    }
-#>
                 </ResourceDictionary>
             </ContentView.Resources>
             <ContentView.Triggers>
-<#
-    {
-        int id = -1;
-        foreach(string detailViewName in detailViews) {
-            id++;
-            ModelViewSerializable detailView = GetModelViewByName(Context, detailViewName);
-            string detailViewClassName = GetModelClassName(detailView, LformUserControlFolder);
-            if(detailView == null) {
-#>
-<!--  can not find the view by Name <#= detailViewName #> -->
-<#
-                continue;
-            }
-            string localDetailViewClassName = GetModelClassName(detailView, LformUserControlFolder);
-            if (string.IsNullOrEmpty(localDetailViewClassName)) {
-#>
-<!--  can not find Lform User control for the view which named: <#= detailViewName #> -->
-<#
-                continue;
-            }
-
-            string localLformUserControlProject  = GetModelProjectName(detailView, LformUserControlFolder);
-#>
                     <MultiTrigger TargetType="ContentView">
                         <MultiTrigger.Conditions>
-                            <BindingCondition Binding="{Binding BindingContext.<#= SelectedDetailsListItemPropertyName #>.<#= RegionPropertyName #>, Source={x:Reference o2mUsrCntrlRootNode}}" Value="<#= detailViewClassName #><#= DetailRegionPropertyName #>"/>
-                            <BindingCondition Binding="{Binding BindingContext.<#= IsDetailReadyPropertyName #>, Source={x:Reference o2mUsrCntrlRootNode}}" Value="True"/>
+                            <BindingCondition Binding="{Binding BindingContext.<#= SelectedDetailsListItemPropertyName #>.<#= RegionPropertyName #>, Source={x:Reference o2mMaskRootControl}}" Value="<#= CheckedModelUserControlClassName #><#= DetailRegionPropertyName #>"/>
+                            <BindingCondition Binding="{Binding BindingContext.<#= IsDetailReadyPropertyName #>, Source={x:Reference o2mMaskRootControl}}" Value="True"/>
                         </MultiTrigger.Conditions>
-                        <Setter Property="ControlTemplate" Value="{StaticResource <#= detailViewClassName #><#= TemplateViewSuffixPropertyName #>}" />
+                        <Setter Property="ControlTemplate" Value="{StaticResource <#= CheckedModelUserControlClassName #><#= TemplateViewSuffixPropertyName #>}" />
                     </MultiTrigger>
-<#
-        }
-    }
-#>
                     <MultiTrigger TargetType="ContentView">
                         <MultiTrigger.Conditions>
-                            <BindingCondition Binding="{Binding BindingContext.<#= IsDetailReadyPropertyName #>, Source={x:Reference o2mUsrCntrlRootNode}}" Value="False"/>
+                            <BindingCondition Binding="{Binding BindingContext.<#= SelectedDetailsListItemPropertyName #>.<#= RegionPropertyName #>, Source={x:Reference o2mMaskRootControl}}" Value="<#= DshCheckedModelUserControlClassName #><#= DetailRegionPropertyName #>"/>
+                            <BindingCondition Binding="{Binding BindingContext.<#= IsDetailReadyPropertyName #>, Source={x:Reference o2mMaskRootControl}}" Value="True"/>
+                        </MultiTrigger.Conditions>
+                        <Setter Property="ControlTemplate" Value="{StaticResource <#= DshCheckedModelUserControlClassName #><#= TemplateViewSuffixPropertyName #>}" />
+                    </MultiTrigger>
+                    <MultiTrigger TargetType="ContentView">
+                        <MultiTrigger.Conditions>
+                            <BindingCondition Binding="{Binding BindingContext.<#= IsDetailReadyPropertyName #>, Source={x:Reference o2mMaskRootControl}}" Value="False"/>
                         </MultiTrigger.Conditions>
                         <Setter Property="ControlTemplate" Value="{StaticResource NoMasterRowIsSelectedView}" />
                     </MultiTrigger>

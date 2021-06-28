@@ -134,6 +134,8 @@ namespace <#= FtrViewModelNameSpace #> {
             _<#= AppSettingServicePropertyName #> = <#= AppSettingServicePropertyName #>;
 
 <#
+    {
+        int curItem = -1;
         foreach(FeatureItemSerializable featureItemSerializable in Feature.FeatureItems) {
             ModelViewSerializable modelViewSerializable = GetModelViewByName(Context, featureItemSerializable.ViewName);
             if(modelViewSerializable == null) {
@@ -148,6 +150,14 @@ namespace <#= FtrViewModelNameSpace #> {
 <#
                 continue;
             }
+            curItem++;
+            string modelClassName = GetModelClassName(modelViewSerializable, featureItemSerializable.FileType);
+#>
+            _<#= ContainerMenuItemsPropertyName #><#= modelClassName #> = 
+                new ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>>() {
+                    new <#= WebServiceFilterMenuClassName #>() { Id = "<#= curItem #>", Caption="Expand(Collapse)", IconName=<#= IconFontClassName #>.Aspect_ratio,  IconColor= (Color)Application.Current.Resources["IconButtonPrimaryColor"], Enabled=true, Data="<#= modelClassName #>", Command = <#= OnContainerMenuItemsCommandPropertyName #> },
+                };
+<#
             AllowedFileTypeSerializable allowedFileTypeSerializable = GetAllowedFileType(AllowedFileTypes, featureItemSerializable.FileType);
             if (allowedFileTypeSerializable == null)  {
 #>
@@ -155,14 +165,15 @@ namespace <#= FtrViewModelNameSpace #> {
 <#
                 continue;
             }
-            string modelClassName = GetModelClassName(modelViewSerializable, featureItemSerializable.FileType);
 #>
             _<#= FilterHeightPropertyName #><#= modelClassName #> = _<#= AppSettingServicePropertyName #>.<#= DefaultFilterHeightMethodName #>("<#= featureItemSerializable.FileType #>");
             _<#= GridHeightPropertyName #><#= modelClassName #> = _<#= AppSettingServicePropertyName #>.<#= DefaultGridHeightMethodName #>("<#= featureItemSerializable.FileType #>");
             //_<#= FilterHeightPropertyName #><#= modelClassName #> = <#= allowedFileTypeSerializable.DefaultFilterMaxHeight #> * _<#= AppSettingServicePropertyName #>.FilterHeightFactor + _<#= AppSettingServicePropertyName #>.FilterHeightAddition;
             //_<#= GridHeightPropertyName #><#= modelClassName #> = <#= allowedFileTypeSerializable.DefaultMaxHeight #> * _<#= AppSettingServicePropertyName #>.TableHeightFactor + _<#= AppSettingServicePropertyName #>.TableHeightAddition;
+
 <#
         }
+    }
 #>
         }
 
@@ -208,7 +219,7 @@ namespace <#= FtrViewModelNameSpace #> {
                 <#= IsOnLoadedCalledPropertyName #> = true;
                 ContentView uc = null;
                 IRegionManager rm = null;
-                <#= INotifiedByParentInterfaceClassName #> nbp = null;
+                // <#= INotifiedByParentInterfaceClassName #> nbp = null;
 <#
         foreach(FeatureItemSerializable featureItemSerializable in Feature.FeatureItems) {
             ModelViewSerializable modelViewSerializable = GetModelViewByName(Context, featureItemSerializable.ViewName);
@@ -239,7 +250,7 @@ namespace <#= FtrViewModelNameSpace #> {
                     uc = _containerProvider.Resolve<ContentView>("<#= modelClassName #>");
                     rm = _regionManager.Regions["<#= modelClassName #><#= FtrUserControlClassName #>"].Add(uc, null, true);
                     _regionManager.Regions["<#= modelClassName #><#= FtrUserControlClassName #>"].Activate(uc);
-                    nbp = uc as <#= INotifiedByParentInterfaceClassName #>;
+                    <#= INotifiedByParentInterfaceClassName #> nbp = uc as <#= INotifiedByParentInterfaceClassName #>;
                     if(nbp != null) {
                         Task.Run(()=>
                             MainThread.BeginInvokeOnMainThread(() =>
@@ -331,10 +342,7 @@ namespace <#= FtrViewModelNameSpace #> {
             }
         }
 
-        protected IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> _<#= ContainerMenuItemsPropertyName #><#= modelClassName #> = 
-            new ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>>() {
-                new <#= WebServiceFilterMenuClassName #>() { Id = "<#= curItem #>", Caption="Expand(Collapse)", IconName=<#= IconFontClassName #>.Aspect_ratio,  IconColor= (Color)Application.Current.Resources["IconButtonPrimaryColor"], Enabled=true, Data="<#= modelClassName #>", Command = <#= OnContainerMenuItemsCommandPropertyName #> },
-            };
+        protected IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> _<#= ContainerMenuItemsPropertyName #><#= modelClassName #> = null;
         public IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> <#= ContainerMenuItemsPropertyName #><#= modelClassName #> {
             get { return _<#= ContainerMenuItemsPropertyName #><#= modelClassName #>; }
         }

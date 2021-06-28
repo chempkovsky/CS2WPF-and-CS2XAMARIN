@@ -1,0 +1,1776 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+using System;
+using Xamarin.Forms;
+using System.Linq;
+using System.ComponentModel;
+using Prism.Regions.Navigation;
+using System.Windows.Input;
+using System.Collections.ObjectModel;
+using System.Threading.Tasks;
+using System.Runtime.CompilerServices;
+using System.Collections.Generic;
+using Prism.Navigation;
+using Prism.Services.Dialogs;
+using Xamarin.Essentials;
+
+<#
+
+    string EformModeEnumFolder                      = "00026-EformModeEnum.cs";
+    string EformModeEnumClassName                   = GetContextModelClassName(Context, EformModeEnumFolder);
+    string EformModeEnumNameSpace                   = GetContextModelNameSpace(Context, EformModeEnumFolder);
+
+    string IAppGlblSettingsServiceFolder            = "00080-IAppGlblSettingsService.cs";
+    string IAppGlblSettingsServiceClassName         = GetContextModelClassName(Context, IAppGlblSettingsServiceFolder);
+    string IAppGlblSettingsServiceNameSpace         = GetContextModelNameSpace(Context, IAppGlblSettingsServiceFolder);
+
+    string IconFontFolder                           = "00178-IconFont.cs";
+    string IconFontClassName                        = GetContextModelClassName(Context, IconFontFolder);
+    string IconFontNameSpace                        = GetContextModelNameSpace(Context, IconFontFolder);
+
+    string ISformViewModelInterfaceFolder           = "00198-ISformViewModelInterface.cs";
+    string ISformViewModelInterfaceClassName        = GetContextModelClassName(Context, ISformViewModelInterfaceFolder);
+    string ISformViewModelInterfaceNameSpace        = GetContextModelNameSpace(Context, ISformViewModelInterfaceFolder);
+
+    string IWebServiceFilterRsltInterfaceFolder     = "00204-IWebServiceFilterRsltInterface.cs";
+    string IWebServiceFilterRsltInterfaceClassName  = GetContextModelClassName(Context, IWebServiceFilterRsltInterfaceFolder);
+    string IWebServiceFilterRsltInterfaceNameSpace  = GetContextModelNameSpace(Context, IWebServiceFilterRsltInterfaceFolder);
+
+    string IWebServiceFilterMenuInterfaceFolder     = "00206-IWebServiceFilterMenuInterface.cs";
+    string IWebServiceFilterMenuInterfaceClassName  = GetContextModelClassName(Context, IWebServiceFilterMenuInterfaceFolder);
+    string IWebServiceFilterMenuInterfaceNameSpace  = GetContextModelNameSpace(Context, IWebServiceFilterMenuInterfaceFolder);
+
+    string WebServiceFilterRsltViewModelFolder      = "00215-WebServiceFilterRsltViewModel.cs";
+    string WebServiceFilterRsltViewModelClassName   = GetContextModelClassName(Context, WebServiceFilterRsltViewModelFolder);
+    string WebServiceFilterRsltViewModelNameSpace   = GetContextModelNameSpace(Context, WebServiceFilterRsltViewModelFolder);
+
+    string WebServiceFilterMenuViewModelFolder      = "00217-WebServiceFilterMenuViewModel.cs";
+    string WebServiceFilterMenuViewModelClassName   = GetContextModelClassName(Context, WebServiceFilterMenuViewModelFolder);
+    string WebServiceFilterMenuViewModelNameSpace   = GetContextModelNameSpace(Context, WebServiceFilterMenuViewModelFolder);
+
+    string IO2mListItemInterfaceFolder              = "00600-IO2mListItemInterface.cs";
+    string IO2mListItemInterfaceClassName           = GetContextModelClassName(Context, IO2mListItemInterfaceFolder);
+    string IO2mListItemInterfaceNameSpace           = GetContextModelNameSpace(Context, IO2mListItemInterfaceFolder);
+
+    string O2mListItemViewModelFolder               = "00602-O2mListItemViewModel.cs";
+    string O2mListItemViewModelClassName            = GetContextModelClassName(Context, O2mListItemViewModelFolder);
+    string O2mListItemViewModelNameSpace            = GetContextModelNameSpace(Context, O2mListItemViewModelFolder);
+
+    string RegionAwareViewModelBaseFolder           = "00648-RegionAwareViewModelBase.cs";
+    string RegionAwareViewModelBaseClassName        = GetContextModelClassName(Context, RegionAwareViewModelBaseFolder);
+    string RegionAwareViewModelBaseNameSpace        = GetContextModelNameSpace(Context, RegionAwareViewModelBaseFolder);
+
+    string AccessDeniedUserControlFolder            = "00678-AccessDeniedUserControl.xaml.cs";
+    string AccessDeniedUserControlClassName         = GetContextModelClassName(Context, AccessDeniedUserControlFolder);
+    string AccessDeniedUserControlNameSpace         = GetContextModelNameSpace(Context, AccessDeniedUserControlFolder);
+
+    string PageNotFoundUserControlFolder            = "00684-PageNotFoundUserControl.xaml.cs";
+    string PageNotFoundUserControlClassName         = GetContextModelClassName(Context, PageNotFoundUserControlFolder);
+    string PageNotFoundUserControlNameSpace         = GetContextModelNameSpace(Context, PageNotFoundUserControlFolder);
+
+    string modelInterfaceFolder                     = "01100-Interface.cs";
+    string modelInterfaceClassName                  = GetInterfaceName(Model);
+    string modelInterfaceNameSpace                  = GetModelNameSpace(Model, modelInterfaceFolder);
+
+
+    string LformUserControlFolder           = "01596-LformUserControl.xaml.cs";
+    string LformUserControlClassName        = GetModelClassName(Model, LformUserControlFolder);
+    string LformUserControlNameSpace        = GetModelNameSpace(Model, LformUserControlFolder);
+    string LformUserControlProject          = GetModelProjectName(Model, LformUserControlFolder);
+
+    string O2mMaskUserControlFolder         = "02120-O2mMaskUserControl.xaml.cs";
+    string O2mMaskUserControlClassName      = GetModelClassName(Model, O2mMaskUserControlFolder);
+    string O2mMaskUserControlNameSpace      = GetModelNameSpace(Model, O2mMaskUserControlFolder);
+    string O2mMaskUserControlProject        = GetModelProjectName(Model, O2mMaskUserControlFolder);
+
+    string O2mMaskViewModelFolder           = "02124-O2mMaskViewModel.cs";
+    string O2mMaskViewModelClassName        = GetModelClassName(Model, O2mMaskViewModelFolder);
+    string O2mMaskViewModelNameSpace        = GetModelNameSpace(Model, O2mMaskViewModelFolder);
+
+    string HiddenFiltersPropertyName                = "HiddenFilters";
+    string TableMenuItemsPropertyName               = "TableMenuItems";
+    string RowMenuItemsPropertyName                 = "RowMenuItems";
+    string RegionPropertyName                       = "Region";
+    string RdlistPageRegionPropertyName             = "RdlistPageRegion";
+    string MasterRegionPropertyName                 = "MasterRegion";
+    string DetailRegionPropertyName                 = "DetailRegion";
+
+    string TableMenuItemsCommandPropertyName        = "TableMenuItemsCommand";
+    string RowMenuItemsCommandPropertyName          = "RowMenuItemsCommand";
+    string SelectedRowPropertyName                  = "SelectedRow";
+    string SelectedRowCommandPropertyName           = "SelectedRowCommand";
+
+    string CanAddPropertyName                       = "CanAdd";
+    string CanUpdPropertyName                       = "CanUpdate";
+    string CanDelPropertyName                       = "CanDelete";
+
+
+    string FormControlModelPropertyName             = "FormControlModel";
+    string CaptionPropertyName                      = "Caption";
+    string EformModePropertyName                    = "EformMode";
+    string ShowSubmitPropertyName                   = "ShowSubmit";
+    string FormServicePrefix                        = "FrmSrv";
+    string RowMIPrefixPropertyName                  = "RowMI";
+
+
+    string CanAddDetailPropertyName                 = "CanAddDetail"; 
+    string CanUpdDetailPropertyName                 = "CanUpdateDetail"; 
+    string CanDelDetailPropertyName                 = "CanDeleteDetail"; 
+    string TableMenuItemsDetailPropertyName         = "TableMenuItemsDetail"; 
+    string RowMenuItemsDetailPropertyName           = "RowMenuItemsDetail"; 
+    string TableMenuItemsCommandDetailPropertyName  = "TableMenuItemsCommandDetail";
+    string RowMenuItemsCommandDetailPropertyName    = "RowMenuItemsCommandDetail";
+    string SelectedRowDetailPropertyName            = "SelectedRowDetail";
+    string SelectedRowCommandDetailPropertyName     = "SelectedRowCommandDetail";
+    string IsDetailReadyPropertyName                = "IsDetailReady"; 
+
+    string SelectedDetailsListItemPropertyName      = "SelectedDetailsListItem"; 
+    string DetailsListPropertyName                  = "DetailsList"; 
+    string AppSettingServicePropertyName            = "GlblSettingsSrv";
+    string ForeignKeyDetailsName                    = "ForeignKeyDetails";
+
+    string IsParentLoadedPropertyName               = "IsParentLoaded";
+
+    string CurrentNavigationContextPropertyName     = "CurrentNavigationContext";
+    string ShowBackBtnPropertyName                  = "ShowBackBtn";
+    string OnNavigationBackCommandPropertyName      = "OnNavigationBackCommand";
+
+    string CanAddDetailParentPropertyName           = "CanAddDetailParent"; 
+    string CanUpdDetailParentPropertyName           = "CanUpdateDetailParent"; 
+    string CanDelDetailParentPropertyName           = "CanDeleteDetailParent"; 
+    string CanAddParentPropertyName                 = "CanAddParent";
+    string CanUpdParentPropertyName                 = "CanUpdateParent";
+    string CanDelParentPropertyName                 = "CanDeleteParent";
+
+    string ParentIsPermissionEditablePropertyName       = "ParentIsPermissionEditable";
+    string ParentPermissionVectorPropertyName           = "ParentPermissionVector";
+    string IsModifiedParentPermissionVectorPropertyName = "IsModifiedParentPermissionVector";
+    string PermissionRecordPropertyName                 = "PermissionRecord";
+    string OnSelectedItemChangedPropertyName            = "OnSelectedItemChanged";
+    string PermissionChangedCommandPropertyName         = "PermissionChangedCommand";
+    string PermissionSaveCommandPropertyName            = "PermissionSaveCommand";
+    string OnParentContainerMenuItemsCommandPropertyName= "OnParentContainerMenuItemsCommand";
+    string SavePermissionRecordPropertyName             = "SavePermissionRecord";
+    string ParentContainerMenuItemsPropertyName         = "ParentContainerMenuItems";
+    string UpdateOneMethodName                          = "updateone";
+    string GetEmptyPermissionsMethodName                = "GetEmptyPermissions";
+    string CopyToModelMethodName                        = "CopyToModel";
+    string FilterOperatorSuffix                         = "Oprtr";
+    string FilterEqOperatorValue                        = "eq";
+    string GetWithFilterMethodName                      = "getwithfilter";
+
+    string MaskSuffixPropertyName                   = "mask";
+    string MaskEntityName                           = Model.RootEntityClassName + MaskSuffixPropertyName;
+    ModelViewSerializable  MaskModel                = Context.ModelViews.Where(m => m.RootEntityClassName == MaskEntityName).FirstOrDefault();
+    if(MaskModel == null) {
+        throw new Exception("Could not find MaskModel for selected " + Model.ViewName);
+    }
+    string MaskModelServiceInterfaceFolder       = "01400-Service.interface.cs";
+    string MaskModelServiceInterfaceClassName    = GetModelServiceInterfaceName(MaskModel);
+    string MaskModelServiceInterfaceNameSpace    = GetModelNameSpace(MaskModel, MaskModelServiceInterfaceFolder);
+    string MaskFormRootServicePropertyName       = "MaskFrmRootSrv";
+    string MaskModelFilterInterfaceFolder        = "01300-Filter.interface.cs";
+    string MaskModelFilterInterfaceClassName     = GetFilterInterfaceName(MaskModel);
+    string MaskModelFilterInterfaceNameSpace     = GetModelNameSpace(MaskModel, MaskModelFilterInterfaceFolder);
+    string MaskModelPageInterfaceFolder          = "01200-Page.interface.cs";
+    string MaskModelPageInterfaceClassName       = GetPageInterfaceName(MaskModel);
+    string MaskModelPageInterfaceNameSpace       = GetModelNameSpace(MaskModel, MaskModelPageInterfaceFolder);
+    string MaskModelInterfaceFolder              = "01100-Interface.cs";
+    string MaskModelInterfaceClassName           = GetInterfaceName(MaskModel);
+    string MaskModelInterfaceNameSpace           = GetModelNameSpace(MaskModel, MaskModelInterfaceFolder);
+
+    string CheckedModelViewModelFolder           = "02106-CheckedModelViewModel.cs";
+    ModelViewSerializable  CheckedModel          = Context.ModelViews.Where(m => m.CommonStaffs.Any(c => c.FileType == CheckedModelViewModelFolder)).FirstOrDefault();
+    if(CheckedModel == null) {
+        throw new Exception("Could not find Checked Model for selected " + Model.ViewName);
+    }
+    string DshCheckedModelViewModelFolder          = "02116-DshCheckedModelViewModel.cs";
+    ModelViewSerializable  CheckedDashboard        = Context.ModelViews.Where(m => m.CommonStaffs.Any(c => c.FileType == DshCheckedModelViewModelFolder)).FirstOrDefault();
+    if(CheckedDashboard == null) {
+        throw new Exception("Could not find Checked Dashboard for selected " + Model.ViewName);
+    }
+    string ParentIsPermissionEditableValue = "false";
+    if(MaskModel.IsWebApiAdd && MaskModel.IsWebApiUpdate && MaskModel.IsWebApiDelete) {
+        ParentIsPermissionEditableValue = "true";
+    }
+
+    string EformUserControlFolder                   = "01496-EformUserControl.xaml.cs";
+    string EformUserControlClassName                = GetModelClassName(MaskModel, EformUserControlFolder);
+    string EformUserControlNameSpace                = GetModelNameSpace(MaskModel, EformUserControlFolder);
+    string EformUserControlProject                  = GetModelProjectName(MaskModel, EformUserControlFolder);
+
+    string CheckedModelUserControlFolder            = "02102-CheckedModelUserControl.xaml.cs";
+    string CheckedModelUserControlClassName         = GetModelClassName(CheckedModel, CheckedModelUserControlFolder);
+    string CheckedModelUserControlNameSpace         = GetModelNameSpace(CheckedModel, CheckedModelUserControlFolder);
+    string CheckedModelUserControlProject           = GetModelProjectName(CheckedModel, CheckedModelUserControlFolder);
+
+    string DshCheckedModelUserControlFolder         = "02112-DshCheckedModelUserControl.xaml.cs";
+    string DshCheckedModelUserControlClassName      = GetModelClassName(CheckedDashboard, DshCheckedModelUserControlFolder);
+    string DshCheckedModelUserControlNameSpace      = GetModelNameSpace(CheckedDashboard, DshCheckedModelUserControlFolder);
+    string DshCheckedModelUserControlProject        = GetModelProjectName(CheckedDashboard, DshCheckedModelUserControlFolder);
+
+
+    List<ModelViewPropertyOfVwSerializable> primKeys = GetModelPrimaryKeyProps(Model);
+    List<ModelViewPropertyOfVwSerializable> maskprimKeys    = GetModelPrimaryKeyProps(MaskModel);
+
+    List<string> nmSpaces = new List<string>();
+    if ((O2mMaskViewModelNameSpace != IWebServiceFilterRsltInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IWebServiceFilterRsltInterfaceNameSpace);
+    if ((O2mMaskViewModelNameSpace != WebServiceFilterRsltViewModelNameSpace) && (nmSpaces.IndexOf(WebServiceFilterRsltViewModelNameSpace) < 0)) 
+        nmSpaces.Add(WebServiceFilterRsltViewModelNameSpace);
+    if ((O2mMaskViewModelNameSpace != IAppGlblSettingsServiceNameSpace) && (nmSpaces.IndexOf(IAppGlblSettingsServiceNameSpace) < 0)) 
+        nmSpaces.Add(IAppGlblSettingsServiceNameSpace);
+    if ((O2mMaskViewModelNameSpace != WebServiceFilterMenuViewModelNameSpace) && (nmSpaces.IndexOf(WebServiceFilterMenuViewModelNameSpace) < 0)) 
+        nmSpaces.Add(WebServiceFilterMenuViewModelNameSpace);
+    if ((O2mMaskViewModelNameSpace != IWebServiceFilterMenuInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterMenuInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IWebServiceFilterMenuInterfaceNameSpace);
+    if ((O2mMaskViewModelNameSpace != IWebServiceFilterMenuInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterMenuInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IWebServiceFilterMenuInterfaceNameSpace);
+    if ((O2mMaskViewModelNameSpace != EformModeEnumNameSpace) && (nmSpaces.IndexOf(EformModeEnumNameSpace) < 0)) 
+        nmSpaces.Add(EformModeEnumNameSpace);
+    if ((O2mMaskViewModelNameSpace != modelInterfaceNameSpace) && (nmSpaces.IndexOf(modelInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(modelInterfaceNameSpace);
+    if ((O2mMaskViewModelNameSpace != ISformViewModelInterfaceNameSpace) && (nmSpaces.IndexOf(ISformViewModelInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(ISformViewModelInterfaceNameSpace);
+    if ((O2mMaskViewModelNameSpace != IconFontNameSpace) && (nmSpaces.IndexOf(IconFontNameSpace) < 0)) 
+        nmSpaces.Add(IconFontNameSpace);
+    if ((O2mMaskViewModelNameSpace != IO2mListItemInterfaceNameSpace) && (nmSpaces.IndexOf(IO2mListItemInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IO2mListItemInterfaceNameSpace);
+    if ((O2mMaskViewModelNameSpace != O2mListItemViewModelNameSpace) && (nmSpaces.IndexOf(O2mListItemViewModelNameSpace) < 0)) 
+        nmSpaces.Add(O2mListItemViewModelNameSpace);
+    if ((O2mMaskViewModelNameSpace != RegionAwareViewModelBaseNameSpace) && (nmSpaces.IndexOf(RegionAwareViewModelBaseNameSpace) < 0)) 
+        nmSpaces.Add(RegionAwareViewModelBaseNameSpace);
+
+    if ((O2mMaskViewModelNameSpace != MaskModelServiceInterfaceNameSpace) && (nmSpaces.IndexOf(MaskModelServiceInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(MaskModelServiceInterfaceNameSpace);
+    if ((O2mMaskViewModelNameSpace != MaskModelFilterInterfaceNameSpace) && (nmSpaces.IndexOf(MaskModelFilterInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(MaskModelFilterInterfaceNameSpace);
+    if ((O2mMaskViewModelNameSpace != MaskModelPageInterfaceNameSpace) && (nmSpaces.IndexOf(MaskModelPageInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(MaskModelPageInterfaceNameSpace);
+    if ((O2mMaskViewModelNameSpace != MaskModelInterfaceNameSpace) && (nmSpaces.IndexOf(MaskModelInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(MaskModelInterfaceNameSpace);
+
+
+    bool IsInTheSameModule = (LformUserControlProject == O2mMaskUserControlProject);
+    
+    
+#>
+<# 
+    foreach(string ns in nmSpaces) {
+#>
+using <#= ns #>;
+<#
+    }
+#>
+/*
+
+<#
+    if (LformUserControlProject != O2mMaskUserControlProject) {
+#>
+    "<#= LformUserControlClassName #>" UserControl is defined in the "<#= LformUserControlProject #>"-project.
+    In the file of IModule-class of "<#= LformUserControlProject #>"-project the following line of code must be inserted:
+
+        public void OnInitialized(IContainerProvider containerProvider)
+        {
+            ...
+            IRegionManager regionManager = containerProvider.Resolve(typeof(IRegionManager)) as IRegionManager;
+            if (regionManager != null)
+            {
+                ...
+                // According to requirements of the "<#= O2mMaskViewModelClassName #>.cs"-file of "<#= O2mMaskUserControlProject #>"-project. 
+                regionManager.RegisterViewWithRegion("<#= LformUserControlClassName #><#= MasterRegionPropertyName #>", typeof(<#= LformUserControlClassName #>));
+                ...
+            }
+            ...
+        }
+<#
+    }
+    if (CheckedModelUserControlProject != O2mMaskUserControlProject) {
+#>
+    "<#= CheckedModelUserControlClassName #>" UserControl is defined in the "<#= CheckedModelUserControlProject #>"-project.
+    In the file of IModule-class of "<#= CheckedModelUserControlProject #>"-project the following line of code must be inserted:
+
+        public void OnInitialized(IContainerProvider containerProvider)
+        {
+            ...
+            IRegionManager regionManager = containerProvider.Resolve(typeof(IRegionManager)) as IRegionManager;
+            if (regionManager != null)
+            {
+                ...
+                // According to requirements of the "<#= O2mMaskViewModelClassName #>.cs"-file of "<#= O2mMaskUserControlProject #>"-project. 
+                regionManager.RegisterViewWithRegion("<#= CheckedModelUserControlClassName #><#= DetailRegionPropertyName #>", typeof(<#= CheckedModelUserControlClassName #>));
+                ...
+            }
+            ...
+        }
+<#
+    }
+#>
+
+<#
+    if (DshCheckedModelUserControlProject != O2mMaskUserControlProject) {
+#>
+    "<#= DshCheckedModelUserControlClassName #>" UserControl is defined in the "<#= DshCheckedModelUserControlProject #>"-project.
+    In the file of IModule-class of "<#= DshCheckedModelUserControlProject #>"-project the following line of code must be inserted:
+
+        public void OnInitialized(IContainerProvider containerProvider)
+        {
+            ...
+            IRegionManager regionManager = containerProvider.Resolve(typeof(IRegionManager)) as IRegionManager;
+            if (regionManager != null)
+            {
+                ...
+                // According to requirements of the "<#= O2mMaskViewModelClassName #>.cs"-file of "<#= O2mMaskUserControlProject #>"-project. 
+                regionManager.RegisterViewWithRegion("<#= DshCheckedModelUserControlClassName #><#= DetailRegionPropertyName #>", typeof(<#= DshCheckedModelUserControlClassName #>));
+                ...
+            }
+            ...
+        }
+<#
+    }
+#>
+
+    "<#= O2mMaskUserControlClassName #>" UserControl is defined in the "<#= O2mMaskUserControlProject #>"-project.
+    In the file of IModule-class of "<#= O2mMaskUserControlProject #>"-project the following line of code must be inserted:
+
+        public void RegisterTypes(IContainerRegistry containerRegistry)
+        {
+            ...
+            // According to requirements of the "<#= O2mMaskViewModelClassName #>.cs"-file of "<#= O2mMaskUserControlProject #>"-project. 
+            ViewModelLocationProvider.Register<<#= O2mMaskUserControlClassName #>, <#= O2mMaskViewModelClassName #>>();
+            // According to requirements of the "<#= O2mMaskViewModelClassName #>.cs"-file of "<#= O2mMaskUserControlProject #>"-project. 
+            containerRegistry.RegisterForRegionNavigation<<#= O2mMaskUserControlClassName #>, <#= O2mMaskViewModelClassName #>>("<#= O2mMaskUserControlClassName #>");
+            // According to requirements of the "<#= O2mMaskViewModelClassName #>.cs"-file of "<#= O2mMaskUserControlProject #>"-project. 
+            containerRegistry.Register<ContentView, <#= O2mMaskUserControlClassName #>>("<#= O2mMaskUserControlClassName #>");
+            ...
+        }
+*/
+
+namespace <#= O2mMaskViewModelNameSpace #> {
+
+    public class <#= O2mMaskViewModelClassName #>: <#= RegionAwareViewModelBaseClassName #>, IRegionAware 
+    {
+        protected <#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName #>=null;
+        protected <#= GetModelServiceInterfaceName(Model) #> <#= FormServicePrefix #><#= Model.ViewName #> = null;
+        protected <#= MaskModelServiceInterfaceClassName #> <#= MaskFormRootServicePropertyName #>=null;
+        protected IDialogService _dialogService=null;
+        public <#= O2mMaskViewModelClassName #>(<#= GetModelServiceInterfaceName(Model) #> _<#= FormServicePrefix #><#= Model.ViewName #>, <#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName  #>, <#= MaskModelServiceInterfaceClassName #> <#= MaskFormRootServicePropertyName #>, IDialogService dialogService) {
+            this.<#= AppSettingServicePropertyName #> = <#= AppSettingServicePropertyName #>;
+            this.<#= FormServicePrefix #><#= Model.ViewName #> = _<#= FormServicePrefix #><#= Model.ViewName #>;
+            this.<#= MaskFormRootServicePropertyName #> = <#= MaskFormRootServicePropertyName #>;
+            this._dialogService= dialogService;
+            PermissionMask = <#= AppSettingServicePropertyName #>.GetViewModelMask("<#= Model.ViewName #>");
+            _<#= TableMenuItemsPropertyName #> = GetDefault<#= TableMenuItemsPropertyName #>();
+            _<#= RowMenuItemsPropertyName #> = GetDefault<#= RowMenuItemsPropertyName #>();
+
+<#
+        if(MaskModel.IsWebApiAdd && MaskModel.IsWebApiUpdate && MaskModel.IsWebApiDelete) {
+#>
+            _<#= ParentContainerMenuItemsPropertyName #> = new ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>>()  {    
+                new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "SaveChangesMI", Caption="Save Changes", IconName=<#= IconFontClassName #>.Save, IconColor=(Color)Application.Current.Resources["IconButtonPrimaryColor"], Enabled=true, Data=null, Command=<#= OnParentContainerMenuItemsCommandPropertyName #>},
+            };
+<#
+        
+        } 
+#>
+        }
+
+        protected int PermissionMask = 0; 
+
+        public bool <#= CanAddPropertyName #>
+        { 
+            get
+            {
+                return ((PermissionMask & 8) == 8) && <#= CanAddParentPropertyName #>;
+            }
+        }
+        public bool <#= CanUpdPropertyName #>
+        { 
+            get
+            {
+                return ((PermissionMask & 4) == 4) && <#= CanUpdParentPropertyName #>;
+            }
+        }
+        public bool <#= CanDelPropertyName #>
+        { 
+            get
+            {
+                return ((PermissionMask & 2) == 2) && <#= CanDelParentPropertyName #>;
+            }
+        }
+
+
+        #region <#= ParentIsPermissionEditablePropertyName #>
+        public bool <#= ParentIsPermissionEditablePropertyName #> {
+            get {
+
+                return <#= ParentIsPermissionEditableValue #>;
+            }
+        }
+        #endregion
+
+        #region <#= IsParentLoadedPropertyName #>
+        bool _<#= IsParentLoadedPropertyName #> = false;
+        public bool <#= IsParentLoadedPropertyName #>
+        { 
+            get
+            {
+                return _<#= IsParentLoadedPropertyName #>;
+            }
+            set {
+                if(_<#= IsParentLoadedPropertyName #> != value) {
+                    _<#= IsParentLoadedPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+
+        #region <#= CaptionPropertyName #>
+        string _<#= CaptionPropertyName #> = "<#= Model.ViewName #>";
+        public string <#= CaptionPropertyName #>
+        { 
+            get
+            {
+                return _<#= CaptionPropertyName #>;
+            }
+            set {
+                if(_<#= CaptionPropertyName #> != value) {
+                    _<#= CaptionPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+        #region <#= RowMenuItemsPropertyName #>
+        protected ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>> GetDefault<#= RowMenuItemsPropertyName #>() {
+            return new ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>>();
+        }
+        protected IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> _<#= RowMenuItemsPropertyName #> = null;
+        public IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> <#= RowMenuItemsPropertyName #>
+        { 
+            get
+            {
+                return _<#= RowMenuItemsPropertyName #>;
+            }
+            set
+            {
+                if (_<#= RowMenuItemsPropertyName #> != value)
+                {
+                    _<#= RowMenuItemsPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+        #region <#= TableMenuItemsPropertyName #>
+        protected ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>> GetDefault<#= TableMenuItemsPropertyName #>() {
+            return new ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>>();
+        }
+        protected IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> _<#= TableMenuItemsPropertyName #> = null;
+        public IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> <#= TableMenuItemsPropertyName #>
+        { 
+            get
+            {
+                return _<#= TableMenuItemsPropertyName #>;
+            }
+            set
+            {
+                if (_<#= TableMenuItemsPropertyName #> != value)
+                {
+                    _<#= TableMenuItemsPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+
+        #region <#= HiddenFiltersPropertyName #>
+        IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>> _<#= HiddenFiltersPropertyName #> = new ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>();
+        public IEnumerable<IWebServiceFilterRsltInterface> <#= HiddenFiltersPropertyName #>
+        {
+            get
+            {
+                return _<#= HiddenFiltersPropertyName #>;
+            }
+            set
+            {
+                if (_<#= HiddenFiltersPropertyName #> != value)
+                {
+                    _<#= HiddenFiltersPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+
+        protected void OnNavigationResult(IRegionNavigationResult navResult) {
+            if (navResult.Result.HasValue) {
+                if (navResult.Result.Value) return;
+            }
+            string navErrorMsg = "Unknown Navigation Error";
+            if (navResult.Error != null)
+            {
+                navErrorMsg = navResult.Error.Message;
+                Exception inner = navResult.Error.InnerException;
+                while (inner != null)
+                {
+                    navErrorMsg = navErrorMsg + ": " + inner.Message;
+                    inner = inner.InnerException;
+                }
+            }
+            navResult.Context.NavigationService.RequestNavigate(new Uri("<#= PageNotFoundUserControlClassName #>", UriKind.Relative));
+            <#= AppSettingServicePropertyName #>.ShowErrorMessage("Navigation Exception", navErrorMsg);
+        }
+        #region <#= TableMenuItemsCommandPropertyName #>
+        protected ICommand _<#= TableMenuItemsCommandPropertyName #> = null;
+        public ICommand <#= TableMenuItemsCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= TableMenuItemsCommandPropertyName #> ?? (_<#= TableMenuItemsCommandPropertyName #> = new Command((p) => <#= TableMenuItemsCommandPropertyName #>Execute(p), (p) => <#= TableMenuItemsCommandPropertyName #>CanExecute(p)));
+            }
+        }
+        protected async void <#= TableMenuItemsCommandPropertyName #>Execute(object prm)
+        {
+        }
+        protected bool <#= TableMenuItemsCommandPropertyName #>CanExecute(object prm)
+        {
+            return true; 
+        }
+        #endregion
+
+
+        #region <#= RowMenuItemsCommandPropertyName #>
+        protected ICommand _<#= RowMenuItemsCommandPropertyName #> = null;
+        public ICommand <#= RowMenuItemsCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= RowMenuItemsCommandPropertyName #> ?? (_<#= RowMenuItemsCommandPropertyName #> = new Command((p) => <#= RowMenuItemsCommandPropertyName #>Execute(p), (p) => <#= RowMenuItemsCommandPropertyName #>CanExecute(p)));
+            }
+        }
+        protected void <#= RowMenuItemsCommandPropertyName #>Execute(object prm)
+        {
+        }
+        protected bool <#= RowMenuItemsCommandPropertyName #>CanExecute(object prm)
+        {
+            return true; 
+        }
+        #endregion
+
+        #region <#= ParentPermissionVectorPropertyName #>
+        protected bool <#= IsModifiedParentPermissionVectorPropertyName #> = false;
+        protected int[] _<#= ParentPermissionVectorPropertyName #> = null;
+        public int[] <#= ParentPermissionVectorPropertyName #> { 
+            get {
+                return _<#= ParentPermissionVectorPropertyName #>;
+            }
+            set {
+                if(_<#= ParentPermissionVectorPropertyName #> != value) {
+                    _<#= ParentPermissionVectorPropertyName #> = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged("<#= IsDetailReadyPropertyName #>");
+                }
+            }
+        }
+        #endregion
+
+        #region <#= PermissionRecordPropertyName #>
+<#
+        if(MaskModel.IsWebApiAdd && MaskModel.IsWebApiUpdate && MaskModel.IsWebApiDelete) {
+#>
+
+        protected async Task <#= SavePermissionRecordPropertyName #>() {
+            if ((_<#= PermissionRecordPropertyName #> == null) || (_<#= ParentPermissionVectorPropertyName #> == null)) return;
+            Vector2Record();
+            <#= MaskModelInterfaceClassName #> rslt = await <#= MaskFormRootServicePropertyName #>.<#= UpdateOneMethodName #>(_<#= PermissionRecordPropertyName #>);
+            <#= PermissionRecordPropertyName #> = rslt;
+            if(rslt != null) {
+                Record2Vector();
+            } else {
+                <#= ParentPermissionVectorPropertyName #> = null;
+                <#= IsModifiedParentPermissionVectorPropertyName #> = false;
+            }
+        }
+<#
+        }
+#>
+
+        protected <#= MaskModelInterfaceClassName #> _<#= PermissionRecordPropertyName #> = null;
+        public <#= MaskModelInterfaceClassName #> <#= PermissionRecordPropertyName #> {
+            get {
+                return _<#= PermissionRecordPropertyName #>;
+            }
+            set {
+                if(_<#= PermissionRecordPropertyName #> != value) {
+                    _<#= PermissionRecordPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+
+        #region Record2Vector Vector2Record
+        protected void Record2Vector() {
+            int[] perms = <#= AppSettingServicePropertyName #>.<#= GetEmptyPermissionsMethodName #>();
+<#
+        {
+            int i = -1;
+            foreach(ModelViewPropertyOfVwSerializable prop in MaskModel.ScalarProperties) {
+                if ((!(prop.IsNullable)) && IsPropInteger(prop)) {
+                    i++;
+                    if (i > 16) continue;
+#>
+            perms[<#= i #>] = _<#= PermissionRecordPropertyName #>.<#= GetModelPropertyName(prop, MaskModel) #>;
+<#                
+                }
+            }
+        }
+#>        
+            <#= ParentPermissionVectorPropertyName #> = perms;
+            <#= IsModifiedParentPermissionVectorPropertyName #> = false;
+        }
+        protected void Vector2Record() {
+            <#= MaskModelInterfaceClassName #> newRecord = <#= MaskFormRootServicePropertyName #>.<#= CopyToModelMethodName #>(_<#= PermissionRecordPropertyName #>);
+<#
+        {
+            int i = -1;
+            foreach(ModelViewPropertyOfVwSerializable prop in MaskModel.ScalarProperties) {
+                if ((!(prop.IsNullable)) && IsPropInteger(prop)) {
+                    i++;
+                    if (i > 16) continue;
+#>
+            newRecord.<#= GetModelPropertyName(prop, MaskModel) #> = _<#= ParentPermissionVectorPropertyName #>[<#= i #>];
+<#                
+                }
+            }
+        }
+#>        
+            <#= PermissionRecordPropertyName #> = newRecord;
+        }
+        #endregion
+
+        #region <#= OnSelectedItemChangedPropertyName #>
+        protected async void <#= OnSelectedItemChangedPropertyName #>() {
+            <#= modelInterfaceClassName #> selItm = _<#= SelectedRowPropertyName #> as <#= modelInterfaceClassName #>;
+            if(selItm==null) {
+                <#= ParentPermissionVectorPropertyName #> = null;
+                <#= PermissionRecordPropertyName #> = null;
+                <#= IsModifiedParentPermissionVectorPropertyName #> = false;
+                return;
+            }
+            <#= MaskModelFilterInterfaceClassName #> flt  = <#= MaskFormRootServicePropertyName #>.GetFilter();
+<#
+    {
+        int fltCount = (primKeys.Count < maskprimKeys.Count) ? primKeys.Count : maskprimKeys.Count;
+        for(int i = 0; i < fltCount; i ++) {
+            ModelViewPropertyOfVwSerializable maskProp  = maskprimKeys[i];
+            ModelViewPropertyOfVwSerializable modelProp = primKeys[i];
+#>
+            flt.<#= GetModelPropertyName(maskProp, MaskModel) #> = new List<<#= GetPropertyTypeName(maskProp) #>>();
+<#
+            if(Model.ViewName.ToUpper().Contains("ROLE")) {
+#>
+            flt.<#= GetModelPropertyName(maskProp, MaskModel) #>.Add(selItm.Name);
+<#
+            } else {
+#>
+            flt.<#= GetModelPropertyName(maskProp, MaskModel) #>.Add(selItm.<#= GetModelPropertyName(modelProp, Model) #>);
+<#
+            }
+#>
+            flt.<#= GetFilterPropertyOperatorName(maskProp, MaskModel, FilterOperatorSuffix) #> = new List<string>();
+            flt.<#= GetFilterPropertyOperatorName(maskProp, MaskModel, FilterOperatorSuffix) #>.Add("<#= FilterEqOperatorValue #>");
+<#
+        }
+    }
+#>
+            <#= MaskModelPageInterfaceClassName #> rslt = await <#= MaskFormRootServicePropertyName #>.<#= GetWithFilterMethodName #>(flt);
+            bool clearPerms = true;
+            if(rslt != null) {
+                if(rslt.items != null) {
+                    clearPerms = rslt.items.Count < 1;
+                }
+            }
+            if (clearPerms) {
+                <#= ParentPermissionVectorPropertyName #> = null;
+                <#= PermissionRecordPropertyName #> = null;
+                <#= IsModifiedParentPermissionVectorPropertyName #> = false;
+                return;
+            }
+            <#= PermissionRecordPropertyName #> = rslt.items[0];
+            Record2Vector();
+        }
+        #endregion
+
+
+        #region <#= SelectedRowPropertyName #>
+        protected object _<#= SelectedRowPropertyName #> = null;
+        public object <#= SelectedRowPropertyName #> {
+            get {
+                return _<#= SelectedRowPropertyName #>;
+            }
+            set {
+<#
+        if(MaskModel.IsWebApiAdd && MaskModel.IsWebApiUpdate && MaskModel.IsWebApiDelete) {
+#>
+                if(_<#= SelectedRowPropertyName #> != value) {
+                    if (<#= IsModifiedParentPermissionVectorPropertyName #>)
+                    {
+                        var parameters = new DialogParameters
+                        {
+                            { "Message", "Permission modification are not saves. Whould you like to save." },
+                            { "Title", "Save changes" },
+                            { "MessageIconName", <#= IconFontClassName #>.Warning },
+                            { "MessageIconColor",  (Color)Application.Current.Resources["IconButtonInfoColor"]},
+                            { "ShowOkBtn", true },
+                            { "ShowCancelBtn", true },
+                        };
+                        _dialogService.ShowDialog("MessageDlg", parameters, (IDialogResult dlgresult) => {
+                            bool rslt = false;
+                            if (dlgresult.Parameters.ContainsKey("Result"))
+                            {
+                                rslt = dlgresult.Parameters["Result"] is bool;
+                                if (rslt) rslt = (bool)dlgresult.Parameters["Result"];
+                            }
+                            MainThread.InvokeOnMainThreadAsync(async () =>
+                            {
+                                if (rslt)
+                                {
+                                    await <#= SavePermissionRecordPropertyName #>();
+                                }
+                                _<#= SelectedRowPropertyName #> = value;
+                                OnPropertyChanged();
+                                <#= OnSelectedItemChangedPropertyName #>();
+                            });
+                        });
+                    } else {
+                        _<#= SelectedRowPropertyName #> = value;
+                        OnPropertyChanged();
+                        <#= OnSelectedItemChangedPropertyName #>();
+                    }
+                }
+<#
+        } else {
+#>
+                if(_<#= SelectedRowPropertyName #> != value) {
+                    _<#= SelectedRowPropertyName #> = value;
+                    OnPropertyChanged();
+                    <#= OnSelectedItemChangedPropertyName #>();
+                }
+<#
+        }
+#>
+            }
+        }
+        #endregion
+
+       #region <#= SelectedRowCommandPropertyName #>
+       protected ICommand _<#= SelectedRowCommandPropertyName #> = null;
+       public ICommand <#= SelectedRowCommandPropertyName #>
+       {
+           get
+           {
+               return _<#= SelectedRowCommandPropertyName #> ?? (_<#= SelectedRowCommandPropertyName #> = new Command((p) => <#= SelectedRowCommandPropertyName #>Execute(p), (p) => <#= SelectedRowCommandPropertyName #>CanExecute(p)));
+           }
+       }
+       protected void <#= SelectedRowCommandPropertyName #>Execute(object prm)
+       {
+           <#= SelectedRowPropertyName #> = prm;
+       }
+       protected bool <#= SelectedRowCommandPropertyName #>CanExecute(object prm)
+       {
+           return true; 
+       }
+       #endregion
+
+
+
+       #region IRegionAware
+       INavigationContext <#= CurrentNavigationContextPropertyName #> = null;
+
+       public bool IsNavigationTarget(INavigationContext navigationContext) {
+            return true;
+       }
+       public void OnNavigatedFrom(INavigationContext navigationContext) {
+            <#= CurrentNavigationContextPropertyName #> = null;
+       }
+       public void OnNavigatedTo(INavigationContext navigationContext) {
+            INavigationParameters prms = navigationContext.Parameters;
+            PermissionMask = <#= AppSettingServicePropertyName #>.GetViewModelMask("<#= Model.ViewName #>");
+            if ((PermissionMask & 1) != 1) {
+                if(navigationContext.NavigationService.Journal.CanGoBack) {
+                    // it should be intercepted by prev item in navigation chain
+                    throw new Exception("Access Denied to navigate <#= Model.ViewName #>");
+                } else {
+                    // this is a first item in navigation chain, so navigationContext.Parameters are not expected
+                    navigationContext.NavigationService.RequestNavigate(new Uri("<#= AccessDeniedUserControlClassName #>", UriKind.Relative), OnNavigationResult);
+                    return;
+                }
+            }
+            <#= CurrentNavigationContextPropertyName #> = navigationContext;
+            OnPropertyChanged("<#= ShowBackBtnPropertyName #>");
+            (<#= OnNavigationBackCommandPropertyName #> as Command).ChangeCanExecute();
+            OnPropertyChanged("<#= CanAddPropertyName  #>");
+            OnPropertyChanged("<#= CanUpdPropertyName  #>");
+            OnPropertyChanged("<#= CanDelPropertyName  #>");
+
+            if(!<#= IsParentLoadedPropertyName #>) {
+                ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>> hf = new ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>();
+<#
+            foreach(ModelViewPropertyOfVwSerializable sclrProp in Model.ScalarProperties) {
+#>          
+                if(prms.ContainsKey("<#= GetModelPropertyName(sclrProp, Model) #>")) {
+                        hf.Add(new <#= WebServiceFilterRsltViewModelClassName #>() {
+                            fltrName = "<#= GetModelPropertyName(sclrProp, Model) #>",
+                            fltrDataType = "<#= GetCCharpDatatype(sclrProp, Model) #>",
+                            fltrOperator = "eq",
+                            fltrValue = prms.GetValue<<#= GetPropertyTypeName(sclrProp) #>>("<#= GetModelPropertyName(sclrProp, Model) #>"),
+                            fltrError = null
+                        });
+                }
+<#
+            }
+#>          
+                ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>> chf = <#= HiddenFiltersPropertyName #> as ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>;
+                bool resetHF = chf.Count != hf.Count;
+                if ((!resetHF) && (hf.Count > 0)) {
+                    foreach(<#= IWebServiceFilterRsltInterfaceClassName #> citm in chf) {
+                        <#= IWebServiceFilterRsltInterfaceClassName #> itm = hf.Where(h => h.fltrName == citm.fltrName).FirstOrDefault();
+                        if(itm == null)
+                        {
+                            resetHF = true;
+                            break;
+                        }
+                        if (!(itm.fltrValue == citm.fltrValue))
+                        {
+                            resetHF = true;
+                            break;
+                        }
+                    }
+                } 
+                if (resetHF) { <#= HiddenFiltersPropertyName #> = hf; }
+            }
+            <#= IsParentLoadedPropertyName #> = true;
+        }
+        #endregion
+        #region <#= ShowBackBtnPropertyName #>
+        public bool <#= ShowBackBtnPropertyName #> {
+            get {
+                return (<#= CurrentNavigationContextPropertyName #> == null) ?  false : <#= CurrentNavigationContextPropertyName #>.NavigationService.Journal.CanGoBack;
+            }
+        }
+        #endregion
+        #region <#= OnNavigationBackCommandPropertyName #>
+        protected ICommand _<#= OnNavigationBackCommandPropertyName #> = null;
+        public ICommand <#= OnNavigationBackCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= OnNavigationBackCommandPropertyName #> ?? (_<#= OnNavigationBackCommandPropertyName #> = new Command(() => <#= OnNavigationBackCommandPropertyName #>Execute(), () => <#= OnNavigationBackCommandPropertyName #>CanExecute()));
+            }
+        }
+        protected void <#= OnNavigationBackCommandPropertyName #>Execute()
+        {
+            if (<#= CurrentNavigationContextPropertyName #> != null) {
+                if(<#= CurrentNavigationContextPropertyName #>.NavigationService.Journal.CanGoBack) {
+                    <#= CurrentNavigationContextPropertyName #>.NavigationService.Journal.GoBack();
+                }
+            }
+        }
+        protected bool <#= OnNavigationBackCommandPropertyName #>CanExecute()
+        {
+            return (<#= CurrentNavigationContextPropertyName #> == null) ?  false : <#= CurrentNavigationContextPropertyName #>.NavigationService.Journal.CanGoBack;
+        }
+        #endregion
+
+
+        #region <#= IsDetailReadyPropertyName #>
+        public bool <#= IsDetailReadyPropertyName #>
+        { 
+            get
+            {
+                 return  (<#= SelectedRowPropertyName #> != null) && (<#= ParentPermissionVectorPropertyName #> != null);
+            }
+        }
+        #endregion
+        #region <#= SelectedDetailsListItemPropertyName #>
+        protected <#= IO2mListItemInterfaceClassName #> _<#= SelectedDetailsListItemPropertyName #> = null;
+        public <#= IO2mListItemInterfaceClassName #> <#= SelectedDetailsListItemPropertyName #> 
+        {
+            get { return _<#= SelectedDetailsListItemPropertyName #>; }
+            set {
+                if(_<#= SelectedDetailsListItemPropertyName #> != value) {
+                    _<#= SelectedDetailsListItemPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+        #region <#= DetailsListPropertyName #>
+        ObservableCollection<<#= IO2mListItemInterfaceClassName #>> _<#= DetailsListPropertyName #> = new ObservableCollection<<#= IO2mListItemInterfaceClassName #>>() {
+            new <#= O2mListItemViewModelClassName #>() {<#= CaptionPropertyName #> = "Dashboards", <#= ForeignKeyDetailsName #> = null,  <#= RegionPropertyName #> = "<#= DshCheckedModelUserControlClassName #><#= DetailRegionPropertyName #>" },
+            new <#= O2mListItemViewModelClassName #>() {<#= CaptionPropertyName #> = "Views", <#= ForeignKeyDetailsName #> = null,  <#= RegionPropertyName #> = "<#= CheckedModelUserControlClassName #><#= DetailRegionPropertyName #>" },
+        };
+        public IEnumerable<<#= IO2mListItemInterfaceClassName #>> <#= DetailsListPropertyName #> { get { return _<#= DetailsListPropertyName #>; } }
+        #endregion
+
+        #region <#= PermissionChangedCommandPropertyName #>
+        protected ICommand _<#= PermissionChangedCommandPropertyName #> = null;
+        public ICommand <#= PermissionChangedCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= PermissionChangedCommandPropertyName #> ?? (_<#= PermissionChangedCommandPropertyName #> = new Command((p) => <#= PermissionChangedCommandPropertyName #>Execute(p), (p) => <#= PermissionChangedCommandPropertyName #>CanExecute(p)));
+            }
+        }
+        protected void <#= PermissionChangedCommandPropertyName #>Execute(object prm)
+        {
+            if(prm == null) return;
+            if (prm.GetType().IsArray && typeof(int).IsAssignableFrom(prm.GetType().GetElementType())) {
+                <#= ParentPermissionVectorPropertyName #>  = (int[])prm;
+                <#= IsModifiedParentPermissionVectorPropertyName #> = true;
+            }
+        }
+        protected bool <#= PermissionChangedCommandPropertyName #>CanExecute(object prm)
+        {
+            return true; 
+        }
+        #endregion
+        #region <#= OnParentContainerMenuItemsCommandPropertyName #>
+        protected ICommand _<#= OnParentContainerMenuItemsCommandPropertyName #> = null;
+        public ICommand <#= OnParentContainerMenuItemsCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= OnParentContainerMenuItemsCommandPropertyName #> ?? (_<#= OnParentContainerMenuItemsCommandPropertyName #> = new Command((prm) => <#= OnParentContainerMenuItemsCommandPropertyName #>Execute(prm), (prm) => <#= OnParentContainerMenuItemsCommandPropertyName #>CanExecute(prm)));
+            }
+        }
+<#
+        if(MaskModel.IsWebApiAdd && MaskModel.IsWebApiUpdate && MaskModel.IsWebApiDelete) {
+#>
+        public async void <#= OnParentContainerMenuItemsCommandPropertyName #>Execute(object prm) { 
+            <#= IWebServiceFilterMenuInterfaceClassName #> mi = prm as <#= IWebServiceFilterMenuInterfaceClassName #>;
+            if(mi == null) return;
+            if(mi.Id == "SaveChangesMI") {
+                await <#= SavePermissionRecordPropertyName #>();
+            }
+        }
+        public bool <#= OnParentContainerMenuItemsCommandPropertyName #>CanExecute(object prm) {
+            return true;
+        }
+<#
+        } else {
+#>
+        public void <#= OnParentContainerMenuItemsCommandPropertyName #>Execute(object prm) { 
+            //<#= IWebServiceFilterMenuInterfaceClassName #> mi = prm as <#= IWebServiceFilterMenuInterfaceClassName #>;
+            //if(mi == null) return;
+            //if(mi.Id == "SaveChangesMI") {
+            //}
+        }
+        public bool <#= OnParentContainerMenuItemsCommandPropertyName #>CanExecute(object prm) {
+            return false;
+        }
+<#
+        } 
+#>
+
+        #endregion
+        #region <#= ParentContainerMenuItemsPropertyName #>
+        protected IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> _<#= ParentContainerMenuItemsPropertyName #> = null;
+        public IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> <#= ParentContainerMenuItemsPropertyName #> {
+            get { return _<#= ParentContainerMenuItemsPropertyName #>; }
+        }
+        #endregion
+
+    }
+}
+
+
+
+<#+
+    string GetFilterPropertyOperatorName(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model, string operatorSufix) {
+        if (model.GenerateJSonAttribute) {
+            return prop.JsonPropertyName + operatorSufix;
+        } else {
+            return FirstLetterToLower(prop.ViewPropertyName) + operatorSufix;
+        }
+    }
+    string GetFilterInterfaceName(ModelViewSerializable model) {
+        return "I" + GetFilterName(model);
+    }
+    string GetFilterName(ModelViewSerializable model) {
+        return GetModelName(model) + "Filter";
+    }
+    string GetPageInterfaceName(ModelViewSerializable model) {
+        return "I"+model.PageViewName;
+    }
+
+    string GetModelServiceInterfaceName(ModelViewSerializable model) {
+        return "I" + GetModelServiceName(model);
+    }
+    string GetModelServiceName(ModelViewSerializable model) {
+        return GetModelName(model) + "Service";
+    }
+    string GetInterfaceName(ModelViewSerializable model) {
+        return "I"+GetModelName(model);
+    }
+    string GetModelName(ModelViewSerializable model) {
+        return FirstLetterToUpper(model.ViewName);
+    }
+
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+    string GetContextModelNameSpace(DbContextSerializable context, string fileType) {
+        string result="";
+        if ((context == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (context.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            context.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+    string GetContextModelClassName(DbContextSerializable context, string fileType) {
+        string result="";
+        if ((context == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (context.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            context.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+
+    public string FirstLetterToUpper(string str)
+    {
+        if (str == null)
+            return null;
+        if (str.Length > 1)
+            return char.ToUpper(str[0]) + str.Substring(1);
+        return str.ToUpper();
+    }
+    public string FirstLetterToLower(string str)
+    {
+        if (str == null)
+            return null;
+        if (str.Length > 1)
+            return char.ToLower(str[0]) + str.Substring(1);
+        return str.ToUpper();
+    }
+    string GetPropertyTypeName(ModelViewPropertyOfVwSerializable prop)
+    {
+        if("System.String".Equals(prop.UnderlyingTypeName, System.StringComparison.OrdinalIgnoreCase)) {
+            return prop.UnderlyingTypeName;
+        }
+        if(prop.IsNullable || (!prop.IsRequiredInView)) {
+            return prop.UnderlyingTypeName + " ?";
+        }
+        return prop.UnderlyingTypeName;
+    }
+    string GetModelPropertyName(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+        if (model.GenerateJSonAttribute) {
+            return prop.ViewPropertyName;
+        } else {
+            return FirstLetterToLower(prop.ViewPropertyName);
+        }
+    }
+    string GetCCharpDatatype(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+        if ((prop == null) || (model == null)) return "";
+        return prop.UnderlyingTypeName.ToLower().Replace("system.", "");
+    }
+    string GetCCharpDatatypeEx(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model) {
+        if ((prop == null) || (model == null)) return "";
+        ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
+        return GetCCharpDatatype(sclrProp, model);
+    }
+    string GetCCharpDatatypeEx2(ModelViewUIListPropertySerializable prop, ModelViewSerializable model) {
+        if ((prop == null) || (model == null)) return "";
+        ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
+        return GetCCharpDatatype(sclrProp, model);
+    }
+    string GetDisplayAttributeValueString(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model, string propName) {
+            if (prop == null)
+            {
+                return "";
+            }
+            if(prop.Attributes == null)
+            {
+                return prop.ViewPropertyName;
+            }
+            ModelViewAttributeSerializable attr =
+                prop.Attributes.Where(a => a.AttrName == "Display").FirstOrDefault();
+            if (attr == null)
+            {
+                return prop.ViewPropertyName;
+            }
+            if (attr.VaueProperties == null)
+            {
+                return prop.ViewPropertyName;
+            }
+            ModelViewAttributePropertySerializable attrProp = 
+                attr.VaueProperties.Where(v => v.PropName == propName).FirstOrDefault();
+            if (attrProp == null)
+            {
+                return prop.ViewPropertyName;
+            }
+            if (string.IsNullOrEmpty( attrProp.PropValue ) )
+            {
+                return prop.ViewPropertyName;
+            } else
+            {
+                char[] charsToTrim = { '"', ' '};
+                return attrProp.PropValue.Trim(charsToTrim);
+            }
+    }
+
+    string GetDisplayAttributeValueStringEx(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model, string propName) {
+            if ((prop == null) || (model == null)) {
+                return "";
+            }
+            if(model.ScalarProperties == null) {
+                return "";
+            }
+            ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
+            return GetDisplayAttributeValueString(sclrProp, model, propName);
+    }
+    string GetDisplayAttributeValueStringEx2(ModelViewUIListPropertySerializable prop, ModelViewSerializable model, string propName) {
+            if ((prop == null) || (model == null)) {
+                return "";
+            }
+            if(model.ScalarProperties == null) {
+                return "";
+            }
+            ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
+            return GetDisplayAttributeValueString(sclrProp, model, propName);
+    }
+    string GetMaxLen(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+        if ((prop == null) || (model == null)) return "null";
+        if( prop.UnderlyingTypeName.ToLower() == "system.string" ) {
+            string propValue = GetUnNamedAtributeValue(prop, "StringLength");
+            if(!string.IsNullOrEmpty(propValue)) {
+                propValue = propValue.Replace("\"", "");
+                if(!string.IsNullOrEmpty(propValue)) {
+                    return propValue;
+                }
+            }
+            propValue = GetUnNamedAtributeValue(prop, "MaxLength");
+            if(!string.IsNullOrEmpty(propValue)) {
+                propValue = propValue.Replace("\"", "");
+                if(!string.IsNullOrEmpty(propValue)) {
+                    return propValue;
+                }
+            }
+        }
+        return "null";
+    }
+    string GetMaxLenEx(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model) {
+        if ((prop == null) || (model == null)) return "null";
+        ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
+        return GetMaxLen(sclrProp, model);
+    }
+    string GetMaxLenEx2(ModelViewUIListPropertySerializable prop, ModelViewSerializable model) {
+        if ((prop == null) || (model == null)) return "null";
+        ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
+        return GetMaxLen(sclrProp, model);
+    }
+    string GetMinVal(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+        if ((prop == null) || (model == null)) return "null";
+        string propValue = GetAtributeValueByNo(prop, "IntegerValidator", 0);
+        if(!string.IsNullOrEmpty(propValue)) {
+            propValue = propValue.Replace("\"", "");
+            if(!string.IsNullOrEmpty(propValue)) {
+                return propValue;
+            }
+        }
+        if (prop.UnderlyingTypeName.ToLower() == "system.datetime") {
+            propValue = GetAtributeValueByNo(prop, "Range", 1);
+            if(!string.IsNullOrEmpty(propValue)) {
+                propValue = propValue.Replace("\"", "");
+                if(!string.IsNullOrEmpty(propValue)) {
+                    return "new Date(\"" + propValue + "\")";
+                }
+            }
+        } else {
+            propValue = GetAtributeValueByNo(prop, "Range", 0);
+            if(!string.IsNullOrEmpty(propValue)) {
+                propValue = propValue.Replace("\"", "");
+                if(!string.IsNullOrEmpty(propValue)) {
+                    return propValue;
+                }
+            }
+        }
+        return "null";
+    }
+    string GetMaxVal(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+        if ((prop == null) || (model == null)) return "null";
+        string propValue = GetAtributeValueByNo(prop, "IntegerValidator", 1);
+        if(!string.IsNullOrEmpty(propValue)) {
+            propValue = propValue.Replace("\"", "");
+            if(!string.IsNullOrEmpty(propValue)) {
+                return propValue;
+            }
+        }
+        if (prop.UnderlyingTypeName.ToLower() == "system.datetime") {
+            propValue = GetAtributeValueByNo(prop, "Range", 2);
+            if(!string.IsNullOrEmpty(propValue)) {
+                propValue = propValue.Replace("\"", "");
+                if(!string.IsNullOrEmpty(propValue)) {
+                    return "new Date(\"" + propValue + "\")";
+                }
+            }
+        } else {
+            propValue = GetAtributeValueByNo(prop, "Range", 1);
+            if(!string.IsNullOrEmpty(propValue)) {
+                propValue = propValue.Replace("\"", "");
+                if(!string.IsNullOrEmpty(propValue)) {
+                    return propValue;
+                }
+            }
+        }
+        return "null";
+    }
+    string GetMaxValEx(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model) {
+        if ((prop == null) || (model == null)) return "null";
+        ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
+        return GetMinVal(sclrProp, model);
+    }
+    string GetMaxValEx2(ModelViewUIListPropertySerializable prop, ModelViewSerializable model) {
+        if ((prop == null) || (model == null)) return "null";
+        ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
+        return GetMaxVal(sclrProp, model);
+    }
+    string GetUnNamedAtributeValue(ModelViewPropertyOfVwSerializable sclrProp, string attrName) {
+        if(sclrProp != null) {
+            if (sclrProp.Attributes != null) {
+                ModelViewAttributeSerializable modelViewAttributeSerializable =
+                    sclrProp.Attributes.Where(a => a.AttrName == attrName).FirstOrDefault();
+                if(modelViewAttributeSerializable != null) {
+                    if (modelViewAttributeSerializable.VaueProperties != null) {
+                    
+                        ModelViewAttributePropertySerializable modelViewAttributePropertySerializable =
+                            modelViewAttributeSerializable.VaueProperties.Where(p => (string.IsNullOrEmpty(p.PropName) || (p.PropName == "..."))).FirstOrDefault();
+                        if (modelViewAttributePropertySerializable != null) {
+                            return modelViewAttributePropertySerializable.PropValue;
+                        }
+                    }
+                }
+            }
+        }
+        return null;                
+    }
+    string GetAtributeValueByNo(ModelViewPropertyOfVwSerializable sclrProp, string attrName, int itemNo) {
+        if(itemNo > -1) {
+            if(sclrProp != null) {
+                if (sclrProp.Attributes != null) {
+                    ModelViewAttributeSerializable modelViewAttributeSerializable =
+                        sclrProp.Attributes.Where(a => a.AttrName == attrName).FirstOrDefault();
+                    if(modelViewAttributeSerializable != null) {
+                        if (modelViewAttributeSerializable.VaueProperties != null) {
+                            if(modelViewAttributeSerializable.VaueProperties.Count > itemNo) {
+                                return modelViewAttributeSerializable.VaueProperties[itemNo].PropValue;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return null;                
+    }
+    List<ModelViewPropertyOfVwSerializable> GetPropsByForeignKey(ModelViewSerializable model, ModelViewForeignKeySerializable foreignKey) {
+        List<ModelViewPropertyOfVwSerializable> result= new List<ModelViewPropertyOfVwSerializable>();
+        if ((model == null) || (foreignKey == null)) {
+            return result;
+        }
+        if (foreignKey.PrincipalKeyProps == null || foreignKey.ForeignKeyProps == null || model.ScalarProperties == null) {
+            return result;
+        }
+        if ((foreignKey.PrincipalKeyProps.Count != foreignKey.ForeignKeyProps.Count) || (foreignKey.ForeignKeyProps.Count < 1)) {
+            return result;
+        }
+        foreach(ModelViewKeyPropertySerializable fkProp in foreignKey.PrincipalKeyProps) {
+            ModelViewPropertyOfVwSerializable prop = 
+                model.ScalarProperties.Where(p => (p.OriginalPropertyName == fkProp.OriginalPropertyName) && (foreignKey.NavigationName == p.ForeignKeyNameChain)).FirstOrDefault();
+            if (prop != null) {
+                result.Add(prop);
+            }
+        }
+        foreach(ModelViewKeyPropertySerializable fkProp in foreignKey.ForeignKeyProps) {
+            ModelViewPropertyOfVwSerializable prop = 
+                model.ScalarProperties.Where(p => (p.OriginalPropertyName == fkProp.OriginalPropertyName) && string.IsNullOrEmpty(p.ForeignKeyNameChain)).FirstOrDefault();
+            if (prop != null) {
+                result.Add(prop);
+            }
+        }
+        return result;
+    }
+    string GetDisplayAttributeValueString2(ModelViewUIListPropertySerializable prop, ModelViewSerializable model, string propName) {
+            ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
+            if (sclrProp == null)
+            {
+                return prop.ViewPropertyName;
+            }
+            if(sclrProp.Attributes == null)
+            {
+                return prop.ViewPropertyName;
+            }
+            ModelViewAttributeSerializable attr =
+                sclrProp.Attributes.Where(a => a.AttrName == "Display").FirstOrDefault();
+            if (attr == null)
+            {
+                return prop.ViewPropertyName;
+            }
+            if (attr.VaueProperties == null)
+            {
+                return prop.ViewPropertyName;
+            }
+            ModelViewAttributePropertySerializable attrProp = 
+                attr.VaueProperties.Where(v => v.PropName == propName).FirstOrDefault();
+            if (attrProp == null)
+            {
+                return prop.ViewPropertyName;
+            }
+            if (string.IsNullOrEmpty( attrProp.PropValue ) )
+            {
+                return prop.ViewPropertyName;
+            } else
+            {
+                char[] charsToTrim = { '"', ' '};
+                return attrProp.PropValue.Trim(charsToTrim);
+            }
+    }
+    string GetModelPropertyNameEx(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model) {
+        ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
+        return GetModelPropertyName(sclrProp, model);
+    }
+    string GetModelPropertyNameEx2(ModelViewUIListPropertySerializable prop, ModelViewSerializable model) {
+        ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
+        return GetModelPropertyName(sclrProp, model);
+    }
+    List<ModelViewPropertyOfVwSerializable> GetModelPrimaryKeyProps(ModelViewSerializable model) {
+        List<ModelViewPropertyOfVwSerializable> result = new List<ModelViewPropertyOfVwSerializable>();
+        if (model == null)
+        {
+            return result;
+        }
+        if ((model.PrimaryKeyProperties == null) || (model.ScalarProperties == null)) {
+            return result;
+        }
+        foreach(ModelViewKeyPropertySerializable modelViewKeyPropertySerializable in model.PrimaryKeyProperties) {
+            ModelViewPropertyOfVwSerializable prop =
+                model.ScalarProperties.Where(p => p.ViewPropertyName == modelViewKeyPropertySerializable.ViewPropertyName).FirstOrDefault();
+            if(prop != null) {
+                result.Add(prop);
+            } else {
+                if(model.ForeignKeys != null) {
+                    foreach(ModelViewForeignKeySerializable modelViewForeignKeySerializable in model.ForeignKeys) {
+                        if ((modelViewForeignKeySerializable.PrincipalKeyProps != null) && (modelViewForeignKeySerializable.ForeignKeyProps != null)) {
+                            for(int i = 0; i < modelViewForeignKeySerializable.ForeignKeyProps.Count; i++) {
+                                if(modelViewForeignKeySerializable.ForeignKeyProps[i].OriginalPropertyName == modelViewKeyPropertySerializable.OriginalPropertyName ) {
+                                    if(i < modelViewForeignKeySerializable.PrincipalKeyProps.Count) {
+                                        prop =
+                                        model.ScalarProperties.Where(p => 
+                                            (p.OriginalPropertyName == modelViewForeignKeySerializable.PrincipalKeyProps[i].OriginalPropertyName)
+                                            &&
+                                            (p.ForeignKeyName == modelViewForeignKeySerializable.NavigationName)
+                                        ).FirstOrDefault();
+                                    }
+                                }
+                                if(prop != null) break;
+                            }
+                        }
+                        if(prop != null) break;
+                    }
+                    if(prop != null) {
+                        result.Add(prop);
+                    }
+                }
+            }
+        }
+        return result;
+    }
+    string GetPrimKeyVarName(ModelViewPropertyOfVwSerializable pkpModelViewUIFormPropertySerializable) {
+        return "pkp" + pkpModelViewUIFormPropertySerializable.ViewPropertyName;
+    }
+    List<string> GetDetailViews(ModelViewSerializable model, DbContextSerializable context, List<string> result)
+    {
+        if (result == null)
+        {
+            result = new List<string>();
+        }
+        if ((model == null) || (context == null))
+        {
+            return result;
+        }
+        if ((model.ScalarProperties == null) || (model.PrimaryKeyProperties == null) || (context.ModelViews == null)) {
+            return result;
+        }
+        if ((model.PrimaryKeyProperties.Count < 1) || (model.ScalarProperties.Count < 1))
+        {
+            return result;
+        }
+        List<ModelViewPropertyOfVwSerializable> primKeys = GetModelPrimaryKeyProps(model);
+        if(primKeys == null)
+        {
+            return result;
+        }
+        if (primKeys.Count != model.PrimaryKeyProperties.Count)
+        {
+            return result;
+        }
+        string RootEntityFullClassName = model.RootEntityFullClassName;
+        string RootEntityUniqueProjectName = model.RootEntityUniqueProjectName;
+        List<ModelViewSerializable> details =
+            context.ModelViews.Where(m => m.ForeignKeys.Any(f => (f.NavigationEntityFullName == RootEntityFullClassName) && (f.NavigationEntityUniqueProjectName == RootEntityUniqueProjectName))).ToList();
+        if(details.Count < 1)
+        {
+            return result;
+        }
+        foreach(ModelViewSerializable detail in details)
+        {
+            if (detail.ScalarProperties == null) continue;
+            if (detail.ForeignKeys == null) continue;
+            if (detail.ForeignKeys.Count < 1) continue;
+            List<ModelViewForeignKeySerializable> ForeignKeys =
+                detail.ForeignKeys.Where(f => (f.NavigationEntityFullName == RootEntityFullClassName) && (f.NavigationEntityUniqueProjectName == RootEntityUniqueProjectName)).ToList();
+            if (ForeignKeys.Count < 1) continue;
+            bool canBeUsed = false;
+            foreach(ModelViewForeignKeySerializable ForeignKey in ForeignKeys)
+            {
+                bool hasForeignKeyProps = true;
+                if (ForeignKey.ForeignKeyProps != null)
+                {
+                    for(int i = 0; i < ForeignKey.ForeignKeyProps.Count; i++)
+                    {
+                        ModelViewKeyPropertySerializable ForeignKeyProp = ForeignKey.ForeignKeyProps[i];
+                        if (!(detail.ScalarProperties.Any(s => (s.OriginalPropertyName == ForeignKeyProp.OriginalPropertyName) && (string.IsNullOrEmpty(s.ForeignKeyNameChain)))))
+                        {
+                            hasForeignKeyProps = false;
+                        }
+                        if(!hasForeignKeyProps)
+                        {
+                            ModelViewKeyPropertySerializable PrincipalKeyProp = ForeignKey.PrincipalKeyProps[i];
+                            if (detail.ScalarProperties.Any(s => (s.OriginalPropertyName == PrincipalKeyProp.OriginalPropertyName) && (s.ForeignKeyNameChain == ForeignKey.NavigationName)))
+                            {
+                                hasForeignKeyProps = true;
+                            } else
+                            {
+                                break;
+                            }
+                        }
+                    }
+                } else
+                {
+                    hasForeignKeyProps = false;
+                }
+                if (hasForeignKeyProps)
+                {
+                    canBeUsed = true;
+                    break;
+                }
+            }
+            if(canBeUsed)
+            {
+                if(!result.Contains(detail.ViewName))
+                {
+                    result.Add(detail.ViewName);
+                }
+            }
+        }
+        return result;
+    }
+    ModelViewSerializable GetModelViewByName(DbContextSerializable context, string viewName) {
+        if ((context == null) || (string.IsNullOrEmpty(viewName))) {
+            return null;
+        }
+        if (context.ModelViews == null) {
+            return null;
+        }
+        return context.ModelViews.Where(v => v.ViewName == viewName).FirstOrDefault();
+    }
+    List<ModelViewForeignKeySerializable> GetDetailViewForeignKeys(ModelViewSerializable model, ModelViewSerializable detail, List<ModelViewForeignKeySerializable> result)
+    {
+        if (result == null) result = new List<ModelViewForeignKeySerializable>();
+        if ((model == null) || (detail == null))
+        {
+            return result;
+        }
+        if ((model.PrimaryKeyProperties == null) || (detail.ScalarProperties == null) || (detail.ForeignKeys == null))
+        {
+            return result;
+        }
+        if ((model.PrimaryKeyProperties.Count < 1) || (model.ScalarProperties.Count < 1))
+        {
+            return result;
+        }
+        List<ModelViewPropertyOfVwSerializable> primKeys = GetModelPrimaryKeyProps(model);
+        if (primKeys == null)
+        {
+            return result;
+        }
+        if (primKeys.Count != model.PrimaryKeyProperties.Count)
+        {
+            return result;
+        }
+        string RootEntityFullClassName = model.RootEntityFullClassName;
+        string RootEntityUniqueProjectName = model.RootEntityUniqueProjectName;
+        List<ModelViewForeignKeySerializable> ForeignKeys =
+            detail.ForeignKeys.Where(f => (f.NavigationEntityFullName == RootEntityFullClassName) && (f.NavigationEntityUniqueProjectName == RootEntityUniqueProjectName)).ToList();
+        if (ForeignKeys.Count < 1)
+        {
+            return result;
+        }
+        foreach (ModelViewForeignKeySerializable ForeignKey in ForeignKeys)
+        {
+            bool hasForeignKeyProps = true;
+            if (ForeignKey.ForeignKeyProps != null)
+            {
+                for (int i = 0; i < ForeignKey.ForeignKeyProps.Count; i++)
+                {
+                    ModelViewKeyPropertySerializable ForeignKeyProp = ForeignKey.ForeignKeyProps[i];
+                    hasForeignKeyProps =
+                        detail.ScalarProperties.Any(s => (s.OriginalPropertyName == ForeignKeyProp.OriginalPropertyName) && (string.IsNullOrEmpty(s.ForeignKeyNameChain)));
+                    if (!hasForeignKeyProps)
+                    {
+                        ModelViewKeyPropertySerializable PrincipalKeyProp = ForeignKey.PrincipalKeyProps[i];
+                        hasForeignKeyProps = detail.ScalarProperties.Any(s => (s.OriginalPropertyName == PrincipalKeyProp.OriginalPropertyName) && (s.ForeignKeyNameChain == ForeignKey.NavigationName));
+                        {
+                            hasForeignKeyProps = true;
+                        }
+                        if(!hasForeignKeyProps)
+                        {
+                            break;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                hasForeignKeyProps = false;
+            }
+            if (hasForeignKeyProps)
+            {
+                result.Add(ForeignKey);
+                break;
+            }
+        }
+        return result;
+    }
+    List<ModelViewPropertyOfVwSerializable> GetDetailViewForeignKeyProps(ModelViewSerializable model, ModelViewPropertyOfVwSerializable primKey, ModelViewSerializable detail, ModelViewForeignKeySerializable ForeignKey, List<ModelViewPropertyOfVwSerializable> result)
+    {
+        if (result == null)
+        {
+            result = new List<ModelViewPropertyOfVwSerializable>();
+        }
+        if ((model == null) || (detail == null) || (primKey == null) || (ForeignKey == null))
+        {
+            return result;
+        }
+        if ((model.ScalarProperties == null) || (model.PrimaryKeyProperties == null) || (detail.ScalarProperties == null) || (detail.ForeignKeys == null) || (ForeignKey == null))
+        {
+            return result;
+        }
+        List<ModelViewPropertyOfVwSerializable> primKeys = GetModelPrimaryKeyProps(model);
+        if(primKeys == null)
+        {
+            return result;
+        }
+        if (primKeys.Count < 1)
+        {
+            return result;
+        }
+        if(!primKeys.Any(p => (p.ViewPropertyName == primKey.ViewPropertyName) && (p.OriginalPropertyName == primKey.OriginalPropertyName)))
+        {
+            return result;
+        }
+        ModelViewForeignKeySerializable fk = detail.ForeignKeys.Where(f => f.NavigationName == ForeignKey.NavigationName).FirstOrDefault();
+        if(fk == null)
+        {
+            return result;
+        }
+        ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable =
+            detail.ScalarProperties.Where(s => (s.OriginalPropertyName == primKey.OriginalPropertyName) && (s.ForeignKeyNameChain == fk.NavigationName)).FirstOrDefault();
+        if (modelViewPropertyOfVwSerializable != null)
+        {
+            result.Add(modelViewPropertyOfVwSerializable);
+        }
+        if (fk.ForeignKeyProps == null)
+        {
+            return result;
+        }
+
+        int ind = fk.PrincipalKeyProps.FindIndex(p => p.OriginalPropertyName == primKey.OriginalPropertyName);
+        if(ind < 0)
+        {
+            return result;
+        }
+        ModelViewKeyPropertySerializable ForeignKeyProp = ForeignKey.ForeignKeyProps[ind];
+        ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializableEx =
+            detail.ScalarProperties.FirstOrDefault(s => (s.OriginalPropertyName == ForeignKeyProp.OriginalPropertyName) && (string.IsNullOrEmpty(s.ForeignKeyNameChain)));
+        if(modelViewPropertyOfVwSerializableEx != null) {
+            if(modelViewPropertyOfVwSerializableEx != modelViewPropertyOfVwSerializable)
+            {
+                result.Add(modelViewPropertyOfVwSerializableEx);
+            }
+        }
+        return result;
+    }
+    string GetModelProjectName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileProject)) {
+            return result;
+        }
+        string[] fnArr = refItem.FileProject.Split(new char[] {'\\'}, 100, System.StringSplitOptions.None); 
+        string fn = fnArr[fnArr.Length - 1];
+
+        return fn.Replace(".csproj","");
+    }
+    bool IsPropInteger(ModelViewPropertyOfVwSerializable prop) {
+        if(prop == null) return false;
+        if(string.IsNullOrEmpty( prop.TypeFullName )) return false;
+        string tpNm = prop.TypeFullName.ToLower();
+        return 
+            "system.int16".Equals(tpNm) ||
+            "system.int32".Equals(tpNm) ||
+            "system.int64".Equals(tpNm) ||
+            "system.uint16".Equals(tpNm) ||
+            "system.uint32".Equals(tpNm) ||
+            "system.uint64".Equals(tpNm);
+    }
+
+#>
