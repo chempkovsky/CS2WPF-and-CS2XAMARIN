@@ -185,7 +185,9 @@
              xmlns:intcntxt="<#= InternalContentPrefix #>"
              xmlns:maxscrlvw="<#= MaxScrollViewHeightPrefix #>"
 
-             x:Name="chckdModelUsrCntrlRootNode">
+             <#= BindingContextFeedbackRefPropertyName #>="{Binding BindingContext.<#= BindingContextFeedbackRefPropertyName #>, Source={x:Reference dshchckdModelUsrCntrlRootNode}}"
+
+             x:Name="dshchckdModelUsrCntrlRootNode">
     <sfrmbs:<#= SformUserControlBaseClassName #>.Resources>
         <invboolcnv:<#= InverseBooleanConverterClassName #> x:Key="<#= InverseBooleanConverterClassName #>"/>
     </sfrmbs:<#= SformUserControlBaseClassName #>.Resources>
@@ -200,33 +202,33 @@
             </Grid.RowDefinitions>
 
             <wsfuc:<#= WebServiceFilterUserControlClassName #> Grid.Row="0" 
-                IsVisible="{Binding <#= ShowFilterPropertyName #>, Mode=OneWay, Source={x:Reference chckdModelUsrCntrlRootNode}}"
-                IsEnabled="{Binding BindingContext.<#= IsInQueryPropertyName #>, Mode=OneWay, Converter={StaticResource <#= InverseBooleanConverterClassName #>}, Source={x:Reference chckdModelUsrCntrlRootNode}}"
-                <#= CaptionPropertyName #>="{Binding <#= CaptionPropertyName #>, Mode=OneWay, Source={x:Reference chckdModelUsrCntrlRootNode}}"
-                <#= ShowBackBtnPropertyName #>="{Binding <#= ShowBackBtnPropertyName #>, Mode=OneWay, Source={x:Reference chckdModelUsrCntrlRootNode}}"
-                <#= ShowAddFilterBtnPropertyName #>="{Binding <#= ShowAddFilterBtnPropertyName #>, Mode=OneWay, Source={x:Reference chckdModelUsrCntrlRootNode}}"
-                <#= HiddenFiltersPropertyName #>="{Binding BindingContext.<#= HiddenFiltersVMPropertyName #>, Mode=OneWay, Source={x:Reference chckdModelUsrCntrlRootNode}}"
-                <#= FilterDefinitionsPropertyName #>="{Binding BindingContext.<#= FilterDefinitionsPropertyName #>, Mode=OneWay, Source={x:Reference chckdModelUsrCntrlRootNode}}"
-                <#= ContainerMenuItemsPropertyName #>="{Binding <#= ContainerMenuItemsPropertyName #>, Mode=OneWay, Source={x:Reference chckdModelUsrCntrlRootNode}}"
-                <#= FilterHeightPropertyName #>="{Binding <#= FilterHeightPropertyName #>, Mode=OneWay, Source={x:Reference chckdModelUsrCntrlRootNode}}"
-                <#= ContainerMenuItemsCommandPropertyName #>="{Binding <#= OnContainerMenuItemsCommandPropertyName #>, Source={x:Reference chckdModelUsrCntrlRootNode}}"
-                <#= NavigationBackCommandPropertyName #>="{Binding <#= OnNavigationBackCommandPropertyName #>, Source={x:Reference chckdModelUsrCntrlRootNode}}"   
-                <#= FilterCommandPropertyName #>="{Binding BindingContext.<#= ApplyFilterCommandPropertyName #>, Source={x:Reference chckdModelUsrCntrlRootNode} }"
+                IsVisible="{Binding <#= ShowFilterPropertyName #>, Mode=OneWay, Source={x:Reference dshchckdModelUsrCntrlRootNode}}"
+                IsEnabled="{Binding BindingContext.<#= IsInQueryPropertyName #>, Mode=OneWay, Converter={StaticResource <#= InverseBooleanConverterClassName #>}, Source={x:Reference dshchckdModelUsrCntrlRootNode}}"
+                <#= CaptionPropertyName #>="{Binding <#= CaptionPropertyName #>, Mode=OneWay, Source={x:Reference dshchckdModelUsrCntrlRootNode}}"
+                <#= ShowBackBtnPropertyName #>="{Binding <#= ShowBackBtnPropertyName #>, Mode=OneWay, Source={x:Reference dshchckdModelUsrCntrlRootNode}}"
+                <#= ShowAddFilterBtnPropertyName #>="{Binding <#= ShowAddFilterBtnPropertyName #>, Mode=OneWay, Source={x:Reference dshchckdModelUsrCntrlRootNode}}"
+                <#= HiddenFiltersPropertyName #>="{Binding BindingContext.<#= HiddenFiltersVMPropertyName #>, Mode=OneWay, Source={x:Reference dshchckdModelUsrCntrlRootNode}}"
+                <#= FilterDefinitionsPropertyName #>="{Binding BindingContext.<#= FilterDefinitionsPropertyName #>, Mode=OneWay, Source={x:Reference dshchckdModelUsrCntrlRootNode}}"
+                <#= ContainerMenuItemsPropertyName #>="{Binding <#= ContainerMenuItemsPropertyName #>, Mode=OneWay, Source={x:Reference dshchckdModelUsrCntrlRootNode}}"
+                <#= FilterHeightPropertyName #>="{Binding <#= FilterHeightPropertyName #>, Mode=OneWay, Source={x:Reference dshchckdModelUsrCntrlRootNode}}"
+                <#= ContainerMenuItemsCommandPropertyName #>="{Binding <#= OnContainerMenuItemsCommandPropertyName #>, Source={x:Reference dshchckdModelUsrCntrlRootNode}}"
+                <#= NavigationBackCommandPropertyName #>="{Binding <#= OnNavigationBackCommandPropertyName #>, Source={x:Reference dshchckdModelUsrCntrlRootNode}}"   
+                <#= FilterCommandPropertyName #>="{Binding BindingContext.<#= ApplyFilterCommandPropertyName #>, Source={x:Reference dshchckdModelUsrCntrlRootNode} }"
                 />
 
-            <ActivityIndicator Grid.Row="1" IsVisible="{Binding BindingContext.IsInQuery, Mode=OneWay, Source={x:Reference chckdModelUsrCntrlRootNode}}"
-                    IsRunning="{Binding BindingContext.IsInQuery, Mode=OneWay, Source={x:Reference chckdModelUsrCntrlRootNode}}"/>
+            <ActivityIndicator Grid.Row="1" IsVisible="{Binding BindingContext.IsInQuery, Mode=OneWay, Source={x:Reference dshchckdModelUsrCntrlRootNode}}"
+                    IsRunning="{Binding BindingContext.IsInQuery, Mode=OneWay, Source={x:Reference dshchckdModelUsrCntrlRootNode}}"/>
 
             <ScrollView Orientation="Horizontal" Grid.Row="2" 
-                    intcntxt:<#= InternalContentChangedClassName #>.<#= InternalContentProperty #>="{Binding BindingContext.<#= InternalContentProperty #>, Source={x:Reference chckdModelUsrCntrlRootNode}}"
-                    maxscrlvw:<#= MaxScrollViewHeightClassName #>.<#= MaxHeightProperty #>="{Binding <#= GridHeightPropertyName #>, Source={x:Reference chckdModelUsrCntrlRootNode}}">
+                    intcntxt:<#= InternalContentChangedClassName #>.<#= InternalContentProperty #>="{Binding BindingContext.<#= InternalContentProperty #>, Source={x:Reference dshchckdModelUsrCntrlRootNode}}"
+                    maxscrlvw:<#= MaxScrollViewHeightClassName #>.<#= MaxHeightProperty #>="{Binding <#= GridHeightPropertyName #>, Source={x:Reference dshchckdModelUsrCntrlRootNode}}">
                 <StackLayout   Orientation="Vertical"   Margin="0, 0, 0, 12" Spacing="0">
                     <FlexLayout Direction="Row"  HorizontalOptions="StartAndExpand" JustifyContent="Start">
                         <Frame  OutlineColor="{DynamicResource DataGridLineColor}" 
                                 BackgroundColor="{DynamicResource DataGridHeaderBackGroundColor}" 
                                 Padding="2, 2, 2, 2" FlexLayout.Basis="64" CornerRadius="0" >
                             <Button Text="{x:Static fontIcons:<#= IconFontClassName #>.More_vert}" FontFamily="<#= FontFamilyPropertyName #>" BackgroundColor="Transparent" 
-                                Command="{Binding BindingContext.<#= TableMenuItemsCommandPropertyName #>, Source={x:Reference chckdModelUsrCntrlRootNode}}"/>
+                                Command="{Binding BindingContext.<#= TableMenuItemsCommandPropertyName #>, Source={x:Reference dshchckdModelUsrCntrlRootNode}}"/>
                         </Frame>
                         <Frame OutlineColor="{DynamicResource DataGridLineColor}" 
                             BackgroundColor="{DynamicResource DataGridHeaderBackGroundColor}" 
@@ -249,7 +251,7 @@
                         <Frame OutlineColor="{DynamicResource DataGridLineColor}" 
                             BackgroundColor="{DynamicResource DataGridHeaderBackGroundColor}" 
                             Padding="8, 8, 2, 2" CornerRadius="0"
-                            IsVisible="{Binding BindingContext.<#= SelectedColumnsPropertyName #>[<#= cntr #>].IsChecked, Mode=OneWay, Source={x:Reference chckdModelUsrCntrlRootNode}}"
+                            IsVisible="{Binding BindingContext.<#= SelectedColumnsPropertyName #>[<#= cntr #>].IsChecked, Mode=OneWay, Source={x:Reference dshchckdModelUsrCntrlRootNode}}"
                             FlexLayout.Basis="<#= FlexLayoutBasis #>" >
 <#
             if (IsSortable) { 
@@ -259,17 +261,17 @@
                                     Text="<#= GetDisplayAttributeValueString2(modelViewUIListPropertySerializable, Model, ShortNameLabelProperty) #>" />
                                 <Label Text="" FontFamily="CustomIconFontAlias" >
                                     <Label.Triggers>
-                                        <DataTrigger TargetType="Label" Binding="{Binding BindingContext.<#= CurrentSortInfoPropertyName #>, Source={x:Reference chckdModelUsrCntrlRootNode}}" Value="<#= GetModelPropertyNameEx2(modelViewUIListPropertySerializable, Model) #> asc">
+                                        <DataTrigger TargetType="Label" Binding="{Binding BindingContext.<#= CurrentSortInfoPropertyName #>, Source={x:Reference dshchckdModelUsrCntrlRootNode}}" Value="<#= GetModelPropertyNameEx2(modelViewUIListPropertySerializable, Model) #> asc">
                                             <Setter Property="Text" Value="{x:Static fontIcons:IconFont.Expand_less}"/>
                                         </DataTrigger>
-                                        <DataTrigger TargetType="Label" Binding="{Binding BindingContext.<#= CurrentSortInfoPropertyName #>, Source={x:Reference chckdModelUsrCntrlRootNode}}" Value="<#= GetModelPropertyNameEx2(modelViewUIListPropertySerializable, Model) #> desc">
+                                        <DataTrigger TargetType="Label" Binding="{Binding BindingContext.<#= CurrentSortInfoPropertyName #>, Source={x:Reference dshchckdModelUsrCntrlRootNode}}" Value="<#= GetModelPropertyNameEx2(modelViewUIListPropertySerializable, Model) #> desc">
                                             <Setter Property="Text" Value="{x:Static fontIcons:IconFont.Expand_more}"/>
                                         </DataTrigger>
                                     </Label.Triggers>
                                 </Label>
                             </StackLayout>
                             <Frame.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding BindingContext.<#= OnSortCommandPropertyName #>, Source={x:Reference chckdModelUsrCntrlRootNode}}" CommandParameter="<#= GetModelPropertyNameEx2(modelViewUIListPropertySerializable, Model) #>"/>
+                                <TapGestureRecognizer Command="{Binding BindingContext.<#= OnSortCommandPropertyName #>, Source={x:Reference dshchckdModelUsrCntrlRootNode}}" CommandParameter="<#= GetModelPropertyNameEx2(modelViewUIListPropertySerializable, Model) #>"/>
                             </Frame.GestureRecognizers>
 <#
             } else {
@@ -287,29 +289,21 @@
 #>
                     </FlexLayout>
                     <ScrollView Orientation="Vertical" Margin="0">
-                        <StackLayout RadioButtonGroup.SelectedValue="{Binding BindingContext.<#= SelectedRowPropertyName #>, Source={x:Reference chckdModelUsrCntrlRootNode}}" RadioButtonGroup.GroupName="{Binding <#= RadioGroupNamePropertyName #>, Source={x:Reference chckdModelUsrCntrlRootNode}}"
-                            BindableLayout.ItemsSource="{Binding BindingContext.<#= DataSourcePropertyName #>, Source={x:Reference chckdModelUsrCntrlRootNode}}" Spacing="0" >
+                        <StackLayout BindableLayout.ItemsSource="{Binding BindingContext.<#= DataSourcePropertyName #>, Source={x:Reference dshchckdModelUsrCntrlRootNode}}" Spacing="0">
                             <BindableLayout.ItemTemplate>
                                 <DataTemplate>
                                     <FlexLayout   Direction="Row"   HorizontalOptions="StartAndExpand" JustifyContent="Start">
                                         <Frame OutlineColor="{DynamicResource DataGridLineColor}" 
                                             BackgroundColor="{DynamicResource DataGridBodyBackgroundColor}" 
-                                            Padding="2, 0, 2, 0" FlexLayout.Basis="64" CornerRadius="0" >
-                                            <StackLayout Orientation="Horizontal" Spacing="0">
-                                                <RadioButton WidthRequest="20" Value="{Binding .}"/>
-                                                <Button WidthRequest="40"
-                                                        Text="{x:Static fontIcons:IconFont.More_vert}" FontFamily="CustomIconFontAlias" BackgroundColor="Transparent" 
-                                                        Command="{Binding BindingContext.<#= RowMenuItemsCommandPropertyName #>, Source={x:Reference chckdModelUsrCntrlRootNode}}" CommandParameter="{Binding .}"/>
-                                            </StackLayout>
-                                        </Frame>
+                                            Padding="2, 0, 2, 0" FlexLayout.Basis="64" CornerRadius="0" />
                                         <Frame OutlineColor="{DynamicResource DataGridLineColor}" 
                                             BackgroundColor="{DynamicResource DataGridBodyBackgroundColor}" 
                                             Padding="8, 0, 2, 0" CornerRadius="0" 
                                             FlexLayout.Basis="40">
-                                            <CheckBox IsChecked="{Binding <#= SelPrmPropertyName #>}"  IsEnabled="{Binding  <#= IsPermissionEditablePropertyName #>, Mode=OneWay, Source={x:Reference chckdModelUsrCntrlRootNode}}">
+                                            <CheckBox IsChecked="{Binding <#= SelPrmPropertyName #>}"  IsEnabled="{Binding  <#= IsPermissionEditablePropertyName #>, Mode=OneWay, Source={x:Reference dshchckdModelUsrCntrlRootNode}}">
                                                 <CheckBox.GestureRecognizers>
                                                     <TapGestureRecognizer 
-                                                        Command="{Binding BindingContext.<#= PermissionChangedCommandPropertyName #>, Source={x:Reference chckdModelUsrCntrlRootNode}}" 
+                                                        Command="{Binding BindingContext.<#= PermissionChangedCommandPropertyName #>, Source={x:Reference dshchckdModelUsrCntrlRootNode}}" 
                                                         CommandParameter="{Binding .}"
                                                        />
                                                 </CheckBox.GestureRecognizers>
@@ -328,7 +322,7 @@
                                         <Frame OutlineColor="{DynamicResource DataGridLineColor}" 
                                             BackgroundColor="{DynamicResource DataGridBodyBackgroundColor}" 
                                             Padding="8, 0, 2, 0" CornerRadius="0" 
-                                            IsVisible="{Binding BindingContext.<#= SelectedColumnsPropertyName #>[<#= cntr #>].IsChecked, Mode=OneWay, Source={x:Reference chckdModelUsrCntrlRootNode}}"
+                                            IsVisible="{Binding BindingContext.<#= SelectedColumnsPropertyName #>[<#= cntr #>].IsChecked, Mode=OneWay, Source={x:Reference dshchckdModelUsrCntrlRootNode}}"
                                             FlexLayout.Basis="<#= FlexLayoutBasis #>">
                                             <CheckBox  IsChecked="{Binding <#= GetModelPropertyNameEx2(modelViewUIListPropertySerializable, Model) #>}"  IsEnabled="False"/>
                                         </Frame>
@@ -338,7 +332,7 @@
                                         <Frame OutlineColor="{DynamicResource DataGridLineColor}" 
                                             BackgroundColor="{DynamicResource DataGridBodyBackgroundColor}" 
                                             Padding="8, 0, 2, 0" CornerRadius="0"  
-                                            IsVisible="{Binding BindingContext.<#= SelectedColumnsPropertyName #>[<#= cntr #>].IsChecked, Mode=OneWay, Source={x:Reference chckdModelUsrCntrlRootNode}}"
+                                            IsVisible="{Binding BindingContext.<#= SelectedColumnsPropertyName #>[<#= cntr #>].IsChecked, Mode=OneWay, Source={x:Reference dshchckdModelUsrCntrlRootNode}}"
                                             FlexLayout.Basis="<#= FlexLayoutBasis #>">
                                             <Label  TextColor="{DynamicResource DataGridBodyTextColor}"
 <#
@@ -372,13 +366,13 @@
                 </StackLayout>
             </ScrollView>
             <tpgnuc:<#= TablePaginationUserControlClassName #> Grid.Row="3"
-                <#= TotalCountPropertyName #>="{Binding BindingContext.<#= TotalCountPropertyName #>, Mode=OneWay, Source={x:Reference chckdModelUsrCntrlRootNode}}"
-                <#= CurrentPagePropertyName #>="{Binding BindingContext.<#= CurrentPagePropertyName #>, Mode=TwoWay, Source={x:Reference chckdModelUsrCntrlRootNode}}"
-                <#= RowsPerPagePropertyName #>="{Binding BindingContext.<#= RowsPerPagePropertyName #>, Mode=TwoWay, Source={x:Reference chckdModelUsrCntrlRootNode}}"
-                <#= RowsPerPageOptionsPropertyName #>="{Binding BindingContext.<#= RowsPerPageOptionsPropertyName #>, Mode=OneWay, Source={x:Reference chckdModelUsrCntrlRootNode}}"
-                IsEnabled="{Binding BindingContext.<#= IsInQueryPropertyName #>, Mode=OneWay,  Converter={StaticResource <#= InverseBooleanConverterClassName #>}, Source={x:Reference chckdModelUsrCntrlRootNode}}"
-                <#= CurrentPageChangedCommandPropertyName #>="{Binding BindingContext.<#= OnCurrentPageChangedCommandPropertyName #>, Source={x:Reference chckdModelUsrCntrlRootNode}}"
-                <#= RowsPerPageChangedCommandPropertyName #>="{Binding BindingContext.<#= OnRowsPerPageChangedCommandPropertyName #>, Source={x:Reference chckdModelUsrCntrlRootNode}}"
+                <#= TotalCountPropertyName #>="{Binding BindingContext.<#= TotalCountPropertyName #>, Mode=OneWay, Source={x:Reference dshchckdModelUsrCntrlRootNode}}"
+                <#= CurrentPagePropertyName #>="{Binding BindingContext.<#= CurrentPagePropertyName #>, Mode=TwoWay, Source={x:Reference dshchckdModelUsrCntrlRootNode}}"
+                <#= RowsPerPagePropertyName #>="{Binding BindingContext.<#= RowsPerPagePropertyName #>, Mode=TwoWay, Source={x:Reference dshchckdModelUsrCntrlRootNode}}"
+                <#= RowsPerPageOptionsPropertyName #>="{Binding BindingContext.<#= RowsPerPageOptionsPropertyName #>, Mode=OneWay, Source={x:Reference dshchckdModelUsrCntrlRootNode}}"
+                IsEnabled="{Binding BindingContext.<#= IsInQueryPropertyName #>, Mode=OneWay,  Converter={StaticResource <#= InverseBooleanConverterClassName #>}, Source={x:Reference dshchckdModelUsrCntrlRootNode}}"
+                <#= CurrentPageChangedCommandPropertyName #>="{Binding BindingContext.<#= OnCurrentPageChangedCommandPropertyName #>, Source={x:Reference dshchckdModelUsrCntrlRootNode}}"
+                <#= RowsPerPageChangedCommandPropertyName #>="{Binding BindingContext.<#= OnRowsPerPageChangedCommandPropertyName #>, Source={x:Reference dshchckdModelUsrCntrlRootNode}}"
                 />
         </Grid>
     </ScrollView>
