@@ -18,6 +18,10 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 <#
 
+    string IBearerTokenModelFolder      = "00496-IBearerTokenModel.cs";
+    string IBearerTokenModelClassName   = GetModelClassName(Model, IBearerTokenModelFolder);
+    string IBearerTokenModelNameSpace   = GetModelNameSpace(Model, IBearerTokenModelFolder);
+
     string IAppGlblSettingsServiceFolder      = "00080-IAppGlblSettingsService.cs";
     string IAppGlblSettingsServiceClassName   = GetModelClassName(Model, IAppGlblSettingsServiceFolder);
     string IAppGlblSettingsServiceNameSpace   = GetModelNameSpace(Model, IAppGlblSettingsServiceFolder);
@@ -35,12 +39,17 @@ using System.Net.Http.Headers;
     string ExpandedGridHeightMethodName         = "ExpandedGridHeight";
     string ExpandedFilterHeightMethodName       = "ExpandedFilterHeight";
 
+    List<string> nmSpaces = new List<string>();
+    if ((AppGlblSettingsServiceNameSpace != IAppGlblSettingsServiceNameSpace) && (nmSpaces.IndexOf(IAppGlblSettingsServiceNameSpace) < 0)) 
+        nmSpaces.Add(IAppGlblSettingsServiceNameSpace);
+    if ((AppGlblSettingsServiceNameSpace != IBearerTokenModelNameSpace) && (nmSpaces.IndexOf(IBearerTokenModelNameSpace) < 0)) 
+        nmSpaces.Add(IBearerTokenModelNameSpace);
+
 #>
-<#
-    if(IAppGlblSettingsServiceNameSpace != AppGlblSettingsServiceNameSpace)
-    {
+<# 
+    foreach(string ns in nmSpaces) {
 #>
-using <#= IAppGlblSettingsServiceNameSpace #>;
+using <#= ns #>;
 <#
     }
 #>
@@ -200,8 +209,8 @@ namespace <#= AppGlblSettingsServiceNameSpace #> {
                 }
             }
         }
-        protected dynamic _AuthInfo = null;
-        public dynamic AuthInfo
+        protected <#= IBearerTokenModelClassName #> _AuthInfo = null;
+        public <#= IBearerTokenModelClassName #> AuthInfo
         {
             get
             {

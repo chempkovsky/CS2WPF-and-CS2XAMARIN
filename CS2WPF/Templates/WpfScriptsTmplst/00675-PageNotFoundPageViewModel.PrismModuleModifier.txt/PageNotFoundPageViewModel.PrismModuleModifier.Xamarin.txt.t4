@@ -1,0 +1,231 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="jsonpmm2txt" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+<#
+
+
+    string PageNotFoundPageFolder     = "00685-PageNotFoundPage.xaml.cs";
+    string PageNotFoundPageClassName  = GetModelClassName(Model, PageNotFoundPageFolder);
+    string PageNotFoundPageNameSpace  = GetModelNameSpace(Model, PageNotFoundPageFolder);
+    string PageNotFoundPageProject    = GetModelProjectName(Model, PageNotFoundPageFolder);
+
+
+    string PageNotFoundPageViewModelFolder      = "00689-PageNotFoundPageViewModel.cs";
+    string PageNotFoundPageViewModelClassName   = GetModelClassName(Model, PageNotFoundPageViewModelFolder);
+    string PageNotFoundPageViewModelNameSpace   = GetModelNameSpace(Model, PageNotFoundPageViewModelFolder);
+    string PageNotFoundPageViewModelProject     = GetModelProjectName(Model, PageNotFoundPageViewModelFolder);
+
+
+
+
+    List<string> nmSpaces = new List<string>();
+
+#>
+{
+"PrismMMMCallItems": [
+    {
+    "Description": [
+    '"<#= PageNotFoundPageViewModelClassName #>" UserControl is defined in the "<#= PageNotFoundPageViewModelProject #>"-project.',
+    'In the file of IModule-class of "<#= PageNotFoundPageViewModelProject #>"-project the following line of code must be inserted:',
+    '    public void RegisterTypes(IContainerRegistry containerRegistry)',
+    '    {',
+    '        ...',
+    '        ViewModelLocationProvider.Register<<#= PageNotFoundPageClassName #>, <#= PageNotFoundPageViewModelClassName #>>();',
+    '        containerRegistry.RegisterForNavigation<<#= PageNotFoundPageClassName #>, <#= PageNotFoundPageViewModelClassName #>>("<#= PageNotFoundPageClassName #>");',
+    '        ...',
+    '    }'
+    ],
+<#
+{
+    string PageNotFoundPageNameSpaceAndClassName                   = PageNotFoundPageNameSpace + "." + PageNotFoundPageClassName;
+    string PageNotFoundPageViewModelNameSpaceAndClassName          = PageNotFoundPageViewModelNameSpace + "." + PageNotFoundPageViewModelClassName;
+    string destProjectName                                  = GetModelProjectUniqueName(Model, PageNotFoundPageFolder);
+    string destImplementedInterface                         = "Prism.Modularity.IModule";
+    string destMethodName                                   = "RegisterTypes";
+    string[] destMethodParamTypes                           = new string[] {"Prism.Ioc.IContainerRegistry"};
+    string destMethodAccessType                             = "public";
+    string invocationClassType                              = "Prism.Mvvm.ViewModelLocationProvider";
+    string invocationMethodName                             = "Register";
+    string[] invocationGenerics                             = new string[]{PageNotFoundPageNameSpaceAndClassName, PageNotFoundPageViewModelNameSpaceAndClassName};
+    string[] invocationParams                               = new string[]{};
+    //result = PrismModifier.UpdateMethodWithClassIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType,
+    //                    invocationClassType, invocationMethodName, invocationGenerics, invocationParams);
+#>
+    "MethodName": 'UpdateMethodWithClassIdentifier',
+    "DestProjectName": '<#= destProjectName #>',
+    "DestImplementedInterface": '<#= destImplementedInterface #>',
+    "DestMethodName": '<#= destMethodName #>',
+    "DestMethodParamTypes": ['<#= destMethodParamTypes[0] #>'],
+    "DestMethodAccessType": '<#= destMethodAccessType #>',
+    "DestMethodParamTypeForVar": '',
+    "InvocationVarType": '',
+    "InvocationParamType": '',
+    "InvocationClassType": '<#= invocationClassType #>',
+    "InvocationMethodName": '<#= invocationMethodName #>',
+    "InvocationGenerics": ['<#= invocationGenerics[0] #>','<#= invocationGenerics[1] #>'],
+    "InvocationParams": [],
+    "StepDescription": 'Insertion the line : ViewModelLocationProvider.Register<<#= PageNotFoundPageClassName #>, <#= PageNotFoundPageViewModelClassName #>>();'
+    },
+<#
+}
+{
+    string PageNotFoundPageNameSpaceAndClassName                   = PageNotFoundPageNameSpace + "." + PageNotFoundPageClassName;
+    string PageNotFoundPageViewModelNameSpaceAndClassName          = PageNotFoundPageViewModelNameSpace + "." + PageNotFoundPageViewModelClassName;
+    string destProjectName                                  = GetModelProjectUniqueName(Model, PageNotFoundPageFolder);
+    string destImplementedInterface                         = "Prism.Modularity.IModule";
+    string destMethodName                                   = "RegisterTypes";
+    string[] destMethodParamTypes                           = new string[] {"Prism.Ioc.IContainerRegistry"};
+    string destMethodAccessType                             = "public";
+    string invocationParamType                              = "Prism.Ioc.IContainerRegistry";
+    string invocationMethodName                             = "RegisterForNavigation";
+    string[] invocationGenerics                             = new string[]{PageNotFoundPageNameSpaceAndClassName,PageNotFoundPageViewModelNameSpaceAndClassName};
+    string[] invocationParams                               = new string[]{"\"" + PageNotFoundPageClassName + "\""};
+    //result = PrismModifier.UpdateMethodWithParamIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType,
+    //                    invocationParamType, invocationMethodName, invocationGenerics, invocationParams);
+#>  
+   {
+    "Description": [],
+    "MethodName": 'UpdateMethodWithParamIdentifier',
+    "DestProjectName": '<#= destProjectName #>',
+    "DestImplementedInterface": '<#= destImplementedInterface #>',
+    "DestMethodName": '<#= destMethodName #>',
+    "DestMethodParamTypes": ['<#= destMethodParamTypes[0] #>'],
+    "DestMethodAccessType": '<#= destMethodAccessType #>',
+    "DestMethodParamTypeForVar": '',
+    "InvocationVarType": '',
+    "InvocationParamType": '<#= invocationParamType #>',
+    "InvocationClassType": '',
+    "InvocationMethodName": '<#= invocationMethodName #>',
+    "InvocationGenerics": ['<#= invocationGenerics[0] #>','<#= invocationGenerics[1] #>'],
+    "InvocationParams": ['<#= invocationParams[0]  #>'],
+    "StepDescription": 'Insertion the line : containerRegistry.RegisterForNavigation<<#= PageNotFoundPageClassName #>, <#= PageNotFoundPageViewModelClassName #>>("<#= PageNotFoundPageClassName #>");'
+    }
+<#
+}
+#>  
+    ]
+}
+
+
+
+
+<#+
+    string GetModelProjectUniqueName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileProject)) {
+            return result;
+        }
+        return refItem.FileProject.Replace(@"\", @"\\");
+    }
+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+    string GetModelProjectName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileProject)) {
+            return result;
+        }
+        string[] fnArr = refItem.FileProject.Split(new char[] {'\\'}, 100, System.StringSplitOptions.None); 
+        string fn = fnArr[fnArr.Length - 1];
+
+        return fn.Replace(".csproj","");
+    }
+
+#>

@@ -592,7 +592,14 @@ namespace <#= RegionAwareUserControlBaseNameSpace #> {
             }
         }
         #endregion
-
+        protected override void OnParentSet()
+        {
+            base.OnParentSet();
+            if (Parent == null) {
+                <#= ContainerMenuItemsPropertyName #> = null;
+                <#= ContainerMenuItemsCommandPropertyName #> = null;
+            }
+        }
     }
 }
 

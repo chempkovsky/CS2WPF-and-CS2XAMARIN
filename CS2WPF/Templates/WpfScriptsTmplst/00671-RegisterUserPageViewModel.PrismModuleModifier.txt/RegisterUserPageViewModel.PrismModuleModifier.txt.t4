@@ -1,0 +1,277 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="jsonpmm2txt" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+<#
+
+    string IRegisterModelFolder      = "00500-IRegisterModel.cs";
+    string IRegisterModelClassName   = GetModelClassName(Model, IRegisterModelFolder);
+    string IRegisterModelNameSpace   = GetModelNameSpace(Model, IRegisterModelFolder);
+
+    string IAppGlblLoginServiceFolder      = "00508-IAppGlblLoginService.cs";
+    string IAppGlblLoginServiceClassName   = GetModelClassName(Model, IAppGlblLoginServiceFolder);
+    string IAppGlblLoginServiceNameSpace   = GetModelNameSpace(Model, IAppGlblLoginServiceFolder);
+    string IAppGlblLoginServiceProject     = GetModelProjectName(Model, IAppGlblLoginServiceFolder);
+
+    string HomePageFolder     = "00691-HomePage.xaml.cs";
+    string HomePageClassName  = GetModelClassName(Model, HomePageFolder);
+    string HomePageNameSpace  = GetModelNameSpace(Model, HomePageFolder);
+
+    string RegisterUserPageFolder               = "00707-RegisterUserPage.xaml.cs";
+    string RegisterUserPageClassName            = GetModelClassName(Model, RegisterUserPageFolder);
+    string RegisterUserPageNameSpace            = GetModelNameSpace(Model, RegisterUserPageFolder);
+    string RegisterUserPageProject              = GetModelProjectName(Model, RegisterUserPageFolder);
+
+    string RegisterUserPageXamlFolder           = "00709-RegisterUserPage.xaml";
+    string RegisterUserPageXamlClassName        = GetModelClassName(Model, RegisterUserPageXamlFolder);
+    string RegisterUserPageXamlNameSpace        = GetModelNameSpace(Model, RegisterUserPageXamlFolder);
+    string RegisterUserPageXamlProject          = GetModelProjectName(Model, RegisterUserPageXamlFolder);
+
+    string RegisterUserPageViewModelFolder      = "00711-RegisterUserPageViewModel.cs";
+    string RegisterUserPageViewModelClassName   = GetModelClassName(Model, RegisterUserPageViewModelFolder);
+    string RegisterUserPageViewModelNameSpace   = GetModelNameSpace(Model, RegisterUserPageViewModelFolder);
+    string RegisterUserPageViewModelProject     = GetModelProjectName(Model, RegisterUserPageViewModelFolder);
+
+    string UserNamePropertyName         = "UserName";
+    string UserNameCaptionPropertyName  = "UserNameCaption";
+    string UserNamePropmptPropertyName  = "UserNamePropmpt";
+    string UserNameErrorPropertyName    = "UserNameError";
+
+    string PassWordPropertyName             = "PassWord";
+    string PassWordCaptionPropertyName      = "PassWordCaption";
+    string PassWordPropmptPropertyName      = "PassWordPropmpt";
+    string PassWordErrorPropertyName        = "PassWordError";
+    string PassWordShowPropertyName         = "PassWordShow";
+    string PassWordIsPasswordPropertyName   = "PassWordIsPassword";
+
+    string ConfirmPassWordPropertyName              = "ConfirmPassWord";
+    string ConfirmPassWordCaptionPropertyName       = "ConfirmPassWordCaption";
+    string ConfirmPassWordPropmptPropertyName       = "ConfirmPassWordPropmpt";
+    string ConfirmPassWordErrorPropertyName         = "ConfirmPassWordError";
+    string ConfirmPassWordShowPropertyName          = "ConfirmPassWordShow";
+    string ConfirmPassWordIsPasswordPropertyName    = "ConfirmPassWordIsPassword";
+
+    string OkCommandPropertyName                    = "OkCommand";
+    string CancelCommandPropertyName                = "CancelCommand";
+
+    string ValueErrorSufix                          = "Error"; 
+
+    string AppLoginServicePropertyName              = "GlblLoginSrv";
+    string RegisterMethodName                       = "Register";
+
+
+    List<string> nmSpaces = new List<string>();
+    if ((RegisterUserPageViewModelNameSpace != IAppGlblLoginServiceNameSpace) && (nmSpaces.IndexOf(IAppGlblLoginServiceNameSpace) < 0)) 
+        nmSpaces.Add(IAppGlblLoginServiceNameSpace);
+    if ((RegisterUserPageViewModelNameSpace != IRegisterModelNameSpace) && (nmSpaces.IndexOf(IRegisterModelNameSpace) < 0)) 
+        nmSpaces.Add(IRegisterModelNameSpace);
+
+#>
+
+{
+"PrismMMMCallItems": [
+    {
+    "Description": [
+
+    '"<#= RegisterUserPageViewModelClassName #>" UserControl is defined in the "<#= RegisterUserPageViewModelProject #>"-project.',
+    'In the file of IModule-class of "<#= RegisterUserPageViewModelProject #>"-project the following line of code must be inserted:',
+    '    public void RegisterTypes(IContainerRegistry containerRegistry)',
+    '    {',
+    '        ...',
+    '        ViewModelLocationProvider.Register<<#= RegisterUserPageClassName #>, <#= RegisterUserPageViewModelClassName #>>();',
+    '        containerRegistry.RegisterForNavigation<<#= RegisterUserPageClassName #>, <#= RegisterUserPageViewModelClassName #>>("<#= RegisterUserPageClassName #>");',
+    '        ...',
+    '    }',
+    ],
+<#
+{
+    string RegisterUserPageNameSpaceAndClassName            = RegisterUserPageNameSpace + "." + RegisterUserPageClassName;
+    string RegisterUserPageViewModelNameSpaceAndClassName   = RegisterUserPageViewModelNameSpace + "." + RegisterUserPageViewModelClassName;
+    string destProjectName                                  = GetModelProjectUniqueName(Model, RegisterUserPageFolder);
+    string destImplementedInterface                         = "Prism.Modularity.IModule";
+    string destMethodName                                   = "RegisterTypes";
+    string[] destMethodParamTypes                           = new string[] {"Prism.Ioc.IContainerRegistry"};
+    string destMethodAccessType                             = "public";
+    string invocationClassType                              = "Prism.Mvvm.ViewModelLocationProvider";
+    string invocationMethodName                             = "Register";
+    string[] invocationGenerics                             = new string[]{RegisterUserPageNameSpaceAndClassName, RegisterUserPageViewModelNameSpaceAndClassName};
+    string[] invocationParams                               = new string[]{};
+    //result = PrismModifier.UpdateMethodWithClassIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType,
+    //                    invocationClassType, invocationMethodName, invocationGenerics, invocationParams);
+#>
+    "MethodName": 'UpdateMethodWithClassIdentifier',
+    "DestProjectName": '<#= destProjectName #>',
+    "DestImplementedInterface": '<#= destImplementedInterface #>',
+    "DestMethodName": '<#= destMethodName #>',
+    "DestMethodParamTypes": ['<#= destMethodParamTypes[0] #>'],
+    "DestMethodAccessType": '<#= destMethodAccessType #>',
+    "DestMethodParamTypeForVar": '',
+    "InvocationVarType": '',
+    "InvocationParamType": '',
+    "InvocationClassType": '<#= invocationClassType #>',
+    "InvocationMethodName": '<#= invocationMethodName #>',
+    "InvocationGenerics": ['<#= invocationGenerics[0] #>','<#= invocationGenerics[1] #>'],
+    "InvocationParams": [],
+    "StepDescription": 'Insertion the line : ViewModelLocationProvider.Register<<#= RegisterUserPageClassName #>, <#= RegisterUserPageViewModelClassName #>>();'
+    },
+<#
+}
+{
+    string RegisterUserPageNameSpaceAndClassName            = RegisterUserPageNameSpace + "." + RegisterUserPageClassName;
+    string RegisterUserPageViewModelNameSpaceAndClassName   = RegisterUserPageViewModelNameSpace + "." + RegisterUserPageViewModelClassName;
+    string destProjectName                                  = GetModelProjectUniqueName(Model, RegisterUserPageFolder);
+    string destImplementedInterface                         = "Prism.Modularity.IModule";
+    string destMethodName                                   = "RegisterTypes";
+    string[] destMethodParamTypes                           = new string[] {"Prism.Ioc.IContainerRegistry"};
+    string destMethodAccessType                             = "public";
+    string invocationParamType                              = "Prism.Ioc.IContainerRegistry";
+    string invocationMethodName                             = "RegisterForNavigation";
+    string[] invocationGenerics                             = new string[]{RegisterUserPageNameSpaceAndClassName,RegisterUserPageViewModelNameSpaceAndClassName};
+    string[] invocationParams                               = new string[]{"\"" + RegisterUserPageClassName + "\""};
+    //result = PrismModifier.UpdateMethodWithParamIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType,
+    //                    invocationParamType, invocationMethodName, invocationGenerics, invocationParams);
+#>  
+   {
+    "Description": [],
+    "MethodName": 'UpdateMethodWithParamIdentifier',
+    "DestProjectName": '<#= destProjectName #>',
+    "DestImplementedInterface": '<#= destImplementedInterface #>',
+    "DestMethodName": '<#= destMethodName #>',
+    "DestMethodParamTypes": ['<#= destMethodParamTypes[0] #>'],
+    "DestMethodAccessType": '<#= destMethodAccessType #>',
+    "DestMethodParamTypeForVar": '',
+    "InvocationVarType": '',
+    "InvocationParamType": '<#= invocationParamType #>',
+    "InvocationClassType": '',
+    "InvocationMethodName": '<#= invocationMethodName #>',
+    "InvocationGenerics": ['<#= invocationGenerics[0] #>','<#= invocationGenerics[1] #>'],
+    "InvocationParams": ['<#= invocationParams[0]  #>'],
+    "StepDescription": 'Insertion the line : containerRegistry.RegisterForNavigation<<#= RegisterUserPageClassName #>, <#= RegisterUserPageViewModelClassName #>>("<#= RegisterUserPageClassName #>");'
+    }
+<#
+}
+#>  
+    ]
+}
+
+
+
+<#+
+    string GetModelProjectUniqueName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileProject)) {
+            return result;
+        }
+        return refItem.FileProject.Replace(@"\", @"\\");
+    }
+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+    string GetModelProjectName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileProject)) {
+            return result;
+        }
+        string[] fnArr = refItem.FileProject.Split(new char[] {'\\'}, 100, System.StringSplitOptions.None); 
+        string fn = fnArr[fnArr.Length - 1];
+
+        return fn.Replace(".csproj","");
+    }
+
+#>

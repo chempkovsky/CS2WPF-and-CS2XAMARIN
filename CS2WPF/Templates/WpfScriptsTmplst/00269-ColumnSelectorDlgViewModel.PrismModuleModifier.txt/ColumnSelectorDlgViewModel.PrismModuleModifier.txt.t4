@@ -1,0 +1,221 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="jsonpmm2txt" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+<#
+
+
+    string IColumnSelectorItemDefInterfaceFolder      = "00258-IColumnSelectorItemDefInterface.cs";
+    string IColumnSelectorItemDefInterfaceClassName   = GetModelClassName(Model, IColumnSelectorItemDefInterfaceFolder);
+    string IColumnSelectorItemDefInterfaceNameSpace   = GetModelNameSpace(Model, IColumnSelectorItemDefInterfaceFolder);
+
+
+
+    string ColumnSelectorItemDefViewModelFolder      = "00262-ColumnSelectorItemDefViewModel.cs";
+    string ColumnSelectorItemDefViewModelClassName   = GetModelClassName(Model, ColumnSelectorItemDefViewModelFolder);
+    string ColumnSelectorItemDefViewModelNameSpace   = GetModelNameSpace(Model, ColumnSelectorItemDefViewModelFolder);
+
+    string ColumnSelectorDlgUserControlFolder            = "00266-ColumnSelectorDlgUserControl.xaml.cs";
+    string ColumnSelectorDlgUserControlClassName         = GetModelClassName(Model, ColumnSelectorDlgUserControlFolder);
+    string ColumnSelectorDlgUserControlNameSpace         = GetModelNameSpace(Model, ColumnSelectorDlgUserControlFolder);
+
+
+    string ColumnSelectorDlgViewModelFolder      = "00268-ColumnSelectorDlgViewModel.cs";
+    string ColumnSelectorDlgViewModelClassName   = GetModelClassName(Model, ColumnSelectorDlgViewModelFolder);
+    string ColumnSelectorDlgViewModelNameSpace   = GetModelNameSpace(Model, ColumnSelectorDlgViewModelFolder);
+    string ColumnSelectorDlgViewModelProject     = GetModelProjectName(Model, ColumnSelectorDlgViewModelFolder);
+
+    string TitlePropertyName = "Title";
+    string ColumnsPropertyName = "Columns";
+    string IsCheckedPropertyName = "IsChecked";
+    string CaptionPropertyName = "Caption";
+    string NamePropertyName = "Name";
+    string OkCommandPropertyName = "OkCommand";
+    string CancelCommandPropertyName = "CancelCommand";
+
+    List<string> nmSpaces = new List<string>();
+    if (ColumnSelectorDlgViewModelNameSpace != IColumnSelectorItemDefInterfaceNameSpace) nmSpaces.Add(IColumnSelectorItemDefInterfaceNameSpace);
+    if ((ColumnSelectorDlgViewModelNameSpace != ColumnSelectorItemDefViewModelNameSpace) && (nmSpaces.IndexOf(ColumnSelectorItemDefViewModelNameSpace) < 0)) 
+        nmSpaces.Add(ColumnSelectorItemDefViewModelNameSpace);
+
+#>
+{
+"PrismMMMCallItems": [
+
+
+    {
+    "Description": [
+
+    '"<#= ColumnSelectorDlgViewModelClassName #>"  is defined in the "<#= ColumnSelectorDlgViewModelProject #>"-project.',
+    'In the file of IModule-class of "<#= ColumnSelectorDlgViewModelProject #>"-project the following line of code must be inserted:',
+    '    public void RegisterTypes(IContainerRegistry containerRegistry)',
+    '    {',
+    '        ...',
+    '        containerRegistry.RegisterDialog<<#= ColumnSelectorDlgUserControlClassName #>, <#= ColumnSelectorDlgViewModelClassName #>>("ColumnSelectorDlg");',
+    '        ...',
+    '    }'
+    ],
+<#
+{
+    string ColumnSelectorDlgUserControlClassNameNameSpaceAndClassName    = ColumnSelectorDlgUserControlNameSpace + "." + ColumnSelectorDlgUserControlClassName;
+    string ColumnSelectorDlgViewModelNameSpaceAndClassName           = ColumnSelectorDlgViewModelNameSpace + "." + ColumnSelectorDlgViewModelClassName;
+    string destProjectName                                  = GetModelProjectUniqueName(Model, ColumnSelectorDlgUserControlFolder); 
+    string destImplementedInterface                         = "Prism.Modularity.IModule";
+    string destMethodName                                   = "RegisterTypes";
+    string[] destMethodParamTypes                           = new string[] {"Prism.Ioc.IContainerRegistry"};
+    string destMethodAccessType                             = "public";
+    string invocationParamType                              = "Prism.Ioc.IContainerRegistry";
+    string invocationMethodName                             = "RegisterDialog";
+    string[] invocationGenerics                             = new string[]{ColumnSelectorDlgUserControlClassNameNameSpaceAndClassName,ColumnSelectorDlgViewModelNameSpaceAndClassName};
+    string[] invocationParams                               = new string[]{"\"" + "ColumnSelectorDlg" +"\""};
+    //result = PrismModifier.UpdateMethodWithParamIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType,
+    //                    invocationParamType, invocationMethodName, invocationGenerics, invocationParams);
+#>
+    "MethodName": 'UpdateMethodWithParamIdentifier',
+    "DestProjectName": '<#= destProjectName #>',
+    "DestImplementedInterface": '<#= destImplementedInterface #>',
+    "DestMethodName": '<#= destMethodName #>',
+    "DestMethodParamTypes": ['<#= destMethodParamTypes[0] #>'],
+    "DestMethodAccessType": '<#= destMethodAccessType #>',
+    "DestMethodParamTypeForVar": '',
+    "InvocationVarType": '',
+    "InvocationParamType": '<#= invocationParamType #>',
+    "InvocationClassType": '',
+    "InvocationMethodName": '<#= invocationMethodName #>',
+    "InvocationGenerics": ['<#= invocationGenerics[0] #>', '<#= invocationGenerics[1] #>'],
+    "InvocationParams": ['<#= invocationParams[0] #>'],
+    "StepDescription": 'Insertion the line : containerRegistry.RegisterDialog<<#= ColumnSelectorDlgUserControlClassName #>, <#= ColumnSelectorDlgViewModelClassName #>>("ColumnSelectorDlg");'
+    },
+<#
+}
+#>
+    ]
+}
+
+
+
+
+
+
+
+
+<#+
+    string GetModelProjectUniqueName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileProject)) {
+            return result;
+        }
+        return refItem.FileProject.Replace(@"\", @"\\");
+    }
+
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+    string GetModelProjectName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileProject)) {
+            return result;
+        }
+        string[] fnArr = refItem.FileProject.Split(new char[] {'\\'}, 100, System.StringSplitOptions.None); 
+        string fn = fnArr[fnArr.Length - 1];
+
+        return fn.Replace(".csproj","");
+    }
+
+#>

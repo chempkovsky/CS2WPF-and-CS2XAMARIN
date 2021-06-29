@@ -218,9 +218,8 @@
                     intcntxt:<#= InternalContentChangedClassName #>.<#= InternalContentProperty #>="{Binding BindingContext.<#= InternalContentProperty #>, Source={x:Reference sformUsrCntrlRootNode}}"
                     maxscrlvw:<#= MaxScrollViewHeightClassName #>.<#= MaxHeightProperty #>="{Binding <#= GridHeightPropertyName #>, Source={x:Reference sformUsrCntrlRootNode}}">
                 <StackLayout   Orientation="Vertical"   Margin="0, 0, 0, 12" Spacing="0">
-                    <FlexLayout Direction="Row"  HorizontalOptions="StartAndExpand" JustifyContent="Start">
+                    <FlexLayout Direction="Row"  HorizontalOptions="StartAndExpand" JustifyContent="Start" BackgroundColor="{DynamicResource DataGridHeaderBackGroundColor}" >
                         <Frame  OutlineColor="{DynamicResource DataGridLineColor}" 
-                                BackgroundColor="{DynamicResource DataGridHeaderBackGroundColor}" 
                                 Padding="2, 2, 2, 2" FlexLayout.Basis="64" CornerRadius="0" >
                             <Button Text="{x:Static fontIcons:<#= IconFontClassName #>.More_vert}" FontFamily="<#= FontFamilyPropertyName #>" BackgroundColor="Transparent" 
                                 Command="{Binding BindingContext.<#= TableMenuItemsCommandPropertyName #>, Source={x:Reference sformUsrCntrlRootNode}}"/>
@@ -237,7 +236,6 @@
         string headercolor= "";
 #>
                         <Frame OutlineColor="{DynamicResource DataGridLineColor}" 
-                            BackgroundColor="{DynamicResource DataGridHeaderBackGroundColor}" 
                             Padding="8, 8, 2, 2" CornerRadius="0"
                             IsVisible="{Binding BindingContext.<#= SelectedColumnsPropertyName #>[<#= cntr #>].IsChecked, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
                             FlexLayout.Basis="<#= FlexLayoutBasis #>" >
@@ -278,12 +276,12 @@
                     </FlexLayout>
                     <ScrollView Orientation="Vertical" Margin="0">
                         <StackLayout RadioButtonGroup.SelectedValue="{Binding BindingContext.<#= SelectedRowPropertyName #>, Source={x:Reference sformUsrCntrlRootNode}}" RadioButtonGroup.GroupName="{Binding <#= RadioGroupNamePropertyName #>, Source={x:Reference sformUsrCntrlRootNode}}"
-                            BindableLayout.ItemsSource="{Binding BindingContext.<#= DataSourcePropertyName #>, Source={x:Reference sformUsrCntrlRootNode}}" Spacing="0" >
+                            BindableLayout.ItemsSource="{Binding BindingContext.<#= DataSourcePropertyName #>, Source={x:Reference sformUsrCntrlRootNode}}" Spacing="0" BackgroundColor="{DynamicResource DataGridBodyBackgroundColor}" >
                             <BindableLayout.ItemTemplate>
                                 <DataTemplate>
                                     <FlexLayout   Direction="Row"   HorizontalOptions="StartAndExpand" JustifyContent="Start">
                                         <Frame OutlineColor="{DynamicResource DataGridLineColor}" 
-                                            BackgroundColor="{DynamicResource DataGridBodyBackgroundColor}" 
+                                            
                                             Padding="2, 0, 2, 0" FlexLayout.Basis="64" CornerRadius="0" >
                                             <StackLayout Orientation="Horizontal" Spacing="0">
                                                 <RadioButton WidthRequest="20" Value="{Binding .}"/>
@@ -303,7 +301,6 @@
         if (IsBooleanInput(modelViewUIListPropertySerializable, Model)) {
 #>
                                         <Frame OutlineColor="{DynamicResource DataGridLineColor}" 
-                                            BackgroundColor="{DynamicResource DataGridBodyBackgroundColor}" 
                                             Padding="8, 0, 2, 0" CornerRadius="0" 
                                             IsVisible="{Binding BindingContext.<#= SelectedColumnsPropertyName #>[<#= cntr #>].IsChecked, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
                                             FlexLayout.Basis="<#= FlexLayoutBasis #>">
@@ -313,7 +310,6 @@
         } else {
 #>
                                         <Frame OutlineColor="{DynamicResource DataGridLineColor}" 
-                                            BackgroundColor="{DynamicResource DataGridBodyBackgroundColor}" 
                                             Padding="8, 0, 2, 0" CornerRadius="0"  
                                             IsVisible="{Binding BindingContext.<#= SelectedColumnsPropertyName #>[<#= cntr #>].IsChecked, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
                                             FlexLayout.Basis="<#= FlexLayoutBasis #>">
