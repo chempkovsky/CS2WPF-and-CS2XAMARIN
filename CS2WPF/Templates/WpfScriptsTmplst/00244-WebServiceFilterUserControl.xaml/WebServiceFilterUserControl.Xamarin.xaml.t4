@@ -28,11 +28,11 @@
     string MaxScrollViewHeightNameSpace     = GetModelNameSpace(Model, MaxScrollViewHeightFolder);
     string MaxScrollViewHeightProject       = GetModelProjectName(Model, MaxScrollViewHeightFolder);
 
+    string ButtonDestroyedFolder      = "00188-ButtonDestroyed.cs";
+    string ButtonDestroyedClassName   = GetModelClassName(Model, ButtonDestroyedFolder);
+    string ButtonDestroyedNameSpace   = GetModelNameSpace(Model, ButtonDestroyedFolder);
+    string ButtonDestroyedProject     = GetModelProjectName(Model, ButtonDestroyedFolder);
 
-    string RoutedCommandExtFolder      = "00224-RoutedCommandExt.cs";
-    string RoutedCommandExtClassName   = GetModelClassName(Model, RoutedCommandExtFolder);
-    string RoutedCommandExtNameSpace   = GetModelNameSpace(Model, RoutedCommandExtFolder);
-    string RoutedCommandExtProject     = GetModelProjectName(Model, RoutedCommandExtFolder);
 
 
     string WebServiceFilterItemUserControlXamlFolder      = "00234-WebServiceFilterItemUserControl.xaml";
@@ -80,6 +80,7 @@
     string ShowBackBtnPropertyName = "ShowBackBtn";
     string ShowAddFilterBtnPropertyName = "ShowAddFilterBtn";
     string ContainerMenuItemsPropertyName = "ContainerMenuItems";
+    string CurrentContainerMenuItemsPropertyName = "CurrentContainerMenuItems";
     string ApplyFilterBtnClickedCommandPropertyName = "ApplyFilterBtnClickedCommand";
     string SelectedFilterDataTypePropertyName = "SelectedFilterDataType";
     string SelectedFilterNamePropertyName = "SelectedFilterName";
@@ -101,8 +102,9 @@
     string OnRemoveWebServiceFilterItemCommandPropertyName = "OnRemoveWebServiceFilterItemCommand";
     string OnContainerMenuItemsCommandPropertyName = "OnContainerMenuItemsCommand";
     ////////////////////////////////
-    string InternalContentProperty           = "InternalContent";
-    string MaxHeightProperty                 = "MaxHeight";
+    string InternalContentProperty          = "InternalContent";
+    string MaxHeightProperty                = "MaxHeight";
+    string IsDestroyedPropertyName          = "IsDestroyed";
 
 
     string IconFontPrefix = "clr-namespace:" + IconFontNameSpace;
@@ -125,10 +127,6 @@
     if(FillHelperModelProject != WebServiceFilterUserControlXamlProject) {
         fllPrefix = fllPrefix + ";assembly=" + foregroundHelperModelProject;
     }
-    string routedCommandPrefix = "clr-namespace:" + RoutedCommandExtNameSpace;
-    if(RoutedCommandExtProject != WebServiceFilterUserControlXamlProject) {
-        routedCommandPrefix = routedCommandPrefix + ";assembly=" + RoutedCommandExtProject;
-    }
     string gridflexPrefix = "clr-namespace:" + gridFlexModelNameSpace;
     if(gridFlexModelProject != WebServiceFilterItemUserControlXamlProject) {
         gridflexPrefix = gridflexPrefix + ";assembly=" + gridFlexModelProject;
@@ -140,6 +138,10 @@
     string MaxScrollViewHeightPrefix = "clr-namespace:" + MaxScrollViewHeightNameSpace;
     if(MaxScrollViewHeightProject != WebServiceFilterItemUserControlXamlProject) {
         MaxScrollViewHeightPrefix = MaxScrollViewHeightPrefix + ";assembly=" + MaxScrollViewHeightProject;
+    }
+    string ButtonDestroyedPrefix = "clr-namespace:" + ButtonDestroyedNameSpace;
+    if(ButtonDestroyedProject != WebServiceFilterItemUserControlXamlProject) {
+        ButtonDestroyedPrefix = ButtonDestroyedPrefix + ";assembly=" + ButtonDestroyedProject;
     }
 
 
@@ -154,6 +156,7 @@
              xmlns:fontIcons="<#= IconFontPrefix #>"
              xmlns:intcntxt="<#= InternalContentPrefix #>"
              xmlns:maxscrlvw="<#= MaxScrollViewHeightPrefix #>"
+             xmlns:btnDstr="<#= ButtonDestroyedPrefix #>"
              x:Name="fltrUsrCntrlRootNode">
     <StackLayout Orientation="Vertical">
         <Grid gridflex:<#= gridFlexModelClassName #>.HorizontalFlex="true"
@@ -163,40 +166,41 @@
             <ScrollView Grid.Row="1" Grid.Column="0"
                 Orientation="Horizontal" VerticalScrollBarVisibility="Never" HorizontalScrollBarVisibility="Default" HorizontalOptions="End">
                 <StackLayout Orientation="Horizontal">
-                    <Button WidthRequest="40" 
+                    <btnDstr:<#= ButtonDestroyedClassName #> WidthRequest="40" 
+                            <#= IsDestroyedPropertyName #>="{Binding <#= IsDestroyedPropertyName #>, Mode=OneWay, Source={x:Reference fltrUsrCntrlRootNode}}"
                             IsVisible="{Binding Path=<#= ShowBackBtnPropertyName #>, Mode=OneWay, Source={x:Reference fltrUsrCntrlRootNode}}"
-                            Command="{Binding Path=<#= OnNavigationBackCommandPropertyName #>, Source={x:Reference fltrUsrCntrlRootNode}}"
+                            Command="{Binding Path=<#= OnNavigationBackCommandPropertyName #>, Mode=OneTime, Source={x:Reference fltrUsrCntrlRootNode}}"
                             Text="{x:Static fontIcons:IconFont.Arrow_back}" FontFamily="CustomIconFontAlias" BackgroundColor="{DynamicResource IconButtonBackgroundColor}" 
                             TextColor="{DynamicResource IconButtonPrimaryColor}" 
-                            FontSize="{OnPlatform iOS=Large, Android=Medium, UWP=Medium}">
-                    </Button>
-                    <Button WidthRequest="40"
+                            FontSize="{OnPlatform iOS=Large, Android=Medium, UWP=Medium}"/>
+                    <btnDstr:<#= ButtonDestroyedClassName #> WidthRequest="40"
+                        <#= IsDestroyedPropertyName #>="{Binding <#= IsDestroyedPropertyName #>, Mode=OneWay, Source={x:Reference fltrUsrCntrlRootNode}}"
                         IsVisible="{Binding Path=<#= ShowAddFilterBtnPropertyName #>, Mode=OneWay, Source={x:Reference fltrUsrCntrlRootNode}}"
-                        Command="{Binding Path=<#= OnAddWebServiceFilterItemCommandPropertyName #>, Source={x:Reference fltrUsrCntrlRootNode}}"
+                        Command="{Binding Path=<#= OnAddWebServiceFilterItemCommandPropertyName #>, Mode=OneTime, Source={x:Reference fltrUsrCntrlRootNode}}"
                         Text="{x:Static fontIcons:IconFont.Filter_9_plus}" FontFamily="CustomIconFontAlias" BackgroundColor="{DynamicResource IconButtonBackgroundColor}" 
                         TextColor="{DynamicResource IconButtonPrimaryColor}" 
-                        FontSize="{OnPlatform iOS=Large, Android=Medium, UWP=Medium}">
-                    </Button>
-                    <Button WidthRequest="40"
+                        FontSize="{OnPlatform iOS=Large, Android=Medium, UWP=Medium}"/>
+                    <btnDstr:<#= ButtonDestroyedClassName #> WidthRequest="40"
+                        <#= IsDestroyedPropertyName #>="{Binding <#= IsDestroyedPropertyName #>, Mode=OneWay, Source={x:Reference fltrUsrCntrlRootNode}}"
                         IsVisible="{Binding Path=<#= ShowAddFilterBtnPropertyName #>, Mode=OneWay, Source={x:Reference fltrUsrCntrlRootNode}}"
-                        Command="{Binding Path=<#= OnRemoveAllWebServiceFilterItemCommandPropertyName #>, Source={x:Reference fltrUsrCntrlRootNode}}"
+                        Command="{Binding Path=<#= OnRemoveAllWebServiceFilterItemCommandPropertyName #>, Mode=OneTime, Source={x:Reference fltrUsrCntrlRootNode}}"
                         Text="{x:Static fontIcons:IconFont.Filter_none}" FontFamily="CustomIconFontAlias" BackgroundColor="{DynamicResource IconButtonBackgroundColor}" 
                         TextColor="{DynamicResource IconButtonDangerColor}" 
-                        FontSize="{OnPlatform iOS=Large, Android=Medium, UWP=Medium}">
-                    </Button>
-                    <Button WidthRequest="40"
-                        Command="{Binding Path=<#= OnFilterCommandPropertyName #>, Source={x:Reference fltrUsrCntrlRootNode}}"
+                        FontSize="{OnPlatform iOS=Large, Android=Medium, UWP=Medium}"/>
+                    <btnDstr:<#= ButtonDestroyedClassName #> WidthRequest="40"
+                        <#= IsDestroyedPropertyName #>="{Binding <#= IsDestroyedPropertyName #>, Mode=OneWay, Source={x:Reference fltrUsrCntrlRootNode}}"
+                        Command="{Binding Path=<#= OnFilterCommandPropertyName #>, Mode=OneTime, Source={x:Reference fltrUsrCntrlRootNode}}"
                         Text="{x:Static fontIcons:IconFont.Refresh}" FontFamily="CustomIconFontAlias" BackgroundColor="{DynamicResource IconButtonBackgroundColor}" 
                         TextColor="{DynamicResource IconButtonPrimaryColor}" 
-                        FontSize="{OnPlatform iOS=Large, Android=Large, UWP=Medium}">
-                    </Button>
+                        FontSize="{OnPlatform iOS=Large, Android=Large, UWP=Medium}"/>
                     <StackLayout Orientation="Horizontal" 
-                                 BindableLayout.ItemsSource="{Binding <#= ContainerMenuItemsPropertyName #>, Source={x:Reference fltrUsrCntrlRootNode}}">
+                                 BindableLayout.ItemsSource="{Binding <#= CurrentContainerMenuItemsPropertyName #>, Source={x:Reference fltrUsrCntrlRootNode}}">
                         <BindableLayout.ItemTemplate>
                             <DataTemplate>
-                                <Button WidthRequest="40"
-                                    Command="{Binding <#= OnContainerMenuItemsCommandPropertyName #>, Source={x:Reference fltrUsrCntrlRootNode}}"
-                                    CommandParameter="{Binding}"
+                                <btnDstr:<#= ButtonDestroyedClassName #> WidthRequest="40"
+                                    <#= IsDestroyedPropertyName #>="{Binding <#= IsDestroyedPropertyName #>, Mode=OneWay}"
+                                    Command="{Binding <#= OnContainerMenuItemsCommandPropertyName #>, Mode=OneTime, Source={x:Reference fltrUsrCntrlRootNode}}"
+                                    CommandParameter="{Binding ., Mode=OneTime}"
                                     IsEnabled="{Binding Enabled}"
                                     Text="{Binding IconName}" 
                                     FontFamily="CustomIconFontAlias" 
@@ -215,7 +219,9 @@
             <StackLayout BindableLayout.ItemsSource="{Binding <#= FiltersPropertyName #>, Source={x:Reference fltrUsrCntrlRootNode}}" >
                 <BindableLayout.ItemTemplate>
                     <DataTemplate>
+<!-- <#= IsDestroyedPropertyName #> must be the first -->
                         <fltitm:WebServiceFilterItemUserControl
+                            <#= IsDestroyedPropertyName #>="{Binding <#= IsDestroyedPropertyName #>, Mode=OneWay}"
                             <#= FilterOperatorsPropertyName #>="{Binding <#= FilterOperatorsPropertyName #>, Source={x:Reference fltrUsrCntrlRootNode}}" 
                             <#= FilterDefinitionsPropertyName #>="{Binding <#= FilterDefinitionsPropertyName #>, Source={x:Reference fltrUsrCntrlRootNode}}"
                             <#= FilterErrorPropertyName #>="{Binding fltrError, Mode=OneWayToSource}"

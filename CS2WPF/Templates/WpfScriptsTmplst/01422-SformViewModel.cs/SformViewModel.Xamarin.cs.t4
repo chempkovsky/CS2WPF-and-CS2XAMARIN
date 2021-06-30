@@ -185,6 +185,8 @@ using Xamarin.Essentials;
     string BindingContextFeedbackRefPropertyName    = "BindingContextFeedbackRef";
 
     string InternalContentProperty                  = "InternalContent";
+    string IsDsDestroyedPropertyName                = "IsDsDestroyed";
+    string OnDestroyPropertyName                    = "OnDestroy";
 
     List<string> nmSpaces = new List<string>();
     if ((SformViewModelNameSpace != IWebServiceFilterDefInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterDefInterfaceNameSpace) < 0)) 
@@ -895,6 +897,15 @@ namespace <#= SformViewModelNameSpace #> {
             return true;
         }
         #endregion
+
+        #region <#= IsDsDestroyedPropertyName #>
+        protected bool _<#= IsDsDestroyedPropertyName #> = false;
+        public bool <#= IsDsDestroyedPropertyName #>
+        {
+            get { return _<#= IsDsDestroyedPropertyName #>; }
+            set { if (_<#= IsDsDestroyedPropertyName #> != value) { _<#= IsDsDestroyedPropertyName #> = value; OnPropertyChanged(); } }
+        }
+        #endregion
         #region Filter
         protected async Task onFilter() {
             if ((<#= IsInQueryPropertyName #>) || (!<#= IsOnLoadedCalledPropertyName #>)) return;
@@ -939,8 +950,11 @@ namespace <#= SformViewModelNameSpace #> {
                 Actual<#= RowsPerPagePropertyName #> = rslt.pagesize;
                 Actual<#= CurrentPagePropertyName #> = rslt.page;
                 <#= TotalCountPropertyName #> = rslt.total; 
+                <#= SelectedRowPropertyName #> = null;
                 ObservableCollection<<#= modelInterfaceClassName #>> ds = <#= DataSourcePropertyName #> as ObservableCollection<<#= modelInterfaceClassName #>>;
+                <#= IsDsDestroyedPropertyName #> = true;
                 if (ds == null) { ds = new ObservableCollection<<#= modelInterfaceClassName #>>(); } else { ds.Clear(); }
+                <#= IsDsDestroyedPropertyName #> = false;
                 if(rslt.items != null) {
                     foreach(<#= modelInterfaceClassName #> itm in rslt.items) {
                         ds.Add(<#= FormRootServicePropertyName #>.<#= CopyToModelNotifyMethodName #>(itm, null));
@@ -1047,6 +1061,10 @@ namespace <#= SformViewModelNameSpace #> {
             }
         }
         #endregion
+        public void <#= OnDestroyPropertyName #>() {
+            <#= IsDsDestroyedPropertyName #> = true;
+        }
+
     }
 }
 

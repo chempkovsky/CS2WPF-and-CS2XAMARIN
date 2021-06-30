@@ -50,6 +50,9 @@ using System;
     string CurrentPageChangedCommandPropertyName    = "CurrentPageChangedCommand";
     string TotalCountChangedCommandPropertyName     = "TotalCountChangedCommand";
 
+    string IsDestroyedPropertyName = "IsDestroyed";
+    string OnDestroyedPropertyName = "OnDestroyed";
+
 #>
 <# 
     if(TablePaginationUserControlNameSpace != ValueChangedCmdParamNameSpace) { 
@@ -432,15 +435,37 @@ namespace <#= TablePaginationUserControlNameSpace #> {
             return (<#= CurrentPagePropertyName #> > 0);
         }
         #endregion
-        protected override void OnParentSet()
+
+        public virtual void <#= OnDestroyedPropertyName #>()
         {
-            base.OnParentSet();
-            if (Parent == null) {
-                <#= RowsPerPageChangedCommandPropertyName #> = null;
                 <#= CurrentPageChangedCommandPropertyName #> = null;
-                <#= TotalCountChangedCommandPropertyName #> = null;
+                <#= RowsPerPageChangedCommandPropertyName #> = null;
+        }
+        private static void <#= IsDestroyedPropertyName #>Changed(BindableObject d, object oldValue, object newValue)
+        {
+            <#= TablePaginationUserControlClassName #> inst = d as <#= TablePaginationUserControlClassName #>;
+            if (inst != null) 
+            {
+                inst.<#= OnDestroyedPropertyName #>();
             }
         }
+        public static readonly BindableProperty <#= IsDestroyedPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= IsDestroyedPropertyName #>", typeof(bool),
+                typeof(<#= TablePaginationUserControlClassName #>),
+                false, propertyChanged: <#= IsDestroyedPropertyName #>Changed);
+        public bool <#= IsDestroyedPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= IsDestroyedPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= IsDestroyedPropertyName #>Property, value);
+            }
+        }
+
    }
 }
 

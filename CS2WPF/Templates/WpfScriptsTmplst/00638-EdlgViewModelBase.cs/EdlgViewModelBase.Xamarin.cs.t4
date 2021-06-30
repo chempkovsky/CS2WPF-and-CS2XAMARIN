@@ -65,6 +65,8 @@ using Prism.Services.Dialogs;
     string CancelCommandPropertyName            = "CancelCommand";
     string IsParentLoadedPropertyName           = "IsParentLoaded";
 
+    string IsDestroyedPropertyName = "IsDestroyed";
+    string OnDestroyedPropertyName = "OnDestroyed";
 
     List<string> nmSpaces = new List<string>();
     if ((EdlgViewModelBaseNameSpace != IWebServiceFilterRsltInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace) < 0)) 
@@ -130,7 +132,10 @@ namespace <#= EdlgViewModelBaseNameSpace #> {
         }
         public void OnDialogOpened(IDialogParameters parameters)
         {
-            if (parameters == null) return;
+            if (parameters == null)  {
+                <#= IsParentLoadedPropertyName #> = true;
+                return;
+            }
             if (parameters.ContainsKey("<#= CaptionPropertyName #>"))
             {
                 <#= CaptionPropertyName #> = parameters.GetValue<string>("<#= CaptionPropertyName #>");
@@ -287,6 +292,7 @@ namespace <#= EdlgViewModelBaseNameSpace #> {
         }
         protected void <#= SubmitCommandPropertyName #>Action(object param)
         {
+            <#= IsDestroyedPropertyName #> = true;
             DialogParameters parameters = new DialogParameters();
             parameters.Add("<#= FormControlModelPropertyName #>", param);
             parameters.Add("Result", true);
@@ -309,6 +315,7 @@ namespace <#= EdlgViewModelBaseNameSpace #> {
         }
         protected void <#= CancelCommandPropertyName #>Action(object param)
         {
+            <#= IsDestroyedPropertyName #> = true;
             DialogParameters parameters = new DialogParameters();
             parameters.Add("Result", false);
             _RequestClose?.Invoke(parameters);
@@ -316,6 +323,19 @@ namespace <#= EdlgViewModelBaseNameSpace #> {
         protected bool <#= CancelCommandPropertyName #>CanExecute(object param)
         {
             return true;
+        }
+        #endregion
+
+        #region <#= IsDestroyedPropertyName #>
+        protected bool _<#= IsDestroyedPropertyName #> = false;
+        public bool <#= IsDestroyedPropertyName #> {
+            get { return _<#= IsDestroyedPropertyName #>; }
+            set { 
+                if(_<#= IsDestroyedPropertyName #> != value) {
+                    _<#= IsDestroyedPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
         }
         #endregion
 

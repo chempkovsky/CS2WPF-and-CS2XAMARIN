@@ -87,6 +87,9 @@ using System.Windows.Input;
     string SformAfterDelItemCommandPropertyName     = "SformAfterDelItemCommand";
 
     string RadioGroupNamePropertyName               = "RadioGroupName";
+    string IsDestroyedPropertyName                  = "IsDestroyed";
+    string OnDestroyedPropertyName                  = "OnDestroyed";
+    string OnDestroyPropertyName                    = "OnDestroy";
 
     List<string> nmSpaces = new List<string>();
     if ((SformUserControlBaseNameSpace != IWebServiceFilterRsltInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace) < 0)) 
@@ -123,7 +126,7 @@ namespace <#= SformUserControlBaseNameSpace #> {
     public class <#= SformUserControlBaseClassName #>: <#= UserControlWithContainerMenuClassName #>, <#= INotifiedByParentInterfaceClassName #>
     {
 
-        string _<#= RadioGroupNamePropertyName #> = Guid.NewGuid().ToString("N");
+        string _<#= RadioGroupNamePropertyName #> = "rgn"+ Guid.NewGuid().ToString("N");
         public string <#= RadioGroupNamePropertyName #> { get { return _<#= RadioGroupNamePropertyName #>; } }
 
 
@@ -562,25 +565,16 @@ namespace <#= SformUserControlBaseNameSpace #> {
         }
         #endregion
 
-        protected override void OnParentSet()
+        public override void <#= OnDestroyedPropertyName #>()
         {
-            base.OnParentSet();
-            if (Parent == null) {
-                <#= TableMenuItemsCommandPropertyName #> = null;
-                <#= RowMenuItemsCommandPropertyName #> = null;
-                <#= SelectedRowCommandPropertyName #> = null;
-                <#= TableMenuItemsPropertyName #> = null;
-                <#= RowMenuItemsPropertyName #> = null;
-                <#= HiddenFiltersPropertyName #> = null;
-                <#= NavigationBackCommandPropertyName #> = null;
-                <#= SformAfterAddItemPropertyName #> = null;
-                <#= SformAfterUpdItemPropertyName #> = null;
-                <#= SformAfterDelItemPropertyName #> = null;
-            }
+            base.<#= OnDestroyedPropertyName #>();
+            <#= IBindingContextChangedClassName #> bc = BindingContext as <#= IBindingContextChangedClassName #>;
+            if(bc != null) bc.<#= OnDestroyPropertyName #>();
+            <#= TableMenuItemsCommandPropertyName #> = null;
+            <#= RowMenuItemsCommandPropertyName #> = null;
+            <#= SelectedRowCommandPropertyName #> = null;
+            <#= NavigationBackCommandPropertyName #> = null;
         }
-
-
-
     }
 }
 

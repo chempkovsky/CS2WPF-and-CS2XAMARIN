@@ -26,6 +26,8 @@ using Xamarin.Forms;
     string WebServiceFilterMenuViewModelClassName   = GetModelClassName(Model, WebServiceFilterMenuViewModelFolder);
     string WebServiceFilterMenuViewModelNameSpace   = GetModelNameSpace(Model, WebServiceFilterMenuViewModelFolder);
 
+    string IsDestroyedPropertyName = "IsDestroyed";
+
 #>
 <# 
     if(IWebServiceFilterMenuInterfaceNameSpace != WebServiceFilterMenuViewModelNameSpace) { 
@@ -61,6 +63,8 @@ namespace <#= WebServiceFilterMenuViewModelNameSpace #> {
         public object  FeedbackData { get { return _FeedbackData; } set { if (_FeedbackData != value) { _FeedbackData = value; OnPropertyChanged(); } } }
         protected ICommand  _Command;
         public ICommand  Command { get { return _Command; } set { if (_Command != value) { _Command = value; OnPropertyChanged(); } } }
+        protected bool _<#= IsDestroyedPropertyName #> = false;
+        public bool <#= IsDestroyedPropertyName #> { get { return _<#= IsDestroyedPropertyName #>; } set { if(_<#= IsDestroyedPropertyName #> != value) { _<#= IsDestroyedPropertyName #> = value; OnPropertyChanged(); } } }
     }
 }
 

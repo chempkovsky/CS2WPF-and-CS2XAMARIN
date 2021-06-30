@@ -24,6 +24,8 @@ using System.Runtime.CompilerServices;
     string WebServiceFilterRsltViewModelClassName   = GetModelClassName(Model, WebServiceFilterRsltViewModelFolder);
     string WebServiceFilterRsltViewModelNameSpace   = GetModelNameSpace(Model, WebServiceFilterRsltViewModelFolder);
 
+    string IsDestroyedPropertyName = "IsDestroyed";
+
 #>
 <# 
     if(IWebServiceFilterRsltInterfaceNameSpace != WebServiceFilterRsltViewModelNameSpace) { 
@@ -53,6 +55,8 @@ namespace <#= WebServiceFilterRsltViewModelNameSpace #> {
         public object fltrValue { get { return _fltrValue; } set { if(_fltrValue != value) { _fltrValue = value; OnPropertyChanged(); } } }
         protected string _fltrError;
         public string fltrError { get { return _fltrError; } set { if(_fltrError != value) { _fltrError = value; OnPropertyChanged(); } } }
+        protected bool _<#= IsDestroyedPropertyName #> = false; // memory leak issue
+        public bool <#= IsDestroyedPropertyName #> { get { return _<#= IsDestroyedPropertyName #>; } set { if(_<#= IsDestroyedPropertyName #> != value) { _<#= IsDestroyedPropertyName #> = value; OnPropertyChanged(); } } }
     }
 }
 

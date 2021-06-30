@@ -76,6 +76,8 @@ using System.Windows.Input;
     string OnCancelCommandPropertyName              = "OnCancelCommand";
     string IsParentLoadedPropertyName               = "IsParentLoaded";
 
+    string IsDestroyedPropertyName = "IsDestroyed";
+    string OnDestroyedPropertyName = "OnDestroyed";
 
     List<string> nmSpaces = new List<string>();
     if ((EformUserControlBaseNameSpace != IWebServiceFilterRsltInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace) < 0)) 
@@ -336,6 +338,13 @@ namespace <#= EformUserControlBaseNameSpace #> {
             }
         }
         #endregion
+
+        public override void <#= OnDestroyedPropertyName #>()
+        {
+            base.<#= OnDestroyedPropertyName #>();
+            <#= SubmitCommandPropertyName #> = null;
+            <#= CancelCommandPropertyName #> = null;
+        }
 
     }
 }

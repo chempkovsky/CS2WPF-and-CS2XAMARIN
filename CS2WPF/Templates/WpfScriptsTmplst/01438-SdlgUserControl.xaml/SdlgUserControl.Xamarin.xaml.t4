@@ -57,6 +57,8 @@
     string RegionPropertyName               = "Region";
     string DialogRegionPropertyName         = "DialogRegion";
 
+    string IsDestroyedPropertyName          = "IsDestroyed";
+    string OnDestroyedPropertyName          = "OnDestroyed";
 
     string proxyPrefix = "clr-namespace:" + ProxyUserControlNameSpace;
     if(ProxyUserControlProject != SdlgUserControlProject) {
@@ -110,6 +112,7 @@
 <#
     }
 #>
+            <#= IsDestroyedPropertyName #>="{Binding BindingContext.<#= IsDestroyedPropertyName #>, Mode=OneWay, Source={x:Reference sdlgUserControlRoot}}" 
             <#= CaptionPropertyName #>="{Binding BindingContext.<#= CaptionPropertyName #>, Mode=OneWay, Source={x:Reference sdlgUserControlRoot}}" 
             <#= FilterHeightPropertyName #>="{Binding BindingContext.<#= FilterHeightPropertyName #>, Mode=OneWay, Source={x:Reference sdlgUserControlRoot}}" 
             <#= ShowFilterPropertyName #>="True" 

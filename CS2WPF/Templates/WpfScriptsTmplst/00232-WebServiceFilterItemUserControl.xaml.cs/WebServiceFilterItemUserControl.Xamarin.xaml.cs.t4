@@ -60,7 +60,8 @@ using Xamarin.Forms.Xaml;
     string SelectedModelRefPropertyName = "SelectedModelRef";
     string RemoveWebServiceFilterItemCommandPropertyName = "RemoveWebServiceFilterItemCommand";
     string FilterItemCommandPropertyName = "FilterItemCommand";
-
+    string IsDestroyedPropertyName = "IsDestroyed";
+    string OnDestroyedPropertyName = "OnDestroyed";
 
     List<string> nmSpaces = new List<string>();
     if (WebServiceFilterItemUserControlNameSpace != IWebServiceFilterDefInterfaceNameSpace) nmSpaces.Add(IWebServiceFilterDefInterfaceNameSpace);
@@ -704,24 +705,47 @@ namespace <#= WebServiceFilterItemUserControlNameSpace #> {
         }
         protected void <#= FilterItemCommandPropertyName #>Execute()
         {
-            <#= RemoveWebServiceFilterItemCommandPropertyName #>?.Execute(<#= SelectedModelRefPropertyName #>);
+            if(!<#= IsDestroyedPropertyName #>)
+                <#= RemoveWebServiceFilterItemCommandPropertyName #>?.Execute(<#= SelectedModelRefPropertyName #>);
         }
         protected bool <#= FilterItemCommandPropertyName #>CanExecute()
         {
-            return true;
+            return !<#= IsDestroyedPropertyName #>;
         }
         #endregion
 
-        protected override void OnParentSet()
+        public virtual void <#= OnDestroyedPropertyName #>()
         {
-            base.OnParentSet();
-            if (Parent == null) {
-                <#= RemoveWebServiceFilterItemCommandPropertyName #> = null;
-                <#= SelectedFilterDefinitionPropertyName #> = null;
-                <#= FilterOperatorsPropertyName #> = null;
-                <#= FilterDefinitionsPropertyName #> = null;
+            <#= RemoveWebServiceFilterItemCommandPropertyName #> = null;
+            <#= SelectedFilterDefinitionPropertyName #> = null;
+            <#= FilterOperatorsPropertyName #> = null;
+            <#= FilterDefinitionsPropertyName #> = null;
+        }
+        private static void <#= IsDestroyedPropertyName #>Changed(BindableObject d, object oldValue, object newValue)
+        {
+            <#= WebServiceFilterItemUserControlClassName #> inst = d as <#= WebServiceFilterItemUserControlClassName #>;
+            if (inst != null)
+            {
+                inst.<#= OnDestroyedPropertyName #>();
             }
         }
+        public static readonly BindableProperty <#= IsDestroyedPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= IsDestroyedPropertyName #>", typeof(bool),
+                typeof(<#= WebServiceFilterItemUserControlClassName #>),
+                false, propertyChanged: <#= IsDestroyedPropertyName #>Changed);
+        public bool <#= IsDestroyedPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= IsDestroyedPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= IsDestroyedPropertyName #>Property, value);
+            }
+        }
+
     }
 }
 

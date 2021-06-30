@@ -54,6 +54,9 @@ using Prism.Services.Dialogs;
     string ExpandedGridHeightMethodName         = "ExpandedGridHeight";
     string ExpandedFilterHeightMethodName       = "ExpandedFilterHeight";
 
+    string IsDestroyedPropertyName = "IsDestroyed";
+    string OnDestroyedPropertyName = "OnDestroyed";
+
     List<string> nmSpaces = new List<string>();
     if ((SdlgViewModelBaseNameSpace != IWebServiceFilterRsltInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace) < 0)) 
         nmSpaces.Add(IWebServiceFilterRsltInterfaceNameSpace);
@@ -110,7 +113,10 @@ namespace <#= SdlgViewModelBaseNameSpace #> {
         }
         public void OnDialogOpened(IDialogParameters parameters)
         {
-            if (parameters == null) return;
+            if (parameters == null)  {
+                <#= IsParentLoadedPropertyName #> = true;
+                return;
+            }
             if (parameters.ContainsKey("<#= CaptionPropertyName #>"))
             {
                 <#= CaptionPropertyName #> = parameters.GetValue<string>("<#= CaptionPropertyName #>");
@@ -286,8 +292,10 @@ namespace <#= SdlgViewModelBaseNameSpace #> {
         protected void <#= OkCommandPropertyName #>Action(object param)
         {
             if(_<#= SelectedItemPropertyName #> != null) {
+                object sip = _<#= SelectedItemPropertyName #>;
+                <#= IsDestroyedPropertyName #> = true;
                 DialogParameters parameters = new DialogParameters();
-                parameters.Add("<#= SelectedItemPropertyName #>", _<#= SelectedItemPropertyName #>);
+                parameters.Add("<#= SelectedItemPropertyName #>", sip);
                 parameters.Add("Result", true);
                 _RequestClose?.Invoke(parameters);
             }
@@ -308,6 +316,7 @@ namespace <#= SdlgViewModelBaseNameSpace #> {
         }
         protected void <#= CancelCommandPropertyName #>Action(object param)
         {
+            <#= IsDestroyedPropertyName #> = true;
             DialogParameters parameters = new DialogParameters();
             parameters.Add("Result", false);
             _RequestClose?.Invoke(parameters);
@@ -317,6 +326,20 @@ namespace <#= SdlgViewModelBaseNameSpace #> {
             return true;
         }
         #endregion
+
+        #region <#= IsDestroyedPropertyName #>
+        protected bool _<#= IsDestroyedPropertyName #> = false;
+        public bool <#= IsDestroyedPropertyName #> {
+            get { return _<#= IsDestroyedPropertyName #>; }
+            set { 
+                if(_<#= IsDestroyedPropertyName #> != value) {
+                    _<#= IsDestroyedPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+
     }
 }
 

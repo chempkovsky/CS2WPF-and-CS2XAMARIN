@@ -98,6 +98,8 @@ using System.Windows.Input;
     string OnLoadedPropertyName                     = "OnLoaded";
     string IsParentLoadedPropertyName               = "IsParentLoaded";
 
+    string IsDestroyedPropertyName = "IsDestroyed";
+    string OnDestroyedPropertyName = "OnDestroyed";
 
     List<string> nmSpaces = new List<string>();
     if ((LformUserControlBaseNameSpace != IWebServiceFilterRsltInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace) < 0)) 
@@ -620,6 +622,19 @@ namespace <#= LformUserControlBaseNameSpace #> {
             }
         }
         #endregion
+
+        public override void <#= OnDestroyedPropertyName #>()
+        {
+            base.<#= OnDestroyedPropertyName #>();
+            <#= SformAfterAddItemCommandPropertyName #> = null;
+            <#= SformAfterUpdItemCommandPropertyName #> = null;
+            <#= SformAfterDelItemCommandPropertyName #> = null;
+            <#= TableMenuItemsCommandPropertyName #> = null;
+            <#= RowMenuItemsCommandPropertyName #> = null;
+            <#= SelectedRowCommandPropertyName #> = null;
+            <#= NavigationBackCommandPropertyName #> = null;
+
+        }
 
     }
 }

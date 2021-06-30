@@ -18,12 +18,7 @@ using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using Xamarin.Essentials;
 using System.Threading.Tasks;
-
 <#
-    string commandHelperModelFolder      = "00140-CommandHelper.cs";
-    string commandHelperModelClassName   = GetModelClassName(Model, commandHelperModelFolder);
-    string commandHelperModelNameSpace   = GetModelNameSpace(Model, commandHelperModelFolder);
-
     string convertHelperModelFolder      = "00150-ConvertHelper.cs";
     string convertHelperModelClassName   = GetModelClassName(Model, convertHelperModelFolder);
     string convertHelperModelNameSpace   = GetModelNameSpace(Model, convertHelperModelFolder);
@@ -43,6 +38,10 @@ using System.Threading.Tasks;
     string WebServiceFilterRsltViewModelFolder      = "00215-WebServiceFilterRsltViewModel.cs";
     string WebServiceFilterRsltViewModelClassName   = GetModelClassName(Model, WebServiceFilterRsltViewModelFolder);
     string WebServiceFilterRsltViewModelNameSpace   = GetModelNameSpace(Model, WebServiceFilterRsltViewModelFolder);
+
+    string WebServiceFilterMenuViewModelFolder      = "00217-WebServiceFilterMenuViewModel.cs";
+    string WebServiceFilterMenuViewModelClassName   = GetModelClassName(Model, WebServiceFilterMenuViewModelFolder);
+    string WebServiceFilterMenuViewModelNameSpace   = GetModelNameSpace(Model, WebServiceFilterMenuViewModelFolder);
 
     string IWebServiceFilterDefInterfaceFolder      = "00200-IWebServiceFilterDefInterface.cs";
     string IWebServiceFilterDefInterfaceClassName   = GetModelClassName(Model, IWebServiceFilterDefInterfaceFolder);
@@ -73,11 +72,13 @@ using System.Threading.Tasks;
     string FilterHeightPropertyName = "FilterHeight";
     string HiddenFiltersPropertyName = "HiddenFilters";
     string FiltersPropertyName = "Filters";
+    string ClearFiltersPropertyName = "ClearFilters";
     string FilterOperatorsPropertyName = "FilterOperators";
     string FilterDefinitionsPropertyName = "FilterDefinitions";
     string ShowBackBtnPropertyName = "ShowBackBtn";
     string ShowAddFilterBtnPropertyName = "ShowAddFilterBtn";
     string ContainerMenuItemsPropertyName = "ContainerMenuItems";
+    string CurrentContainerMenuItemsPropertyName = "CurrentContainerMenuItems";
     string ApplyFilterBtnClickedNotificationPropertyName = "ApplyFilterBtnClickedNotification";
     string ApplyFilterBtnClickedCommandPropertyName = "ApplyFilterBtnClickedCommand";
     string AddFilterBtnClickedCommandPropertyName = "AddFilterBtnClickedCommand";
@@ -97,7 +98,9 @@ using System.Threading.Tasks;
     string OnContainerMenuItemsCommandPropertyName = "OnContainerMenuItemsCommand";
 
     ////////////////////////////////
-    string InternalContentProperty           = "InternalContent";
+    string InternalContentProperty              = "InternalContent";
+    string IsDestroyedPropertyName              = "IsDestroyed";
+    string OnDestroyedPropertyName              = "OnDestroyed";
 
 
     List<string> nmSpaces = new List<string>();
@@ -112,10 +115,10 @@ using System.Threading.Tasks;
         nmSpaces.Add(WebServiceFilterOperatorViewModelNameSpace);
     if ((WebServiceFilterUserControlNameSpace != WebServiceFilterRsltViewModelNameSpace) && (nmSpaces.IndexOf(WebServiceFilterRsltViewModelNameSpace) < 0)) 
         nmSpaces.Add(WebServiceFilterRsltViewModelNameSpace);
-    if ((WebServiceFilterUserControlNameSpace != commandHelperModelNameSpace) && (nmSpaces.IndexOf(commandHelperModelNameSpace) < 0)) 
-        nmSpaces.Add(commandHelperModelNameSpace);
     if ((WebServiceFilterUserControlNameSpace != WebServiceFilterRsltNameSpace) && (nmSpaces.IndexOf(WebServiceFilterRsltNameSpace) < 0)) 
         nmSpaces.Add(WebServiceFilterRsltNameSpace);
+    if ((WebServiceFilterUserControlNameSpace != WebServiceFilterMenuViewModelNameSpace) && (nmSpaces.IndexOf(WebServiceFilterMenuViewModelNameSpace) < 0)) 
+        nmSpaces.Add(WebServiceFilterMenuViewModelNameSpace);
     if ((WebServiceFilterUserControlNameSpace != convertHelperModelNameSpace) && (nmSpaces.IndexOf(convertHelperModelNameSpace) < 0)) 
         nmSpaces.Add(convertHelperModelNameSpace);
     
@@ -214,6 +217,7 @@ namespace <#= WebServiceFilterUserControlNameSpace #> {
         }
         protected void <#= OnNavigationBackCommandPropertyName #>Execute()
         {
+            if(<#= IsDestroyedPropertyName #>) return;
             ICommand cmd = <#= NavigationBackCommandPropertyName #>;
             if(cmd != null) {
                 if(cmd.CanExecute(this)) cmd.Execute(this);
@@ -235,6 +239,7 @@ namespace <#= WebServiceFilterUserControlNameSpace #> {
         }
         protected void <#= OnAddWebServiceFilterItemCommandPropertyName #>Execute()
         {
+            if(<#= IsDestroyedPropertyName #>) return;
             Filters.Add(new <#= WebServiceFilterRsltViewModelClassName #>());
             <#= InternalContentProperty #>Changed();
         }
@@ -262,6 +267,10 @@ namespace <#= WebServiceFilterUserControlNameSpace #> {
         }
         #endregion
         #region <#= FiltersPropertyName #>
+        public void <#= ClearFiltersPropertyName #>() {
+                foreach(<#= IWebServiceFilterRsltInterfaceClassName #> itm in <#= FiltersPropertyName #>) itm.<#= IsDestroyedPropertyName #> = true;
+                <#= FiltersPropertyName #>.Clear();
+        }
         ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>> _<#= FiltersPropertyName #> = new ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>()
         {
             new <#= WebServiceFilterRsltViewModelClassName #>()
@@ -322,8 +331,8 @@ namespace <#= WebServiceFilterUserControlNameSpace #> {
             <#= WebServiceFilterUserControlClassName #> inst = d as <#= WebServiceFilterUserControlClassName #>;
             if (inst != null)
             {
-                inst.Filters.Clear();
-                inst.Filters.Add(new WebServiceFilterRsltViewModel());
+                inst.<#= ClearFiltersPropertyName #>();
+                inst.<#= FiltersPropertyName #>.Add(new WebServiceFilterRsltViewModel());
                 inst.<#= InternalContentProperty #>Changed();
             }
         }
@@ -344,12 +353,51 @@ namespace <#= WebServiceFilterUserControlNameSpace #> {
             }
         }
         #endregion
+        #region <#= CurrentContainerMenuItemsPropertyName #>
+        protected ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>> _<#= CurrentContainerMenuItemsPropertyName #> = new ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>>();
+        public ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>> <#= CurrentContainerMenuItemsPropertyName #> { get {return _<#= CurrentContainerMenuItemsPropertyName #>; } }
+        public void <#= CurrentContainerMenuItemsPropertyName #>Clear() {
+            if(_<#= CurrentContainerMenuItemsPropertyName #> != null) {
+                foreach(<#= IWebServiceFilterMenuInterfaceClassName #> itm in _<#= CurrentContainerMenuItemsPropertyName #>) {
+                    itm.<#= IsDestroyedPropertyName #> = true;
+                }
+                _<#= CurrentContainerMenuItemsPropertyName #>.Clear();
+            }
+        }
+        #endregion
         #region <#= ContainerMenuItemsPropertyName #>
+        private static void <#= ContainerMenuItemsPropertyName #>Changed(BindableObject d, object oldValue, object newValue)
+        {
+            <#= WebServiceFilterUserControlClassName #> inst = d as <#= WebServiceFilterUserControlClassName #>;
+            if (inst != null)
+            {
+                inst.<#= CurrentContainerMenuItemsPropertyName #>Clear();
+                if(inst.<#= IsDestroyedPropertyName #>) return;
+                IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> cmitms =  newValue as IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>;
+                if(cmitms != null) {
+                    foreach(<#= IWebServiceFilterMenuInterfaceClassName #> itm in cmitms) {
+                        inst.<#= CurrentContainerMenuItemsPropertyName #>.Add(
+                            new <#= WebServiceFilterMenuViewModelClassName #>() {
+                                Id = itm.Id,
+                                Caption = itm.Caption,
+                                IconName = itm.IconName,
+                                IconColor = itm.IconColor,
+                                Enabled = itm.Enabled,
+                                Data = itm.Data,
+                                FeedbackData = itm.FeedbackData,
+                                Command = itm.Command,
+                                <#= IsDestroyedPropertyName #> = itm.<#= IsDestroyedPropertyName #>
+                            }
+                        );
+                    }
+                }
+            }
+        }
         public static readonly BindableProperty <#= ContainerMenuItemsPropertyName #>Property =
                 BindableProperty.Create(
                 "<#= ContainerMenuItemsPropertyName #>", typeof(IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>),
                 typeof(<#= WebServiceFilterUserControlClassName #>),
-                null);
+                propertyChanged: <#= ContainerMenuItemsPropertyName #>Changed);
         public IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> <#= ContainerMenuItemsPropertyName #>
         {
             get
@@ -363,22 +411,9 @@ namespace <#= WebServiceFilterUserControlNameSpace #> {
         }
         #endregion
         #region <#= FilterCommandPropertyName #>
-        // private static void <#= FilterCommandPropertyName #>Changed(BindableObject bindable, object oldValue, object newValue)
-        // {
-        //     <#= WebServiceFilterUserControlClassName #> d = bindable as <#= WebServiceFilterUserControlClassName #>;
-        //     if(d != null)
-        //     {
-        //         if(d.<#= OnFilterCommandPropertyName #> != null)
-        //         {
-        //             (d.<#= OnFilterCommandPropertyName #> as Command).ChangeCanExecute();
-        //         }
-        //     }
-        // }
-        //
-
         public static readonly BindableProperty <#= FilterCommandPropertyName #>Property =
             BindableProperty.Create(nameof(<#= FilterCommandPropertyName #>), typeof(ICommand), typeof(<#= WebServiceFilterUserControlClassName #>), 
-            null); // , propertyChanged: <#= FilterCommandPropertyName #>Changed);
+            null); 
         public ICommand <#= FilterCommandPropertyName #>
         {
             get { return (ICommand)GetValue(<#= FilterCommandPropertyName #>Property); }
@@ -397,7 +432,7 @@ namespace <#= WebServiceFilterUserControlNameSpace #> {
                     {
                         if ((flt.fltrValue != null) && (!string.IsNullOrEmpty(flt.fltrDataType)) && (!string.IsNullOrEmpty(flt.fltrOperator)))
                         {
-                            object v = ConvertHelper.TryToConvert(flt.fltrDataType, flt.fltrValue);
+                            object v = <#= convertHelperModelClassName #>.TryToConvert(flt.fltrDataType, flt.fltrValue);
                             if (v != null)
                             {
                                 rslt.Add(new WebServiceFilterRslt() { fltrName = flt.fltrName, fltrDataType = flt.fltrDataType, fltrOperator = flt.fltrOperator, fltrValue = v });
@@ -414,7 +449,7 @@ namespace <#= WebServiceFilterUserControlNameSpace #> {
                     {
                         if ((flt.fltrValue != null) && (!string.IsNullOrEmpty(flt.fltrDataType)) && (!string.IsNullOrEmpty(flt.fltrOperator)))
                         {
-                            object v = ConvertHelper.TryToConvert(flt.fltrDataType, flt.fltrValue);
+                            object v = <#= convertHelperModelClassName #>.TryToConvert(flt.fltrDataType, flt.fltrValue);
                             if (v != null)
                             {
                                 rslt.Add(new <#= WebServiceFilterRsltClassName #>() { fltrName = flt.fltrName, fltrDataType = flt.fltrDataType, fltrOperator = flt.fltrOperator, fltrValue = v });
@@ -435,6 +470,7 @@ namespace <#= WebServiceFilterUserControlNameSpace #> {
         }
         protected void <#= OnFilterCommandPropertyName #>Execute()
         {
+            if(<#= IsDestroyedPropertyName #>) return;
             ICommand cmd = <#= FilterCommandPropertyName #>;
             if (cmd != null)
             {
@@ -444,15 +480,6 @@ namespace <#= WebServiceFilterUserControlNameSpace #> {
         }
         protected bool <#= OnFilterCommandPropertyName #>CanExecute()
         {
-            //
-            //ICommand cmd = <#= FilterCommandPropertyName #>;
-            //if (cmd != null)
-            //{
-            //    IList<<#= IWebServiceFilterRsltInterfaceClassName #>> rslt = InternalDefineFilter();
-            //    return cmd.CanExecute(rslt);
-            //} else return false;
-            //
-
             return true;
         }
         #endregion
@@ -467,20 +494,22 @@ namespace <#= WebServiceFilterUserControlNameSpace #> {
         }
         protected void <#= OnRemoveWebServiceFilterItemCommandPropertyName #>Execute(object prm)
         {
-            if (Filters.Count < 1)
+            if(<#= IsDestroyedPropertyName #>) return;
+            if (<#= FiltersPropertyName #>.Count < 1)
             {
-                Filters.Add(new <#= WebServiceFilterRsltViewModelClassName #>());
+                <#= FiltersPropertyName #>.Add(new <#= WebServiceFilterRsltViewModelClassName #>());
                 <#= InternalContentProperty #>Changed();
                 return;
             }
-            if (Filters.Count < 2)
+            if (<#= FiltersPropertyName #>.Count < 2)
             {
                 return;
             }
             <#= IWebServiceFilterRsltInterfaceClassName #> itm = prm as <#= IWebServiceFilterRsltInterfaceClassName #>;
             if (itm != null)
             {
-                Filters.Remove(itm);
+                itm.<#= IsDestroyedPropertyName #> = true;
+                <#= FiltersPropertyName #>.Remove(itm);
                 <#= InternalContentProperty #>Changed();
             }
         }
@@ -500,8 +529,9 @@ namespace <#= WebServiceFilterUserControlNameSpace #> {
         }
         private void <#= OnRemoveAllWebServiceFilterItemCommandPropertyName #>Execute()
         {
-            Filters.Clear();
-            Filters.Add(new <#= WebServiceFilterRsltViewModelClassName #>());
+            if(<#= IsDestroyedPropertyName #>) return;
+            <#= ClearFiltersPropertyName #>();
+            <#= FiltersPropertyName #>.Add(new <#= WebServiceFilterRsltViewModelClassName #>());
             <#= InternalContentProperty #>Changed();
         }
         private bool <#= OnRemoveAllWebServiceFilterItemCommandPropertyName #>CanExecute() {
@@ -509,22 +539,9 @@ namespace <#= WebServiceFilterUserControlNameSpace #> {
         }
         #endregion
         #region <#= OnContainerMenuItemsCommandPropertyName #>
-        //private static void <#= ContainerMenuItemsCommandPropertyName #>Changed(BindableObject bindable, object oldValue, object newValue)
-        //{
-        //    <#= WebServiceFilterUserControlClassName #> d = bindable as <#= WebServiceFilterUserControlClassName #>;
-        //    if (d != null)
-        //    {
-        //        if (d.<#= OnContainerMenuItemsCommandPropertyName #> != null)
-        //        {
-        //            (d.<#= OnContainerMenuItemsCommandPropertyName #> as Command).ChangeCanExecute();
-        //        }
-        //    }
-        //}
-        //
-
         public static readonly BindableProperty <#= ContainerMenuItemsCommandPropertyName #>Property =
             BindableProperty.Create(nameof(<#= ContainerMenuItemsCommandPropertyName #>), typeof(ICommand), typeof(<#= WebServiceFilterUserControlClassName #>), 
-            null); //, propertyChanged: <#= ContainerMenuItemsCommandPropertyName #>Changed);
+            null); 
         public ICommand <#= ContainerMenuItemsCommandPropertyName #>
         {
             get { return (ICommand)GetValue(<#= ContainerMenuItemsCommandPropertyName #>Property); }
@@ -541,6 +558,7 @@ namespace <#= WebServiceFilterUserControlNameSpace #> {
         }
         protected void <#= OnContainerMenuItemsCommandPropertyName #>Execute(object p)
         {
+            if(<#= IsDestroyedPropertyName #>) return;
             ICommand cmd = <#= ContainerMenuItemsCommandPropertyName #>;
             if(cmd != null) {
                 if(cmd.CanExecute(p)) cmd.Execute(p);
@@ -548,20 +566,9 @@ namespace <#= WebServiceFilterUserControlNameSpace #> {
         }
         protected bool <#= OnContainerMenuItemsCommandPropertyName #>CanExecute(object p)
         {
-            //
-            //ICommand cmd = <#= ContainerMenuItemsCommandPropertyName #>;
-            //if (cmd != null)
-            //    return cmd.CanExecute(p);
-            //else
-            //    return false;
-            //
-
             return true;
         }
         #endregion
-
-
-
 
         #region <#= FilterHeightPropertyName #>
         public static readonly BindableProperty <#= FilterHeightPropertyName #>Property =
@@ -581,18 +588,37 @@ namespace <#= WebServiceFilterUserControlNameSpace #> {
             }
         }
         #endregion
-        protected override void OnParentSet()
+
+        public virtual void <#= OnDestroyedPropertyName #>()
         {
-            base.OnParentSet();
-            if (Parent == null) {
-                <#= HiddenFiltersPropertyName #> = null;
-                // <#= FiltersPropertyName #> = null;
+                <#= ClearFiltersPropertyName #>();
                 <#= NavigationBackCommandPropertyName #> = null;
-                // <#= FilterOperatorsPropertyName #> = null;
-                <#= FilterDefinitionsPropertyName #> = null;
                 <#= ContainerMenuItemsPropertyName #> = null;
                 <#= FilterCommandPropertyName #> = null;
-                <#= ContainerMenuItemsCommandPropertyName #> = null;
+                <#= CurrentContainerMenuItemsPropertyName #>Clear();
+        }
+        private static void <#= IsDestroyedPropertyName #>Changed(BindableObject d, object oldValue, object newValue)
+        {
+            <#= WebServiceFilterUserControlClassName #> inst = d as <#= WebServiceFilterUserControlClassName #>;
+            if (inst != null) 
+            {
+                inst.<#= OnDestroyedPropertyName #>();
+            }
+        }
+        public static readonly BindableProperty <#= IsDestroyedPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= IsDestroyedPropertyName #>", typeof(bool),
+                typeof(<#= WebServiceFilterUserControlClassName #>),
+                false, propertyChanged: <#= IsDestroyedPropertyName #>Changed);
+        public bool <#= IsDestroyedPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= IsDestroyedPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= IsDestroyedPropertyName #>Property, value);
             }
         }
 

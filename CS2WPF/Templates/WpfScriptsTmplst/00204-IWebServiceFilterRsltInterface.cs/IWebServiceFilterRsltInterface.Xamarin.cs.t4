@@ -18,6 +18,8 @@
     string IWebServiceFilterRsltInterfaceClassName   = GetModelClassName(Model, IWebServiceFilterRsltInterfaceFolder);
     string IWebServiceFilterRsltInterfaceNameSpace   = GetModelNameSpace(Model, IWebServiceFilterRsltInterfaceFolder);
     
+    string IsDestroyedPropertyName = "IsDestroyed";
+
 #>
 
 namespace <#= IWebServiceFilterRsltInterfaceNameSpace #> {
@@ -28,6 +30,7 @@ namespace <#= IWebServiceFilterRsltInterfaceNameSpace #> {
         string  fltrOperator { get; set; }
         object  fltrValue { get; set; }
         string  fltrError { get; set; }
+        bool    <#= IsDestroyedPropertyName #> { get; set; } // memory leak issue
     }
 }
 

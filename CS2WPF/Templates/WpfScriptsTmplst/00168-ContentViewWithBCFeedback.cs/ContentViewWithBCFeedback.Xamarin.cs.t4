@@ -21,6 +21,8 @@ using System.Threading.Tasks;
     string ContentViewWithBCFeedbackNameSpace   = GetModelNameSpace(Model, ContentViewWithBCFeedbackFolder);
 
     string BindingContextFeedbackRefPropertyName = "BindingContextFeedbackRef";
+    string IsDestroyedPropertyName = "IsDestroyed";
+    string OnDestroyedPropertyName = "OnDestroyed";
 
 #>
 
@@ -38,6 +40,7 @@ namespace <#= ContentViewWithBCFeedbackNameSpace #> {
                 <#= ContentViewWithBCFeedbackClassName #> sender = bindable as <#= ContentViewWithBCFeedbackClassName #>;
                 if(sender != null)
                 {
+                    if(sender.<#= IsDestroyedPropertyName #>) return;
                     sender.On<#= BindingContextFeedbackRefPropertyName #>(newValue);
                 }
             } catch {}
@@ -59,6 +62,36 @@ namespace <#= ContentViewWithBCFeedbackNameSpace #> {
             }
         }
         #endregion
+
+        public virtual void <#= OnDestroyedPropertyName #>()
+        {
+            <#= BindingContextFeedbackRefPropertyName #> = null;
+        }
+        private static void <#= IsDestroyedPropertyName #>Changed(BindableObject d, object oldValue, object newValue)
+        {
+            <#= ContentViewWithBCFeedbackClassName #> inst = d as <#= ContentViewWithBCFeedbackClassName #>;
+            if (inst != null)
+            {
+                inst.<#= OnDestroyedPropertyName #>();
+            }
+        }
+        public static readonly BindableProperty <#= IsDestroyedPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= IsDestroyedPropertyName #>", typeof(bool),
+                typeof(<#= ContentViewWithBCFeedbackClassName #>),
+                false, propertyChanged: <#= IsDestroyedPropertyName #>Changed);
+        public bool <#= IsDestroyedPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= IsDestroyedPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= IsDestroyedPropertyName #>Property, value);
+            }
+        }
+
     }
 }
 

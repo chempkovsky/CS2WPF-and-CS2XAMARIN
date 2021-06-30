@@ -23,6 +23,8 @@
     string WebServiceFilterRsltClassName   = GetModelClassName(Model, WebServiceFilterRsltFolder);
     string WebServiceFilterRsltNameSpace   = GetModelNameSpace(Model, WebServiceFilterRsltFolder);
 
+    string IsDestroyedPropertyName          = "IsDestroyed";
+
 #>
 <# 
     if(IWebServiceFilterRsltInterfaceNameSpace != WebServiceFilterRsltNameSpace) { 
@@ -40,6 +42,7 @@ namespace <#= WebServiceFilterRsltNameSpace #> {
         public string fltrOperator { get; set; }
         public object fltrValue { get; set; }
         public string fltrError { get; set; }
+        public bool   <#= IsDestroyedPropertyName #> { get; set; } // memory leak issue
     }
 }
 

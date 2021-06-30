@@ -12,41 +12,49 @@
 <#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
 using Xamarin.Forms;
-using System.Windows.Input;
 <#
 
-    string IWebServiceFilterMenuInterfaceFolder      = "00206-IWebServiceFilterMenuInterface.cs";
-    string IWebServiceFilterMenuInterfaceClassName   = GetModelClassName(Model, IWebServiceFilterMenuInterfaceFolder);
-    string IWebServiceFilterMenuInterfaceNameSpace   = GetModelNameSpace(Model, IWebServiceFilterMenuInterfaceFolder);
-
+    string ButtonDestroyedFolder      = "00188-ButtonDestroyed.cs";
+    string ButtonDestroyedClassName   = GetModelClassName(Model, ButtonDestroyedFolder);
+    string ButtonDestroyedNameSpace   = GetModelNameSpace(Model, ButtonDestroyedFolder);
     
-    string WebServiceFilterMenuFolder       = "00216-WebServiceFilterMenu.cs";
-    string WebServiceFilterMenuClassName    = GetModelClassName(Model, WebServiceFilterMenuFolder);
-    string WebServiceFilterMenuNameSpace    = GetModelNameSpace(Model, WebServiceFilterMenuFolder);
-
-    string IsDestroyedPropertyName          = "IsDestroyed";
+    string IsDestroyedPropertyName              = "IsDestroyed";
+    string OnDestroyedPropertyName              = "OnDestroyed";
 
 #>
-<# 
-    if(IWebServiceFilterMenuInterfaceNameSpace != WebServiceFilterMenuNameSpace) { 
-#>
-using <#= IWebServiceFilterMenuInterfaceNameSpace #>;
-<#
-    }
-#>
 
-namespace <#= WebServiceFilterMenuNameSpace #> {
-    public class <#= WebServiceFilterMenuClassName #>: <#= IWebServiceFilterMenuInterfaceClassName #>
+namespace <#= ButtonDestroyedNameSpace #> {
+    public class <#= ButtonDestroyedClassName #>: Button
     {
-        public string Id { get; set; }
-        public string Caption { get; set; }
-        public string IconName { get; set; }
-        public Color IconColor { get; set; }
-        public bool Enabled { get; set; }
-        public object Data { get; set; }
-        public object FeedbackData { get; set; }
-        public ICommand Command { get; set; }
-        public bool <#= IsDestroyedPropertyName #> { get; set; }
+        public virtual void <#= OnDestroyedPropertyName #>()
+        {
+            Command = null;
+            CommandParameter = null;
+        }
+        private static void <#= IsDestroyedPropertyName #>Changed(BindableObject d, object oldValue, object newValue)
+        {
+            <#= ButtonDestroyedClassName #> inst = d as <#= ButtonDestroyedClassName #>;
+            if ((inst != null) && (newValue is bool))
+            {
+                inst.<#= OnDestroyedPropertyName #>();
+            }
+        }
+        public static readonly BindableProperty <#= IsDestroyedPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= IsDestroyedPropertyName #>", typeof(bool),
+                typeof(<#= ButtonDestroyedClassName #>),
+                false, propertyChanged: <#= IsDestroyedPropertyName #>Changed);
+        public bool <#= IsDestroyedPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= IsDestroyedPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= IsDestroyedPropertyName #>Property, value);
+            }
+        }
     }
 }
 

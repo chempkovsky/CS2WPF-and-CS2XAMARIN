@@ -36,6 +36,8 @@ using System.Windows.Input;
     string FilterHeightPropertyName                 = "FilterHeight";
     string GridHeightPropertyName                   = "GridHeight";
 
+    string IsDestroyedPropertyName = "IsDestroyed";
+    string OnDestroyedPropertyName = "OnDestroyed";
 
     List<string> nmSpaces = new List<string>();
     if ((UserControlWithContainerMenuNameSpace != IWebServiceFilterMenuInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterMenuInterfaceNameSpace) < 0)) 
@@ -165,13 +167,10 @@ namespace <#= UserControlWithContainerMenuNameSpace #> {
             }
         }
         #endregion
-        protected override void OnParentSet()
+        public override void <#= OnDestroyedPropertyName #>()
         {
-            base.OnParentSet();
-            if (Parent == null) {
-                <#= ContainerMenuItemsPropertyName #> = null;
-                <#= ContainerMenuItemsCommandPropertyName #> = null;
-            }
+            base.OnDestroyed();
+            <#= ContainerMenuItemsCommandPropertyName #> = null;
         }
 
     }

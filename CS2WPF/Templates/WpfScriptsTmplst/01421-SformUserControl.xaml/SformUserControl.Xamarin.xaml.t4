@@ -132,6 +132,11 @@
     string InternalContentProperty           = "InternalContent";
     string MaxHeightProperty                 = "MaxHeight";
 
+    string IsDestroyedPropertyName = "IsDestroyed";
+    string OnDestroyedPropertyName = "OnDestroyed";
+    string IsDsDestroyedPropertyName = "IsDsDestroyed";
+    
+
     string wsfucPrefix = "clr-namespace:" + WebServiceFilterUserControlNameSpace;
     if(SformUserControlProject != WebServiceFilterUserControlProject) {
         wsfucPrefix = wsfucPrefix + ";assembly=" + WebServiceFilterUserControlProject;
@@ -195,6 +200,7 @@
             </Grid.RowDefinitions>
 
             <wsfuc:<#= WebServiceFilterUserControlClassName #> Grid.Row="0" 
+                <#= IsDestroyedPropertyName #>="{Binding <#= IsDestroyedPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
                 IsVisible="{Binding <#= ShowFilterPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
                 IsEnabled="{Binding BindingContext.<#= IsInQueryPropertyName #>, Mode=OneWay, Converter={StaticResource <#= InverseBooleanConverterClassName #>}, Source={x:Reference sformUsrCntrlRootNode}}"
                 <#= CaptionPropertyName #>="{Binding <#= CaptionPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
@@ -204,9 +210,9 @@
                 <#= FilterDefinitionsPropertyName #>="{Binding BindingContext.<#= FilterDefinitionsPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
                 <#= ContainerMenuItemsPropertyName #>="{Binding <#= ContainerMenuItemsPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
                 <#= FilterHeightPropertyName #>="{Binding <#= FilterHeightPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
-                <#= ContainerMenuItemsCommandPropertyName #>="{Binding <#= OnContainerMenuItemsCommandPropertyName #>, Source={x:Reference sformUsrCntrlRootNode}}"
-                <#= NavigationBackCommandPropertyName #>="{Binding <#= OnNavigationBackCommandPropertyName #>, Source={x:Reference sformUsrCntrlRootNode}}"   
-                <#= FilterCommandPropertyName #>="{Binding BindingContext.<#= ApplyFilterCommandPropertyName #>, Source={x:Reference sformUsrCntrlRootNode} }"
+                <#= ContainerMenuItemsCommandPropertyName #>="{Binding <#= OnContainerMenuItemsCommandPropertyName #>, Mode=OneTime, Source={x:Reference sformUsrCntrlRootNode}}"
+                <#= NavigationBackCommandPropertyName #>="{Binding <#= OnNavigationBackCommandPropertyName #>, Mode=OneTime, Source={x:Reference sformUsrCntrlRootNode}}"   
+                <#= FilterCommandPropertyName #>="{Binding BindingContext.<#= ApplyFilterCommandPropertyName #>, Mode=OneTime, Source={x:Reference sformUsrCntrlRootNode} }"
                 />
 <!--
             FilterOperators="{Binding FilterOperators, Source={x:Reference sformUsrCntrlRootNode}}"
@@ -286,6 +292,8 @@
                                             <StackLayout Orientation="Horizontal" Spacing="0">
                                                 <RadioButton WidthRequest="20" Value="{Binding .}"/>
                                                 <Button WidthRequest="40"
+                                                        <#= IsDestroyedPropertyName #>="{Binding BindingContext.<#= IsDsDestroyedPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}" 
+
                                                         Text="{x:Static fontIcons:IconFont.More_vert}" FontFamily="CustomIconFontAlias" BackgroundColor="Transparent" 
                                                         Command="{Binding BindingContext.<#= RowMenuItemsCommandPropertyName #>, Source={x:Reference sformUsrCntrlRootNode}}" CommandParameter="{Binding .}"/>
                                             </StackLayout>
@@ -347,13 +355,14 @@
 
 
             <tpgnuc:<#= TablePaginationUserControlClassName #> Grid.Row="3"
+                <#= IsDestroyedPropertyName #>="{Binding <#= IsDestroyedPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
                 <#= TotalCountPropertyName #>="{Binding BindingContext.<#= TotalCountPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
                 <#= CurrentPagePropertyName #>="{Binding BindingContext.<#= CurrentPagePropertyName #>, Mode=TwoWay, Source={x:Reference sformUsrCntrlRootNode}}"
                 <#= RowsPerPagePropertyName #>="{Binding BindingContext.<#= RowsPerPagePropertyName #>, Mode=TwoWay, Source={x:Reference sformUsrCntrlRootNode}}"
                 <#= RowsPerPageOptionsPropertyName #>="{Binding BindingContext.<#= RowsPerPageOptionsPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
                 IsEnabled="{Binding BindingContext.<#= IsInQueryPropertyName #>, Mode=OneWay,  Converter={StaticResource <#= InverseBooleanConverterClassName #>}, Source={x:Reference sformUsrCntrlRootNode}}"
-                <#= CurrentPageChangedCommandPropertyName #>="{Binding BindingContext.<#= OnCurrentPageChangedCommandPropertyName #>, Source={x:Reference sformUsrCntrlRootNode}}"
-                <#= RowsPerPageChangedCommandPropertyName #>="{Binding BindingContext.<#= OnRowsPerPageChangedCommandPropertyName #>, Source={x:Reference sformUsrCntrlRootNode}}"
+                <#= CurrentPageChangedCommandPropertyName #>="{Binding BindingContext.<#= OnCurrentPageChangedCommandPropertyName #>, Mode=OneTime, Source={x:Reference sformUsrCntrlRootNode}}"
+                <#= RowsPerPageChangedCommandPropertyName #>="{Binding BindingContext.<#= OnRowsPerPageChangedCommandPropertyName #>, Mode=OneTime, Source={x:Reference sformUsrCntrlRootNode}}"
                 />
         </Grid>
     </ScrollView>
