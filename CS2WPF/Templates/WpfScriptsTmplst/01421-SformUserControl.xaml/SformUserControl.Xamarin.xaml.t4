@@ -34,6 +34,11 @@
     string IconFontNameSpace   = GetContextModelNameSpace(Context, IconFontFolder);
     string IconFontNameProject = GetContextModelProjectName(Context, IconFontFolder);
 
+    string ButtonDestroyedFolder      = "00188-ButtonDestroyed.cs";
+    string ButtonDestroyedClassName   = GetContextModelClassName(Context, ButtonDestroyedFolder);
+    string ButtonDestroyedNameSpace   = GetContextModelNameSpace(Context, ButtonDestroyedFolder);
+    string ButtonDestroyedProject     = GetContextModelProjectName(Context, ButtonDestroyedFolder);
+
     string WebServiceFilterUserControlFolder      = "00242-WebServiceFilterUserControl.xaml.cs";
     string WebServiceFilterUserControlClassName   = GetContextModelClassName(Context, WebServiceFilterUserControlFolder);
     string WebServiceFilterUserControlNameSpace   = GetContextModelNameSpace(Context, WebServiceFilterUserControlFolder);
@@ -165,6 +170,10 @@
     if(SformUserControlProject != MaxScrollViewHeightProject) {
         MaxScrollViewHeightPrefix = MaxScrollViewHeightPrefix + ";assembly=" + MaxScrollViewHeightProject;
     }
+    string ButtonDestroyedPrefix = "clr-namespace:" + ButtonDestroyedNameSpace;
+    if(SformUserControlProject != ButtonDestroyedProject) {
+        ButtonDestroyedPrefix = ButtonDestroyedPrefix + ";assembly=" + ButtonDestroyedProject;
+    }
 
 #>
 
@@ -184,6 +193,7 @@
              xmlns:invboolcnv="<#= invboolcnvPrefix #>"
              xmlns:intcntxt="<#= InternalContentPrefix #>"
              xmlns:maxscrlvw="<#= MaxScrollViewHeightPrefix #>"
+             xmlns:btnDstr="<#= ButtonDestroyedPrefix #>"
 
              <#= BindingContextFeedbackRefPropertyName #>="{Binding BindingContext.<#= BindingContextFeedbackRefPropertyName #>, Source={x:Reference sformUsrCntrlRootNode}}"
             >
@@ -291,7 +301,8 @@
                                             Padding="2, 0, 2, 0" FlexLayout.Basis="64" CornerRadius="0" >
                                             <StackLayout Orientation="Horizontal" Spacing="0">
                                                 <RadioButton WidthRequest="20" Value="{Binding .}"/>
-                                                <Button WidthRequest="40"
+<!-- Command and CommandParameter are cleared automatically without <#= ButtonDestroyedClassName #>. BindingContext plays its role here. -->
+                                                <btnDstr:<#= ButtonDestroyedClassName #> WidthRequest="40"
                                                         <#= IsDestroyedPropertyName #>="{Binding BindingContext.<#= IsDsDestroyedPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}" 
 
                                                         Text="{x:Static fontIcons:IconFont.More_vert}" FontFamily="CustomIconFontAlias" BackgroundColor="Transparent" 
