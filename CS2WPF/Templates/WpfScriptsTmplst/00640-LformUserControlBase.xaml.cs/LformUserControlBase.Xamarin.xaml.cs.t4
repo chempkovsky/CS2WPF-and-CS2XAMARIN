@@ -445,22 +445,6 @@ namespace <#= LformUserControlBaseNameSpace #> {
         }
         #endregion
         #region <#= OnBindingContextChangedPropertyName #>
-//        protected override async void <#= OnBindingContextChangedPropertyName #>()
-//        {
-//            base.OnBindingContextChanged();
-//            <#= ILformViewModelInterfaceClassName #> bcs = BindingContext as <#= ILformViewModelInterfaceClassName #>;
-//            if (bcs != null)
-//            {
-//                bcs.<#= RowMenuItemsPropertyChangedPropertyName #>(this, null, <#= RowMenuItemsPropertyName #>);
-//                bcs.<#= TableMenuItemsPropertyChangedPropertyName #>(this, null, <#= TableMenuItemsPropertyName #>);
-//                await bcs.<#= HiddenFiltersPropertyChangedPropertyName #>(this, null, <#= HiddenFiltersPropertyName #>);
-//            }
-//            <#= IBindingContextChangedClassName #> bcl = this.BindingContext as <#= IBindingContextChangedClassName #>;
-//            if (bcl != null)
-//            {
-//                await bcl.<#= OnLoadedPropertyName #>(this);
-//            }
-//        }
         #endregion
         #region <#= NavigationBackCommandPropertyName #>
         private static void <#= NavigationBackCommandPropertyName #>Changed(BindableObject bindable, object oldValue, object newValue)
@@ -474,7 +458,7 @@ namespace <#= LformUserControlBaseNameSpace #> {
                 }
             }
         }
-        public static readonly BindableProperty NavigationBackCommandProperty =
+        public static readonly BindableProperty <#= NavigationBackCommandPropertyName #>Property =
             BindableProperty.Create(nameof(<#= NavigationBackCommandPropertyName #>), typeof(ICommand), 
             typeof(<#= LformUserControlBaseClassName #>), 
             propertyChanged: <#= NavigationBackCommandPropertyName #>Changed);
@@ -626,6 +610,31 @@ namespace <#= LformUserControlBaseNameSpace #> {
         public override void <#= OnDestroyedPropertyName #>()
         {
             base.<#= OnDestroyedPropertyName #>();
+            <#= IBindingContextChangedClassName #> bc = BindingContext as <#= IBindingContextChangedClassName #>
+            if(bc != null) bc.<#= OnDestroyPropertyName #>();
+            RemoveBinding(<#= SformAfterAddItemCommandPropertyName #>Property);
+            RemoveBinding(<#= SformAfterUpdItemCommandPropertyName #>Property);
+            RemoveBinding(<#= SformAfterDelItemCommandPropertyName #>Property);
+            RemoveBinding(<#= TableMenuItemsCommandPropertyName #>Property);
+            RemoveBinding(<#= RowMenuItemsCommandPropertyName #>Property);
+            RemoveBinding(<#= SelectedRowCommandPropertyName #>Property);
+            RemoveBinding(<#= CaptionPropertyName #>Property);
+            RemoveBinding(<#= ShowFilterPropertyName #>Property);
+            RemoveBinding(<#= ShowAddFilterBtnPropertyName #>Property);
+            RemoveBinding(<#= ShowBackBtnPropertyName #>Property);
+            RemoveBinding(<#= TableMenuItemsPropertyName #>Property);
+            RemoveBinding(<#= RowMenuItemsPropertyName #>Property);
+            RemoveBinding(<#= HiddenFiltersPropertyName #>Property);
+            RemoveBinding(<#= NavigationBackCommandPropertyName #>Property);
+            RemoveBinding(<#= CanAddPropertyName #>Property);
+            RemoveBinding(<#= CanUpdPropertyName #>Property);
+            RemoveBinding(<#= CanDelPropertyName #>Property);
+            RemoveBinding(<#= IsParentLoadedPropertyName #>Property);
+
+
+
+
+
             <#= SformAfterAddItemCommandPropertyName #> = null;
             <#= SformAfterUpdItemCommandPropertyName #> = null;
             <#= SformAfterDelItemCommandPropertyName #> = null;
@@ -633,7 +642,9 @@ namespace <#= LformUserControlBaseNameSpace #> {
             <#= RowMenuItemsCommandPropertyName #> = null;
             <#= SelectedRowCommandPropertyName #> = null;
             <#= NavigationBackCommandPropertyName #> = null;
-
+            <#= RowMenuItemsPropertyName #> = null;
+            <#= TableMenuItemsPropertyName #>=null;
+            <#= HiddenFiltersPropertyName #>=null;
         }
 
     }

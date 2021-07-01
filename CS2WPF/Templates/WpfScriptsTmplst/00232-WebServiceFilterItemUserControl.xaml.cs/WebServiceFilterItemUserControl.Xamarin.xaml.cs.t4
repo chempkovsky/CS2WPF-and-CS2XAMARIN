@@ -157,6 +157,7 @@ namespace <#= WebServiceFilterItemUserControlNameSpace #> {
             <#= WebServiceFilterItemUserControlClassName #> inst = d as <#= WebServiceFilterItemUserControlClassName #>;
             if (inst != null)
             {
+                if(inst.<#= IsDestroyedPropertyName #>) return;
                 IEnumerable<<#= IWebServiceFilterOperatorInterfaceClassName #>> newVals = newValue as IEnumerable<<#= IWebServiceFilterOperatorInterfaceClassName #>>;
                 if (newVals == null)
                 {
@@ -203,6 +204,7 @@ namespace <#= WebServiceFilterItemUserControlNameSpace #> {
             <#= WebServiceFilterItemUserControlClassName #> inst = d as <#= WebServiceFilterItemUserControlClassName #>;
             if (inst != null)
             {
+                if(inst.<#= IsDestroyedPropertyName #>) return;
                 if (oldValue != null)
                 {
                     inst.<#= FilterValuePropertyName #> = null;
@@ -283,6 +285,7 @@ namespace <#= WebServiceFilterItemUserControlNameSpace #> {
             <#= WebServiceFilterItemUserControlClassName #> inst = d as <#= WebServiceFilterItemUserControlClassName #>;
             if (inst != null)
             {
+                if(inst.<#= IsDestroyedPropertyName #>) return;
                 IEnumerable<<#= IWebServiceFilterDefInterfaceClassName #>> newVals = newValue as IEnumerable<<#= IWebServiceFilterDefInterfaceClassName #>>;
                 if (newVals == null)
                 {
@@ -716,6 +719,22 @@ namespace <#= WebServiceFilterItemUserControlNameSpace #> {
 
         public virtual void <#= OnDestroyedPropertyName #>()
         {
+            RemoveBinding(<#= IsDestroyedPropertyName #>Property);
+            <#= IsDestroyedPropertyName #> = true;
+            RemoveBinding(<#= SelectedFilterOperatorNamePropertyName #>Property);
+            RemoveBinding(<#= SelectedFilterOperatorPropertyName #>Property);
+            RemoveBinding(<#= FilterOperatorsPropertyName #>Property);
+            RemoveBinding(<#= SelectedFilterDefinitionPropertyName #>Property);
+            RemoveBinding(<#= SelectedFilterDataTypePropertyName #>Property);
+            RemoveBinding(<#= SelectedFilterNamePropertyName #>Property);
+            RemoveBinding(<#= FilterDefinitionsPropertyName #>Property);
+            RemoveBinding(<#= FilterValuePropertyName #>Property);
+            RemoveBinding(<#= IsDateInputPropertyName #>Property);
+            RemoveBinding(<#= IsFilterValueReadOnlyPropertyName #>Property);
+            RemoveBinding(<#= FilterErrorPropertyName #>Property);
+            RemoveBinding(<#= FilterValuePromptPropertyName #>Property);
+            RemoveBinding(<#= SelectedModelRefPropertyName #>Property);
+            RemoveBinding(<#= RemoveWebServiceFilterItemCommandPropertyName #>Property);
             <#= RemoveWebServiceFilterItemCommandPropertyName #> = null;
             <#= SelectedFilterDefinitionPropertyName #> = null;
             <#= FilterOperatorsPropertyName #> = null;

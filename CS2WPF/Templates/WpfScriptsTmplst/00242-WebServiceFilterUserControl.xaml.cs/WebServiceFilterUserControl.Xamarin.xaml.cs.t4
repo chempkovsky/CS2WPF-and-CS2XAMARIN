@@ -199,7 +199,7 @@ namespace <#= WebServiceFilterUserControlNameSpace #> {
         }
         #endregion
         #region <#= OnNavigationBackCommandPropertyName #>
-        public static readonly BindableProperty NavigationBackCommandProperty =
+        public static readonly BindableProperty <#= NavigationBackCommandPropertyName #>Property =
             BindableProperty.Create(nameof(<#= NavigationBackCommandPropertyName #>), typeof(ICommand), typeof(<#= WebServiceFilterUserControlClassName #>), null);
         public ICommand <#= NavigationBackCommandPropertyName #>
         {
@@ -591,11 +591,25 @@ namespace <#= WebServiceFilterUserControlNameSpace #> {
 
         public virtual void <#= OnDestroyedPropertyName #>()
         {
-                <#= ClearFiltersPropertyName #>();
-                <#= NavigationBackCommandPropertyName #> = null;
-                <#= ContainerMenuItemsPropertyName #> = null;
-                <#= FilterCommandPropertyName #> = null;
-                <#= CurrentContainerMenuItemsPropertyName #>Clear();
+            RemoveBinding(<#= IsDestroyedPropertyName #>Property);
+            <#= IsDestroyedPropertyName #> = true;
+            RemoveBinding(<#= CaptionPropertyName #>Property);
+            RemoveBinding(<#= ShowBackBtnPropertyName #>Property);
+            RemoveBinding(<#= ShowAddFilterBtnPropertyName #>Property);
+            RemoveBinding(<#= NavigationBackCommandPropertyName #>Property);
+            RemoveBinding(<#= HiddenFiltersPropertyName #>Property);
+            RemoveBinding(<#= FilterOperatorsPropertyName #>Property);
+            RemoveBinding(<#= FilterDefinitionsPropertyName #>Property);
+            RemoveBinding(<#= ContainerMenuItemsPropertyName #>Property);
+            RemoveBinding(<#= FilterCommandPropertyName #>Property);
+            RemoveBinding(<#= ContainerMenuItemsCommandPropertyName #>Property);
+            RemoveBinding(<#= FilterHeightPropertyName #>Property);
+           <#= ClearFiltersPropertyName #>();
+           <#= NavigationBackCommandPropertyName #> = null;
+           <#= ContainerMenuItemsPropertyName #> = null;
+           <#= FilterCommandPropertyName #> = null;
+           <#= ContainerMenuItemsCommandPropertyName #> = null;
+           <#= CurrentContainerMenuItemsPropertyName #>Clear();
         }
         private static void <#= IsDestroyedPropertyName #>Changed(BindableObject d, object oldValue, object newValue)
         {

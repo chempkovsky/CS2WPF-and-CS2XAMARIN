@@ -598,15 +598,32 @@ namespace <#= RegionAwareUserControlBaseNameSpace #> {
 
         public virtual void <#= OnDestroyedPropertyName #>()
         {
-            // at first notify
-            <#= IRegionAwareViewModelInterfaceClassName #> bc = inst.BindingContext as <#= IRegionAwareViewModelInterfaceClassName #>;
+            RemoveBinding(<#= IsDestroyedPropertyName #>Property);
+            <#= IsDestroyedPropertyName #> = true;
+            <#= IRegionAwareViewModelInterfaceClassName #> bc = BindingContext as <#= IRegionAwareViewModelInterfaceClassName #>;
             if(bc != null) bc.<#= OnDestroyPropertyName #>();
-            // at second clear menus
+            RemoveBinding(<#= ContainerMenuItemsPropertyName #>Property);
+            RemoveBinding(<#= ContainerMenuItemsCommandPropertyName #>Property);
+            RemoveBinding(<#= FilterHeightPropertyName #>Property);
+            RemoveBinding(<#= GridHeightPropertyName #>Property);
+            RemoveBinding(<#= ShowFilterPropertyName #>Property);
+            RemoveBinding(<#= ShowAddFilterBtnPropertyName #>Property);
+            RemoveBinding(<#= CanAddPropertyName #>Property);
+            RemoveBinding(<#= CanUpdPropertyName #>Property);
+            RemoveBinding(<#= CanDelPropertyName #>Property);
+            RemoveBinding(<#= FilterHeightDetailPropertyName #>Property);
+            RemoveBinding(<#= GridHeightDetailPropertyName #>Property);
+            RemoveBinding(<#= ShowFilterDetailPropertyName #>Property);
+            RemoveBinding(<#= ShowAddFilterBtnDetailPropertyName #>Property);
+            RemoveBinding(<#= CanAddDetailPropertyName #>Property);
+            RemoveBinding(<#= CanUpdDetailPropertyName #>Property);
+            RemoveBinding(<#= CanDelDetailPropertyName #>Property);
             <#= ContainerMenuItemsPropertyName #> = null;
             <#= ContainerMenuItemsCommandPropertyName #> = null;
         }
         private static void <#= IsDestroyedPropertyName #>Changed(BindableObject d, object oldValue, object newValue)
         {
+        <#= IsDestroyedPropertyName #>Property
             <#= RegionAwareUserControlBaseClassName #> inst = d as <#= RegionAwareUserControlBaseClassName #>;
             if (inst != null)
             {

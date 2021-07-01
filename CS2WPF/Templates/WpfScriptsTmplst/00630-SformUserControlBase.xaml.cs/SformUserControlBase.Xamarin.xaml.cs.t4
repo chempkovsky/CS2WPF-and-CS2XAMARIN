@@ -375,22 +375,6 @@ namespace <#= SformUserControlBaseNameSpace #> {
         }
         #endregion
         #region <#= OnBindingContextChangedPropertyName #>
-//        protected override async void <#= OnBindingContextChangedPropertyName #>()
-//        {
-//            base.OnBindingContextChanged();
-//            <#= ISformViewModelInterfaceClassName #> bcs = BindingContext as <#= ISformViewModelInterfaceClassName #>;
-//            if (bcs != null)
-//            {
-//                bcs.<#= RowMenuItemsPropertyChangedPropertyName #>(this, null, <#= RowMenuItemsPropertyName #>);
-//                bcs.<#= TableMenuItemsPropertyChangedPropertyName #>(this, null, <#= TableMenuItemsPropertyName #>);
-//                await bcs.<#= HiddenFiltersPropertyChangedPropertyName #>(this, null, <#= HiddenFiltersPropertyName #>);
-//            }
-//            <#= IBindingContextChangedClassName #> bcl = this.BindingContext as <#= IBindingContextChangedClassName #>;
-//            if (bcl != null)
-//            {
-//                await bcl.<#= OnLoadedPropertyName #>(this);
-//            }
-//        }
         #endregion
         #region <#= NavigationBackCommandPropertyName #>
         private static void <#= NavigationBackCommandPropertyName #>Changed(BindableObject bindable, object oldValue, object newValue)
@@ -404,7 +388,7 @@ namespace <#= SformUserControlBaseNameSpace #> {
                 }
             }
         }
-        public static readonly BindableProperty NavigationBackCommandProperty =
+        public static readonly BindableProperty <#= NavigationBackCommandPropertyName #>Property =
             BindableProperty.Create(nameof(<#= NavigationBackCommandPropertyName #>), typeof(ICommand), 
             typeof(<#= SformUserControlBaseClassName #>), 
             propertyChanged: <#= NavigationBackCommandPropertyName #>Changed);
@@ -563,10 +547,30 @@ namespace <#= SformUserControlBaseNameSpace #> {
             base.<#= OnDestroyedPropertyName #>();
             <#= IBindingContextChangedClassName #> bc = BindingContext as <#= IBindingContextChangedClassName #>;
             if(bc != null) bc.<#= OnDestroyPropertyName #>();
+            RemoveBinding(<#= TableMenuItemsCommandPropertyName #>Property);
+            RemoveBinding(<#= RowMenuItemsCommandPropertyName #>Property);
+            RemoveBinding(<#= SelectedRowCommandPropertyName #>Property);
+            RemoveBinding(<#= CaptionPropertyName #>Property);
+            RemoveBinding(<#= ShowFilterPropertyName #>Property);
+            RemoveBinding(<#= ShowAddFilterBtnPropertyName #>Property);
+            RemoveBinding(<#= ShowBackBtnPropertyName #>Property);
+            RemoveBinding(<#= TableMenuItemsPropertyName #>Property);
+            RemoveBinding(<#= RowMenuItemsPropertyName #>Property);
+            RemoveBinding(<#= HiddenFiltersPropertyName #>Property);
+            RemoveBinding(<#= NavigationBackCommandPropertyName #>Property);
+            RemoveBinding(<#= SformAfterAddItemPropertyName #>Property);
+            RemoveBinding(<#= SformAfterUpdItemPropertyName #>Property);
+            RemoveBinding(<#= SformAfterDelItemPropertyName #>Property);
+            RemoveBinding(<#= IsParentLoadedPropertyName #>Property);
             <#= TableMenuItemsCommandPropertyName #> = null;
             <#= RowMenuItemsCommandPropertyName #> = null;
             <#= SelectedRowCommandPropertyName #> = null;
             <#= NavigationBackCommandPropertyName #> = null;
+            <#= TableMenuItemsPropertyName #> = null;
+            <#= RowMenuItemsPropertyName #> = null;
+            <#= SformAfterAddItemPropertyName #> = null;
+            <#= SformAfterUpdItemPropertyName #> = null;
+            <#= SformAfterDelItemPropertyName #> = null;
         }
     }
 }

@@ -28,6 +28,10 @@ namespace <#= ButtonDestroyedNameSpace #> {
     {
         public virtual void <#= OnDestroyedPropertyName #>()
         {
+            RemoveBinding(<#= IsDestroyedPropertyName #>Property);
+            <#= IsDestroyedPropertyName #> = true;
+            RemoveBinding(CommandProperty);
+            RemoveBinding(CommandParameterProperty);
             Command = null;
             CommandParameter = null;
         }

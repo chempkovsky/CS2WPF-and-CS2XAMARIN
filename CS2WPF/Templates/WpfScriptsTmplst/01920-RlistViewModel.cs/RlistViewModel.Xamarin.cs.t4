@@ -168,6 +168,7 @@ using Xamarin.Essentials;
     string CanUpdDetailParentPropertyName       = "CanUpdateDetailParent"; 
     string CanDelDetailParentPropertyName       = "CanDeleteDetailParent"; 
     string IsDestroyedPropertyName              = "IsDestroyed";
+    string IsNavigatedBackPropertyName          = "IsNavigatedBack";
 
     List<string> detailViews = GetDetailViews(Model, Context, null);
     List<ModelViewPropertyOfVwSerializable> primKeys = GetModelPrimaryKeyProps(Model);
@@ -760,6 +761,7 @@ namespace <#= RlistViewModelNameSpace #> {
        }
        #endregion
        #region IRegionAware
+       bool <#= IsNavigatedBackPropertyName #> = false;
        public bool IsNavigationTarget(INavigationContext navigationContext) {
             return true;
        }
@@ -795,7 +797,7 @@ namespace <#= RlistViewModelNameSpace #> {
             <#= SformAfterUpdItemPropertyName  #> = null; 
             <#= SformAfterDelItemPropertyName  #> = null; 
 
-            if(!<#= IsParentLoadedPropertyName #>) {
+            if ((!<#= IsParentLoadedPropertyName #>) || (<#= IsNavigatedBackPropertyName #>)) {
                 ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>> hf = new ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>();
 <#
             foreach(ModelViewPropertyOfVwSerializable sclrProp in Model.ScalarProperties) {
@@ -872,6 +874,7 @@ namespace <#= RlistViewModelNameSpace #> {
                                 <#= SformAfterUpdItemPropertyName  #> = tdata; 
                             }
                             <#= IsParentLoadedPropertyName #> = true;
+                            <#= IsNavigatedBackPropertyName #> = false;
                         });
                     });
                 } else {
@@ -885,9 +888,11 @@ namespace <#= RlistViewModelNameSpace #> {
 #>
                     <#= SformAfterDelItemPropertyName  #> = data;
                     <#= IsParentLoadedPropertyName #> = true;
+                    <#= IsNavigatedBackPropertyName #> = false;
                 }
             } else {
                 <#= IsParentLoadedPropertyName #> = true;
+                <#= IsNavigatedBackPropertyName #> = false;
             }
         }
         #endregion
@@ -912,6 +917,7 @@ namespace <#= RlistViewModelNameSpace #> {
         {
             if (<#= CurrentNavigationContextPropertyName #> != null) {
                 if(<#= CurrentNavigationContextPropertyName #>.NavigationService.Journal.CanGoBack) {
+                    <#= IsNavigatedBackPropertyName #> = true;
                     <#= CurrentNavigationContextPropertyName #>.NavigationService.Journal.GoBack();
                 }
             }

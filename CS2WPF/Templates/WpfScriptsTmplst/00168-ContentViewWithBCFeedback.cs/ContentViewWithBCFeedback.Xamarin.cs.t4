@@ -65,6 +65,9 @@ namespace <#= ContentViewWithBCFeedbackNameSpace #> {
 
         public virtual void <#= OnDestroyedPropertyName #>()
         {
+            RemoveBinding(<#= IsDestroyedPropertyName #>Property);
+            <#= IsDestroyedPropertyName #> = true;
+            RemoveBinding(<#= BindingContextFeedbackRefPropertyName #>Property);
             <#= BindingContextFeedbackRefPropertyName #> = null;
         }
         private static void <#= IsDestroyedPropertyName #>Changed(BindableObject d, object oldValue, object newValue)

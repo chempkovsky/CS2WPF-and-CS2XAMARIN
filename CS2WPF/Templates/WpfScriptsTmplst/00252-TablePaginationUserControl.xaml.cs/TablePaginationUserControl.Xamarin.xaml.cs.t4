@@ -438,8 +438,25 @@ namespace <#= TablePaginationUserControlNameSpace #> {
 
         public virtual void <#= OnDestroyedPropertyName #>()
         {
-                <#= CurrentPageChangedCommandPropertyName #> = null;
+                RemoveBinding(<#= IsDestroyedPropertyName #>Property);
+                <#= IsDestroyedPropertyName #> = true;
+                RemoveBinding(<#= TitlePropertyName #>Property);
+                RemoveBinding(<#= RowsPerPageOptionsPropertyName #>Property);
+                RemoveBinding(<#= RowsPerPageChangedCommandPropertyName #>Property);
+                RemoveBinding(<#= RowsPerPagePropertyName #>Property);
+                RemoveBinding(<#= CountFromPropertyName #>Property);
+                RemoveBinding(<#= CountToPropertyName #>Property);
+                RemoveBinding(<#= TotalCountPropertyName #>Property);
+                RemoveBinding(<#= CurrentPagePropertyName #>Property);
+                RemoveBinding(<#= PreviousButtonIconNamePropertyName #>Property);
+                RemoveBinding(<#= NextButtonIconNamePropertyName #>Property);
+                RemoveBinding(<#= ButtonIconColorPropertyName #>Property);
+                RemoveBinding(<#= ButtonBackgroundColorPropertyName #>Property);
+                RemoveBinding(<#= CurrentPageChangedCommandPropertyName #>Property);
+                RemoveBinding(<#= TotalCountChangedCommandPropertyName #>Property);
                 <#= RowsPerPageChangedCommandPropertyName #> = null;
+                <#= CurrentPageChangedCommandPropertyName #> = null;
+                <#= TotalCountChangedCommandPropertyName #> = null;
         }
         private static void <#= IsDestroyedPropertyName #>Changed(BindableObject d, object oldValue, object newValue)
         {

@@ -342,10 +342,20 @@ namespace <#= EformUserControlBaseNameSpace #> {
         public override void <#= OnDestroyedPropertyName #>()
         {
             base.<#= OnDestroyedPropertyName #>();
-            <#= IBindingContextChangedClassName #> bc = d.BindingContext as <#= IBindingContextChangedClassName #>
+            <#= IBindingContextChangedClassName #> bc = BindingContext as <#= IBindingContextChangedClassName #>
             if(bc != null) bc.<#= OnDestroyPropertyName #>();
+            RemoveBinding(<#= CaptionPropertyName #>Property);
+            RemoveBinding(<#= ShowSubmitPropertyName #>Property);
+            RemoveBinding(<#= HiddenFiltersPropertyName #>Property);
+            RemoveBinding(<#= FormControlModelPropertyName #>Property);
+            RemoveBinding(<#= EformModePropertyName #>Property);
+            RemoveBinding(<#= SubmitCommandPropertyName #>Property);
+            RemoveBinding(<#= CancelCommandPropertyName #>Property);
+            RemoveBinding(<#= IsParentLoadedPropertyName #>Property);
             <#= SubmitCommandPropertyName #> = null;
             <#= CancelCommandPropertyName #> = null;
+            <#= HiddenFiltersPropertyName #>Property = null;
+            <#= FormControlModelPropertyName #>Property = null;
         }
 
     }

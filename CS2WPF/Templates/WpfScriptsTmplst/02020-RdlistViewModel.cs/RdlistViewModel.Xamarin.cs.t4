@@ -148,7 +148,7 @@ using Xamarin.Essentials;
     string ShowBackBtnPropertyName              = "ShowBackBtn";
     string OnNavigationBackCommandPropertyName  = "OnNavigationBackCommand";
     string IsDestroyedPropertyName              = "IsDestroyed";
-
+    string IsNavigatedBackPropertyName          = "IsNavigatedBack";
 
     List<string> detailViews = GetDetailViews(Model, Context, null);
     List<ModelViewPropertyOfVwSerializable> primKeys = GetModelPrimaryKeyProps(Model);
@@ -598,7 +598,7 @@ namespace <#= RdlistViewModelNameSpace #> {
        #endregion
 
        #region IRegionAware
-
+       bool <#= IsNavigatedBackPropertyName #> = false;
        public bool IsNavigationTarget(INavigationContext navigationContext) {
             return true;
        }
@@ -634,7 +634,7 @@ namespace <#= RdlistViewModelNameSpace #> {
             OnPropertyChanged("<#= CanUpdPropertyName  #>");
             OnPropertyChanged("<#= CanDelPropertyName  #>");
 
-            if(!<#= IsParentLoadedPropertyName #>) {
+            if((!<#= IsParentLoadedPropertyName #>) || (<#= IsNavigatedBackPropertyName #>)) {
                 ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>> hf = new ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>();
 <#
             foreach(ModelViewPropertyOfVwSerializable sclrProp in Model.ScalarProperties) {
@@ -671,6 +671,7 @@ namespace <#= RdlistViewModelNameSpace #> {
                 if (resetHF) { <#= HiddenFiltersPropertyName #> = hf; }
             }
             <#= IsParentLoadedPropertyName #> = true;
+            <#= IsNavigatedBackPropertyName #> = false;
         }
         #endregion
 
@@ -694,6 +695,7 @@ namespace <#= RdlistViewModelNameSpace #> {
         {
             if (<#= CurrentNavigationContextPropertyName #> != null) {
                 if(<#= CurrentNavigationContextPropertyName #>.NavigationService.Journal.CanGoBack) {
+                    <#= IsNavigatedBackPropertyName #> = true;
                     <#= CurrentNavigationContextPropertyName #>.NavigationService.Journal.GoBack();
                 }
             }
