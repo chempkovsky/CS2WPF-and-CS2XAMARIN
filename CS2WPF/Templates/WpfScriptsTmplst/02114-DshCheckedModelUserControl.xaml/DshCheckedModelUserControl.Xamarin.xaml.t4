@@ -139,6 +139,7 @@
     string UpdPrmPropertyName                           = "UpdPrm";
     string DelPrmPropertyName                           = "DelPrm";
     string SelPrmPropertyName                           = "SelPrm";
+    string IsDestroyedPropertyName                      = "IsDestroyed";
 
     string wsfucPrefix = "clr-namespace:" + WebServiceFilterUserControlNameSpace;
     if(DshCheckedModelUserControlProject != WebServiceFilterUserControlProject) {
@@ -202,6 +203,7 @@
             </Grid.RowDefinitions>
 
             <wsfuc:<#= WebServiceFilterUserControlClassName #> Grid.Row="0" 
+                <#= IsDestroyedPropertyName #>="{Binding <#= IsDestroyedPropertyName #>, Mode=OneWay, Source={x:Reference dshchckdModelUsrCntrlRootNode}}"
                 IsVisible="{Binding <#= ShowFilterPropertyName #>, Mode=OneWay, Source={x:Reference dshchckdModelUsrCntrlRootNode}}"
                 IsEnabled="{Binding BindingContext.<#= IsInQueryPropertyName #>, Mode=OneWay, Converter={StaticResource <#= InverseBooleanConverterClassName #>}, Source={x:Reference dshchckdModelUsrCntrlRootNode}}"
                 <#= CaptionPropertyName #>="{Binding <#= CaptionPropertyName #>, Mode=OneWay, Source={x:Reference dshchckdModelUsrCntrlRootNode}}"
@@ -366,6 +368,7 @@
                 </StackLayout>
             </ScrollView>
             <tpgnuc:<#= TablePaginationUserControlClassName #> Grid.Row="3"
+                <#= IsDestroyedPropertyName #>="{Binding <#= IsDestroyedPropertyName #>, Mode=OneWay, Source={x:Reference dshchckdModelUsrCntrlRootNode}}"
                 <#= TotalCountPropertyName #>="{Binding BindingContext.<#= TotalCountPropertyName #>, Mode=OneWay, Source={x:Reference dshchckdModelUsrCntrlRootNode}}"
                 <#= CurrentPagePropertyName #>="{Binding BindingContext.<#= CurrentPagePropertyName #>, Mode=TwoWay, Source={x:Reference dshchckdModelUsrCntrlRootNode}}"
                 <#= RowsPerPagePropertyName #>="{Binding BindingContext.<#= RowsPerPagePropertyName #>, Mode=TwoWay, Source={x:Reference dshchckdModelUsrCntrlRootNode}}"

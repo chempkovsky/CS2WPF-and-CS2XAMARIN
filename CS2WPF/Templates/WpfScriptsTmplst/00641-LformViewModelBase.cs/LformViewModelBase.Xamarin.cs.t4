@@ -138,6 +138,7 @@ using Prism.Services.Dialogs;
     string edialogNamePropertyName                  = "edialogName";
     string IsParentLoadedPropertyName               = "IsParentLoaded";
     string OnDestroyPropertyName                    = "OnDestroy";
+    string IsDestroyedPropertyName                  = "IsDestroyed";
 
     List<string> nmSpaces = new List<string>();
     if ((LformViewModelBaseNameSpace != IWebServiceFilterRsltInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace) < 0)) 
@@ -230,6 +231,7 @@ namespace <#= LformViewModelBaseNameSpace #> {
         #region <#= HiddenFiltersPropertyChangedPropertyName #>
         public void <#= HiddenFiltersPropertyChangedPropertyName #>(object Sender, object OldValue, object NewValue)
         {
+            if(<#= IsDestroyedPropertyName #>) return;
             IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>> hfs = NewValue as IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>;
             ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>> newhfs = new ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>();
             if(hfs != null) {
@@ -265,6 +267,7 @@ namespace <#= LformViewModelBaseNameSpace #> {
             };
         }
         public void <#= TableMenuItemsPropertyChangedPropertyName #>(object Sender, object OldValue, object NewValue) {
+            if(<#= IsDestroyedPropertyName #>) return;
             ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>> tmis = GetDefault<#= TableMenuItemsVMPropertyName #>();
             IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> intmis = NewValue as IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>;
             if(intmis != null) {
@@ -301,6 +304,7 @@ namespace <#= LformViewModelBaseNameSpace #> {
             };
         }
         public void <#= RowMenuItemsPropertyChangedPropertyName #>(object Sender, object OldValue, object NewValue) {
+            if(<#= IsDestroyedPropertyName #>) return;
             ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>> tmis = GetDefault<#= RowMenuItemsVMPropertyName #>();
             IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> intmis = null;
             intmis = NewValue as IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>;
@@ -362,6 +366,7 @@ namespace <#= LformViewModelBaseNameSpace #> {
         }
         protected void <#= TableMenuItemsCommandPropertyName #>Execute(object p)
         {
+            if(<#= IsDestroyedPropertyName #>) return;
             <#= WebServiceFilterMenuViewModelClassName #> mi = p as <#= WebServiceFilterMenuViewModelClassName #>;
             if(mi != null) {
                 if(mi.Id == "TableAddMI") {
@@ -409,6 +414,7 @@ namespace <#= LformViewModelBaseNameSpace #> {
         }
         protected void <#= RowMenuItemsCommandPropertyName #>Execute(object p)
         {
+            if(<#= IsDestroyedPropertyName #>) return;
             <#= WebServiceFilterMenuViewModelClassName #> mi = p as <#= WebServiceFilterMenuViewModelClassName #>;
             if(mi != null) {
                 if(mi.Id == "RowUpdMI") {
@@ -544,6 +550,7 @@ namespace <#= LformViewModelBaseNameSpace #> {
         #endregion
         #region <#= SformAddItemCommandPropertyName #>
         public void <#= SformAddItemCommandPropertyName #>() {
+            if(<#= IsDestroyedPropertyName #>) return;
             if (!<#= CanAddVMPropertyName #>) return;
             IDialogParameters prms = new DialogParameters();
             prms.Add("<#= CaptionPropertyName #>", "Add Item");
@@ -583,6 +590,7 @@ namespace <#= LformViewModelBaseNameSpace #> {
         #endregion
         #region <#= SformUpdItemCommandPropertyName #>
         public void <#= SformUpdItemCommandPropertyName #>(object selected) {
+            if(<#= IsDestroyedPropertyName #>) return;
             if ((!<#= CanUpdVMPropertyName #>) || (selected == null)) return;
             IDialogParameters prms = new DialogParameters();
             prms.Add("<#= CaptionPropertyName #>", "Update Item");
@@ -622,6 +630,7 @@ namespace <#= LformViewModelBaseNameSpace #> {
         #endregion
         #region <#= SformDelItemCommandPropertyName #>
         public void <#= SformDelItemCommandPropertyName #>(object selected) {
+            if(<#= IsDestroyedPropertyName #>) return;
             if ((!<#= CanDelVMPropertyName #>) || (selected == null)) return;
             IDialogParameters prms = new DialogParameters();
             prms.Add("<#= CaptionPropertyName #>", "Delete Item");
@@ -649,6 +658,9 @@ namespace <#= LformViewModelBaseNameSpace #> {
         #endregion
 
         public void <#= OnDestroyPropertyName #>() {
+            <#= RowMenuItemsVMPropertyName #> = null; // correct: notify children
+            <#= TableMenuItemsVMPropertyName #> = null;
+            <#= HiddenFiltersVMPropertyName #> = null;
         }
     }
 }

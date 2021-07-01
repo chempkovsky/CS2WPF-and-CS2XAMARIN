@@ -148,6 +148,9 @@ using Prism.Navigation;
     string CanAddParentPropertyName                 = "CanAddParent";
     string CanUpdParentPropertyName                 = "CanUpdateParent";
     string CanDelParentPropertyName                 = "CanDeleteParent";
+    string IsDestroyedPropertyName                  = "IsDestroyed";
+    string OnDestroyedPropertyName                  = "OnDestroyed";
+    string OnDestroyPropertyName                    = "OnDestroy";
 
     List<string> detailViews = GetDetailViews(Model, Context, null);
     List<ModelViewPropertyOfVwSerializable> primKeys = GetModelPrimaryKeyProps(Model);
@@ -525,12 +528,13 @@ namespace <#= O2mViewModelNameSpace #> {
 
 
        #region IRegionAware
-       INavigationContext <#= CurrentNavigationContextPropertyName #> = null;
-
        public bool IsNavigationTarget(INavigationContext navigationContext) {
             return true;
        }
        public void OnNavigatedFrom(INavigationContext navigationContext) {
+            // not correct
+            //NavigationMode nm = navigationContext.Parameters.GetNavigationMode();
+            //<#= IsDestroyedPropertyName #> = (nm == NavigationMode.Back); 
             <#= CurrentNavigationContextPropertyName #> = null;
        }
        public void OnNavigatedTo(INavigationContext navigationContext) {

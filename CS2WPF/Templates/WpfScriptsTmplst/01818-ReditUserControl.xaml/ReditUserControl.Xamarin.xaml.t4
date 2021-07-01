@@ -58,6 +58,7 @@
     string ReditReditUserControlRegionPropertyName  = "ReditUserControlRegion";
 
     string IsParentLoadedPropertyName       = "IsParentLoaded";
+    string IsDestroyedPropertyName          = "IsDestroyed";
 
     string proxyPrefix = "clr-namespace:" + ProxyUserControlNameSpace;
     if(ProxyUserControlProject != ReditUserControlProject) {
@@ -94,6 +95,8 @@
 <#
     }
 #>
+            <#= IsDestroyedPropertyName #>="{Binding BindingContext.<#= IsDestroyedPropertyName #>, Mode=OneWay, Source={x:Reference reditUsrCntrlRootNode}}" 
+
              x:Name="reditUsrCntrlRootNode"
              >
 <#
@@ -108,9 +111,9 @@
 <#
     }
 #>
-
+            <#= IsDestroyedPropertyName #>="{Binding <#= IsDestroyedPropertyName #>, Mode=OneWay, Source={x:Reference reditUsrCntrlRootNode}}" 
             <#= ContainerMenuItemsPropertyName #>="{Binding <#= ContainerMenuItemsPropertyName #>, Mode=OneWay, Source={x:Reference reditUsrCntrlRootNode}}" 
-            <#= ContainerMenuItemsCommandPropertyName #>="{Binding <#= OnContainerMenuItemsCommandPropertyName #>, Source={x:Reference reditUsrCntrlRootNode}}"
+            <#= ContainerMenuItemsCommandPropertyName #>="{Binding <#= OnContainerMenuItemsCommandPropertyName #>, Mode=OneWay, Source={x:Reference reditUsrCntrlRootNode}}"
 
             <#= CaptionPropertyName #>="{Binding BindingContext.<#= CaptionPropertyName #>, Mode=OneWay, Source={x:Reference reditUsrCntrlRootNode}}" 
             <#= HiddenFiltersPropertyName #>="{Binding BindingContext.<#= HiddenFiltersPropertyName #>, Mode=OneWay, Source={x:Reference reditUsrCntrlRootNode}}" 

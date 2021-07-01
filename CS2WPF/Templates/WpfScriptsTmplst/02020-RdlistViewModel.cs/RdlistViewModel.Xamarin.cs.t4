@@ -147,6 +147,7 @@ using Xamarin.Essentials;
     string CurrentNavigationContextPropertyName = "CurrentNavigationContext";
     string ShowBackBtnPropertyName              = "ShowBackBtn";
     string OnNavigationBackCommandPropertyName  = "OnNavigationBackCommand";
+    string IsDestroyedPropertyName              = "IsDestroyed";
 
 
     List<string> detailViews = GetDetailViews(Model, Context, null);
@@ -597,12 +598,14 @@ namespace <#= RdlistViewModelNameSpace #> {
        #endregion
 
        #region IRegionAware
-       INavigationContext <#= CurrentNavigationContextPropertyName #> = null;
 
        public bool IsNavigationTarget(INavigationContext navigationContext) {
             return true;
        }
        public void OnNavigatedFrom(INavigationContext navigationContext) {
+            // not correct
+            //NavigationMode nm = navigationContext.Parameters.GetNavigationMode();
+            //<#= IsDestroyedPropertyName #> = (nm == NavigationMode.Back); 
             <#= CurrentNavigationContextPropertyName #> = null;
        }
        public void OnNavigatedTo(INavigationContext navigationContext) {

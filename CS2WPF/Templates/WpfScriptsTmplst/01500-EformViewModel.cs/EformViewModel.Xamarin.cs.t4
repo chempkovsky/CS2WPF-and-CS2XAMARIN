@@ -166,6 +166,7 @@ using Xamarin.Essentials;
 
     string BindingContextFeedbackRefPropertyName    = "BindingContextFeedbackRef";
     string OnDestroyPropertyName                    = "OnDestroy";
+    string IsDestroyedPropertyName                  = "IsDestroyed";
 
     string UIDispatcherInvokePropertyName   =       "await MainThread.InvokeOnMainThreadAsync";
 
@@ -828,6 +829,7 @@ namespace <#= EformViewModelNameSpace #> {
 <#  
     }
 #>
+            if(<#= IsDestroyedPropertyName #>) return;
             IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>> nwval = NewValue as IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>;
             ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>> curVal = new ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>();
             if(nwval != null) {
@@ -3064,8 +3066,21 @@ if (ModelHasDoInitMethod) {
 #>
         }
         #endregion
+        #region <#= IsDestroyedPropertyName #>
+        protected bool _<#= IsDestroyedPropertyName #> = false;
+        public bool <#= IsDestroyedPropertyName #> {
+            get { return _<#= IsDestroyedPropertyName #>; }
+            set { 
+                if(_<#= IsDestroyedPropertyName #> != value) {
+                    _<#= IsDestroyedPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
         public void <#= OnDestroyPropertyName #>() {
-            
+            <#= IsDestroyedPropertyName #> = true;
+            _<#= HiddenFiltersVMPropertyName #> = false;
         }
 
     }

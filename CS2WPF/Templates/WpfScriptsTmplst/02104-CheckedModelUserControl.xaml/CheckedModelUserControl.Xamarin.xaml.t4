@@ -140,6 +140,7 @@
     string UpdPrmPropertyName                           = "UpdPrm";
     string DelPrmPropertyName                           = "DelPrm";
     string SelPrmPropertyName                           = "SelPrm";
+    string IsDestroyedPropertyName                      = "IsDestroyed";
 
     string wsfucPrefix = "clr-namespace:" + WebServiceFilterUserControlNameSpace;
     if(CheckedModelUserControlProject != WebServiceFilterUserControlProject) {
@@ -203,6 +204,7 @@
             </Grid.RowDefinitions>
 
             <wsfuc:<#= WebServiceFilterUserControlClassName #> Grid.Row="0" 
+                <#= IsDestroyedPropertyName #>="{Binding <#= IsDestroyedPropertyName #>, Mode=OneWay, Source={x:Reference chckdModelUsrCntrlRootNode}}"
                 IsVisible="{Binding <#= ShowFilterPropertyName #>, Mode=OneWay, Source={x:Reference chckdModelUsrCntrlRootNode}}"
                 IsEnabled="{Binding BindingContext.<#= IsInQueryPropertyName #>, Mode=OneWay, Converter={StaticResource <#= InverseBooleanConverterClassName #>}, Source={x:Reference chckdModelUsrCntrlRootNode}}"
                 <#= CaptionPropertyName #>="{Binding <#= CaptionPropertyName #>, Mode=OneWay, Source={x:Reference chckdModelUsrCntrlRootNode}}"
@@ -423,6 +425,7 @@
                 </StackLayout>
             </ScrollView>
             <tpgnuc:<#= TablePaginationUserControlClassName #> Grid.Row="3"
+                <#= IsDestroyedPropertyName #>="{Binding <#= IsDestroyedPropertyName #>, Mode=OneWay, Source={x:Reference chckdModelUsrCntrlRootNode}}"
                 <#= TotalCountPropertyName #>="{Binding BindingContext.<#= TotalCountPropertyName #>, Mode=OneWay, Source={x:Reference chckdModelUsrCntrlRootNode}}"
                 <#= CurrentPagePropertyName #>="{Binding BindingContext.<#= CurrentPagePropertyName #>, Mode=TwoWay, Source={x:Reference chckdModelUsrCntrlRootNode}}"
                 <#= RowsPerPagePropertyName #>="{Binding BindingContext.<#= RowsPerPagePropertyName #>, Mode=TwoWay, Source={x:Reference chckdModelUsrCntrlRootNode}}"

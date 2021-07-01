@@ -13,6 +13,7 @@
 <#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using Prism.Regions.Navigation;
 <#
 
 
@@ -62,7 +63,11 @@ using System.Runtime.CompilerServices;
     string CanAddDetailChangedPropertyName          = "CanAddDetailChanged"; 
     string CanUpdDetailChangedPropertyName          = "CanUpdateDetailChanged"; 
     string CanDelDetailChangedPropertyName          = "CanDeleteDetailChanged"; 
+    string IsDestroyedPropertyName                  = "IsDestroyed";
+    string OnDestroyedPropertyName                  = "OnDestroyed";
+    string OnDestroyPropertyName                    = "OnDestroy";
 
+    string CurrentNavigationContextPropertyName     = "CurrentNavigationContext";
 
 
     List<string> nmSpaces = new List<string>();
@@ -189,7 +194,17 @@ namespace <#= RegionAwareViewModelBaseNameSpace #> {
             <#= CanDelDetailParentPropertyName #> = NewValue;
             OnPropertyChanged("<#= CanDelDetailPropertyName #>");
         }
+        bool _<#= IsDestroyedPropertyName #> = false;
+        public bool <#= IsDestroyedPropertyName #> {
+            get { return _<#= IsDestroyedPropertyName #>; }
+            set { if (_<#= IsDestroyedPropertyName #> != value) { _<#= IsDestroyedPropertyName #> = value; OnPropertyChanged();} }
+        }
+        public virtual void <#= OnDestroyPropertyName #>() {
+            <#= IsDestroyedPropertyName #> = true;
+            <#= CurrentNavigationContextPropertyName #> = null;
+        }
         #endregion
+       protected INavigationContext <#= CurrentNavigationContextPropertyName #> = null;
 
 
     }

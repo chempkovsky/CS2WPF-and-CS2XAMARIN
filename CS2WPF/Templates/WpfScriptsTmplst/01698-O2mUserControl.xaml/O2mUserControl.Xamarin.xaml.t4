@@ -93,6 +93,7 @@
     string OnContainerMenuItemsCommandPropertyName  = "OnContainerMenuItemsCommand";
     string NavigationBackCommandPropertyName        = "NavigationBackCommand";
     string OnNavigationBackCommandPropertyName      = "OnNavigationBackCommand";
+    string IsDestroyedPropertyName                  = "IsDestroyed";
 
     string proxyPrefix = "clr-namespace:" + ProxyUserControlNameSpace;
     if(ProxyUserControlProject != O2mUserControlProject) {
@@ -159,7 +160,7 @@
     }
 #>
 
-
+            <#= IsDestroyedPropertyName #>="{Binding BindingContext.<#= IsDestroyedPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
              x:Name="o2mUsrCntrlRootNode"
              >
     <StackLayout>
@@ -196,8 +197,9 @@
 <#
     }
 #>
+            <#= IsDestroyedPropertyName #>="{Binding <#= IsDestroyedPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
             <#= ContainerMenuItemsPropertyName #>="{Binding <#= ContainerMenuItemsPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
-            <#= ContainerMenuItemsCommandPropertyName #>="{Binding <#= OnContainerMenuItemsCommandPropertyName #>, Source={x:Reference o2mUsrCntrlRootNode}}"
+            <#= ContainerMenuItemsCommandPropertyName #>="{Binding <#= OnContainerMenuItemsCommandPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}"
 
             <#= ShowBackBtnPropertyName #>="{Binding BindingContext.<#= ShowBackBtnPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
             <#= NavigationBackCommandPropertyName #>="{Binding BindingContext.<#= OnNavigationBackCommandPropertyName #>, Source={x:Reference o2mUsrCntrlRootNode}}"                                
@@ -273,6 +275,7 @@
 <#
             }
 #>
+                            <#= IsDestroyedPropertyName #>="{Binding <#= IsDestroyedPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
                             <#= CaptionPropertyName #>="{Binding BindingContext.<#= SelectedDetailsListItemPropertyName #>.<#= CaptionPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
                             <#= FilterHeightPropertyName #>="{Binding BindingContext.<#= FilterHeightDetailPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
                             <#= ShowFilterPropertyName #>="{Binding BindingContext.<#= ShowFilterDetailPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 

@@ -186,6 +186,7 @@ using Xamarin.Essentials;
 
     string InternalContentProperty                  = "InternalContent";
     string IsDsDestroyedPropertyName                = "IsDsDestroyed";
+    string IsDestroyedPropertyName                  = "IsDestroyed";
     string OnDestroyPropertyName                    = "OnDestroy";
 
     List<string> nmSpaces = new List<string>();
@@ -447,6 +448,7 @@ namespace <#= SformViewModelNameSpace #> {
 
         #region <#= RowMenuItemsPropertyChangedPropertyName #>
         public void <#= RowMenuItemsPropertyChangedPropertyName #>(object Sender, object OldValue, object NewValue) {
+            if (<#= IsDestroyedPropertyName #>) return true;
             ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>> tmis = new ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>>();
             IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> intmis = NewValue as IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>;
             if(intmis != null) {
@@ -521,6 +523,7 @@ namespace <#= SformViewModelNameSpace #> {
             };
         }
         public void <#= TableMenuItemsPropertyChangedPropertyName #>(object Sender, object OldValue, object NewValue) {
+            if (<#= IsDestroyedPropertyName #>) return true;
             ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>> tmis = GetDefault<#= TableMenuItemsVMPropertyName #>();
             IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> intmis = NewValue as IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>;
             if(intmis != null) {
@@ -594,6 +597,7 @@ namespace <#= SformViewModelNameSpace #> {
         #region <#= HiddenFiltersVMPropertyName #>
         public async Task <#= HiddenFiltersPropertyChangedPropertyName #>(object Sender, object OldValue, object NewValue)
         {
+            if(<#= IsDestroyedPropertyName #>) return;
             IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>> hfs = NewValue as IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>;
             ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>> newhfs = new ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>();
             if(hfs != null) {
@@ -906,8 +910,19 @@ namespace <#= SformViewModelNameSpace #> {
             set { if (_<#= IsDsDestroyedPropertyName #> != value) { _<#= IsDsDestroyedPropertyName #> = value; OnPropertyChanged(); } }
         }
         #endregion
+        #region <#= IsDestroyedPropertyName #>
+        protected bool _<#= IsDestroyedPropertyName #> = false;
+        public bool <#= IsDestroyedPropertyName #>
+        {
+            get { return _<#= IsDestroyedPropertyName #>; }
+            set { if (_<#= IsDestroyedPropertyName #> != value) { _<#= IsDestroyedPropertyName #> = value; OnPropertyChanged(); } }
+        }
+        #endregion
+
+        
         #region Filter
         protected async Task onFilter() {
+            if(<#= IsDsDestroyedPropertyName #>) return;
             if ((<#= IsInQueryPropertyName #>) || (!<#= IsOnLoadedCalledPropertyName #>)) return;
             <#= IsInQueryPropertyName #> = true;
 
@@ -1062,7 +1077,13 @@ namespace <#= SformViewModelNameSpace #> {
         }
         #endregion
         public void <#= OnDestroyPropertyName #>() {
-            <#= IsDsDestroyedPropertyName #> = true;
+            <#= IsDestroyedPropertyName #> = true;
+            _<#= RowMenuItemsPropertyName #> = null; // correct: without notification
+            _<#= TableMenuItemsVMPropertyName #> = null;
+            _<#= FilterDefinitionsPropertyName #> = null; 
+            _<#= HiddenFiltersVMPropertyName #> = null;
+            _<#= BindingContextFeedbackRefPropertyName #> = null;
+            _<#= SelectedRowPropertyName #> = null; 
         }
 
     }

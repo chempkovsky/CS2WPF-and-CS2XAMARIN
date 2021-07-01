@@ -342,6 +342,8 @@ namespace <#= EformUserControlBaseNameSpace #> {
         public override void <#= OnDestroyedPropertyName #>()
         {
             base.<#= OnDestroyedPropertyName #>();
+            <#= IBindingContextChangedClassName #> bc = d.BindingContext as <#= IBindingContextChangedClassName #>
+            if(bc != null) bc.<#= OnDestroyPropertyName #>();
             <#= SubmitCommandPropertyName #> = null;
             <#= CancelCommandPropertyName #> = null;
         }

@@ -380,6 +380,7 @@ namespace <#= LdlgViewModelBaseNameSpace #> {
             if(_<#= SelectedItemPropertyName #> != null) {
                 object sip = _<#= SelectedItemPropertyName #>;
                 <#= IsDestroyedPropertyName #> = true;
+                <#= HiddenFiltersPropertyName #> = null;
                 DialogParameters parameters = new DialogParameters();
                 parameters.Add("<#= SelectedItemPropertyName #>", sip);
                 parameters.Add("Result", true);
@@ -403,6 +404,7 @@ namespace <#= LdlgViewModelBaseNameSpace #> {
         protected void <#= CancelCommandPropertyName #>Action(object param)
         {
             <#= IsDestroyedPropertyName #> = true;
+            <#= HiddenFiltersPropertyName #> = null;
             DialogParameters parameters = new DialogParameters();
             parameters.Add("Result", false);
             _RequestClose?.Invoke(parameters);
