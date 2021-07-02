@@ -24,7 +24,7 @@ using Prism.Mvvm;
 using Prism.Services.Dialogs;
 using System.Threading.Tasks;
 using Xamarin.Essentials;
-
+using Prism.Navigation;
 <#
     string IAppGlblSettingsServiceFolder      = "00080-IAppGlblSettingsService.cs";
     string IAppGlblSettingsServiceClassName   = GetContextModelClassName(Context, IAppGlblSettingsServiceFolder);
@@ -448,7 +448,7 @@ namespace <#= SformViewModelNameSpace #> {
 
         #region <#= RowMenuItemsPropertyChangedPropertyName #>
         public void <#= RowMenuItemsPropertyChangedPropertyName #>(object Sender, object OldValue, object NewValue) {
-            if (<#= IsDestroyedPropertyName #>) return true;
+            if (<#= IsDestroyedPropertyName #>) return;
             ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>> tmis = new ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>>();
             IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> intmis = NewValue as IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>;
             if(intmis != null) {
@@ -523,7 +523,7 @@ namespace <#= SformViewModelNameSpace #> {
             };
         }
         public void <#= TableMenuItemsPropertyChangedPropertyName #>(object Sender, object OldValue, object NewValue) {
-            if (<#= IsDestroyedPropertyName #>) return true;
+            if (<#= IsDestroyedPropertyName #>) return;
             ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>> tmis = GetDefault<#= TableMenuItemsVMPropertyName #>();
             IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> intmis = NewValue as IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>;
             if(intmis != null) {
@@ -598,6 +598,10 @@ namespace <#= SformViewModelNameSpace #> {
         public async Task <#= HiddenFiltersPropertyChangedPropertyName #>(object Sender, object OldValue, object NewValue)
         {
             if(<#= IsDestroyedPropertyName #>) return;
+            if(NewValue == null) {
+                if(_<#= HiddenFiltersVMPropertyName #> == null) return;
+                if(!_<#= HiddenFiltersVMPropertyName #>.Any()) return;
+            }
             IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>> hfs = NewValue as IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>;
             ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>> newhfs = new ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>();
             if(hfs != null) {
@@ -622,6 +626,7 @@ namespace <#= SformViewModelNameSpace #> {
                 };
 <#
     {
+        bool isFilterDefinitionsResetable = false;
         bool hasForeignKeys = Model.ForeignKeys != null;
         bool isNotDescl = true;
         if(hasForeignKeys) {
@@ -635,6 +640,7 @@ namespace <#= SformViewModelNameSpace #> {
                         if (modelViewPropertyOfVwSerializable.IsUsedByfilter &&  (!string.IsNullOrEmpty(modelViewPropertyOfVwSerializable.ForeignKeyNameChain))) {
                             if ( modelViewPropertyOfVwSerializable.ForeignKeyNameChain.StartsWith(modelViewForeignKeySerializable.NavigationName + ".") || 
                                 (modelViewPropertyOfVwSerializable.ForeignKeyNameChain == modelViewForeignKeySerializable.NavigationName) ) {
+                                    isFilterDefinitionsResetable = true;
 #>
             fltDf.Add(new <#= WebServiceFilterDefViewModelClassName #>() {fltrName='<#= GetModelPropertyName(modelViewPropertyOfVwSerializable, Model)#>', fltrCaption='<#= GetDisplayAttributeValueString(modelViewPropertyOfVwSerializable, Model, DisplayLabelProperty) #>',  fltrDataType='<#= GetCCharpDatatype(modelViewPropertyOfVwSerializable, Model) #>', fltrMaxLen=<#= GetMaxLen(modelViewPropertyOfVwSerializable, Model) #>, fltrMin=<#= GetMinVal(modelViewPropertyOfVwSerializable, Model) #>, fltrMax=<#= GetMaxVal(modelViewPropertyOfVwSerializable, Model) #> });
 <#
@@ -666,6 +672,7 @@ namespace <#= SformViewModelNameSpace #> {
                         if (modelViewPropertyOfVwSerializable.IsUsedByfilter &&  (!string.IsNullOrEmpty(modelViewPropertyOfVwSerializable.ForeignKeyNameChain))) {
                             if ( modelViewPropertyOfVwSerializable.ForeignKeyNameChain.StartsWith(modelViewForeignKeySerializable.NavigationName + ".") || 
                                 (modelViewPropertyOfVwSerializable.ForeignKeyNameChain == modelViewForeignKeySerializable.NavigationName) ) {
+                                    isFilterDefinitionsResetable = true;
 #>
                 fltDf.Add(new <#= WebServiceFilterDefViewModelClassName #>() {fltrName="<#= GetModelPropertyName(modelViewPropertyOfVwSerializable, Model)#>", fltrCaption="<#= GetDisplayAttributeValueString(modelViewPropertyOfVwSerializable, Model, DisplayLabelProperty) #>",  fltrDataType="<#= GetCCharpDatatype(modelViewPropertyOfVwSerializable, Model) #>", fltrMaxLen=<#= GetMaxLen(modelViewPropertyOfVwSerializable, Model) #>, fltrMin=<#= GetMinVal(modelViewPropertyOfVwSerializable, Model) #>, fltrMax=<#= GetMaxVal(modelViewPropertyOfVwSerializable, Model) #> });
 <#
@@ -677,10 +684,14 @@ namespace <#= SformViewModelNameSpace #> {
 <#
                 }
             }
-        } 
-    }
+        }
+        if (isFilterDefinitionsResetable) {
 #>
             <#= FilterDefinitionsPropertyName #> = fltDf;
+<#
+        }
+    }
+#>
             Actual<#= CurrentPagePropertyName #> = 0;
             await onFilter();
         }

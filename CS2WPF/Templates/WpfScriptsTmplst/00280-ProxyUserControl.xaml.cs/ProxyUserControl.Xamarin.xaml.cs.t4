@@ -11,11 +11,13 @@
 <#@ import namespace="CS2WPF.Model.Serializable" #>
 <#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
-using System;
 using Xamarin.Forms;
 using System.Collections.Generic;
 using System.Windows.Input;
-
+using System.Collections.Specialized;
+using System.Reflection;
+using Prism.Regions;
+using Prism.Navigation;
 <#
 
     string EformModeEnumFolder      = "00026-EformModeEnum.cs";
@@ -113,7 +115,10 @@ using System.Windows.Input;
     string PermissionVectorPropertyName             = "PermissionVector";
     string PermissionChangedCommandPropertyName     = "PermissionChangedCommand";
     string OnPermissionChangedCommandPropertyName   = "OnPermissionChangedCommand";
-
+    string OnViewsCollectionChangedPropertyName     = "OnViewsCollectionChanged";
+    string ProxyRegionPropertyName                  = "ProxyRegion";
+    string IsDestroyedPropertyName                  = "IsDestroyed";
+    string OnDestroyedPropertyName                  = "OnDestroyed";
 
     List<string> nmSpaces = new List<string>();
     if ((ProxyUserControlNameSpace != IWebServiceFilterMenuInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterMenuInterfaceNameSpace) < 0)) 
@@ -136,7 +141,7 @@ namespace <#= ProxyUserControlNameSpace #> {
     /// <summary>
     /// Interaction logic for <#= ProxyUserControlClassName #>.xaml
     /// </summary>
-    public partial class <#= ProxyUserControlClassName #>: ContentView
+    public partial class <#= ProxyUserControlClassName #>: ContentView, IDestructible
     {
         public <#= ProxyUserControlClassName #>()
         {
@@ -1294,6 +1299,253 @@ namespace <#= ProxyUserControlNameSpace #> {
             }
         }
         */
+
+        protected void SetBinding(BindableObject element, BindingMode mode, string propertyName, string sourcePropertyName) {
+            var fieldInfo = element.GetType().GetField(propertyName + "Property", BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy);
+            if(fieldInfo!= null)
+            {
+                BindableProperty dp = fieldInfo.GetValue(null) as BindableProperty;
+                if(dp != null)
+                {
+                    element.SetBinding(dp, new Binding(path: sourcePropertyName, mode: mode, source: this));
+                }
+            }
+        }
+        protected void ClearBinding(BindableObject element, string propertyName) {
+            var fieldInfo = element.GetType().GetField(propertyName + "Property", BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy);
+            if (fieldInfo != null)
+            {
+                BindableProperty dp = fieldInfo.GetValue(null) as BindableProperty;
+                if (dp != null)
+                {
+                    element.RemoveBinding(dp);
+                }
+            }
+        }
+        public void <#= OnViewsCollectionChangedPropertyName #>(object sender, NotifyCollectionChangedEventArgs e) {
+                if (e.Action == NotifyCollectionChangedAction.Remove)
+                {
+                    if (e.OldItems != null) {
+                        foreach (View element in e.OldItems)
+                        {
+                            ClearBinding(element, "<#= CaptionPropertyName #>");
+                            ClearBinding(element, "<#= FilterHeightPropertyName #>");
+                            ClearBinding(element, "<#= ShowFilterPropertyName #>");
+                            ClearBinding(element, "<#= ShowAddFilterBtnPropertyName #>");
+                            ClearBinding(element, "<#= GridHeightPropertyName #>");
+                            ClearBinding(element, "<#= ShowBackBtnPropertyName #>");
+                            ClearBinding(element, "<#= NavigationBackCommandPropertyName #>");
+                            ClearBinding(element, "<#= TableMenuItemsPropertyName #>");
+                            ClearBinding(element, "<#= TableMenuItemsCommandPropertyName #>");
+                            ClearBinding(element, "<#= RowMenuItemsPropertyName #>");
+                            ClearBinding(element, "<#= RowMenuItemsCommandPropertyName #>");
+                            ClearBinding(element, "<#= ContainerMenuItemsPropertyName #>");
+                            ClearBinding(element, "<#= ContainerMenuItemsCommandPropertyName #>");
+                            ClearBinding(element, "<#= SelectedRowCommandPropertyName #>");
+                            ClearBinding(element, "<#= HiddenFiltersPropertyName #>");
+                            ClearBinding(element, "<#= SformAfterAddItemPropertyName #>");
+                            ClearBinding(element, "<#= SformAfterUpdItemPropertyName #>");
+                            ClearBinding(element, "<#= SformAfterDelItemPropertyName #>");
+                            ClearBinding(element, "<#= ShowSubmitPropertyName #>");
+                            ClearBinding(element, "<#= FormControlModelPropertyName #>");
+                            ClearBinding(element, "<#= EformModePropertyName #>");
+                            ClearBinding(element, "<#= SubmitCommandPropertyName #>");
+                            ClearBinding(element, "<#= CancelCommandPropertyName #>");
+                            ClearBinding(element, "<#= CanAddPropertyName #>");
+                            ClearBinding(element, "<#= CanUpdPropertyName #>");
+                            ClearBinding(element, "<#= CanDelPropertyName #>");
+                            ClearBinding(element, "<#= SformAfterAddItemCommandPropertyName #>");
+                            ClearBinding(element, "<#= SformAfterUpdItemCommandPropertyName #>");
+                            ClearBinding(element, "<#= SformAfterDelItemCommandPropertyName #>");
+                            ClearBinding(element, "<#= IsParentLoadedPropertyName #>");
+
+                            ClearBinding(element, "<#= FilterHeightDetailPropertyName #>");
+                            ClearBinding(element, "<#= ShowFilterDetailPropertyName #>");
+                            ClearBinding(element, "<#= ShowAddFilterBtnDetailPropertyName #>");
+                            ClearBinding(element, "<#= GridHeightDetailPropertyName #>");
+                            ClearBinding(element, "<#= HiddenFiltersDetailPropertyName #>");
+                            ClearBinding(element, "<#= TableMenuItemsDetailPropertyName #>");
+                            ClearBinding(element, "<#= RowMenuItemsDetailPropertyName #>");
+                            ClearBinding(element, "<#= CanAddDetailPropertyName #>");
+                            ClearBinding(element, "<#= CanUpdDetailPropertyName #>");
+                            ClearBinding(element, "<#= CanDelDetailPropertyName #>");
+
+                            ClearBinding(element, "<#= IsPermissionEditablePropertyName #>");
+                            ClearBinding(element, "<#= PermissionVectorPropertyName #>");
+                            ClearBinding(element, "<#= PermissionChangedCommandPropertyName #>");
+
+                            if (this.Content == element) this.Content = null;
+                        }
+                    }
+                }
+                if (e.Action == NotifyCollectionChangedAction.Add)
+                {
+                    if(e.NewItems != null) {
+                        foreach (View element in e.NewItems)
+                        {
+                            this.Content = element;
+                            SetBinding(element,  BindingMode.OneWay, "<#= CaptionPropertyName #>",                     "<#= CaptionPropertyName #>");
+                            SetBinding(element,  BindingMode.OneWay, "<#= FilterHeightPropertyName #>",                "<#= FilterHeightPropertyName #>");
+                            SetBinding(element,  BindingMode.OneWay, "<#= ShowFilterPropertyName #>",                  "<#= ShowFilterPropertyName #>");
+                            SetBinding(element,  BindingMode.OneWay, "<#= ShowAddFilterBtnPropertyName #>",            "<#= ShowAddFilterBtnPropertyName #>");
+                            SetBinding(element,  BindingMode.OneWay, "<#= GridHeightPropertyName #>",                  "<#= GridHeightPropertyName #>");
+                            SetBinding(element,  BindingMode.OneWay, "<#= ShowBackBtnPropertyName #>",                 "<#= ShowBackBtnPropertyName #>");
+                            SetBinding(element,  BindingMode.OneWay, "<#= NavigationBackCommandPropertyName #>",       "<#= OnNavigationBackCommandPropertyName #>");
+                            SetBinding(element,  BindingMode.OneWay, "<#= TableMenuItemsPropertyName #>",              "<#= TableMenuItemsPropertyName #>");
+                            SetBinding(element,  BindingMode.OneWay, "<#= TableMenuItemsCommandPropertyName #>",       "<#= OnTableMenuItemsCommandPropertyName #>");
+                            SetBinding(element,  BindingMode.OneWay, "<#= RowMenuItemsPropertyName #>",                "<#= RowMenuItemsPropertyName #>");
+                            SetBinding(element,  BindingMode.OneWay, "<#= RowMenuItemsCommandPropertyName #>",         "<#= OnRowMenuItemsCommandPropertyName #>");
+                            SetBinding(element,  BindingMode.OneWay, "<#= ContainerMenuItemsPropertyName #>",          "<#= ContainerMenuItemsPropertyName #>");
+                            SetBinding(element,  BindingMode.OneWay, "<#= ContainerMenuItemsCommandPropertyName #>",   "<#= OnContainerMenuItemsCommandPropertyName #>");
+                            SetBinding(element,  BindingMode.OneWay, "<#= SelectedRowCommandPropertyName #>",          "<#= OnSelectedRowCommandPropertyName #>");
+                            SetBinding(element,  BindingMode.OneWay, "<#= HiddenFiltersPropertyName #>",               "<#= HiddenFiltersPropertyName #>");
+                            SetBinding(element,  BindingMode.OneWay, "<#= SformAfterAddItemPropertyName #>",           "<#= SformAfterAddItemPropertyName #>");
+                            SetBinding(element,  BindingMode.OneWay, "<#= SformAfterUpdItemPropertyName #>",           "<#= SformAfterUpdItemPropertyName #>");
+                            SetBinding(element,  BindingMode.OneWay, "<#= SformAfterDelItemPropertyName #>",           "<#= SformAfterDelItemPropertyName #>");
+                            SetBinding(element,  BindingMode.OneWay, "<#= ShowSubmitPropertyName #>",                  "<#= ShowSubmitPropertyName #>");
+                            SetBinding(element,  BindingMode.OneWay, "<#= FormControlModelPropertyName #>",            "<#= FormControlModelPropertyName #>");
+                            SetBinding(element,  BindingMode.OneWay, "<#= EformModePropertyName #>",                   "<#= EformModePropertyName #>");
+                            SetBinding(element,  BindingMode.OneWay, "<#= SubmitCommandPropertyName #>",               "<#= OnSubmitCommandPropertyName #>");
+                            SetBinding(element,  BindingMode.OneWay, "<#= CancelCommandPropertyName #>",               "<#= OnCancelCommandPropertyName #>");
+                            SetBinding(element,  BindingMode.OneWay, "<#= CanAddPropertyName #>",                      "<#= CanAddPropertyName #>");
+                            SetBinding(element,  BindingMode.OneWay, "<#= CanUpdPropertyName #>",                      "<#= CanUpdPropertyName #>");
+                            SetBinding(element,  BindingMode.OneWay, "<#= CanDelPropertyName #>",                      "<#= CanDelPropertyName #>");
+                            SetBinding(element,  BindingMode.OneWay, "<#= SformAfterAddItemCommandPropertyName #>",    "<#= OnSformAfterAddItemCommandPropertyName #>");
+                            SetBinding(element,  BindingMode.OneWay, "<#= SformAfterUpdItemCommandPropertyName #>",    "<#= OnSformAfterUpdItemCommandPropertyName #>");
+                            SetBinding(element,  BindingMode.OneWay, "<#= SformAfterDelItemCommandPropertyName #>",    "<#= OnSformAfterDelItemCommandPropertyName #>");
+                            SetBinding(element,  BindingMode.OneWay, "<#= IsParentLoadedPropertyName #>",              "<#= IsParentLoadedPropertyName #>");
+
+                            SetBinding(element, BindingMode.OneWay, "<#= FilterHeightDetailPropertyName #>"               , "<#= FilterHeightDetailPropertyName #>"    );
+                            SetBinding(element, BindingMode.OneWay, "<#= ShowFilterDetailPropertyName #>"                 , "<#= ShowFilterDetailPropertyName #>"      );
+                            SetBinding(element, BindingMode.OneWay, "<#= ShowAddFilterBtnDetailPropertyName #>"           , "<#= ShowAddFilterBtnDetailPropertyName #>");
+                            SetBinding(element, BindingMode.OneWay, "<#= GridHeightDetailPropertyName #>"                 , "<#= GridHeightDetailPropertyName #>"      );
+                            SetBinding(element, BindingMode.OneWay, "<#= HiddenFiltersDetailPropertyName #>"              , "<#= HiddenFiltersDetailPropertyName #>"   );
+                            SetBinding(element, BindingMode.OneWay, "<#= TableMenuItemsDetailPropertyName #>"             , "<#= TableMenuItemsDetailPropertyName #>"  );
+                            SetBinding(element, BindingMode.OneWay, "<#= RowMenuItemsDetailPropertyName #>"               , "<#= RowMenuItemsDetailPropertyName #>"    );
+                            SetBinding(element, BindingMode.OneWay, "<#= CanAddDetailPropertyName #>"                     , "<#= CanAddDetailPropertyName #>"          );
+                            SetBinding(element, BindingMode.OneWay, "<#= CanUpdDetailPropertyName #>"                     , "<#= CanUpdDetailPropertyName #>"          );
+                            SetBinding(element, BindingMode.OneWay, "<#= CanDelDetailPropertyName #>"                     , "<#= CanDelDetailPropertyName #>"          );
+
+                            SetBinding(element, BindingMode.OneWay, "<#= IsPermissionEditablePropertyName #>"             , "<#= IsPermissionEditablePropertyName #>"   );
+                            SetBinding(element, BindingMode.OneWay, "<#= PermissionVectorPropertyName #>"                 , "<#= PermissionVectorPropertyName #>"       );
+                            SetBinding(element, BindingMode.OneWay, "<#= PermissionChangedCommandPropertyName #>"         ,"<#= OnPermissionChangedCommandPropertyName #>");
+                        }
+                    }
+                }
+        }
+
+        public IRegion <#= ProxyRegionPropertyName #> = null;
+
+
+        public virtual void <#= OnDestroyedPropertyName #>()
+        {
+            if(<#= ProxyRegionPropertyName #> == null) return;
+            RemoveBinding(<#= IsDestroyedPropertyName #>Property);
+            <#= IsDestroyedPropertyName #> = true;
+            IRegion proxyRegion = <#= ProxyRegionPropertyName #>;
+            <#= ProxyRegionPropertyName #> = null;
+            if (proxyRegion != null) {
+                proxyRegion.Views.CollectionChanged -= <#= OnViewsCollectionChangedPropertyName #>;
+            }
+
+            RemoveBinding(<#= CaptionPropertyName #>Property);
+            RemoveBinding(<#= FilterHeightPropertyName #>Property);
+            RemoveBinding(<#= ShowFilterPropertyName #>Property);
+            RemoveBinding(<#= ShowAddFilterBtnPropertyName #>Property);
+            RemoveBinding(<#= GridHeightPropertyName #>Property);
+            RemoveBinding(<#= ShowBackBtnPropertyName #>Property);
+            RemoveBinding(<#= NavigationBackCommandPropertyName #>Property);
+            RemoveBinding(<#= TableMenuItemsPropertyName #>Property);
+            RemoveBinding(<#= TableMenuItemsCommandPropertyName #>Property);
+            RemoveBinding(<#= RowMenuItemsPropertyName #>Property);
+            RemoveBinding(<#= RowMenuItemsCommandPropertyName #>Property);
+            RemoveBinding(<#= ContainerMenuItemsPropertyName #>Property);
+            RemoveBinding(<#= ContainerMenuItemsCommandPropertyName #>Property);
+            RemoveBinding(<#= SelectedRowCommandPropertyName #>Property);
+            RemoveBinding(<#= HiddenFiltersPropertyName #>Property);
+            RemoveBinding(<#= SformAfterAddItemPropertyName #>Property);
+            RemoveBinding(<#= SformAfterUpdItemPropertyName #>Property);
+            RemoveBinding(<#= SformAfterDelItemPropertyName #>Property);
+            RemoveBinding(<#= ShowSubmitPropertyName #>Property);
+            RemoveBinding(<#= FormControlModelPropertyName #>Property);
+            RemoveBinding(<#= EformModePropertyName #>Property);
+            RemoveBinding(<#= SubmitCommandPropertyName #>Property);
+            RemoveBinding(<#= CancelCommandPropertyName #>Property);
+            RemoveBinding(<#= CanAddPropertyName #>Property);
+            RemoveBinding(<#= CanUpdPropertyName #>Property);
+            RemoveBinding(<#= CanDelPropertyName #>Property);
+            RemoveBinding(<#= SformAfterAddItemCommandPropertyName #>Property);
+            RemoveBinding(<#= SformAfterUpdItemCommandPropertyName #>Property);
+            RemoveBinding(<#= SformAfterDelItemCommandPropertyName #>Property);
+            RemoveBinding(<#= IsParentLoadedPropertyName #>Property);
+            RemoveBinding(<#= FilterHeightDetailPropertyName #>Property);
+            RemoveBinding(<#= ShowFilterDetailPropertyName #>Property);
+            RemoveBinding(<#= ShowAddFilterBtnDetailPropertyName #>Property);
+            RemoveBinding(<#= GridHeightDetailPropertyName #>Property);
+            RemoveBinding(<#= HiddenFiltersDetailPropertyName #>Property);
+            RemoveBinding(<#= TableMenuItemsDetailPropertyName #>Property);
+            RemoveBinding(<#= RowMenuItemsDetailPropertyName #>Property);
+            RemoveBinding(<#= CanAddDetailPropertyName #>Property);
+            RemoveBinding(<#= CanUpdDetailPropertyName #>Property);
+            RemoveBinding(<#= CanDelDetailPropertyName #>Property);
+            RemoveBinding(<#= IsPermissionEditablePropertyName #>Property);
+            RemoveBinding(<#= PermissionVectorPropertyName #>Property);
+            RemoveBinding(<#= PermissionChangedCommandPropertyName #>Property);
+
+            <#= NavigationBackCommandPropertyName #> = null;
+            <#= TableMenuItemsCommandPropertyName #> = null;
+            <#= RowMenuItemsCommandPropertyName #> = null;
+            <#= ContainerMenuItemsCommandPropertyName #> = null;
+            <#= SelectedRowCommandPropertyName #> = null;
+            <#= SubmitCommandPropertyName #> = null;
+            <#= CancelCommandPropertyName #> = null;
+            <#= SformAfterAddItemCommandPropertyName #> = null;
+            <#= SformAfterUpdItemCommandPropertyName #> = null;
+            <#= SformAfterDelItemCommandPropertyName #> = null;
+            <#= PermissionChangedCommandPropertyName #> = null;
+            <#= TableMenuItemsPropertyName #> = null;
+            <#= RowMenuItemsPropertyName #> = null;
+            <#= ContainerMenuItemsPropertyName #> = null;
+            <#= TableMenuItemsDetailPropertyName #> = null;
+            <#= RowMenuItemsDetailPropertyName #> = null;
+
+            if (proxyRegion != null) {
+                proxyRegion.RemoveAll();
+                proxyRegion.RegionManager.Regions.Remove(proxyRegion.Name);
+            }
+        }
+        private static void <#= IsDestroyedPropertyName #>Changed(BindableObject d, object oldValue, object newValue)
+        {
+            <#= ProxyUserControlClassName #> inst = d as <#= ProxyUserControlClassName #>;
+            if (inst != null)
+            {
+                inst.<#= OnDestroyedPropertyName #>();
+            }
+        }
+        public static readonly BindableProperty <#= IsDestroyedPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= IsDestroyedPropertyName #>", typeof(bool),
+                typeof(<#= ProxyUserControlClassName #>),
+                false, propertyChanged: <#= IsDestroyedPropertyName #>Changed);
+        public bool <#= IsDestroyedPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= IsDestroyedPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= IsDestroyedPropertyName #>Property, value);
+            }
+        }
+        #region IDestructible
+        public void Destroy()
+        {
+            if(<#= IsDestroyedPropertyName #>) return;
+            <#= OnDestroyedPropertyName #>();
+        }
+        #endregion
+
     }
 }
 

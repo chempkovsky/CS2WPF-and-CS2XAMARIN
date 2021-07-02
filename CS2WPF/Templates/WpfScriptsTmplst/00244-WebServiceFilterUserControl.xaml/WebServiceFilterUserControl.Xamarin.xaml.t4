@@ -105,6 +105,7 @@
     string InternalContentProperty          = "InternalContent";
     string MaxHeightProperty                = "MaxHeight";
     string IsDestroyedPropertyName          = "IsDestroyed";
+    string IsGridFlexPropertyName           = "IsGridFlex";
 
 
     string IconFontPrefix = "clr-namespace:" + IconFontNameSpace;
@@ -159,7 +160,7 @@
              xmlns:btnDstr="<#= ButtonDestroyedPrefix #>"
              x:Name="fltrUsrCntrlRootNode">
     <StackLayout Orientation="Vertical">
-        <Grid gridflex:<#= gridFlexModelClassName #>.HorizontalFlex="true"
+        <Grid gridflex:<#= gridFlexModelClassName #>.HorizontalFlex="{Binding Path=<#= IsGridFlexPropertyName #>, Mode=OneWay, Source={x:Reference fltrUsrCntrlRootNode}}" 
             RowDefinitions="Auto,Auto" ColumnDefinitions="*" >
             <Label Grid.Row="0" Grid.Column="0"
                 Margin="8, 0, 0, 0"  Text="{Binding Path=<#= CaptionPropertyName #>, Source={x:Reference fltrUsrCntrlRootNode}}" FontAttributes="Bold"/>

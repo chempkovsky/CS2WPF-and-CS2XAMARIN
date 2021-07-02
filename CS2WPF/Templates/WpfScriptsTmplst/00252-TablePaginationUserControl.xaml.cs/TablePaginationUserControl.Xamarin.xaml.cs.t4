@@ -22,6 +22,10 @@ using System;
     string IconFontClassName   = GetModelClassName(Model, IconFontFolder);
     string IconFontNameSpace   = GetModelNameSpace(Model, IconFontFolder);
 
+    string ButtonDestroyedFolder      = "00188-ButtonDestroyed.cs";
+    string ButtonDestroyedClassName   = GetModelClassName(Model, ButtonDestroyedFolder);
+    string ButtonDestroyedNameSpace   = GetModelNameSpace(Model, ButtonDestroyedFolder);
+
     string ValueChangedCmdParamFolder      = "00218-ValueChangedCmdParam.cs";
     string ValueChangedCmdParamClassName   = GetModelClassName(Model, ValueChangedCmdParamFolder);
     string ValueChangedCmdParamNameSpace   = GetModelNameSpace(Model, ValueChangedCmdParamFolder);
@@ -53,18 +57,17 @@ using System;
     string IsDestroyedPropertyName = "IsDestroyed";
     string OnDestroyedPropertyName = "OnDestroyed";
 
+    List<string> nmSpaces = new List<string>();
+    if ((TablePaginationUserControlNameSpace != ValueChangedCmdParamNameSpace) && (nmSpaces.IndexOf(ValueChangedCmdParamNameSpace) < 0)) 
+        nmSpaces.Add(ValueChangedCmdParamNameSpace);
+    if ((TablePaginationUserControlNameSpace != IconFontNameSpace) && (nmSpaces.IndexOf(IconFontNameSpace) < 0)) 
+        nmSpaces.Add(IconFontNameSpace);
+
 #>
 <# 
-    if(TablePaginationUserControlNameSpace != ValueChangedCmdParamNameSpace) { 
+    foreach(string ns in nmSpaces) {
 #>
-using <#= ValueChangedCmdParamNameSpace #>;
-<#
-    }
-#>
-<# 
-    if(TablePaginationUserControlNameSpace != IconFontNameSpace) { 
-#>
-using <#= IconFontNameSpace #>;
+using <#= ns #>;
 <#
     }
 #>
@@ -457,6 +460,7 @@ namespace <#= TablePaginationUserControlNameSpace #> {
                 <#= RowsPerPageChangedCommandPropertyName #> = null;
                 <#= CurrentPageChangedCommandPropertyName #> = null;
                 <#= TotalCountChangedCommandPropertyName #> = null;
+                <#= RowsPerPageOptionsPropertyName #> = null;
         }
         private static void <#= IsDestroyedPropertyName #>Changed(BindableObject d, object oldValue, object newValue)
         {

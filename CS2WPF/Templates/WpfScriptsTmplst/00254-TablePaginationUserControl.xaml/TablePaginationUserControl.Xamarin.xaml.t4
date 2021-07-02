@@ -20,6 +20,11 @@
     string IconFontNameSpace   = GetModelNameSpace(Model, IconFontFolder);
     string IconFontNameProject = GetModelProjectName(Model, IconFontFolder);
 
+    string ButtonDestroyedFolder      = "00188-ButtonDestroyed.cs";
+    string ButtonDestroyedClassName   = GetModelClassName(Model, ButtonDestroyedFolder);
+    string ButtonDestroyedNameSpace   = GetModelNameSpace(Model, ButtonDestroyedFolder);
+    string ButtonDestroyedProject     = GetModelProjectName(Model, ButtonDestroyedFolder);
+
     string TablePaginationUserControlFolder      = "00252-TablePaginationUserControl.xaml.cs";
     string TablePaginationUserControlClassName   = GetModelClassName(Model, TablePaginationUserControlFolder);
     string TablePaginationUserControlNameSpace   = GetModelNameSpace(Model, TablePaginationUserControlFolder);
@@ -49,11 +54,16 @@
     string TotalCountChangedPropertyName  = "TotalCountChanged";
     string OnNextPageCommandPropertyName  = "OnNextPageCommand";
     string OnPreviousPageCommandPropertyName  = "OnPreviousPageCommand";
+    string IsDestroyedPropertyName = "IsDestroyed";
 
 
     string IconFontPrefix = "clr-namespace:" + IconFontNameSpace;
     if(IconFontNameProject != TablePaginationUserControlXamlProject) {
         IconFontPrefix = IconFontPrefix + ";assembly=" + IconFontNameProject;
+    }
+    string ButtonDestroyedPrefix = "clr-namespace:" + ButtonDestroyedNameSpace;
+    if(ButtonDestroyedProject != TablePaginationUserControlXamlProject) {
+        ButtonDestroyedPrefix = ButtonDestroyedPrefix + ";assembly=" + ButtonDestroyedProject;
     }
 
 #>
@@ -61,6 +71,7 @@
              xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:fontIcons="<#= IconFontPrefix #>"
+             xmlns:btnDstr="<#= ButtonDestroyedPrefix #>"
              x:Name="tblPgntrUsrCntrlRootNode">
     <StackLayout Orientation="Horizontal">
         <Label VerticalOptions="Center" Text="{Binding <#= TitlePropertyName #>, Source={x:Reference tblPgntrUsrCntrlRootNode}}"/>
@@ -72,14 +83,16 @@
         <Label VerticalOptions="Center" Text="{Binding <#= CountToPropertyName #>, Source={x:Reference tblPgntrUsrCntrlRootNode}}"/>
         <Label VerticalOptions="Center" Text=" / "/>
         <Label VerticalOptions="Center" Text="{Binding <#= TotalCountPropertyName #>, Source={x:Reference tblPgntrUsrCntrlRootNode}}"/>
-        <Button VerticalOptions="Center" WidthRequest="30" HeightRequest="36" 
+        <btnDstr:<#= ButtonDestroyedClassName #> VerticalOptions="Center" WidthRequest="30" HeightRequest="36" 
+                <#= IsDestroyedPropertyName #>="{Binding <#= IsDestroyedPropertyName #>, Mode=OneWay, Source={x:Reference tblPgntrUsrCntrlRootNode}}"
                 Command="{Binding Path=<#= OnPreviousPageCommandPropertyName #>, Source={x:Reference tblPgntrUsrCntrlRootNode}}"
                 Text="{Binding  <#= PreviousButtonIconNamePropertyName #>, Source={x:Reference tblPgntrUsrCntrlRootNode}}" 
                 FontFamily="CustomIconFontAlias" 
                 BackgroundColor="{Binding  <#= ButtonBackgroundColorPropertyName #>, Source={x:Reference tblPgntrUsrCntrlRootNode}}" 
                 TextColor="{Binding  <#= ButtonIconColorPropertyName #>, Source={x:Reference tblPgntrUsrCntrlRootNode}}" 
                 FontSize="{OnPlatform iOS=Default, Android=Default, UWP=Default}"/>
-        <Button VerticalOptions="Center" WidthRequest="30" HeightRequest="36" 
+        <btnDstr:<#= ButtonDestroyedClassName #> VerticalOptions="Center" WidthRequest="30" HeightRequest="36" 
+                <#= IsDestroyedPropertyName #>="{Binding <#= IsDestroyedPropertyName #>, Mode=OneWay, Source={x:Reference tblPgntrUsrCntrlRootNode}}"
                 Command="{Binding Path=<#= OnNextPageCommandPropertyName #>, Source={x:Reference tblPgntrUsrCntrlRootNode}}"
                 Text="{Binding  <#= NextButtonIconNamePropertyName #>, Source={x:Reference tblPgntrUsrCntrlRootNode}}" 
                 FontFamily="CustomIconFontAlias" 

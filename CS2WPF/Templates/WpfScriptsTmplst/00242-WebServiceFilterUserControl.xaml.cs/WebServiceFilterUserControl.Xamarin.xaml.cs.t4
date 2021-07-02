@@ -101,6 +101,7 @@ using System.Threading.Tasks;
     string InternalContentProperty              = "InternalContent";
     string IsDestroyedPropertyName              = "IsDestroyed";
     string OnDestroyedPropertyName              = "OnDestroyed";
+    string IsGridFlexPropertyName               = "IsGridFlex";
 
 
     List<string> nmSpaces = new List<string>();
@@ -331,6 +332,7 @@ namespace <#= WebServiceFilterUserControlNameSpace #> {
             <#= WebServiceFilterUserControlClassName #> inst = d as <#= WebServiceFilterUserControlClassName #>;
             if (inst != null)
             {
+                if(inst.<#= IsDestroyedPropertyName #>) return;
                 inst.<#= ClearFiltersPropertyName #>();
                 inst.<#= FiltersPropertyName #>.Add(new WebServiceFilterRsltViewModel());
                 inst.<#= InternalContentProperty #>Changed();
@@ -589,10 +591,30 @@ namespace <#= WebServiceFilterUserControlNameSpace #> {
         }
         #endregion
 
+        #region <#= IsGridFlexPropertyName #>Property
+        public static readonly BindableProperty <#= IsGridFlexPropertyName #>Property =
+                BindableProperty.Create(
+                "IsGridFlex", typeof(bool),
+                typeof(<#= WebServiceFilterUserControlClassName #>),
+                true);
+        public bool <#= IsGridFlexPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= IsGridFlexPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= IsGridFlexPropertyName #>Property, value);
+            }
+        }
+        #endregion
+
         public virtual void <#= OnDestroyedPropertyName #>()
         {
             RemoveBinding(<#= IsDestroyedPropertyName #>Property);
             <#= IsDestroyedPropertyName #> = true;
+            RemoveBinding(<#= IsGridFlexPropertyName #>Property);
             RemoveBinding(<#= CaptionPropertyName #>Property);
             RemoveBinding(<#= ShowBackBtnPropertyName #>Property);
             RemoveBinding(<#= ShowAddFilterBtnPropertyName #>Property);
@@ -604,12 +626,13 @@ namespace <#= WebServiceFilterUserControlNameSpace #> {
             RemoveBinding(<#= FilterCommandPropertyName #>Property);
             RemoveBinding(<#= ContainerMenuItemsCommandPropertyName #>Property);
             RemoveBinding(<#= FilterHeightPropertyName #>Property);
-           <#= ClearFiltersPropertyName #>();
-           <#= NavigationBackCommandPropertyName #> = null;
-           <#= ContainerMenuItemsPropertyName #> = null;
-           <#= FilterCommandPropertyName #> = null;
-           <#= ContainerMenuItemsCommandPropertyName #> = null;
-           <#= CurrentContainerMenuItemsPropertyName #>Clear();
+            <#= IsGridFlexPropertyName #> = false;
+            <#= ClearFiltersPropertyName #>();
+            <#= NavigationBackCommandPropertyName #> = null;
+            <#= ContainerMenuItemsPropertyName #> = null;
+            <#= FilterCommandPropertyName #> = null;
+            <#= ContainerMenuItemsCommandPropertyName #> = null;
+            <#= CurrentContainerMenuItemsPropertyName #>Clear();
         }
         private static void <#= IsDestroyedPropertyName #>Changed(BindableObject d, object oldValue, object newValue)
         {

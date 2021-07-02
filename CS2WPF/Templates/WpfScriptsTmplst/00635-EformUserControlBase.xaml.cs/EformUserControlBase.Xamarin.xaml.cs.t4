@@ -78,6 +78,7 @@ using Prism.Navigation;
 
     string IsDestroyedPropertyName = "IsDestroyed";
     string OnDestroyedPropertyName = "OnDestroyed";
+    string OnDestroyPropertyName   = "OnDestroy";
 
     List<string> nmSpaces = new List<string>();
     if ((EformUserControlBaseNameSpace != IWebServiceFilterRsltInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace) < 0)) 
@@ -343,7 +344,7 @@ namespace <#= EformUserControlBaseNameSpace #> {
         public override void <#= OnDestroyedPropertyName #>()
         {
             base.<#= OnDestroyedPropertyName #>();
-            <#= IBindingContextChangedClassName #> bc = BindingContext as <#= IBindingContextChangedClassName #>
+            <#= IBindingContextChangedClassName #> bc = BindingContext as <#= IBindingContextChangedClassName #>;
             if(bc != null) bc.<#= OnDestroyPropertyName #>();
             RemoveBinding(<#= CaptionPropertyName #>Property);
             RemoveBinding(<#= ShowSubmitPropertyName #>Property);
@@ -355,8 +356,8 @@ namespace <#= EformUserControlBaseNameSpace #> {
             RemoveBinding(<#= IsParentLoadedPropertyName #>Property);
             <#= SubmitCommandPropertyName #> = null;
             <#= CancelCommandPropertyName #> = null;
-            <#= HiddenFiltersPropertyName #>Property = null;
-            <#= FormControlModelPropertyName #>Property = null;
+            <#= HiddenFiltersPropertyName #> = null;
+            <#= FormControlModelPropertyName #> = null;
         }
         #endregion
 

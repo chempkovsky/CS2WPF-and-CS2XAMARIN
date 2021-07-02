@@ -98,6 +98,7 @@ using Prism.Regions.Behaviors;
     string PermissionVectorPropertyName     = "PermissionVector";
     string PermissionChangedCommandPropertyName     = "PermissionChangedCommand";
     string OnPermissionChangedCommandPropertyName   = "OnPermissionChangedCommand";
+    string OnViewsCollectionChangedPropertyName     = "OnViewsCollectionChanged";
 
 
 #>
@@ -130,6 +131,7 @@ namespace <#= ProxyUserControlRegionAdapterNameSpace #> {
         public <#= ProxyUserControlRegionAdapterClassName #>(IRegionBehaviorFactory factory): base(factory)
         {
         }
+        /*
         protected void SetBinding(BindableObject element, <#= ProxyUserControlClassName #> regionTarget, BindingMode mode, string propertyName, string sourcePropertyName) {
             var fieldInfo = element.GetType().GetField(propertyName + "Property", BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy);
             if(fieldInfo!= null)
@@ -163,8 +165,11 @@ namespace <#= ProxyUserControlRegionAdapterNameSpace #> {
                 }
             }
         }
+        */
         protected override void Adapt(IRegion region, <#= ProxyUserControlClassName #> regionTarget)
         {
+            region.Views.CollectionChanged += regionTarget.<#= OnViewsCollectionChangedPropertyName #>;
+        /*
             region.Views.CollectionChanged += (s, e) =>
             {
                 if (e.Action == NotifyCollectionChangedAction.Remove)
@@ -291,6 +296,7 @@ namespace <#= ProxyUserControlRegionAdapterNameSpace #> {
                 var c = region.ActiveViews.FirstOrDefault();
                 if (c != null) regionTarget.Content = c as View;
             };
+            */
         }
         protected override IRegion CreateRegion()
         {

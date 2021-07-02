@@ -100,6 +100,7 @@ using Prism.Navigation;
 
     string IsDestroyedPropertyName = "IsDestroyed";
     string OnDestroyedPropertyName = "OnDestroyed";
+    string OnDestroyPropertyName   = "OnDestroy";
 
     List<string> nmSpaces = new List<string>();
     if ((LformUserControlBaseNameSpace != IWebServiceFilterRsltInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace) < 0)) 
@@ -611,7 +612,7 @@ namespace <#= LformUserControlBaseNameSpace #> {
         public override void <#= OnDestroyedPropertyName #>()
         {
             base.<#= OnDestroyedPropertyName #>();
-            <#= IBindingContextChangedClassName #> bc = BindingContext as <#= IBindingContextChangedClassName #>
+            <#= IBindingContextChangedClassName #> bc = BindingContext as <#= IBindingContextChangedClassName #>;
             if(bc != null) bc.<#= OnDestroyPropertyName #>();
             RemoveBinding(<#= SformAfterAddItemCommandPropertyName #>Property);
             RemoveBinding(<#= SformAfterUpdItemCommandPropertyName #>Property);

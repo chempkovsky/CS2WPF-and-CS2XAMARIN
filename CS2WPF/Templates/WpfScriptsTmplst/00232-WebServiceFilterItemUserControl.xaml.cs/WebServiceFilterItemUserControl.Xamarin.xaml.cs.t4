@@ -62,6 +62,7 @@ using Xamarin.Forms.Xaml;
     string FilterItemCommandPropertyName = "FilterItemCommand";
     string IsDestroyedPropertyName = "IsDestroyed";
     string OnDestroyedPropertyName = "OnDestroyed";
+    string IsGridFlexPropertyName = "IsGridFlex";
 
     List<string> nmSpaces = new List<string>();
     if (WebServiceFilterItemUserControlNameSpace != IWebServiceFilterDefInterfaceNameSpace) nmSpaces.Add(IWebServiceFilterDefInterfaceNameSpace);
@@ -717,10 +718,30 @@ namespace <#= WebServiceFilterItemUserControlNameSpace #> {
         }
         #endregion
 
+        #region <#= IsGridFlexPropertyName #>Property
+        public static readonly BindableProperty <#= IsGridFlexPropertyName #>Property =
+                BindableProperty.Create(
+                "IsGridFlex", typeof(bool),
+                typeof(<#= WebServiceFilterItemUserControlClassName #>),
+                true);
+        public bool <#= IsGridFlexPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= IsGridFlexPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= IsGridFlexPropertyName #>Property, value);
+            }
+        }
+        #endregion
+
         public virtual void <#= OnDestroyedPropertyName #>()
         {
             RemoveBinding(<#= IsDestroyedPropertyName #>Property);
             <#= IsDestroyedPropertyName #> = true;
+            RemoveBinding(<#= IsGridFlexPropertyName #>Property);
             RemoveBinding(<#= SelectedFilterOperatorNamePropertyName #>Property);
             RemoveBinding(<#= SelectedFilterOperatorPropertyName #>Property);
             RemoveBinding(<#= FilterOperatorsPropertyName #>Property);
@@ -735,6 +756,7 @@ namespace <#= WebServiceFilterItemUserControlNameSpace #> {
             RemoveBinding(<#= FilterValuePromptPropertyName #>Property);
             RemoveBinding(<#= SelectedModelRefPropertyName #>Property);
             RemoveBinding(<#= RemoveWebServiceFilterItemCommandPropertyName #>Property);
+            <#= IsGridFlexPropertyName #> = false;
             <#= RemoveWebServiceFilterItemCommandPropertyName #> = null;
             <#= SelectedFilterDefinitionPropertyName #> = null;
             <#= FilterOperatorsPropertyName #> = null;
