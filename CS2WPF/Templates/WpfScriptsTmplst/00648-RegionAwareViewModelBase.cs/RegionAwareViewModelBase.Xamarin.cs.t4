@@ -86,7 +86,7 @@ using <#= ns #>;
 
 
 namespace <#= RegionAwareViewModelBaseNameSpace #> {
-    public class <#= RegionAwareViewModelBaseClassName #>: <#= IRegionAwareViewModelInterfaceClassName #>, INotifyPropertyChanged
+    public class <#= RegionAwareViewModelBaseClassName #>: <#= IRegionAwareViewModelInterfaceClassName #>, INotifyPropertyChanged, IDestructible
     {
 
         #region INotifyPropertyChanged
@@ -206,6 +206,13 @@ namespace <#= RegionAwareViewModelBaseNameSpace #> {
         #endregion
        protected INavigationContext <#= CurrentNavigationContextPropertyName #> = null;
 
+        #region IDestructible
+        public void Destroy()
+        {
+            if(<#= IsDestroyedPropertyName #>) return;
+            <#= OnDestroyPropertyName #>();
+        }
+        #endregion
 
     }
 }

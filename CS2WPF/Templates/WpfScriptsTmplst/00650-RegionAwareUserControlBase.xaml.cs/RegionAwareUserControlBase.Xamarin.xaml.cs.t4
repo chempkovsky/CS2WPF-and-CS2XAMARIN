@@ -14,6 +14,7 @@
 using Xamarin.Forms;
 using System.Collections.Generic;
 using System.Windows.Input;
+using Prism.Navigation;
 <#
     string IWebServiceFilterMenuInterfaceFolder      = "00206-IWebServiceFilterMenuInterface.cs";
     string IWebServiceFilterMenuInterfaceClassName   = GetModelClassName(Model, IWebServiceFilterMenuInterfaceFolder);
@@ -90,7 +91,7 @@ namespace <#= RegionAwareUserControlBaseNameSpace #> {
     /// <summary>
     /// Interaction logic for <#= RegionAwareUserControlBaseClassName #>.xaml
     /// </summary>
-    public class <#= RegionAwareUserControlBaseClassName #>: ContentView
+    public class <#= RegionAwareUserControlBaseClassName #>: ContentView, IDestructible
     {
         // public <#= RegionAwareUserControlBaseClassName #>()
         // {
@@ -646,6 +647,14 @@ namespace <#= RegionAwareUserControlBaseNameSpace #> {
                 SetValue(<#= IsDestroyedPropertyName #>Property, value);
             }
         }
+
+        #region IDestructible
+        public void Destroy()
+        {
+            if(<#= IsDestroyedPropertyName #>) return;
+            <#= OnDestroyedPropertyName #>();
+        }
+        #endregion
 
     }
 }

@@ -15,7 +15,7 @@ using System;
 using Xamarin.Forms;
 using System.Collections.Generic;
 using System.Windows.Input;
-
+using Prism.Navigation;
 <#
 
     string BindingContextFeedbackFolder         = "00166-BindingContextFeedback.cs";
@@ -123,7 +123,7 @@ namespace <#= SformUserControlBaseNameSpace #> {
     /// <summary>
     /// Interaction logic for <#= SformUserControlBaseClassName #>.xaml
     /// </summary>
-    public class <#= SformUserControlBaseClassName #>: <#= UserControlWithContainerMenuClassName #>, <#= INotifiedByParentInterfaceClassName #>
+    public class <#= SformUserControlBaseClassName #>: <#= UserControlWithContainerMenuClassName #>, <#= INotifiedByParentInterfaceClassName #>, IDestructible
     {
 
         string _<#= RadioGroupNamePropertyName #> = "rgn"+ Guid.NewGuid().ToString("N");
@@ -542,6 +542,7 @@ namespace <#= SformUserControlBaseNameSpace #> {
         }
         #endregion
 
+        #region IDestructible <#= OnDestroyedPropertyName #>
         public override void <#= OnDestroyedPropertyName #>()
         {
             base.<#= OnDestroyedPropertyName #>();
@@ -572,6 +573,16 @@ namespace <#= SformUserControlBaseNameSpace #> {
             <#= SformAfterUpdItemPropertyName #> = null;
             <#= SformAfterDelItemPropertyName #> = null;
         }
+        #endregion
+
+        #region IDestructible
+        public void Destroy()
+        {
+            if(<#= IsDestroyedPropertyName #>) return;
+            <#= OnDestroyedPropertyName #>();
+        }
+        #endregion
+
     }
 }
 

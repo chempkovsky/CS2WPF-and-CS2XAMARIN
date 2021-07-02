@@ -15,7 +15,7 @@ using System;
 using Xamarin.Forms;
 using System.Collections.Generic;
 using System.Windows.Input;
-
+using Prism.Navigation;
 <#
     string BindingContextFeedbackFolder             = "00166-BindingContextFeedback.cs";
     string BindingContextFeedbackClassName          = GetModelClassName(Model, BindingContextFeedbackFolder);
@@ -127,7 +127,7 @@ namespace <#= LformUserControlBaseNameSpace #> {
     /// <summary>
     /// Interaction logic for <#= LformUserControlBaseClassName #>.xaml
     /// </summary>
-    public class <#= LformUserControlBaseClassName #>: <#= UserControlWithContainerMenuClassName #>, <#= INotifiedByParentInterfaceClassName #>
+    public class <#= LformUserControlBaseClassName #>: <#= UserControlWithContainerMenuClassName #>, <#= INotifiedByParentInterfaceClassName #>, IDestructible
     {
         //public <#= LformUserControlBaseClassName #>()
         //{
@@ -607,6 +607,7 @@ namespace <#= LformUserControlBaseNameSpace #> {
         }
         #endregion
 
+        #region <#= OnDestroyedPropertyName #>
         public override void <#= OnDestroyedPropertyName #>()
         {
             base.<#= OnDestroyedPropertyName #>();
@@ -630,11 +631,6 @@ namespace <#= LformUserControlBaseNameSpace #> {
             RemoveBinding(<#= CanUpdPropertyName #>Property);
             RemoveBinding(<#= CanDelPropertyName #>Property);
             RemoveBinding(<#= IsParentLoadedPropertyName #>Property);
-
-
-
-
-
             <#= SformAfterAddItemCommandPropertyName #> = null;
             <#= SformAfterUpdItemCommandPropertyName #> = null;
             <#= SformAfterDelItemCommandPropertyName #> = null;
@@ -646,7 +642,15 @@ namespace <#= LformUserControlBaseNameSpace #> {
             <#= TableMenuItemsPropertyName #>=null;
             <#= HiddenFiltersPropertyName #>=null;
         }
+        #endregion
 
+        #region IDestructible
+        public void Destroy()
+        {
+            if(<#= IsDestroyedPropertyName #>) return;
+            <#= OnDestroyedPropertyName #>();
+        }
+        #endregion
     }
 }
 

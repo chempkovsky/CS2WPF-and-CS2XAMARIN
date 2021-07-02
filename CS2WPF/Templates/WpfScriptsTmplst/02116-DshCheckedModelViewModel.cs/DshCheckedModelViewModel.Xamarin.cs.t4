@@ -24,7 +24,7 @@ using Prism.Mvvm;
 using Prism.Services.Dialogs;
 using System.Threading.Tasks;
 using Xamarin.Essentials;
-
+using Prism.Navigation;
 <#
     string IAppGlblSettingsServiceFolder      = "00080-IAppGlblSettingsService.cs";
     string IAppGlblSettingsServiceClassName   = GetContextModelClassName(Context, IAppGlblSettingsServiceFolder);
@@ -213,6 +213,7 @@ using Xamarin.Essentials;
     string SelPrmPropertyName                               = "SelPrm";
     string PrimKeyPropertyName                              = "";
     string OnDestroyPropertyName                            = "OnDestroy";
+    string IsDestroyedPropertyName                          = "IsDestroyed";
 
     List<ModelViewPropertyOfVwSerializable> primKeys= new List<ModelViewPropertyOfVwSerializable>();
     {
@@ -340,7 +341,7 @@ using <#= ns #>;
 #>
 
 namespace <#= DshCheckedModelViewModelNameSpace #> {
-    public class <#= DshCheckedModelViewModelClassName #>: INotifyPropertyChanged, <#= ISformViewModelInterfaceClassName #>, <#= IBindingContextChangedClassName #>, <#= IPermissionVectorInterfaceClassName #>
+    public class <#= DshCheckedModelViewModelClassName #>: INotifyPropertyChanged, <#= ISformViewModelInterfaceClassName #>, <#= IBindingContextChangedClassName #>, <#= IPermissionVectorInterfaceClassName #>, IDestructible
     {
         protected <#= modelServiceInterfaceClassName #> <#= FormRootServicePropertyName #>=null;
         protected <#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName #>=null;
@@ -1248,9 +1249,22 @@ namespace <#= DshCheckedModelViewModelNameSpace #> {
             }
         }
         #endregion
-        public void <#= OnDestroyPropertyName #>() {
-            
+        bool _<#= IsDestroyedPropertyName #> = false;
+        public bool <#= IsDestroyedPropertyName #> {
+            get { return _<#= IsDestroyedPropertyName #>; }
+            set { if (_<#= IsDestroyedPropertyName #> != value) { _<#= IsDestroyedPropertyName #> = value; OnPropertyChanged();} }
         }
+
+        public virtual void <#= OnDestroyPropertyName #>() {
+            <#= IsDestroyedPropertyName #> = true;
+        }
+        #region IDestructible
+        public void Destroy()
+        {
+            if(<#= IsDestroyedPropertyName #>) return;
+            <#= OnDestroyPropertyName #>();
+        }
+        #endregion
 
     }
 }

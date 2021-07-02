@@ -67,6 +67,7 @@ using System.Windows.Input;
     string HiddenFiltersPropertyChangedPropertyName = "HiddenFiltersPropertyChanged";
     string HiddenFiltersPropertyName                = "HiddenFilters";
     string RowMenuItemsPropertyChangedPropertyName  = "RowMenuItemsPropertyChanged";
+    string OnDestroyedPropertyName                  = "OnDestroyed";
 
 
 
@@ -229,6 +230,13 @@ namespace <#= CheckedModelUserControlNameSpace #> {
             }
         }
         #endregion
+
+        public override void <#= OnDestroyedPropertyName #>() {
+            base.<#= OnDestroyedPropertyName #>();
+            RemoveBinding(<#= PermissionChangedCommandPropertyName #>Property);
+            RemoveBinding(<#= IsPermissionEditablePropertyName #>Property);
+            RemoveBinding(<#= PermissionVectorPropertyName #>Property);
+        }
 
     }
 }

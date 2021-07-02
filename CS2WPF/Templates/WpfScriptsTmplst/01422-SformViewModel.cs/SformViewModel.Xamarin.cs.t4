@@ -253,7 +253,7 @@ using <#= ns #>;
 */
 
 namespace <#= SformViewModelNameSpace #> {
-    public class <#= SformViewModelClassName #>: INotifyPropertyChanged, <#= ISformViewModelInterfaceClassName #>, <#= IBindingContextChangedClassName #>
+    public class <#= SformViewModelClassName #>: INotifyPropertyChanged, <#= ISformViewModelInterfaceClassName #>, <#= IBindingContextChangedClassName #>, IDestructible
     {
         protected <#= modelServiceInterfaceClassName #> <#= FormRootServicePropertyName #>=null;
         protected <#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName #>=null;
@@ -1078,13 +1078,23 @@ namespace <#= SformViewModelNameSpace #> {
         #endregion
         public void <#= OnDestroyPropertyName #>() {
             <#= IsDestroyedPropertyName #> = true;
-            _<#= RowMenuItemsPropertyName #> = null; // correct: without notification
+            <#= IsDsDestroyedPropertyName #> = true;
+            _<#= RowMenuItemsPropertyName #> = null; 
             _<#= TableMenuItemsVMPropertyName #> = null;
             _<#= FilterDefinitionsPropertyName #> = null; 
             _<#= HiddenFiltersVMPropertyName #> = null;
             _<#= BindingContextFeedbackRefPropertyName #> = null;
             _<#= SelectedRowPropertyName #> = null; 
+            <#= DataSourcePropertyName #> = null; 
         }
+        #region IDestructible
+
+        public void Destroy()
+        {
+            if(<#= IsDestroyedPropertyName #>) return;
+            <#= OnDestroyPropertyName #>();
+        }
+        #endregion
 
     }
 }

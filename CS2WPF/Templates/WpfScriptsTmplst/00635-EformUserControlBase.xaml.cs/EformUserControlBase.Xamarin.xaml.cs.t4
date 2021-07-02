@@ -15,7 +15,7 @@ using System;
 using Xamarin.Forms;
 using System.Collections.Generic;
 using System.Windows.Input;
-
+using Prism.Navigation;
 <#
 
     string EformModeEnumFolder                      = "00026-EformModeEnum.cs";
@@ -111,7 +111,7 @@ namespace <#= EformUserControlBaseNameSpace #> {
     /// <summary>
     /// Interaction logic for <#= EformUserControlBaseClassName #>.xaml
     /// </summary>
-    public class <#= EformUserControlBaseClassName #>: <#= UserControlWithContainerMenuClassName #>, <#= INotifiedByParentInterfaceClassName #>
+    public class <#= EformUserControlBaseClassName #>: <#= UserControlWithContainerMenuClassName #>, <#= INotifiedByParentInterfaceClassName #>, IDestructible
     {
        // public <#= EformUserControlBaseClassName #>()
        // {
@@ -339,6 +339,7 @@ namespace <#= EformUserControlBaseNameSpace #> {
         }
         #endregion
 
+        #region <#= OnDestroyedPropertyName #>
         public override void <#= OnDestroyedPropertyName #>()
         {
             base.<#= OnDestroyedPropertyName #>();
@@ -357,6 +358,15 @@ namespace <#= EformUserControlBaseNameSpace #> {
             <#= HiddenFiltersPropertyName #>Property = null;
             <#= FormControlModelPropertyName #>Property = null;
         }
+        #endregion
+
+        #region IDestructible
+        public void Destroy()
+        {
+            if(<#= IsDestroyedPropertyName #>) return;
+            <#= OnDestroyedPropertyName #>();
+        }
+        #endregion
 
     }
 }

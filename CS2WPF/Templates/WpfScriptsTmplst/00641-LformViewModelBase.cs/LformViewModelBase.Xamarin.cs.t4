@@ -19,7 +19,7 @@ using System.Windows.Input;
 using System.Collections.ObjectModel;
 using System.Collections.Generic;
 using Prism.Services.Dialogs;
-
+using Prism.Navigation;
 
 <#
 
@@ -176,7 +176,7 @@ using <#= ns #>;
 #>
 
 namespace <#= LformViewModelBaseNameSpace #> {
-    public class <#= LformViewModelBaseClassName #>: INotifyPropertyChanged, <#= IBindingContextChangedClassName #>, <#= ILformViewModelInterfaceClassName #>
+    public class <#= LformViewModelBaseClassName #>: INotifyPropertyChanged, <#= IBindingContextChangedClassName #>, <#= ILformViewModelInterfaceClassName #>, IDestructible
     {
         protected <#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName #>=null;
         protected IDialogService _dialogService=null;
@@ -657,11 +657,34 @@ namespace <#= LformViewModelBaseNameSpace #> {
         }
         #endregion
 
+        #region <#= OnDestroyPropertyName #>
         public void <#= OnDestroyPropertyName #>() {
+            <#= IsDestroyedPropertyName #> = true;
             <#= RowMenuItemsVMPropertyName #> = null; // correct: notify children
             <#= TableMenuItemsVMPropertyName #> = null;
             <#= HiddenFiltersVMPropertyName #> = null;
         }
+        #endregion
+
+        public bool _<#= IsDestroyedPropertyName #> = false;
+        public bool <#= IsDestroyedPropertyName #> {
+            get { return _<#= IsDestroyedPropertyName #>; }
+            set { 
+                if (_<#= IsDestroyedPropertyName #> != value) { 
+                    _<#= IsDestroyedPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        #region IDestructible
+        public void Destroy()
+        {
+            if(<#= IsDestroyedPropertyName #>) return;
+            <#= OnDestroyPropertyName #>();
+        }
+        #endregion
+
     }
 }
 
