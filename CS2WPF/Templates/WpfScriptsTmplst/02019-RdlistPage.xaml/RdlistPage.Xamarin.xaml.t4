@@ -63,6 +63,7 @@
     string RegionPropertyName                   = "Region";
     string RdlistPageRegionPropertyName         = "RdlistPageRegion";
     string IsParentLoadedPropertyName           = "IsParentLoaded";
+    string IsDestroyedPropertyName              = "IsDestroyed";
     
 
     string proxyPrefix = "clr-namespace:" + ProxyUserControlNameSpace;
@@ -111,7 +112,7 @@
 <#
     }
 #>
-
+            <#= IsDestroyedPropertyName #>="{Binding <#= IsDestroyedPropertyName #>, Mode=OneWay, Source={x:Reference rdlistUsrCntrlRootNode}}" 
             <#= CaptionPropertyName #>="{Binding BindingContext.<#= CaptionPropertyName #>, Mode=OneWay, Source={x:Reference rdlistUsrCntrlRootNode}}" 
             <#= FilterHeightPropertyName #>="{Binding BindingContext.<#= FilterHeightPropertyName #>, Mode=OneWay, Source={x:Reference rdlistUsrCntrlRootNode}}" 
             <#= ShowFilterPropertyName #>="True" 

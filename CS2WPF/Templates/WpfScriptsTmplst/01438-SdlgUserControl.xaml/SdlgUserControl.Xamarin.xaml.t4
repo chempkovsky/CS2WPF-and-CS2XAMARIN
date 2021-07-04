@@ -94,41 +94,37 @@
             
              BackgroundColor="{DynamicResource SelectItemDlgBackgroundColor}"
              x:Name="sdlgUserControlRoot">
-  <ScrollView Orientation="Vertical" VerticalOptions="StartAndExpand">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+    <ScrollView Orientation="Vertical" VerticalOptions="StartAndExpand">
+        <StackLayout Orientation="Vertical">
 <#
     if(IsInTheSameModule) {
 #>
-        <sfrm:<#= SformUserControlClassName #> Grid.Row="0" VerticalOptions="FillAndExpand"
+            <sfrm:<#= SformUserControlClassName #> VerticalOptions="FillAndExpand"
 <#
     } else {
 #>
-        <prx:<#= ProxyUserControlClassName #> Grid.Row="0" VerticalOptions="FillAndExpand"
-            prism:RegionManager.RegionName="<#= SformUserControlClassName #><#= DialogRegionPropertyName #>"
+            <prx:<#= ProxyUserControlClassName #> VerticalOptions="FillAndExpand"
+                prism:RegionManager.RegionName="<#= SformUserControlClassName #><#= DialogRegionPropertyName #>"
 <#
     }
 #>
-            <#= IsDestroyedPropertyName #>="{Binding BindingContext.<#= IsDestroyedPropertyName #>, Mode=OneWay, Source={x:Reference sdlgUserControlRoot}}" 
-            <#= CaptionPropertyName #>="{Binding BindingContext.<#= CaptionPropertyName #>, Mode=OneWay, Source={x:Reference sdlgUserControlRoot}}" 
-            <#= FilterHeightPropertyName #>="{Binding BindingContext.<#= FilterHeightPropertyName #>, Mode=OneWay, Source={x:Reference sdlgUserControlRoot}}" 
-            <#= ShowFilterPropertyName #>="True" 
-            <#= ShowAddFilterBtnPropertyName #>="True" 
-            <#= GridHeightPropertyName #>="{Binding BindingContext.<#= GridHeightPropertyName #>, Mode=OneWay, Source={x:Reference sdlgUserControlRoot}}" 
-            <#= ShowBackBtnPropertyName #>="False" 
-            <#= HiddenFiltersPropertyName #>="{Binding BindingContext.<#= HiddenFiltersPropertyName #>, Mode=OneWay, Source={x:Reference sdlgUserControlRoot}}" 
-            <#= SelectedRowCommandPropertyName #>="{Binding BindingContext.<#= OnSelectedRowCommandPropertyName #>, Mode=OneWay, Source={x:Reference sdlgUserControlRoot}}" 
-            <#= IsParentLoadedPropertyName #>="{Binding BindingContext.<#= IsParentLoadedPropertyName #>, Mode=OneWay, Source={x:Reference sdlgUserControlRoot}}" 
-            />
-        <StackLayout Orientation="Horizontal" Grid.Row="1" Margin="8">
-                <Button Text=" Ok "  Command="{Binding BindingContext.<#= OkCommandPropertyName #>, Mode=OneWay, Source={x:Reference sdlgUserControlRoot}}"/>
-                <Button Text=" Cancel "  Command="{Binding BindingContext.<#= CancelCommandPropertyName #>, Mode=OneWay, Source={x:Reference sdlgUserControlRoot}}"/>
+                <#= IsDestroyedPropertyName #>="{Binding BindingContext.<#= IsDestroyedPropertyName #>, Mode=OneWay, Source={x:Reference sdlgUserControlRoot}}" 
+                <#= CaptionPropertyName #>="{Binding BindingContext.<#= CaptionPropertyName #>, Mode=OneWay, Source={x:Reference sdlgUserControlRoot}}" 
+                <#= FilterHeightPropertyName #>="{Binding BindingContext.<#= FilterHeightPropertyName #>, Mode=OneWay, Source={x:Reference sdlgUserControlRoot}}" 
+                <#= ShowFilterPropertyName #>="True" 
+                <#= ShowAddFilterBtnPropertyName #>="True" 
+                <#= GridHeightPropertyName #>="{Binding BindingContext.<#= GridHeightPropertyName #>, Mode=OneWay, Source={x:Reference sdlgUserControlRoot}}" 
+                <#= ShowBackBtnPropertyName #>="False" 
+                <#= HiddenFiltersPropertyName #>="{Binding BindingContext.<#= HiddenFiltersPropertyName #>, Mode=OneWay, Source={x:Reference sdlgUserControlRoot}}" 
+                <#= SelectedRowCommandPropertyName #>="{Binding BindingContext.<#= OnSelectedRowCommandPropertyName #>, Mode=OneWay, Source={x:Reference sdlgUserControlRoot}}" 
+                <#= IsParentLoadedPropertyName #>="{Binding BindingContext.<#= IsParentLoadedPropertyName #>, Mode=OneWay, Source={x:Reference sdlgUserControlRoot}}" 
+                />
+            <StackLayout Orientation="Horizontal"  Margin="8">
+                    <Button Text=" Ok "  Command="{Binding BindingContext.<#= OkCommandPropertyName #>, Mode=OneWay, Source={x:Reference sdlgUserControlRoot}}"/>
+                    <Button Text=" Cancel "  Command="{Binding BindingContext.<#= CancelCommandPropertyName #>, Mode=OneWay, Source={x:Reference sdlgUserControlRoot}}"/>
+            </StackLayout>
         </StackLayout>
-    </Grid>
-  </ScrollView>
+    </ScrollView>
 </ContentView>
 
 

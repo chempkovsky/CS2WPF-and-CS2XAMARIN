@@ -518,6 +518,7 @@ namespace <#= O2mMaskViewModelNameSpace #> {
         #endregion
 
         protected void OnNavigationResult(IRegionNavigationResult navResult) {
+            if(<#= IsDestroyedPropertyName #>) return;
             if (navResult.Result.HasValue) {
                 if (navResult.Result.Value) return;
             }
@@ -595,6 +596,7 @@ namespace <#= O2mMaskViewModelNameSpace #> {
 #>
 
         protected async Task <#= SavePermissionRecordPropertyName #>() {
+            if(<#= IsDestroyedPropertyName #>) return;
             if ((_<#= PermissionRecordPropertyName #> == null) || (_<#= ParentPermissionVectorPropertyName #> == null)) return;
             Vector2Record();
             <#= MaskModelInterfaceClassName #> rslt = await <#= MaskFormRootServicePropertyName #>.<#= UpdateOneMethodName #>(_<#= PermissionRecordPropertyName #>);
@@ -626,6 +628,7 @@ namespace <#= O2mMaskViewModelNameSpace #> {
 
         #region Record2Vector Vector2Record
         protected void Record2Vector() {
+            if(<#= IsDestroyedPropertyName #>) return;
             int[] perms = <#= AppSettingServicePropertyName #>.<#= GetEmptyPermissionsMethodName #>();
 <#
         {
@@ -666,6 +669,7 @@ namespace <#= O2mMaskViewModelNameSpace #> {
 
         #region <#= OnSelectedItemChangedPropertyName #>
         protected async void <#= OnSelectedItemChangedPropertyName #>() {
+            if(<#= IsDestroyedPropertyName #>) return;
             <#= modelInterfaceClassName #> selItm = _<#= SelectedRowPropertyName #> as <#= modelInterfaceClassName #>;
             if(selItm==null) {
                 <#= ParentPermissionVectorPropertyName #> = null;
@@ -728,6 +732,7 @@ namespace <#= O2mMaskViewModelNameSpace #> {
 <#
         if(MaskModel.IsWebApiAdd && MaskModel.IsWebApiUpdate && MaskModel.IsWebApiDelete) {
 #>
+                if(<#= IsDestroyedPropertyName #>) return;
                 if(_<#= SelectedRowPropertyName #> != value) {
                     if (<#= IsModifiedParentPermissionVectorPropertyName #>)
                     {
@@ -809,6 +814,7 @@ namespace <#= O2mMaskViewModelNameSpace #> {
             <#= CurrentNavigationContextPropertyName #> = null;
        }
        public void OnNavigatedTo(INavigationContext navigationContext) {
+            if(<#= IsDestroyedPropertyName #>) return;
             INavigationParameters prms = navigationContext.Parameters;
             PermissionMask = <#= AppSettingServicePropertyName #>.GetViewModelMask("<#= Model.ViewName #>");
             if ((PermissionMask & 1) != 1) {
@@ -885,6 +891,7 @@ namespace <#= O2mMaskViewModelNameSpace #> {
         }
         protected void <#= OnNavigationBackCommandPropertyName #>Execute()
         {
+            if(<#= IsDestroyedPropertyName #>) return;
             if (<#= CurrentNavigationContextPropertyName #> != null) {
                 if(<#= CurrentNavigationContextPropertyName #>.NavigationService.Journal.CanGoBack) {
                     <#= CurrentNavigationContextPropertyName #>.NavigationService.Journal.GoBack();
@@ -939,6 +946,7 @@ namespace <#= O2mMaskViewModelNameSpace #> {
         }
         protected void <#= PermissionChangedCommandPropertyName #>Execute(object prm)
         {
+            if(<#= IsDestroyedPropertyName #>) return;
             if(prm == null) return;
             if (prm.GetType().IsArray && typeof(int).IsAssignableFrom(prm.GetType().GetElementType())) {
                 <#= ParentPermissionVectorPropertyName #>  = (int[])prm;
@@ -963,6 +971,7 @@ namespace <#= O2mMaskViewModelNameSpace #> {
         if(MaskModel.IsWebApiAdd && MaskModel.IsWebApiUpdate && MaskModel.IsWebApiDelete) {
 #>
         public async void <#= OnParentContainerMenuItemsCommandPropertyName #>Execute(object prm) { 
+            if(<#= IsDestroyedPropertyName #>) return;
             <#= IWebServiceFilterMenuInterfaceClassName #> mi = prm as <#= IWebServiceFilterMenuInterfaceClassName #>;
             if(mi == null) return;
             if(mi.Id == "SaveChangesMI") {
@@ -998,6 +1007,13 @@ namespace <#= O2mMaskViewModelNameSpace #> {
 
         public override void <#= OnDestroyPropertyName #>() {
             base.<#= OnDestroyPropertyName #>();
+            _<#= TableMenuItemsPropertyName #> = null;
+            _<#= RowMenuItemsPropertyName #> = null;
+            _<#= ParentContainerMenuItemsPropertyName #> = null;
+            _<#= HiddenFiltersPropertyName #> = null;
+            _<#= SelectedRowPropertyName #> = null;
+            _<#= SelectedDetailsListItemPropertyName #> = null;
+            _<#= ParentPermissionVectorPropertyName #> = null;
         }
 
     }

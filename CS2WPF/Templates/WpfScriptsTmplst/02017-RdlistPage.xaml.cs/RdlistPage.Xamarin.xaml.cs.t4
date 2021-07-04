@@ -12,12 +12,15 @@
 <#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
 using Xamarin.Forms;
+using Prism.Navigation;
 <#
 
-    string RdlistPageFolder                          = "02017-RdlistPage.xaml.cs";
-    string RdlistPageClassName                       = GetModelClassName(Model, RdlistPageFolder);
-    string RdlistPageNameSpace                       = GetModelNameSpace(Model, RdlistPageFolder);
+    string RdlistPageFolder                         = "02017-RdlistPage.xaml.cs";
+    string RdlistPageClassName                      = GetModelClassName(Model, RdlistPageFolder);
+    string RdlistPageNameSpace                      = GetModelNameSpace(Model, RdlistPageFolder);
 
+    string IsDestroyedPropertyName                  = "IsDestroyed";
+    string OnDestroyedPropertyName                  = "OnDestroyed";
 
     List<string> nmSpaces = new List<string>();
     
@@ -35,12 +38,49 @@ namespace <#= RdlistPageNameSpace #> {
     /// <summary>
     /// Interaction logic for <#= RdlistPageClassName #>.xaml
     /// </summary>
-    public partial class <#= RdlistPageClassName #>: ContentPage
+    public partial class <#= RdlistPageClassName #>: ContentPage, IDestructible 
     {
         public <#= RdlistPageClassName #>()
         {
             InitializeComponent();
         }
+        #region IDestructible
+        public virtual void <#= OnDestroyedPropertyName #>()
+        {
+            IDestructible bc = BindingContext as IDestructible;
+            if(bc != null) bc.Destroy();
+        }
+        private static void <#= IsDestroyedPropertyName #>Changed(BindableObject d, object oldValue, object newValue)
+        {
+            <#= RdlistPageClassName #> inst = d as <#= RdlistPageClassName #>;
+            if (inst != null)
+            {
+                inst.<#= OnDestroyedPropertyName #>();
+            }
+        }
+        public static readonly BindableProperty <#= IsDestroyedPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= IsDestroyedPropertyName #>", typeof(bool),
+                typeof(<#= RdlistPageClassName #>),
+                false, propertyChanged: <#= IsDestroyedPropertyName #>Changed);
+        public bool <#= IsDestroyedPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= IsDestroyedPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= IsDestroyedPropertyName #>Property, value);
+            }
+        }
+
+        public void Destroy()
+        {
+            <#= IsDestroyedPropertyName #> = true;
+        }
+        #endregion
+
     }
 }
 

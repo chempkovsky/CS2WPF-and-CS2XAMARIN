@@ -24,6 +24,7 @@ using System.Runtime.CompilerServices;
 using System.Collections.Generic;
 using Prism.Navigation;
 using Xamarin.Essentials;
+using Prism.Navigation;
 
 <#
 
@@ -114,6 +115,7 @@ using Xamarin.Essentials;
     string SubmitCommandPropertyName            = "SubmitCommand";
     string CancelCommandPropertyName            = "CancelCommand";
     string IsParentLoadedPropertyName           = "IsParentLoaded";
+    string IsDestroyedPropertyName              = "IsDestroyed";
     
 
     List<string> detailViews = GetDetailViews(Model, Context, null);
@@ -193,7 +195,7 @@ using <#= ns #>;
 */
 
 namespace <#= ReditPageViewModelNameSpace #> {
-    public class <#= ReditPageViewModelClassName #>: INotifyPropertyChanged, INavigationAware 
+    public class <#= ReditPageViewModelClassName #>: INotifyPropertyChanged, INavigationAware, IDestructible  
     {
         protected <#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName #>=null;
         protected <#= GetModelServiceInterfaceName(Model) #> <#= FormServicePrefix #><#= Model.ViewName #> = null;
@@ -315,6 +317,7 @@ namespace <#= ReditPageViewModelNameSpace #> {
         //     return true;
         // }
         public void OnNavigatedFrom(INavigationParameters prms) {
+            if(<#= IsDestroyedPropertyName #>) return;
             if(!<#= IsCanceledPropertyName #>) {
 <#
             foreach(ModelViewPropertyOfVwSerializable pk in primKeys) {
@@ -327,6 +330,7 @@ namespace <#= ReditPageViewModelNameSpace #> {
             }
         }
         public void OnNavigatedTo(INavigationParameters prms) {
+            if(<#= IsDestroyedPropertyName #>) return;
             <#= IsCanceledPropertyName #> = true;
             <#= EformModeEnumClassName #> modeToCheck = <#= EformModeEnumClassName #>.DeleteMode;
             if(prms.ContainsKey("<#= EformModeEnumClassName #>")) {
@@ -437,6 +441,7 @@ namespace <#= ReditPageViewModelNameSpace #> {
         #endregion
         #region NavigationBackCommand
         public async Task  <#= NavigationBackCommandPropertyName #>() { 
+            if(<#= IsDestroyedPropertyName #>) return;
             INavigationResult rslt = await _navigationService.GoBackAsync();
             if (rslt.Success) return;
             string exceptionMsg = "Can not navigate back:";
@@ -467,6 +472,7 @@ namespace <#= ReditPageViewModelNameSpace #> {
         }
         protected async void <#= SubmitCommandPropertyName #>Action(object param)
         {
+            if(<#= IsDestroyedPropertyName #>) return;
             modelToReturn = param as <#= modelInterfaceClassName #>;
             <#= IsCanceledPropertyName #> = false;
             await <#= NavigationBackCommandPropertyName #>();
@@ -494,6 +500,22 @@ namespace <#= ReditPageViewModelNameSpace #> {
         protected bool <#= CancelCommandPropertyName #>CanExecute(object param)
         {
             return true;
+        }
+        #endregion
+
+        #region IDestructible 
+        bool _<#= IsDestroyedPropertyName #> = false;
+        public bool <#= IsDestroyedPropertyName #> {
+            get { return _<#= IsDestroyedPropertyName #>; }
+            set { if (_<#= IsDestroyedPropertyName #> != value) { _<#= IsDestroyedPropertyName #> = value; OnPropertyChanged();} }
+        }
+
+        public void Destroy()
+        {
+            if(<#= IsDestroyedPropertyName #>) return;
+            <#= IsDestroyedPropertyName #> = true;
+            _<#= HiddenFiltersPropertyName #> = null;
+            _<#= FormControlModelPropertyName #> = null;
         }
         #endregion
 

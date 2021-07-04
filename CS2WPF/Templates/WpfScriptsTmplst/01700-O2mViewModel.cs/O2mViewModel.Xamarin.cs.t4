@@ -535,6 +535,7 @@ namespace <#= O2mViewModelNameSpace #> {
             <#= CurrentNavigationContextPropertyName #> = null;
        }
        public void OnNavigatedTo(INavigationContext navigationContext) {
+            if(<#= IsDestroyedPropertyName #>) return;
             INavigationParameters prms = navigationContext.Parameters;
             PermissionMask = <#= AppSettingServicePropertyName #>.GetViewModelMask("<#= Model.ViewName #>");
             if ((PermissionMask & 1) != 1) {
@@ -611,6 +612,7 @@ namespace <#= O2mViewModelNameSpace #> {
         }
         protected void <#= OnNavigationBackCommandPropertyName #>Execute()
         {
+            if(<#= IsDestroyedPropertyName #>) return;
             if (<#= CurrentNavigationContextPropertyName #> != null) {
                 if(<#= CurrentNavigationContextPropertyName #>.NavigationService.Journal.CanGoBack) {
                     <#= CurrentNavigationContextPropertyName #>.NavigationService.Journal.GoBack();
@@ -819,6 +821,7 @@ namespace <#= O2mViewModelNameSpace #> {
 
         #region DefineHiddenDetailFilter
         protected void DefineHiddenDetailFilter() {
+            if(<#= IsDestroyedPropertyName #>) return;
             PermissionMaskDetail = 0;
             ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>> chfd = new ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>();
             <#= modelInterfaceClassName  #>  selectedMasterRow  = <#= SelectedRowPropertyName #> as <#= modelInterfaceClassName  #>;
@@ -882,7 +885,14 @@ namespace <#= O2mViewModelNameSpace #> {
         #endregion
 
         public override void <#= OnDestroyPropertyName #>() {
-            base.<#= OnDestroyPropertyName #>()
+            base.<#= OnDestroyPropertyName #>();
+            _<#= TableMenuItemsPropertyName #> = null;
+            _<#= RowMenuItemsPropertyName #> = null;
+            _<#= TableMenuItemsDetailPropertyName #> = null;
+            _<#= RowMenuItemsDetailPropertyName #> = null;
+            _<#= HiddenFiltersDetailPropertyName #> = null;
+            _<#= SelectedRowDetailPropertyName #> = null;
+            _<#= SelectedRowPropertyName #> = null;
         }
 
     }

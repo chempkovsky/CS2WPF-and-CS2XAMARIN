@@ -49,6 +49,7 @@
     string ReditPageRegionPropertyName      = "ReditPageRegion";
 
     string IsParentLoadedPropertyName       = "IsParentLoaded";
+    string IsDestroyedPropertyName          = "IsDestroyed";
 
     string proxyPrefix = "clr-namespace:" + ProxyUserControlNameSpace;
     if(ProxyUserControlProject != ReditPageProject) {
@@ -97,7 +98,7 @@
 <#
     }
 #>
-
+            <#= IsDestroyedPropertyName #>="{Binding <#= IsDestroyedPropertyName #>, Mode=OneWay, Source={x:Reference reditUsrCntrlRootNode}}" 
             <#= CaptionPropertyName #>="{Binding BindingContext.<#= CaptionPropertyName #>, Mode=OneWay, Source={x:Reference reditUsrCntrlRootNode}}" 
             <#= HiddenFiltersPropertyName #>="{Binding BindingContext.<#= HiddenFiltersPropertyName #>, Mode=OneWay, Source={x:Reference reditUsrCntrlRootNode}}" 
             <#= ShowSubmitPropertyName #>="True" 

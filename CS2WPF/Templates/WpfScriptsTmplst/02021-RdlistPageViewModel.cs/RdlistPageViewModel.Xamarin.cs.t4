@@ -108,6 +108,7 @@ using Prism.Navigation;
     string GetWithFilterMethodName                   = "getwithfilter";
     string ColumnSelectorDlgPropertyName             = "ColumnSelectorDlg";
     string IsParentLoadedPropertyName                = "IsParentLoaded";
+    string IsDestroyedPropertyName                   = "IsDestroyed";
 
 
 
@@ -224,7 +225,7 @@ using <#= ns #>;
 
 namespace <#= RdlistPageViewModelNameSpace #> {
 
-    public class <#= RdlistPageViewModelClassName #>: INotifyPropertyChanged, INavigationAware 
+    public class <#= RdlistPageViewModelClassName #>: INotifyPropertyChanged, INavigationAware, IDestructible  
     {
         protected <#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName #>=null;
         protected <#= GetModelServiceInterfaceName(Model) #> <#= FormServicePrefix #><#= Model.ViewName #> = null;
@@ -386,6 +387,7 @@ namespace <#= RdlistPageViewModelNameSpace #> {
         #endregion
 
         protected async Task OnNavigationResult(INavigationResult navResult) {
+            if(<#= IsDestroyedPropertyName #>) return;
             if (navResult.Success) return;
             string navErrorMsg = "Unknown Navigation Error";
             if (navResult.Exception != null)
@@ -418,6 +420,7 @@ namespace <#= RdlistPageViewModelNameSpace #> {
 #>
         #region <#= detailViewClassName #><#= foreignKey.NavigationName #>Command
         public async Task <#= detailViewClassName #><#= foreignKey.NavigationName #>Command(<#= modelInterfaceClassName #> selected) { 
+            if(<#= IsDestroyedPropertyName #>) return;
             if (((<#= AppSettingServicePropertyName #>.GetViewModelMask("<#= detailView.ViewName #>") & 1) != 1 )) {
                 INavigationResult nr1 = await _navigationService.NavigateAsync("<#= AccessDeniedPageClassName #>");
                 await OnNavigationResult(nr1);
@@ -531,6 +534,7 @@ namespace <#= RdlistPageViewModelNameSpace #> {
         }
         protected async void <#= RowMenuItemsCommandPropertyName #>Execute(object prm)
         {
+            if(<#= IsDestroyedPropertyName #>) return;
             <#= IWebServiceFilterMenuInterfaceClassName #> mi = prm as <#= IWebServiceFilterMenuInterfaceClassName #>;
             if (mi == null) return;
             <#= modelInterfaceClassName #> arow = mi.FeedbackData as <#= modelInterfaceClassName #>;
@@ -565,6 +569,7 @@ namespace <#= RdlistPageViewModelNameSpace #> {
         }
         protected bool <#= RowMenuItemsCommandPropertyName #>CanExecute(object prm)
         {
+            if(<#= IsDestroyedPropertyName #>) return false;
             <#= IWebServiceFilterMenuInterfaceClassName #> mi = prm as <#= IWebServiceFilterMenuInterfaceClassName #>;
             if (mi != null) {
                 switch(mi.Id) {
@@ -656,6 +661,7 @@ namespace <#= RdlistPageViewModelNameSpace #> {
             
        }
        public void OnNavigatedTo(INavigationParameters prms) {
+            if(<#= IsDestroyedPropertyName #>) return;
             PermissionMask = <#= AppSettingServicePropertyName #>.GetViewModelMask("<#= Model.ViewName #>");
             if ((PermissionMask & 1) != 1) {
                 throw new Exception("Access Denied to navigate <#= Model.ViewName #>");
@@ -703,6 +709,26 @@ namespace <#= RdlistPageViewModelNameSpace #> {
             <#= IsParentLoadedPropertyName #> = true;
         }
         #endregion
+
+        #region IDestructible 
+        bool _<#= IsDestroyedPropertyName #> = false;
+        public bool <#= IsDestroyedPropertyName #> {
+            get { return _<#= IsDestroyedPropertyName #>; }
+            set { if (_<#= IsDestroyedPropertyName #> != value) { _<#= IsDestroyedPropertyName #> = value; OnPropertyChanged();} }
+        }
+
+        public void Destroy()
+        {
+            if(<#= IsDestroyedPropertyName #>) return;
+            <#= IsDestroyedPropertyName #> = true;
+            _<#= HiddenFiltersPropertyName #> = null;
+            _<#= TableMenuItemsPropertyName #> = null;
+            _<#= RowMenuItemsPropertyName #> = null;
+            _<#= GridHeightPropertyName #> = -1d;
+            _<#= FilterHeightPropertyName #> = -1d;
+        }
+        #endregion
+
     }
 }
 

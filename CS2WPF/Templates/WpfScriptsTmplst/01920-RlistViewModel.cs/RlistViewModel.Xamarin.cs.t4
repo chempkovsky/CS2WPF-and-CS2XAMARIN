@@ -169,6 +169,7 @@ using Xamarin.Essentials;
     string CanDelDetailParentPropertyName       = "CanDeleteDetailParent"; 
     string IsDestroyedPropertyName              = "IsDestroyed";
     string IsNavigatedBackPropertyName          = "IsNavigatedBack";
+    string OnDestroyPropertyName                = "OnDestroy";
 
     List<string> detailViews = GetDetailViews(Model, Context, null);
     List<ModelViewPropertyOfVwSerializable> primKeys = GetModelPrimaryKeyProps(Model);
@@ -413,6 +414,7 @@ namespace <#= RlistViewModelNameSpace #> {
         #endregion
 
         protected void OnNavigationResult(IRegionNavigationResult navResult) {
+            if (<#= IsDestroyedPropertyName #>) return;
             if (navResult.Result.HasValue) {
                 if (navResult.Result.Value) return;
             }
@@ -447,6 +449,7 @@ namespace <#= RlistViewModelNameSpace #> {
 #>
         #region <#= detailViewClassName #><#= foreignKey.NavigationName #>Command
         public void <#= detailViewClassName #><#= foreignKey.NavigationName #>Command(<#= modelInterfaceClassName #> selected) { 
+            if (<#= IsDestroyedPropertyName #>) return;
             if (((<#= AppSettingServicePropertyName #>.GetViewModelMask("<#= detailView.ViewName #>") & 1) != 1 )) {
                 <#= CurrentNavigationContextPropertyName #>.NavigationService.RequestNavigate(new Uri("<#= AccessDeniedUserControlClassName #>", UriKind.Relative), OnNavigationResult);
                 return;
@@ -532,6 +535,7 @@ namespace <#= RlistViewModelNameSpace #> {
         #endregion
         #region <#= SformAddItemCommandPropertyName #>
         public void <#= SformAddItemCommandPropertyName #>() {
+            if (<#= IsDestroyedPropertyName #>) return;
             if (!<#= CanAddPropertyName #>) {
                 <#= CurrentNavigationContextPropertyName #>.NavigationService.RequestNavigate(new Uri("<#= AccessDeniedUserControlClassName #>", UriKind.Relative), OnNavigationResult);
                 return;
@@ -556,6 +560,7 @@ namespace <#= RlistViewModelNameSpace #> {
         }
         protected void <#= TableMenuItemsCommandPropertyName #>Execute(object prm)
         {
+            if (<#= IsDestroyedPropertyName #>) return;
             if(prm == null) return;
             <#= IWebServiceFilterMenuInterfaceClassName #> mi = prm as <#= IWebServiceFilterMenuInterfaceClassName #>;
             if (mi == null) return;
@@ -578,6 +583,7 @@ namespace <#= RlistViewModelNameSpace #> {
 
         #region <#= SformUpdItemCommandPropertyName #>
         public void <#= SformUpdItemCommandPropertyName #>(<#= modelInterfaceClassName #> selected) {
+            if (<#= IsDestroyedPropertyName #>) return;
             if (selected == null) return;
             if (!<#= CanUpdPropertyName #>) {
                 <#= CurrentNavigationContextPropertyName #>.NavigationService.RequestNavigate(new Uri("<#= AccessDeniedUserControlClassName #>", UriKind.Relative), OnNavigationResult);
@@ -601,6 +607,7 @@ namespace <#= RlistViewModelNameSpace #> {
         #endregion
         #region <#= SformDelItemCommandPropertyName #>
         public void <#= SformDelItemCommandPropertyName #>(<#= modelInterfaceClassName #> selected) {
+            if (<#= IsDestroyedPropertyName #>) return;
             if (selected == null) return;
             if(!<#= CanDelPropertyName #>) {
                 <#= CurrentNavigationContextPropertyName #>.NavigationService.RequestNavigate(new Uri("<#= AccessDeniedUserControlClassName #>", UriKind.Relative), OnNavigationResult);
@@ -633,6 +640,7 @@ namespace <#= RlistViewModelNameSpace #> {
         }
         protected void <#= RowMenuItemsCommandPropertyName #>Execute(object prm)
         {
+            if (<#= IsDestroyedPropertyName #>) return;
             <#= IWebServiceFilterMenuInterfaceClassName #> mi = prm as <#= IWebServiceFilterMenuInterfaceClassName #>;
             if (mi == null) return;
             <#= modelInterfaceClassName #> arow = mi.FeedbackData as <#= modelInterfaceClassName #>;
@@ -673,6 +681,7 @@ namespace <#= RlistViewModelNameSpace #> {
         }
         protected bool <#= RowMenuItemsCommandPropertyName #>CanExecute(object prm)
         {
+            if (<#= IsDestroyedPropertyName #>) return false;
             <#= IWebServiceFilterMenuInterfaceClassName #> mi = prm as <#= IWebServiceFilterMenuInterfaceClassName #>;
             if (mi != null) {
                 switch(mi.Id) {
@@ -768,6 +777,7 @@ namespace <#= RlistViewModelNameSpace #> {
             <#= CurrentNavigationContextPropertyName #> = null;
        }
        public void OnNavigatedTo(INavigationContext navigationContext) {
+            if (<#= IsDestroyedPropertyName #>) return;
             INavigationParameters prms = navigationContext.Parameters;
             PermissionMask = <#= AppSettingServicePropertyName #>.GetViewModelMask("<#= Model.ViewName #>");
             if ((PermissionMask & 1) != 1) {
@@ -911,6 +921,7 @@ namespace <#= RlistViewModelNameSpace #> {
         }
         protected void <#= OnNavigationBackCommandPropertyName #>Execute()
         {
+            if (<#= IsDestroyedPropertyName #>) return;
             if (<#= CurrentNavigationContextPropertyName #> != null) {
                 if(<#= CurrentNavigationContextPropertyName #>.NavigationService.Journal.CanGoBack) {
                     <#= IsNavigatedBackPropertyName #> = true;
@@ -923,6 +934,17 @@ namespace <#= RlistViewModelNameSpace #> {
             return (<#= CurrentNavigationContextPropertyName #> == null) ?  false : <#= CurrentNavigationContextPropertyName #>.NavigationService.Journal.CanGoBack;
         }
         #endregion
+
+        public override void <#= OnDestroyPropertyName #>() {
+            base.<#= OnDestroyPropertyName #>();
+            _<#= HiddenFiltersPropertyName #> = null;
+            _<#= TableMenuItemsPropertyName #> = null;
+            _<#= RowMenuItemsPropertyName #> = null;
+            _<#= CaptionPropertyName #> = null;
+            _<#= SformAfterAddItemPropertyName #> = null;
+            _<#= SformAfterUpdItemPropertyName #> = null;
+            _<#= SformAfterDelItemPropertyName #> = null;
+        }
 
     }
 }

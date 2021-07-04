@@ -130,19 +130,15 @@
 #>
              <#= BindingContextFeedbackRefPropertyName #>="{Binding BindingContext.<#= BindingContextFeedbackRefPropertyName #>, Source={x:Reference lformUsrCntrlRootNode}}"
              x:Name="lformUsrCntrlRootNode">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
 
 <#
     if(IsInTheSameModule) {
 #>
-        <sfrm:<#= SformUserControlClassName #>  Grid.Row="0"
+        <sfrm:<#= SformUserControlClassName #>  
 <#
     } else {
 #>
-        <prx:<#= ProxyUserControlClassName #> Grid.Row="0" 
+        <prx:<#= ProxyUserControlClassName #> 
             x:Name="<#= SformUserControlClassName #><#= ProxyPropertyName #>"
             prism:RegionManager.RegionName="<#= SformUserControlClassName #><#= LformRegionPropertyName #>"
 <#
@@ -177,7 +173,6 @@
             <#= SformAfterDelItemPropertyName #>="{Binding BindingContext.<#= SformAfterDelItemPropertyName #>, Mode=OneWay, Source={x:Reference lformUsrCntrlRootNode}}" 
             <#= IsParentLoadedPropertyName #>="{Binding BindingContext.<#= IsParentLoadedPropertyName #>, Mode=OneWay, Source={x:Reference lformUsrCntrlRootNode}}" 
             />
-    </Grid>
 </lfucbs:<#= LformUserControlBaseClassName #>>
 
 

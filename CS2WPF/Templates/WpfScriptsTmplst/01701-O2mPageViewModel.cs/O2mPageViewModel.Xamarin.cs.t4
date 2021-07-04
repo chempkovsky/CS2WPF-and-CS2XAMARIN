@@ -147,6 +147,7 @@ using Prism.Navigation;
     string DefaultFilterHeightMethodName            = "DefaultFilterHeight";
     string ExpandedGridHeightMethodName             = "ExpandedGridHeight";
     string ExpandedFilterHeightMethodName           = "ExpandedFilterHeight";
+    string IsDestroyedPropertyName                  = "IsDestroyed";
 
 
     List<string> detailViews = GetDetailViews(Model, Context, null);
@@ -275,7 +276,7 @@ using <#= ns #>;
 
 namespace <#= O2mPageViewModelNameSpace #> {
 
-    public class <#= O2mPageViewModelClassName #>: INotifyPropertyChanged, INavigationAware 
+    public class <#= O2mPageViewModelClassName #>: INotifyPropertyChanged, INavigationAware, IDestructible 
     {
         protected <#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName #>=null;
         protected <#= GetModelServiceInterfaceName(Model) #> <#= FormServicePrefix #><#= Model.ViewName #> = null;
@@ -400,6 +401,7 @@ namespace <#= O2mPageViewModelNameSpace #> {
         #endregion
 
         protected async Task OnNavigationResult(INavigationResult navResult) {
+            if(<#= IsDestroyedPropertyName #>) return;
             if (navResult.Success) return;
             string navErrorMsg = "Unknown Navigation Error";
             if (navResult.Exception != null)
@@ -587,6 +589,7 @@ namespace <#= O2mPageViewModelNameSpace #> {
             
        }
        public void OnNavigatedTo(INavigationParameters prms) {
+            if(<#= IsDestroyedPropertyName #>) return;
             PermissionMask = <#= AppSettingServicePropertyName #>.GetViewModelMask("<#= Model.ViewName #>");
             if ((PermissionMask & 1) != 1) {
                 throw new Exception("Access Denied to navigate <#= Model.ViewName #>");
@@ -892,6 +895,7 @@ namespace <#= O2mPageViewModelNameSpace #> {
 
         #region DefineHiddenDetailFilter
         protected void DefineHiddenDetailFilter() {
+            if(<#= IsDestroyedPropertyName #>) return;
             PermissionMaskDetail = 0;
             ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>> chfd = new ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>();
             <#= modelInterfaceClassName  #>  selectedMasterRow  = <#= SelectedRowPropertyName #> as <#= modelInterfaceClassName  #>;
@@ -951,6 +955,35 @@ namespace <#= O2mPageViewModelNameSpace #> {
                 }
             }
             <#= HiddenFiltersDetailPropertyName #> = chfd;
+        }
+        #endregion
+
+        #region IDestructible 
+        bool _<#= IsDestroyedPropertyName #> = false;
+        public bool <#= IsDestroyedPropertyName #> {
+            get { return _<#= IsDestroyedPropertyName #>; }
+            set { if (_<#= IsDestroyedPropertyName #> != value) { _<#= IsDestroyedPropertyName #> = value; OnPropertyChanged();} }
+        }
+
+        public void Destroy()
+        {
+            if(<#= IsDestroyedPropertyName #>) return;
+            <#= IsDestroyedPropertyName #> = true;
+            _<#= TableMenuItemsPropertyName #> = null;
+            _<#= RowMenuItemsPropertyName #> = null;
+            _<#= HiddenFiltersPropertyName #> = null;
+            _<#= SelectedRowPropertyName #> = null;
+
+            _<#= TableMenuItemsDetailPropertyName #> = null;
+            _<#= RowMenuItemsDetailPropertyName #> = null;
+            _<#= HiddenFiltersDetailPropertyName #> = null;
+            _<#= SelectedRowDetailPropertyName #> = null;
+
+            <#= GridHeightPropertyName #> = -1;
+            <#= FilterHeightPropertyName #> = -1;
+            <#= GridHeightDetailPropertyName #> = -1;
+            <#= FilterHeightDetailPropertyName #> = -1;  
+
         }
         #endregion
     }

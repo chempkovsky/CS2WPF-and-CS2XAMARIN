@@ -83,6 +83,7 @@
     string TemplateViewSuffixPropertyName           = "TemplateView"; 
 
     string IsParentLoadedPropertyName               = "IsParentLoaded";
+    string IsDestroyedPropertyName = "IsDestroyed";
 
     string proxyPrefix = "clr-namespace:" + ProxyUserControlNameSpace;
     if(ProxyUserControlProject != O2mPageProject) {
@@ -183,6 +184,7 @@
 <#
     }
 #>
+            <#= IsDestroyedPropertyName #>="{Binding <#= IsDestroyedPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
             <#= CaptionPropertyName #>="{Binding BindingContext.<#= CaptionPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
             <#= FilterHeightPropertyName #>="{Binding BindingContext.<#= FilterHeightPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
             <#= ShowFilterPropertyName #>="True" 
@@ -255,6 +257,7 @@
 <#
             }
 #>
+                            <#= IsDestroyedPropertyName #>="{Binding <#= IsDestroyedPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
                             <#= CaptionPropertyName #>="{Binding BindingContext.<#= SelectedDetailsListItemPropertyName #>.<#= CaptionPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
                             <#= FilterHeightPropertyName #>="{Binding BindingContext.<#= FilterHeightDetailPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
                             <#= ShowFilterPropertyName #>="True" 

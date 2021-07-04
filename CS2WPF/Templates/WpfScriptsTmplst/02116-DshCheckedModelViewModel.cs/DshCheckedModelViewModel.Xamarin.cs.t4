@@ -432,6 +432,7 @@ namespace <#= DshCheckedModelViewModelNameSpace #> {
         }
         protected void <#= PermissionChangedCommandPropertyName #>Execute(object prm)
         {
+            if(<#= IsDestroyedPropertyName #>) return;
             if(!<#= IsPermissionEditablePropertyName #>) return;
             <#= DshPermissionNotifyInterfaceClassName #> selItem = prm as <#= DshPermissionNotifyInterfaceClassName #>;
             if(selItem == null) return;
@@ -458,6 +459,7 @@ namespace <#= DshCheckedModelViewModelNameSpace #> {
 
         #region <#= IPermissionVectorInterfaceClassName #>
         public void <#= PermissionVectorPropertyChangedPropertyName #>(object Sender, object OldValue, object NewValue) {
+            if(<#= IsDestroyedPropertyName #>) return;
             if(NewValue == null) {
                 <#= PermissionsPropertyName #> = <#= AppSettingServicePropertyName #>.<#= GetEmptyPermissionsMethodName #>();
             } else if (NewValue.GetType().IsArray && typeof(int).IsAssignableFrom(NewValue.GetType().GetElementType())) {
@@ -611,6 +613,7 @@ namespace <#= DshCheckedModelViewModelNameSpace #> {
         #region <#= SelectColumnsCommandPropertyName #>
         protected void <#= SelectColumnsCommandPropertyName #>Callback(IDialogResult rslt)
         {
+            if(<#= IsDestroyedPropertyName #>) return;
             if ((!rslt.Parameters.ContainsKey("Result")) || (!rslt.Parameters.ContainsKey("Columns"))) return;
             bool aResult =  rslt.Parameters["Result"] is bool;
             if(aResult) aResult = (bool)rslt.Parameters["Result"];
@@ -624,6 +627,7 @@ namespace <#= DshCheckedModelViewModelNameSpace #> {
             }
         }
         public void <#= SelectColumnsCommandPropertyName #>() {
+            if(<#= IsDestroyedPropertyName #>) return;
             ObservableCollection<<#= IColumnSelectorItemDefInterfaceClassName #>> columns = new ObservableCollection<<#= IColumnSelectorItemDefInterfaceClassName #>>();
             foreach(<#= IColumnSelectorItemDefInterfaceClassName #> sc  in <#= SelectedColumnsPropertyName #>) {
                 columns.Add( new <#= ColumnSelectorItemDefViewModelClassName #>() {Name = sc.Name, Caption=sc.Caption, IsChecked=sc.IsChecked });
@@ -637,6 +641,7 @@ namespace <#= DshCheckedModelViewModelNameSpace #> {
 
         #region <#= RowMenuItemsPropertyChangedPropertyName #>
         public void <#= RowMenuItemsPropertyChangedPropertyName #>(object Sender, object OldValue, object NewValue) {
+            if(<#= IsDestroyedPropertyName #>) return;
             ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>> tmis = new ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>>();
             IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> intmis = NewValue as IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>>;
             if(intmis != null) {
@@ -675,6 +680,7 @@ namespace <#= DshCheckedModelViewModelNameSpace #> {
         }
         protected async void <#= RowMenuItemsCommandPropertyName #>Execute(object prm)
         {
+            if(<#= IsDestroyedPropertyName #>) return;
             List<string> lst = new List<string>();
             foreach(<#= IWebServiceFilterMenuInterfaceClassName #> mi in <#= RowMenuItemsPropertyName #>) {
                 if (mi.Command != null) {
@@ -749,6 +755,7 @@ namespace <#= DshCheckedModelViewModelNameSpace #> {
         }
         protected async void <#= TableMenuItemsCommandPropertyName #>Execute()
         {
+            if(<#= IsDestroyedPropertyName #>) return;
             List<string> lst = new List<string>();
             foreach(<#= IWebServiceFilterMenuInterfaceClassName #> mi in <#= TableMenuItemsVMPropertyName #>) {
                 if (mi.Command != null) {
@@ -784,6 +791,7 @@ namespace <#= DshCheckedModelViewModelNameSpace #> {
         #region <#= HiddenFiltersVMPropertyName #>
         public async Task <#= HiddenFiltersPropertyChangedPropertyName #>(object Sender, object OldValue, object NewValue)
         {
+            if(<#= IsDestroyedPropertyName #>) return;
             IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>> hfs = NewValue as IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>;
             ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>> newhfs = new ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>();
             if(hfs != null) {
@@ -1009,6 +1017,7 @@ namespace <#= DshCheckedModelViewModelNameSpace #> {
         }
         protected async void <#= OnRowsPerPageChangedCommandPropertyName #>Execute(object prm)
         {
+            if(<#= IsDestroyedPropertyName #>) return;
             <#= ValueChangedCmdParamClassName #><int> val = prm as <#= ValueChangedCmdParamClassName #><int>;
             if (val != null) {
                 if (Actual<#= RowsPerPagePropertyName #> != val.NewVal)
@@ -1034,6 +1043,7 @@ namespace <#= DshCheckedModelViewModelNameSpace #> {
         }
         protected async void <#= OnCurrentPageChangedCommandPropertyName #>Execute(object prm)
         {
+            if(<#= IsDestroyedPropertyName #>) return;
             <#= ValueChangedCmdParamClassName #><int> val = prm as <#= ValueChangedCmdParamClassName #><int>;
             if (val != null) {
                 if (Actual<#= CurrentPagePropertyName #> != val.NewVal)
@@ -1068,6 +1078,7 @@ namespace <#= DshCheckedModelViewModelNameSpace #> {
         }
         protected async void <#= OnSortCommandPropertyName #>Execute(object prm)
         {
+            if(<#= IsDestroyedPropertyName #>) return;
             string val = prm as string;
             if(string.IsNullOrEmpty(val)) return;
             if (val != CurrentSortColumn) {
@@ -1089,6 +1100,7 @@ namespace <#= DshCheckedModelViewModelNameSpace #> {
         #endregion
         #region Filter
         protected async Task onFilter() {
+            if(<#= IsDestroyedPropertyName #>) return;
             if ((<#= IsInQueryPropertyName #>) || (!<#= IsOnLoadedCalledPropertyName #>)) return;
             <#= IsInQueryPropertyName #> = true;
 
@@ -1157,6 +1169,7 @@ namespace <#= DshCheckedModelViewModelNameSpace #> {
         #endregion
         #region <#= SformAfterAddItemCommandPropertyName #>
         public void <#= SformAfterAddItemCommandPropertyName #>(object sender, object item) {
+            if(<#= IsDestroyedPropertyName #>) return;
             <#= modelInterfaceClassName #> prm = item as  <#= modelInterfaceClassName #>;
             if(prm == null) return;
             ObservableCollection<<#= modelInterfaceClassName #>> ds = <#= DataSourcePropertyName #> as ObservableCollection<<#= modelInterfaceClassName #>>;
@@ -1166,6 +1179,7 @@ namespace <#= DshCheckedModelViewModelNameSpace #> {
         #endregion
         #region <#= SformAfterUpdItemCommandPropertyName #>
         public void <#= SformAfterUpdItemCommandPropertyName #>(object sender, object item) {
+            if(<#= IsDestroyedPropertyName #>) return;
             <#= modelInterfaceClassName #> prm = item as  <#= modelInterfaceClassName #>;
             if(prm == null) return;
             ObservableCollection<<#= modelInterfaceClassName #>> ds = <#= DataSourcePropertyName #> as ObservableCollection<<#= modelInterfaceClassName #>>;
@@ -1206,6 +1220,7 @@ namespace <#= DshCheckedModelViewModelNameSpace #> {
         #endregion
         #region <#= SformAfterDelItemCommandPropertyName #>
         public void <#= SformAfterDelItemCommandPropertyName #>(object sender, object item) {
+            if(<#= IsDestroyedPropertyName #>) return;
             <#= modelInterfaceClassName #> prm = item as  <#= modelInterfaceClassName #>;
             if(prm == null) return;
             ObservableCollection<<#= modelInterfaceClassName #>> ds = <#= DataSourcePropertyName #> as ObservableCollection<<#= modelInterfaceClassName #>>;
@@ -1257,6 +1272,10 @@ namespace <#= DshCheckedModelViewModelNameSpace #> {
 
         public virtual void <#= OnDestroyPropertyName #>() {
             <#= IsDestroyedPropertyName #> = true;
+            _<#= BindingContextFeedbackRefPropertyName #> = null;
+            _<#= TableMenuItemsVMPropertyName #> = null;
+            _<#= HiddenFiltersVMPropertyName #> = null;
+            _<#= RowMenuItemsPropertyName #> = null;
         }
         #region IDestructible
         public void Destroy()

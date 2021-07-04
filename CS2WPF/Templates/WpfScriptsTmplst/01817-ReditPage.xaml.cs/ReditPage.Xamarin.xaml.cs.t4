@@ -12,11 +12,15 @@
 <#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
 using Xamarin.Forms;
+using Prism.Navigation;
 <#
 
     string ReditPageFolder                           = "01817-ReditPage.xaml.cs";
     string ReditPageClassName                        = GetModelClassName(Model, ReditPageFolder);
     string ReditPageNameSpace                        = GetModelNameSpace(Model, ReditPageFolder);
+
+    string IsDestroyedPropertyName = "IsDestroyed";
+    string OnDestroyedPropertyName = "OnDestroyed";
 
     List<string> nmSpaces = new List<string>();
     
@@ -34,12 +38,49 @@ namespace <#= ReditPageNameSpace #> {
     /// <summary>
     /// Interaction logic for <#= ReditPageClassName #>.xaml
     /// </summary>
-    public partial class <#= ReditPageClassName #>: ContentPage
+    public partial class <#= ReditPageClassName #>: ContentPage, IDestructible
     {
         public <#= ReditPageClassName #>()
         {
             InitializeComponent();
         }
+        #region IDestructible
+        public virtual void <#= OnDestroyedPropertyName #>()
+        {
+            IDestructible bc = BindingContext as IDestructible;
+            if(bc != null) bc.Destroy();
+        }
+        private static void <#= IsDestroyedPropertyName #>Changed(BindableObject d, object oldValue, object newValue)
+        {
+            <#= ReditPageClassName #> inst = d as <#= ReditPageClassName #>;
+            if (inst != null)
+            {
+                inst.<#= OnDestroyedPropertyName #>();
+            }
+        }
+        public static readonly BindableProperty <#= IsDestroyedPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= IsDestroyedPropertyName #>", typeof(bool),
+                typeof(<#= ReditPageClassName #>),
+                false, propertyChanged: <#= IsDestroyedPropertyName #>Changed);
+        public bool <#= IsDestroyedPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= IsDestroyedPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= IsDestroyedPropertyName #>Property, value);
+            }
+        }
+
+        public void Destroy()
+        {
+            <#= IsDestroyedPropertyName #> = true;
+        }
+        #endregion
+
     }
 }
 

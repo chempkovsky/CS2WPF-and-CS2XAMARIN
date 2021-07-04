@@ -150,6 +150,7 @@ using Xamarin.Essentials;
     string GridHeightPropertyName               = "GridHeight";
 
     string IsParentLoadedPropertyName           = "IsParentLoaded";
+    string IsDestroyedPropertyName              = "IsDestroyed";
 
     string DefaultGridHeightMethodName              = "DefaultGridHeight";
     string DefaultFilterHeightMethodName            = "DefaultFilterHeight";
@@ -234,7 +235,7 @@ using <#= ns #>;
 
 namespace <#= RlistPageViewModelNameSpace #> {
 
-    public class <#= RlistPageViewModelClassName #>: INotifyPropertyChanged, INavigationAware 
+    public class <#= RlistPageViewModelClassName #>: INotifyPropertyChanged, INavigationAware, IDestructible 
     {
         protected <#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName #>=null;
         protected <#= GetModelServiceInterfaceName(Model) #> <#= FormServicePrefix #><#= Model.ViewName #> = null;
@@ -402,6 +403,7 @@ namespace <#= RlistPageViewModelNameSpace #> {
         #endregion
 
         protected async Task OnNavigationResult(INavigationResult navResult) {
+            if(<#= IsDestroyedPropertyName #>) return;
             if (navResult.Success) return;
             string navErrorMsg = "Unknown Navigation Error";
             if (navResult.Exception != null)
@@ -434,6 +436,7 @@ namespace <#= RlistPageViewModelNameSpace #> {
 #>
         #region <#= detailViewClassName #><#= foreignKey.NavigationName #>Command
         public async Task <#= detailViewClassName #><#= foreignKey.NavigationName #>Command(<#= modelInterfaceClassName #> selected) { 
+            if(<#= IsDestroyedPropertyName #>) return;
             if (((<#= AppSettingServicePropertyName #>.GetViewModelMask("<#= detailView.ViewName #>") & 1) != 1 )) {
                 INavigationResult nr1 = await _navigationService.NavigateAsync("<#= AccessDeniedPageClassName #>");
                 await OnNavigationResult(nr1);
@@ -460,10 +463,6 @@ namespace <#= RlistPageViewModelNameSpace #> {
             }
         }
 #>
-
-
-
-
 
         #region <#= SformAfterAddItemPropertyName #>
         protected object _<#= SformAfterAddItemPropertyName #> = null;
@@ -521,6 +520,7 @@ namespace <#= RlistPageViewModelNameSpace #> {
         #endregion
         #region <#= SformAddItemCommandPropertyName #>
         public async Task <#= SformAddItemCommandPropertyName #>() {
+            if(<#= IsDestroyedPropertyName #>) return;
             if ((PermissionMask & 8) != 8) {
                 INavigationResult nr1 = await _navigationService.NavigateAsync("<#= AccessDeniedPageClassName #>");
                 await OnNavigationResult(nr1);
@@ -547,6 +547,7 @@ namespace <#= RlistPageViewModelNameSpace #> {
         }
         protected async void <#= TableMenuItemsCommandPropertyName #>Execute(object prm)
         {
+            if(<#= IsDestroyedPropertyName #>) return;
             if(prm == null) return;
             <#= IWebServiceFilterMenuInterfaceClassName #> mi = prm as <#= IWebServiceFilterMenuInterfaceClassName #>;
             if (mi == null) return;
@@ -569,6 +570,7 @@ namespace <#= RlistPageViewModelNameSpace #> {
 
         #region <#= SformUpdItemCommandPropertyName #>
         public async Task <#= SformUpdItemCommandPropertyName #>(<#= modelInterfaceClassName #> selected) {
+            if(<#= IsDestroyedPropertyName #>) return;
             if (selected == null) return;
             if ((PermissionMask & 4) != 4) {
                 INavigationResult nr1 = await _navigationService.NavigateAsync("<#= AccessDeniedPageClassName #>");
@@ -594,6 +596,7 @@ namespace <#= RlistPageViewModelNameSpace #> {
         #endregion
         #region <#= SformDelItemCommandPropertyName #>
         public async Task <#= SformDelItemCommandPropertyName #>(<#= modelInterfaceClassName #> selected) {
+            if(<#= IsDestroyedPropertyName #>) return;
             if (selected == null) return;
             if((PermissionMask & 2) != 2) {
                 INavigationResult nr1 = await _navigationService.NavigateAsync("<#= AccessDeniedPageClassName #>");
@@ -628,6 +631,7 @@ namespace <#= RlistPageViewModelNameSpace #> {
         }
         protected async void <#= RowMenuItemsCommandPropertyName #>Execute(object prm)
         {
+            if(<#= IsDestroyedPropertyName #>) return;
             <#= IWebServiceFilterMenuInterfaceClassName #> mi = prm as <#= IWebServiceFilterMenuInterfaceClassName #>;
             if (mi == null) return;
             <#= modelInterfaceClassName #> arow = mi.FeedbackData as <#= modelInterfaceClassName #>;
@@ -668,6 +672,7 @@ namespace <#= RlistPageViewModelNameSpace #> {
         }
         protected bool <#= RowMenuItemsCommandPropertyName #>CanExecute(object prm)
         {
+            if(<#= IsDestroyedPropertyName #>) return false;
             <#= IWebServiceFilterMenuInterfaceClassName #> mi = prm as <#= IWebServiceFilterMenuInterfaceClassName #>;
             if (mi != null) {
                 switch(mi.Id) {
@@ -762,6 +767,7 @@ namespace <#= RlistPageViewModelNameSpace #> {
             
        }
        public void OnNavigatedTo(INavigationParameters prms) {
+            if(<#= IsDestroyedPropertyName #>) return;
             PermissionMask = <#= AppSettingServicePropertyName #>.GetViewModelMask("<#= Model.ViewName #>");
             if ((PermissionMask & 1) != 1) {
                 throw new Exception("Access Denied to navigate <#= Model.ViewName #>");
@@ -865,6 +871,29 @@ namespace <#= RlistPageViewModelNameSpace #> {
             }
         }
         #endregion
+
+        #region IDestructible 
+        bool _<#= IsDestroyedPropertyName #> = false;
+        public bool <#= IsDestroyedPropertyName #> {
+            get { return _<#= IsDestroyedPropertyName #>; }
+            set { if (_<#= IsDestroyedPropertyName #> != value) { _<#= IsDestroyedPropertyName #> = value; OnPropertyChanged();} }
+        }
+
+        public void Destroy()
+        {
+            if(<#= IsDestroyedPropertyName #>) return;
+            <#= IsDestroyedPropertyName #> = true;
+            _<#= HiddenFiltersPropertyName #> = null;
+            _<#= TableMenuItemsPropertyName #> = null;
+            _<#= RowMenuItemsPropertyName #> = null;
+            _<#= GridHeightPropertyName #> = -1;
+            _<#= FilterHeightPropertyName #> = -1;
+            _<#= SformAfterAddItemPropertyName #> = null;
+            _<#= SformAfterUpdItemPropertyName #> = null;
+            _<#= SformAfterDelItemPropertyName #> = null;
+        }
+        #endregion
+
     }
 }
 

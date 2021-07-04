@@ -429,6 +429,7 @@ namespace <#= EformViewModelNameSpace #> {
     }
 #>
         {
+            if (<#= IsDestroyedPropertyName #>) return;
             if (newValue is bool) {
                 bool v = (bool)newValue;
                 if ((!<#= IsOnLoadedCalledPropertyName #>) && v) {
@@ -719,6 +720,7 @@ namespace <#= EformViewModelNameSpace #> {
 <#  
     }
 #>
+            if (<#= IsDestroyedPropertyName #>) return;
             if(NewValue != null) {
                 <#= EformModeEnumClassName #> nwval = (<#= EformModeEnumClassName #>)NewValue; 
                 if(nwval != <#= EformModeVMPropertyName #>) {
@@ -777,6 +779,7 @@ namespace <#= EformViewModelNameSpace #> {
 <#  
     }
 #>
+            if (<#= IsDestroyedPropertyName #>) return;
             <#= UIDispatcherInvokePropertyName #>(() => {
                 _<#= FormControlModelVMPropertyName #> =  NewValue as <#= modelInterfaceClassName #>;
                 OnPropertyChanged("<#= FormControlModelVMPropertyName #>");
@@ -1036,6 +1039,7 @@ namespace <#= EformViewModelNameSpace #> {
 if (ModelHasDoInitMethod) {
 #>
         public async Task DoInit() {
+            if (<#= IsDestroyedPropertyName #>) return;
 <#  //////////////////////////// start OnInit()-generator
     {
         bool genElse = false;
@@ -1086,6 +1090,7 @@ if (ModelHasDoInitMethod) {
 <#  //////////////////////////// start InputToControls()-generator
 #>
         public async Task InputToControls() {
+            if (<#= IsDestroyedPropertyName #>) return;
             <#= UIDispatcherInvokePropertyName #>(() => {
                 bool isNotDefByHdnfltr = true;
                 if(<#= FormControlModelVMPropertyName #> != null) {
@@ -1145,6 +1150,7 @@ if (ModelHasDoInitMethod) {
                 if(HasInitMethod(modelViewUIFormPropertySerializable, Model)) {
 #>
     public async Task <#= GetExpressionForOnInitMethod(modelViewUIFormPropertySerializable, Model) #>() {
+        if (<#= IsDestroyedPropertyName #>) return;
 <#  
                     bool genElse = false;
                     for(int inptTp = 1; inptTp < 4; inptTp++) {
@@ -1511,6 +1517,7 @@ if (ModelHasDoInitMethod) {
                 if(HasCombo(modelViewUIFormPropertySerializable, Model)) {
 #>
     public async Task <#= GetExpressionForOnUpdateComboControlListMethod(modelViewUIFormPropertySerializable, Model, ComboSufix) #>() {
+        if (<#= IsDestroyedPropertyName #>) return;
 <#  
                     bool genElse = false;
                     for(int inptTp = 1; inptTp < 4; inptTp++) {
@@ -1836,6 +1843,7 @@ if (ModelHasDoInitMethod) {
         // Reason: UserInput = 0, ProgrammaticChange = 1, SuggestionChosen = 2
         public void <#= OnAutoSuggestBoxTextChangedPropertyName #>(object Sender, object AutoSggstBx, string PropName, int Reason, string QueryText)
         {
+            if (<#= IsDestroyedPropertyName #>) return;
 <#  
             {
             bool switchNotInserter = true;
@@ -1875,6 +1883,7 @@ if (ModelHasDoInitMethod) {
         // IF (ChosenSuggestion != null) THEN User selected an item from the suggestion list, take an action on it here.
         public void <#= OnAutoSuggestBoxQuerySubmittedPropertyName #>(object Sender, object AutoSggstBx, string PropName, object ChosenSuggestion, string QueryText)
         {
+            if (<#= IsDestroyedPropertyName #>) return;
 <#  
             {
             bool switchNotInserter = true;
@@ -1913,6 +1922,7 @@ if (ModelHasDoInitMethod) {
 #>
     protected bool <#=  GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadCalledSufix) #> = false;
     public async void <#= GetExpressionForOnFilterTypeaheadControlListMethod(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>(string inFilter) {
+        if (<#= IsDestroyedPropertyName #>) return;
 <#  
                     bool genElse = false;
                     for(int inptTp = 1; inptTp < 4; inptTp++) {
@@ -2138,6 +2148,7 @@ if (ModelHasDoInitMethod) {
                     HasOnValChangedMethod(Context, Model, modelViewUIFormPropertySerializable)) {
 #>
     public async Task <#= GetExpressionForOnValChangedMethod(modelViewUIFormPropertySerializable, Model) #>(object inputVal, bool dscrdChld) {
+        if (<#= IsDestroyedPropertyName #>) return;
 <#  
                     bool genElse = false;
                     for(int inptTp = 1; inptTp < 4; inptTp++) {
@@ -2515,6 +2526,7 @@ if (ModelHasDoInitMethod) {
         return <#=  GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, EnabledSufix) #>;
     }
     public void <#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, SearchClickSufix) #>(object param) {
+        if (<#= IsDestroyedPropertyName #>) return;
 <#
                 {
                 bool genElse = false;
@@ -2706,6 +2718,7 @@ if (ModelHasDoInitMethod) {
 <#  //////////////////////////// start ControlsToObject()-generator
 #>
         public <#= GetInterfaceName(Model) #> ControlsToObject() {
+            if (<#= IsDestroyedPropertyName #>) return null;
             <#= GetInterfaceName(Model) #> rslt = <#= FormServicePrefix + Model.ViewName #>.<#= CopyToModelMethodName #>(null, null);
 <#
     foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) {
@@ -2729,6 +2742,7 @@ if (ModelHasDoInitMethod) {
 <#  //////////////////////////// start onSubmit()-generator
 #>
         public async Task doSubmit() {
+            if (<#= IsDestroyedPropertyName #>) return;
             CheckIsValid();
             if(HasErrors) return;
 
@@ -2838,6 +2852,7 @@ if (ModelHasDoInitMethod) {
         protected void <#= CancelCommandPropertyName #>Action(object param)
         {
             // notify EformUserControl
+            if (<#= IsDestroyedPropertyName #>) return;
             <#= BindingContextFeedbackRefPropertyName #> = new <#= BindingContextFeedbackClassName #>() {
 		        BcfName = "<#= CancelCommandPropertyName #>",
 		        BcfData = null
@@ -3080,7 +3095,33 @@ if (ModelHasDoInitMethod) {
         #endregion
         public void <#= OnDestroyPropertyName #>() {
             <#= IsDestroyedPropertyName #> = true;
+            <#= IsLoadingPropertyName #> = false;
+            <#= IsOnLoadedCalledPropertyName #> = false;
             _<#= HiddenFiltersVMPropertyName #> = null;
+            _<#= FormControlModelVMPropertyName #> = null;
+            _<#= BindingContextFeedbackRefPropertyName #> = null;
+<#
+    foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) {
+        if (HasCombo(modelViewUIFormPropertySerializable, Model) && modelViewUIFormPropertySerializable.IsShownInView) { 
+#>
+            _<#=  GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #> = null;
+            _<#=  GetExpressionForControlList(modelViewUIFormPropertySerializable, Model, ComboSufix) #> = null;
+<#
+        }
+        if (HasButton(modelViewUIFormPropertySerializable, Model)  && modelViewUIFormPropertySerializable.IsShownInView) {  
+#>
+            _<#=  GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ButtonSufix) #> = null;
+<#
+        }
+        if (HasTypeahead(modelViewUIFormPropertySerializable, Model)  && modelViewUIFormPropertySerializable.IsShownInView) { 
+#>
+            _<#=  GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadItemsSourceSufix) #> = null;
+            _<#=  GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #> = null;
+            _<#=  GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadTextSufix) #>=null;
+<#
+        }
+    }
+#>
         }
 
     }

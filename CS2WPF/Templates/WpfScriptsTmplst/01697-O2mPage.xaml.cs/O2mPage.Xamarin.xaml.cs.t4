@@ -44,7 +44,7 @@ namespace <#= O2mPageNameSpace #> {
         {
             InitializeComponent();
         }
-
+        #region IDestructible
         public virtual void <#= OnDestroyedPropertyName #>()
         {
             IDestructible bc = BindingContext as IDestructible;
@@ -52,7 +52,7 @@ namespace <#= O2mPageNameSpace #> {
         }
         private static void <#= IsDestroyedPropertyName #>Changed(BindableObject d, object oldValue, object newValue)
         {
-            <#= ContentViewWithBCFeedbackClassName #> inst = d as <#= ContentViewWithBCFeedbackClassName #>;
+            <#= O2mPageClassName #> inst = d as <#= O2mPageClassName #>;
             if (inst != null)
             {
                 inst.<#= OnDestroyedPropertyName #>();
@@ -61,7 +61,7 @@ namespace <#= O2mPageNameSpace #> {
         public static readonly BindableProperty <#= IsDestroyedPropertyName #>Property =
                 BindableProperty.Create(
                 "<#= IsDestroyedPropertyName #>", typeof(bool),
-                typeof(<#= ContentViewWithBCFeedbackClassName #>),
+                typeof(<#= O2mPageClassName #>),
                 false, propertyChanged: <#= IsDestroyedPropertyName #>Changed);
         public bool <#= IsDestroyedPropertyName #>
         {
@@ -79,6 +79,7 @@ namespace <#= O2mPageNameSpace #> {
         {
             <#= IsDestroyedPropertyName #> = true;
         }
+        #endregion
     }
 }
 

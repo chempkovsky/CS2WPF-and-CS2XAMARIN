@@ -79,6 +79,7 @@ using Prism.Navigation;
     string IsDestroyedPropertyName = "IsDestroyed";
     string OnDestroyedPropertyName = "OnDestroyed";
     string OnDestroyPropertyName   = "OnDestroy";
+    string IsGridFlexPropertyName  = "IsGridFlex";
 
     List<string> nmSpaces = new List<string>();
     if ((EformUserControlBaseNameSpace != IWebServiceFilterRsltInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace) < 0)) 
@@ -340,12 +341,32 @@ namespace <#= EformUserControlBaseNameSpace #> {
         }
         #endregion
 
+        #region <#= IsGridFlexPropertyName #>Property
+        public static readonly BindableProperty <#= IsGridFlexPropertyName #>Property =
+                BindableProperty.Create(
+                "IsGridFlex", typeof(bool),
+                typeof(<#= EformUserControlBaseClassName #>),
+                true);
+        public bool <#= IsGridFlexPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= IsGridFlexPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= IsGridFlexPropertyName #>Property, value);
+            }
+        }
+        #endregion
+
         #region <#= OnDestroyedPropertyName #>
         public override void <#= OnDestroyedPropertyName #>()
         {
             base.<#= OnDestroyedPropertyName #>();
             <#= IBindingContextChangedClassName #> bc = BindingContext as <#= IBindingContextChangedClassName #>;
             if(bc != null) bc.<#= OnDestroyPropertyName #>();
+            RemoveBinding(<#= IsGridFlexPropertyName #>Property);
             RemoveBinding(<#= CaptionPropertyName #>Property);
             RemoveBinding(<#= ShowSubmitPropertyName #>Property);
             RemoveBinding(<#= HiddenFiltersPropertyName #>Property);
@@ -354,6 +375,8 @@ namespace <#= EformUserControlBaseNameSpace #> {
             RemoveBinding(<#= SubmitCommandPropertyName #>Property);
             RemoveBinding(<#= CancelCommandPropertyName #>Property);
             RemoveBinding(<#= IsParentLoadedPropertyName #>Property);
+            <#= IsGridFlexPropertyName #> = false;
+            <#= IsParentLoadedPropertyName #> = false;
             <#= SubmitCommandPropertyName #> = null;
             <#= CancelCommandPropertyName #> = null;
             <#= HiddenFiltersPropertyName #> = null;

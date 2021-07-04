@@ -390,6 +390,7 @@ namespace <#= RdlistViewModelNameSpace #> {
         #endregion
 
         protected void OnNavigationResult(IRegionNavigationResult navResult) {
+            if (<#= IsDestroyedPropertyName #>) return;
             if (navResult.Result.HasValue) {
                 if (navResult.Result.Value) return;
             }
@@ -424,6 +425,7 @@ namespace <#= RdlistViewModelNameSpace #> {
 #>
         #region <#= detailViewClassName #><#= foreignKey.NavigationName #>Command
         public void <#= detailViewClassName #><#= foreignKey.NavigationName #>Command(<#= modelInterfaceClassName #> selected) { 
+            if (<#= IsDestroyedPropertyName #>) return;
             if (((<#= AppSettingServicePropertyName #>.GetViewModelMask("<#= detailView.ViewName #>") & 1) != 1 )) {
                 <#= CurrentNavigationContextPropertyName #>.NavigationService.RequestNavigate(new Uri("<#= AccessDeniedUserControlClassName #>", UriKind.Relative), OnNavigationResult);
                 return;
@@ -481,6 +483,7 @@ namespace <#= RdlistViewModelNameSpace #> {
         }
         protected void <#= RowMenuItemsCommandPropertyName #>Execute(object prm)
         {
+            if (<#= IsDestroyedPropertyName #>) return;
             <#= IWebServiceFilterMenuInterfaceClassName #> mi = prm as <#= IWebServiceFilterMenuInterfaceClassName #>;
             if (mi == null) return;
             <#= modelInterfaceClassName #> arow = mi.FeedbackData as <#= modelInterfaceClassName #>;
@@ -515,6 +518,7 @@ namespace <#= RdlistViewModelNameSpace #> {
         }
         protected bool <#= RowMenuItemsCommandPropertyName #>CanExecute(object prm)
         {
+            if (<#= IsDestroyedPropertyName #>) return false;
             <#= IWebServiceFilterMenuInterfaceClassName #> mi = prm as <#= IWebServiceFilterMenuInterfaceClassName #>;
             if (mi != null) {
                 switch(mi.Id) {
@@ -607,6 +611,7 @@ namespace <#= RdlistViewModelNameSpace #> {
             <#= CurrentNavigationContextPropertyName #> = null;
        }
        public void OnNavigatedTo(INavigationContext navigationContext) {
+            if (<#= IsDestroyedPropertyName #>) return;
             INavigationParameters prms = navigationContext.Parameters;
             PermissionMask = <#= AppSettingServicePropertyName #>.GetViewModelMask("<#= Model.ViewName #>");
             if ((PermissionMask & 1) != 1) {
@@ -691,6 +696,7 @@ namespace <#= RdlistViewModelNameSpace #> {
         }
         protected void <#= OnNavigationBackCommandPropertyName #>Execute()
         {
+            if (<#= IsDestroyedPropertyName #>) return;
             if (<#= CurrentNavigationContextPropertyName #> != null) {
                 if(<#= CurrentNavigationContextPropertyName #>.NavigationService.Journal.CanGoBack) {
                     <#= IsNavigatedBackPropertyName #> = true;
@@ -706,6 +712,9 @@ namespace <#= RdlistViewModelNameSpace #> {
 
         public override void <#= OnDestroyPropertyName #>() {
             base.<#= OnDestroyPropertyName #>();
+            _<#= HiddenFiltersPropertyName #> = null;
+            _<#= TableMenuItemsPropertyName #> = null;
+            _<#= RowMenuItemsPropertyName #> = null;
         }
 
     }

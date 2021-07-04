@@ -85,20 +85,15 @@
 #>
              BackgroundColor="{DynamicResource ModifyItemDlgBackgroundColor}"
              x:Name="edlgUserControlRoot">
-  <ScrollView Orientation="Vertical" VerticalOptions="StartAndExpand">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
-
+    <ScrollView Orientation="Vertical" VerticalOptions="StartAndExpand">
 <#
     if(IsInTheSameModule) {
 #>
-        <efrm:<#= EformUserControlClassName #>  Grid.Row="0" VerticalOptions="FillAndExpand"
+        <efrm:<#= EformUserControlClassName #> VerticalOptions="FillAndExpand"
 <#
     } else {
 #>
-        <prx:<#= ProxyUserControlClassName #> Grid.Row="0" VerticalOptions="FillAndExpand"
+        <prx:<#= ProxyUserControlClassName #> VerticalOptions="FillAndExpand"
             prism:RegionManager.RegionName="<#= EformUserControlClassName #><#= DialogRegionPropertyName #>"
 <#
     }
@@ -114,8 +109,7 @@
             <#= CancelCommandPropertyName #>="{Binding BindingContext.<#= CancelCommandPropertyName #>, Mode=OneWay, Source={x:Reference edlgUserControlRoot}}" 
             <#= IsParentLoadedPropertyName #>="{Binding BindingContext.<#= IsParentLoadedPropertyName #>, Mode=OneWay, Source={x:Reference edlgUserControlRoot}}" 
             />
-    </Grid>
-  </ScrollView>
+    </ScrollView>
 </ContentView>
 
 

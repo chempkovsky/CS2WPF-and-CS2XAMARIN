@@ -367,6 +367,7 @@ namespace <#= ReditViewModelNameSpace #> {
             return true;
         }
         public void OnNavigatedFrom(INavigationContext navigationContext) {
+            if (<#= IsDestroyedPropertyName #>) return;
             if(!<#= IsCanceledPropertyName #>) {
                 INavigationParameters prms = navigationContext.Parameters;
 <#
@@ -382,6 +383,7 @@ namespace <#= ReditViewModelNameSpace #> {
             <#= IsParentLoadedPropertyName #> = false; // important to set
         }
         public void OnNavigatedTo(INavigationContext navigationContext) {
+            if (<#= IsDestroyedPropertyName #>) return;
             INavigationParameters prms = navigationContext.Parameters;
             <#= IsCanceledPropertyName #> = true;
             <#= EformModeEnumClassName #> modeToCheck = <#= EformModeEnumClassName #>.DeleteMode;
@@ -495,6 +497,7 @@ namespace <#= ReditViewModelNameSpace #> {
         #endregion
         #region NavigationBackCommand
         public void  <#= NavigationBackCommandPropertyName #>() { 
+            if (<#= IsDestroyedPropertyName #>) return;
             if (<#= CurrentNavigationContextPropertyName #> != null) {
                 if(<#= CurrentNavigationContextPropertyName #>.NavigationService.Journal.CanGoBack) {
                     <#= CurrentNavigationContextPropertyName #>.NavigationService.Journal.GoBack();
@@ -515,6 +518,7 @@ namespace <#= ReditViewModelNameSpace #> {
         }
         protected void <#= SubmitCommandPropertyName #>Action(object param)
         {
+            if (<#= IsDestroyedPropertyName #>) return;
             modelToReturn = param as <#= modelInterfaceClassName #>;
             <#= IsCanceledPropertyName #> = false;
             <#= NavigationBackCommandPropertyName #>();
@@ -547,6 +551,9 @@ namespace <#= ReditViewModelNameSpace #> {
 
         public override void <#= OnDestroyPropertyName #>() {
             base.<#= OnDestroyPropertyName #>();
+            _<#= HiddenFiltersPropertyName #> = null;
+            _<#= FormControlModelPropertyName #> = null;
+            _<#= CaptionPropertyName #> = null;
         }
 
     }
