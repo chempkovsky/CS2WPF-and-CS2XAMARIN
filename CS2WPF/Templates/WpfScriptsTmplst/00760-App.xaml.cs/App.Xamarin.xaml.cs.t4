@@ -1,0 +1,177 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+using Prism;
+using Prism.Ioc;
+using Prism.Modularity;
+using Prism.Regions.Adapters;
+<#
+
+    string AppGlblSettingsServiceFolder      = "00082-AppGlblSettingsService.cs";
+    string AppGlblSettingsServiceClassName   = GetModelClassName(Model, AppGlblSettingsServiceFolder);
+    string AppGlblSettingsServiceNameSpace   = GetModelNameSpace(Model, AppGlblSettingsServiceFolder);
+    string AppGlblSettingsServiceProject     = GetModelProjectName(Model, AppGlblSettingsServiceFolder);
+
+    string ProxyUserControlFolder     = "00280-ProxyUserControl.xaml.cs";
+    string ProxyUserControlClassName  = GetModelClassName(Model, ProxyUserControlFolder);
+    string ProxyUserControlNameSpace  = GetModelNameSpace(Model, ProxyUserControlFolder);
+    string ProxyUserControlProject    = GetModelProjectName(Model, ProxyUserControlFolder);
+
+    string ProxyUserControlRegionAdapterFolder      = "00284-ProxyUserControlRegionAdapter.cs";
+    string ProxyUserControlRegionAdapterClassName   = GetModelClassName(Model, ProxyUserControlRegionAdapterFolder);
+    string ProxyUserControlRegionAdapterNameSpace   = GetModelNameSpace(Model, ProxyUserControlRegionAdapterFolder);
+
+    string HomePageFolder     = "00691-HomePage.xaml.cs";
+    string HomePageClassName  = GetModelClassName(Model, HomePageFolder);
+    string HomePageNameSpace  = GetModelNameSpace(Model, HomePageFolder);
+    string HomePageProject    = GetModelProjectName(Model, HomePageFolder);
+
+    string MainFlyoutPageFolder     = "00740-MainFlyoutPage.xaml.cs";
+    string MainFlyoutPageClassName  = GetModelClassName(Model, MainFlyoutPageFolder);
+    string MainFlyoutPageNameSpace  = GetModelNameSpace(Model, MainFlyoutPageFolder);
+
+    string MainFlyoutPageViewModelFolder      = "00744-MainFlyoutPageViewModel.cs";
+    string MainFlyoutPageViewModelClassName   = GetModelClassName(Model, MainFlyoutPageViewModelFolder);
+    string MainFlyoutPageViewModelNameSpace   = GetModelNameSpace(Model, MainFlyoutPageViewModelFolder);
+
+    string AppFolder     = "00760-App.xaml.cs";
+    string AppClassName  = GetModelClassName(Model, AppFolder);
+    string AppNameSpace  = GetModelNameSpace(Model, AppFolder);
+
+    List<string> nmSpaces = new List<string>();
+    if ((AppNameSpace != MainFlyoutPageNameSpace) && (nmSpaces.IndexOf(MainFlyoutPageNameSpace) < 0)) 
+        nmSpaces.Add(MainFlyoutPageNameSpace);
+    if ((AppNameSpace != MainFlyoutPageViewModelNameSpace) && (nmSpaces.IndexOf(MainFlyoutPageViewModelNameSpace) < 0)) 
+        nmSpaces.Add(MainFlyoutPageViewModelNameSpace);
+    if ((AppNameSpace != ProxyUserControlNameSpace) && (nmSpaces.IndexOf(ProxyUserControlNameSpace) < 0)) 
+        nmSpaces.Add(ProxyUserControlNameSpace);
+    if ((AppNameSpace != ProxyUserControlRegionAdapterNameSpace) && (nmSpaces.IndexOf(ProxyUserControlRegionAdapterNameSpace) < 0)) 
+        nmSpaces.Add(ProxyUserControlRegionAdapterNameSpace);
+
+#>
+<# 
+    foreach(string ns in nmSpaces) {
+#>
+using <#= ns #>;
+<#
+    }
+#>
+
+namespace <#= MainFlyoutPageNameSpace #> {
+    /// <summary>
+    /// Interaction logic for <#= AppClassName #>.xaml
+    /// </summary>
+    
+    public partial class <#= AppClassName #>
+    {
+        public <#= AppClassName #>(IPlatformInitializer initializer)
+            : base(initializer)
+        {
+        }
+
+        protected override async void OnInitialized()
+        {
+            InitializeComponent();
+            await NavigationService.NavigateAsync($"/<#= MainFlyoutPageClassName #>/NavigationPage/<#= HomePageClassName #>");
+        }
+        protected override void RegisterTypes(IContainerRegistry containerRegistry)
+        {
+            containerRegistry.RegisterRegionServices(configureAdapters: OnconfigureAdapters);
+            containerRegistry.RegisterSingleton<IAppInfo, AppInfoImplementation>();
+            containerRegistry.RegisterForNavigation<NavigationPage>();
+            containerRegistry.RegisterForNavigation<<#= MainFlyoutPageClassName #>, <#= MainFlyoutPageViewModelClassName #>>();
+        }
+        private void OnconfigureAdapters(RegionAdapterMappings obj)
+        {
+            obj.RegisterMapping<<#= ProxyUserControlClassName #>, <#= ProxyUserControlRegionAdapterClassName #>>();
+        }
+        protected override void ConfigureModuleCatalog(IModuleCatalog moduleCatalog)
+        {
+            moduleCatalog.AddModule<<#= AppGlblSettingsServiceProject #>Module>();
+        }
+
+    }
+}
+
+<#+
+
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+
+#>

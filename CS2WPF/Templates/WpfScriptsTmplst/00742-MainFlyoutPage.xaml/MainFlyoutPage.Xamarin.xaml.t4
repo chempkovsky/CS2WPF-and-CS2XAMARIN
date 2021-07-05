@@ -1,0 +1,201 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="xaml" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+<#
+
+
+    string IconFontFolder      = "00178-IconFont.cs";
+    string IconFontClassName   = GetModelClassName(Model, IconFontFolder);
+    string IconFontNameSpace   = GetModelNameSpace(Model, IconFontFolder);
+    string IconFontNameProject = GetModelProjectName(Model, IconFontFolder);
+
+
+    string HomePageFolder                       = "00691-HomePage.xaml.cs";
+    string HomePageClassName                    = GetModelClassName(Model, HomePageFolder);
+    string HomePageNameSpace                    = GetModelNameSpace(Model, HomePageFolder);
+
+    string AccessDeniedPageViewModelFolder      = "00683-AccessDeniedPageViewModel.cs";
+    string AccessDeniedPageViewModelClassName   = GetModelClassName(Model, AccessDeniedPageViewModelFolder);
+    string AccessDeniedPageViewModelNameSpace   = GetModelNameSpace(Model, AccessDeniedPageViewModelFolder);
+    string AccessDeniedPageViewModelProject     = GetModelProjectName(Model, AccessDeniedPageViewModelFolder);
+
+    string PageNotFoundPageViewModelFolder      = "00689-PageNotFoundPageViewModel.cs";
+    string PageNotFoundPageViewModelClassName   = GetModelClassName(Model, PageNotFoundPageViewModelFolder);
+    string PageNotFoundPageViewModelNameSpace   = GetModelNameSpace(Model, PageNotFoundPageViewModelFolder);
+    string PageNotFoundPageViewModelProject     = GetModelProjectName(Model, PageNotFoundPageViewModelFolder);
+
+    string RegisterUserPageViewModelFolder      = "00711-RegisterUserPageViewModel.cs";
+    string RegisterUserPageViewModelClassName   = GetModelClassName(Model, RegisterUserPageViewModelFolder);
+    string RegisterUserPageViewModelNameSpace   = GetModelNameSpace(Model, RegisterUserPageViewModelFolder);
+    string RegisterUserPageViewModelProject     = GetModelProjectName(Model, RegisterUserPageViewModelFolder);
+
+    string LoginUserPageViewModelFolder      = "00717-LoginUserPageViewModel.cs";
+    string LoginUserPageViewModelClassName   = GetModelClassName(Model, LoginUserPageViewModelFolder);
+    string LoginUserPageViewModelNameSpace   = GetModelNameSpace(Model, LoginUserPageViewModelFolder);
+    string LoginUserPageViewModelProject     = GetModelProjectName(Model, LoginUserPageViewModelFolder);
+
+    string LogoutUserPageViewModelFolder      = "00723-LogoutUserPageViewModel.cs";
+    string LogoutUserPageViewModelClassName   = GetModelClassName(Model, LogoutUserPageViewModelFolder);
+    string LogoutUserPageViewModelNameSpace   = GetModelNameSpace(Model, LogoutUserPageViewModelFolder);
+    string LogoutUserPageViewModelProject     = GetModelProjectName(Model, LogoutUserPageViewModelFolder);
+
+    string ChngpswdUserPageViewModelFolder    = "00729-ChngpswdUserPageViewModel.cs";
+    string ChngpswdUserPageViewModelClassName = GetModelClassName(Model, ChngpswdUserPageViewModelFolder);
+    string ChngpswdUserPageViewModelNameSpace = GetModelNameSpace(Model, ChngpswdUserPageViewModelFolder);
+    string ChngpswdUserPageViewModelProject   = GetModelProjectName(Model, ChngpswdUserPageViewModelFolder);
+
+    string MainFlyoutPageFolder         = "00740-MainFlyoutPage.xaml.cs";
+    string MainFlyoutPageClassName      = GetModelClassName(Model, MainFlyoutPageFolder);
+    string MainFlyoutPageNameSpace      = GetModelNameSpace(Model, MainFlyoutPageFolder);
+    string MainFlyoutPageProject        = GetModelProjectName(Model, MainFlyoutPageFolder);
+
+    string MainFlyoutPageXamlFolder      = "00742-MainFlyoutPage.xaml";
+    string MainFlyoutPageXamlClassName   = GetModelClassName(Model, MainFlyoutPageXamlFolder);
+    string MainFlyoutPageXamlNameSpace   = GetModelNameSpace(Model, MainFlyoutPageXamlFolder);
+    string MainFlyoutPageXamlProject     = GetModelProjectName(Model, MainFlyoutPageXamlFolder);
+
+
+    string NavigateCommandPropertyName   = "NavigateCommand";
+    string ShowDialogCommandPropertyName = "ShowDialogCommand";
+    string FontFamilyPropertyName        = "CustomIconFontAlias";
+
+    string IconFontPrefix = "clr-namespace:" + IconFontNameSpace;
+    if(IconFontNameProject != MainFlyoutPageProject) {
+        IconFontPrefix = IconFontPrefix + ";assembly=" + IconFontNameProject;
+    }
+
+#>
+<?xml version="1.0" encoding="utf-8" ?>
+<FlyoutPage xmlns="http://xamarin.com/schemas/2014/forms"
+            xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+            xmlns:prism="http://prismlibrary.com"
+            prism:ViewModelLocator.AutowireViewModel="True"
+
+            xmlns:fontIcons="<#= IconFontPrefix #>"
+
+            x:Class="<#= MainFlyoutPageNameSpace #>.<#= MainFlyoutPageClassName #>"
+            x:Name="chngpswdCntrlRootNode">
+    <FlyoutPage.Flyout>
+        <ContentPage Title="Menu">
+            <ScrollView Orientation="Vertical">
+                <StackLayout Padding="20">
+                    <Button Text="Home"             Command="{Binding <#= NavigateCommandPropertyName #>}" CommandParameter="<#= HomePageClassName #>" />
+                    <Button Text="Access Denied"    Command="{Binding <#= NavigateCommandPropertyName #>}" CommandParameter="<#= AccessDeniedPageViewModelClassName #>" />
+                    <Button Text="Page Not Found"   Command="{Binding <#= NavigateCommandPropertyName #>}" CommandParameter="<#= PageNotFoundPageViewModelClassName #>" />
+                    <Button Text="Register User"    Command="{Binding <#= NavigateCommandPropertyName #>}" CommandParameter="<#= RegisterUserPageViewModelClassName #>" />
+                    <Button Text="Login User"       Command="{Binding <#= NavigateCommandPropertyName #>}" CommandParameter="<#= LoginUserPageViewModelClassName #>" />
+                    <Button Text="Logout User"      Command="{Binding <#= NavigateCommandPropertyName #>}" CommandParameter="<#= LogoutUserPageViewModelClassName #>" />
+                    <Button Text="Change Password"  Command="{Binding <#= NavigateCommandPropertyName #>}" CommandParameter="<#= ChngpswdUserPageViewModelClassName #>" />
+                    
+                    <Button Text="Show Dialog"      Command="{Binding <#= ShowDialogCommandPropertyName #>}" CommandParameter="MessageDlg" />
+                    
+                </StackLayout>
+            </ScrollView>
+        </ContentPage>
+    </FlyoutPage.Flyout>
+</FlyoutPage>
+
+
+<#+
+
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+    string GetModelProjectName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileProject)) {
+            return result;
+        }
+        string[] fnArr = refItem.FileProject.Split(new char[] {'\\'}, 100, System.StringSplitOptions.None); 
+        string fn = fnArr[fnArr.Length - 1];
+
+        return fn.Replace(".csproj","");
+    }
+
+#>

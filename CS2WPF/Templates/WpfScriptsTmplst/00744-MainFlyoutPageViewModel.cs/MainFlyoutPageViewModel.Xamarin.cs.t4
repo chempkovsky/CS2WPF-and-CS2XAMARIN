@@ -1,0 +1,218 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+using Xamarin.Forms;
+using Prism.Mvvm;
+using Prism.Navigation;
+using Prism.Services.Dialogs;
+using System.Windows.Input;
+
+<#
+
+
+    string IAppGlblSettingsServiceFolder            = "00080-IAppGlblSettingsService.cs";
+    string IAppGlblSettingsServiceClassName         = GetContextModelClassName(Context, IAppGlblSettingsServiceFolder);
+    string IAppGlblSettingsServiceNameSpace         = GetContextModelNameSpace(Context, IAppGlblSettingsServiceFolder);
+
+    string MainFlyoutPageFolder     = "00740-MainFlyoutPage.xaml.cs";
+    string MainFlyoutPageClassName  = GetModelClassName(Model, MainFlyoutPageFolder);
+    string MainFlyoutPageNameSpace  = GetModelNameSpace(Model, MainFlyoutPageFolder);
+
+
+    string MainFlyoutPageViewModelFolder      = "00744-MainFlyoutPageViewModel.cs";
+    string MainFlyoutPageViewModelClassName   = GetModelClassName(Model, MainFlyoutPageViewModelFolder);
+    string MainFlyoutPageViewModelNameSpace   = GetModelNameSpace(Model, MainFlyoutPageViewModelFolder);
+    string MainFlyoutPageViewModelProject     = GetModelProjectName(Model, MainFlyoutPageViewModelFolder);
+
+
+    string AppSettingServicePropertyName            = "GlblSettingsSrv";
+    string NavigateCommandPropertyName              = "NavigateCommand";
+    string ShowDialogCommandPropertyName            = "ShowDialogCommand";
+
+    List<string> nmSpaces = new List<string>();
+    if ((MainFlyoutPageViewModelNameSpace != IAppGlblLoginServiceNameSpace) && (nmSpaces.IndexOf(IAppGlblLoginServiceNameSpace) < 0)) 
+        nmSpaces.Add(IAppGlblLoginServiceNameSpace);
+    
+#>
+<# 
+    foreach(string ns in nmSpaces) {
+#>
+using <#= ns #>;
+<#
+    }
+#>
+
+
+namespace <#= MainFlyoutPageViewModelNameSpace #> {
+    public class <#= MainFlyoutPageViewModelClassName #>: INotifyPropertyChanged, IDestructible  
+    {
+        protected <#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName #>=null;
+        protected INavigationService _navigationService;
+        private IDialogService _dialogService;
+        public <#= MainFlyoutPageViewModelClassName #>(<#= IAppGlblLoginServiceClassName #> <#= AppLoginServicePropertyName #>, INavigationService navigationService, IDialogService dialogService) {
+            _<#= AppLoginServicePropertyName #> = <#= AppLoginServicePropertyName #>;
+            _navigationService = navigationService;
+            _dialogService = dialogService;
+        }
+
+        #region INotifyPropertyChanged
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string name = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+        #endregion
+
+        #region <#= NavigateCommandPropertyName #>
+        protected ICommand _<#= NavigateCommandPropertyName #> = null;
+        public ICommand <#= NavigateCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= NavigateCommandPropertyName #> ?? (_<#= NavigateCommandPropertyName #> = new Command<string>((p) => <#= NavigateCommandPropertyName #>Execute(p), (p) => <#= NavigateCommandPropertyName #>CanExecute(p)));
+            }
+        }
+        protected async void <#= NavigateCommandPropertyName #>Execute(string navPath)
+        {
+            await _navigationService.GoBackToRootAsync();
+            await _navigationService.NavigateAsync(name: $"/<#= MainFlyoutPageClassName #>/NavigationPage/{navPath}");
+        }
+        protected bool <#= NavigateCommandPropertyName #>CanExecute(string navPath)
+        {
+            return true;
+        }
+        #endregion
+
+        #region <#= ShowDialogCommandPropertyName #>
+        protected ICommand _<#= ShowDialogCommandPropertyName #> = null;
+        public ICommand <#= ShowDialogCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= ShowDialogCommandPropertyName #> ?? (_<#= ShowDialogCommandPropertyName #> = new Command<string>((p) => <#= ShowDialogCommandPropertyName #>Execute(p), (p) => <#= ShowDialogCommandPropertyName #>CanExecute(p)));
+            }
+        }
+        protected void <#= ShowDialogCommandPropertyName #>Execute(string navPath)
+        {
+            if (string.IsNullOrEmpty(navPath)) return;
+            DialogParameters parameters = new DialogParameters();
+            _dialogService.ShowDialog(navPath, parameters, (outprm) => { });
+        }
+        protected bool <#= ShowDialogCommandPropertyName #>CanExecute(string navPath)
+        {
+            return true;
+        }
+        #endregion
+
+        #region IDestructible  
+        public virtual void Destroy()
+        {
+            _<#= AppLoginServicePropertyName #> = null;
+            _navigationService = null;
+            _dialogService = null;
+        }
+        #endregion
+    }
+}
+
+<#+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+    string GetModelProjectName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileProject)) {
+            return result;
+        }
+        string[] fnArr = refItem.FileProject.Split(new char[] {'\\'}, 100, System.StringSplitOptions.None); 
+        string fn = fnArr[fnArr.Length - 1];
+
+        return fn.Replace(".csproj","");
+    }
+
+#>

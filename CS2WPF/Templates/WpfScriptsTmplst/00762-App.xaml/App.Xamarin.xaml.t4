@@ -1,0 +1,149 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="xaml" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+<#
+
+    string AppFolder     = "00760-App.xaml.cs";
+    string AppClassName  = GetModelClassName(Model, AppFolder);
+    string AppNameSpace  = GetModelNameSpace(Model, AppFolder);
+
+
+#>
+<?xml version="1.0" encoding="utf-8" ?>
+<prism:PrismApplication xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:prism="http://prismlibrary.com"
+
+             x:Class="<#= AppNameSpace #>.<#= AppClassName #>">
+  <Application.Resources>
+        <ResourceDictionary>
+            <Color x:Key="IconButtonPrimaryColor" >#FF087EFF</Color>
+            <Color x:Key="IconButtonDangerColor" >#FFD50000</Color>
+            <Color x:Key="IconButtonInfoColor" >#FFFFAB40</Color>
+            <Color x:Key="ValidationErrorColor" >#FFD0284C</Color>
+            
+            <Color x:Key="TablePaginationIconButtonTextColor">White</Color>
+            <Color x:Key="Color_NotificationBackground">#FFCDCDCD</Color>
+            <Color x:Key="IconButtonBackgroundColor" >Transparent</Color>
+            <NamedSize x:Key="IconButtonFontNamedSize">Large</NamedSize>
+            <Color x:Key="ColumnSelectorDlgBackgroundColor" >White</Color>
+            <Color x:Key="MessageDlgBackgroundColor" >White</Color>
+            <Color x:Key="IconMessageBackgroundColor">Transparent</Color>
+            <Color x:Key="SelectItemDlgBackgroundColor" >White</Color>
+            <Color x:Key="ModifyItemDlgBackgroundColor" >White</Color>
+            <Color x:Key="LformDlgBackgroundColor" >White</Color>
+
+
+
+            <Color x:Key="DataGridLineColor">Silver</Color>
+            <Color x:Key="DataGridHeaderBackGroundColor">Gray</Color>
+            <Color x:Key="DataGridHeaderTextColor">White</Color>
+            <Color x:Key="DataGridBodyBackgroundColor">WhiteSmoke</Color>
+            <Color x:Key="DataGridBodyTextColor">Black</Color>
+        </ResourceDictionary>
+    </Application.Resources>
+</prism:PrismApplication>
+
+<#+
+
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+    string GetModelProjectName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileProject)) {
+            return result;
+        }
+        string[] fnArr = refItem.FileProject.Split(new char[] {'\\'}, 100, System.StringSplitOptions.None); 
+        string fn = fnArr[fnArr.Length - 1];
+
+        return fn.Replace(".csproj","");
+    }
+
+#>
