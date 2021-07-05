@@ -16,13 +16,15 @@ using Prism.Mvvm;
 using Prism.Navigation;
 using Prism.Services.Dialogs;
 using System.Windows.Input;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 <#
 
 
     string IAppGlblSettingsServiceFolder            = "00080-IAppGlblSettingsService.cs";
-    string IAppGlblSettingsServiceClassName         = GetContextModelClassName(Context, IAppGlblSettingsServiceFolder);
-    string IAppGlblSettingsServiceNameSpace         = GetContextModelNameSpace(Context, IAppGlblSettingsServiceFolder);
+    string IAppGlblSettingsServiceClassName         = GetModelClassName(Model, IAppGlblSettingsServiceFolder);
+    string IAppGlblSettingsServiceNameSpace         = GetModelNameSpace(Model, IAppGlblSettingsServiceFolder);
 
     string MainFlyoutPageFolder     = "00740-MainFlyoutPage.xaml.cs";
     string MainFlyoutPageClassName  = GetModelClassName(Model, MainFlyoutPageFolder);
@@ -40,8 +42,8 @@ using System.Windows.Input;
     string ShowDialogCommandPropertyName            = "ShowDialogCommand";
 
     List<string> nmSpaces = new List<string>();
-    if ((MainFlyoutPageViewModelNameSpace != IAppGlblLoginServiceNameSpace) && (nmSpaces.IndexOf(IAppGlblLoginServiceNameSpace) < 0)) 
-        nmSpaces.Add(IAppGlblLoginServiceNameSpace);
+    if ((MainFlyoutPageViewModelNameSpace != IAppGlblSettingsServiceNameSpace) && (nmSpaces.IndexOf(IAppGlblSettingsServiceNameSpace) < 0)) 
+        nmSpaces.Add(IAppGlblSettingsServiceNameSpace);
     
 #>
 <# 
@@ -56,11 +58,11 @@ using <#= ns #>;
 namespace <#= MainFlyoutPageViewModelNameSpace #> {
     public class <#= MainFlyoutPageViewModelClassName #>: INotifyPropertyChanged, IDestructible  
     {
-        protected <#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName #>=null;
+        protected <#= IAppGlblSettingsServiceClassName #> _<#= AppSettingServicePropertyName #>=null;
         protected INavigationService _navigationService;
         private IDialogService _dialogService;
-        public <#= MainFlyoutPageViewModelClassName #>(<#= IAppGlblLoginServiceClassName #> <#= AppLoginServicePropertyName #>, INavigationService navigationService, IDialogService dialogService) {
-            _<#= AppLoginServicePropertyName #> = <#= AppLoginServicePropertyName #>;
+        public <#= MainFlyoutPageViewModelClassName #>(<#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName #>, INavigationService navigationService, IDialogService dialogService) {
+            _<#= AppSettingServicePropertyName #> = <#= AppSettingServicePropertyName #>;
             _navigationService = navigationService;
             _dialogService = dialogService;
         }
@@ -117,7 +119,7 @@ namespace <#= MainFlyoutPageViewModelNameSpace #> {
         #region IDestructible  
         public virtual void Destroy()
         {
-            _<#= AppLoginServicePropertyName #> = null;
+            _<#= AppSettingServicePropertyName #> = null;
             _navigationService = null;
             _dialogService = null;
         }

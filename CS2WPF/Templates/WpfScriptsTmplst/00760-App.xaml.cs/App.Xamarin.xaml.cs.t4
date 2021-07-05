@@ -15,12 +15,16 @@ using Prism;
 using Prism.Ioc;
 using Prism.Modularity;
 using Prism.Regions.Adapters;
+using Xamarin.Forms;
+using Xamarin.Essentials.Interfaces;
+using Xamarin.Essentials.Implementation;
 <#
 
-    string AppGlblSettingsServiceFolder      = "00082-AppGlblSettingsService.cs";
-    string AppGlblSettingsServiceClassName   = GetModelClassName(Model, AppGlblSettingsServiceFolder);
-    string AppGlblSettingsServiceNameSpace   = GetModelNameSpace(Model, AppGlblSettingsServiceFolder);
-    string AppGlblSettingsServiceProject     = GetModelProjectName(Model, AppGlblSettingsServiceFolder);
+    string AppGlblSettingsServiceFolder             = "00082-AppGlblSettingsService.cs";
+    string AppGlblSettingsServiceClassName          = GetModelClassName(Model, AppGlblSettingsServiceFolder);
+    string AppGlblSettingsServiceNameSpace          = GetModelNameSpace(Model, AppGlblSettingsServiceFolder);
+    string AppGlblSettingsServiceProject            = GetModelProjectName(Model, AppGlblSettingsServiceFolder);
+    string AppGlblSettingsServiceDefaultNameSpace   = GetModelDefaultNameSpace(Model, AppGlblSettingsServiceFolder);
 
     string ProxyUserControlFolder     = "00280-ProxyUserControl.xaml.cs";
     string ProxyUserControlClassName  = GetModelClassName(Model, ProxyUserControlFolder);
@@ -57,6 +61,8 @@ using Prism.Regions.Adapters;
         nmSpaces.Add(ProxyUserControlNameSpace);
     if ((AppNameSpace != ProxyUserControlRegionAdapterNameSpace) && (nmSpaces.IndexOf(ProxyUserControlRegionAdapterNameSpace) < 0)) 
         nmSpaces.Add(ProxyUserControlRegionAdapterNameSpace);
+    if ((AppNameSpace != AppGlblSettingsServiceDefaultNameSpace) && (nmSpaces.IndexOf(AppGlblSettingsServiceDefaultNameSpace) < 0)) 
+        nmSpaces.Add(AppGlblSettingsServiceDefaultNameSpace);
 
 #>
 <# 
@@ -67,7 +73,7 @@ using <#= ns #>;
     }
 #>
 
-namespace <#= MainFlyoutPageNameSpace #> {
+namespace <#= AppNameSpace #> {
     /// <summary>
     /// Interaction logic for <#= AppClassName #>.xaml
     /// </summary>
@@ -173,5 +179,43 @@ namespace <#= MainFlyoutPageNameSpace #> {
         }
         return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
     }
+    string GetModelProjectName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileProject)) {
+            return result;
+        }
+        string[] fnArr = refItem.FileProject.Split(new char[] {'\\'}, 100, System.StringSplitOptions.None); 
+        string fn = fnArr[fnArr.Length - 1];
+
+        return fn.Replace(".csproj","");
+    }
+    string GetModelDefaultNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        return refItem.FileDefaultProjectNameSpace;
+    }
+
+
 
 #>
