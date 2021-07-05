@@ -14,12 +14,15 @@
 <#@ parameter type="CS2WPF.Model.Serializable.FeatureSerializable" name="Feature" #>
 <#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
 using Xamarin.Forms;
+using Prism.Navigation;
 <#
 
     string FtrUserControlFolder                   = "30100-FtrUserControl.xaml.cs";
     string FtrUserControlClassName                = GetFeatureComponentClassName(Feature, FtrUserControlFolder);
     string FtrUserControlNameSpace                = GetFeatureNameSpace(Feature, FtrUserControlFolder);
 
+    string IsDestroyedPropertyName = "IsDestroyed";
+    string OnDestroyedPropertyName = "OnDestroyed";
 
     List<string> nmSpaces = new List<string>();
     
@@ -36,12 +39,53 @@ namespace <#= FtrUserControlNameSpace #> {
     /// <summary>
     /// Interaction logic for <#= FtrUserControlClassName #>.xaml
     /// </summary>
-    public partial class <#= FtrUserControlClassName #>: ContentPage
+    public partial class <#= FtrUserControlClassName #>: ContentPage, IDestructible
     {
         public <#= FtrUserControlClassName #>()
         {
             InitializeComponent();
         }
+
+        #region IDestructible
+        public virtual void <#= OnDestroyedPropertyName #>()
+        {
+            IDestructible bc = BindingContext as IDestructible;
+            if(bc != null) bc.Destroy();
+            inst.Content = null;
+            inst.BindingContext = null;
+        }
+        private static void <#= IsDestroyedPropertyName #>Changed(BindableObject d, object oldValue, object newValue)
+        {
+            <#= FtrUserControlClassName #> inst = d as <#= FtrUserControlClassName #>;
+            if (inst != null)
+            {
+                inst.<#= OnDestroyedPropertyName #>();
+            }
+        }
+        public static readonly BindableProperty <#= IsDestroyedPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= IsDestroyedPropertyName #>", typeof(bool),
+                typeof(<#= FtrUserControlClassName #>),
+                false, propertyChanged: <#= IsDestroyedPropertyName #>Changed);
+        public bool <#= IsDestroyedPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= IsDestroyedPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= IsDestroyedPropertyName #>Property, value);
+            }
+        }
+
+        public void Destroy()
+        {
+            <#= IsDestroyedPropertyName #> = true;
+        }
+        #endregion
+
+
     }
 }
 

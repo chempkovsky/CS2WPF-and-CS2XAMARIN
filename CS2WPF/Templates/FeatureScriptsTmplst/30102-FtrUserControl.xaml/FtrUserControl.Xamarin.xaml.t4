@@ -65,6 +65,7 @@
 
     string ShowFilterPropertyName           = "ShowFilter";
     string ShowFilterDetailPropertyName     = "ShowFilterDetail"; 
+    string IsDestroyedPropertyName          = "IsDestroyed";
 
 
     string proxyPrefix = "clr-namespace:" + ProxyUserControlNameSpace;
@@ -123,6 +124,7 @@
             <prx:<#= ProxyUserControlClassName #> Grid.Row="<#= curItem % 2  #>" Grid.Column="0"
                     IsVisible="{Binding BindingContext.<#= VisiblePrefixPropertyName #><#= modelClassName #>, Mode=OneWay, Source={x:Reference fchrUsrCntrlRootNode}}"
                     prism:RegionManager.RegionName="<#= modelClassName #><#= FtrUserControlClassName #>" 
+                    <#= IsDestroyedPropertyName #>="{Binding <#= IsDestroyedPropertyName #>, Mode=OneWay, Source={x:Reference fchrUsrCntrlRootNode}}" 
                     <#= ContainerMenuItemsPropertyName #>="{Binding BindingContext.<#= ContainerMenuItemsPropertyName #><#= modelClassName #>, Mode=OneWay, Source={x:Reference fchrUsrCntrlRootNode}}"
                     <#= ContainerMenuItemsCommandPropertyName #>="{Binding BindingContext.<#= OnContainerMenuItemsCommandPropertyName #>, Mode=OneWay, Source={x:Reference fchrUsrCntrlRootNode}}"
 <#

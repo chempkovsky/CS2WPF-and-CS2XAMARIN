@@ -11,10 +11,6 @@
 <#@ import namespace="CS2WPF.Model.Serializable" #>
 <#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
-using System.Reflection;
-using System.Collections.Specialized;
-using System.Linq;
-using Xamarin.Forms;
 using Prism.Regions;
 using Prism.Regions.Adapters;
 using Prism.Regions.Behaviors;
@@ -96,9 +92,10 @@ using Prism.Regions.Behaviors;
     string CanDelDetailPropertyName = "CanDeleteDetail"; 
     string IsPermissionEditablePropertyName = "IsPermissionEditable";
     string PermissionVectorPropertyName     = "PermissionVector";
-    string PermissionChangedCommandPropertyName     = "PermissionChangedCommand";
-    string OnPermissionChangedCommandPropertyName   = "OnPermissionChangedCommand";
-    string OnViewsCollectionChangedPropertyName     = "OnViewsCollectionChanged";
+    string PermissionChangedCommandPropertyName         = "PermissionChangedCommand";
+    string OnPermissionChangedCommandPropertyName       = "OnPermissionChangedCommand";
+    string OnViewsCollectionChangedPropertyName         = "OnViewsCollectionChanged";
+    string OnActiveViewsCollectionChangedPropertyName   = "OnActiveViewsCollectionChanged";
 
 
 #>
@@ -169,6 +166,8 @@ namespace <#= ProxyUserControlRegionAdapterNameSpace #> {
         protected override void Adapt(IRegion region, <#= ProxyUserControlClassName #> regionTarget)
         {
             region.Views.CollectionChanged += regionTarget.<#= OnViewsCollectionChangedPropertyName #>;
+            region.ActiveViews.CollectionChanged += regionTarget.<#= OnActiveViewsCollectionChangedPropertyName #>;
+            regionTarget.ProxyRegion = region;
         /*
             region.Views.CollectionChanged += (s, e) =>
             {

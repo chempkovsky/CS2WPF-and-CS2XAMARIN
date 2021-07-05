@@ -82,6 +82,7 @@ using System.Threading.Tasks;
     string DefaultFilterHeightMethodName            = "DefaultFilterHeight";
     string ExpandedGridHeightMethodName             = "ExpandedGridHeight";
     string ExpandedFilterHeightMethodName           = "ExpandedFilterHeight";
+    string IsDestroyedPropertyName                  = "IsDestroyed";
 
     List<string> nmSpaces = new List<string>();
     if ((FtrViewModelNameSpace != IWebServiceFilterMenuInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterMenuInterfaceNameSpace) < 0)) 
@@ -123,7 +124,7 @@ using <#= ns #>;
 */
 
 namespace <#= FtrViewModelNameSpace #> {
-    public class <#= FtrViewModelClassName #> : INotifyPropertyChanged, INavigationAware 
+    public class <#= FtrViewModelClassName #> : INotifyPropertyChanged, INavigationAware, IDestructible 
     {
         IRegionManager _regionManager;
         IContainerProvider _containerProvider;
@@ -194,6 +195,7 @@ namespace <#= FtrViewModelNameSpace #> {
         #endregion
         #region OnNavigationResult
         protected void OnNavigationResult(IRegionNavigationResult navResult) {
+                if(<#= IsDestroyedPropertyName #>) return;
                 if(navResult.Result.HasValue) { if(navResult.Result.Value) return; }
                 string navErrorMsg = "Unknown Navigation Error";
                 if (navResult.Error != null)
@@ -214,6 +216,7 @@ namespace <#= FtrViewModelNameSpace #> {
         protected bool <#= IsOnLoadedCalledPropertyName #> = false;
         private void OnLoaded()
         {
+            if(<#= IsDestroyedPropertyName #>) return;
             if (!<#= IsOnLoadedCalledPropertyName #>)
             {
                 <#= IsOnLoadedCalledPropertyName #> = true;
@@ -278,6 +281,7 @@ namespace <#= FtrViewModelNameSpace #> {
         {
             get 
             {
+                if(<#= IsDestroyedPropertyName #>) return false;
                 return true
 <#
         foreach(FeatureItemSerializable featureItemSerializable in Feature.FeatureItems) {
@@ -388,6 +392,7 @@ namespace <#= FtrViewModelNameSpace #> {
         }
 
         protected void <#= OnContainerMenuItemsCommandPropertyName #>Action(object prm) {
+            if(<#= IsDestroyedPropertyName #>) return;
             <#= IWebServiceFilterMenuInterfaceClassName #> mi = prm as <#= IWebServiceFilterMenuInterfaceClassName #>;
             if (mi == null) return;
             string modelName = mi.Data as string;
@@ -471,6 +476,38 @@ namespace <#= FtrViewModelNameSpace #> {
             return true;
         }
         #endregion
+
+        #region IDestructible 
+        bool _<#= IsDestroyedPropertyName #> = false;
+        public bool <#= IsDestroyedPropertyName #> {
+            get { return _<#= IsDestroyedPropertyName #>; }
+            set { if (_<#= IsDestroyedPropertyName #> != value) { _<#= IsDestroyedPropertyName #> = value; OnPropertyChanged();} }
+        }
+
+        public void Destroy()
+        {
+            if(<#= IsDestroyedPropertyName #>) return;
+            <#= IsDestroyedPropertyName #> = true;
+            OnPropertyChanged("<#= FlexOnPropertyName #>");
+            _regionManager = null;
+<#
+    {
+        foreach(FeatureItemSerializable featureItemSerializable in Feature.FeatureItems) {
+            ModelViewSerializable modelViewSerializable = GetModelViewByName(Context, featureItemSerializable.ViewName);
+            if(modelViewSerializable != null) {
+                if(isComponentGenerated(modelViewSerializable, featureItemSerializable.FileType)) {
+                    string modelClassName = GetModelClassName(modelViewSerializable, featureItemSerializable.FileType);
+#>
+            _<#= ContainerMenuItemsPropertyName #><#= modelClassName #> = null;
+<#
+                }
+            }
+        }
+    }
+#>
+        }
+        #endregion
+
     }
 }
 

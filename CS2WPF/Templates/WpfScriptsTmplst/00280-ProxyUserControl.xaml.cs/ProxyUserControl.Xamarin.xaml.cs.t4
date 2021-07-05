@@ -18,6 +18,7 @@ using System.Collections.Specialized;
 using System.Reflection;
 using Prism.Regions;
 using Prism.Navigation;
+using System.Linq;
 <#
 
     string EformModeEnumFolder      = "00026-EformModeEnum.cs";
@@ -109,16 +110,17 @@ using Prism.Navigation;
 
 
 
-    string ShowFilterDetailPropertyName             = "ShowFilterDetail"; 
-    string ShowAddFilterBtnDetailPropertyName       = "ShowAddFilterBtnDetail"; 
-    string IsPermissionEditablePropertyName         = "IsPermissionEditable";
-    string PermissionVectorPropertyName             = "PermissionVector";
-    string PermissionChangedCommandPropertyName     = "PermissionChangedCommand";
-    string OnPermissionChangedCommandPropertyName   = "OnPermissionChangedCommand";
-    string OnViewsCollectionChangedPropertyName     = "OnViewsCollectionChanged";
-    string ProxyRegionPropertyName                  = "ProxyRegion";
-    string IsDestroyedPropertyName                  = "IsDestroyed";
-    string OnDestroyedPropertyName                  = "OnDestroyed";
+    string ShowFilterDetailPropertyName                 = "ShowFilterDetail"; 
+    string ShowAddFilterBtnDetailPropertyName           = "ShowAddFilterBtnDetail"; 
+    string IsPermissionEditablePropertyName             = "IsPermissionEditable";
+    string PermissionVectorPropertyName                 = "PermissionVector";
+    string PermissionChangedCommandPropertyName         = "PermissionChangedCommand";
+    string OnPermissionChangedCommandPropertyName       = "OnPermissionChangedCommand";
+    string OnViewsCollectionChangedPropertyName         = "OnViewsCollectionChanged";
+    string OnActiveViewsCollectionChangedPropertyName   = "OnActiveViewsCollectionChanged";
+    string ProxyRegionPropertyName                      = "ProxyRegion";
+    string IsDestroyedPropertyName                      = "IsDestroyed";
+    string OnDestroyedPropertyName                      = "OnDestroyed";
 
     List<string> nmSpaces = new List<string>();
     if ((ProxyUserControlNameSpace != IWebServiceFilterMenuInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterMenuInterfaceNameSpace) < 0)) 
@@ -1433,6 +1435,12 @@ namespace <#= ProxyUserControlNameSpace #> {
                     }
                 }
         }
+        public void <#= OnActiveViewsCollectionChangedPropertyName #>(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (ProxyRegion == null) return;
+            var c = ProxyRegion.ActiveViews.FirstOrDefault();
+            if (c != null) Content = c as View;
+        }
 
         public IRegion <#= ProxyRegionPropertyName #> = null;
 
@@ -1446,6 +1454,7 @@ namespace <#= ProxyUserControlNameSpace #> {
             <#= ProxyRegionPropertyName #> = null;
             if (proxyRegion != null) {
                 proxyRegion.Views.CollectionChanged -= <#= OnViewsCollectionChangedPropertyName #>;
+                proxyRegion.ActiveViews.CollectionChanged -= <#= OnActiveViewsCollectionChangedPropertyName #>;
             }
 
             RemoveBinding(<#= CaptionPropertyName #>Property);
@@ -1512,6 +1521,8 @@ namespace <#= ProxyUserControlNameSpace #> {
             if (proxyRegion != null) {
                 proxyRegion.RemoveAll();
                 proxyRegion.RegionManager.Regions.Remove(proxyRegion.Name);
+                proxyRegion.Context = null;
+                Content = null;
             }
         }
         private static void <#= IsDestroyedPropertyName #>Changed(BindableObject d, object oldValue, object newValue)
