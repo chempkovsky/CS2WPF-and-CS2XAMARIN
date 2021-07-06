@@ -14,13 +14,23 @@
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using Prism.Navigation;
+using Xamarin.Essentials;
 <#
+    string IAppGlblSettingsServiceFolder        = "00080-IAppGlblSettingsService.cs";
+    string IAppGlblSettingsServiceClassName     = GetModelClassName(Model, IAppGlblSettingsServiceFolder);
+    string IAppGlblSettingsServiceNameSpace     = GetModelNameSpace(Model, IAppGlblSettingsServiceFolder);
 
-    string MainFlyoutPageFolder     = "00740-MainFlyoutPage.xaml.cs";
-    string MainFlyoutPageClassName  = GetModelClassName(Model, MainFlyoutPageFolder);
-    string MainFlyoutPageNameSpace  = GetModelNameSpace(Model, MainFlyoutPageFolder);
+    string MainFlyoutPageFolder                 = "00740-MainFlyoutPage.xaml.cs";
+    string MainFlyoutPageClassName              = GetModelClassName(Model, MainFlyoutPageFolder);
+    string MainFlyoutPageNameSpace              = GetModelNameSpace(Model, MainFlyoutPageFolder);
+
+    string OnMessageNotificationPropertyName    = "OnMessageNotification";
+    string AppSettingServicePropertyName        = "GlblSettingsSrv";
+    string ShowErrorMethodName                  = "ShowErrorMessage";
 
     List<string> nmSpaces = new List<string>();
+    if ((MainFlyoutPageNameSpace != IAppGlblSettingsServiceNameSpace) && (nmSpaces.IndexOf(IAppGlblSettingsServiceNameSpace) < 0)) 
+        nmSpaces.Add(IAppGlblSettingsServiceNameSpace);
 
 #>
 <# 
@@ -36,10 +46,12 @@ namespace <#= MainFlyoutPageNameSpace #> {
     /// Interaction logic for <#= MainFlyoutPageClassName #>.xaml
     /// </summary>
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class <#= MainFlyoutPageClassName #>: FlyoutPage, IFlyoutPageOptions
+    public partial class <#= MainFlyoutPageClassName #>: FlyoutPage, IFlyoutPageOptions, IDestructible
     {
-        public <#= MainFlyoutPageClassName #>()
+        // protected <#= IAppGlblSettingsServiceClassName #> _<#= AppSettingServicePropertyName #>=null;
+        public <#= MainFlyoutPageClassName #>() // <#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName  #>)
         {
+            //_<#= AppSettingServicePropertyName #> = <#= AppSettingServicePropertyName  #>;
             InitializeComponent();
         }
         public static readonly BindableProperty IsPresentedAfterNavigationProperty =
@@ -48,6 +60,11 @@ namespace <#= MainFlyoutPageNameSpace #> {
         {
             get => (bool)GetValue(IsPresentedAfterNavigationProperty);
             set => SetValue(IsPresentedAfterNavigationProperty, value);
+        }
+        public void Destroy()
+        {
+            //_<#= AppSettingServicePropertyName #> = null;
+            BindingContext = null;
         }
     }
 }

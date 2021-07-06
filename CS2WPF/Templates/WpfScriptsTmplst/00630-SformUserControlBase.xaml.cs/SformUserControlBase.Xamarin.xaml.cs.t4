@@ -125,9 +125,26 @@ namespace <#= SformUserControlBaseNameSpace #> {
     /// </summary>
     public class <#= SformUserControlBaseClassName #>: <#= UserControlWithContainerMenuClassName #>, <#= INotifiedByParentInterfaceClassName #>, IDestructible
     {
-
-        string _<#= RadioGroupNamePropertyName #> = "rgn"+ Guid.NewGuid().ToString("N");
-        public string <#= RadioGroupNamePropertyName #> { get { return _<#= RadioGroupNamePropertyName #>; } }
+        private static object <#= RadioGroupNamePropertyName #>Creator(BindableObject bindable)
+        {
+            return "rgn" + Guid.NewGuid().ToString("N");
+        }
+        public static readonly BindableProperty <#= RadioGroupNamePropertyName #>Property =
+                BindableProperty.Create(
+                "<#= RadioGroupNamePropertyName #>", typeof(string),
+                typeof(SformUserControlBase),
+                defaultValueCreator: <#= RadioGroupNamePropertyName #>Creator);
+        public string <#= RadioGroupNamePropertyName #>
+        {
+            get
+            {
+                return (string)GetValue(<#= RadioGroupNamePropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= RadioGroupNamePropertyName #>Property, value);
+            }
+        }
 
 
         #region On<#= BindingContextFeedbackRefPropertyName #>
@@ -563,6 +580,8 @@ namespace <#= SformUserControlBaseNameSpace #> {
             RemoveBinding(<#= SformAfterUpdItemPropertyName #>Property);
             RemoveBinding(<#= SformAfterDelItemPropertyName #>Property);
             RemoveBinding(<#= IsParentLoadedPropertyName #>Property);
+            RemoveBinding(<#= RadioGroupNamePropertyName #>Property);
+            <#= RadioGroupNamePropertyName #> = null;
             <#= TableMenuItemsCommandPropertyName #> = null;
             <#= RowMenuItemsCommandPropertyName #> = null;
             <#= SelectedRowCommandPropertyName #> = null;

@@ -22,6 +22,10 @@ using System.Runtime.CompilerServices;
 using System.Linq;
 <#
 
+    string IAppGlblSettingsServiceFolder            = "00080-IAppGlblSettingsService.cs";
+    string IAppGlblSettingsServiceClassName         = GetModelClassName(Model, IAppGlblSettingsServiceFolder);
+    string IAppGlblSettingsServiceNameSpace         = GetModelNameSpace(Model, IAppGlblSettingsServiceFolder);
+
     string IRegisterModelFolder      = "00500-IRegisterModel.cs";
     string IRegisterModelClassName   = GetModelClassName(Model, IRegisterModelFolder);
     string IRegisterModelNameSpace   = GetModelNameSpace(Model, IRegisterModelFolder);
@@ -76,6 +80,8 @@ using System.Linq;
 
     string AppLoginServicePropertyName              = "GlblLoginSrv";
     string RegisterMethodName                       = "Register";
+    string AppSettingServicePropertyName            = "GlblSettingsSrv";
+    string NavigateToMethodName                     = "NavigateTo";
 
 
     List<string> nmSpaces = new List<string>();
@@ -83,6 +89,8 @@ using System.Linq;
         nmSpaces.Add(IAppGlblLoginServiceNameSpace);
     if ((RegisterUserPageViewModelNameSpace != IRegisterModelNameSpace) && (nmSpaces.IndexOf(IRegisterModelNameSpace) < 0)) 
         nmSpaces.Add(IRegisterModelNameSpace);
+    if ((RegisterUserPageViewModelNameSpace != IAppGlblSettingsServiceNameSpace) && (nmSpaces.IndexOf(IAppGlblSettingsServiceNameSpace) < 0)) 
+        nmSpaces.Add(IAppGlblSettingsServiceNameSpace);
 
 #>
 <# 
@@ -111,13 +119,13 @@ using <#= ns #>;
 */
 
 namespace <#= RegisterUserPageViewModelNameSpace #> {
-    public class <#= RegisterUserPageViewModelClassName #>: INotifyPropertyChanged, INotifyDataErrorInfo  
+    public class <#= RegisterUserPageViewModelClassName #>: INotifyPropertyChanged, INotifyDataErrorInfo, IDestructible    
     {
-        <#= IAppGlblLoginServiceClassName #> _<#= AppLoginServicePropertyName #>;
-        protected INavigationService _navigationService;
-        public <#= RegisterUserPageViewModelClassName #>(<#= IAppGlblLoginServiceClassName #> <#= AppLoginServicePropertyName #>, INavigationService navigationService) {
+        protected <#= IAppGlblSettingsServiceClassName #> _<#= AppSettingServicePropertyName #>=null;
+        protected <#= IAppGlblLoginServiceClassName #> _<#= AppLoginServicePropertyName #>;
+        public <#= RegisterUserPageViewModelClassName #>(<#= IAppGlblLoginServiceClassName #> <#= AppLoginServicePropertyName #>, <#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName #>) {
+            _<#= AppSettingServicePropertyName #> = <#= AppSettingServicePropertyName #>;
             _<#= AppLoginServicePropertyName #> = <#= AppLoginServicePropertyName #>;
-            _navigationService = navigationService;
         }
 
         #region INotifyPropertyChanged
@@ -337,7 +345,9 @@ namespace <#= RegisterUserPageViewModelNameSpace #> {
         }
         protected async void <#= CancelCommandPropertyName #>Action(object param)
         {
-            await _navigationService.NavigateAsync("<#= HomePageClassName #>");
+            if(_<#= AppSettingServicePropertyName #> != null) {
+                _<#= AppSettingServicePropertyName #>.<#= NavigateToMethodName #>("<#= HomePageClassName #>");
+            }
         }
         protected bool <#= CancelCommandPropertyName #>CanExecute(object param)
         {
@@ -361,7 +371,9 @@ namespace <#= RegisterUserPageViewModelNameSpace #> {
             if (HasErrors) return;
             <#= IRegisterModelClassName #> model = await _<#= AppLoginServicePropertyName #>.<#= RegisterMethodName #>(<#= UserNamePropertyName #> , <#= PassWordPropertyName #>, <#= ConfirmPassWordPropertyName #>);
             if (model == null) return;
-            await _navigationService.NavigateAsync("<#= HomePageClassName #>");
+            if(_<#= AppSettingServicePropertyName #> != null) {
+                _<#= AppSettingServicePropertyName #>.<#= NavigateToMethodName #>("<#= HomePageClassName #>");
+            }
         }
         protected bool <#= OkCommandPropertyName #>CanExecute(object param)
         {
@@ -405,6 +417,14 @@ namespace <#= RegisterUserPageViewModelNameSpace #> {
         }
         #endregion
         
+        #region IDestructible  
+        public virtual void Destroy()
+        {
+            _<#= AppSettingServicePropertyName #> = null;
+            _<#= AppLoginServicePropertyName #> = null;
+        }
+        #endregion
+
     }
 }
 

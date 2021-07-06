@@ -14,6 +14,7 @@
 using Xamarin.Forms;
 using Prism.Mvvm;
 using Prism.Navigation;
+using Xamarin.Essentials;
 using Prism.Services.Dialogs;
 using System.Windows.Input;
 using System.ComponentModel;
@@ -40,6 +41,11 @@ using System.Runtime.CompilerServices;
     string AppSettingServicePropertyName            = "GlblSettingsSrv";
     string NavigateCommandPropertyName              = "NavigateCommand";
     string ShowDialogCommandPropertyName            = "ShowDialogCommand";
+    string NavigateToMethodName                     = "NavigateTo";
+    string OnNavigateToNotificationPropertyName     = "OnNavigateToNotification";
+    string DelayFromMillisecondsPropertyName        = "DelayFromMilliseconds";
+    string ShowErrorMethodName                      = "ShowErrorMessage";
+    string OnMessageNotificationPropertyName        = "OnMessageNotification";
 
     List<string> nmSpaces = new List<string>();
     if ((MainFlyoutPageViewModelNameSpace != IAppGlblSettingsServiceNameSpace) && (nmSpaces.IndexOf(IAppGlblSettingsServiceNameSpace) < 0)) 
@@ -63,6 +69,8 @@ namespace <#= MainFlyoutPageViewModelNameSpace #> {
         private IDialogService _dialogService;
         public <#= MainFlyoutPageViewModelClassName #>(<#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName #>, INavigationService navigationService, IDialogService dialogService) {
             _<#= AppSettingServicePropertyName #> = <#= AppSettingServicePropertyName #>;
+            _<#= AppSettingServicePropertyName #>.<#= OnNavigateToNotificationPropertyName #> += <#= NavigateToMethodName #>;
+            _<#= AppSettingServicePropertyName #>.<#= OnMessageNotificationPropertyName #> += <#= ShowErrorMethodName #>;
             _navigationService = navigationService;
             _dialogService = dialogService;
         }
@@ -119,11 +127,36 @@ namespace <#= MainFlyoutPageViewModelNameSpace #> {
         #region IDestructible  
         public virtual void Destroy()
         {
+            if( _<#= AppSettingServicePropertyName #> != null ) {
+                _<#= AppSettingServicePropertyName #>.<#= OnNavigateToNotificationPropertyName #> -= <#= NavigateToMethodName #>;
+                _<#= AppSettingServicePropertyName #>.<#= OnMessageNotificationPropertyName #> -= <#= ShowErrorMethodName #>;
+            }
             _<#= AppSettingServicePropertyName #> = null;
             _navigationService = null;
             _dialogService = null;
         }
         #endregion
+
+        private async void <#= NavigateToMethodName #>(object sender, string navPath)
+        {
+            await MainThread.InvokeOnMainThreadAsync(async () => {
+                await _navigationService.GoBackToRootAsync();
+                await _navigationService.NavigateAsync(name: $"/<#= MainFlyoutPageClassName #>/NavigationPage/{navPath}");
+            });
+        }
+        private bool isErrorMsgOpened = false;
+        private void <#= ShowErrorMethodName #>(object sender, string errorMessage)
+        {
+            if(isErrorMsgOpened) return;
+            isErrorMsgOpened = true;
+            MainThread.BeginInvokeOnMainThread(() => {
+                DialogParameters parameters = new DialogParameters();
+                parameters.Add("Title", "Error");
+                parameters.Add("Message", errorMessage);
+                parameters.Add("<#= DelayFromMillisecondsPropertyName #>", 3000);
+                if(_dialogService != null) _dialogService.ShowDialog("MessageDlg", parameters, (r) => { isErrorMsgOpened = false; });
+            });
+        }
     }
 }
 

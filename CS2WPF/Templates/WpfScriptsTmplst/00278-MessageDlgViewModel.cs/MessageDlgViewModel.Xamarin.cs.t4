@@ -44,7 +44,8 @@ using Prism.Services.Dialogs;
     string ShowCancelBtnPropertyName = "ShowCancelBtn";
     string OkCommandPropertyName = "OkCommand";
     string CancelCommandPropertyName = "CancelCommand";
-    
+    string DelayFromMillisecondsPropertyName = "DelayFromMilliseconds";
+
     List<string> nmSpaces = new List<string>();
     if ((MessageDlgViewModelNameSpace != IconFontNameSpace) && (nmSpaces.IndexOf(IconFontNameSpace) < 0)) 
         nmSpaces.Add(IconFontNameSpace);
@@ -125,7 +126,7 @@ namespace <#= MessageDlgViewModelNameSpace #> {
         {
             
         }
-
+        int <#= DelayFromMillisecondsPropertyName #> = 0;
         public void OnDialogOpened(IDialogParameters parameters)
         {
             if (parameters == null) return;
@@ -153,6 +154,21 @@ namespace <#= MessageDlgViewModelNameSpace #> {
             {
                 <#= ShowOkBtnPropertyName #> = parameters.GetValue<bool>("<#= ShowOkBtnPropertyName #>");
             }
+            if (parameters.ContainsKey("<#= DelayFromMillisecondsPropertyName #>"))
+            {
+                <#= DelayFromMillisecondsPropertyName #> = parameters.GetValue<int>("<#= DelayFromMillisecondsPropertyName #>");
+            }
+            if(<#= DelayFromMillisecondsPropertyName #> > 0)
+                Device.StartTimer(TimeSpan.FromMilliseconds(<#= DelayFromMillisecondsPropertyName #>) , () => { 
+                    if (<#= DelayFromMillisecondsPropertyName #> > 0) {
+                        Device.BeginInvokeOnMainThread(() =>
+                        {
+                            <#= OkCommandPropertyName #>Action();
+                        });
+                    }; 
+                    return false; 
+                });
+            
         }
         #endregion
         #region <#= MessagePropertyName #>
@@ -258,6 +274,7 @@ namespace <#= MessageDlgViewModelNameSpace #> {
         {
             if (<#= OkCommandPropertyName #>CheckOk())
             {
+                <#= DelayFromMillisecondsPropertyName #> = 0;
                 DialogParameters parameters = new DialogParameters();
                 parameters.Add("Result", true);
                 _RequestClose?.Invoke(parameters);

@@ -34,10 +34,15 @@
     string IconFontNameSpace   = GetContextModelNameSpace(Context, IconFontFolder);
     string IconFontNameProject = GetContextModelProjectName(Context, IconFontFolder);
 
-    string ButtonDestroyedFolder      = "00188-ButtonDestroyed.cs";
-    string ButtonDestroyedClassName   = GetContextModelClassName(Context, ButtonDestroyedFolder);
-    string ButtonDestroyedNameSpace   = GetContextModelNameSpace(Context, ButtonDestroyedFolder);
-    string ButtonDestroyedProject     = GetContextModelProjectName(Context, ButtonDestroyedFolder);
+    string ButtonDestroyedFolder        = "00188-ButtonDestroyed.cs";
+    string ButtonDestroyedClassName     = GetContextModelClassName(Context, ButtonDestroyedFolder);
+    string ButtonDestroyedNameSpace     = GetContextModelNameSpace(Context, ButtonDestroyedFolder);
+    string ButtonDestroyedProject       = GetContextModelProjectName(Context, ButtonDestroyedFolder);
+
+    string RadioDestroyedFolder         = "00190-RadioDestroyed.cs";
+    string RadioDestroyedlassName       = GetContextModelClassName(Context, RadioDestroyedFolder);
+    string RadioDestroyedNameSpace      = GetContextModelNameSpace(Context, RadioDestroyedFolder);
+    string RadioDestroyedProject        = GetContextModelProjectName(Context, RadioDestroyedFolder);
 
     string WebServiceFilterUserControlFolder      = "00242-WebServiceFilterUserControl.xaml.cs";
     string WebServiceFilterUserControlClassName   = GetContextModelClassName(Context, WebServiceFilterUserControlFolder);
@@ -174,7 +179,11 @@
     if(SformUserControlProject != ButtonDestroyedProject) {
         ButtonDestroyedPrefix = ButtonDestroyedPrefix + ";assembly=" + ButtonDestroyedProject;
     }
-
+    string RadioDestroyedPrefix = "clr-namespace:" + RadioDestroyedNameSpace;
+    if(SformUserControlProject != RadioDestroyedProject) {
+        RadioDestroyedPrefix = ButtonDestroyedPrefix + ";assembly=" + RadioDestroyedProject;
+    }
+    
 #>
 
 <sfrmbs:<#= SformUserControlBaseClassName #> 
@@ -194,6 +203,7 @@
              xmlns:intcntxt="<#= InternalContentPrefix #>"
              xmlns:maxscrlvw="<#= MaxScrollViewHeightPrefix #>"
              xmlns:btnDstr="<#= ButtonDestroyedPrefix #>"
+             xmlns:rdoDstr="<#= RadioDestroyedPrefix #>"
 
              <#= BindingContextFeedbackRefPropertyName #>="{Binding BindingContext.<#= BindingContextFeedbackRefPropertyName #>, Source={x:Reference sformUsrCntrlRootNode}}"
             >
@@ -300,7 +310,7 @@
                                             
                                             Padding="2, 0, 2, 0" FlexLayout.Basis="64" CornerRadius="0" >
                                             <StackLayout Orientation="Horizontal" Spacing="0">
-                                                <RadioButton WidthRequest="20" Value="{Binding .}"/>
+                                                <rdoDstr:<#= RadioDestroyedlassName #> WidthRequest="20" Value="{Binding .}"/>
 <!-- Command and CommandParameter are cleared automatically without <#= ButtonDestroyedClassName #>. BindingContext plays its role here. -->
                                                 <btnDstr:<#= ButtonDestroyedClassName #> WidthRequest="40"
                                                         <#= IsDestroyedPropertyName #>="{Binding BindingContext.<#= IsDsDestroyedPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}" 

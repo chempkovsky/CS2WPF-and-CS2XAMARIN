@@ -38,6 +38,8 @@ using System.Net.Http.Headers;
     string DefaultFilterHeightMethodName        = "DefaultFilterHeight";
     string ExpandedGridHeightMethodName         = "ExpandedGridHeight";
     string ExpandedFilterHeightMethodName       = "ExpandedFilterHeight";
+    string OnNavigateToNotificationPropertyName = "OnNavigateToNotification";
+    string NavigateToMethodName                 = "NavigateTo";
 
     List<string> nmSpaces = new List<string>();
     if ((AppGlblSettingsServiceNameSpace != IAppGlblSettingsServiceNameSpace) && (nmSpaces.IndexOf(IAppGlblSettingsServiceNameSpace) < 0)) 
@@ -169,6 +171,7 @@ namespace <#= AppGlblSettingsServiceNameSpace #> {
         }
         public event Action<object, string> OnMessageNotification;
         public event Action<object, string> OnUserChangedNotification;
+        public event Action<object, string> <#= OnNavigateToNotificationPropertyName #>;
         public string GetWebApiPrefix(string ViewName)
         {
             string rslt = "";
@@ -330,6 +333,9 @@ namespace <#= AppGlblSettingsServiceNameSpace #> {
         }
         public void <#= ShowErrorMethodName #>(string errorType, string errorMsg) {
             OnMessageNotification?.Invoke(this, errorType + ": " + errorMsg);
+        }
+        public void <#= NavigateToMethodName #>(string navigationPath) {
+            <#= OnNavigateToNotificationPropertyName #>?.Invoke(this, navigationPath);
         }
 
    }

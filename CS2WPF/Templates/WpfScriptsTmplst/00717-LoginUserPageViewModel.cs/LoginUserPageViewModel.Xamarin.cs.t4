@@ -82,6 +82,7 @@ using System.Net.Http.Headers;
     string BuserNamePropertyName                    = "userName";
     string Btoken_typePropertyName                  = "token_type";
     string Baccess_tokenPropertyName                = "access_token";
+    string NavigateToMethodName                     = "NavigateTo";
 
 
     List<string> nmSpaces = new List<string>();
@@ -119,15 +120,13 @@ using <#= ns #>;
 */
 
 namespace <#= LoginUserPageViewModelNameSpace #> {
-    public class <#= LoginUserPageViewModelClassName #>: INotifyPropertyChanged, INotifyDataErrorInfo  
+    public class <#= LoginUserPageViewModelClassName #>: INotifyPropertyChanged, INotifyDataErrorInfo, IDestructible    
     {
         <#= IAppGlblSettingsServiceClassName #> _<#= AppSettingServicePropertyName #>;
         <#= IAppGlblLoginServiceClassName #> _<#= AppLoginServicePropertyName #>;
-        protected INavigationService _navigationService;
-        public <#= LoginUserPageViewModelClassName #>(<#= IAppGlblLoginServiceClassName #> <#= AppLoginServicePropertyName #>, <#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName #>, INavigationService navigationService) {
+        public <#= LoginUserPageViewModelClassName #>(<#= IAppGlblLoginServiceClassName #> <#= AppLoginServicePropertyName #>, <#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName #>) {
             _<#= AppLoginServicePropertyName #> = <#= AppLoginServicePropertyName #>;
             _<#= AppSettingServicePropertyName #> = <#= AppSettingServicePropertyName #>;
-            _navigationService = navigationService;
         }
 
         #region INotifyPropertyChanged
@@ -291,7 +290,9 @@ namespace <#= LoginUserPageViewModelNameSpace #> {
         }
         protected async void <#= CancelCommandPropertyName #>Action(object param)
         {
-            await _navigationService.NavigateAsync("<#= HomePageClassName #>");
+            if(_<#= AppSettingServicePropertyName #> != null) {
+                _<#= AppSettingServicePropertyName #>.<#= NavigateToMethodName #>("<#= HomePageClassName #>");
+            }
         }
         protected bool <#= CancelCommandPropertyName #>CanExecute(object param)
         {
@@ -314,10 +315,13 @@ namespace <#= LoginUserPageViewModelNameSpace #> {
             if (HasErrors) return;
             <#= IBearerTokenModelClassName #> model = await _<#= AppLoginServicePropertyName #>.<#= LoginMethodName #>(<#= UserNamePropertyName #> , <#= PassWordPropertyName #>);
             if (model == null) return;
-            _<#= AppSettingServicePropertyName #>.AuthInfo = model;
-            _<#= AppSettingServicePropertyName #>.UserName = model.<#= BuserNamePropertyName #>;
-            _<#= AppSettingServicePropertyName #>.Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(model.<#= Btoken_typePropertyName #>, model.<#= Baccess_tokenPropertyName #>);
-            await _navigationService.NavigateAsync("<#= HomePageClassName #>");
+            if(_<#= AppSettingServicePropertyName #> != null) {
+                _<#= AppSettingServicePropertyName #>.AuthInfo = model;
+                _<#= AppSettingServicePropertyName #>.UserName = model.<#= BuserNamePropertyName #>;
+                _<#= AppSettingServicePropertyName #>.Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(model.<#= Btoken_typePropertyName #>, model.<#= Baccess_tokenPropertyName #>);
+                _<#= AppSettingServicePropertyName #>.<#= NavigateToMethodName #>("<#= HomePageClassName #>");
+            }
+
         }
         protected bool <#= OkCommandPropertyName #>CanExecute(object param)
         {
@@ -343,6 +347,14 @@ namespace <#= LoginUserPageViewModelNameSpace #> {
         }
         #endregion
         
+        #region IDestructible  
+        public virtual void Destroy()
+        {
+            _<#= AppSettingServicePropertyName #> = null;
+            _<#= AppLoginServicePropertyName #> = null;
+        }
+        #endregion
+
     }
 }
 

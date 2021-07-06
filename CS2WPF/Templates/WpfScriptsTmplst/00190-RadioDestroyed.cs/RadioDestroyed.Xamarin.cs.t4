@@ -11,68 +11,52 @@
 <#@ import namespace="CS2WPF.Model.Serializable" #>
 <#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
-using System;
-using System.Collections.Generic;
-using System.Net.Http;
+using Xamarin.Forms;
 <#
 
-    string IBearerTokenModelFolder      = "00496-IBearerTokenModel.cs";
-    string IBearerTokenModelClassName   = GetModelClassName(Model, IBearerTokenModelFolder);
-    string IBearerTokenModelNameSpace   = GetModelNameSpace(Model, IBearerTokenModelFolder);
-
-    string IAppGlblSettingsServiceFolder      = "00080-IAppGlblSettingsService.cs";
-    string IAppGlblSettingsServiceClassName   = GetModelClassName(Model, IAppGlblSettingsServiceFolder);
-    string IAppGlblSettingsServiceNameSpace   = GetModelNameSpace(Model, IAppGlblSettingsServiceFolder);
+    string RadioDestroyedFolder     = "00190-RadioDestroyed.cs";
+    string RadioDestroyedlassName   = GetModelClassName(Model, RadioDestroyedFolder);
+    string RadioDestroyedNameSpace  = GetModelNameSpace(Model, RadioDestroyedFolder);
     
-    string ShowErrorMethodName                  = "ShowErrorMessage";
-    string NavigateToMethodName                 = "NavigateTo";
-    string OnNavigateToNotificationPropertyName = "OnNavigateToNotification";
-
-    List<string> nmSpaces = new List<string>();
-    if ((IAppGlblSettingsServiceNameSpace != IBearerTokenModelNameSpace) && (nmSpaces.IndexOf(IBearerTokenModelNameSpace) < 0)) 
-        nmSpaces.Add(IBearerTokenModelNameSpace);
+    string IsDestroyedPropertyName              = "IsDestroyed";
+    string OnDestroyedPropertyName              = "OnDestroyed";
 
 #>
-<# 
-    foreach(string ns in nmSpaces) {
-#>
-using <#= ns #>;
-<#
-    }
-#>
 
-namespace <#= IAppGlblSettingsServiceNameSpace #> {
-    public interface  <#= IAppGlblSettingsServiceClassName #>
+namespace <#= RadioDestroyedNameSpace #> {
+    public class <#= RadioDestroyedlassName #>: RadioButton
     {
-        double FilterHeightAddition { get; set; }
-        double FilterHeightFactor { get; set; }
-        double TableHeightAddition { get; set; }
-        double TableHeightFactor { get; set; }
-        event Action<object, string> OnMessageNotification;
-        event Action<object, string> OnUserChangedNotification;
-        event Action<object, string> <#= OnNavigateToNotificationPropertyName #>;
-        string GetWebApiPrefix(string ViewName);
-        string GetSecurityWebApiPrefix();
-        double getDialogWidth(string ViewName);
-        string UserName { get; set; }
-        <#= IBearerTokenModelClassName #> AuthInfo { get; set; }
-        List<KeyValuePair<string, string>> GetAuthInfoHeader();
-        int[] Permissions { get; set; }
-        int[] GetEmptyPermissions();
-        int GetViewModelMask(string vwModel);
-        int GetDashBrdMask(string dshBrd);
-        HttpClient Client  { get; }
-        void <#= ShowErrorMethodName #>(string errorType, string errorMsg);
-        void <#= NavigateToMethodName #>(string navigationPath);
-
-        double DefaultGridRows(string fileType);
-        double DefaultFilterRows(string fileType);
-        double ExpandedGridRows(string fileType);
-        double ExpandedFilterRows(string fileType);
-        double DefaultGridHeight(string fileType);
-        double DefaultFilterHeight(string fileType);
-        double ExpandedGridHeight(string fileType);
-        double ExpandedFilterHeight(string fileType);
+        public virtual void <#= OnDestroyedPropertyName #>()
+        {
+            RemoveBinding(<#= IsDestroyedPropertyName #>Property);
+            <#= IsDestroyedPropertyName #> = true;
+            RemoveBinding(GroupNameProperty);
+            SetValue(GroupNameProperty, GroupNameProperty.DefaultValue); // this is  MessagingCenter.Unsubscribe<RadioButton, RadioButtonGroupSelectionChanged> and MessagingCenter.Unsubscribe<Layout<View>, RadioButtonGroupValueChanged>
+        }
+        private static void <#= IsDestroyedPropertyName #>Changed(BindableObject d, object oldValue, object newValue)
+        {
+            <#= RadioDestroyedlassName #> inst = d as <#= RadioDestroyedlassName #>;
+            if ((inst != null) && (newValue is bool))
+            {
+                inst.<#= OnDestroyedPropertyName #>();
+            }
+        }
+        public static readonly BindableProperty <#= IsDestroyedPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= IsDestroyedPropertyName #>", typeof(bool),
+                typeof(<#= RadioDestroyedlassName #>),
+                false, propertyChanged: <#= IsDestroyedPropertyName #>Changed);
+        public bool <#= IsDestroyedPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= IsDestroyedPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= IsDestroyedPropertyName #>Property, value);
+            }
+        }
     }
 }
 

@@ -981,6 +981,7 @@ namespace <#= SformViewModelNameSpace #> {
                 <#= IsDsDestroyedPropertyName #> = true;
                 if (ds == null) { ds = new ObservableCollection<<#= modelInterfaceClassName #>>(); } else { ds.Clear(); }
                 <#= IsDsDestroyedPropertyName #> = false;
+                <#= DataSourcePropertyName #> = null; 
                 if(rslt.items != null) {
                     foreach(<#= modelInterfaceClassName #> itm in rslt.items) {
                         ds.Add(<#= FormRootServicePropertyName #>.<#= CopyToModelNotifyMethodName #>(itm, null));
@@ -988,7 +989,7 @@ namespace <#= SformViewModelNameSpace #> {
                 }
                 <#= DataSourcePropertyName #> = ds;
                 <#= SelectedRowPropertyName #> = <#= DataSourcePropertyName #>?.FirstOrDefault();
-                <#= InternalContentProperty #>Changed();
+                // <#= InternalContentProperty #>Changed();
             }
             <#= IsInQueryPropertyName #> = false;
         }
@@ -1080,8 +1081,12 @@ namespace <#= SformViewModelNameSpace #> {
             if (rw != null) {
                 indx = ds.IndexOf(rw);
                 if (indx > -1) {
+                    <#= IsDsDestroyedPropertyName #> = true;
+                    <#= DataSourcePropertyName #> = null;
+                    <#= IsDsDestroyedPropertyName #> = false;
                     ds.RemoveAt(indx);
-                    <#= InternalContentProperty #>Changed();
+                    <#= DataSourcePropertyName #> = ds;
+                    //<#= InternalContentProperty #>Changed();
                     return;
                 }
             }
@@ -1089,7 +1094,7 @@ namespace <#= SformViewModelNameSpace #> {
         #endregion
         public void <#= OnDestroyPropertyName #>() {
             <#= IsDestroyedPropertyName #> = true;
-            <#= IsDsDestroyedPropertyName #> = true;
+            <#= IsDsDestroyedPropertyName #> = true; // notify UI
             _<#= RowMenuItemsPropertyName #> = null; 
             _<#= TableMenuItemsVMPropertyName #> = null;
             _<#= FilterDefinitionsPropertyName #> = null; 
