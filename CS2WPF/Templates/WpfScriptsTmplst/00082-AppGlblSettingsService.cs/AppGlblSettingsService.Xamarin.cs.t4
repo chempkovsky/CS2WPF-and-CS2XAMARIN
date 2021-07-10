@@ -12,6 +12,8 @@
 <#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
 using System;
+using Xamarin.Forms;
+using Xamarin.Essentials;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -75,6 +77,11 @@ namespace <#= AppGlblSettingsServiceNameSpace #> {
         double _FilterHeightFactor = 70;
         double _TableHeightAddition = 33.8;
         double _TableHeightFactor = 33.6;
+        double _DeviceHeight = 1080;
+        public <#= AppGlblSettingsServiceClassName #>() {
+            DisplayInfo mainDisplayInfo = DeviceDisplay.MainDisplayInfo;
+            _DeviceHeight = mainDisplayInfo.Height / mainDisplayInfo.Density;
+        }
 
         public double DefaultGridRows(string fileType) {
             switch(fileType) {
@@ -100,7 +107,13 @@ namespace <#= AppGlblSettingsServiceNameSpace #> {
                 case "01699-O2mPage.xaml":
                     return 5d;
                 default:
-                    return 19d;
+                    if (_DeviceHeight < 1080d)
+                    {
+                        return 8d;
+                    } else
+                    {
+                        return 18d;
+                    }
             }
         }
         public double ExpandedFilterRows(string fileType) {
@@ -177,13 +190,27 @@ namespace <#= AppGlblSettingsServiceNameSpace #> {
             string rslt = "";
             if(!string.IsNullOrEmpty(ViewName))
             {
-                rslt = "http://192.168.100.9:63547/";
+                if (Device.RuntimePlatform == Device.Android)
+                {
+                
+                    rslt = "http://10.0.2.2:52157/";  
+                }
+                else
+                {
+                    return "http://localhost:52157/";
+                }
             }
             return rslt;
         }
         public string GetSecurityWebApiPrefix()
         {
-            return "http://192.168.100.9:63547/";
+            if (Device.RuntimePlatform == Device.Android)
+            {
+                return "http://10.0.2.2:52157/";  
+            } else
+            {
+                return "http://localhost:52157/";
+            }
         }
         public double getDialogWidth(string ViewName)  {
             double rslt = 90;
