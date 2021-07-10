@@ -144,17 +144,18 @@ namespace <#= MainFlyoutPageViewModelNameSpace #> {
                 await _navigationService.NavigateAsync(name: $"/<#= MainFlyoutPageClassName #>/NavigationPage/{navPath}");
             });
         }
-        private bool isErrorMsgOpened = false;
         private void <#= ShowErrorMethodName #>(object sender, string errorMessage)
         {
-            if(isErrorMsgOpened) return;
-            isErrorMsgOpened = true;
+            <#= IAppGlblSettingsServiceClassName #> gss = _<#= AppSettingServicePropertyName #>;
+            if (gss == null) return;
+            if (gss.DelayActivated) return;
+            gss.DelayActivated = true;
             MainThread.BeginInvokeOnMainThread(() => {
                 DialogParameters parameters = new DialogParameters();
                 parameters.Add("Title", "Error");
                 parameters.Add("Message", errorMessage);
-                parameters.Add("<#= DelayFromMillisecondsPropertyName #>", 3000);
-                if(_dialogService != null) _dialogService.ShowDialog("MessageDlg", parameters, (r) => { isErrorMsgOpened = false; });
+                parameters.Add("<#= DelayFromMillisecondsPropertyName #>", 4000);
+                if(_dialogService != null) _dialogService.ShowDialog("MessageDlg", parameters, (r) => { gss.DelayActivated = false; });
             });
         }
     }
