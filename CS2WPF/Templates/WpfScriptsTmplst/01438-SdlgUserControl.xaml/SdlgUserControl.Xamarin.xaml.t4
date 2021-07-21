@@ -95,15 +95,18 @@
              BackgroundColor="{DynamicResource SelectItemDlgBackgroundColor}"
              x:Name="sdlgUserControlRoot">
     <ScrollView Orientation="Vertical" VerticalOptions="StartAndExpand">
+    <!-- does not work correctly
         <StackLayout Orientation="Vertical">
+    -->
+        <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="*">    
 <#
     if(IsInTheSameModule) {
 #>
-            <sfrm:<#= SformUserControlClassName #> VerticalOptions="FillAndExpand"
+            <sfrm:<#= SformUserControlClassName #> VerticalOptions="FillAndExpand" Grid.Row="0" Grid.Column="0"
 <#
     } else {
 #>
-            <prx:<#= ProxyUserControlClassName #> VerticalOptions="FillAndExpand"
+            <prx:<#= ProxyUserControlClassName #> VerticalOptions="FillAndExpand" Grid.Row="0" Grid.Column="0"
                 prism:RegionManager.RegionName="<#= SformUserControlClassName #><#= DialogRegionPropertyName #>"
 <#
     }
@@ -119,11 +122,14 @@
                 <#= SelectedRowCommandPropertyName #>="{Binding BindingContext.<#= OnSelectedRowCommandPropertyName #>, Mode=OneWay, Source={x:Reference sdlgUserControlRoot}}" 
                 <#= IsParentLoadedPropertyName #>="{Binding BindingContext.<#= IsParentLoadedPropertyName #>, Mode=OneWay, Source={x:Reference sdlgUserControlRoot}}" 
                 />
-            <StackLayout Orientation="Horizontal"  Margin="8">
+            <StackLayout Orientation="Horizontal"  Margin="8" Grid.Row="1" Grid.Column="0">
                     <Button Text=" Ok "  Command="{Binding BindingContext.<#= OkCommandPropertyName #>, Mode=OneWay, Source={x:Reference sdlgUserControlRoot}}"/>
                     <Button Text=" Cancel "  Command="{Binding BindingContext.<#= CancelCommandPropertyName #>, Mode=OneWay, Source={x:Reference sdlgUserControlRoot}}"/>
             </StackLayout>
+        </Grid>
+        <!-- does not work correctly
         </StackLayout>
+        -->
     </ScrollView>
 </ContentView>
 

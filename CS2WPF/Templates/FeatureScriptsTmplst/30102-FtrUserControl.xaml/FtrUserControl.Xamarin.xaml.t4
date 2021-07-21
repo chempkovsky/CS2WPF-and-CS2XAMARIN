@@ -91,10 +91,20 @@
              x:Name="fchrUsrCntrlRootNode"   
              >
     <ScrollView Orientation="Vertical">
+      <!-- does not work correctly
       <StackLayout Orientation="Vertical"  Margin="8,0,16,8">
-
+      -->
+<#
+    string rowsCountString = "Auto";
+    {
+        int rowsCount = Feature.FeatureItems.Count / 2;
+        rowsCountString = rowsCountString + string.Concat(Enumerable.Repeat(", Auto", rowsCount+1));
+    }
+#>
+      <Grid    RowDefinitions="<#= rowsCountString #>" ColumnDefinitions="*">
 <#
     {
+        int curGridRow = -1;
         int curItem = -1;
         foreach(FeatureItemSerializable featureItemSerializable in Feature.FeatureItems) {
             ModelViewSerializable modelViewSerializable = GetModelViewByName(Context, featureItemSerializable.ViewName);
@@ -115,8 +125,10 @@
             string modelClassName = GetModelClassName(modelViewSerializable, featureItemSerializable.FileType);
             curItem++;
             if (curItem % 2 == 0) {
+                curGridRow++;
 #>
-        <Grid gridflex:GridFlex.HorizontalFlex="{Binding BindingContext.<#= FlexOnPropertyName #>, Mode=OneWay, Source={x:Reference fchrUsrCntrlRootNode}}"
+        <Grid Grid.Row="<#= curGridRow #>" Grid.Column="0"
+            gridflex:GridFlex.HorizontalFlex="{Binding BindingContext.<#= FlexOnPropertyName #>, Mode=OneWay, Source={x:Reference fchrUsrCntrlRootNode}}"
             RowDefinitions="Auto,Auto" ColumnDefinitions="*">
 <#
             }
@@ -176,7 +188,10 @@
         }
     }
 #>  
+      <!-- does not work correctly
       </StackLayout>
+      -->
+      </Grid>
     </ScrollView>
 </ContentPage>
 

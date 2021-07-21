@@ -248,15 +248,28 @@
                 <ResourceDictionary>
 
 <#
+    string rowDefinitionsRowDefinitionsString = "Auto";
+    {
+        int gridRowCount=0;
+        for(int i = 0; i < Model.UIFormProperties.Count; i++) {
+            ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable = Model.UIFormProperties[i];
+            if(modelViewUIFormPropertySerializable.IsNewLineAfter) gridRowCount++;
+        }
+        
+        rowDefinitionsRowDefinitionsString = rowDefinitionsRowDefinitionsString + string.Concat(Enumerable.Repeat(", Auto", gridRowCount+1));
+    }
     for (int InputTypeId = 1; InputTypeId <= 3; InputTypeId++) {
+        int curGridRow = -1;
         string convName= AddEformModeEnumToVisibilityConverterClassName;
         string controlTemplateKey = "ctkForAdd";
         if(InputTypeId == 2) { convName= UpdEformModeEnumToVisibilityConverterClassName; controlTemplateKey = "ctkForUpd"; }
         if(InputTypeId == 3) { convName= DelEformModeEnumToVisibilityConverterClassName; controlTemplateKey = "ctkForDel"; }
 #>
                 <ControlTemplate x:Key="<#= controlTemplateKey #>">
+                <!-- does not work correctly
                     <StackLayout Orientation="Vertical">
-                        
+                -->
+                    <Grid RowDefinitions="<#= rowDefinitionsRowDefinitionsString #>" ColumnDefinitions="*">    
 <#
 
         bool isNewLine = false;
@@ -298,8 +311,10 @@
             }
             if(InputTypeWhenXXX == InputTypeEnum.Combo) {
                 if(! gridOpened) {
+                    curGridRow++;
 #>
-                    <Grid RowDefinitions="<#= GetGridFlexRowDefs(Model, i) #>" ColumnDefinitions="*"
+                    <Grid Grid.Row="<#= curGridRow #>" Grid.Column="0"
+                          RowDefinitions="<#= GetGridFlexRowDefs(Model, i) #>" ColumnDefinitions="*"
                           gridflex:<#= gridFlexModelClassName #>.HorizontalFlex="{Binding Path=<#= IsGridFlexPropertyName #>, Mode=OneWay, Source={x:Reference eformUsrCntrlRootNode}}" Margin="0 0 8 0">
 <#
                     currGridFlexRow = 0;
@@ -345,9 +360,11 @@
             }
             if(InputTypeWhenXXX == InputTypeEnum.Typeahead) {
                 if(! gridOpened) {
+                    curGridRow++;
 #>
-                    <Grid RowDefinitions="<#= GetGridFlexRowDefs(Model, i) #>" ColumnDefinitions="*"
-                            gridflex:<#= gridFlexModelClassName #>.HorizontalFlex="{Binding Path=<#= IsGridFlexPropertyName #>, Mode=OneWay, Source={x:Reference eformUsrCntrlRootNode}}" Margin="0 0 8 0">
+                    <Grid Grid.Row="<#= curGridRow #>" Grid.Column="0"
+                          RowDefinitions="<#= GetGridFlexRowDefs(Model, i) #>" ColumnDefinitions="*"
+                          gridflex:<#= gridFlexModelClassName #>.HorizontalFlex="{Binding Path=<#= IsGridFlexPropertyName #>, Mode=OneWay, Source={x:Reference eformUsrCntrlRootNode}}" Margin="0 0 8 0">
 <#
                     currGridFlexRow = 0;
                     gridOpened = true;
@@ -408,8 +425,10 @@
             }
             if(InputTypeWhenXXX == InputTypeEnum.SearchDialog) {
                 if(! gridOpened) {
+                    curGridRow++;
 #>
-                    <Grid RowDefinitions="<#= GetGridFlexRowDefs(Model, i) #>" ColumnDefinitions="*"
+                    <Grid Grid.Row="<#= curGridRow #>" Grid.Column="0"
+                          RowDefinitions="<#= GetGridFlexRowDefs(Model, i) #>" ColumnDefinitions="*"
                           gridflex:<#= gridFlexModelClassName #>.HorizontalFlex="{Binding Path=<#= IsGridFlexPropertyName #>, Mode=OneWay, Source={x:Reference eformUsrCntrlRootNode}}" Margin="0 0 8 0">
 <#
                     currGridFlexRow = 0;
@@ -477,8 +496,10 @@
             }
             if(IsBooleanInput(modelViewUIFormPropertySerializable, Model)) {
                 if(! gridOpened) {
+                    curGridRow++;
 #>
-                    <Grid RowDefinitions="<#= GetGridFlexRowDefs(Model, i) #>" ColumnDefinitions="*"
+                    <Grid Grid.Row="<#= curGridRow #>" Grid.Column="0"
+                          RowDefinitions="<#= GetGridFlexRowDefs(Model, i) #>" ColumnDefinitions="*"
                           gridflex:<#= gridFlexModelClassName #>.HorizontalFlex="{Binding Path=<#= IsGridFlexPropertyName #>, Mode=OneWay, Source={x:Reference eformUsrCntrlRootNode}}" Margin="0 0 8 0">
 <#
                     currGridFlexRow = 0;
@@ -535,8 +556,10 @@
             }
             if(IsDateInput(modelViewUIFormPropertySerializable, Model)) {
                 if(! gridOpened) {
+                    curGridRow++;
 #>
-                    <Grid RowDefinitions="<#= GetGridFlexRowDefs(Model, i) #>" ColumnDefinitions="*"
+                    <Grid Grid.Row="<#= curGridRow #>" Grid.Column="0"
+                          RowDefinitions="<#= GetGridFlexRowDefs(Model, i) #>" ColumnDefinitions="*"
                           gridflex:<#= gridFlexModelClassName #>.HorizontalFlex="{Binding Path=<#= IsGridFlexPropertyName #>, Mode=OneWay, Source={x:Reference eformUsrCntrlRootNode}}" Margin="0 0 8 0">
 <#
                     currGridFlexRow = 0;
@@ -591,8 +614,10 @@
             }
             if(IsMemoInput(modelViewUIFormPropertySerializable, Model)) {
                 if(! gridOpened) {
+                    curGridRow++;
 #>
-                    <Grid RowDefinitions="<#= GetGridFlexRowDefs(Model, i) #>" ColumnDefinitions="*"
+                    <Grid Grid.Row="<#= curGridRow #>" Grid.Column="0"
+                          RowDefinitions="<#= GetGridFlexRowDefs(Model, i) #>" ColumnDefinitions="*"
                           gridflex:<#= gridFlexModelClassName #>.HorizontalFlex="{Binding Path=<#= IsGridFlexPropertyName #>, Mode=OneWay, Source={x:Reference eformUsrCntrlRootNode}}" Margin="0 0 8 0">
 <#
                     currGridFlexRow = 0;
@@ -645,9 +670,11 @@
             }
 // TextBox: Readonly and NotReadonly
             if(! gridOpened) {
+                curGridRow++;
 #>
-                    <Grid  RowDefinitions="<#= GetGridFlexRowDefs(Model, i) #>" ColumnDefinitions="*"
-                            gridflex:<#= gridFlexModelClassName #>.HorizontalFlex="{Binding Path=<#= IsGridFlexPropertyName #>, Mode=OneWay, Source={x:Reference eformUsrCntrlRootNode}}" Margin="0 0 8 0">
+                    <Grid Grid.Row="<#= curGridRow #>" Grid.Column="0" 
+                          RowDefinitions="<#= GetGridFlexRowDefs(Model, i) #>" ColumnDefinitions="*"
+                          gridflex:<#= gridFlexModelClassName #>.HorizontalFlex="{Binding Path=<#= IsGridFlexPropertyName #>, Mode=OneWay, Source={x:Reference eformUsrCntrlRootNode}}" Margin="0 0 8 0">
 <#
                     currGridFlexRow = 0;
                     gridOpened = true;
@@ -706,8 +733,17 @@
                 } else {
                     currGridFlexRow++;
                 }
+                curGridRow++;
 #>
+                    <!-- does not work correctly
                     </StackLayout>
+                    -->
+                        <StackLayout Orientation="Horizontal" Grid.Row="<#= curGridRow #>" Grid.Column="0" Margin="8" IsVisible="{Binding <#= ShowSubmitPropertyName #>, Mode=OneWay,  Source={x:Reference eformUsrCntrlRootNode} }">
+                            <Button Text="Submit" Command="{Binding BindingContext.<#= SubmitCommandPropertyName #>, Source={x:Reference eformUsrCntrlRootNode}}" />
+                            <Button Text="Cancel" Command="{Binding BindingContext.<#= CancelCommandPropertyName #>, Source={x:Reference eformUsrCntrlRootNode}}" />
+                        </StackLayout>
+
+                    </Grid>
                 </ControlTemplate> 
 
 <#
@@ -734,10 +770,12 @@
 #>
             </ContentView.Triggers>
         </ContentView>
+        <!--
         <StackLayout Orientation="Horizontal" Grid.Row="3"  Margin="8" IsVisible="{Binding <#= ShowSubmitPropertyName #>, Mode=OneWay,  Source={x:Reference eformUsrCntrlRootNode} }">
             <Button Text="Submit" Command="{Binding BindingContext.<#= SubmitCommandPropertyName #>, Source={x:Reference eformUsrCntrlRootNode}}" />
             <Button Text="Cancel" Command="{Binding BindingContext.<#= CancelCommandPropertyName #>, Source={x:Reference eformUsrCntrlRootNode}}" />
         </StackLayout>
+        -->
     </Grid>
 </efrmbs:<#= EformUserControlBaseClassName #>>
 
