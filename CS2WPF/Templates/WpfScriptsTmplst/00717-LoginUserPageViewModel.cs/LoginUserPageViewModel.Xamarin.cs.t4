@@ -317,9 +317,12 @@ namespace <#= LoginUserPageViewModelNameSpace #> {
             if (model == null) return;
             if(_<#= AppSettingServicePropertyName #> != null) {
                 _<#= AppSettingServicePropertyName #>.AuthInfo = model;
-                _<#= AppSettingServicePropertyName #>.UserName = model.<#= BuserNamePropertyName #>;
                 _<#= AppSettingServicePropertyName #>.Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(model.<#= Btoken_typePropertyName #>, model.<#= Baccess_tokenPropertyName #>);
-                _<#= AppSettingServicePropertyName #>.<#= NavigateToMethodName #>("<#= HomePageClassName #>");
+                // this line must be the last. It activates notification
+                _<#= AppSettingServicePropertyName #>.UserName = model.<#= BuserNamePropertyName #>;
+
+                // this line was used at development time
+                // _<#= AppSettingServicePropertyName #>.<#= NavigateToMethodName #>("<#= HomePageClassName #>");
             }
 
         }

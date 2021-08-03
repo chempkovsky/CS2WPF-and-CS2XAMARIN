@@ -402,7 +402,7 @@ namespace <#= RlistPageViewModelNameSpace #> {
         }
         #endregion
 
-        protected async Task OnNavigationResult(INavigationResult navResult) {
+        protected void OnNavigationResult(INavigationResult navResult) {
             if(<#= IsDestroyedPropertyName #>) return;
             if (navResult.Success) return;
             string navErrorMsg = "Unknown Navigation Error";
@@ -416,7 +416,8 @@ namespace <#= RlistPageViewModelNameSpace #> {
                     inner = inner.InnerException;
                 }
             }
-            await _navigationService.NavigateAsync("<#= PageNotFoundPageClassName #>");
+            // await _navigationService.NavigateAsync("<#= PageNotFoundPageClassName #>");
+            <#= AppSettingServicePropertyName #>.NavigateTo("<#= PageNotFoundPageClassName #>");
             <#= AppSettingServicePropertyName #>.ShowErrorMessage("Navigation Exception", navErrorMsg);
         }
 <#
@@ -439,7 +440,7 @@ namespace <#= RlistPageViewModelNameSpace #> {
             if(<#= IsDestroyedPropertyName #>) return;
             if (((<#= AppSettingServicePropertyName #>.GetViewModelMask("<#= detailView.ViewName #>") & 1) != 1 )) {
                 INavigationResult nr1 = await _navigationService.NavigateAsync("<#= AccessDeniedPageClassName #>");
-                await OnNavigationResult(nr1);
+                OnNavigationResult(nr1);
                 return;
             }
             if(selected == null) return;
@@ -456,7 +457,7 @@ namespace <#= RlistPageViewModelNameSpace #> {
                     }
 #>
             INavigationResult nr2 = await _navigationService.NavigateAsync("<#= detailViewClassName #>", navigationParameters);
-            await OnNavigationResult(nr2);
+            OnNavigationResult(nr2);
         }
         #endregion
 <#
@@ -523,7 +524,7 @@ namespace <#= RlistPageViewModelNameSpace #> {
             if(<#= IsDestroyedPropertyName #>) return;
             if ((PermissionMask & 8) != 8) {
                 INavigationResult nr1 = await _navigationService.NavigateAsync("<#= AccessDeniedPageClassName #>");
-                await OnNavigationResult(nr1);
+                OnNavigationResult(nr1);
                 return;
             }
 
@@ -533,7 +534,7 @@ namespace <#= RlistPageViewModelNameSpace #> {
             }
             navigationParameters.Add("<#= EformModeEnumClassName #>", <#= EformModeEnumClassName #>.AddMode);
             INavigationResult nr2 = await _navigationService.NavigateAsync("<#= ReditPageClassName #>", navigationParameters);
-            await OnNavigationResult(nr2);
+            OnNavigationResult(nr2);
         }
         #endregion
         #region <#= TableMenuItemsCommandPropertyName #>
@@ -574,7 +575,7 @@ namespace <#= RlistPageViewModelNameSpace #> {
             if (selected == null) return;
             if ((PermissionMask & 4) != 4) {
                 INavigationResult nr1 = await _navigationService.NavigateAsync("<#= AccessDeniedPageClassName #>");
-                await OnNavigationResult(nr1);
+                OnNavigationResult(nr1);
                 return;
             }
 
@@ -591,7 +592,7 @@ namespace <#= RlistPageViewModelNameSpace #> {
             }
 #>
             INavigationResult nr2 = await _navigationService.NavigateAsync("<#= ReditPageClassName #>", navigationParameters);
-            await OnNavigationResult(nr2);
+            OnNavigationResult(nr2);
         }
         #endregion
         #region <#= SformDelItemCommandPropertyName #>
@@ -600,7 +601,7 @@ namespace <#= RlistPageViewModelNameSpace #> {
             if (selected == null) return;
             if((PermissionMask & 2) != 2) {
                 INavigationResult nr1 = await _navigationService.NavigateAsync("<#= AccessDeniedPageClassName #>");
-                await OnNavigationResult(nr1);
+                OnNavigationResult(nr1);
                 return;
             }
 
@@ -617,7 +618,7 @@ namespace <#= RlistPageViewModelNameSpace #> {
             }
 #>
             INavigationResult nr2 = await _navigationService.NavigateAsync("<#= ReditPageClassName #>", navigationParameters);
-            await OnNavigationResult(nr2);
+            OnNavigationResult(nr2);
         }
         #endregion
         #region <#= RowMenuItemsCommandPropertyName #>

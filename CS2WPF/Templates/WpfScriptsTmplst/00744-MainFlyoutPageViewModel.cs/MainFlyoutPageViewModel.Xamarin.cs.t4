@@ -19,6 +19,7 @@ using Prism.Services.Dialogs;
 using System.Windows.Input;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using Prism.Ioc;
 
 <#
 
@@ -66,13 +67,16 @@ namespace <#= MainFlyoutPageViewModelNameSpace #> {
     {
         protected <#= IAppGlblSettingsServiceClassName #> _<#= AppSettingServicePropertyName #>=null;
         protected INavigationService _navigationService;
-        private IDialogService _dialogService;
-        public <#= MainFlyoutPageViewModelClassName #>(<#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName #>, INavigationService navigationService, IDialogService dialogService) {
+        protected IDialogService _dialogService;
+        protected IContainerProvider _containerProvider;
+        public <#= MainFlyoutPageViewModelClassName #>(<#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName #>, INavigationService navigationService, IDialogService dialogService, IContainerProvider containerProvider) {
             _<#= AppSettingServicePropertyName #> = <#= AppSettingServicePropertyName #>;
             _<#= AppSettingServicePropertyName #>.<#= OnNavigateToNotificationPropertyName #> += <#= NavigateToMethodName #>;
             _<#= AppSettingServicePropertyName #>.<#= OnMessageNotificationPropertyName #> += <#= ShowErrorMethodName #>;
+            _<#= AppSettingServicePropertyName #>.OnUserChangedNotification += OnUserChangedNotification;
             _navigationService = navigationService;
             _dialogService = dialogService;
+            _containerProvider = containerProvider;
         }
 
         #region INotifyPropertyChanged
@@ -94,8 +98,11 @@ namespace <#= MainFlyoutPageViewModelNameSpace #> {
         }
         protected async void <#= NavigateCommandPropertyName #>Execute(string navPath)
         {
-            await _navigationService.GoBackToRootAsync();
-            await _navigationService.NavigateAsync(name: $"/<#= MainFlyoutPageClassName #>/NavigationPage/{navPath}");
+            INavigationService ns = _navigationService;
+            if(ns != null) {
+                await _navigationService.GoBackToRootAsync();
+                await _navigationService.NavigateAsync(name: $"/<#= MainFlyoutPageClassName #>/NavigationPage/{navPath}");
+            }
         }
         protected bool <#= NavigateCommandPropertyName #>CanExecute(string navPath)
         {
@@ -130,6 +137,7 @@ namespace <#= MainFlyoutPageViewModelNameSpace #> {
             if( _<#= AppSettingServicePropertyName #> != null ) {
                 _<#= AppSettingServicePropertyName #>.<#= OnNavigateToNotificationPropertyName #> -= <#= NavigateToMethodName #>;
                 _<#= AppSettingServicePropertyName #>.<#= OnMessageNotificationPropertyName #> -= <#= ShowErrorMethodName #>;
+                _<#= AppSettingServicePropertyName #>.OnUserChangedNotification -= OnUserChangedNotification;
             }
             _<#= AppSettingServicePropertyName #> = null;
             _navigationService = null;
@@ -139,10 +147,13 @@ namespace <#= MainFlyoutPageViewModelNameSpace #> {
 
         private async void <#= NavigateToMethodName #>(object sender, string navPath)
         {
-            await MainThread.InvokeOnMainThreadAsync(async () => {
-                await _navigationService.GoBackToRootAsync();
-                await _navigationService.NavigateAsync(name: $"/<#= MainFlyoutPageClassName #>/NavigationPage/{navPath}");
-            });
+            INavigationService ns = _navigationService;
+            if(ns != null) {
+                await MainThread.InvokeOnMainThreadAsync(async () => {
+                    await ns.GoBackToRootAsync();
+                    await ns.NavigateAsync(name: $"/<#= MainFlyoutPageClassName #>/NavigationPage/{navPath}");
+                });
+            }
         }
         private void <#= ShowErrorMethodName #>(object sender, string errorMessage)
         {
@@ -157,6 +168,30 @@ namespace <#= MainFlyoutPageViewModelNameSpace #> {
                 parameters.Add("<#= DelayFromMillisecondsPropertyName #>", 4000);
                 if(_dialogService != null) _dialogService.ShowDialog("MessageDlg", parameters, (r) => { gss.DelayActivated = false; });
             });
+        }
+        private async void OnUserChangedNotification(object sender, string uname)
+        {
+            
+            /* Uncomment to turn ON Authorization
+            if (string.IsNullOrEmpty(uname))
+            {
+                (sender as IAppGlblSettingsService).Permissions = (sender as IAppGlblSettingsService).GetEmptyPermissions();
+                (sender as IAppGlblSettingsService).NavigateTo("HomePage");
+                return;
+            }
+            else
+            {
+                IAspnetusermaskViewServicePermission ServicePermission = _containerProvider.Resolve<IAspnetusermaskViewServicePermission>();
+                await MainThread.InvokeOnMainThreadAsync(async () => 
+                {
+                    IaspnetusermaskViewPage rslt = await ServicePermission.getcurrusermasks();
+                    (sender as IAppGlblSettingsService).Permissions = ServicePermission.src2array(rslt);
+                    (sender as IAppGlblSettingsService).NavigateTo("HomePage");
+                });
+                return;
+            }
+             */
+            (sender as IAppGlblSettingsService).NavigateTo("HomePage");
         }
     }
 }

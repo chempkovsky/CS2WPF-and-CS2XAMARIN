@@ -818,7 +818,12 @@ namespace <#= O2mMaskViewModelNameSpace #> {
             INavigationParameters prms = navigationContext.Parameters;
             PermissionMask = <#= AppSettingServicePropertyName #>.GetViewModelMask("<#= Model.ViewName #>");
             if ((PermissionMask & 1) != 1) {
-                if(navigationContext.NavigationService.Journal.CanGoBack) {
+                if (navigationContext.NavigationService.Journal.CurrentEntry.Uri.OriginalString == "<#= AccessDeniedUserControlClassName #>")
+                {
+                    navigationContext.NavigationService.RequestNavigate(new Uri("<#= AccessDeniedUserControlClassName #>", UriKind.Relative), OnNavigationResult);
+                    return;
+                }
+                else if(navigationContext.NavigationService.Journal.CanGoBack) {
                     // it should be intercepted by prev item in navigation chain
                     throw new Exception("Access Denied to navigate <#= Model.ViewName #>");
                 } else {

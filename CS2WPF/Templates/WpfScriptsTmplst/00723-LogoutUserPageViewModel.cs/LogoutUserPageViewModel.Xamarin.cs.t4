@@ -160,9 +160,12 @@ namespace <#= LogoutUserPageViewModelNameSpace #> {
             if (!model) return;
             if(_<#= AppSettingServicePropertyName #> != null) {
                 _<#= AppSettingServicePropertyName #>.AuthInfo = null;
-                _<#= AppSettingServicePropertyName #>.UserName = null;
                 _<#= AppSettingServicePropertyName #>.Client.DefaultRequestHeaders.Authorization = null;
-                _<#= AppSettingServicePropertyName #>.<#= NavigateToMethodName #>("<#= HomePageClassName #>");
+                // this line must be the last. It activates notification
+                _<#= AppSettingServicePropertyName #>.UserName = null;
+
+                // this line was used at development time
+                // _<#= AppSettingServicePropertyName #>.<#= NavigateToMethodName #>("<#= HomePageClassName #>");
             }
         }
         protected bool <#= OkCommandPropertyName #>CanExecute(object param)

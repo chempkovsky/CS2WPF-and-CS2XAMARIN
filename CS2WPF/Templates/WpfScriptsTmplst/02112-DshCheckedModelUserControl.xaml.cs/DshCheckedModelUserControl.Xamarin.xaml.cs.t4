@@ -236,6 +236,12 @@ namespace <#= DshCheckedModelUserControlNameSpace #> {
             RemoveBinding(<#= PermissionVectorPropertyName #>Property);
         }
 
+        private void CheckBox_CheckedChanged(object sender, CheckedChangedEventArgs e)
+        {
+            <#= IPermissionVectorInterfaceClassName #> pvi = (this.BindingContext as <#= IPermissionVectorInterfaceClassName #>);
+            if(pvi != null) pvi.PermissionChangedCommand.Execute((sender as CheckBox).BindingContext);
+        }
+
     }
 }
 

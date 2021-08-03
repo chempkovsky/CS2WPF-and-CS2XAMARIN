@@ -400,7 +400,7 @@ namespace <#= O2mPageViewModelNameSpace #> {
         }
         #endregion
 
-        protected async Task OnNavigationResult(INavigationResult navResult) {
+        protected void OnNavigationResult(INavigationResult navResult) {
             if(<#= IsDestroyedPropertyName #>) return;
             if (navResult.Success) return;
             string navErrorMsg = "Unknown Navigation Error";
@@ -414,8 +414,10 @@ namespace <#= O2mPageViewModelNameSpace #> {
                     inner = inner.InnerException;
                 }
             }
-            await _navigationService.NavigateAsync("<#= PageNotFoundPageClassName #>");
+            // await _navigationService.NavigateAsync("<#= PageNotFoundPageClassName #>");
+            <#= AppSettingServicePropertyName #>.NavigateTo("<#= PageNotFoundPageClassName #>");
             <#= AppSettingServicePropertyName #>.ShowErrorMessage("Navigation Exception", navErrorMsg);
+
         }
         #region <#= CanAddPropertyName #>
         protected bool _<#= CanAddPropertyName #> = false;
