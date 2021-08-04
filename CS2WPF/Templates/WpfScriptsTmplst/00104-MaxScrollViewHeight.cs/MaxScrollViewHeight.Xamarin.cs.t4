@@ -51,7 +51,9 @@ namespace <#= MaxScrollViewHeightNameSpace #> {
             {
                 ScrollView sw = obj as ScrollView;
                 if(nv != -1) {
+                    sw.PropertyChanged -= PropertyChangedEventHandler; // this is correct
                     sw.PropertyChanged += PropertyChangedEventHandler;
+                    UpdateScrollViewSetting(sw);
                 }
                 else
                 {
