@@ -28,6 +28,10 @@ using Prism.Ioc;
     string IAppGlblSettingsServiceClassName         = GetModelClassName(Model, IAppGlblSettingsServiceFolder);
     string IAppGlblSettingsServiceNameSpace         = GetModelNameSpace(Model, IAppGlblSettingsServiceFolder);
 
+    string PageNotFoundPageFolder                   = "00685-PageNotFoundPage.xaml.cs";
+    string PageNotFoundPageClassName                = GetModelClassName(Model, PageNotFoundPageFolder);
+    string PageNotFoundPageNameSpace                = GetModelNameSpace(Model, PageNotFoundPageFolder);
+
     string MainFlyoutPageFolder     = "00740-MainFlyoutPage.xaml.cs";
     string MainFlyoutPageClassName  = GetModelClassName(Model, MainFlyoutPageFolder);
     string MainFlyoutPageNameSpace  = GetModelNameSpace(Model, MainFlyoutPageFolder);
@@ -99,9 +103,17 @@ namespace <#= MainFlyoutPageViewModelNameSpace #> {
         protected async void <#= NavigateCommandPropertyName #>Execute(string navPath)
         {
             INavigationService ns = _navigationService;
-            if(ns != null) {
-                await _navigationService.GoBackToRootAsync();
-                await _navigationService.NavigateAsync(name: $"/<#= MainFlyoutPageClassName #>/NavigationPage/{navPath}");
+            IAppGlblSettingsService gss = _GlblSettingsSrv;
+            if (ns != null)  {
+                await ns.GoBackToRootAsync();
+                INavigationResult nrslt = await ns.NavigateAsync(name: $"/<#= MainFlyoutPageClassName #>/NavigationPage/{navPath}");
+                if (!nrslt.Success)
+                {
+                    string msg = "Navigation Error";
+                    if (nrslt.Exception != null) msg = ": " + nrslt.Exception.Message;
+                    await ns.NavigateAsync(name: $"/<#= MainFlyoutPageClassName #>/NavigationPage/<#= PageNotFoundPageClassName #>");
+                    if (gss != null) gss.ShowErrorMessage("Navigation Error", msg);
+                }
             }
         }
         protected bool <#= NavigateCommandPropertyName #>CanExecute(string navPath)
@@ -148,10 +160,18 @@ namespace <#= MainFlyoutPageViewModelNameSpace #> {
         private async void <#= NavigateToMethodName #>(object sender, string navPath)
         {
             INavigationService ns = _navigationService;
-            if(ns != null) {
+            IAppGlblSettingsService gss = _GlblSettingsSrv;
+            if (ns != null) {
                 await MainThread.InvokeOnMainThreadAsync(async () => {
                     await ns.GoBackToRootAsync();
-                    await ns.NavigateAsync(name: $"/<#= MainFlyoutPageClassName #>/NavigationPage/{navPath}");
+                    INavigationResult nrslt = await ns.NavigateAsync(name: $"/<#= MainFlyoutPageClassName #>/NavigationPage/{navPath}");
+                    if (!nrslt.Success)
+                    {
+                        string msg = "Navigation Error";
+                        if (nrslt.Exception != null) msg = ": " + nrslt.Exception.Message;
+                        await ns.NavigateAsync(name: $"/<#= MainFlyoutPageClassName #>/NavigationPage/<#= PageNotFoundPageClassName #>");
+                        if (gss != null) gss.ShowErrorMessage("Navigation Error", msg);
+                    }
                 });
             }
         }
@@ -172,7 +192,7 @@ namespace <#= MainFlyoutPageViewModelNameSpace #> {
         private async void OnUserChangedNotification(object sender, string uname)
         {
             
-            /* Uncomment to turn ON Authorization
+            /* Uncomment to turn ON Authorization 
             if (string.IsNullOrEmpty(uname))
             {
                 (sender as IAppGlblSettingsService).Permissions = (sender as IAppGlblSettingsService).GetEmptyPermissions();
@@ -190,7 +210,7 @@ namespace <#= MainFlyoutPageViewModelNameSpace #> {
                 });
                 return;
             }
-             */
+            */ 
             (sender as IAppGlblSettingsService).NavigateTo("HomePage");
         }
     }
