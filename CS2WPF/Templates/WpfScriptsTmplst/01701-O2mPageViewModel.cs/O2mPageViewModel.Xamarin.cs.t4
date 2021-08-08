@@ -148,6 +148,7 @@ using Prism.Navigation;
     string ExpandedGridHeightMethodName             = "ExpandedGridHeight";
     string ExpandedFilterHeightMethodName           = "ExpandedFilterHeight";
     string IsDestroyedPropertyName                  = "IsDestroyed";
+    string IsSwitchingPropertyName                  = "IsSwitching";
 
 
     List<string> detailViews = GetDetailViews(Model, Context, null);
@@ -304,6 +305,11 @@ namespace <#= O2mPageViewModelNameSpace #> {
         #endregion
 
         protected int PermissionMask = 0; 
+
+        public bool <#= IsSwitchingPropertyName #>
+        {
+            get { return !<#= IsParentLoadedPropertyName #>; }
+        }
 
         #region <#= IsParentLoadedPropertyName #>
         bool _<#= IsParentLoadedPropertyName #> = false;
@@ -590,7 +596,7 @@ namespace <#= O2mPageViewModelNameSpace #> {
        public void OnNavigatedFrom(INavigationParameters prms) {
             
        }
-       public void OnNavigatedTo(INavigationParameters prms) {
+       public async void OnNavigatedTo(INavigationParameters prms) {
             if(<#= IsDestroyedPropertyName #>) return;
             PermissionMask = <#= AppSettingServicePropertyName #>.GetViewModelMask("<#= Model.ViewName #>");
             if ((PermissionMask & 1) != 1) {
@@ -635,6 +641,11 @@ namespace <#= O2mPageViewModelNameSpace #> {
             } 
             if (resetHF) { <#= HiddenFiltersPropertyName #> = hf; }
             <#= IsParentLoadedPropertyName #> = true;
+            await Device.InvokeOnMainThreadAsync(async () =>
+            {
+                await Task.Delay(1);
+                OnPropertyChanged("<#= IsSwitchingPropertyName #>");
+            });
         }
         #endregion
 

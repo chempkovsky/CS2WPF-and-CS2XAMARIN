@@ -103,6 +103,7 @@
     string ParentIsPermissionEditablePropertyName       = "ParentIsPermissionEditable";
     string ParentPermissionVectorPropertyName           = "ParentPermissionVector";
     string IsDestroyedPropertyName                      = "IsDestroyed";
+    string IsSwitchingPropertyName                      = "IsSwitching";
 
     string MaskSuffixPropertyName                   = "mask";
     string MaskEntityName                           = Model.RootEntityClassName + MaskSuffixPropertyName;
@@ -211,6 +212,12 @@
              x:Name="o2mMaskRootControl"
              >
     <StackLayout>
+        <ActivityIndicator 
+                IsVisible="{Binding BindingContext.<#= IsSwitchingPropertyName #>, Mode=OneWay, Source={x:Reference o2mMaskRootControl}}"
+                IsRunning="{Binding BindingContext.<#= IsSwitchingPropertyName #>, Mode=OneWay, Source={x:Reference o2mMaskRootControl}}"/>
+        <!-- <ProgressBar 
+                         Progress="0.75"
+                         IsVisible="{Binding BindingContext.<#= IsSwitchingPropertyName #>, Mode=OneWay, Source={x:Reference o2mMaskRootControl}}"/>-->
 
 <#
     if(IsInTheSameModule) {

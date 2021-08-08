@@ -94,6 +94,7 @@
     string NavigationBackCommandPropertyName        = "NavigationBackCommand";
     string OnNavigationBackCommandPropertyName      = "OnNavigationBackCommand";
     string IsDestroyedPropertyName                  = "IsDestroyed";
+    string IsSwitchingPropertyName                  = "IsSwitching";
 
     string proxyPrefix = "clr-namespace:" + ProxyUserControlNameSpace;
     if(ProxyUserControlProject != O2mUserControlProject) {
@@ -163,6 +164,13 @@
              x:Name="o2mUsrCntrlRootNode"
              >
     <StackLayout>
+        <ActivityIndicator 
+                IsVisible="{Binding BindingContext.<#= IsSwitchingPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}"
+                IsRunning="{Binding BindingContext.<#= IsSwitchingPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}"/>
+        <!-- <ProgressBar 
+                         Progress="0.75"
+                         IsVisible="{Binding BindingContext.<#= IsSwitchingPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}"/>-->
+
 <#
     {
         int id = -1;

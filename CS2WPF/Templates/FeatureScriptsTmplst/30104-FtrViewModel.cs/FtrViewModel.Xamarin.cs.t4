@@ -83,6 +83,7 @@ using System.Threading.Tasks;
     string ExpandedGridHeightMethodName             = "ExpandedGridHeight";
     string ExpandedFilterHeightMethodName           = "ExpandedFilterHeight";
     string IsDestroyedPropertyName                  = "IsDestroyed";
+    string IsSwitchingPropertyName                  = "IsSwitching";
 
     List<string> nmSpaces = new List<string>();
     if ((FtrViewModelNameSpace != IWebServiceFilterMenuInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterMenuInterfaceNameSpace) < 0)) 
@@ -276,6 +277,20 @@ namespace <#= FtrViewModelNameSpace #> {
             }
         }
         #endregion
+        
+
+        protected bool _<#= IsSwitchingPropertyName #> = false;
+        public bool <#= IsSwitchingPropertyName #>
+        {
+            get { return _<#= IsSwitchingPropertyName #>; }
+            set {
+                if (_<#= IsSwitchingPropertyName #> != value)
+                {
+                    _<#= IsSwitchingPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
         public bool <#= FlexOnPropertyName #> 
         {
@@ -391,10 +406,16 @@ namespace <#= FtrViewModelNameSpace #> {
             }
         }
 
-        protected void <#= OnContainerMenuItemsCommandPropertyName #>Action(object prm) {
+        protected async void <#= OnContainerMenuItemsCommandPropertyName #>Action(object prm) {
             if(<#= IsDestroyedPropertyName #>) return;
             <#= IWebServiceFilterMenuInterfaceClassName #> mi = prm as <#= IWebServiceFilterMenuInterfaceClassName #>;
             if (mi == null) return;
+            await Device.InvokeOnMainThreadAsync(async () =>
+            {
+                <#= IsSwitchingPropertyName #> = true;
+                await Task.Delay(1);
+            });
+
             string modelName = mi.Data as string;
             if (string.IsNullOrEmpty(modelName)) return;
             bool IsAllCollapsed = <#= FlexOnPropertyName #>;
@@ -470,7 +491,14 @@ namespace <#= FtrViewModelNameSpace #> {
                         break;
                 }
             }
-            OnPropertyChanged("<#= FlexOnPropertyName #>");
+            await Device.InvokeOnMainThreadAsync(async () =>
+            {
+                OnPropertyChanged("<#= FlexOnPropertyName #>");
+
+                await Task.Delay(1);
+                <#= IsSwitchingPropertyName #> = false;
+            });
+
         } 
         protected bool <#= OnContainerMenuItemsCommandPropertyName #>CanExecute(object prm) {
             return true;

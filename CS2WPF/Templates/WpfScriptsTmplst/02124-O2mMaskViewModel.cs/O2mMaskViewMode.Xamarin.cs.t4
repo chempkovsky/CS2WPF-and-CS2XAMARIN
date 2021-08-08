@@ -171,6 +171,7 @@ using Xamarin.Essentials;
     string GetWithFilterMethodName                      = "getwithfilter";
     string IsDestroyedPropertyName                      = "IsDestroyed";
     string OnDestroyPropertyName                        = "OnDestroy";
+    string IsSwitchingPropertyName                      = "IsSwitching";
 
     string MaskSuffixPropertyName                   = "mask";
     string MaskEntityName                           = Model.RootEntityClassName + MaskSuffixPropertyName;
@@ -421,6 +422,11 @@ namespace <#= O2mMaskViewModelNameSpace #> {
             }
         }
         #endregion
+
+        public bool <#= IsSwitchingPropertyName #>
+        {
+            get { return !<#= IsParentLoadedPropertyName #>; }
+        }
 
         #region <#= IsParentLoadedPropertyName #>
         bool _<#= IsParentLoadedPropertyName #> = false;
@@ -813,7 +819,7 @@ namespace <#= O2mMaskViewModelNameSpace #> {
        public void OnNavigatedFrom(INavigationContext navigationContext) {
             <#= CurrentNavigationContextPropertyName #> = null;
        }
-       public void OnNavigatedTo(INavigationContext navigationContext) {
+       public async void OnNavigatedTo(INavigationContext navigationContext) {
             if(<#= IsDestroyedPropertyName #>) return;
             INavigationParameters prms = navigationContext.Parameters;
             PermissionMask = <#= AppSettingServicePropertyName #>.GetViewModelMask("<#= Model.ViewName #>");
@@ -876,6 +882,11 @@ namespace <#= O2mMaskViewModelNameSpace #> {
                 if (resetHF) { <#= HiddenFiltersPropertyName #> = hf; }
             }
             <#= IsParentLoadedPropertyName #> = true;
+            await Device.InvokeOnMainThreadAsync(async () =>
+            {
+                await Task.Delay(1);
+                OnPropertyChanged("<#= IsSwitchingPropertyName #>");
+            });
         }
         #endregion
         #region <#= ShowBackBtnPropertyName #>

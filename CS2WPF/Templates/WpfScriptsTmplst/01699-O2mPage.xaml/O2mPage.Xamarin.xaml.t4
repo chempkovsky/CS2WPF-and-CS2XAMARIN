@@ -83,7 +83,9 @@
     string TemplateViewSuffixPropertyName           = "TemplateView"; 
 
     string IsParentLoadedPropertyName               = "IsParentLoaded";
-    string IsDestroyedPropertyName = "IsDestroyed";
+    string IsDestroyedPropertyName                  = "IsDestroyed";
+    string IsSwitchingPropertyName                  = "IsSwitching";
+
 
     string proxyPrefix = "clr-namespace:" + ProxyUserControlNameSpace;
     if(ProxyUserControlProject != O2mPageProject) {
@@ -151,6 +153,13 @@
              >
   <ScrollView Orientation="Vertical" VerticalOptions="StartAndExpand">
     <StackLayout>
+        <ActivityIndicator 
+                IsVisible="{Binding BindingContext.<#= IsSwitchingPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}"
+                IsRunning="{Binding BindingContext.<#= IsSwitchingPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}"/>
+        <!-- <ProgressBar 
+                         Progress="0.75"
+                         IsVisible="{Binding BindingContext.<#= IsSwitchingPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}"/>-->
+
 <#
     {
         int id = -1;

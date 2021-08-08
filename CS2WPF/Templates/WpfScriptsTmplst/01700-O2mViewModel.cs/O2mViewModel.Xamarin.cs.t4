@@ -151,6 +151,7 @@ using Prism.Navigation;
     string IsDestroyedPropertyName                  = "IsDestroyed";
     string OnDestroyedPropertyName                  = "OnDestroyed";
     string OnDestroyPropertyName                    = "OnDestroy";
+    string IsSwitchingPropertyName                  = "IsSwitching";
 
     List<string> detailViews = GetDetailViews(Model, Context, null);
     List<ModelViewPropertyOfVwSerializable> primKeys = GetModelPrimaryKeyProps(Model);
@@ -339,6 +340,10 @@ namespace <#= O2mViewModelNameSpace #> {
             }
         }
 
+        public bool <#= IsSwitchingPropertyName #>
+        {
+            get { return !<#= IsParentLoadedPropertyName #>; }
+        }
 
         #region <#= IsParentLoadedPropertyName #>
         bool _<#= IsParentLoadedPropertyName #> = false;
@@ -534,7 +539,7 @@ namespace <#= O2mViewModelNameSpace #> {
        public void OnNavigatedFrom(INavigationContext navigationContext) {
             <#= CurrentNavigationContextPropertyName #> = null;
        }
-       public void OnNavigatedTo(INavigationContext navigationContext) {
+       public async void OnNavigatedTo(INavigationContext navigationContext) {
             if(<#= IsDestroyedPropertyName #>) return;
             INavigationParameters prms = navigationContext.Parameters;
             PermissionMask = <#= AppSettingServicePropertyName #>.GetViewModelMask("<#= Model.ViewName #>");
@@ -597,6 +602,11 @@ namespace <#= O2mViewModelNameSpace #> {
                 if (resetHF) { <#= HiddenFiltersPropertyName #> = hf; }
             }
             <#= IsParentLoadedPropertyName #> = true;
+            await Device.InvokeOnMainThreadAsync(async () =>
+            {
+                await Task.Delay(1);
+                OnPropertyChanged("<#= IsSwitchingPropertyName #>");
+            });
         }
         #endregion
         #region <#= ShowBackBtnPropertyName #>
