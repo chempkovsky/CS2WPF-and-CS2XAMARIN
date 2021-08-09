@@ -215,7 +215,7 @@ namespace <#= FtrViewModelNameSpace #> {
         #endregion
         #region OnLoaded
         protected bool <#= IsOnLoadedCalledPropertyName #> = false;
-        private void OnLoaded()
+        private async void OnLoaded()
         {
             if(<#= IsDestroyedPropertyName #>) return;
             if (!<#= IsOnLoadedCalledPropertyName #>)
@@ -246,22 +246,30 @@ namespace <#= FtrViewModelNameSpace #> {
                 //suc.ScopedRegionManager = _regionManager.Regions["<#= modelClassName #><#= FtrUserControlClassName #>"].Add(suc, null, true);
                 //suc.RequestNavigateSource = "<#= modelClassName #>";
                 //_regionManager.Regions["<#= modelClassName #><#= FtrUserControlClassName #>"].Activate(suc);
-                _regionManager.RequestNavigate("<#= modelClassName #><#= FtrUserControlClassName #>", "<#= modelClassName #>", OnNavigationResult);
+                await Device.InvokeOnMainThreadAsync(async () =>
+                {
+                    _regionManager.RequestNavigate("<#= modelClassName #><#= FtrUserControlClassName #>", "<#= modelClassName #>", OnNavigationResult);
+                    IsSwitching = true;
+                    await Task.Delay(1);
+                    IsSwitching = false;
+                });
 <#
             } else {
 #>
                 if ((_<#= AppSettingServicePropertyName #>.GetViewModelMask("<#= modelViewSerializable.ViewName #>") & 1) == 1) {
-                    uc = _containerProvider.Resolve<ContentView>("<#= modelClassName #>");
-                    rm = _regionManager.Regions["<#= modelClassName #><#= FtrUserControlClassName #>"].Add(uc, null, true);
-                    _regionManager.Regions["<#= modelClassName #><#= FtrUserControlClassName #>"].Activate(uc);
-                    <#= INotifiedByParentInterfaceClassName #> nbp = uc as <#= INotifiedByParentInterfaceClassName #>;
-                    if(nbp != null) {
-                        Task.Run(()=>
-                            MainThread.BeginInvokeOnMainThread(() =>
-                            {
+                    await Device.InvokeOnMainThreadAsync(async () =>
+                    {
+                        uc = _containerProvider.Resolve<ContentView>("<#= modelClassName #>");
+                        rm = _regionManager.Regions["<#= modelClassName #><#= FtrUserControlClassName #>"].Add(uc, null, true);
+                        _regionManager.Regions["<#= modelClassName #><#= FtrUserControlClassName #>"].Activate(uc);
+                        <#= INotifiedByParentInterfaceClassName #> nbp = uc as <#= INotifiedByParentInterfaceClassName #>;
+                        if(nbp != null) {
                                 nbp.<#= IsParentLoadedPropertyName #> = true;
-                            }));
-                    }
+                        }
+                        IsSwitching = true;
+                        await Task.Delay(1);
+                        IsSwitching = false;
+                    });
                 } else {
                     _regionManager.RequestNavigate("<#= modelClassName #><#= FtrUserControlClassName #>", "<#= AccessDeniedUserControlClassName #>", OnNavigationResult);
                     //suc = _containerProvider.Resolve<IScopedRegionNavigationUserControlInterface>();
