@@ -13,40 +13,37 @@
 <#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
 <#
+    string entityUpdFolder              = "01142-EntityUpd.php";
+    string entityUpdNameSpace           = GetDoctrineModelNameSpace(Model, entityUpdFolder);
 
-    string entityFolder             = "01140-Entity.php";
-    string entityNameSpace          = GetDoctrineModelNameSpace(Model, entityFolder);
-
-    string DoctrineEntityClassName  = GetDoctrineEntityClassName(Model);
-    string DoctrineEntityTableName  = GetDoctrineEntityTableName(Model); 
-
-
+    string DoctrineEntityUpdClassName   = GetDoctrineEntityUpdClassName(Model);
+    string DoctrineEntityTableName      = GetDoctrineEntityTableName(Model); 
 #>
 <?php
-namespace <#= entityNameSpace #>;
+namespace <#= entityUpdNameSpace #>;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * <#= DoctrineEntityClassName #>
+ * <#= DoctrineEntityUpdClassName #>
  *
  * @ORM\Table(name="<#= DoctrineEntityTableName #>")
  * @ORM\Entity
  */
-class <#= DoctrineEntityClassName #>
+class <#= DoctrineEntityUpdClassName #>
 {
 
 <#
         foreach (ModelViewKeyPropertySerializable prop in Model.AllProperties) {
+            ModelViewPropertyOfVwSerializable scalarProp = GetScalarProperty(prop, Model);
+            if(scalarProp == null) continue;
             string isnullableStr = prop.IsRequired ? "nullable=false" : "nullable=true";
             string isnullableVar = prop.IsRequired ? "" : "|null";
-            
-
             bool isId = GetDoctrineEntityFieldIsId(prop, Model);
-            string maxLen = GetMaxLenEx(prop, Model);
+            string maxLen = GetMaxLen(scalarProp, Model);
             if (string.IsNullOrEmpty(maxLen)) maxLen = ""; else maxLen = ", length=" + maxLen;
-            string optionsFixed = GetDoctrineEntityFieldIsGuid(prop, Model) ? ", options={\"fixed\"=true}" : "";
+            string optionsFixed = GetDoctrineEntityFieldViewIsGuid(scalarProp, Model) ? ", options={\"fixed\"=true}" : "";
 #>
     /**
      * @var <#= GetDoctrineEntityFieldPhpType(prop, Model) + isnullableVar #>
@@ -69,71 +66,27 @@ class <#= DoctrineEntityClassName #>
             }
 #>
      */
-    private $<#= GetDoctrineEntityFieldName(prop) #>;
-
+    private $<#= GetDoctrineEntityViewFieldName(scalarProp) #>;
+    
 <#
-        }
-        if (Model.ForeignKeys != null) {
-            foreach (ModelViewForeignKeySerializable foreignKey in Model.ForeignKeys) {
-                string nullableStr =  "nullable=false";
-                if(foreignKey.NavigationType == NavigationTypeEnum.OptionalToMany) nullableStr = "nullable=true";
-#>
-    /**
-     * @var <#= GetDoctrineEntityClassNameForStr(foreignKey.NavigationEntityName) #>
-     *
-     * @ORM\ManyToOne(targetEntity="<#= GetDoctrineEntityClassNameForStr(foreignKey.NavigationEntityName) #>")
-     * @ORM\JoinColumns({
-<#
-            int fkcnt = foreignKey.PrincipalKeyProps.Count;
-            for(int i = 0; i < fkcnt; i++) {
-                if (i < (fkcnt - 1)) {
-#>
-     *   @ORM\JoinColumn(name="<#= foreignKey.ForeignKeyProps[i].OriginalPropertyName #>", referencedColumnName="<#= foreignKey.PrincipalKeyProps[i].OriginalPropertyName #>", <#= nullableStr #>),
-<#
-                } else {
-#>
-     *   @ORM\JoinColumn(name="<#= foreignKey.ForeignKeyProps[i].OriginalPropertyName #>", referencedColumnName="<#= foreignKey.PrincipalKeyProps[i].OriginalPropertyName #>", <#= nullableStr #>)
-<#
-                }
-            }
-#>
-     * })
-     */
-    private $<#= GetDoctrineEntityFieldNameForStr(foreignKey.NavigationName) #>;
-
-<#
-            }
         }
         foreach (ModelViewKeyPropertySerializable prop in Model.AllProperties) {
+            ModelViewPropertyOfVwSerializable scalarProp = GetScalarProperty(prop, Model);
+            if(scalarProp == null) continue;
 #>
 
-    public function <#= GetDoctrineEntityGetMethodName(prop) #>(): ?<#= GetDoctrineEntityGetSetPhpType(prop, Model) #>
+    public function <#= GetDoctrineEntityViewGetMethodName(scalarProp) #>(): ?<#= GetDoctrineEntityViewGetSetPhpType(scalarProp, Model) #>
     {
-        return $this-><#= GetDoctrineEntityFieldName(prop) #>;
+        return $this-><#= GetDoctrineEntityViewFieldName(scalarProp) #>;
     }
-    public function <#= GetDoctrineEntitySetMethodName(prop) #>(<#= GetDoctrineEntityGetSetPhpType(prop, Model) #> $<#= GetDoctrineEntityFieldName(prop) #>): self
+    public function <#= GetDoctrineEntityViewSetMethodName(scalarProp) #>(<#= GetDoctrineEntityViewGetSetPhpType(scalarProp, Model) #> $<#= GetDoctrineEntityViewFieldName(scalarProp) #>): self
     {
-        $this-><#= GetDoctrineEntityFieldName(prop) #> = $<#= GetDoctrineEntityFieldName(prop) #>;
+        $this-><#= GetDoctrineEntityViewFieldName(scalarProp) #> = $<#= GetDoctrineEntityViewFieldName(scalarProp) #>;
         return $this;
     }
 <#
         }
-        if (Model.ForeignKeys != null) {
-            foreach (ModelViewForeignKeySerializable foreignKey in Model.ForeignKeys) {
-#>
 
-    public function <#= GetDoctrineEntityGetMethodNameForStr(foreignKey.NavigationName) #>(): ?<#= GetDoctrineEntityClassNameForStr(foreignKey.NavigationEntityName) #>
-    {
-        return $this-><#= GetDoctrineEntityFieldNameForStr(foreignKey.NavigationName) #>;
-    }
-    public function <#= GetDoctrineEntitySetMethodNameForStr(foreignKey.NavigationName) #>(?<#= GetDoctrineEntityClassNameForStr(foreignKey.NavigationEntityName) #> $<#= GetDoctrineEntityFieldNameForStr(foreignKey.NavigationName) #>): self
-    {
-        $this-><#= GetDoctrineEntityFieldNameForStr(foreignKey.NavigationName) #> = $<#= GetDoctrineEntityFieldNameForStr(foreignKey.NavigationName) #>;
-        return $this;
-    }
-<#
-            }
-        }
 #>                
 
 }
@@ -173,7 +126,6 @@ class <#= DoctrineEntityClassName #>
         }
         return defaultNameSpace + delim + filePath;
     }
-
     string GetModelClassName(ModelViewSerializable model, string fileType) {
         string result="";
         if ((model == null) || string.IsNullOrEmpty(fileType)) {
@@ -315,7 +267,7 @@ class <#= DoctrineEntityClassName #>
         return "";
     }
     string GetMaxLenEx(ModelViewKeyPropertySerializable prop, ModelViewSerializable model) {
-        if ((prop == null) || (model == null)) return null;
+        if ((prop == null) || (model == null)) return "";
         ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => (p.OriginalPropertyName == prop.OriginalPropertyName) && string.IsNullOrEmpty(p.ForeignKeyName)).FirstOrDefault();
         return GetMaxLen(sclrProp, model);
     }
@@ -419,6 +371,15 @@ class <#= DoctrineEntityClassName #>
         
         if (model == null) return "";
         return GetDoctrineEntityClassNameForStr(model.RootEntityClassName);
+    }
+    string GetDoctrineEntityUpdClassNameForStr(string RootEntityClassName) {
+        if (string.IsNullOrEmpty(RootEntityClassName)) return "";
+        return RootEntityClassName + "EntityUpd";
+    }
+    string GetDoctrineEntityUpdClassName(ModelViewSerializable model) {
+        
+        if (model == null) return "";
+        return GetDoctrineEntityUpdClassNameForStr(model.RootEntityClassName);
     }
     string GetDoctrineEntityTableName(ModelViewSerializable model) { 
         string rslt = "";
