@@ -233,9 +233,9 @@ namespace <#= modelServiceNameSpace #> {
             }
 #>
                             if(prms == null)
-                                prms = "?" + Uri.EscapeDataString("<#= GetModelPropertyName(prop, Model) #>") + "=" + Uri.EscapeDataString(val.ToString());
+                                prms = "?" + Uri.EscapeDataString("<#= GetFilterPropertyName(prop, Model) #>") + "=" + Uri.EscapeDataString(val.ToString());
                             else 
-                                prms += "&" + Uri.EscapeDataString("<#= GetModelPropertyName(prop, Model) #>") + "=" + Uri.EscapeDataString(val.ToString());
+                                prms += "&" + Uri.EscapeDataString("<#= GetFilterPropertyName(prop, Model) #>") + "=" + Uri.EscapeDataString(val.ToString());
 <#          if(prop.IsNullable) { 
 #>
                         } 
@@ -248,9 +248,9 @@ namespace <#= modelServiceNameSpace #> {
 #>
                     if(hasNull) {
                             if(prms == null)
-                                prms = "?" + Uri.EscapeDataString("<#= GetModelPropertyName(prop, Model) #>") + "=" ;
+                                prms = "?" + Uri.EscapeDataString("<#= GetFilterPropertyName(prop, Model) #>") + "=" ;
                             else 
-                                prms += "&" + Uri.EscapeDataString("<#= GetModelPropertyName(prop, Model) #>") + "=";
+                                prms += "&" + Uri.EscapeDataString("<#= GetFilterPropertyName(prop, Model) #>") + "=";
                     }
 <#
             }
@@ -350,9 +350,9 @@ namespace <#= modelServiceNameSpace #> {
             }
 #>
                 if(prms == null)
-                    prms = "?" + Uri.EscapeDataString("<#= GetModelPropertyName(prop, Model) #>") + "=" +  Uri.EscapeDataString(<#= GetModelPropertyName(prop, Model) #>.ToString());
+                    prms = "?" + Uri.EscapeDataString("<#= GetFilterPropertyName(prop, Model) #>") + "=" +  Uri.EscapeDataString(<#= GetModelPropertyName(prop, Model) #>.ToString());
                 else 
-                    prms += "&" + Uri.EscapeDataString("<#= GetModelPropertyName(prop, Model) #>") + "=" + Uri.EscapeDataString(<#= GetModelPropertyName(prop, Model) #>.ToString());
+                    prms += "&" + Uri.EscapeDataString("<#= GetFilterPropertyName(prop, Model) #>") + "=" + Uri.EscapeDataString(<#= GetModelPropertyName(prop, Model) #>.ToString());
 <#
             if(prop.IsNullable) { 
 #>
@@ -479,9 +479,9 @@ namespace <#= modelServiceNameSpace #> {
             }
 #>
                 if(prms == null)
-                    prms = "?" + Uri.EscapeDataString("<#= GetModelPropertyName(prop, Model) #>") + "=" +  Uri.EscapeDataString(<#= GetModelPropertyName(prop, Model) #>.ToString());
+                    prms = "?" + Uri.EscapeDataString("<#= GetFilterPropertyName(prop, Model) #>") + "=" +  Uri.EscapeDataString(<#= GetModelPropertyName(prop, Model) #>.ToString());
                 else 
-                    prms += "&" + Uri.EscapeDataString("<#= GetModelPropertyName(prop, Model) #>") + "=" + Uri.EscapeDataString(<#= GetModelPropertyName(prop, Model) #>.ToString());
+                    prms += "&" + Uri.EscapeDataString("<#= GetFilterPropertyName(prop, Model) #>") + "=" + Uri.EscapeDataString(<#= GetModelPropertyName(prop, Model) #>.ToString());
 <#
             if(prop.IsNullable) { 
 #>
@@ -899,6 +899,13 @@ namespace <#= modelServiceNameSpace #> {
             return true;
         }
         return prop.IsNullable; 
+    }
+    string GetFilterPropertyName(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+        if (model.GenerateJSonAttribute) {
+            return prop.JsonPropertyName;
+        } else {
+            return FirstLetterToLower(prop.ViewPropertyName);
+        }
     }
 
 #>

@@ -14,18 +14,22 @@
 <#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
 <#
 
-    string entityFolder             = "01140-Entity.php";
-    string entityNameSpace          = GetDoctrineModelNameSpace(Model, entityFolder);
+    string AppPrefix                = "App";
 
+    string entityFolder             = "01140-Entity.php";
+    string entityNameSpace          = GetSymfonyModelNameSpace(Model, entityFolder, AppPrefix);
+    
+    
     string DoctrineEntityClassName  = GetDoctrineEntityClassName(Model);
     string DoctrineEntityTableName  = GetDoctrineEntityTableName(Model); 
 
 
 #>
 <?php
+
 namespace <#= entityNameSpace #>;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+// use Doctrine\Common\Collections\ArrayCollection;
+// use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -173,7 +177,6 @@ class <#= DoctrineEntityClassName #>
         }
         return defaultNameSpace + delim + filePath;
     }
-
     string GetModelClassName(ModelViewSerializable model, string fileType) {
         string result="";
         if ((model == null) || string.IsNullOrEmpty(fileType)) {
@@ -212,7 +215,9 @@ class <#= DoctrineEntityClassName #>
             }
                 
         }
-        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+        result = sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+        result = result.Replace(".php", "").Replace(".Php", "").Replace(".PHP", "");
+        return result;
     }
     public string FirstLetterToUpper(string str)
     {
@@ -383,7 +388,7 @@ class <#= DoctrineEntityClassName #>
         return IsIdentityProperty(sclrProp, model);
     }
 
-    string GetDoctrineModelNameSpace(ModelViewSerializable model, string fileType) {
+    string GetSymfonyModelNameSpace(ModelViewSerializable model, string fileType, string appPrefix) {
         string result="";
         if ((model == null) || string.IsNullOrEmpty(fileType)) {
             return result;
@@ -398,18 +403,14 @@ class <#= DoctrineEntityClassName #>
         }
         string delim = "\\";
         string filePath = "";
-        string defaultNameSpace = "App";
+        string defaultNameSpace = (string.IsNullOrEmpty(appPrefix)) ? "" : appPrefix;
         if(!string.IsNullOrEmpty(refItem.FileFolder)) {
-            filePath = refItem.FileFolder;
+            if (string.IsNullOrEmpty(appPrefix))
+                filePath = refItem.FileFolder;
+            else 
+                filePath = delim + refItem.FileFolder;
         }
-        //if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
-        //    defaultNameSpace = refItem.FileDefaultProjectNameSpace;
-        //}
-        //if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
-        //    delim = ".";
-        //}
-        
-        return defaultNameSpace + delim + filePath;
+        return defaultNameSpace + filePath;
     }
     string GetDoctrineEntityClassNameForStr(string RootEntityClassName) {
         if (string.IsNullOrEmpty(RootEntityClassName)) return "";
@@ -614,7 +615,26 @@ class <#= DoctrineEntityClassName #>
 
     ModelViewPropertyOfVwSerializable GetScalarProperty(ModelViewKeyPropertySerializable prop, ModelViewSerializable model) {
         if((model == null) || (prop == null)) return null;
-        return model.ScalarProperties.Where(p => (p.OriginalPropertyName == prop.OriginalPropertyName) && (string.IsNullOrEmpty(p.ForeignKeyName))).FirstOrDefault();
+        ModelViewPropertyOfVwSerializable rslt =
+            model.ScalarProperties.Where(p => (p.OriginalPropertyName == prop.OriginalPropertyName) && (string.IsNullOrEmpty(p.ForeignKeyName))).FirstOrDefault();
+        if (rslt != null) return rslt;
+        if(model.ForeignKeys == null) return null;
+        foreach(ModelViewForeignKeySerializable foreignKey in model.ForeignKeys) {
+            if ((foreignKey.ForeignKeyProps != null) && (foreignKey.PrincipalKeyProps != null)) {
+                string navigationName = foreignKey.NavigationName;
+                int cnt = foreignKey.ForeignKeyProps.Count;
+                if (foreignKey.PrincipalKeyProps.Count < cnt) cnt = foreignKey.PrincipalKeyProps.Count;
+                for(int i = 0; i < cnt; i++) {
+                    if(foreignKey.ForeignKeyProps[i].OriginalPropertyName == prop.OriginalPropertyName) {
+                        ModelViewKeyPropertySerializable pkp = foreignKey.PrincipalKeyProps[i];
+                        rslt =
+                            model.ScalarProperties.Where(p => (p.OriginalPropertyName == pkp.OriginalPropertyName) && (p.ForeignKeyNameChain == navigationName)).FirstOrDefault();
+                        if(rslt != null) return rslt;
+                    }
+                }
+            }
+        }
+        return null;
     }
     string GetDoctrineEntityViewFieldPhpType(ModelViewPropertyOfVwSerializable prop) {
         return GetDoctrinePhpType(prop.UnderlyingTypeName);
