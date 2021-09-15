@@ -16,9 +16,10 @@
 <#
 
     string aspnetroleFolder             = "00400-aspnetrole.cs";
+    string aspnetuserloginFolder        = "00405-aspnetuserlogin.cs";
     string aspnetuserFolder             = "00410-aspnetuser.cs";
+    string aspnetuserclaimFolder        = "00415-aspnetuserclaim.cs";
     string aspnetuserroleFolder         = "00420-aspnetuserroles.cs";
-    string aspnetdbcontextFolder        = "00430-aspnetdbcontext.cs";
     string aspnetusermaskFolder         = "00430-aspnetusermask.cs";
 
     string aspnetrolemaskFolder         = "00440-aspnetrolemask.cs";
@@ -76,11 +77,15 @@ namespace <#= GetNameSpaceName(Model, aspnetchckdbcontextFolder, DefaultProjectN
                 Property(p => p.Id).HasDatabaseGeneratedOption(System.ComponentModel.DataAnnotations.Schema.DatabaseGeneratedOption.Computed);
             modelBuilder.Entity<<#= GetEntityClassName(Model, aspnetroleFolder) #>>().
                 Property(p => p.Id).HasDatabaseGeneratedOption(System.ComponentModel.DataAnnotations.Schema.DatabaseGeneratedOption.Computed);
-
+            modelBuilder.Entity<<#= GetEntityClassName(Model, aspnetuserclaimFolder) #>>().
+                Property(p => p.Id).HasDatabaseGeneratedOption(System.ComponentModel.DataAnnotations.Schema.DatabaseGeneratedOption.Identity);
+                
             modelBuilder.Entity<<#= GetEntityClassName(Model, aspnetusermaskFolder) #>>().HasKey(p => p.UserId);
             modelBuilder.Entity<<#= GetEntityClassName(Model, aspnetuserroleFolder) #>>().HasKey(p => new { p.UserId, p.RoleId });
             modelBuilder.Entity<<#= GetEntityClassName(Model, aspnetuserFolder) #>>().HasKey(p => p.Id);
             modelBuilder.Entity<<#= GetEntityClassName(Model, aspnetroleFolder) #>>().HasKey(p => p.Id);
+            modelBuilder.Entity<<#= GetEntityClassName(Model, aspnetuserloginFolder) #>>().HasKey(p => new { p.LoginProvider, p.ProviderKey, p.UserId });
+            modelBuilder.Entity<<#= GetEntityClassName(Model, aspnetuserclaimFolder) #>>().HasKey(p => p.Id);
 
             modelBuilder.Entity<<#= GetEntityClassName(Model, aspnetuserroleFolder) #>>().HasRequired(d => d.AspNetUser)
                 .WithMany(m => m.UserRoles)
@@ -91,10 +96,16 @@ namespace <#= GetNameSpaceName(Model, aspnetchckdbcontextFolder, DefaultProjectN
                 .HasForeignKey(d => d.RoleId);
 
 
-            modelBuilder.Entity<<#= GetEntityClassName(Model, aspnetusermaskFolder) #>>().HasRequired(d => d.AspNetUser)
-                .WithMany(m => m.UserMasks)
+            modelBuilder.Entity<<#= GetEntityClassName(Model, aspnetuserclaimFolder) #>>().HasRequired(d => d.AspNetUser)
+                .WithMany(m => m.UserClaims)
                 .HasForeignKey(d => d.UserId);
 
+            modelBuilder.Entity<<#= GetEntityClassName(Model, aspnetuserloginFolder) #>>().HasRequired(d => d.AspNetUser)
+                .WithMany(m => m.UserLogins)
+                .HasForeignKey(d => d.UserId);
+
+            modelBuilder.Entity<<#= GetEntityClassName(Model, aspnetuserFolder) #>>().HasIndex(p => p.UserName)
+                .IsUnique();
 // end code to remove
 //-------------------------------------------
 
@@ -128,6 +139,17 @@ namespace <#= GetNameSpaceName(Model, aspnetchckdbcontextFolder, DefaultProjectN
             set;
         }
 
+        public DbSet< <#= GetEntityClassName(Model, aspnetuserloginFolder) #> > aspnetuserloginDbSet
+        {
+            get;
+            set;
+        }
+
+        public DbSet< <#= GetEntityClassName(Model, aspnetuserclaimFolder) #> > aspnetuserclaimDbSet
+        {
+            get;
+            set;
+        }
 
 // end code to remove
 //-------------------------------------------

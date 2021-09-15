@@ -16,7 +16,9 @@
 <#
 
     string aspnetroleFolder             = "00400-aspnetrole.cs";
+    string aspnetuserloginFolder        = "00405-aspnetuserlogin.cs";
     string aspnetuserFolder             = "00410-aspnetuser.cs";
+    string aspnetuserclaimFolder        = "00415-aspnetuserclaim.cs";
     string aspnetuserroleFolder         = "00420-aspnetuserroles.cs";
     string aspnetusermaskFolder         = "00430-aspnetusermask.cs";
 
@@ -70,9 +72,10 @@ namespace <#= GetNameSpaceName(Model, aspnetuserFolder, DefaultProjectNameSpace)
         [StringLength(256, MinimumLength = 1, ErrorMessage = "Invalid")]
         public string UserName { get; set; }
 
-
-        public virtual ICollection<<#= GetEntityClassName(Model, aspnetuserroleFolder) #>> UserRoles { get; set; }
-        public virtual ICollection<<#= GetEntityClassName(Model, aspnetusermaskFolder) #>> UserMasks { get; set; }
+        public virtual ICollection<<#= GetEntityClassName(Model, aspnetuserclaimFolder) #>> UserClaims { get; set; }
+        public virtual ICollection<<#= GetEntityClassName(Model, aspnetuserloginFolder) #>> UserLogins { get; set; }
+        public virtual ICollection<<#= GetEntityClassName(Model, aspnetuserroleFolder) #>>  UserRoles { get; set; }
+        public virtual ICollection<<#= GetEntityClassName(Model, aspnetusermaskFolder) #>>  UserMasks { get; set; }
     }
 }
 

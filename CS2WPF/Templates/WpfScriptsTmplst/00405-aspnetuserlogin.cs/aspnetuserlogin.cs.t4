@@ -20,6 +20,7 @@
     string aspnetuserFolder             = "00410-aspnetuser.cs";
     string aspnetuserclaimFolder        = "00415-aspnetuserclaim.cs";
     string aspnetuserroleFolder         = "00420-aspnetuserroles.cs";
+
     
 #>
 
@@ -28,21 +29,32 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 
-namespace <#= GetNameSpaceName(Model, aspnetroleFolder, DefaultProjectNameSpace) #>
+namespace <#= GetNameSpaceName(Model, aspnetuserloginFolder, DefaultProjectNameSpace) #>
 {
-    public class <#= GetEntityClassName(Model, aspnetroleFolder) #>
+    public class <#= GetEntityClassName(Model, aspnetuserloginFolder) #>
     {
+        //[Key]
+        //[Column("LoginProvider", Order = 0)] // zero-based order of the column the property is mapped to
+        [Display(Description = "Login Provider", Name = "Login of the Provider", Prompt = "Login of the Provider", ShortName = "Login Provider")]
+        [StringLength(128)]
         [Required]
-        [Display(Description = "Role Id", Name = "Role Id", Prompt = "Enter Id", ShortName = "Id")]
-        [StringLength(128, MinimumLength = 1, ErrorMessage = "Invalid")]
-        public string Id { get; set; }
+        public string LoginProvider { get; set; }
 
+        //[Key]
+        //[Column("ProviderKey", Order = 1)] // zero-based order of the column the property is mapped to
+        [Display(Description = "Provider Key", Name = "Key of the Provider", Prompt = "Key of the Provider", ShortName = "Provider Key")]
+        [StringLength(128)]
         [Required]
-        [Display(Description = "Role Name", Name = "Role Name", Prompt = "Enter RoleName", ShortName = "Role Name")]
-        [StringLength(128, MinimumLength = 1, ErrorMessage = "Invalid")]
-        public string Name { get; set; }
+        public string ProviderKey { get; set; }
 
-        public virtual ICollection<<#= GetEntityClassName(Model, aspnetuserroleFolder) #>> UserRoles { get; set; }
+        //[Key]
+        //[Column("UserId", Order = 2)] // zero-based order of the column the property is mapped to
+        [Display(Description = "User id", Name = "Id of the User", Prompt = "Enter Id of the User", ShortName = "User Id")]
+        [StringLength(128)]
+        [Required]
+        public string UserId { get; set; }
+
+        public <#= GetEntityClassName(Model, aspnetuserFolder) #> AspNetUser { get; set; }
     }
 }
 

@@ -28,21 +28,29 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 
-namespace <#= GetNameSpaceName(Model, aspnetroleFolder, DefaultProjectNameSpace) #>
+namespace <#= GetNameSpaceName(Model, aspnetuserclaimFolder, DefaultProjectNameSpace) #>
 {
-    public class <#= GetEntityClassName(Model, aspnetroleFolder) #>
+    public class <#= GetEntityClassName(Model, aspnetuserclaimFolder) #>
     {
+        //[Key]
+        //[Column("Id", Order = 0)] // zero-based order of the column the property is mapped to
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [Display(Description = "Claim id", Name = "Id of the Claim", Prompt = "Enter Id of the Claim", ShortName = "Claim Id")]
         [Required]
-        [Display(Description = "Role Id", Name = "Role Id", Prompt = "Enter Id", ShortName = "Id")]
-        [StringLength(128, MinimumLength = 1, ErrorMessage = "Invalid")]
-        public string Id { get; set; }
+        public int Id { get; set; }
 
+        [Display(Description = "User id", Name = "Id of the User", Prompt = "Enter Id of the User", ShortName = "User Id")]
+        [StringLength(128)]
         [Required]
-        [Display(Description = "Role Name", Name = "Role Name", Prompt = "Enter RoleName", ShortName = "Role Name")]
-        [StringLength(128, MinimumLength = 1, ErrorMessage = "Invalid")]
-        public string Name { get; set; }
+        public string UserId { get; set; }
 
-        public virtual ICollection<<#= GetEntityClassName(Model, aspnetuserroleFolder) #>> UserRoles { get; set; }
+        [Display(Description = "Claim Type", Name = "Type of the Claim", Prompt = "Enter Type of the Claim", ShortName = "Claim Type")]
+        public string ClaimType { get; set; }
+
+        [Display(Description = "Claim Type", Name = "Type of the Claim", Prompt = "Enter Type of the Claim", ShortName = "Claim Type")]
+        public string ClaimValue { get; set; }
+
+        public <#= GetEntityClassName(Model, aspnetuserFolder) #> AspNetUser { get; set; }
     }
 }
 
