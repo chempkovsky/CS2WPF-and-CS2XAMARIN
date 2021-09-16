@@ -95,6 +95,9 @@ namespace <#= GetNameSpaceName(Model, aspnetchckdbcontextFolder, DefaultProjectN
                 .WithMany(m => m.UserRoles)
                 .HasForeignKey(d => d.RoleId);
 
+            modelBuilder.Entity<<#= GetEntityClassName(Model, aspnetusermaskFolder) #>>().HasRequired(d => d.AspNetUser)
+                .WithMany(m => m.UserMasks)
+                .HasForeignKey(d => d.UserId);
 
             modelBuilder.Entity<<#= GetEntityClassName(Model, aspnetuserclaimFolder) #>>().HasRequired(d => d.AspNetUser)
                 .WithMany(m => m.UserClaims)
