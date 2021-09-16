@@ -1377,14 +1377,14 @@ class <#= controllerClassName #> extends AbstractController
         }
         return defaultNameSpace + filePath;
     }
-    string GetDoctrineEntityClassNameForStr(string RootEntityClassName) {
-        if (string.IsNullOrEmpty(RootEntityClassName)) return "";
-        return RootEntityClassName + "Entity";
+    string GetDoctrineEntityClassNameForStr(string ViewClassName) {
+        if (string.IsNullOrEmpty(ViewClassName)) return "";
+        return ViewClassName + "Entity";
     }
     string GetDoctrineEntityClassName(ModelViewSerializable model) {
         
         if (model == null) return "";
-        return GetDoctrineEntityClassNameForStr(model.RootEntityClassName);
+        return GetDoctrineEntityClassNameForStr(model.ViewName);
     }
     string GetDoctrineEntityUpdClassNameForStr(string RootEntityClassName) {
         if (string.IsNullOrEmpty(RootEntityClassName)) return "";

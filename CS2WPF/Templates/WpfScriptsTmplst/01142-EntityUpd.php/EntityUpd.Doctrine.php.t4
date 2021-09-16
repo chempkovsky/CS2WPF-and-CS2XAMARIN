@@ -22,6 +22,19 @@
 
 //    string DoctrineEntityUpdClassName   = GetDoctrineEntityUpdClassName(Model);
     string DoctrineEntityTableName      = GetDoctrineEntityTableName(Model); 
+
+    bool hasGuid = false;
+    foreach (ModelViewKeyPropertySerializable prop in Model.AllProperties) {
+        ModelViewPropertyOfVwSerializable scalarProp = GetScalarProperty(prop, Model);
+        if(scalarProp == null) continue;
+        if (IsComputedPropertyKey(prop, Model)) {
+            if (IsStringPropertyKey(prop, Model)) {
+                hasGuid = true;
+                break;
+            }
+        }
+    }
+
 #>
 <?php
 
@@ -29,6 +42,7 @@ namespace <#= entityUpdNameSpace #>;
 // use Doctrine\Common\Collections\ArrayCollection;
 // use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Uid\Uuid;
 
 /**
  * <#= entityUpdClassName #>
@@ -38,6 +52,27 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class <#= entityUpdClassName #>
 {
+
+<# 
+    if (hasGuid) {
+#>
+    public function __construct()
+    {
+<#
+        foreach (ModelViewKeyPropertySerializable prop in Model.AllProperties) {
+            ModelViewPropertyOfVwSerializable scalarProp = GetScalarProperty(prop, Model);
+            if(scalarProp == null) continue;
+            if (IsComputedPropertyKey(prop, Model) && IsStringPropertyKey(prop, Model)) {
+#>
+        $this-><#= GetDoctrineEntityViewFieldName(scalarProp) #> = Uuid::v4()->toRfc4122();
+<#
+            }
+        }
+#>
+    }
+<# 
+    }
+#>
 
 <#
         foreach (ModelViewKeyPropertySerializable prop in Model.AllProperties) {
@@ -326,19 +361,39 @@ class <#= entityUpdClassName #>
         return false;
     }
     bool IsIdentityProperty(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
-        if (HasAtributeWithValue(prop, "DatabaseGenerated", "identity") || HasAtributeWithValue(prop, "DatabaseGenerated", "computed")) {
+        if (HasAtributeWithValue(prop, "DatabaseGenerated", "identity")) {
             return true;
         }
         if(HasFluentAtribute(prop, new string[] {"UseSqlServerIdentityColumn", "ForSqlServerUseSequenceHiLo", "ValueGeneratedOnAdd", "ValueGeneratedOnAddOrUpdate", "IsConcurrencyToken", "IsRowVersion"} )) {
             return true;
         }
-        return HasFluentAtributeWithValue(prop, "HasDatabaseGeneratedOption", "identity") || HasFluentAtributeWithValue(prop, "HasDatabaseGeneratedOption", "computed");
+        return HasFluentAtributeWithValue(prop, "HasDatabaseGeneratedOption", "identity");
     }
     bool IsIdentityPropertyKey(ModelViewKeyPropertySerializable prop, ModelViewSerializable model) {
         if ((model == null)||(prop == null)) return false;
         ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => (p.OriginalPropertyName == prop.OriginalPropertyName) && (string.IsNullOrEmpty(p.ForeignKeyName))).FirstOrDefault();
         if(sclrProp == null) return false;
         return IsIdentityProperty(sclrProp, model);
+    }
+    bool IsComputedProperty(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+        if (HasAtributeWithValue(prop, "DatabaseGenerated", "computed")) {
+            return true;
+        }
+        if(HasFluentAtribute(prop, new string[] {"UseSqlServerIdentityColumn", "ForSqlServerUseSequenceHiLo", "ValueGeneratedOnAdd", "ValueGeneratedOnAddOrUpdate", "IsConcurrencyToken", "IsRowVersion"} )) {
+            return true;
+        }
+        return HasFluentAtributeWithValue(prop, "HasDatabaseGeneratedOption", "computed");
+    }
+    bool IsComputedPropertyKey(ModelViewKeyPropertySerializable prop, ModelViewSerializable model) {
+        if ((model == null)||(prop == null)) return false;
+        ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => (p.OriginalPropertyName == prop.OriginalPropertyName) && (string.IsNullOrEmpty(p.ForeignKeyName))).FirstOrDefault();
+        if(sclrProp == null) return false;
+        return IsComputedProperty(sclrProp, model);
+    }
+    bool IsStringPropertyKey(ModelViewKeyPropertySerializable prop, ModelViewSerializable model) {
+        if ((model == null)||(prop == null)) return false;
+        if(string.IsNullOrEmpty( prop.UnderlyingTypeName )) return false;
+        return prop.UnderlyingTypeName.ToLower() == "system.string";
     }
 
     string GetSymfonyModelNameSpace(ModelViewSerializable model, string fileType, string appPrefix) {
@@ -365,14 +420,14 @@ class <#= entityUpdClassName #>
         }
         return defaultNameSpace + filePath;
     }
-    string GetDoctrineEntityClassNameForStr(string RootEntityClassName) {
-        if (string.IsNullOrEmpty(RootEntityClassName)) return "";
-        return RootEntityClassName + "Entity";
+    string GetDoctrineEntityClassNameForStr(string ViewClassName) {
+        if (string.IsNullOrEmpty(ViewClassName)) return "";
+        return ViewClassName + "Entity";
     }
     string GetDoctrineEntityClassName(ModelViewSerializable model) {
         
         if (model == null) return "";
-        return GetDoctrineEntityClassNameForStr(model.RootEntityClassName);
+        return GetDoctrineEntityClassNameForStr(model.ViewName);
     }
     string GetDoctrineEntityUpdClassNameForStr(string RootEntityClassName) {
         if (string.IsNullOrEmpty(RootEntityClassName)) return "";

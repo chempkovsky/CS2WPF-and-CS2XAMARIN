@@ -307,19 +307,39 @@ class <#= entityTotalClassName #>
         return false;
     }
     bool IsIdentityProperty(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
-        if (HasAtributeWithValue(prop, "DatabaseGenerated", "identity") || HasAtributeWithValue(prop, "DatabaseGenerated", "computed")) {
+        if (HasAtributeWithValue(prop, "DatabaseGenerated", "identity")) {
             return true;
         }
         if(HasFluentAtribute(prop, new string[] {"UseSqlServerIdentityColumn", "ForSqlServerUseSequenceHiLo", "ValueGeneratedOnAdd", "ValueGeneratedOnAddOrUpdate", "IsConcurrencyToken", "IsRowVersion"} )) {
             return true;
         }
-        return HasFluentAtributeWithValue(prop, "HasDatabaseGeneratedOption", "identity") || HasFluentAtributeWithValue(prop, "HasDatabaseGeneratedOption", "computed");
+        return HasFluentAtributeWithValue(prop, "HasDatabaseGeneratedOption", "identity");
     }
     bool IsIdentityPropertyKey(ModelViewKeyPropertySerializable prop, ModelViewSerializable model) {
         if ((model == null)||(prop == null)) return false;
         ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => (p.OriginalPropertyName == prop.OriginalPropertyName) && (string.IsNullOrEmpty(p.ForeignKeyName))).FirstOrDefault();
         if(sclrProp == null) return false;
         return IsIdentityProperty(sclrProp, model);
+    }
+    bool IsComputedProperty(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+        if (HasAtributeWithValue(prop, "DatabaseGenerated", "computed")) {
+            return true;
+        }
+        if(HasFluentAtribute(prop, new string[] {"UseSqlServerIdentityColumn", "ForSqlServerUseSequenceHiLo", "ValueGeneratedOnAdd", "ValueGeneratedOnAddOrUpdate", "IsConcurrencyToken", "IsRowVersion"} )) {
+            return true;
+        }
+        return HasFluentAtributeWithValue(prop, "HasDatabaseGeneratedOption", "computed");
+    }
+    bool IsComputedPropertyKey(ModelViewKeyPropertySerializable prop, ModelViewSerializable model) {
+        if ((model == null)||(prop == null)) return false;
+        ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => (p.OriginalPropertyName == prop.OriginalPropertyName) && (string.IsNullOrEmpty(p.ForeignKeyName))).FirstOrDefault();
+        if(sclrProp == null) return false;
+        return IsComputedProperty(sclrProp, model);
+    }
+    bool IsStringPropertyKey(ModelViewKeyPropertySerializable prop, ModelViewSerializable model) {
+        if ((model == null)||(prop == null)) return false;
+        if(string.IsNullOrEmpty( prop.UnderlyingTypeName )) return false;
+        return prop.UnderlyingTypeName.ToLower() == "system.string";
     }
     string GetAtributeValueByNo(ModelViewPropertyOfVwSerializable sclrProp, string attrName, int itemNo) {
         if(itemNo > -1) {
@@ -420,14 +440,14 @@ class <#= entityTotalClassName #>
         }
         return defaultNameSpace + filePath;
     }
-    string GetDoctrineEntityClassNameForStr(string RootEntityClassName) {
-        if (string.IsNullOrEmpty(RootEntityClassName)) return "";
-        return RootEntityClassName + "Entity";
+    string GetDoctrineEntityClassNameForStr(string ViewClassName) {
+        if (string.IsNullOrEmpty(ViewClassName)) return "";
+        return ViewClassName + "Entity";
     }
     string GetDoctrineEntityClassName(ModelViewSerializable model) {
         
         if (model == null) return "";
-        return GetDoctrineEntityClassNameForStr(model.RootEntityClassName);
+        return GetDoctrineEntityClassNameForStr(model.ViewName);
     }
     string GetDoctrineEntityUpdClassNameForStr(string RootEntityClassName) {
         if (string.IsNullOrEmpty(RootEntityClassName)) return "";

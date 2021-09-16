@@ -23,6 +23,15 @@
     string DoctrineEntityClassName  = GetDoctrineEntityClassName(Model);
     string DoctrineEntityTableName  = GetDoctrineEntityTableName(Model); 
 
+    bool hasGuid = false;
+    foreach (ModelViewKeyPropertySerializable prop in Model.AllProperties) {
+        if (IsComputedPropertyKey(prop, Model)) {
+            if (IsStringPropertyKey(prop, Model)) {
+                hasGuid = true;
+                break;
+            }
+        }
+    }
 
 #>
 <?php
@@ -31,6 +40,7 @@ namespace <#= entityNameSpace #>;
 // use Doctrine\Common\Collections\ArrayCollection;
 // use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Uid\Uuid;
 
 /**
  * <#= DoctrineEntityClassName #>
@@ -40,6 +50,24 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class <#= DoctrineEntityClassName #>
 {
+<# 
+    if (hasGuid) {
+#>
+    public function __construct()
+    {
+<#
+        foreach (ModelViewKeyPropertySerializable prop in Model.AllProperties) {
+            if (IsComputedPropertyKey(prop, Model) && IsStringPropertyKey(prop, Model)) {
+#>
+        $this-><#= GetDoctrineEntityFieldName(prop) #> = Uuid::v4()->toRfc4122();
+<#
+            }
+        }
+#>
+    }
+<# 
+    }
+#>
 
 <#
         foreach (ModelViewKeyPropertySerializable prop in Model.AllProperties) {
@@ -83,9 +111,9 @@ class <#= DoctrineEntityClassName #>
                 if(foreignKey.NavigationType == NavigationTypeEnum.OptionalToMany) nullableStr = "nullable=true";
 #>
     /**
-     * @var <#= GetDoctrineEntityClassNameForStr(foreignKey.NavigationEntityName) #>
+     * @var <#= GetDoctrineEntityClassNameForStr(foreignKey.ViewName) #>
      *
-     * @ORM\ManyToOne(targetEntity="<#= GetDoctrineEntityClassNameForStr(foreignKey.NavigationEntityName) #>")
+     * @ORM\ManyToOne(targetEntity="<#= GetDoctrineEntityClassNameForStr(foreignKey.ViewName) #>")
      * @ORM\JoinColumns({
 <#
             int fkcnt = foreignKey.PrincipalKeyProps.Count;
@@ -126,11 +154,11 @@ class <#= DoctrineEntityClassName #>
             foreach (ModelViewForeignKeySerializable foreignKey in Model.ForeignKeys) {
 #>
 
-    public function <#= GetDoctrineEntityGetMethodNameForStr(foreignKey.NavigationName) #>(): ?<#= GetDoctrineEntityClassNameForStr(foreignKey.NavigationEntityName) #>
+    public function <#= GetDoctrineEntityGetMethodNameForStr(foreignKey.NavigationName) #>(): ?<#= GetDoctrineEntityClassNameForStr(foreignKey.ViewName) #>
     {
         return $this-><#= GetDoctrineEntityFieldNameForStr(foreignKey.NavigationName) #>;
     }
-    public function <#= GetDoctrineEntitySetMethodNameForStr(foreignKey.NavigationName) #>(?<#= GetDoctrineEntityClassNameForStr(foreignKey.NavigationEntityName) #> $<#= GetDoctrineEntityFieldNameForStr(foreignKey.NavigationName) #>): self
+    public function <#= GetDoctrineEntitySetMethodNameForStr(foreignKey.NavigationName) #>(?<#= GetDoctrineEntityClassNameForStr(foreignKey.ViewName) #> $<#= GetDoctrineEntityFieldNameForStr(foreignKey.NavigationName) #>): self
     {
         $this-><#= GetDoctrineEntityFieldNameForStr(foreignKey.NavigationName) #> = $<#= GetDoctrineEntityFieldNameForStr(foreignKey.NavigationName) #>;
         return $this;
@@ -373,13 +401,13 @@ class <#= DoctrineEntityClassName #>
         return false;
     }
     bool IsIdentityProperty(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
-        if (HasAtributeWithValue(prop, "DatabaseGenerated", "identity") || HasAtributeWithValue(prop, "DatabaseGenerated", "computed")) {
+        if (HasAtributeWithValue(prop, "DatabaseGenerated", "identity")) {
             return true;
         }
         if(HasFluentAtribute(prop, new string[] {"UseSqlServerIdentityColumn", "ForSqlServerUseSequenceHiLo", "ValueGeneratedOnAdd", "ValueGeneratedOnAddOrUpdate", "IsConcurrencyToken", "IsRowVersion"} )) {
             return true;
         }
-        return HasFluentAtributeWithValue(prop, "HasDatabaseGeneratedOption", "identity") || HasFluentAtributeWithValue(prop, "HasDatabaseGeneratedOption", "computed");
+        return HasFluentAtributeWithValue(prop, "HasDatabaseGeneratedOption", "identity");
     }
     bool IsIdentityPropertyKey(ModelViewKeyPropertySerializable prop, ModelViewSerializable model) {
         if ((model == null)||(prop == null)) return false;
@@ -387,6 +415,27 @@ class <#= DoctrineEntityClassName #>
         if(sclrProp == null) return false;
         return IsIdentityProperty(sclrProp, model);
     }
+    bool IsComputedProperty(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+        if (HasAtributeWithValue(prop, "DatabaseGenerated", "computed")) {
+            return true;
+        }
+        if(HasFluentAtribute(prop, new string[] {"UseSqlServerIdentityColumn", "ForSqlServerUseSequenceHiLo", "ValueGeneratedOnAdd", "ValueGeneratedOnAddOrUpdate", "IsConcurrencyToken", "IsRowVersion"} )) {
+            return true;
+        }
+        return HasFluentAtributeWithValue(prop, "HasDatabaseGeneratedOption", "computed");
+    }                          
+    bool IsComputedPropertyKey(ModelViewKeyPropertySerializable prop, ModelViewSerializable model) {
+        if ((model == null)||(prop == null)) return false;
+        ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => (p.OriginalPropertyName == prop.OriginalPropertyName) && (string.IsNullOrEmpty(p.ForeignKeyName))).FirstOrDefault();
+        if(sclrProp == null) return false;
+        return IsComputedProperty(sclrProp, model);
+    }
+    bool IsStringPropertyKey(ModelViewKeyPropertySerializable prop, ModelViewSerializable model) {
+        if ((model == null)||(prop == null)) return false;
+        if(string.IsNullOrEmpty( prop.UnderlyingTypeName )) return false;
+        return prop.UnderlyingTypeName.ToLower() == "system.string";
+    }
+
 
     string GetSymfonyModelNameSpace(ModelViewSerializable model, string fileType, string appPrefix) {
         string result="";
@@ -412,14 +461,14 @@ class <#= DoctrineEntityClassName #>
         }
         return defaultNameSpace + filePath;
     }
-    string GetDoctrineEntityClassNameForStr(string RootEntityClassName) {
-        if (string.IsNullOrEmpty(RootEntityClassName)) return "";
-        return RootEntityClassName + "Entity";
+    string GetDoctrineEntityClassNameForStr(string ViewClassName) {
+        if (string.IsNullOrEmpty(ViewClassName)) return "";
+        return ViewClassName + "Entity";
     }
     string GetDoctrineEntityClassName(ModelViewSerializable model) {
         
         if (model == null) return "";
-        return GetDoctrineEntityClassNameForStr(model.RootEntityClassName);
+        return GetDoctrineEntityClassNameForStr(model.ViewName);
     }
     string GetDoctrineEntityTableName(ModelViewSerializable model) { 
         string rslt = "";
@@ -663,6 +712,11 @@ class <#= DoctrineEntityClassName #>
         if ((model == null) || (prop == null)) return false;
         if(string.IsNullOrEmpty( prop.UnderlyingTypeName )) return false;
         return prop.UnderlyingTypeName.ToLower() == "system.guid";
+    }
+    bool   GetDoctrineEntityFieldViewIsString(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+        if ((model == null) || (prop == null)) return false;
+        if(string.IsNullOrEmpty( prop.UnderlyingTypeName )) return false;
+        return prop.UnderlyingTypeName.ToLower() == "system.string";
     }
 
 #>

@@ -14,19 +14,19 @@
 <#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
 <#
 
-    string AppPrefix                                = "App";
-    
-    string entitySelFolder                          = "01144-EntitySel.php";
-    string entitySelClassName                       = GetModelClassName(Model, entitySelFolder);
-    string entitySelNameSpace                       = GetSymfonyModelNameSpace(Model, entitySelFolder, AppPrefix);
+    string AppPrefix                = "App";
 
-//    string DoctrineEntitySelClassName               = GetDoctrineEntitySelClassName(Model);
-    string DoctrineEntityTableName                  = GetDoctrineEntityTableName(Model); 
+    string entityFolder             = "01140-Entity.php";
+    string entityNameSpace          = GetSymfonyModelNameSpace(Model, entityFolder, AppPrefix);
+    
+    
+    string DoctrineEntityClassName  = GetDoctrineEntityClassName(Model);
+    string DoctrineEntityTableName  = GetDoctrineEntityTableName(Model); 
+    string DoctrineEntityRepositoryClassName = DoctrineEntityClassName + "Repository";
+    string DoctrineEntityRepositoryUse = @"App\Repository\"+DoctrineEntityRepositoryClassName;
 
     bool hasGuid = false;
     foreach (ModelViewKeyPropertySerializable prop in Model.AllProperties) {
-        ModelViewPropertyOfVwSerializable scalarProp = GetScalarProperty(prop, Model);
-        if(scalarProp == null) continue;
         if (IsComputedPropertyKey(prop, Model)) {
             if (IsStringPropertyKey(prop, Model)) {
                 hasGuid = true;
@@ -38,23 +38,23 @@
 #>
 <?php
 
-namespace <#= entitySelNameSpace #>;
+namespace <#= entityNameSpace #>;
 // use Doctrine\Common\Collections\ArrayCollection;
 // use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Uid\Uuid;
-use Symfony\Component\Serializer\Annotation\SerializedName;
-use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
+use <#= DoctrineEntityRepositoryUse #>;
 
 /**
- * <#= entitySelClassName #>
+ * <#= DoctrineEntityClassName #>
  *
  * @ORM\Table(name="<#= DoctrineEntityTableName #>")
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass=<#= DoctrineEntityRepositoryClassName #>::class)
  */
-class <#= entitySelClassName #>
+class <#= DoctrineEntityClassName #> implements UserInterface, PasswordAuthenticatedUserInterface
 {
-
 <# 
     if (hasGuid) {
 #>
@@ -62,11 +62,9 @@ class <#= entitySelClassName #>
     {
 <#
         foreach (ModelViewKeyPropertySerializable prop in Model.AllProperties) {
-            ModelViewPropertyOfVwSerializable scalarProp = GetScalarProperty(prop, Model);
-            if(scalarProp == null) continue;
             if (IsComputedPropertyKey(prop, Model) && IsStringPropertyKey(prop, Model)) {
 #>
-        $this-><#= GetDoctrineEntityViewFieldName(scalarProp) #> = Uuid::v4()->toRfc4122();
+        $this-><#= GetDoctrineEntityFieldName(prop) #> = Uuid::v4()->toRfc4122();
 <#
             }
         }
@@ -77,75 +75,26 @@ class <#= entitySelClassName #>
 #>
 
 <#
-        foreach (ModelViewPropertyOfVwSerializable scalarProp in Model.ScalarProperties) {
-            string isnullableStr = scalarProp.IsRequiredInView ? "nullable=false" : "nullable=true";
-            bool isId = GetDoctrineEntityViewFieldIsId(scalarProp, Model);
-            string maxLen = GetMaxLen(scalarProp, Model);
+        foreach (ModelViewKeyPropertySerializable prop in Model.AllProperties) {
+            string isnullableStr = prop.IsRequired ? "nullable=false" : "nullable=true";
+            string isnullableVar = prop.IsRequired ? "" : "|null";
+            if ("UserName" == prop.OriginalPropertyName) isnullableStr += ", unique=true";
+
+            bool isId = GetDoctrineEntityFieldIsId(prop, Model);
+            string maxLen = GetMaxLenEx(prop, Model);
             if (string.IsNullOrEmpty(maxLen)) maxLen = ""; else maxLen = ", length=" + maxLen;
-            string optionsFixed = GetDoctrineEntityFieldViewIsGuid(scalarProp, Model) ?  ", options={\"fixed\"=true}" : "";
+            string optionsFixed = GetDoctrineEntityFieldIsGuid(prop, Model) ? ", options={\"fixed\"=true}" : "";
 #>
     /**
-     * @var <#= GetDoctrineEntityViewFieldPhpType(scalarProp) #>
+     * @var <#= GetDoctrineEntityFieldPhpType(prop, Model) + isnullableVar #>
      *
-<#
-            if(scalarProp.IsRequiredInView) {
-#>
-     * @Assert\NotBlank
-<#
-            }
-            string assertTp = GetDoctrineAssertType(scalarProp);
-            if(!string.IsNullOrEmpty(assertTp)) {
-#>
-     * @Assert\Type(type="<#= assertTp #>")
-<#
-            }
-            if(GetDoctrineEntityFieldViewIsGuid(scalarProp, Model)) {
-#>
-     * @Assert\Uuid
-<#
-            }
-            string minmaxVal = GetMinVal(scalarProp, Model);
-            if (!string.IsNullOrEmpty(minmaxVal)) {
-#>
-     * @Assert\GreaterThanOrEqual(<#= minmaxVal #>)
-<#
-            }
-            minmaxVal = GetMinVal(scalarProp, Model);
-            if (!string.IsNullOrEmpty(minmaxVal)) {
-#>
-     * @Assert\LessThanOrEqual(<#= minmaxVal #>)
-<#
-            }
-            string assmaxLen = GetMaxLen(scalarProp, Model);
-            string assminLen = GetMinLen(scalarProp, Model);
-            minmaxVal = "";
-            if (!string.IsNullOrEmpty(assmaxLen) ) minmaxVal = "max="+assmaxLen;
-            if (!string.IsNullOrEmpty(assminLen) ) minmaxVal = string.IsNullOrEmpty(minmaxVal) ?  (minmaxVal + "min="+assminLen) : (minmaxVal + ", min="+assminLen);
-            if(!string.IsNullOrEmpty(minmaxVal)) {
-#>
-     * @Assert\Length(<#= minmaxVal #>)
-<#
-            }
-            if(Model.GenerateJSonAttribute) {
-#>
-     *
-     * @SerializedName("<#= scalarProp.JsonPropertyName #>")
-<#
-            } else {
-#>
-     *
-     * @SerializedName("<#= GetModelPropertyName(scalarProp, Model) #>")
-<#
-            }
-#>
-     *
-     * @ORM\Column(name="<#= GetDoctrineEntityViewTableColumnName(scalarProp) #>", type="<#= GetDoctrineEntityViewFieldDataBaseType(scalarProp, Model) #>" <#= optionsFixed #> <#= maxLen #>, <#= isnullableStr #>)
+     * @ORM\Column(name="<#= GetDoctrineEntityTableColumnName(prop) #>", type="<#= GetDoctrineEntityFieldDataBaseType(prop, Model) #>" <#= optionsFixed #> <#= maxLen #>, <#= isnullableStr #>)
 <# 
             if(isId) { 
 #>
      * @ORM\Id
 <# 
-                if(IsIdentityProperty(scalarProp, Model)) {
+                if(IsIdentityPropertyKey(prop, Model)) {
 #>
      * @ORM\GeneratedValue(strategy="IDENTITY")
 <#
@@ -157,26 +106,141 @@ class <#= entitySelClassName #>
             }
 #>
      */
-    private $<#= GetDoctrineEntityViewFieldName(scalarProp) #>;
-    
+    private $<#= GetDoctrineEntityFieldName(prop) #>;
+
 <#
         }
-        foreach (ModelViewPropertyOfVwSerializable scalarProp in Model.ScalarProperties) {
+        if (Model.ForeignKeys != null) {
+            foreach (ModelViewForeignKeySerializable foreignKey in Model.ForeignKeys) {
+                string nullableStr =  "nullable=false";
+                if(foreignKey.NavigationType == NavigationTypeEnum.OptionalToMany) nullableStr = "nullable=true";
+#>
+    /**
+     * @var <#= GetDoctrineEntityClassNameForStr(foreignKey.ViewName) #>
+     *
+     * @ORM\ManyToOne(targetEntity="<#= GetDoctrineEntityClassNameForStr(foreignKey.ViewName) #>")
+     * @ORM\JoinColumns({
+<#
+            int fkcnt = foreignKey.PrincipalKeyProps.Count;
+            for(int i = 0; i < fkcnt; i++) {
+                if (i < (fkcnt - 1)) {
+#>
+     *   @ORM\JoinColumn(name="<#= foreignKey.ForeignKeyProps[i].OriginalPropertyName #>", referencedColumnName="<#= foreignKey.PrincipalKeyProps[i].OriginalPropertyName #>", <#= nullableStr #>),
+<#
+                } else {
+#>
+     *   @ORM\JoinColumn(name="<#= foreignKey.ForeignKeyProps[i].OriginalPropertyName #>", referencedColumnName="<#= foreignKey.PrincipalKeyProps[i].OriginalPropertyName #>", <#= nullableStr #>)
+<#
+                }
+            }
+#>
+     * })
+     */
+    private $<#= GetDoctrineEntityFieldNameForStr(foreignKey.NavigationName) #>;
+
+<#
+            }
+        }
+        foreach (ModelViewKeyPropertySerializable prop in Model.AllProperties) {
 #>
 
-    public function <#= GetDoctrineEntityViewGetMethodName(scalarProp) #>(): ?<#= GetDoctrineEntityViewGetSetPhpType(scalarProp, Model) #>
+    public function <#= GetDoctrineEntityGetMethodName(prop) #>(): ?<#= GetDoctrineEntityGetSetPhpType(prop, Model) #>
     {
-        return $this-><#= GetDoctrineEntityViewFieldName(scalarProp) #>;
+        return $this-><#= GetDoctrineEntityFieldName(prop) #>;
     }
-    public function <#= GetDoctrineEntityViewSetMethodName(scalarProp) #>(<#= GetDoctrineEntityViewGetSetPhpType(scalarProp, Model) #> $<#= GetDoctrineEntityViewFieldName(scalarProp) #>): self
+    public function <#= GetDoctrineEntitySetMethodName(prop) #>(<#= GetDoctrineEntityGetSetPhpType(prop, Model) #> $<#= GetDoctrineEntityFieldName(prop) #>): self
     {
-        $this-><#= GetDoctrineEntityViewFieldName(scalarProp) #> = $<#= GetDoctrineEntityViewFieldName(scalarProp) #>;
+        $this-><#= GetDoctrineEntityFieldName(prop) #> = $<#= GetDoctrineEntityFieldName(prop) #>;
         return $this;
     }
 <#
         }
+        if (Model.ForeignKeys != null) {
+            foreach (ModelViewForeignKeySerializable foreignKey in Model.ForeignKeys) {
+#>
 
+    public function <#= GetDoctrineEntityGetMethodNameForStr(foreignKey.NavigationName) #>(): ?<#= GetDoctrineEntityClassNameForStr(foreignKey.ViewName) #>
+    {
+        return $this-><#= GetDoctrineEntityFieldNameForStr(foreignKey.NavigationName) #>;
+    }
+    public function <#= GetDoctrineEntitySetMethodNameForStr(foreignKey.NavigationName) #>(?<#= GetDoctrineEntityClassNameForStr(foreignKey.ViewName) #> $<#= GetDoctrineEntityFieldNameForStr(foreignKey.NavigationName) #>): self
+    {
+        $this-><#= GetDoctrineEntityFieldNameForStr(foreignKey.NavigationName) #> = $<#= GetDoctrineEntityFieldNameForStr(foreignKey.NavigationName) #>;
+        return $this;
+    }
+<#
+            }
+        }
 #>                
+
+
+    /**
+     * 
+     */
+    private $roles = [];
+
+    /**
+     * @see UserInterface
+     */
+    public function getRoles(): array
+    {
+        $roles = $this->roles;
+        // guarantee every user at least has ROLE_USER
+        $roles[] = 'ROLE_USER';
+
+        return array_unique($roles);
+    }
+
+    public function setRoles(array $roles): self
+    {
+        $this->roles = $roles;
+
+        return $this;
+    }
+
+    /**
+     * A visual identifier that represents this user.
+     *
+     * @see UserInterface
+     */
+    public function getUserIdentifier(): string
+    {
+        return (string) $this->username;
+    }
+
+    /**
+     * @see PasswordAuthenticatedUserInterface
+     */
+    public function getPassword(): string
+    {
+        return $this->passwordhash;
+    }
+
+    public function setPassword(string $password): self
+    {
+        $this->passwordhash = $password;
+        return $this;
+    }
+
+    /**
+     * Returning a salt is only needed, if you are not using a modern
+     * hashing algorithm (e.g. bcrypt or sodium) in your security.yaml.
+     *
+     * @see UserInterface
+     */
+    public function getSalt(): ?string
+    {
+        return null;
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function eraseCredentials()
+    {
+        // If you store any temporary, sensitive data on the user, clear it here
+        // $this->plainPassword = null;
+    }
 
 }
 
@@ -254,7 +318,8 @@ class <#= entitySelClassName #>
                 
         }
         result = sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
-        return result.Replace(".php", "").Replace(".Php", "").Replace(".PHP", "");
+        result = result.Replace(".php", "").Replace(".Php", "").Replace(".PHP", "");
+        return result;
     }
     public string FirstLetterToUpper(string str)
     {
@@ -356,30 +421,10 @@ class <#= entitySelClassName #>
         }
         return "";
     }
-    string GetMinLen(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
-        if ((prop == null) || (model == null)) return "";
-        if( prop.UnderlyingTypeName.ToLower() == "system.string" ) {
-            string propValue = GetUnNamedAtributeValue(prop, "MinLength");
-            if(!string.IsNullOrEmpty(propValue)) {
-                propValue = propValue.Replace("\"", "");
-                if(!string.IsNullOrEmpty(propValue)) {
-                    return propValue;
-                }
-            }
-        } else if( prop.UnderlyingTypeName.ToLower() == "system.guid" ) {
-            return "36";
-        }
-        return "";
-    }
     string GetMaxLenEx(ModelViewKeyPropertySerializable prop, ModelViewSerializable model) {
-        if ((prop == null) || (model == null)) return "";
+        if ((prop == null) || (model == null)) return null;
         ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => (p.OriginalPropertyName == prop.OriginalPropertyName) && string.IsNullOrEmpty(p.ForeignKeyName)).FirstOrDefault();
         return GetMaxLen(sclrProp, model);
-    }
-    string GetMinLenEx(ModelViewKeyPropertySerializable prop, ModelViewSerializable model) {
-        if ((prop == null) || (model == null)) return "";
-        ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => (p.OriginalPropertyName == prop.OriginalPropertyName) && string.IsNullOrEmpty(p.ForeignKeyName)).FirstOrDefault();
-        return GetMinLen(sclrProp, model);
     }
     bool HasAtributeWithValue(ModelViewPropertyOfVwSerializable sclrProp, string attrName, string attrVal) {
         if ((sclrProp != null) && (!string.IsNullOrEmpty(attrName)) && (!string.IsNullOrEmpty(attrVal)) ) {
@@ -452,7 +497,7 @@ class <#= entitySelClassName #>
             return true;
         }
         return HasFluentAtributeWithValue(prop, "HasDatabaseGeneratedOption", "computed");
-    }
+    }                          
     bool IsComputedPropertyKey(ModelViewKeyPropertySerializable prop, ModelViewSerializable model) {
         if ((model == null)||(prop == null)) return false;
         ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => (p.OriginalPropertyName == prop.OriginalPropertyName) && (string.IsNullOrEmpty(p.ForeignKeyName))).FirstOrDefault();
@@ -464,80 +509,7 @@ class <#= entitySelClassName #>
         if(string.IsNullOrEmpty( prop.UnderlyingTypeName )) return false;
         return prop.UnderlyingTypeName.ToLower() == "system.string";
     }
-    string GetAtributeValueByNo(ModelViewPropertyOfVwSerializable sclrProp, string attrName, int itemNo) {
-        if(itemNo > -1) {
-            if(sclrProp != null) {
-                if (sclrProp.Attributes != null) {
-                    ModelViewAttributeSerializable modelViewAttributeSerializable =
-                        sclrProp.Attributes.Where(a => a.AttrName == attrName).FirstOrDefault();
-                    if(modelViewAttributeSerializable != null) {
-                        if (modelViewAttributeSerializable.VaueProperties != null) {
-                            if(modelViewAttributeSerializable.VaueProperties.Count > itemNo) {
-                                return modelViewAttributeSerializable.VaueProperties[itemNo].PropValue;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return null;                
-    }
-    string GetMinVal(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
-        if ((prop == null) || (model == null)) return "null";
-        string propValue = GetAtributeValueByNo(prop, "IntegerValidator", 0);
-        if(!string.IsNullOrEmpty(propValue)) {
-            propValue = propValue.Replace("\"", "");
-            if(!string.IsNullOrEmpty(propValue)) {
-                return propValue;
-            }
-        }
-        if (prop.UnderlyingTypeName.ToLower() == "system.datetime") {
-            propValue = GetAtributeValueByNo(prop, "Range", 1);
-            if(!string.IsNullOrEmpty(propValue)) {
-                propValue = propValue.Replace("\"", "");
-                if(!string.IsNullOrEmpty(propValue)) {
-                    return propValue ;
-                }
-            }
-        } else {
-            propValue = GetAtributeValueByNo(prop, "Range", 0);
-            if(!string.IsNullOrEmpty(propValue)) {
-                propValue = propValue.Replace("\"", "");
-                if(!string.IsNullOrEmpty(propValue)) {
-                    return propValue;
-                }
-            }
-        }
-        return "";
-    }
-    string GetMaxVal(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
-        if ((prop == null) || (model == null)) return "null";
-        string propValue = GetAtributeValueByNo(prop, "IntegerValidator", 1);
-        if(!string.IsNullOrEmpty(propValue)) {
-            propValue = propValue.Replace("\"", "");
-            if(!string.IsNullOrEmpty(propValue)) {
-                return propValue;
-            }
-        }
-        if (prop.UnderlyingTypeName.ToLower() == "system.datetime") {
-            propValue = GetAtributeValueByNo(prop, "Range", 2);
-            if(!string.IsNullOrEmpty(propValue)) {
-                propValue = propValue.Replace("\"", "");
-                if(!string.IsNullOrEmpty(propValue)) {
-                    return propValue ;
-                }
-            }
-        } else {
-            propValue = GetAtributeValueByNo(prop, "Range", 1);
-            if(!string.IsNullOrEmpty(propValue)) {
-                propValue = propValue.Replace("\"", "");
-                if(!string.IsNullOrEmpty(propValue)) {
-                    return propValue;
-                }
-            }
-        }
-        return "";
-    }
+
 
     string GetSymfonyModelNameSpace(ModelViewSerializable model, string fileType, string appPrefix) {
         string result="";
@@ -571,24 +543,6 @@ class <#= entitySelClassName #>
         
         if (model == null) return "";
         return GetDoctrineEntityClassNameForStr(model.ViewName);
-    }
-    string GetDoctrineEntityUpdClassNameForStr(string RootEntityClassName) {
-        if (string.IsNullOrEmpty(RootEntityClassName)) return "";
-        return RootEntityClassName + "EntityUpd";
-    }
-    string GetDoctrineEntityUpdClassName(ModelViewSerializable model) {
-        
-        if (model == null) return "";
-        return GetDoctrineEntityUpdClassNameForStr(model.RootEntityClassName);
-    }
-    string GetDoctrineEntitySelClassNameForStr(string ViewName) {
-        if (string.IsNullOrEmpty(ViewName)) return "";
-        return ViewName + "EntitySel";
-    }
-    string GetDoctrineEntitySelClassName(ModelViewSerializable model) {
-        
-        if (model == null) return "";
-        return GetDoctrineEntitySelClassNameForStr(model.ViewName);
     }
     string GetDoctrineEntityTableName(ModelViewSerializable model) { 
         string rslt = "";
@@ -828,57 +782,15 @@ class <#= entitySelClassName #>
         if(tpName == "DateTime") tpName = "DateTimeInterface";
         return tpName;
     }
-    bool   GetDoctrineEntityViewFieldIsId(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
-        if ((model == null) || (prop == null)) return false;
-        if(string.IsNullOrEmpty(prop.ForeignKeyNameChain)) {
-            return Model.PrimaryKeyProperties.Where(p => (p.OriginalPropertyName == prop.OriginalPropertyName)).Any();
-        }
-        if(prop.ForeignKeyName != prop.ForeignKeyNameChain) return false;
-        if(model.ForeignKeys == null) return false;
-        ModelViewForeignKeySerializable foreignKey = model.ForeignKeys.Where(f => f.NavigationName == prop.ForeignKeyNameChain).FirstOrDefault();
-        if(foreignKey == null) return false;
-        if ((foreignKey.ForeignKeyProps == null) || (foreignKey.PrincipalKeyProps == null)) return false;
-        int cnt = foreignKey.ForeignKeyProps.Count;
-        if (foreignKey.PrincipalKeyProps.Count < cnt) cnt = foreignKey.PrincipalKeyProps.Count;
-        for(int i = 0; i < cnt; i++) {
-            if(foreignKey.PrincipalKeyProps[i].OriginalPropertyName == prop.OriginalPropertyName) {
-                return Model.PrimaryKeyProperties.Where(p => (p.OriginalPropertyName == foreignKey.ForeignKeyProps[i].OriginalPropertyName)).Any();
-            }
-        }
-        return false;
-    }
-    string GetDoctrineEntityViewTableColumnName(ModelViewPropertyOfVwSerializable prop) {
-        if(prop == null) return "";
-        return prop.ViewPropertyName;
-    }
-    string GetDoctrineAssertType(ModelViewPropertyOfVwSerializable prop) {
-        if(prop == null) return "";
-        string rslt = GetDoctrineEntityViewFieldPhpType(prop);
-        if(string.IsNullOrEmpty(rslt)) return "";
-        switch(rslt) {
-            case "string":
-                string tn = prop.UnderlyingTypeName;
-                if (string.IsNullOrEmpty(tn)) {
-                    rslt = "";
-                } else if ("system.decimal" == tn.ToLower()) {
-                    rslt = "numeric";
-                }
-                break;
-            case "int":
-            case "bool":
-            case "float":
-            case "DateTime":
-                break;
-            default:
-                rslt="";
-                break;
-        }
-        return rslt;
-    }
     bool   GetDoctrineEntityFieldViewIsGuid(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
         if ((model == null) || (prop == null)) return false;
         if(string.IsNullOrEmpty( prop.UnderlyingTypeName )) return false;
         return prop.UnderlyingTypeName.ToLower() == "system.guid";
+    }
+    bool   GetDoctrineEntityFieldViewIsString(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+        if ((model == null) || (prop == null)) return false;
+        if(string.IsNullOrEmpty( prop.UnderlyingTypeName )) return false;
+        return prop.UnderlyingTypeName.ToLower() == "system.string";
     }
 
 #>
