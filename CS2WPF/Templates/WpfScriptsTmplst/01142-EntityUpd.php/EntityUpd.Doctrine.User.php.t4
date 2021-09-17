@@ -14,19 +14,22 @@
 <#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
 <#
 
-    string AppPrefix                = "App";
+    string AppPrefix                    = "App";
 
-    string entityFolder             = "01140-Entity.php";
-    string entityNameSpace          = GetSymfonyModelNameSpace(Model, entityFolder, AppPrefix);
-    
-    
-    string DoctrineEntityClassName  = GetDoctrineEntityClassName(Model);
-    string DoctrineEntityTableName  = GetDoctrineEntityTableName(Model); 
-    string DoctrineEntityRepositoryClassName = DoctrineEntityClassName + "Repository";
+    string entityUpdFolder              = "01142-EntityUpd.php";
+    string entityUpdClassName           = GetModelClassName(Model, entityUpdFolder);
+    string entityUpdNameSpace           = GetSymfonyModelNameSpace(Model, entityUpdFolder, AppPrefix);
+
+    string DoctrineEntityRepositoryClassName = entityUpdClassName + "Repository";
     string DoctrineEntityRepositoryUse = @"App\Repository\"+DoctrineEntityRepositoryClassName;
+
+
+    string DoctrineEntityTableName      = GetDoctrineEntityTableName(Model); 
 
     bool hasGuid = false;
     foreach (ModelViewKeyPropertySerializable prop in Model.AllProperties) {
+        ModelViewPropertyOfVwSerializable scalarProp = GetScalarProperty(prop, Model);
+        if(scalarProp == null) continue;
         if (IsComputedPropertyKey(prop, Model)) {
             if (IsStringPropertyKey(prop, Model)) {
                 hasGuid = true;
@@ -38,7 +41,7 @@
 #>
 <?php
 
-namespace <#= entityNameSpace #>;
+namespace <#= entityUpdNameSpace #>;
 // use Doctrine\Common\Collections\ArrayCollection;
 // use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -48,13 +51,15 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use <#= DoctrineEntityRepositoryUse #>;
 
 /**
- * <#= DoctrineEntityClassName #>
+ * <#= entityUpdClassName #>
  *
  * @ORM\Table(name="<#= DoctrineEntityTableName #>")
  * @ORM\Entity(repositoryClass=<#= DoctrineEntityRepositoryClassName #>::class)
+ * @ORM\Entity
  */
-class <#= DoctrineEntityClassName #> implements UserInterface, PasswordAuthenticatedUserInterface
+class <#= entityUpdClassName #>
 {
+
 <# 
     if (hasGuid) {
 #>
@@ -62,9 +67,11 @@ class <#= DoctrineEntityClassName #> implements UserInterface, PasswordAuthentic
     {
 <#
         foreach (ModelViewKeyPropertySerializable prop in Model.AllProperties) {
+            ModelViewPropertyOfVwSerializable scalarProp = GetScalarProperty(prop, Model);
+            if(scalarProp == null) continue;
             if (IsComputedPropertyKey(prop, Model) && IsStringPropertyKey(prop, Model)) {
 #>
-        $this-><#= GetDoctrineEntityFieldName(prop) #> = Uuid::v4()->toRfc4122();
+        $this-><#= GetDoctrineEntityViewFieldName(scalarProp) #> = Uuid::v4()->toRfc4122();
 <#
             }
         }
@@ -76,14 +83,15 @@ class <#= DoctrineEntityClassName #> implements UserInterface, PasswordAuthentic
 
 <#
         foreach (ModelViewKeyPropertySerializable prop in Model.AllProperties) {
+            ModelViewPropertyOfVwSerializable scalarProp = GetScalarProperty(prop, Model);
+            if(scalarProp == null) continue;
             string isnullableStr = prop.IsRequired ? "nullable=false" : "nullable=true";
             string isnullableVar = prop.IsRequired ? "" : "|null";
             if ("UserName" == prop.OriginalPropertyName) isnullableStr += ", unique=true";
-
             bool isId = GetDoctrineEntityFieldIsId(prop, Model);
-            string maxLen = GetMaxLenEx(prop, Model);
+            string maxLen = GetMaxLen(scalarProp, Model);
             if (string.IsNullOrEmpty(maxLen)) maxLen = ""; else maxLen = ", length=" + maxLen;
-            string optionsFixed = GetDoctrineEntityFieldIsGuid(prop, Model) ? ", options={\"fixed\"=true}" : "";
+            string optionsFixed = GetDoctrineEntityFieldViewIsGuid(scalarProp, Model) ? ", options={\"fixed\"=true}" : "";
 #>
     /**
      * @var <#= GetDoctrineEntityFieldPhpType(prop, Model) + isnullableVar #>
@@ -106,71 +114,27 @@ class <#= DoctrineEntityClassName #> implements UserInterface, PasswordAuthentic
             }
 #>
      */
-    private $<#= GetDoctrineEntityFieldName(prop) #>;
-
+    private $<#= GetDoctrineEntityViewFieldName(scalarProp) #>;
+    
 <#
-        }
-        if (Model.ForeignKeys != null) {
-            foreach (ModelViewForeignKeySerializable foreignKey in Model.ForeignKeys) {
-                string nullableStr =  "nullable=false";
-                if(foreignKey.NavigationType == NavigationTypeEnum.OptionalToMany) nullableStr = "nullable=true";
-#>
-    /**
-     * @var <#= GetDoctrineEntityClassNameForStr(foreignKey.ViewName) #>
-     *
-     * @ORM\ManyToOne(targetEntity="<#= GetDoctrineEntityClassNameForStr(foreignKey.ViewName) #>")
-     * @ORM\JoinColumns({
-<#
-            int fkcnt = foreignKey.PrincipalKeyProps.Count;
-            for(int i = 0; i < fkcnt; i++) {
-                if (i < (fkcnt - 1)) {
-#>
-     *   @ORM\JoinColumn(name="<#= foreignKey.ForeignKeyProps[i].OriginalPropertyName #>", referencedColumnName="<#= foreignKey.PrincipalKeyProps[i].OriginalPropertyName #>", <#= nullableStr #>),
-<#
-                } else {
-#>
-     *   @ORM\JoinColumn(name="<#= foreignKey.ForeignKeyProps[i].OriginalPropertyName #>", referencedColumnName="<#= foreignKey.PrincipalKeyProps[i].OriginalPropertyName #>", <#= nullableStr #>)
-<#
-                }
-            }
-#>
-     * })
-     */
-    private $<#= GetDoctrineEntityFieldNameForStr(foreignKey.NavigationName) #>;
-
-<#
-            }
         }
         foreach (ModelViewKeyPropertySerializable prop in Model.AllProperties) {
+            ModelViewPropertyOfVwSerializable scalarProp = GetScalarProperty(prop, Model);
+            if(scalarProp == null) continue;
 #>
 
-    public function <#= GetDoctrineEntityGetMethodName(prop) #>(): ?<#= GetDoctrineEntityGetSetPhpType(prop, Model) #>
+    public function <#= GetDoctrineEntityViewGetMethodName(scalarProp) #>(): ?<#= GetDoctrineEntityViewGetSetPhpType(scalarProp, Model) #>
     {
-        return $this-><#= GetDoctrineEntityFieldName(prop) #>;
+        return $this-><#= GetDoctrineEntityViewFieldName(scalarProp) #>;
     }
-    public function <#= GetDoctrineEntitySetMethodName(prop) #>(<#= GetDoctrineEntityGetSetPhpType(prop, Model) #> $<#= GetDoctrineEntityFieldName(prop) #>): self
+    public function <#= GetDoctrineEntityViewSetMethodName(scalarProp) #>(<#= GetDoctrineEntityViewGetSetPhpType(scalarProp, Model) #> $<#= GetDoctrineEntityViewFieldName(scalarProp) #>): self
     {
-        $this-><#= GetDoctrineEntityFieldName(prop) #> = $<#= GetDoctrineEntityFieldName(prop) #>;
+        $this-><#= GetDoctrineEntityViewFieldName(scalarProp) #> = $<#= GetDoctrineEntityViewFieldName(scalarProp) #>;
         return $this;
     }
 <#
         }
-        if (Model.ForeignKeys != null) {
-            foreach (ModelViewForeignKeySerializable foreignKey in Model.ForeignKeys) {
-#>
 
-    public function <#= GetDoctrineEntityGetMethodNameForStr(foreignKey.NavigationName) #>(): ?<#= GetDoctrineEntityClassNameForStr(foreignKey.ViewName) #>
-    {
-        return $this-><#= GetDoctrineEntityFieldNameForStr(foreignKey.NavigationName) #>;
-    }
-    public function <#= GetDoctrineEntitySetMethodNameForStr(foreignKey.NavigationName) #>(?<#= GetDoctrineEntityClassNameForStr(foreignKey.ViewName) #> $<#= GetDoctrineEntityFieldNameForStr(foreignKey.NavigationName) #>): self
-    {
-        $this-><#= GetDoctrineEntityFieldNameForStr(foreignKey.NavigationName) #> = $<#= GetDoctrineEntityFieldNameForStr(foreignKey.NavigationName) #>;
-        return $this;
-    }
-<#
-            }
-        }
 #>                
 
 
@@ -318,8 +282,7 @@ class <#= DoctrineEntityClassName #> implements UserInterface, PasswordAuthentic
                 
         }
         result = sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
-        result = result.Replace(".php", "").Replace(".Php", "").Replace(".PHP", "");
-        return result;
+        return result.Replace(".php", "").Replace(".Php", "").Replace(".PHP", "");
     }
     public string FirstLetterToUpper(string str)
     {
@@ -422,7 +385,7 @@ class <#= DoctrineEntityClassName #> implements UserInterface, PasswordAuthentic
         return "";
     }
     string GetMaxLenEx(ModelViewKeyPropertySerializable prop, ModelViewSerializable model) {
-        if ((prop == null) || (model == null)) return null;
+        if ((prop == null) || (model == null)) return "";
         ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => (p.OriginalPropertyName == prop.OriginalPropertyName) && string.IsNullOrEmpty(p.ForeignKeyName)).FirstOrDefault();
         return GetMaxLen(sclrProp, model);
     }
@@ -497,7 +460,7 @@ class <#= DoctrineEntityClassName #> implements UserInterface, PasswordAuthentic
             return true;
         }
         return HasFluentAtributeWithValue(prop, "HasDatabaseGeneratedOption", "computed");
-    }                          
+    }
     bool IsComputedPropertyKey(ModelViewKeyPropertySerializable prop, ModelViewSerializable model) {
         if ((model == null)||(prop == null)) return false;
         ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => (p.OriginalPropertyName == prop.OriginalPropertyName) && (string.IsNullOrEmpty(p.ForeignKeyName))).FirstOrDefault();
@@ -509,7 +472,6 @@ class <#= DoctrineEntityClassName #> implements UserInterface, PasswordAuthentic
         if(string.IsNullOrEmpty( prop.UnderlyingTypeName )) return false;
         return prop.UnderlyingTypeName.ToLower() == "system.string";
     }
-
 
     string GetSymfonyModelNameSpace(ModelViewSerializable model, string fileType, string appPrefix) {
         string result="";
@@ -543,6 +505,15 @@ class <#= DoctrineEntityClassName #> implements UserInterface, PasswordAuthentic
         
         if (model == null) return "";
         return GetDoctrineEntityClassNameForStr(model.ViewName);
+    }
+    string GetDoctrineEntityUpdClassNameForStr(string RootEntityClassName) {
+        if (string.IsNullOrEmpty(RootEntityClassName)) return "";
+        return RootEntityClassName + "EntityUpd";
+    }
+    string GetDoctrineEntityUpdClassName(ModelViewSerializable model) {
+        
+        if (model == null) return "";
+        return GetDoctrineEntityUpdClassNameForStr(model.RootEntityClassName);
     }
     string GetDoctrineEntityTableName(ModelViewSerializable model) { 
         string rslt = "";
@@ -786,11 +757,6 @@ class <#= DoctrineEntityClassName #> implements UserInterface, PasswordAuthentic
         if ((model == null) || (prop == null)) return false;
         if(string.IsNullOrEmpty( prop.UnderlyingTypeName )) return false;
         return prop.UnderlyingTypeName.ToLower() == "system.guid";
-    }
-    bool   GetDoctrineEntityFieldViewIsString(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
-        if ((model == null) || (prop == null)) return false;
-        if(string.IsNullOrEmpty( prop.UnderlyingTypeName )) return false;
-        return prop.UnderlyingTypeName.ToLower() == "system.string";
     }
 
 #>

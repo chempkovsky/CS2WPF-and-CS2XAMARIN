@@ -14,6 +14,7 @@
 <#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
 <#
     string AppPrefix                                = "App";
+    string SrcPrefix                                = "src";
 
 
     string entityUpdFolder                          = "01142-EntityUpd.php";
@@ -38,6 +39,11 @@
     string controllerPrefix                         = GetWebApiServicePrefix(Model);
 
     string DoctrineEntityTableName                  = GetDoctrineEntityTableName(Model); 
+    string DoctrineEntityConnection                 = (Context.DbContextClassName + "Connection").ToLower();
+    string DoctrineEntityManager                    = (Context.DbContextClassName + "Manager").ToLower();
+    string DoctrineEntityMapping                    = FirstLetterToUpper(Context.DbContextClassName.ToLower());
+    string DoctrineEntityUrl                        = ("DATABASE_" + Context.DbContextClassName + "_URL").ToUpper();
+    
 
     string OperatorSufix            = "Oprtr";
 
@@ -174,6 +180,48 @@ use Doctrine\ORM\Query\ResultSetMapping;
 use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
 
+// ///////////////////////////////////////////////////////////////////////////////
+// the generated code expects "config/packages/doctrine.yaml"-file to have the following config parameters
+// ///////////////////////////////////////////////////////////////////////////////
+// doctrine:
+//    dbal:
+//       default_connection: here is a name of default connection (for instance, default_connection: <#= DoctrineEntityConnection #>)
+//
+//       connections:
+//       ...
+//          <#= DoctrineEntityConnection #>:
+//                # configure these for your database server 
+//                url: '%env(resolve:<#= DoctrineEntityUrl #>)%'
+//                # driver: 'pdo_mysql'
+//                # server_version: '5.7'
+//                # charset: utf8mb4
+//    orm:
+//       default_entity_manager: here is a name of default manager (for instance, default_entity_manager: <#= DoctrineEntityManager #>)
+//
+//       entity_managers:
+//       ...
+//          <#= DoctrineEntityManager #>:
+//              connection: <#= DoctrineEntityConnection #>
+//              mappings:
+//                  <#= DoctrineEntityMapping #>:
+//                      is_bundle: false
+//                      type: annotation 
+//                      dir: '%kernel.project_dir%/<#= GetSymfonyModelNameSpace(Model, entityUpdFolder, SrcPrefix).Replace("\\","/") #>'
+//                      prefix: '<#= GetSymfonyModelNameSpace(Model, entityUpdFolder, AppPrefix) #>'
+//                      alias: <#= DoctrineEntityManager #>  
+//
+// ///////////////////////////////////////////////////////////////////////////////
+// "config/packages/doctrine.yaml"-file  expects ".env"-file to have the following config parameters like below
+// ///////////////////////////////////////////////////////////////////////////////
+// ...
+// ### > doctrine/doctrine-bundle ###
+// # Format described at https://www.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/configuration.html#connecting-using-a-url
+// # IMPORTANT: You MUST configure your server version, either here or in config/packages/doctrine.yaml
+// #
+// <#= DoctrineEntityUrl #>="mysql://root:password_here@127.0.0.1:3306/schema_name_here?serverVersion=8.0"
+// ### < doctrine/doctrine-bundle ###
+// ...
+// ///////////////////////////////////////////////////////////////////////////////
 
 class <#= controllerClassName #> extends AbstractController
 {
@@ -189,7 +237,8 @@ class <#= controllerClassName #> extends AbstractController
      */
     public function <#= GetAllMethodName #>(): Response
     {
-        $rsm = new ResultSetMapping($this->getDoctrine()->getManager());
+        $em = $this->getDoctrine()->getManager('<#= DoctrineEntityManager #>');
+        $rsm = new ResultSetMapping($em);
         $rsm->addEntityResult(<#= entitySelClassName #>::class, "er");
 <#
         foreach(ModelViewPropertyOfVwSerializable sclrProp in Model.ScalarProperties) {
@@ -198,7 +247,7 @@ class <#= controllerClassName #> extends AbstractController
 <#
         }
 #>
-        $query = $this->getDoctrine()->getManager()->createNativeQuery("<#= selectClause + " " + fromClause #>", $rsm);
+        $query = $em->createNativeQuery("<#= selectClause + " " + fromClause #>", $rsm);
         $rslt = $query->getResult();
         if (!$rslt) {
             throw $this->createNotFoundException(); // error 404
@@ -270,7 +319,8 @@ class <#= controllerClassName #> extends AbstractController
         } // the end of foreach(ModelViewPropertyOfVwSerializable sclrProp in Model.ScalarProperties) {}
 #>
         $whereClause = $whereClause.")";
-        $rsm = new ResultSetMapping($this->getDoctrine()->getManager());
+        $em = $this->getDoctrine()->getManager('<#= DoctrineEntityManager #>');
+        $rsm = new ResultSetMapping($em);
         $rsm->addEntityResult(<#= entitySelClassName #>::class, "er");
 <#
         foreach(ModelViewPropertyOfVwSerializable sclrProp in Model.ScalarProperties) {
@@ -279,7 +329,7 @@ class <#= controllerClassName #> extends AbstractController
 <#
         }
 #>
-        $query = $this->getDoctrine()->getManager()->createNativeQuery("<#= selectClause + " " + fromClause #>".$whereClause, $rsm);
+        $query = $em->createNativeQuery("<#= selectClause + " " + fromClause #>".$whereClause, $rsm);
 <#
         foreach(ModelViewPropertyOfVwSerializable sclrProp in Model.ScalarProperties) {
             if(! (primKeys.Contains(sclrProp))) {
@@ -364,7 +414,8 @@ class <#= controllerClassName #> extends AbstractController
         } // the end of foreach(ModelViewPropertyOfVwSerializable sclrProp in Model.ScalarProperties) {}
 #>
         $whereClause = $whereClause.")";
-        $rsm = new ResultSetMapping($this->getDoctrine()->getManager());
+        $em = $this->getDoctrine()->getManager('<#= DoctrineEntityManager #>');
+        $rsm = new ResultSetMapping($em);
         $rsm->addEntityResult(<#= entitySelClassName #>::class, "er");
 <#
         foreach(ModelViewPropertyOfVwSerializable sclrProp in Model.ScalarProperties) {
@@ -373,7 +424,7 @@ class <#= controllerClassName #> extends AbstractController
 <#
         }
 #>
-        $query = $this->getDoctrine()->getManager()->createNativeQuery("<#= selectClause + " " + fromClause #>".$whereClause, $rsm);
+        $query = $em->createNativeQuery("<#= selectClause + " " + fromClause #>".$whereClause, $rsm);
 <#
         
         foreach(ModelViewPropertyOfVwSerializable sclrProp in Model.ScalarProperties) {
@@ -432,7 +483,8 @@ class <#= controllerClassName #> extends AbstractController
         }
 #>
         $whereClause = $whereClause.")";
-        $rsm = new ResultSetMapping($this->getDoctrine()->getManager());
+        $em = $this->getDoctrine()->getManager('<#= DoctrineEntityManager #>');
+        $rsm = new ResultSetMapping($em);
         $rsm->addEntityResult(<#= entityUpdClassName #>::class, "er");
 <#
         foreach (ModelViewKeyPropertySerializable prop in Model.AllProperties) {
@@ -443,7 +495,7 @@ class <#= controllerClassName #> extends AbstractController
 <#                                                                                       
         }
 #>
-        $query = $this->getDoctrine()->getManager()->createNativeQuery("<#= selForUpdateClause + " " + fromForUpdateClause #>".$whereClause, $rsm);
+        $query = $em->createNativeQuery("<#= selForUpdateClause + " " + fromForUpdateClause #>".$whereClause, $rsm);
 <#
         foreach(ModelViewPropertyOfVwSerializable sclrProp in Model.ScalarProperties) {
             if(! (primKeys.Contains(sclrProp))) {
@@ -461,8 +513,8 @@ class <#= controllerClassName #> extends AbstractController
         if(count($rsltEx) != 1) {
             throw $this->createNotFoundException(); // error 404
         }
-        $this->getDoctrine()->getManager()->remove($rsltEx[0]);
-        $this->getDoctrine()->getManager()->flush();
+        $em->remove($rsltEx[0]);
+        $em->flush();
         return $this->json($rslt[0]); 
     }
 <#
@@ -531,7 +583,8 @@ class <#= controllerClassName #> extends AbstractController
         }
 #>
         $whereClause = $whereClause.")";
-        $rsm = new ResultSetMapping($this->getDoctrine()->getManager());
+        $em = $this->getDoctrine()->getManager('<#= DoctrineEntityManager #>');
+        $rsm = new ResultSetMapping($em);
         $rsm->addEntityResult(<#= entityUpdClassName #>::class, "er");
 <#
         foreach (ModelViewKeyPropertySerializable prop in Model.AllProperties) {
@@ -542,7 +595,7 @@ class <#= controllerClassName #> extends AbstractController
 <#
         }
 #>
-        $query = $this->getDoctrine()->getManager()->createNativeQuery("<#= selForUpdateClause + " " + fromForUpdateClause #>".$whereClause, $rsm);
+        $query = $em->createNativeQuery("<#= selForUpdateClause + " " + fromForUpdateClause #>".$whereClause, $rsm);
 <#
         foreach(ModelViewPropertyOfVwSerializable sclrProp in Model.ScalarProperties) {
             if(! (primKeys.Contains(sclrProp))) {
@@ -572,9 +625,9 @@ class <#= controllerClassName #> extends AbstractController
 <#
         }
 #>
-        $this->getDoctrine()->getManager()->flush();
+        $em->flush();
 //        deprecated
-//        $this->getDoctrine()->getManager()->detach($rsltEx[0]);
+//        $em->detach($rsltEx[0]);
         $whereClause = " where (";
 <#
         isfirst = true;
@@ -616,7 +669,7 @@ class <#= controllerClassName #> extends AbstractController
         } // the end of foreach(ModelViewPropertyOfVwSerializable sclrProp in Model.ScalarProperties) {}
 #>
         $whereClause = $whereClause.")";
-        $rsm = new ResultSetMapping($this->getDoctrine()->getManager());
+        $rsm = new ResultSetMapping($em);
         $rsm->addEntityResult(<#= entitySelClassName #>::class, "er");
 <#
         foreach(ModelViewPropertyOfVwSerializable sclrProp in Model.ScalarProperties) {
@@ -625,7 +678,7 @@ class <#= controllerClassName #> extends AbstractController
 <#
         }
 #>
-        $query = $this->getDoctrine()->getManager()->createNativeQuery("<#= selectClause + " " + fromClause #>".$whereClause, $rsm);
+        $query = $em->createNativeQuery("<#= selectClause + " " + fromClause #>".$whereClause, $rsm);
 <#
         
         foreach(ModelViewPropertyOfVwSerializable sclrProp in Model.ScalarProperties) {
@@ -688,10 +741,11 @@ class <#= controllerClassName #> extends AbstractController
 <#
         }
 #>
-        $this->getDoctrine()->getManager()->persist($entityNew);
-        $this->getDoctrine()->getManager()->flush();
+        $em = $this->getDoctrine()->getManager('<#= DoctrineEntityManager #>');
+        $em->persist($entityNew);
+        $em->flush();
 //        deprecated
-//        $this->getDoctrine()->getManager()->detach($entityNew);
+//        $em->detach($entityNew);
         $whereClause = " where (";
 <#
         bool isfirst = true;
@@ -735,7 +789,7 @@ class <#= controllerClassName #> extends AbstractController
         }
 #>
         $whereClause = $whereClause.")";
-        $rsm = new ResultSetMapping($this->getDoctrine()->getManager());
+        $rsm = new ResultSetMapping($em);
         $rsm->addEntityResult(<#= entitySelClassName #>::class, "er");
 <#
         foreach(ModelViewPropertyOfVwSerializable sclrProp in Model.ScalarProperties) {
@@ -744,7 +798,7 @@ class <#= controllerClassName #> extends AbstractController
 <#
         }
 #>
-        $query = $this->getDoctrine()->getManager()->createNativeQuery("<#= selectClause + " " + fromClause #>".$whereClause, $rsm);
+        $query = $em->createNativeQuery("<#= selectClause + " " + fromClause #>".$whereClause, $rsm);
 <#
         foreach(ModelViewPropertyOfVwSerializable sclrProp in Model.ScalarProperties) {
             if(! (primKeys.Contains(sclrProp))) {
@@ -859,10 +913,11 @@ class <#= controllerClassName #> extends AbstractController
         }
 #>
         if($whereClause == " where (") { $whereClause = " "; } else { $whereClause = $whereClause.")"; }
-        $rsm = new ResultSetMapping($this->getDoctrine()->getManager());
+        $em = $this->getDoctrine()->getManager('<#= DoctrineEntityManager #>');
+        $rsm = new ResultSetMapping($em);
         $rsm->addEntityResult(<#= entityTotalClassName #>::class, "er");
         $rsm->addFieldResult("er", "totalcount", "totalcount");
-        $query = $this->getDoctrine()->getManager()->createNativeQuery("select count(*) as totalcount <#= fromClause #>".$whereClause, $rsm);
+        $query = $em->createNativeQuery("select count(*) as totalcount <#= fromClause #>".$whereClause, $rsm);
         foreach ($filters as $k => $v) {
             $query->setParameter($k, $v);
         }
@@ -948,7 +1003,7 @@ class <#= controllerClassName #> extends AbstractController
 #>
         }
 
-        $rsm = new ResultSetMapping($this->getDoctrine()->getManager());
+        $rsm = new ResultSetMapping($em);
         $rsm->addEntityResult(<#= entitySelClassName #>::class, "er");
 <#
         foreach(ModelViewPropertyOfVwSerializable sclrProp in Model.ScalarProperties) {
@@ -958,7 +1013,7 @@ class <#= controllerClassName #> extends AbstractController
         }
 #>
         $offset = ($currentPage - 1) * $currentPageSize;
-        $query = $this->getDoctrine()->getManager()->createNativeQuery("<#= selectClause + " " + fromClause #>".$whereClause.$orderby." LIMIT " . $offset . "," . $currentPageSize, $rsm);
+        $query = $em->createNativeQuery("<#= selectClause + " " + fromClause #>".$whereClause.$orderby." LIMIT " . $offset . "," . $currentPageSize, $rsm);
         foreach ($filters as $k => $v) {
             $query->setParameter($k, $v);
         }
@@ -1379,7 +1434,7 @@ class <#= controllerClassName #> extends AbstractController
     }
     string GetDoctrineEntityClassNameForStr(string ViewClassName) {
         if (string.IsNullOrEmpty(ViewClassName)) return "";
-        return ViewClassName + "Entity";
+        return FirstLetterToUpper(ViewClassName + "Entity");
     }
     string GetDoctrineEntityClassName(ModelViewSerializable model) {
         
