@@ -15,6 +15,8 @@
 <#
 
     string AppPrefix                = "App";
+    string SrcPrefix                = "src";
+
 
     string entityFolder             = "01140-Entity.php";
     string entityNameSpace          = GetSymfonyModelNameSpace(Model, entityFolder, AppPrefix);
@@ -22,6 +24,12 @@
     
     string DoctrineEntityClassName  = GetDoctrineEntityClassName(Model);
     string DoctrineEntityTableName  = GetDoctrineEntityTableName(Model); 
+
+    string DoctrineEntityConnection                 = (Context.DbContextClassName + "DeployConnection").ToLower();
+    string DoctrineEntityManager                    = (Context.DbContextClassName + "DeployManager").ToLower();
+    string DoctrineEntityMapping                    = FirstLetterToUpper(Context.DbContextClassName.ToLower()) + "deploy";
+    string DoctrineEntityUrl                        = ("DATABASE_" + Context.DbContextClassName + "_URL").ToUpper();
+
 
     bool hasGuid = false;
     foreach (ModelViewKeyPropertySerializable prop in Model.AllProperties) {
@@ -41,6 +49,61 @@ namespace <#= entityNameSpace #>;
 // use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Uid\Uuid;
+
+
+// ///////////////////////////////////////////////////////////////////////////////
+// to create database tables you can apply the following config parameters in the "config/packages/doctrine.yaml"-file
+// than create DB tables with the following commands:
+//
+// php bin/console make:migration --em=<#= DoctrineEntityManager #>
+// php bin/console doctrine:migrations:migrate --em=<#= DoctrineEntityManager #>
+//
+// or commands:
+//
+// php bin/console doctrine:migrations:diff --em=<#= DoctrineEntityManager #>
+// php bin/console doctrine:migrations:migrate --em=<#= DoctrineEntityManager #>
+//
+// ///////////////////////////////////////////////////////////////////////////////
+// doctrine:
+//    dbal:
+//       default_connection: here is a name of default connection (for instance, default_connection: <#= DoctrineEntityConnection #>)
+//
+//       connections:
+//       ...
+//          <#= DoctrineEntityConnection #>:
+//                # configure these for your database server 
+//                url: '%env(resolve:<#= DoctrineEntityUrl #>)%'
+//                # driver: 'pdo_mysql'
+//                # server_version: '5.7'
+//                # charset: utf8mb4
+//    orm:
+//       default_entity_manager: here is a name of default manager (for instance, default_entity_manager: <#= DoctrineEntityManager #>)
+//
+//       entity_managers:
+//       ...
+//          <#= DoctrineEntityManager #>:
+//              connection: <#= DoctrineEntityConnection #>
+//              mappings:
+//                  <#= DoctrineEntityMapping #>:
+//                      is_bundle: false
+//                      type: annotation 
+//                      dir: '%kernel.project_dir%/<#= GetSymfonyModelNameSpace(Model, entityFolder, SrcPrefix).Replace("\\","/") #>'
+//                      prefix: '<#= GetSymfonyModelNameSpace(Model, entityFolder, AppPrefix) #>'
+//                      alias: <#= DoctrineEntityManager #>  
+//
+// ///////////////////////////////////////////////////////////////////////////////
+// "config/packages/doctrine.yaml"-file  expects ".env"-file to have the following config parameters like below
+// ///////////////////////////////////////////////////////////////////////////////
+// ...
+// ### > doctrine/doctrine-bundle ###
+// # Format described at https://www.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/configuration.html#connecting-using-a-url
+// # IMPORTANT: You MUST configure your server version, either here or in config/packages/doctrine.yaml
+// #
+// <#= DoctrineEntityUrl #>="mysql://root:password_here@127.0.0.1:3306/schema_name_here?serverVersion=8.0"
+// ### < doctrine/doctrine-bundle ###
+// ...
+// ///////////////////////////////////////////////////////////////////////////////
+
 
 /**
  * <#= DoctrineEntityClassName #>
