@@ -1371,5 +1371,44 @@ namespace CS2WPF.Helpers
             result.UIListProperties = ListModelViewForeignKeySerializableGetCopy(srcModelViewSerializable.UIListProperties);
             return result;
         }
+        public static ModelViewSerializable ModelViewSerializableSimpleGetCopy(this ModelViewSerializable srcModelViewSerializable, string destinationProject, string defaultProjectNameSpace, string destinationFolder)
+        {
+            Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
+            if (srcModelViewSerializable == null) return null;
+            ModelViewSerializable result = new ModelViewSerializable()
+            {
+                RootEntityClassName = srcModelViewSerializable.RootEntityClassName,
+                RootEntityFullClassName = srcModelViewSerializable.RootEntityFullClassName,
+                RootEntityDbContextPropertyName = srcModelViewSerializable.RootEntityDbContextPropertyName,
+                RootEntityUniqueProjectName = srcModelViewSerializable.RootEntityUniqueProjectName,
+
+                ViewName = srcModelViewSerializable.ViewName,
+                PageViewName = srcModelViewSerializable.PageViewName,
+                ViewProject = destinationProject,
+                ViewDefaultProjectNameSpace = defaultProjectNameSpace,
+                ViewFolder = destinationFolder,
+                GenerateJSonAttribute = srcModelViewSerializable.GenerateJSonAttribute,
+
+                WebApiServiceName = srcModelViewSerializable.WebApiServiceName,
+                WebApiServiceProject = srcModelViewSerializable.WebApiServiceProject,
+                WebApiServiceDefaultProjectNameSpace = srcModelViewSerializable.WebApiServiceDefaultProjectNameSpace,
+                WebApiServiceFolder = srcModelViewSerializable.WebApiServiceFolder,
+
+                IsWebApiSelectAll = srcModelViewSerializable.IsWebApiSelectAll,
+                IsWebApiSelectManyWithPagination = srcModelViewSerializable.IsWebApiSelectManyWithPagination,
+                IsWebApiSelectOneByPrimarykey = srcModelViewSerializable.IsWebApiSelectOneByPrimarykey,
+                IsWebApiAdd = srcModelViewSerializable.IsWebApiAdd,
+                IsWebApiUpdate = srcModelViewSerializable.IsWebApiUpdate,
+                IsWebApiDelete = srcModelViewSerializable.IsWebApiDelete,
+            };
+            result.ScalarProperties = ListModelViewPropertyOfVwSerializableGetCopy(srcModelViewSerializable.ScalarProperties);
+            result.PrimaryKeyProperties = ListModelViewKeyPropertySerializableGetCopy(srcModelViewSerializable.PrimaryKeyProperties);
+            result.AllProperties = ListModelViewKeyPropertySerializableGetCopy(srcModelViewSerializable.AllProperties);
+            result.ForeignKeys = ListModelViewForeignKeySerializableGetCopy(srcModelViewSerializable.ForeignKeys, srcModelViewSerializable.RootEntityUniqueProjectName, srcModelViewSerializable.RootEntityFullClassName);
+            result.UIFormProperties = ListModelViewForeignKeySerializableGetCopy(srcModelViewSerializable.UIFormProperties);
+            result.UIListProperties = ListModelViewForeignKeySerializableGetCopy(srcModelViewSerializable.UIListProperties);
+            return result;
+        }
+
     }
 }

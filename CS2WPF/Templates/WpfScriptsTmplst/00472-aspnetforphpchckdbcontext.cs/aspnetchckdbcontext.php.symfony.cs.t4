@@ -36,10 +36,6 @@ using System.Web;
 using System.Collections.Generic;
 using System.Data.Entity;
 
-/*
-    This is a dummy(mock) class, and you must remove it from the project after generating the user interface.
-*/
-
 namespace <#= GetNameSpaceName(Model, aspnetchckdbcontextFolder, DefaultProjectNameSpace) #>
 {
     public class <#= GetEntityClassName(Model, aspnetchckdbcontextFolder) #> : DbContext
@@ -77,7 +73,10 @@ namespace <#= GetNameSpaceName(Model, aspnetchckdbcontextFolder, DefaultProjectN
                 Property(p => p.Id).HasDatabaseGeneratedOption(System.ComponentModel.DataAnnotations.Schema.DatabaseGeneratedOption.Computed);
             modelBuilder.Entity<<#= GetEntityClassName(Model, aspnetuserclaimFolder) #>>().
                 Property(p => p.Id).HasDatabaseGeneratedOption(System.ComponentModel.DataAnnotations.Schema.DatabaseGeneratedOption.Identity);
+            modelBuilder.Entity<<#= GetEntityClassName(Model, aspnetuserloginFolder) #>>().
+                Property(p => p.UserId).HasDatabaseGeneratedOption(System.ComponentModel.DataAnnotations.Schema.DatabaseGeneratedOption.Computed);
                 
+
             modelBuilder.Entity<<#= GetEntityClassName(Model, aspnetuserroleFolder) #>>().HasKey(p => new { p.UserId, p.RoleId });
             modelBuilder.Entity<<#= GetEntityClassName(Model, aspnetuserFolder) #>>().HasKey(p => p.Id);
             modelBuilder.Entity<<#= GetEntityClassName(Model, aspnetroleFolder) #>>().HasKey(p => p.Id);
@@ -103,17 +102,6 @@ namespace <#= GetNameSpaceName(Model, aspnetchckdbcontextFolder, DefaultProjectN
 
             modelBuilder.Entity<<#= GetEntityClassName(Model, aspnetuserFolder) #>>().HasIndex(p => p.UserName)
                 .IsUnique();
-
-//-------------------------------------------
-// begin code to remove
-            modelBuilder.Entity<<#= GetEntityClassName(Model, aspnetusermaskFolder) #>>().HasKey(p => p.UserId);
-
-            modelBuilder.Entity<<#= GetEntityClassName(Model, aspnetusermaskFolder) #>>().HasRequired(d => d.AspNetUser)
-                .WithMany(m => m.UserMasks)
-                .HasForeignKey(d => d.UserId);
-// end code to remove
-//-------------------------------------------
-
 
         }
 
@@ -148,17 +136,6 @@ namespace <#= GetNameSpaceName(Model, aspnetchckdbcontextFolder, DefaultProjectN
             set;
         }
 
-//-------------------------------------------
-// begin code to remove
-
-        public DbSet< <#= GetEntityClassName(Model, aspnetusermaskFolder) #> > aspnetusermaskDbSet
-        {
-            get;
-            set;
-        }
-
-// end code to remove
-//-------------------------------------------
         public DbSet< <#= GetEntityClassName(Model, aspnetmodelFolder) #> > aspnetmodellDbSet
         {
             get;

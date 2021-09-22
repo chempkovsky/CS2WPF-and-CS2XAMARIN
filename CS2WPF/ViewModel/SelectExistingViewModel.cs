@@ -34,6 +34,17 @@ namespace CS2WPF.ViewModel
             this.Dte = dte;
             ModelViews = new ObservableCollection<ModelViewSerializable>();
         }
+
+        public SolutionCodeElement SelectedDbContext
+        {
+            get { return _SelectedDbContext; }
+            set
+            {
+                if (_SelectedDbContext == value) return;
+                _SelectedDbContext = value;
+            }
+        }
+
         public DbContextSerializable CurrentDbContext
         {
             get
@@ -261,19 +272,25 @@ namespace CS2WPF.ViewModel
                 CurrentDbContext.ModelViews = new List<ModelViewSerializable>();
                 SelectedModel = null;
                 ModelViews = new ObservableCollection<ModelViewSerializable>();
-                foreach (ModelViewSerializable itm in srcContext.ModelViews)
+                if (srcContext.ModelViews != null)
                 {
-                    ModelViewSerializable destItm = itm.ModelViewSerializableGetCopy(this.DestinationProject, this.DefaultProjectNameSpace, this.DestinationFolder, this.DbSetProppertyName, this.SelectedEntity);
-                    CurrentDbContext.ModelViews.Add(destItm);
+                    foreach (ModelViewSerializable itm in srcContext.ModelViews)
+                    {
+                        ModelViewSerializable destItm = itm.ModelViewSerializableSimpleGetCopy(this.DestinationProject, this.DefaultProjectNameSpace, this.DestinationFolder);
+                        CurrentDbContext.ModelViews.Add(destItm);
+                    }
                 }
 
                 string projectName = "";
-                if (_SelectedDbContext.CodeElementRef != null)
+                if (_SelectedDbContext != null)
                 {
-                    if (_SelectedDbContext.CodeElementRef.ProjectItem != null)
+                    if (_SelectedDbContext.CodeElementRef != null)
                     {
-                        projectName =
-                           _SelectedDbContext.CodeElementRef.ProjectItem.ContainingProject.UniqueName;
+                        if (_SelectedDbContext.CodeElementRef.ProjectItem != null)
+                        {
+                            projectName =
+                               _SelectedDbContext.CodeElementRef.ProjectItem.ContainingProject.UniqueName;
+                        }
                     }
                 }
                 string SolutionDirectory = System.IO.Path.GetDirectoryName(Dte.Solution.FullName);

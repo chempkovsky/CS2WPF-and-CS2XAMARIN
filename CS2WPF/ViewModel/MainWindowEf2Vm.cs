@@ -195,6 +195,8 @@ namespace CS2WPF.ViewModel
                         dataContext.IsReady.IsReadyEvent += SelectEntityForGivenDbContextViewModel_IsReady;
                         SelectExistingUC = new UserControlSelectExisting(dataContext);
                     }
+                    (SelectExistingUC.DataContext as SelectExistingViewModel).SelectedDbContext =
+                        (SelectSourceEntityUC.DataContext as SelectEntityForGivenDbContextViewModel).SelectedDbContext;
                     (SelectExistingUC.DataContext as SelectExistingViewModel).CurrentDbContext = CurrentDbContext;
                     (SelectExistingUC.DataContext as SelectExistingViewModel).SelectedEntity =
                         (SelectSourceEntityUC.DataContext as SelectEntityForGivenDbContextViewModel).SelectedCodeElement;
