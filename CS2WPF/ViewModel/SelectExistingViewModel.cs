@@ -221,7 +221,91 @@ namespace CS2WPF.ViewModel
                 return;
             }
 
-}
+        }
+        #endregion
+
+        #region ImportAllBtnCommand
+        private ICommand _ImportAllBtnCommand;
+        public ICommand ImportAllBtnCommand
+        {
+            get
+            {
+                return _ImportAllBtnCommand ?? (_ImportAllBtnCommand = new CommandHandler((param) => ImportAllBtnCommandAction(param), (param) => ImportAllBtnCommandCanExecute(param)));
+            }
+        }
+        public bool ImportAllBtnCommandCanExecute(Object param)
+        {
+            return true;
+        }
+        public virtual void ImportAllBtnCommandAction(Object param)
+        {
+            if(System.Windows.Forms.MessageBox.Show("Warning: ==Importing all== clears all existing settings for the selected context. Information about generated code will be lost.  Are you sure you want to continue?" , "Warning", 
+                MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return;
+            OpenFileDialog ofdlg = new OpenFileDialog();
+            ofdlg.Filter = "JSON-files(*.json)|*.json";
+            ofdlg.DefaultExt = "json";
+            ofdlg.Title = "Select a source to import";
+            if (ofdlg.ShowDialog() != DialogResult.OK)
+            {
+                return;
+            }
+            try
+            {
+                string jsonString = File.ReadAllText(ofdlg.FileName);
+                DbContextSerializable srcContext = JsonConvert.DeserializeObject<DbContextSerializable>(jsonString);
+                if (CurrentDbContext == null)
+                {
+                    return;
+                }
+                CurrentDbContext.CommonStaffs = new List<CommonStaffSerializable>();
+                CurrentDbContext.ModelViews = new List<ModelViewSerializable>();
+                SelectedModel = null;
+                ModelViews.Clear();
+                foreach (ModelViewSerializable itm in srcContext.ModelViews)
+                {
+                    ModelViewSerializable destItm = itm.ModelViewSerializableGetCopy(this.DestinationProject, this.DefaultProjectNameSpace, this.DestinationFolder, this.DbSetProppertyName, this.SelectedEntity);
+                    CurrentDbContext.ModelViews.Add(destItm);
+                }
+
+                string projectName = "";
+                if (_SelectedDbContext.CodeElementRef != null)
+                {
+                    if (_SelectedDbContext.CodeElementRef.ProjectItem != null)
+                    {
+                        projectName =
+                           _SelectedDbContext.CodeElementRef.ProjectItem.ContainingProject.UniqueName;
+                    }
+                }
+                string SolutionDirectory = System.IO.Path.GetDirectoryName(Dte.Solution.FullName);
+                if (!string.IsNullOrEmpty(projectName))
+                {
+                    string locFileName = Path.Combine(projectName, _SelectedDbContext.CodeElementFullName, "json");
+                    locFileName = locFileName.Replace("\\", ".");
+                    locFileName = Path.Combine(SolutionDirectory, locFileName);
+                    jsonString = JsonConvert.SerializeObject(CurrentDbContext);
+                    File.WriteAllText(locFileName, jsonString);
+                    System.Windows.Forms.MessageBox.Show("Information: New setting have been saved onto disk. The file name: " + locFileName + " Please restart the Wizard", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    foreach (ModelViewSerializable itm in CurrentDbContext.ModelViews)
+                    {
+                        if (itm.RootEntityClassName == SelectedEntity.CodeElementName)
+                        {
+                            ModelViews.Add(itm);
+                        }
+                    }
+
+                }
+                else
+                {
+                    System.Windows.Forms.MessageBox.Show("Error: ProjectName is not defined. Please restart the Wizard", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            catch (Exception e)
+            {
+                System.Windows.Forms.MessageBox.Show("Error:" + e.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+        }
         #endregion
 
     }
