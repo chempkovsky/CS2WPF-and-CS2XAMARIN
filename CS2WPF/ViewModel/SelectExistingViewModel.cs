@@ -260,7 +260,7 @@ namespace CS2WPF.ViewModel
                 CurrentDbContext.CommonStaffs = new List<CommonStaffSerializable>();
                 CurrentDbContext.ModelViews = new List<ModelViewSerializable>();
                 SelectedModel = null;
-                ModelViews.Clear();
+                ModelViews = new ObservableCollection<ModelViewSerializable>();
                 foreach (ModelViewSerializable itm in srcContext.ModelViews)
                 {
                     ModelViewSerializable destItm = itm.ModelViewSerializableGetCopy(this.DestinationProject, this.DefaultProjectNameSpace, this.DestinationFolder, this.DbSetProppertyName, this.SelectedEntity);
