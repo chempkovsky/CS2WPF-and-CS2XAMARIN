@@ -2,6 +2,7 @@
 using CS2WPF.Helpers.UI;
 using CS2WPF.Model;
 using CS2WPF.Model.Serializable;
+using EnvDTE;
 using EnvDTE80;
 using Newtonsoft.Json;
 using System;
@@ -250,7 +251,7 @@ namespace CS2WPF.ViewModel
         }
         public virtual void ImportAllBtnCommandAction(Object param)
         {
-            if(System.Windows.Forms.MessageBox.Show("Warning: ==Importing all== clears all existing settings for the selected context. Information about generated code will be lost.  Are you sure you want to continue?" , "Warning", 
+            if(System.Windows.Forms.MessageBox.Show("Warning: ==Importing all== clears all existing settings for the selected context. Information about generated code will be lost. Information about WebApi services will be incorrect. Are you sure you want to continue?" , "Warning", 
                 MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return;
             OpenFileDialog ofdlg = new OpenFileDialog();
             ofdlg.Filter = "JSON-files(*.json)|*.json";
@@ -260,26 +261,51 @@ namespace CS2WPF.ViewModel
             {
                 return;
             }
+            if (CurrentDbContext == null)
+            {
+                System.Windows.Forms.MessageBox.Show("Current DbContext is not defined. Please restart the Wizard", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
             try
             {
                 string jsonString = File.ReadAllText(ofdlg.FileName);
                 DbContextSerializable srcContext = JsonConvert.DeserializeObject<DbContextSerializable>(jsonString);
+
+                string EntityUniqueProjectName = (SelectedEntity.CodeElementRef as CodeClass).ProjectItem.ContainingProject.UniqueName;
+                string EntityFullClassName = SelectedEntity.CodeElementFullName;
+                string EntityNameSpace = EntityFullClassName.Replace("." + SelectedEntity.CodeElementName, "");
+                if (srcContext.ModelViews != null)
+                {
+                    foreach(ModelViewSerializable mv in srcContext.ModelViews)
+                    {
+                        mv.RootEntityFullClassName = EntityNameSpace + "." + mv.RootEntityClassName;
+                        mv.RootEntityUniqueProjectName = EntityUniqueProjectName;
+                        mv.ViewProject = this.DestinationProject;
+                        mv.ViewDefaultProjectNameSpace = this.DefaultProjectNameSpace;
+                        mv.ViewFolder = this.DbSetProppertyName;
+                        if(mv.ForeignKeys != null)
+                        {
+                            foreach(ModelViewForeignKeySerializable fk in mv.ForeignKeys)
+                            {
+                                fk.EntityFullName = EntityNameSpace + "." + fk.EntityName; //": "Dm01Entity.AspNetForPhp.aspnetuserroles",
+                                fk.EntityUniqueProjectName = EntityUniqueProjectName;
+                                fk.NavigationEntityFullName = EntityNameSpace + "." + fk.NavigationEntityName;
+                                fk.NavigationEntityUniqueProjectName = EntityUniqueProjectName;
+                            }
+                        }
+                        mv.CommonStaffs = new List<CommonStaffSerializable>();
+                    }
+                }
                 if (CurrentDbContext == null)
                 {
                     return;
                 }
                 CurrentDbContext.CommonStaffs = new List<CommonStaffSerializable>();
-                CurrentDbContext.ModelViews = new List<ModelViewSerializable>();
+                CurrentDbContext.ModelViews = srcContext.ModelViews;
                 SelectedModel = null;
                 ModelViews = new ObservableCollection<ModelViewSerializable>();
-                if (srcContext.ModelViews != null)
-                {
-                    foreach (ModelViewSerializable itm in srcContext.ModelViews)
-                    {
-                        ModelViewSerializable destItm = itm.ModelViewSerializableSimpleGetCopy(this.DestinationProject, this.DefaultProjectNameSpace, this.DestinationFolder);
-                        CurrentDbContext.ModelViews.Add(destItm);
-                    }
-                }
+                
 
                 string projectName = "";
                 if (_SelectedDbContext != null)
@@ -309,7 +335,6 @@ namespace CS2WPF.ViewModel
                             ModelViews.Add(itm);
                         }
                     }
-
                 }
                 else
                 {
