@@ -531,12 +531,19 @@ namespace CS2WPF.ViewModel
             try
             {
                 // insert code here
-
+                string lflnm = (SelectFolderUC.DataContext as SelectFolderViewModel).FileName;
+                if (
+                    (string.Compare("php", (GenerateUC.DataContext as GenerateCommonStaffViewModel).FileExtension, StringComparison.OrdinalIgnoreCase ) == 0) ||
+                    (string.Compare(".php", (GenerateUC.DataContext as GenerateCommonStaffViewModel).FileExtension, StringComparison.OrdinalIgnoreCase) == 0)
+                    )
+                {
+                    lflnm = lflnm.FirstLetterToUpper();
+                }
                 SolutionDirectory = System.IO.Path.GetDirectoryName(Dte.Solution.FullName);
                 string FlNm = Path.Combine(
                     (InvitationUC.DataContext as InvitationViewModel).DestinationProjectRootFolder,
                     (CreateWebApiUC.DataContext as CreateWebApiViewModel).DestinationFolder,
-                    (SelectFolderUC.DataContext as SelectFolderViewModel).FileName
+                    lflnm // (SelectFolderUC.DataContext as SelectFolderViewModel).FileName
                     + (GenerateUC.DataContext as GenerateCommonStaffViewModel).FileExtension);
                 File.WriteAllText(FlNm, (GenerateUC.DataContext as GenerateCommonStaffViewModel).GenerateText);
                 DestinationProject.ProjectItems.AddFromFile(FlNm);

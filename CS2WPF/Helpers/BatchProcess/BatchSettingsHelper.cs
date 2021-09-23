@@ -264,7 +264,15 @@ namespace CS2WPF.Helpers.BatchProcess
                 DestinationSubFolder);
             }
             System.IO.Directory.CreateDirectory(FlNm);
-            FlNm = Path.Combine(FlNm, FileName + FileExtension);
+            string lflnm = FileName;
+            if ( 
+                (string.Compare("php",FileExtension, System.StringComparison.OrdinalIgnoreCase) == 0 ) ||
+                (string.Compare(".php", FileExtension, System.StringComparison.OrdinalIgnoreCase) == 0)
+               )
+            {
+                lflnm = lflnm.FirstLetterToUpper();
+            }
+            FlNm = Path.Combine(FlNm, lflnm + FileExtension);
             File.WriteAllText(FlNm, GenerateText);
             DestinationProject.ProjectItems.AddFromFile(FlNm);
         }
