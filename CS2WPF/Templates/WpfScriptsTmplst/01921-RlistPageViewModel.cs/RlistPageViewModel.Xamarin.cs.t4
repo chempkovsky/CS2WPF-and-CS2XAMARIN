@@ -847,10 +847,18 @@ namespace <#= RlistPageViewModelNameSpace #> {
             }
 #>
                         ).ContinueWith((tdata) => {MainThread.InvokeOnMainThreadAsync(() =>{
-                            if (mode == <#= EformModeEnumClassName #>.AddMode) {
-                                <#= SformAfterAddItemPropertyName  #> = tdata; 
+                            if (tdata.Status == TaskStatus.RanToCompletion) {
+                                if (mode == <#= EformModeEnumClassName #>.AddMode) {
+                                    <#= SformAfterAddItemPropertyName  #> = tdata.Result; 
+                                } else {
+                                    <#= SformAfterUpdItemPropertyName  #> = tdata.Result; 
+                                }
                             } else {
-                                <#= SformAfterUpdItemPropertyName  #> = tdata; 
+                                if (mode == <#= EformModeEnumClassName #>.AddMode) {
+                                    <#= SformAfterAddItemPropertyName  #> = null; 
+                                } else {
+                                    <#= SformAfterUpdItemPropertyName  #> = null; 
+                                }
                             }
                             <#= IsParentLoadedPropertyName #> = true;
                         });
