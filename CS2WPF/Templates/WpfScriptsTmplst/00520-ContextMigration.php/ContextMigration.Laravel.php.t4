@@ -18,219 +18,243 @@
     string SrcPrefix                = "src";
 
 
-    string entityFolder             = "01140-Entity.php";
-    string entityNameSpace          = GetSymfonyModelNameSpace(Model, entityFolder, AppPrefix);
+    string migrationFolder          = "00520-ContextMigration.php";
+    string migrationClassName       = GetLaravelMigrationName(Context);
+    string connectionName           = GetLaravelConnectionName(Context);
     
     
-    string DoctrineEntityClassName  = GetDoctrineEntityClassName(Model);
-    string DoctrineEntityTableName  = GetDoctrineEntityTableName(Model); 
-
-    string DoctrineEntityConnection                 = (Context.DbContextClassName + "DeployConnection").ToLower();
-    string DoctrineEntityManager                    = (Context.DbContextClassName + "DeployManager").ToLower();
-    string DoctrineEntityMapping                    = FirstLetterToUpper(Context.DbContextClassName.ToLower()) + "deploy";
-    string DoctrineEntityUrl                        = ("DATABASE_" + Context.DbContextClassName + "_URL").ToUpper();
-
-
-    bool hasGuid = false;
-    foreach (ModelViewKeyPropertySerializable prop in Model.AllProperties) {
-        if (IsComputedPropertyKey(prop, Model)) {
-            if (IsStringPropertyKey(prop, Model)) {
-                hasGuid = true;
-                break;
-            }
-        }
-    }
+    
 
 #>
 <?php
 
-namespace <#= entityNameSpace #>;
-// use Doctrine\Common\Collections\ArrayCollection;
-// use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Uid\Uuid;
-
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 // ///////////////////////////////////////////////////////////////////////////////
-// to create database tables you can apply the following config parameters in the "config/packages/doctrine.yaml"-file
+// to create database tables you can apply the following config parameters in the "config/database.php"-file
 // than create DB tables with the following commands:
 //
-// php bin/console make:migration --em=<#= DoctrineEntityManager #>
-// php bin/console doctrine:migrations:migrate --em=<#= DoctrineEntityManager #>
+// php artisan migrate --database=<#= connectionName #>
 //
-// or commands:
+// or drop the tables
 //
-// php bin/console doctrine:migrations:diff --em=<#= DoctrineEntityManager #>
-// php bin/console doctrine:migrations:migrate --em=<#= DoctrineEntityManager #>
+// php artisan migrate:rollback --database=<#= connectionName #>
 //
 // ///////////////////////////////////////////////////////////////////////////////
-// doctrine:
-//    dbal:
-//       default_connection: here is a name of default connection (for instance, default_connection: <#= DoctrineEntityConnection #>)
-//
-//       connections:
-//       ...
-//          <#= DoctrineEntityConnection #>:
-//                # configure these for your database server 
-//                url: '%env(resolve:<#= DoctrineEntityUrl #>)%'
-//                # driver: 'pdo_mysql'
-//                # server_version: '5.7'
-//                # charset: utf8mb4
-//    orm:
-//       default_entity_manager: here is a name of default manager (for instance, default_entity_manager: <#= DoctrineEntityManager #>)
-//
-//       entity_managers:
-//       ...
-//          <#= DoctrineEntityManager #>:
-//              connection: <#= DoctrineEntityConnection #>
-//              mappings:
-//                  <#= DoctrineEntityMapping #>:
-//                      is_bundle: false
-//                      type: annotation 
-//                      dir: '%kernel.project_dir%/<#= GetSymfonyModelNameSpace(Model, entityFolder, SrcPrefix).Replace("\\","/") #>'
-//                      prefix: '<#= GetSymfonyModelNameSpace(Model, entityFolder, AppPrefix) #>'
-//                      alias: <#= DoctrineEntityManager #>  
-//
+//  NOTE: "config/database.php" must define 'litdbcontext'-connection
+//  here is a sample:
 // ///////////////////////////////////////////////////////////////////////////////
-// "config/packages/doctrine.yaml"-file  expects ".env"-file to have the following config parameters like below
-// ///////////////////////////////////////////////////////////////////////////////
-// ...
-// ### > doctrine/doctrine-bundle ###
-// # Format described at https://www.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/configuration.html#connecting-using-a-url
-// # IMPORTANT: You MUST configure your server version, either here or in config/packages/doctrine.yaml
-// #
-// <#= DoctrineEntityUrl #>="mysql://root:password_here@127.0.0.1:3306/schema_name_here?serverVersion=8.0"
-// ### < doctrine/doctrine-bundle ###
-// ...
+// 
+//    'connections' => [
+//  ... 
+//        '<#= connectionName #>' => [
+//            'url' => 'mysql://root:password_here@127.0.0.1:3306/data_base_name_here?serverVersion=8.0&charset=utf8mb4',
+//        ],
+//   ...
+//
+//
 // ///////////////////////////////////////////////////////////////////////////////
 
-
-/**
- * <#= DoctrineEntityClassName #>
- *
- * @ORM\Table(name="<#= DoctrineEntityTableName #>")
- * @ORM\Entity
- */
-class <#= DoctrineEntityClassName #>
+class <#= migrationClassName #> extends Migration
 {
-<# 
-    if (hasGuid) {
-#>
-    public function __construct()
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
     {
 <#
-        foreach (ModelViewKeyPropertySerializable prop in Model.AllProperties) {
-            if (IsComputedPropertyKey(prop, Model) && IsStringPropertyKey(prop, Model)) {
+    List<Tuple<string, string, bool, bool, bool, ModelViewSerializable>> allViews = new List<Tuple<string, string, bool, bool, bool, ModelViewSerializable>>();
+    List<string> entities = new List<string>();
+    if (Context.ModelViews != null) {
+        foreach(ModelViewSerializable mv in Context.ModelViews) {
+            if(mv.AllProperties == null) {
 #>
-        $this-><#= GetDoctrineEntityFieldName(prop) #> = Uuid::v4()->toRfc4122();
+// Error: AllProperties is not defined for <#= mv.ViewName #>
 <#
+                continue;
+            }
+            if(mv.ScalarProperties == null) {
+#>
+// Error: ScalarProperties is not defined for <#= mv.ViewName #>
+<#
+                continue;
+            }
+            bool IsScalarPropsContainAllProp = true;
+            foreach(ModelViewKeyPropertySerializable keyProp in mv.AllProperties) {
+                ModelViewPropertyOfVwSerializable scalarProp = mv.ScalarProperties.Where(p => (p.OriginalPropertyName == keyProp.OriginalPropertyName) && string.IsNullOrEmpty(p.ForeignKeyName)).FirstOrDefault();
+                if(scalarProp == null) {
+#>
+// Error: For <#= mv.ViewName #> ScalarProperties do not contain  definition for <#= keyProp.OriginalPropertyName #>. Migration file may be incorrect.
+<#
+                    IsScalarPropsContainAllProp = false;
+                }
+            }
+            bool HasPrimKey = false;
+            if(mv.PrimaryKeyProperties != null) {
+                HasPrimKey = true;
+                foreach(ModelViewKeyPropertySerializable primKey in mv.PrimaryKeyProperties) {
+                    ModelViewKeyPropertySerializable keyProp = mv.AllProperties.Where(p => (p.OriginalPropertyName == primKey.OriginalPropertyName)).FirstOrDefault();
+                    if(keyProp == null) {
+                        HasPrimKey = false;
+#>
+// Error: For <#= mv.ViewName #> AllProperties do not contain  definition for <#= primKey.OriginalPropertyName #>. Migration file may be incorrect.
+<#
+
+                    }
+                }
+            }
+            bool IsForeignKeysCorrect = true;
+            if(mv.ForeignKeys != null) {
+                foreach(ModelViewForeignKeySerializable foreignKey in mv.ForeignKeys) {
+                    if ((foreignKey.PrincipalKeyProps == null) || (foreignKey.ForeignKeyProps == null)) {
+#>
+// Error: For <#= mv.ViewName #> foreignKey [<#=foreignKey.NavigationName #>] is not correctly defined.Migration file may be incorrect.
+<#
+                        IsForeignKeysCorrect = false;
+                    } else {
+                        if (foreignKey.PrincipalKeyProps.Count != foreignKey.ForeignKeyProps.Count) {
+#>
+// Error: For <#= mv.ViewName #> foreignKey [<#=foreignKey.NavigationName #>] is not correctly defined. Migration file may be incorrect.
+<#
+                            IsForeignKeysCorrect = false;
+                        }
+                    }
+                }
+            }
+
+            allViews.Add(new Tuple <string, string, bool, bool, bool, ModelViewSerializable>(mv.RootEntityFullClassName, mv.ViewName, IsScalarPropsContainAllProp, HasPrimKey, IsForeignKeysCorrect, mv));
+            if(!entities.Where(p=>p ==  mv.RootEntityFullClassName).Any()) {
+                entities.Add(mv.RootEntityFullClassName);
             }
         }
+        foreach(string entityName in entities) {
+            Tuple<string, string, bool, bool, bool, ModelViewSerializable> t = 
+                allViews.Where(p => p.Item1 == entityName && p.Item3 ).FirstOrDefault();
+            if(t == null) continue;
+            ModelViewSerializable mv = t.Item6;
 #>
-    }
-<# 
-    }
-#>
+            Schema::connection('<#= connectionName #>')->create('<#= GetDoctrineEntityTableName(mv) #>', function (Blueprint $table) {
+<#
+            foreach(ModelViewKeyPropertySerializable keyProp  in mv.AllProperties) {
+                string isNullable = keyProp.IsRequired ? "" : "->nullable()";
+                string optionalParams = IsIdentityPropertyKey(keyProp, mv) ? ", true" : "";
+                string maxLen = GetMaxLenEx(keyProp, Model);
+                switch (keyProp.UnderlyingTypeName.ToLower()) {
+                    case "system.decimal": 
+                        optionalParams = ", 18"; 
+                        break;
+                    case "system.single": 
+                        optionalParams = ", 10, 0"; 
+                        break;
+                }
 
+#>
+                $table-><#= GetLaravelEntityFieldDataBaseType(keyProp, mv) #>('<#= GetDoctrineEntityTableColumnName(keyProp) + optionalParams #>')<#= isNullable #>;
 <#
-        foreach (ModelViewKeyPropertySerializable prop in Model.AllProperties) {
-            string isnullableStr = prop.IsRequired ? "nullable=false" : "nullable=true";
-            string isnullableVar = prop.IsRequired ? "" : "|null";
-            
-
-            bool isId = GetDoctrineEntityFieldIsId(prop, Model);
-            string maxLen = GetMaxLenEx(prop, Model);
-            if (string.IsNullOrEmpty(maxLen)) maxLen = ""; else maxLen = ", length=" + maxLen;
-            string optionsFixed = GetDoctrineEntityFieldIsGuid(prop, Model) ? ", options={\"fixed\"=true}" : "";
+            }
+            t = allViews.Where(p => p.Item1 == entityName && p.Item4).FirstOrDefault();
+            if(t != null) mv = t.Item6; else mv = null;
+            if(mv != null) {
+                if(mv.PrimaryKeyProperties != null) {
+                    if(mv.PrimaryKeyProperties.Count > 0) {
+                        string columns = "'" + GetDoctrineEntityTableColumnName(mv.PrimaryKeyProperties[0]) + "'";
+                        for(int i = 1; i < mv.PrimaryKeyProperties.Count-1; i++) {
+                            columns += ", '" + GetDoctrineEntityTableColumnName(mv.PrimaryKeyProperties[i]) + "'";
+                        }
 #>
-    /**
-     * @var <#= GetDoctrineEntityFieldPhpType(prop, Model) + isnullableVar #>
-     *
-     * @ORM\Column(name="<#= GetDoctrineEntityTableColumnName(prop) #>", type="<#= GetDoctrineEntityFieldDataBaseType(prop, Model) #>" <#= optionsFixed #> <#= maxLen #>, <#= isnullableStr #>)
-<# 
-            if(isId) { 
-#>
-     * @ORM\Id
-<# 
-                if(IsIdentityPropertyKey(prop, Model)) {
-#>
-     * @ORM\GeneratedValue(strategy="IDENTITY")
+                $table->primary([<#= columns #>]);
 <#
-                } else {
-#>
-     * @ORM\GeneratedValue(strategy="NONE")
-<#
+                    }
                 }
             }
 #>
-     */
-    private $<#= GetDoctrineEntityFieldName(prop) #>;
-
+            });
 <#
         }
-        if (Model.ForeignKeys != null) {
-            foreach (ModelViewForeignKeySerializable foreignKey in Model.ForeignKeys) {
-                string nullableStr =  "nullable=false";
-                if(foreignKey.NavigationType == NavigationTypeEnum.OptionalToMany) nullableStr = "nullable=true";
+        foreach(string entityName in entities) {
+            Tuple<string, string, bool, bool, bool, ModelViewSerializable> t = 
+                allViews.Where(p => p.Item1 == entityName && p.Item3 && p.Item5).FirstOrDefault();
+            if(t == null) continue;
+            ModelViewSerializable mv = t.Item6;
+            if (mv.ForeignKeys == null) continue;
+            if (mv.ForeignKeys.Count < 1) continue;
 #>
-    /**
-     * @var <#= GetDoctrineEntityClassNameForStr(foreignKey.ViewName) #>
-     *
-     * @ORM\ManyToOne(targetEntity="<#= GetDoctrineEntityClassNameForStr(foreignKey.ViewName) #>")
-     * @ORM\JoinColumns({
+            Schema::connection('<#= connectionName #>')->table('<#= GetDoctrineEntityTableName(mv) #>', function (Blueprint $table) {
 <#
-            int fkcnt = foreignKey.PrincipalKeyProps.Count;
-            for(int i = 0; i < fkcnt; i++) {
-                if (i < (fkcnt - 1)) {
-#>
-     *   @ORM\JoinColumn(name="<#= foreignKey.ForeignKeyProps[i].OriginalPropertyName #>", referencedColumnName="<#= foreignKey.PrincipalKeyProps[i].OriginalPropertyName #>", <#= nullableStr #>),
-<#
-                } else {
-#>
-     *   @ORM\JoinColumn(name="<#= foreignKey.ForeignKeyProps[i].OriginalPropertyName #>", referencedColumnName="<#= foreignKey.PrincipalKeyProps[i].OriginalPropertyName #>", <#= nullableStr #>)
-<#
+            foreach(ModelViewForeignKeySerializable foreignKey in mv.ForeignKeys) {
+                if(foreignKey.PrincipalKeyProps == null || foreignKey.ForeignKeyProps == null) continue;
+                if(foreignKey.PrincipalKeyProps.Count != foreignKey.ForeignKeyProps.Count) continue;
+                if(foreignKey.PrincipalKeyProps.Count < 1) continue;
+                string fkStr = "";
+                string pkStr = "";
+                bool isFirst = true;
+                foreach(ModelViewKeyPropertySerializable keyProp in foreignKey.ForeignKeyProps) {
+                    if(isFirst) { fkStr = "'"; isFirst = false; } else { fkStr += ", '";} 
+                    fkStr +=  GetDoctrineEntityTableColumnName(keyProp) + "'"; 
                 }
+                isFirst = true;
+                foreach(ModelViewKeyPropertySerializable keyProp in foreignKey.PrincipalKeyProps) {
+                    if(isFirst) { pkStr = "'"; isFirst = false; } else { pkStr += ", '";} 
+                    pkStr +=  GetDoctrineEntityTableColumnName(keyProp) + "'"; 
+                }
+                string navigName = "'"+foreignKey.InverseNavigationName + "_" + foreignKey.NavigationName + "'";
+#>
+                $table->foreign([<#= fkStr #>], <#= navigName #>)->references([<#= pkStr #>])->on('<#= GetDoctrineEntityTableNameForStr(foreignKey.NavigationEntityName) #>')->onUpdate('NO ACTION')->onDelete('NO ACTION');
+<#
             }
 #>
-     * })
+            });
+<#
+        }
+    }
+#>
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
      */
-    private $<#= GetDoctrineEntityFieldNameForStr(foreignKey.NavigationName) #>;
-
+    public function down()
+    {
+<#
+        foreach(string entityName in entities) {
+            Tuple<string, string, bool, bool, bool, ModelViewSerializable> t = 
+                allViews.Where(p => p.Item1 == entityName && p.Item3 && p.Item5).FirstOrDefault();
+            if(t == null) continue;
+            ModelViewSerializable mv = t.Item6;
+            if (mv.ForeignKeys == null) continue;
+            if (mv.ForeignKeys.Count < 1) continue;
+#>
+            Schema::connection('<#= connectionName #>')->table('<#= GetDoctrineEntityTableName(mv) #>', function (Blueprint $table) {
+<#
+            foreach(ModelViewForeignKeySerializable foreignKey in mv.ForeignKeys) {
+             string navigName = "'"+foreignKey.InverseNavigationName + "_" + foreignKey.NavigationName + "'";
+#>
+                $table->dropForeign(<#= navigName #>);
 <#
             }
-        }
-        foreach (ModelViewKeyPropertySerializable prop in Model.AllProperties) {
 #>
-
-    public function <#= GetDoctrineEntityGetMethodName(prop) #>(): ?<#= GetDoctrineEntityGetSetPhpType(prop, Model) #>
-    {
-        return $this-><#= GetDoctrineEntityFieldName(prop) #>;
-    }
-    public function <#= GetDoctrineEntitySetMethodName(prop) #>(<#= GetDoctrineEntityGetSetPhpType(prop, Model) #> $<#= GetDoctrineEntityFieldName(prop) #>): self
-    {
-        $this-><#= GetDoctrineEntityFieldName(prop) #> = $<#= GetDoctrineEntityFieldName(prop) #>;
-        return $this;
-    }
+            });
 <#
         }
-        if (Model.ForeignKeys != null) {
-            foreach (ModelViewForeignKeySerializable foreignKey in Model.ForeignKeys) {
+        foreach(string entityName in entities) {
+            Tuple<string, string, bool, bool, bool, ModelViewSerializable> t = 
+                allViews.Where(p => p.Item1 == entityName && p.Item3).FirstOrDefault();
+            if(t == null) continue;
+            ModelViewSerializable mv = t.Item6;
 #>
-
-    public function <#= GetDoctrineEntityGetMethodNameForStr(foreignKey.NavigationName) #>(): ?<#= GetDoctrineEntityClassNameForStr(foreignKey.ViewName) #>
-    {
-        return $this-><#= GetDoctrineEntityFieldNameForStr(foreignKey.NavigationName) #>;
-    }
-    public function <#= GetDoctrineEntitySetMethodNameForStr(foreignKey.NavigationName) #>(?<#= GetDoctrineEntityClassNameForStr(foreignKey.ViewName) #> $<#= GetDoctrineEntityFieldNameForStr(foreignKey.NavigationName) #>): self
-    {
-        $this-><#= GetDoctrineEntityFieldNameForStr(foreignKey.NavigationName) #> = $<#= GetDoctrineEntityFieldNameForStr(foreignKey.NavigationName) #>;
-        return $this;
-    }
+            Schema::connection('<#= connectionName #>')->drop('<#= GetDoctrineEntityTableName(mv) #>', function (Blueprint $table) {
+            });
 <#
-            }
         }
-#>                
 
+#>
+    }
 }
 
 <#+
@@ -533,10 +557,15 @@ class <#= DoctrineEntityClassName #>
         if (model == null) return "";
         return GetDoctrineEntityClassNameForStr(model.ViewName);
     }
+    string GetDoctrineEntityTableNameForStr(string RootEntityClassName) { 
+        string rslt = "";
+        if (string.IsNullOrEmpty(RootEntityClassName)) return rslt;
+        return CS2WPF.Helpers.CustomPluralization.Pluralize(RootEntityClassName).ToLower();
+    }
     string GetDoctrineEntityTableName(ModelViewSerializable model) { 
         string rslt = "";
         if (model == null) return rslt;
-        return CS2WPF.Helpers.CustomPluralization.Pluralize(model.RootEntityClassName).ToLower();
+        return GetDoctrineEntityTableNameForStr(model.RootEntityClassName);
     }
     string GetDoctrineEntityTableColumnName(ModelViewKeyPropertySerializable prop) {
         string rslt = "";
@@ -846,4 +875,24 @@ class <#= DoctrineEntityClassName #>
         return prop.UnderlyingTypeName.ToLower() == "system.string";
     }
 
+    string GetLaravelConnectionName(DbContextSerializable context) {
+        result = "";
+        if(context != null) {
+            result = context.DbContextClassName;
+            if(!string.IsNullOrEmpty(context.DbContextClassName)) {
+                result = context.DbContextClassName.ToLower(); 
+            }
+        }
+        return result; 
+    }
+    string GetLaravelMigrationName(DbContextSerializable context) {
+        result = "Migration";
+        if(context != null) {
+            if(!string.IsNullOrEmpty(context.DbContextClassName)) {
+                result = context.DbContextClassName + result; 
+            }
+        }
+        return result; 
+    }
+    
 #>
