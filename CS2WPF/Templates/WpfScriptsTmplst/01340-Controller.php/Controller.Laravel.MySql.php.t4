@@ -121,7 +121,62 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Database\Query\Builder;
 
-class <#= controllerClassName #> extends AbstractController
+// ///////////////////////////////////////////////////////////////////////////////
+// the generated code expects "config/database.php"-file to have the following config parameters
+// ///////////////////////////////////////////////////////////////////////////////
+//     ...
+//     'connections' => [
+//        ...
+//
+//        '<#= connectionName #>' => [
+//            'url' => 'mysql://root:your_password_here@127.0.0.1:3306/database_name_here?serverVersion=8.0&charset=utf8mb4',
+//        ],
+//        ...
+// ///////////////////////////////////////////////////////////////////////////////
+// the generated code expects "routes/api.php"-file to have the following config parameters
+// ///////////////////////////////////////////////////////////////////////////////
+//        ...
+// use <#= controllerNameSpace + "\\" + controllerClassName #>;
+//        ...
+<# 
+    if (Model.IsWebApiSelectAll) { 
+#>
+// Route::get('<#= "/" + controllerPrefix + "/" + GetAllMethodName #>', [<#= controllerClassName #>::class,'<#= GetAllMethodName #>']);
+<# 
+    }
+    if (Model.IsWebApiSelectManyWithPagination) { 
+#>
+// Route::get('<#= "/" + controllerPrefix + "/" + GetWithFilterMethodName #>', [<#= controllerClassName #>::class,'<#= GetWithFilterMethodName #>']);
+<# 
+    }
+    if (Model.IsWebApiSelectOneByPrimarykey) { 
+#>
+// Route::get('<#= "/" + controllerPrefix + "/" + GetOneMethodName #>', [<#= controllerClassName #>::class,'<#= GetOneMethodName #>']);
+<# 
+    }
+    if (Model.IsWebApiAdd) { 
+#>
+// Route::post('<#= "/" + controllerPrefix + "/" + AddOneMethodName #>', [<#= controllerClassName #>::class,'<#= AddOneMethodName #>']);
+<# 
+    }
+    if (Model.IsWebApiUpdate) { 
+#>
+// Route::put('<#= "/" + controllerPrefix + "/" + UpdateOneMethodName #>', [<#= controllerClassName #>::class,'<#= UpdateOneMethodName #>']);
+<# 
+    }
+    if (Model.IsWebApiDelete) { 
+#>
+// Route::delete('<#= "/" + controllerPrefix + "/" + DeleteOneMethodName #>', [<#= controllerClassName #>::class,'<#= DeleteOneMethodName #>']);
+<# 
+    }
+#>
+//        ...
+// ///////////////////////////////////////////////////////////////////////////////
+
+
+
+
+class <#= controllerClassName #> extends Controller
 {
         protected int $defaultPageSize = 50;
         protected int $minPageSize = 5;
@@ -129,7 +184,7 @@ class <#= controllerClassName #> extends AbstractController
 
     protected function getQueryBuilder(): Builder
     {
-        return DB::connection(<#= connectionName #>)
+        return DB::connection('<#= connectionName #>')
 <#
         foreach(KeyValuePair<string, ValueTuple<ModelViewSerializable, ModelViewForeignKeySerializable, string, string, string>>  curChain in navChains) {
             if(curChain.Value.Item2 == null) {
@@ -161,22 +216,23 @@ class <#= controllerClassName #> extends AbstractController
                        ->select(
 
 <#
-        
-        int navChainCnt = 0;
-        foreach(ModelViewPropertyOfVwSerializable sclrProp in Model.ScalarProperties) {
-            hasDatetimePropperties = ("System.DateTime".Equals(sclrProp.UnderlyingTypeName) || "DateTime".Equals(sclrProp.UnderlyingTypeName)) || hasDatetimePropperties;
+        {
+            int navChainCnt = 0;
+            foreach(ModelViewPropertyOfVwSerializable sclrProp in Model.ScalarProperties) {
+                hasDatetimePropperties = ("System.DateTime".Equals(sclrProp.UnderlyingTypeName) || "DateTime".Equals(sclrProp.UnderlyingTypeName)) || hasDatetimePropperties;
             
-            string curPath = string.IsNullOrEmpty(sclrProp.ForeignKeyNameChain) ? "" : sclrProp.ForeignKeyNameChain;
-            ValueTuple<ModelViewSerializable, ModelViewForeignKeySerializable, string, string, string> curTp = navChains[curPath];
-            if(navChainCnt==0) { 
+                string curPath = string.IsNullOrEmpty(sclrProp.ForeignKeyNameChain) ? "" : sclrProp.ForeignKeyNameChain;
+                ValueTuple<ModelViewSerializable, ModelViewForeignKeySerializable, string, string, string> curTp = navChains[curPath];
+                if(navChainCnt==0) { 
 #>
                          '<#= curTp.Item4 + "." + sclrProp.OriginalPropertyName + " as " + GetOutputPropertyName(sclrProp, Model) #>'
 <#
-                navChainCnt = 1; 
-            } else { 
+                    navChainCnt = 1; 
+                } else { 
 #>
                         ,'<#= curTp.Item4 + "." + sclrProp.OriginalPropertyName + " as " + GetOutputPropertyName(sclrProp, Model) #>'
 <#
+                }
             }
         }
 #>
@@ -291,7 +347,7 @@ class <#= controllerClassName #> extends AbstractController
 <#
         }
 #>
-        return $this->json($queryResult); 
+        return response()->json($queryResult); 
     }
 <#
     } // the end of if (Model.IsWebApiSelectOneByPrimarykey) { }
@@ -357,10 +413,10 @@ class <#= controllerClassName #> extends AbstractController
             $this->resetDateTime($queryResult);
 <#
         }
-        KeyValuePair<string, ValueTuple<ModelViewSerializable, ModelViewForeignKeySerializable, string, string, string>>  curChain =  navChains[""];
+        ValueTuple<ModelViewSerializable, ModelViewForeignKeySerializable, string, string, string> curChain =  navChains[""];
 #>
-        $queryBuilder = DB::connection(<#= connectionName #>)
-                       ->table('<#= curChain.Value.Item3 #>', '<#= curChain.Value.Item4 #>')
+        $queryBuilder = DB::connection('<#= connectionName #>')
+                       ->table('<#= curChain.Item3 #>');
 <#
         foreach(ModelViewPropertyOfVwSerializable sclrProp in Model.ScalarProperties) {
             if(! (primKeys.Contains(sclrProp))) {
@@ -370,9 +426,9 @@ class <#= controllerClassName #> extends AbstractController
             ValueTuple<ModelViewSerializable, ModelViewForeignKeySerializable, string, string, string> curTp = navChains[curPath];
 #>
         if(is_null($<#= GetModelPropertyName(sclrProp, Model) #>)) {
-            $queryBuilder->whereNull('<#= curTp.Item4 #>.<#= sclrProp.OriginalPropertyName #>');
+            $queryBuilder->whereNull('<#= sclrProp.OriginalPropertyName #>');
         } else {
-            $queryBuilder->where('<#= curTp.Item4 #>.<#= sclrProp.OriginalPropertyName #>', '=', $<#= GetModelPropertyName(sclrProp, Model) #>);
+            $queryBuilder->where('<#= sclrProp.OriginalPropertyName #>', '=', $<#= GetModelPropertyName(sclrProp, Model) #>);
         }
 <#
         }
@@ -383,7 +439,7 @@ class <#= controllerClassName #> extends AbstractController
                 'message' => 'Could not delete selected row'
             ], 404);
         }
-        return $this->json($queryResult); 
+        return response()->json($queryResult); 
     }
 <#
     } // the end of if (Model.IsWebApiDelete) { }
@@ -435,10 +491,11 @@ class <#= controllerClassName #> extends AbstractController
                 'message' => $validator->errors()->first()
             ], 404);
         }        
-        KeyValuePair<string, ValueTuple<ModelViewSerializable, ModelViewForeignKeySerializable, string, string, string>>  primChain = navChains[""];
-
-        $queryBuilder = DB::connection(<#= connectionName #>)
-                        ->table('<#= primChain.Value.Item3 #>');
+<#
+        ValueTuple<ModelViewSerializable, ModelViewForeignKeySerializable, string, string, string>  primChain = navChains[""];
+#>
+        $queryBuilder = DB::connection('<#= connectionName #>')
+                        ->table('<#= primChain.Item3 #>');
 <#
         foreach(ModelViewPropertyOfVwSerializable sclrProp in Model.ScalarProperties) {
             if(! (primKeys.Contains(sclrProp))) {
@@ -448,9 +505,9 @@ class <#= controllerClassName #> extends AbstractController
             ValueTuple<ModelViewSerializable, ModelViewForeignKeySerializable, string, string, string> curTp = navChains[curPath];
 #>
         if(is_null($content['<#= GetOutputPropertyName(sclrProp, Model) #>'])) {
-            $queryBuilder->whereNull('<#= curTp.Item4 #>.<#= sclrProp.OriginalPropertyName #>');
+            $queryBuilder->whereNull('<#= sclrProp.OriginalPropertyName #>');
         } else {
-            $queryBuilder->where('<#= curTp.Item4 #>.<#= sclrProp.OriginalPropertyName #>', '=', $content['<#= GetOutputPropertyName(sclrProp, Model) #>']);
+            $queryBuilder->where('<#= sclrProp.OriginalPropertyName #>', '=', $content['<#= GetOutputPropertyName(sclrProp, Model) #>']);
         }
 <#
         }
@@ -465,13 +522,20 @@ class <#= controllerClassName #> extends AbstractController
             $updList['<#= sclrProp.OriginalPropertyName #>'] = $content['<#= GetOutputPropertyName(sclrProp, Model) #>'];
 <#
         }                        
-#>        
-        $cnt = $queryBuilder->update($updList);
-        if($cnt < 1) {
-            return response()->json([
-                'message' => 'Could not update selected row'
-            ], 404);
-        }
+#>
+
+// ///////////////////////////////////////
+// do not check the count of updated rows: 
+// $cnt will be 0 if the user calls "save"-method without real modification of the record 
+// instead check for existance with $queryBuilder->first();
+// //////////////////////////////////////
+//        $cnt = $queryBuilder->update($updList);
+//        if($cnt < 1) {
+//            return response()->json([
+//                'message' => 'Could not update selected row'
+//            ], 404);
+//        }
+//
         
         $queryBuilder = $this->getQueryBuilder();
 <#
@@ -503,7 +567,7 @@ class <#= controllerClassName #> extends AbstractController
 <#
         }
 #>
-        return $this->json($queryResult); 
+        return response()->json($queryResult); 
     }
 <#
     } // the end of if (Model.IsWebApiUpdate) { }
@@ -512,7 +576,7 @@ class <#= controllerClassName #> extends AbstractController
 <#
     if (Model.IsWebApiAdd) { 
 #>
-    public function <#= AddOneMethodName #>(Request $request, SerializerInterface $serializer, ValidatorInterface $validator): Response
+    public function <#= AddOneMethodName #>(Request $request): JsonResponse
     {
         if(!$request->isJson()) {
             return response()->json([
@@ -555,27 +619,11 @@ class <#= controllerClassName #> extends AbstractController
                 'message' => $validator->errors()->first()
             ], 404);
         }        
-
-        KeyValuePair<string, ValueTuple<ModelViewSerializable, ModelViewForeignKeySerializable, string, string, string>>  primChain = navChains[""];
-
-        $queryBuilder = DB::connection(<#= connectionName #>)
-                        ->table('<#= primChain.Value.Item3 #>');
 <#
-        foreach(ModelViewPropertyOfVwSerializable sclrProp in Model.ScalarProperties) {
-            if(! (primKeys.Contains(sclrProp))) {
-                continue;
-            }
-            string curPath = (string.IsNullOrEmpty(sclrProp.ForeignKeyNameChain)) ? "" : sclrProp.ForeignKeyNameChain;
-            ValueTuple<ModelViewSerializable, ModelViewForeignKeySerializable, string, string, string> curTp = navChains[curPath];
+        ValueTuple<ModelViewSerializable, ModelViewForeignKeySerializable, string, string, string>  primChain = navChains[""];
 #>
-        if(is_null($content['<#= GetOutputPropertyName(sclrProp, Model) #>'])) {
-            $queryBuilder->whereNull('<#= curTp.Item4 #>.<#= sclrProp.OriginalPropertyName #>');
-        } else {
-            $queryBuilder->where('<#= curTp.Item4 #>.<#= sclrProp.OriginalPropertyName #>', '=', $content['<#= GetOutputPropertyName(sclrProp, Model) #>']);
-        }
-<#
-        }
-#>        
+        $queryBuilder = DB::connection('<#= connectionName #>')
+                        ->table('<#= primChain.Item3 #>');
         $insList = [];
 <#
         bool hasIdentity = false;
@@ -586,6 +634,11 @@ class <#= controllerClassName #> extends AbstractController
                      hasIdentity = true;
                      identityColumn =  GetOutputPropertyName(sclrProp, Model);
                  }
+                if (IsGuidInput(sclrProp, Model)) {
+#>
+            $insList['<#= sclrProp.OriginalPropertyName #>'] = Str::uuid();
+<#
+                }
             }
             if(!string.IsNullOrEmpty(sclrProp.ForeignKeyNameChain)) continue;
             if(IsComputedProperty(sclrProp, Model)) continue;
@@ -635,7 +688,7 @@ class <#= controllerClassName #> extends AbstractController
             ], 404);
         }
 <#
-        if(hasDatetime) {
+        if(hasDatetimePropperties) {
             foreach(ModelViewPropertyOfVwSerializable sclrProp in Model.ScalarProperties) {
                 if ("System.DateTime".Equals(sclrProp.UnderlyingTypeName) || "DateTime".Equals(sclrProp.UnderlyingTypeName)) {
 
@@ -646,7 +699,7 @@ class <#= controllerClassName #> extends AbstractController
             }
         }
 #>
-        return $this->json($queryResult); 
+        return response()->json($queryResult); 
     }
 <#
     } // the end of if (Model.IsWebApiAdd) { }
@@ -750,13 +803,13 @@ class <#= controllerClassName #> extends AbstractController
         $offset = ($currentPage - 1) * $currentPageSize;
         if($offset > $totals) {
             if($currentPage > 0) $currentPage = $currentPage - 1;
-            $pgrslt = new <#= pageClassName #>();
-            $pgrslt->setPage($currentPage);
-            $pgrslt->setPagesize($currentPageSize);
-            $pgrslt->setPagecount($pageCount); 
-            $pgrslt->setTotal($totals); 
-            $pgrslt->setItems([]);
-            return $this->json($pgrslt);
+            return response()->json([
+                'page' => $currentPage,
+                'pagesize' => $currentPageSize,
+                'pagecount' => $pageCount,
+                'total' => $totals,
+                'items' => []
+            ]);
         }
         $orderByNotSet = true;
         
@@ -784,7 +837,7 @@ class <#= controllerClassName #> extends AbstractController
                         break;
                     case "-<#= GetLowerCasePropertyName(sclrProp, Model)#>" :
                         $orderByNotSet = false;
-                        $queryBuilder->orderBy('<#= curTp.Item4 #>.<#= sclrProp.OriginalPropertyName #>', 'desc')
+                        $queryBuilder->orderBy('<#= curTp.Item4 #>.<#= sclrProp.OriginalPropertyName #>', 'desc');
                         $wasInUseOrderBy[] = "<#= GetLowerCasePropertyName(sclrProp, Model)#>";
                         $wasInUseOrderBy[] = "-<#= GetLowerCasePropertyName(sclrProp, Model)#>";
                         break;
@@ -805,7 +858,7 @@ class <#= controllerClassName #> extends AbstractController
             string curPath = (string.IsNullOrEmpty(sclrProp.ForeignKeyNameChain)) ? "" : sclrProp.ForeignKeyNameChain;
             ValueTuple<ModelViewSerializable, ModelViewForeignKeySerializable, string, string, string> curTp = navChains[curPath];
 #>
-            $queryBuilder->orderBy('<#= curTp.Item4 #>.<#= sclrProp.OriginalPropertyName #>', 'asc')
+            $queryBuilder->orderBy('<#= curTp.Item4 #>.<#= sclrProp.OriginalPropertyName #>', 'asc');
 <#
         }
 #>
@@ -1594,7 +1647,7 @@ class <#= controllerClassName #> extends AbstractController
     }
 
     string GetLaravelConnectionName(DbContextSerializable context) {
-        result = "";
+        string result = "";
         if(context != null) {
             result = context.DbContextClassName;
             if(!string.IsNullOrEmpty(context.DbContextClassName)) {
@@ -1604,7 +1657,7 @@ class <#= controllerClassName #> extends AbstractController
         return result; 
     }
     string GetLaravelMigrationName(DbContextSerializable context) {
-        result = "Migration";
+        string result = "Migration";
         if(context != null) {
             if(!string.IsNullOrEmpty(context.DbContextClassName)) {
                 result = context.DbContextClassName + result; 
@@ -1658,6 +1711,24 @@ class <#= controllerClassName #> extends AbstractController
         if(string.IsNullOrEmpty( prop.TypeFullName )) return false;
         string tpNm = prop.TypeFullName.ToLower();
         return  "system.boolean".Equals(tpNm);
+    }
+    bool IsGuidInput(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+        if(prop == null) return false;
+        if(string.IsNullOrEmpty( prop.TypeFullName )) return false;
+        string tpNm = prop.TypeFullName.ToLower();
+        return  "system.guid".Equals(tpNm);
+    }
+    bool HasAtribute(ModelViewPropertyOfVwSerializable sclrProp, string attrName) {
+        if ((sclrProp != null) && (!string.IsNullOrEmpty(attrName))) {
+            if (sclrProp.Attributes != null) {
+                foreach(ModelViewAttributeSerializable a in sclrProp.Attributes) {
+                    if (attrName.Equals(a.AttrName, StringComparison.InvariantCultureIgnoreCase)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
     bool IsComputedProperty(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
         if (HasAtribute(prop, "ConcurrencyCheck") || HasAtribute(prop, "Timestamp")) {

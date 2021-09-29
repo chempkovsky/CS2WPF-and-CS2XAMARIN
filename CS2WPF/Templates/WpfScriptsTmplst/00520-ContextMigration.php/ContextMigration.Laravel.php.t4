@@ -46,14 +46,13 @@ use Illuminate\Support\Facades\Schema;
 //  NOTE: "config/database.php" must define 'litdbcontext'-connection
 //  here is a sample:
 // ///////////////////////////////////////////////////////////////////////////////
-// 
+//  ... 
 //    'connections' => [
 //  ... 
 //        '<#= connectionName #>' => [
 //            'url' => 'mysql://root:password_here@127.0.0.1:3306/data_base_name_here?serverVersion=8.0&charset=utf8mb4',
 //        ],
 //   ...
-//
 //
 // ///////////////////////////////////////////////////////////////////////////////
 
@@ -153,7 +152,7 @@ class <#= migrationClassName #> extends Migration
                 }
 
 #>
-                $table-><#= GetLaravelEntityFieldDataBaseType(keyProp, mv) #>('<#= GetDoctrineEntityTableColumnName(keyProp) + optionalParams #>')<#= isNullable #>;
+                $table-><#= GetLaravelEntityFieldDataBaseType(keyProp, mv) #>('<#= GetDoctrineEntityTableColumnName(keyProp) #>' <#= optionalParams #>)<#= isNullable #>;
 <#
             }
             t = allViews.Where(p => p.Item1 == entityName && p.Item4).FirstOrDefault();
@@ -162,12 +161,48 @@ class <#= migrationClassName #> extends Migration
                 if(mv.PrimaryKeyProperties != null) {
                     if(mv.PrimaryKeyProperties.Count > 0) {
                         string columns = "'" + GetDoctrineEntityTableColumnName(mv.PrimaryKeyProperties[0]) + "'";
-                        for(int i = 1; i < mv.PrimaryKeyProperties.Count-1; i++) {
+                        for(int i = 1; i < mv.PrimaryKeyProperties.Count; i++) {
                             columns += ", '" + GetDoctrineEntityTableColumnName(mv.PrimaryKeyProperties[i]) + "'";
                         }
+                        if (mv.PrimaryKeyProperties.Count == 1) {
+                            if (IsIdentityPropertyKey(mv.PrimaryKeyProperties[0], mv)) {
+#>
+                // 
+                // the column is defined as AutoIncrement, it creates primary key automatically
+                // $table->primary([<#= columns #>]); 
+                // 
+<#
+                            } else {
+#>
+                 
+                $table->primary([<#= columns #>]); 
+<#
+                            }
+                        } else {
 #>
                 $table->primary([<#= columns #>]);
 <#
+                        }
+                    }
+                }
+                if(mv.ForeignKeys != null) {
+                    foreach(ModelViewForeignKeySerializable foreignKey in mv.ForeignKeys) {
+                        if(foreignKey.PrincipalKeyProps != null || foreignKey.ForeignKeyProps != null) {
+                            if ((foreignKey.PrincipalKeyProps.Count == foreignKey.ForeignKeyProps.Count) && (foreignKey.ForeignKeyProps.Count > 0)) {
+                                string indexName = "'IX_"+foreignKey.InverseNavigationName + "_" + foreignKey.NavigationName + "'";
+                                string fkStr = "";
+                                bool isFirst = true;
+                                foreach(ModelViewKeyPropertySerializable keyProp in foreignKey.ForeignKeyProps) {
+                                    if(isFirst) { fkStr = "'"; isFirst = false; } else { fkStr += ", '";} 
+                                    fkStr +=  GetDoctrineEntityTableColumnName(keyProp) + "'"; 
+                                }
+#>
+                // it's possible not to define <#= indexName #> explicitly
+                // creation of the foreign key creates such a key automatically
+                $table->index([<#= fkStr #>], <#= indexName #>);
+<#
+                            }
+                        }
                     }
                 }
             }
@@ -876,7 +911,7 @@ class <#= migrationClassName #> extends Migration
     }
 
     string GetLaravelConnectionName(DbContextSerializable context) {
-        result = "";
+        string result = "";
         if(context != null) {
             result = context.DbContextClassName;
             if(!string.IsNullOrEmpty(context.DbContextClassName)) {
@@ -886,7 +921,7 @@ class <#= migrationClassName #> extends Migration
         return result; 
     }
     string GetLaravelMigrationName(DbContextSerializable context) {
-        result = "Migration";
+        string result = "Migration";
         if(context != null) {
             if(!string.IsNullOrEmpty(context.DbContextClassName)) {
                 result = context.DbContextClassName + result; 
