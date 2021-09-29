@@ -1,0 +1,781 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="php" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ import namespace="CS2WPF.Helpers" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+<#
+
+    string AppPrefix                = "App";
+    string SrcPrefix                = "src";
+
+
+    string crtdbFolder          = "00522-Crtdb.php";
+    string crtdbClassName       = GetModelClassName(Model, crtdbFolder); 
+    string crtdbNameSpace       = GetLaravelModelNameSpace(Model, crtdbFolder, AppPrefix);
+
+    
+    
+    
+    
+
+#>
+<?php
+
+namespace <#= crtdbNameSpace #>;
+
+
+use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
+
+
+class <#= crtdbClassName #> extends Migration
+{
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'command:<#= crtdbClassName.ToLower() #>';
+
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Creates SQL Databse for the given connection of the database.php-file';
+
+    /**
+     * Create a new command instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
+    /**
+     * Execute the console command.
+     *
+     * @return int
+     */
+    public function handle()
+    {
+        $allconnection = config('database.connections');
+        $connectionNames = [];
+        foreach ($allconnection as $key => $value) {
+            //foreach($connection as $key => $value)
+            $connectionNames[]=$key;
+        }
+        $primaryConnectionName = $this->choice(
+            'What is you primary connection name? Primary connection is a connection for the existing database.',
+            $connectionNames,
+            0
+        );        
+        $secondaryConnectionName = $this->choice(
+            'What is a connection name for the database to be created?',
+            $connectionNames,
+            0
+        );
+        $databaseName = null;
+        $allconnection[$secondaryConnectionName];
+        if(array_key_exists('url', $allconnection[$secondaryConnectionName])) {
+            $url = ($allconnection[$secondaryConnectionName])['url'];
+            $urlParts = parse_url($url);
+            if(array_key_exists('path', $urlParts)) {
+                $databaseName = str_replace('/','',$urlParts['path']);
+            }
+            if (($databaseName === null) || ($databaseName === '')) {
+                if(array_key_exists('database', $allconnection[$secondaryConnectionName])) {
+                    $databaseName = ($allconnection[$secondaryConnectionName])['database'];;
+                }
+            }
+        } else {
+            if(array_key_exists('database', $allconnection[$secondaryConnectionName])) {
+                $databaseName = ($allconnection[$secondaryConnectionName])['database'];;
+            }
+        };
+        if (($databaseName === null) || ($databaseName === '')) {
+            $this->error('Error: Could not detect Database Name for '.$secondaryConnectionName);
+            return 0;    
+        }
+        if ($this->confirm('You are ready to create database with a name ['.$databaseName.'] Do you want to continue?', true)) {
+            DB::connection($primaryConnectionName)->statement('CREATE DATABASE '.$databaseName);
+            $this->info('Done');
+        }
+        return 0;
+    }
+}
+
+<#+
+
+    string GetModelName(ModelViewSerializable model) {
+        return FirstLetterToUpper(model.ViewName);
+    }
+    string GetInterfaceName(ModelViewSerializable model) {
+        return "I"+ GetModelName(model);
+    }
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '_' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        result = sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+        result = result.Replace(".php", "").Replace(".Php", "").Replace(".PHP", "");
+        return result;
+    }
+    public string FirstLetterToUpper(string str)
+    {
+        if (str == null)
+            return null;
+        if (str.Length > 1)
+            return char.ToUpper(str[0]) + str.Substring(1);
+        return str.ToUpper();
+    }
+    public string FirstLetterToLower(string str)
+    {
+        if (str == null)
+            return null;
+        if (str.Length > 1)
+            return char.ToLower(str[0]) + str.Substring(1);
+        return str.ToUpper();
+    }
+    string GetModelPropertyName(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+        if (model.GenerateJSonAttribute) {
+            return prop.ViewPropertyName;
+        } else {
+            return FirstLetterToLower(prop.ViewPropertyName);
+        }
+    }
+    string AttribToString(ModelViewAttributeSerializable attr) {
+        if(attr == null) return "";
+        string result= "[" + attr.AttrName; 
+        if (attr.VaueProperties == null) {
+            return result + "]";
+        }
+        if (attr.VaueProperties.Count < 1) {
+            return result + "]";
+        }
+        result = result + "(";
+        bool insComma= false;
+        foreach(ModelViewAttributePropertySerializable valProp in attr.VaueProperties) {
+            if (insComma) {
+                result =  result + ",";
+            } else {
+                insComma = true;
+            }
+            if(! string.IsNullOrEmpty(valProp.PropName) ) {
+                if (! valProp.PropName.Contains("...") ) {
+                    result =  result + valProp.PropName + "=";
+                }
+            }
+            result =  result + valProp.PropValue;
+        }
+        return result + ")]";
+    }
+    string GetPropertyTypeName(ModelViewPropertyOfVwSerializable prop)
+    {
+        if("System.String".Equals(prop.UnderlyingTypeName, System.StringComparison.OrdinalIgnoreCase)) {
+            return prop.UnderlyingTypeName;
+        }
+        if(prop.IsNullable || (!prop.IsRequiredInView)) {
+            return prop.UnderlyingTypeName + " ?";
+        }
+        return prop.UnderlyingTypeName;
+    }
+    string GetUnNamedAtributeValue(ModelViewPropertyOfVwSerializable sclrProp, string attrName) {
+        if(sclrProp != null) {
+            if (sclrProp.Attributes != null) {
+                ModelViewAttributeSerializable modelViewAttributeSerializable =
+                    sclrProp.Attributes.Where(a => a.AttrName == attrName).FirstOrDefault();
+                if(modelViewAttributeSerializable != null) {
+                    if (modelViewAttributeSerializable.VaueProperties != null) {
+                    
+                        ModelViewAttributePropertySerializable modelViewAttributePropertySerializable =
+                            modelViewAttributeSerializable.VaueProperties.Where(p => (string.IsNullOrEmpty(p.PropName) || (p.PropName == "..."))).FirstOrDefault();
+                        if (modelViewAttributePropertySerializable != null) {
+                            return modelViewAttributePropertySerializable.PropValue;
+                        }
+                    }
+                }
+            }
+        }
+        return null;                
+    }
+    string GetMaxLen(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+        if ((prop == null) || (model == null)) return "";
+        if( prop.UnderlyingTypeName.ToLower() == "system.string" ) {
+            string propValue = GetUnNamedAtributeValue(prop, "StringLength");
+            if(!string.IsNullOrEmpty(propValue)) {
+                propValue = propValue.Replace("\"", "");
+                if(!string.IsNullOrEmpty(propValue)) {
+                    return propValue;
+                }
+            }
+            propValue = GetUnNamedAtributeValue(prop, "MaxLength");
+            if(!string.IsNullOrEmpty(propValue)) {
+                propValue = propValue.Replace("\"", "");
+                if(!string.IsNullOrEmpty(propValue)) {
+                    return propValue;
+                }
+            }
+        } else if( prop.UnderlyingTypeName.ToLower() == "system.guid" ) {
+            return "36";
+        }
+        return "";
+    }
+    string GetMaxLenEx(ModelViewKeyPropertySerializable prop, ModelViewSerializable model) {
+        if ((prop == null) || (model == null)) return null;
+        ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => (p.OriginalPropertyName == prop.OriginalPropertyName) && string.IsNullOrEmpty(p.ForeignKeyName)).FirstOrDefault();
+        return GetMaxLen(sclrProp, model);
+    }
+    bool HasAtributeWithValue(ModelViewPropertyOfVwSerializable sclrProp, string attrName, string attrVal) {
+        if ((sclrProp != null) && (!string.IsNullOrEmpty(attrName)) && (!string.IsNullOrEmpty(attrVal)) ) {
+            if (sclrProp.Attributes != null) {
+                foreach(ModelViewAttributeSerializable a in sclrProp.Attributes) {
+                    if (attrName.Equals(a.AttrName, StringComparison.InvariantCultureIgnoreCase)) {
+                        if (a.VaueProperties != null) {
+                            foreach(ModelViewAttributePropertySerializable v in a.VaueProperties) {
+                                if(!string.IsNullOrEmpty( v.PropValue )) {
+                                    if(v.PropValue.ToLower().Contains(attrVal)) {
+                                        return true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    bool HasFluentAtributeWithValue(ModelViewPropertyOfVwSerializable sclrProp, string attrName, string attrVal) {
+        if ((sclrProp != null) && (!string.IsNullOrEmpty(attrName)) && (!string.IsNullOrEmpty(attrVal)) ) {
+            if (sclrProp.FAPIAttributes != null) {
+                foreach(ModelViewFAPIAttributeSerializable a in sclrProp.FAPIAttributes) {
+                    if (attrName.Equals(a.AttrName, StringComparison.InvariantCultureIgnoreCase)) {
+                        if (a.VaueProperties != null) {
+                            foreach(ModelViewFAPIAttributePropertySerializable v in a.VaueProperties) {
+                                if(!string.IsNullOrEmpty( v.PropValue )) {
+                                    if(v.PropValue.ToLower().Contains(attrVal)) {
+                                        return true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    bool HasFluentAtribute(ModelViewPropertyOfVwSerializable sclrProp, string[] attrName) {
+        if ((sclrProp != null) && (attrName != null)  ) {
+            if ((sclrProp.FAPIAttributes != null) && (attrName.Length > 0)) {
+                return sclrProp.FAPIAttributes.Any(a => attrName.Contains(a.AttrName));
+            }
+        }
+        return false;
+    }
+    bool IsIdentityProperty(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+        if (HasAtributeWithValue(prop, "DatabaseGenerated", "identity")) {
+            return true;
+        }
+        if(HasFluentAtribute(prop, new string[] {"UseSqlServerIdentityColumn", "ForSqlServerUseSequenceHiLo", "ValueGeneratedOnAdd", "ValueGeneratedOnAddOrUpdate", "IsConcurrencyToken", "IsRowVersion"} )) {
+            return true;
+        }
+        return HasFluentAtributeWithValue(prop, "HasDatabaseGeneratedOption", "identity");
+    }
+    bool IsIdentityPropertyKey(ModelViewKeyPropertySerializable prop, ModelViewSerializable model) {
+        if ((model == null)||(prop == null)) return false;
+        ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => (p.OriginalPropertyName == prop.OriginalPropertyName) && (string.IsNullOrEmpty(p.ForeignKeyName))).FirstOrDefault();
+        if(sclrProp == null) return false;
+        return IsIdentityProperty(sclrProp, model);
+    }
+    bool IsComputedProperty(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+        if (HasAtributeWithValue(prop, "DatabaseGenerated", "computed")) {
+            return true;
+        }
+        if(HasFluentAtribute(prop, new string[] {"UseSqlServerIdentityColumn", "ForSqlServerUseSequenceHiLo", "ValueGeneratedOnAdd", "ValueGeneratedOnAddOrUpdate", "IsConcurrencyToken", "IsRowVersion"} )) {
+            return true;
+        }
+        return HasFluentAtributeWithValue(prop, "HasDatabaseGeneratedOption", "computed");
+    }                          
+    bool IsComputedPropertyKey(ModelViewKeyPropertySerializable prop, ModelViewSerializable model) {
+        if ((model == null)||(prop == null)) return false;
+        ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => (p.OriginalPropertyName == prop.OriginalPropertyName) && (string.IsNullOrEmpty(p.ForeignKeyName))).FirstOrDefault();
+        if(sclrProp == null) return false;
+        return IsComputedProperty(sclrProp, model);
+    }
+    bool IsStringPropertyKey(ModelViewKeyPropertySerializable prop, ModelViewSerializable model) {
+        if ((model == null)||(prop == null)) return false;
+        if(string.IsNullOrEmpty( prop.UnderlyingTypeName )) return false;
+        return prop.UnderlyingTypeName.ToLower() == "system.string";
+    }
+
+
+    string GetSymfonyModelNameSpace(ModelViewSerializable model, string fileType, string appPrefix) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "\\";
+        string filePath = "";
+        string defaultNameSpace = (string.IsNullOrEmpty(appPrefix)) ? "" : appPrefix;
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            if (string.IsNullOrEmpty(appPrefix))
+                filePath = refItem.FileFolder;
+            else 
+                filePath = delim + refItem.FileFolder;
+        }
+        return defaultNameSpace + filePath;
+    }
+    string GetDoctrineEntityClassNameForStr(string ViewClassName) {
+        if (string.IsNullOrEmpty(ViewClassName)) return "";
+        return FirstLetterToUpper( ViewClassName + "Entity" );
+    }
+    string GetDoctrineEntityClassName(ModelViewSerializable model) {
+        
+        if (model == null) return "";
+        return GetDoctrineEntityClassNameForStr(model.ViewName);
+    }
+    string GetDoctrineEntityTableNameForStr(string RootEntityClassName) { 
+        string rslt = "";
+        if (string.IsNullOrEmpty(RootEntityClassName)) return rslt;
+        return CS2WPF.Helpers.CustomPluralization.Pluralize(RootEntityClassName).ToLower();
+    }
+    string GetDoctrineEntityTableName(ModelViewSerializable model) { 
+        string rslt = "";
+        if (model == null) return rslt;
+        return GetDoctrineEntityTableNameForStr(model.RootEntityClassName);
+    }
+    string GetDoctrineEntityTableColumnName(ModelViewKeyPropertySerializable prop) {
+        string rslt = "";
+        if (prop == null) return rslt;
+        return prop.OriginalPropertyName;
+    }
+    string GetDoctrineEntityGetSetSuffixForStr(string rslt) {
+        if (string.IsNullOrEmpty(rslt)) return "";
+        rslt = rslt.ToLower();
+        StringBuilder rsltSb = new StringBuilder();
+        bool nextIsUpper = false;
+        foreach (char ch in rslt)
+        {
+            if (ch == '_') { 
+                nextIsUpper = true; 
+            } else {
+                char chl = ch;
+                if(nextIsUpper) chl = char.ToUpper(ch);
+                rsltSb.Append(chl);
+                nextIsUpper = false; 
+            }
+        }
+        return FirstLetterToUpper(rsltSb.ToString());
+    }
+    string GetDoctrineEntityGetMethodNameForStr(string rslt) {
+        return "get" + GetDoctrineEntityGetSetSuffixForStr(rslt);
+    }
+    string GetDoctrineEntitySetMethodNameForStr(string rslt) {
+        return "set" + GetDoctrineEntityGetSetSuffixForStr(rslt);
+    }
+    string GetDoctrineEntityFieldNameForStr(string rslt) {
+        return GetDoctrineEntityGetSetSuffixForStr(rslt).ToLower();
+    }
+    string GetDoctrineEntityGetSetSuffix(ModelViewKeyPropertySerializable prop) {
+        string rslt = "";
+        if (prop == null) return rslt;
+        return GetDoctrineEntityGetSetSuffixForStr( GetDoctrineEntityTableColumnName(prop));
+    }
+    string GetDoctrineEntityGetMethodName(ModelViewKeyPropertySerializable prop) {
+        return "get" + GetDoctrineEntityGetSetSuffix(prop);
+    }
+    string GetDoctrineEntitySetMethodName(ModelViewKeyPropertySerializable prop) {
+        return "set" + GetDoctrineEntityGetSetSuffix(prop);
+    }
+    string GetDoctrineEntityFieldName(ModelViewKeyPropertySerializable prop) {
+        return GetDoctrineEntityGetSetSuffix(prop).ToLower();
+    }
+    string GetDoctrinePhpType(string csharptype) {
+        if(string.IsNullOrEmpty(csharptype)) return "string";
+        string rslt;
+        switch (csharptype.ToLower()) {
+            case "system.int32": // type="integer"
+                rslt = "int";
+                break;
+            case "system.sbyte": // type="boolean"
+                rslt = "bool";
+                break;
+            case "system.byte": // type="boolean"
+                rslt = "bool";
+                break;
+            case "system.int16": // type="smallint"
+                rslt = "int";
+                break;
+            case "system.uint16": // type="smallint"
+                rslt = "int";
+                break;
+            case "system.uint32": // type="integer"
+                rslt = "int";
+                break;
+            case "system.int64": // type="bigint"
+                rslt = "int";
+                break;
+            case "system.uint64": // type="bigint"
+                rslt = "int";
+                break;
+            case "system.char": // type="boolean"
+                rslt = "bool";
+                break;
+            case "system.single": // type="float", precision=10, scale=0
+                rslt = "float";
+                break;
+            case "system.double": // type="float", precision=10, scale=0
+                rslt = "float";
+                break;
+            case "system.boolean": // type="boolean"
+                rslt = "bool";
+                break;
+            case "system.decimal": // type="decimal", precision=18, scale=2
+                rslt = "string";
+                break;
+            case "system.string": // type="text", length=0; type="string", length=20
+                rslt = "string";
+                break;
+            case "system.guid":  // type="string", length=36, nullable=false/true, options={"fixed"=true}
+                rslt = "string";
+                break;
+            case "system.datetime": // type="datetime"
+                rslt = "DateTime";
+                break;
+                
+            default:
+                rslt = "string";
+                break;
+        }
+        return rslt;
+    }
+    string GetDoctrineEntityFieldPhpType(ModelViewKeyPropertySerializable prop, ModelViewSerializable model) {
+        return GetDoctrinePhpType(prop.UnderlyingTypeName);
+    }
+    string GetDoctrineDataBaseType(string csharptype, string maxLen) {
+        if(string.IsNullOrEmpty(csharptype)) return "string";
+        string rslt;
+        switch (csharptype.ToLower()) {
+            case "system.int32": 
+                rslt = "integer"; //"int";
+                break;
+            case "system.sbyte": 
+                rslt = "boolean"; // "bool";
+                break;
+            case "system.byte": 
+                rslt = "boolean"; // "bool";
+                break;
+            case "system.int16": 
+                rslt = "smallint"; // "int";
+                break;
+            case "system.uint16": 
+                rslt = "smallint"; // "int";
+                break;
+            case "system.uint32": 
+                rslt = "integer"; // "int";
+                break;
+            case "system.int64": 
+                rslt = "bigint"; // "int";
+                break;
+            case "system.uint64": 
+                rslt = "bigint"; // "int";
+                break;
+            case "system.char": 
+                rslt = "boolean"; // "bool";
+                break;
+            case "system.single": // type="float", precision=10, scale=0
+                rslt = "float"; // "float";
+                break;
+            case "system.double": // type="float", precision=10, scale=0
+                rslt = "float"; // "float";
+                break;
+            case "system.boolean": // type="boolean"
+                rslt = "boolean";// "bool";
+                break;
+            case "system.decimal": // type="decimal", precision=18, scale=2
+                rslt = "decimal"; // "string";
+                break;
+            case "system.string": // type="text", length=0; type="string", length=20
+               if (string.IsNullOrEmpty(maxLen))
+                    rslt = "text";
+                else
+                    rslt = "string";
+                break;
+            case "system.guid":  // type="string", length=36, nullable=false/true, options={"fixed"=true}
+                rslt = "string";
+                break;
+            case "system.datetime": // type="datetime"
+                rslt = "datetime"; // "DateTime";
+                break;
+            default:
+                rslt = "string";
+                break;
+        }
+        return rslt;
+    }
+    string GetLaravelDataBaseType(string csharptype, string maxLen) {
+        if(string.IsNullOrEmpty(csharptype)) return "string";
+        string rslt;
+        switch (csharptype.ToLower()) {
+            case "system.int32": 
+                rslt = "integer"; //"int";
+                break;
+            case "system.sbyte": 
+                rslt = "tinyInteger"; // "bool";
+                break;
+            case "system.byte": 
+                rslt = "unsignedTinyInteger"; // "bool";
+                break;
+            case "system.int16": 
+                rslt = "smallInteger"; // "int";
+                break;
+            case "system.uint16": 
+                rslt = "smallInteger"; // "int";
+                break;
+            case "system.uint32": 
+                rslt = "integer"; // "int";
+                break;
+            case "system.int64": 
+                rslt = "bigInteger"; // "int";
+                break;
+            case "system.uint64": 
+                rslt = "bigInteger"; // "int";
+                break;
+            case "system.char": 
+                rslt = "boolean"; // "bool";
+                break;
+            case "system.single": // type="float", precision=10, scale=0
+                rslt = "float"; // "float";
+                break;
+            case "system.double": // type="float", precision=10, scale=0
+                rslt = "double"; // "float";
+                break;
+            case "system.boolean": // type="boolean"
+                rslt = "boolean";// "bool";
+                break;
+            case "system.decimal": // type="decimal", precision=18, scale=2
+                rslt = "decimal"; // "string";
+                break;
+            case "system.string": // type="text", length=0; type="string", length=20
+               if (string.IsNullOrEmpty(maxLen))
+                    rslt = "longText";
+                else
+                    rslt = "string";
+                break;
+            case "system.guid":  // type="string", length=36, nullable=false/true, options={"fixed"=true}
+                rslt = "string";
+                break;
+            case "system.datetime": // type="datetime"
+                rslt = "datetime"; // "DateTime";
+                break;
+            default:
+                rslt = "string";
+                break;
+        }
+        return rslt;
+    }
+    string GetDoctrineEntityFieldDataBaseType(ModelViewKeyPropertySerializable prop, ModelViewSerializable model) {
+        return GetDoctrineDataBaseType(prop.UnderlyingTypeName, GetMaxLenEx(prop, model));
+    }
+    string GetLaravelEntityFieldDataBaseType(ModelViewKeyPropertySerializable prop, ModelViewSerializable model) {
+        return GetLaravelDataBaseType(prop.UnderlyingTypeName, GetMaxLenEx(prop, model));
+    }
+    bool   GetDoctrineEntityFieldIsId(ModelViewKeyPropertySerializable prop, ModelViewSerializable model) {
+        if ((model == null) || (prop == null)) return false;
+        return Model.PrimaryKeyProperties.Where(p => (p.OriginalPropertyName == prop.OriginalPropertyName)).Any();
+    }
+    bool   GetDoctrineEntityFieldIsGuid(ModelViewKeyPropertySerializable prop, ModelViewSerializable model) {
+        if ((model == null) || (prop == null)) return false;
+        if(string.IsNullOrEmpty( prop.UnderlyingTypeName )) return false;
+        return prop.UnderlyingTypeName.ToLower() == "system.guid";
+    }
+    string GetDoctrineEntityGetSetPhpType(ModelViewKeyPropertySerializable prop, ModelViewSerializable model) {
+        string tpName = GetDoctrineEntityFieldPhpType(prop, model);
+        if(tpName == "DateTime") tpName = "\\DateTimeInterface";
+        return tpName;
+    }
+
+    ModelViewPropertyOfVwSerializable GetScalarProperty(ModelViewKeyPropertySerializable prop, ModelViewSerializable model) {
+        if((model == null) || (prop == null)) return null;
+        ModelViewPropertyOfVwSerializable rslt =
+            model.ScalarProperties.Where(p => (p.OriginalPropertyName == prop.OriginalPropertyName) && (string.IsNullOrEmpty(p.ForeignKeyName))).FirstOrDefault();
+        if (rslt != null) return rslt;
+        if(model.ForeignKeys == null) return null;
+        foreach(ModelViewForeignKeySerializable foreignKey in model.ForeignKeys) {
+            if ((foreignKey.ForeignKeyProps != null) && (foreignKey.PrincipalKeyProps != null)) {
+                string navigationName = foreignKey.NavigationName;
+                int cnt = foreignKey.ForeignKeyProps.Count;
+                if (foreignKey.PrincipalKeyProps.Count < cnt) cnt = foreignKey.PrincipalKeyProps.Count;
+                for(int i = 0; i < cnt; i++) {
+                    if(foreignKey.ForeignKeyProps[i].OriginalPropertyName == prop.OriginalPropertyName) {
+                        ModelViewKeyPropertySerializable pkp = foreignKey.PrincipalKeyProps[i];
+                        rslt =
+                            model.ScalarProperties.Where(p => (p.OriginalPropertyName == pkp.OriginalPropertyName) && (p.ForeignKeyNameChain == navigationName)).FirstOrDefault();
+                        if(rslt != null) return rslt;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+    string GetDoctrineEntityViewFieldPhpType(ModelViewPropertyOfVwSerializable prop) {
+        return GetDoctrinePhpType(prop.UnderlyingTypeName);
+    }
+    string GetDoctrineEntityViewFieldDataBaseType(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+        return GetDoctrineDataBaseType(prop.UnderlyingTypeName, GetMaxLen(prop, model));
+    }
+    string GetDoctrineEntityViewFieldName(ModelViewPropertyOfVwSerializable prop) {
+        if(prop == null) return "";
+        return GetDoctrineEntityGetSetSuffixForStr( prop.ViewPropertyName ).ToLower();
+    }
+    string GetDoctrineEntityViewGetMethodName(ModelViewPropertyOfVwSerializable prop) {
+        if(prop == null) return "";
+        return "get" + GetDoctrineEntityGetSetSuffixForStr( prop.ViewPropertyName );
+    }
+    string GetDoctrineEntityViewSetMethodName(ModelViewPropertyOfVwSerializable prop) {
+        if(prop == null) return "";
+        return "set" + GetDoctrineEntityGetSetSuffixForStr( prop.ViewPropertyName );
+    }
+    string GetDoctrineEntityViewGetSetPhpType(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+        string tpName = GetDoctrineEntityViewFieldPhpType(prop);
+        if(tpName == "DateTime") tpName = "\\DateTimeInterface";
+        return tpName;
+    }
+    bool   GetDoctrineEntityFieldViewIsGuid(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+        if ((model == null) || (prop == null)) return false;
+        if(string.IsNullOrEmpty( prop.UnderlyingTypeName )) return false;
+        return prop.UnderlyingTypeName.ToLower() == "system.guid";
+    }
+    bool   GetDoctrineEntityFieldViewIsString(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+        if ((model == null) || (prop == null)) return false;
+        if(string.IsNullOrEmpty( prop.UnderlyingTypeName )) return false;
+        return prop.UnderlyingTypeName.ToLower() == "system.string";
+    }
+
+    string GetLaravelConnectionName(DbContextSerializable context) {
+        string result = "";
+        if(context != null) {
+            result = context.DbContextClassName;
+            if(!string.IsNullOrEmpty(context.DbContextClassName)) {
+                result = context.DbContextClassName.ToLower(); 
+            }
+        }
+        return result; 
+    }
+    string GetLaravelMigrationName(DbContextSerializable context) {
+        string result = "Migration";
+        if(context != null) {
+            if(!string.IsNullOrEmpty(context.DbContextClassName)) {
+                result = context.DbContextClassName + result; 
+            }
+        }
+        return result; 
+    }
+    string GetLaravelModelNameSpace(ModelViewSerializable model, string fileType, string appPrefix) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "\\";
+        string filePath = "";
+        string defaultNameSpace = (string.IsNullOrEmpty(appPrefix)) ? "" : appPrefix;
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            if (string.IsNullOrEmpty(appPrefix))
+                filePath = refItem.FileFolder;
+            else 
+                filePath = delim + refItem.FileFolder;
+        }
+        return defaultNameSpace + filePath;
+    }
+    
+#>
