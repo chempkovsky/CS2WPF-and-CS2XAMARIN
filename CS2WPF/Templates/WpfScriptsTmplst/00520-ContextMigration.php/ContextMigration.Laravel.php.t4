@@ -141,13 +141,16 @@ class <#= migrationClassName #> extends Migration
             foreach(ModelViewKeyPropertySerializable keyProp  in mv.AllProperties) {
                 string isNullable = keyProp.IsRequired ? "" : "->nullable()";
                 string optionalParams = IsIdentityPropertyKey(keyProp, mv) ? ", true" : "";
-                string maxLen = GetMaxLenEx(keyProp, Model);
+                string maxLen = GetMaxLenEx(keyProp, mv);
                 switch (keyProp.UnderlyingTypeName.ToLower()) {
                     case "system.decimal": 
                         optionalParams = ", 18"; 
                         break;
                     case "system.single": 
                         optionalParams = ", 10, 0"; 
+                        break;
+                    default:
+                        if(!string.IsNullOrEmpty(maxLen)) optionalParams = ", " + maxLen; 
                         break;
                 }
 
