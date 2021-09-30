@@ -70,6 +70,10 @@ class <#= dropdbClassName #> extends Command
      */
     public function handle()
     {
+        if (!$this->confirm('This command is to drop database. Do you want to continue?', true)) {
+            return 0;
+        }
+
         $allconnection = config('database.connections');
         $connectionNames = [];
         foreach ($allconnection as $key => $value) {
