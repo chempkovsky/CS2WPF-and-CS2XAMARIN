@@ -776,8 +776,6 @@ class <#= controllerClassName #> extends Controller
             }
             
         }
-        $isFirst = true;
-        $filters =  [];
         $queryBuilder = $this->getQueryBuilder();
 <#
         foreach(ModelViewPropertyOfVwSerializable sclrProp in Model.ScalarProperties) {
@@ -805,7 +803,6 @@ class <#= controllerClassName #> extends Controller
                     $<#= GetFilterPropertyOperatorName(sclrProp, Model, OperatorSufix) #>[] = $tmpval;
                 }
             }
-            $cnt = 0;
             foreach ($<#= GetModelPropertyName(sclrProp, Model) #> as $k => $v) {
                 if(!($v === null)) {
                     $op = "eq";
