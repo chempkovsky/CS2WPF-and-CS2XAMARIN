@@ -133,7 +133,7 @@ use Illuminate\Database\Query\Builder;
 //        ],
 //        ...
 // ///////////////////////////////////////////////////////////////////////////////
-// the generated code expects "routes/api.php"-file to have the following config parameters
+// Laravel: the generated code expects "routes/api.php"-file to have the following config parameters
 // ///////////////////////////////////////////////////////////////////////////////
 //        ...
 // use <#= controllerNameSpace + "\\" + controllerClassName #>;
@@ -170,6 +170,47 @@ use Illuminate\Database\Query\Builder;
 <# 
     }
 #>
+//        ...
+// ///////////////////////////////////////////////////////////////////////////////
+// Lumen: the generated code expects "routes/web.php"-file to have the following config parameters
+// ///////////////////////////////////////////////////////////////////////////////
+//        ...
+// 
+//  //$router->group(['prefix' => 'api'], function () use ($router) {
+//  $router->group([], function () use ($router) {
+<# 
+    if (Model.IsWebApiSelectAll) { 
+#>
+//   $router->get('<#= "/" + controllerPrefix + "/" + GetAllMethodName #>', ['uses' => '<#= controllerClassName #>@<#= GetAllMethodName #>']);
+<# 
+    }
+    if (Model.IsWebApiSelectManyWithPagination) { 
+#>
+//   $router->get('<#= "/" + controllerPrefix + "/" + GetWithFilterMethodName #>', ['uses' => '<#= controllerClassName #>@<#= GetWithFilterMethodName #>']);
+<# 
+    }
+    if (Model.IsWebApiSelectOneByPrimarykey) { 
+#>
+//   $router->get('<#= "/" + controllerPrefix + "/" + GetOneMethodName #>', ['uses' => '<#= controllerClassName #>@<#= GetOneMethodName #>']);
+<# 
+    }
+    if (Model.IsWebApiAdd) { 
+#>
+//   $router->post('<#= "/" + controllerPrefix + "/" + AddOneMethodName #>', ['uses' => '<#= controllerClassName #>@<#= AddOneMethodName #>']);
+<# 
+    }
+    if (Model.IsWebApiUpdate) { 
+#>
+//   $router->put('<#= "/" + controllerPrefix + "/" + UpdateOneMethodName #>', ['uses' => '<#= controllerClassName #>@<#= UpdateOneMethodName #>']);
+<# 
+    }
+    if (Model.IsWebApiDelete) { 
+#>
+//   $router->delete('<#= "/" + controllerPrefix + "/" + DeleteOneMethodName #>', ['uses' => '<#= controllerClassName #>@<#= DeleteOneMethodName #>']);
+<# 
+    }
+#>
+//  });
 //        ...
 // ///////////////////////////////////////////////////////////////////////////////
 
