@@ -19,13 +19,13 @@
 
 
     string entityToSkip             = "aspnetusermask";
+    string userEntity               = "aspnetuser";
 
     string migrationFolder          = "00520-ContextMigration.php";
     string migrationClassName       = GetLaravelMigrationName(Context);
     string connectionName           = GetLaravelConnectionName(Context);
     
 
-    
     
     
 
@@ -136,10 +136,10 @@ class <#= migrationClassName #> extends Migration
         }
         foreach(string entityName in entities) {
             Tuple<string, string, bool, bool, bool, ModelViewSerializable> t = 
-                allViews.Where(p => p.Item1 == entityName && p.Item3 ).FirstOrDefault();
-            if(t == null) continue;
+                allViews.Where(p => p.Item1 == entityName).FirstOrDefault();
             ModelViewSerializable mv = t.Item6;
             if(mv.RootEntityClassName == entityToSkip) continue;
+            if ((mv.RootEntityClassName != userEntity) && (!(t.Item3))) continue;
 #>
             Schema::connection('<#= connectionName #>')->create('<#= GetDoctrineEntityTableName(mv) #>', function (Blueprint $table) {
 <#
@@ -220,9 +220,10 @@ class <#= migrationClassName #> extends Migration
         }
         foreach(string entityName in entities) {
             Tuple<string, string, bool, bool, bool, ModelViewSerializable> t = 
-                allViews.Where(p => p.Item1 == entityName && p.Item3 && p.Item5).FirstOrDefault();
+                allViews.Where(p => p.Item1 == entityName && p.Item5).FirstOrDefault();
             if(t == null) continue;
             ModelViewSerializable mv = t.Item6;
+            if ((mv.RootEntityClassName != userEntity) && (!(t.Item3))) continue;
             if(mv.RootEntityClassName == entityToSkip) continue;
             if (mv.ForeignKeys == null) continue;
             if (mv.ForeignKeys.Count < 1) continue;
@@ -268,9 +269,10 @@ class <#= migrationClassName #> extends Migration
 <#
         foreach(string entityName in entities) {
             Tuple<string, string, bool, bool, bool, ModelViewSerializable> t = 
-                allViews.Where(p => p.Item1 == entityName && p.Item3 && p.Item5).FirstOrDefault();
+                allViews.Where(p => p.Item1 == entityName && p.Item5).FirstOrDefault();
             if(t == null) continue;
             ModelViewSerializable mv = t.Item6;
+            if ((mv.RootEntityClassName != userEntity) && (!(t.Item3))) continue;
             if(mv.RootEntityClassName == entityToSkip) continue;
             if (mv.ForeignKeys == null) continue;
             if (mv.ForeignKeys.Count < 1) continue;
@@ -289,9 +291,10 @@ class <#= migrationClassName #> extends Migration
         }
         foreach(string entityName in entities) {
             Tuple<string, string, bool, bool, bool, ModelViewSerializable> t = 
-                allViews.Where(p => p.Item1 == entityName && p.Item3).FirstOrDefault();
+                allViews.Where(p => p.Item1 == entityName).FirstOrDefault();
             if(t == null) continue;
             ModelViewSerializable mv = t.Item6;
+            if ((mv.RootEntityClassName != userEntity) && (!(t.Item3))) continue;
 #>
             Schema::connection('<#= connectionName #>')->drop('<#= GetDoctrineEntityTableName(mv) #>', function (Blueprint $table) {
             });
