@@ -76,6 +76,11 @@ class <#= entityUpdClassName #>
             }
         }
 #>
+        $this->emailconfirmed=false;
+        $this->phonenumberconfirmed=false;
+        $this->twofactorenabled=false;
+        $this->lockoutenabled=false;
+        $this->accessfailedcount=0;
     }
 <# 
     }
@@ -137,6 +142,20 @@ class <#= entityUpdClassName #>
 
 #>                
 
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="PasswordHash", type="text"  , nullable=true)
+     */
+    private $passwordhash;
+
+    
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="SecurityStamp", type="text"  , nullable=true)
+     */
+    private $securitystamp;
 
     /**
      * 
@@ -161,6 +180,17 @@ class <#= entityUpdClassName #>
 
         return $this;
     }
+
+    public function getSecuritystamp(): ?string
+    {
+        return $this->securitystamp;
+    }
+    public function setSecuritystamp(string $securitystamp): self
+    {
+        $this->securitystamp = $securitystamp;
+        return $this;
+    }
+
 
     /**
      * A visual identifier that represents this user.

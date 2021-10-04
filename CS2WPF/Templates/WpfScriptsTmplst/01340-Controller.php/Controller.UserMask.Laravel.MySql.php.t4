@@ -17,19 +17,13 @@
     string SrcPrefix                                = "src";
 
 
-    string entityUpdFolder                          = "01142-EntityUpd.php";
-    string entityUpdClassName                       = GetModelClassName(Model, entityUpdFolder);
-    string entityUpdNameSpace                       = GetSymfonyModelNameSpace(Model, entityUpdFolder, AppPrefix);
-    string entityUpdRepositoryClassName             = entityUpdClassName + "Repository";
 
-    string entitySelFolder                          = "01144-EntitySel.php";
-    string entitySelClassName                       = GetModelClassName(Model, entitySelFolder);
-    string entitySelNameSpace                       = GetSymfonyModelNameSpace(Model, entitySelFolder, AppPrefix);
 
-    string keyAuthenticatorFolder                   = "01360-KeyAuthenticator.php";
-    string keyAuthenticatorClassName                = GetModelClassName(Model, keyAuthenticatorFolder);
-    string keyAuthenticatorNameSpace                = GetSymfonyModelNameSpace(Model, keyAuthenticatorFolder, AppPrefix);
-    
+    string controllerFolder                         = "01340-Controller.php";
+    string controllerClassName                      = GetModelClassName(Model, controllerFolder);
+    string controllerNameSpace                      = GetLaravelModelNameSpace(Model, controllerFolder, AppPrefix);
+    string controllerPrefix                         = GetWebApiServicePrefix(Model);
+    string connectionName                           = GetLaravelConnectionName(Context);
 
     string DoctrineEntityTableName                  = GetDoctrineEntityTableName(Model); 
     string DoctrineEntityConnection                 = (Context.DbContextClassName + "Connection").ToLower();
@@ -47,335 +41,234 @@
     string AddOneMethodName         = "addone";
     string DeleteOneMethodName      = "deleteone";
 
-
-
     string UserEntityName       = "aspnetuser";
     string UserRolesEntityName  = "aspnetuserroles";
     string RoleEntityName       = "aspnetrole";
+    string RoleMaskEntityName   = "aspnetrolemask";
 
+    ModelViewSerializable UserModel         =  Context.ModelViews.Where(f => f.RootEntityClassName == UserEntityName).FirstOrDefault();
     ModelViewSerializable UserRolesModel    =  Context.ModelViews.Where(f => f.RootEntityClassName == UserRolesEntityName).FirstOrDefault();
+    ModelViewSerializable RoleMaskModel     =  Context.ModelViews.Where(f => f.RootEntityClassName == RoleMaskEntityName).FirstOrDefault();
     ModelViewSerializable RoleModel         =  Context.ModelViews.Where(f => f.RootEntityClassName == RoleEntityName).FirstOrDefault();
 
+    if(UserModel == null) {
+        throw new Exception("Could not find ModelView with RootEntityClassName = aspnetuser. Make sure that such a ModelView exists in the current context, or change the UserEntityName-var value in the current script if the name for the User Entity has changed in your modeling infrastructure.");
+    }
     if(UserRolesModel == null) {
         throw new Exception("Could not find ModelView with RootEntityClassName = aspnetuserroles. Make sure that such a ModelView exists in the current context, or change the UserRolesEntityName-var value in the current script if the name for the UserRoles Entity has changed in your modeling infrastructure.");
+    }
+    if(RoleMaskEntityName == null) {
+        throw new Exception("Could not find ModelView with RootEntityClassName = aspnetrolemask. Make sure that such a ModelView exists in the current context, or change the RoleMaskEntityName-var value in the current script if the name for the RoleMasks Entity has changed in your modeling infrastructure.");
     }
     if(RoleModel == null) {
         throw new Exception("Could not find ModelView with RootEntityClassName = aspnetrole. Make sure that such a ModelView exists in the current context, or change the RoleEntityName-var value in the current script if the name for the Role Entity has changed in your modeling infrastructure.");
     }
 
-    string roleEntitySelClassName               = GetModelClassName(RoleModel, entitySelFolder);
-    string roleEntitySelNameSpace               = GetSymfonyModelNameSpace(RoleModel, entitySelFolder, AppPrefix);
+    string DoctrineUserEntityTableName                  = GetDoctrineEntityTableName(UserModel); 
+    string DoctrineUserRolesEntityTableName             = GetDoctrineEntityTableName(UserRolesModel); 
+    string DoctrineRoleMaskEntityTableName              = GetDoctrineEntityTableName(RoleMaskModel); 
+    string DoctrineRoleEntityTableName                  = GetDoctrineEntityTableName(RoleModel); 
 
-    string DoctrineUserRolesEntityTableName     = GetDoctrineEntityTableName(UserRolesModel); 
-    string DoctrineRoleEntityTableName          = GetDoctrineEntityTableName(RoleModel); 
-
+    if(UserRolesModel.ForeignKeys == null) {
+        throw new Exception("The list of Foreign Keys is empty for aspnetuserroles-entity.");
+    }
     ModelViewForeignKeySerializable UserRoles2UserFK =  UserRolesModel.ForeignKeys.Where(f => f.NavigationEntityName == UserEntityName).FirstOrDefault();
     if(UserRoles2UserFK == null) {
         throw new Exception("Could not find ForeignKey with NavigationEntityName == " + UserEntityName + " for ModelView with a name " + UserRolesModel.ViewName);
     }
-    if(UserRolesModel.ForeignKeys == null) {
-        throw new Exception("The list of Foreign Keys is empty for aspnetuserroles-entity.");
-    }
-
     ModelViewForeignKeySerializable UserRoles2RoleFK =  UserRolesModel.ForeignKeys.Where(f => f.NavigationEntityName == RoleEntityName).FirstOrDefault();
     if(UserRoles2RoleFK == null) {
         throw new Exception("Could not find ForeignKey with NavigationEntityName == " + RoleEntityName + " for ModelView with a name " + UserRolesModel.ViewName);
     }
 
-    string selForRolesClause = "select ";
-    {
-        int navChainCnt = 0;
-        foreach (ModelViewKeyPropertySerializable prop in RoleModel.AllProperties) {
-            ModelViewPropertyOfVwSerializable sclrProp = GetScalarProperty(prop, RoleModel);
-            if(sclrProp == null) continue;
-            if(navChainCnt==0) { selForRolesClause += " "; navChainCnt = 1; } else { selForRolesClause += ", "; }
-            selForRolesClause += "t0001." + sclrProp.OriginalPropertyName + " as " + sclrProp.ViewPropertyName;
-        } 
-    }
-    selForRolesClause += " from " + DoctrineUserRolesEntityTableName + " t0000 INNER JOIN " + DoctrineRoleEntityTableName + " as t0001 on (t0000."
-        + UserRoles2RoleFK.ForeignKeyProps[0].OriginalPropertyName + " = t0001." 
-        + UserRoles2RoleFK.PrincipalKeyProps[0].OriginalPropertyName + ")"  // ---- this line is correct: the column names are the same in both tables
-        + " where t0000." + UserRoles2UserFK.ForeignKeyProps[0].OriginalPropertyName + " = :UserId";
-
-
 #>
 <?php
 
-namespace <#= keyAuthenticatorNameSpace #>;
+namespace <#= controllerNameSpace #>;
 
-use <#= entityUpdNameSpace + "\\" + entityUpdClassName #>;
-use <#= roleEntitySelNameSpace + "\\" + roleEntitySelClassName #>;
-
-use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
-use Symfony\Component\Security\Core\Exception\AccountExpiredException;
-use Symfony\Component\Security\Http\Authenticator\AbstractAuthenticator;
-use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
-use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
-use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
-use Firebase\JWT\JWT as JWT;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Database\Query\Builder;
 
 // ///////////////////////////////////////////////////////////////////////////////
-// Important note
-//
-// <#= DoctrineEntityConnection #> and <#= DoctrineEntityManager #> must be declared as "default_connection" and "default_entity_manager"
-//
+// the generated code expects "config/database.php"-file to have the following config parameters
 // ///////////////////////////////////////////////////////////////////////////////
-// the generated code expects "config/packages/doctrine.yaml"-file to have the following config parameters
+//     ...
+//     'connections' => [
+//        ...
+//
+//        '<#= connectionName #>' => [
+//            'url' => 'mysql://root:your_password_here@127.0.0.1:3306/database_name_here?serverVersion=8.0&charset=utf8mb4',
+//        ],
+//        ...
 // ///////////////////////////////////////////////////////////////////////////////
-// doctrine:
-//    dbal:
-//       default_connection: here is a name of default connection (for instance, default_connection: <#= DoctrineEntityConnection #>)
-//
-//       connections:
-//       ...
-//          <#= DoctrineEntityConnection #>:
-//                # configure these for your database server 
-//                url: '%env(resolve:<#= DoctrineEntityUrl #>)%'
-//                # driver: 'pdo_mysql'
-//                # server_version: '5.7'
-//                # charset: utf8mb4
-//    orm:
-//       default_entity_manager: here is a name of default manager (for instance, default_entity_manager: <#= DoctrineEntityManager #>)
-//
-//       entity_managers:
-//       ...
-//          <#= DoctrineEntityManager #>:
-//              connection: <#= DoctrineEntityConnection #>
-//              mappings:
-//                  <#= DoctrineEntityMapping #>:
-//                      is_bundle: false
-//                      type: annotation 
-//                      dir: '%kernel.project_dir%/<#= GetSymfonyModelNameSpace(Model, entityUpdFolder, SrcPrefix).Replace("\\","/") #>'
-//                      prefix: '<#= GetSymfonyModelNameSpace(Model, entityUpdFolder, AppPrefix) #>'
-//                      alias: <#= DoctrineEntityManager #>  
-//
+// Laravel: the generated code expects "routes/api.php"-file to have the following config parameters
 // ///////////////////////////////////////////////////////////////////////////////
-// "config/packages/doctrine.yaml"-file  expects ".env"-file to have the following config parameters like below
+//        ...
+// use <#= controllerNameSpace + "\\" + controllerClassName #>;
+//        ...
+// Route::get('<#= "/" + controllerPrefix + "/getcurrusermasks"  #>', [<#= controllerClassName #>::class,'getcurrusermasks']);
+// Route::get('<#= "/" + controllerPrefix + "/getUserMask"  #>', [<#= controllerClassName #>::class,'getUserMask']);
+// Route::get('<#= "/" + controllerPrefix + "/getwithfilter"  #>', [<#= controllerClassName #>::class,'getwithfilter']);
+//        ...
 // ///////////////////////////////////////////////////////////////////////////////
-// ...
-// ### > doctrine/doctrine-bundle ###
-// # Format described at https://www.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/configuration.html#connecting-using-a-url
-// # IMPORTANT: You MUST configure your server version, either here or in config/packages/doctrine.yaml
-// #
-// <#= DoctrineEntityUrl #>="mysql://root:password_here@127.0.0.1:3306/schema_name_here?serverVersion=8.0"
-// ### < doctrine/doctrine-bundle ###
-// ...
+// Lumen: the generated code expects "routes/web.php"-file to have the following config parameters
 // ///////////////////////////////////////////////////////////////////////////////
-// Important note:
-// the generated code expects "config/packages/security.yaml"-file to have the following config parameters
-// ///////////////////////////////////////////////////////////////////////////////
-//
-//security:
-//    # https://symfony.com/doc/current/security/authenticator_manager.html
-//    enable_authenticator_manager: true
-//    # https://symfony.com/doc/current/security.html#c-hashing-passwords
-//    password_hashers:
-//        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
-//        App\Entity\AspnetuserViewEntityUpd:
-//            algorithm: auto
-//
-//    # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
-//    providers:
-//        # used to reload user from session & other features (e.g. switch_user)
-//        app_user_provider:
-//            entity:
-//                class: <#= entityUpdNameSpace + "\\" + entityUpdClassName #>
-//                property: username
-//    firewalls:
-//        main:
-//            custom_authenticators:
-//                - <#= keyAuthenticatorNameSpace #> +"\\"+ <#= keyAuthenticatorClassName #>
-//                               
-//            # activate different ways to authenticate
-//            # https://symfony.com/doc/current/security.html#firewalls-authentication
-//
-//            # https://symfony.com/doc/current/security/impersonating_user.html
-//            # switch_user: true
-//
-//    # Easy way to control access for large sections of your site
-//    # Note: Only the *first* access control that matches will be used
-//    access_control:
-//        - { path: ^/token, roles: PUBLIC_ACCESS }
-//        - { path: ^/api/Account/Register, roles: PUBLIC_ACCESS }
-//        - { path: ^/api/Account/ChangePassword, roles: IS_AUTHENTICATED_FULLY }
-//        - { path: ^/api/Account/Logout, roles: IS_AUTHENTICATED_FULLY }
-//
+//        ...
+// 
+//  //$router->group(['prefix' => 'api'], function () use ($router) {
+//  $router->group([], function () use ($router) {
+//   $router->get('<#= "/" + controllerPrefix + "/getcurrusermasks" #>', ['uses' => '<#= controllerClassName #>@getcurrusermasks']);
+//   $router->get('<#= "/" + controllerPrefix + "/getUserMask" #>', ['uses' => '<#= controllerClassName #>@getUserMask']);
+//   $router->get('<#= "/" + controllerPrefix + "/getwithfilter" #>', ['uses' => '<#= controllerClassName #>@getwithfilter']);
+//  });
+//        ...
 // ///////////////////////////////////////////////////////////////////////////////
 
 
-
-class <#= keyAuthenticatorClassName #> extends AbstractAuthenticator
+class <#= controllerClassName #> extends Controller
 {
-    private $em;
-    private $params;
-    public function __construct(EntityManagerInterface $em, ContainerBagInterface $params)
-    {
-        $this->em = $em;
-        $this->params = $params;
-    }    
+        protected int $defaultPageSize = 50;
+        protected int $minPageSize = 5;
+        protected int $maxPageSize = 150;
 
-    /**
-     * Called on every request to decide if this authenticator should be
-     * used for the request. Returning `false` will cause this authenticator
-     * to be skipped.
-     */
-    public function supports(Request $request): ?bool
+    protected function getQueryBuilder(): Builder
     {
-        return $request->headers->has('Authorization');
-    }
-
-
-    public function authenticate(Request $request): PassportInterface
-    {
-        $token = $request->headers->get('Authorization');
-        if (null === $token) {
-            // The token header was empty, authentication fails with HTTP Status
-            // Code 401 "Unauthorized"
-            throw new CustomUserMessageAuthenticationException('No API token provided');
-        }
-        $bearer = str_replace('Bearer ', '', str_replace('bearer ', '', $token));
-        $usrIdentifier = null;
-        try {
-            $jwt = (array) JWT::decode(
-                $bearer, 
-                $this->params->get('jwt_secret'),
-                ['HS256']
-            );
-            $today = (new \DateTime())->getTimestamp();
-            $expires = (int) ($jwt['expires']);
-            if($expires < $today) {
-                throw new AccountExpiredException('API token is expired');
-            }
-            $usrIdentifier = $jwt['user'];
-        }catch (\Exception $exception) {
-            throw new CustomUserMessageAuthenticationException($exception->getMessage());
-        }            
-        if (null === $usrIdentifier) {
-            // The token header was empty, authentication fails with HTTP Status
-            // Code 401 "Unauthorized"
-            throw new CustomUserMessageAuthenticationException('No API token provided');
-        }
-        return new SelfValidatingPassport(new UserBadge($usrIdentifier, function ($userIdentifier) {
-            $auser = $this->em->getRepository(<#= entityUpdClassName #>::class)->findOneBy(['username' => $userIdentifier]);
-            if($auser !== null) {
-                $rsm = new ResultSetMapping($this->em);
-                $rsm->addEntityResult(<#= roleEntitySelClassName #>::class, "er");
+        return DB::connection('<#= connectionName #>')
+              ->table('<#= DoctrineRoleMaskEntityTableName #>', 't0000')
+              ->join('<#= DoctrineRoleEntityTableName #> as t0001',  function($join) {
 <#
-                foreach(ModelViewPropertyOfVwSerializable sclrProp in RoleModel.ScalarProperties) {
+    // next line is correct: the column names are the same in both tables
 #>
-                    $rsm->addFieldResult("er", "<#= sclrProp.ViewPropertyName #>", "<#= GetDoctrineEntityViewFieldName(sclrProp) #>");
+                    $join->on('t0001.<#= RoleMaskModel.PrimaryKeyProperties[0].OriginalPropertyName #>', '=', 't0000.<#= RoleMaskModel.PrimaryKeyProperties[0].OriginalPropertyName #>');
+              })
+              ->select(
+<#
+    {
+            int navChainCnt = 0;
+            foreach (ModelViewKeyPropertySerializable prop in RoleMaskModel.AllProperties) {
+                ModelViewPropertyOfVwSerializable sclrProp = GetScalarProperty(prop, RoleMaskModel);
+                if(sclrProp == null) continue;
+                if(navChainCnt==0) { 
+#>
+                  't0000.<#=  sclrProp.OriginalPropertyName + " as " + GetOutputPropertyName(sclrProp, RoleMaskModel) #>'
+<#
+                    navChainCnt=1;
+                } else {
+#>
+                , 't0000.<#=  sclrProp.OriginalPropertyName + " as " + GetOutputPropertyName(sclrProp, RoleMaskModel) #>'
 <#
                 }
+            } 
+    }
 #>
-                $query = $em->createNativeQuery("<#= selForRolesClause #>", $rsm);
-                $query->setParameter("UserId", $auser->getId());
-                $queryrslt = $query->getResult();
-                if ($queryrslt !== null) {
-                    $rls = [];
-                    foreach ($queryrslt as $v) {
-                       $rls[]  = $v->getName();
-                    }
-                    $auser->setRoles($rls);
-                }
-            }
-            return $auser; 
-        }));
+              );
     }
 
-
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
-    {
-        // on success, let the request continue
-        return null;
-    }   
-
-    public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
-    {
-        $data = [
-            // you may want to customize or obfuscate the message first
-            'message' => strtr($exception->getMessageKey(), $exception->getMessageData())
-
-            // or to translate this message
-            // $this->translator->trans($exception->getMessageKey(), $exception->getMessageData())
+    protected function getUserMask(string $userId) {
+        $rslt = [
+<#
+        ModelViewPropertyOfVwSerializable modelPkProp = 
+            Model.ScalarProperties.Where(p => ((p.OriginalPropertyName == Model.PrimaryKeyProperties[0].OriginalPropertyName) && (string.IsNullOrEmpty(p.ForeignKeyNameChain)))).FirstOrDefault();
+        foreach(ModelViewPropertyOfVwSerializable sclrProp in Model.ScalarProperties) {
+                if(modelPkProp != sclrProp) {
+#>
+            '<#= GetOutputPropertyName(sclrProp, Model) #>' => 0,
+<#
+                }
+            }
+#>
         ];
-        return new JsonResponse($data, Response::HTTP_UNAUTHORIZED);
-    }     
+        if (!isset($userId) || trim($userId) === '')  {
+            $rslt ['<#= GetOutputPropertyName(modelPkProp, Model) #>']= '';
+            return $rslt;
+        }
+        $rslt ['<#= GetOutputPropertyName(modelPkProp, Model) #>']= $userId;
+        $queryResult = $this->getQueryBuilder()
+            ->whereIn('t0001.<#= RoleModel.PrimaryKeyProperties[0].OriginalPropertyName #>', function($query) {
+                    $query
+                    ->table('<#= DoctrineUserRolesEntityTableName #>', 't0002')
+                    ->where('t0002.<#= UserRoles2UserFK.ForeignKeyProps[0].OriginalPropertyName #>', '=', $userId)
+                    ->select('t0002.<#= UserRoles2RoleFK.ForeignKeyProps[0].OriginalPropertyName #>' );
+            })->get();
+        foreach ($queryResult as $v) {
+<#
+            foreach(ModelViewPropertyOfVwSerializable sclrProp in Model.ScalarProperties) {
+                if(modelPkProp != sclrProp) {
+                // the correct prop name for $v is GetOutputPropertyName(XXX, RoleMaskModel) where XXX is a scalar property of RoleMaskModel
+                // but RoleMaskModel and Model(== aspnetusermaskView) have idetical names
+                // so the next line of code is correct
+#>
+            $rslt['<#= GetOutputPropertyName(sclrProp, Model) #>'] = $rslt['<#= GetOutputPropertyName(sclrProp, Model) #>'] | $v['<#= GetOutputPropertyName(sclrProp, Model) #>'];
+<#
+                }
+            }
+#>
+        }
+        unset($v);
+        return $rslt;
+    }
+    public function getcurrusermasks(Request $request): JsonResponse
+    {
+        $user = $request->user();
+        $userId = '';
+        if(!($user === null)) {
+            $userId = $user['<#= UserModel.PrimaryKeyProperties[0].OriginalPropertyName #>'];
+        }
+        $rslt = $this->getUserMask($userId);
+        return response()->json([
+            'page' => 0,
+            'pagesize' => $this->defaultPageSize,
+            'pagecount' => 1,
+            'total' => 1,
+            'items' => [$rslt]
+        ]);
+    }
 
+    public function getwithfilter(Request $request): JsonResponse
+    {
+        $prms = $request->query->all();
+        $userId = '';
+<#
+        {
+            ModelViewPropertyOfVwSerializable pkProp = 
+                Model.ScalarProperties.Where(p => ((p.OriginalPropertyName == Model.PrimaryKeyProperties[0].OriginalPropertyName) && (string.IsNullOrEmpty(p.ForeignKeyNameChain)))).FirstOrDefault();
+#>
+            if (array_key_exists("<#= GetFilterPropertyName(pkProp, Model) #>", $prms)) {
+                $tmpval = $prms["<#= GetFilterPropertyName(pkProp, Model) #>"];
+                if (is_array($tmpval)) {
+                    foreach($tmpval as $v) {
+                        if (!(!isset($v) || trim($v) === ''))  {
+                            $userId = $v;
+                            break;
+                        }
+                    }
+                    unset($v);
+                } else {
+                    $userId = $tmpval;
+                }
+
+            }
+<#
+        }
+#>
+        $rslt = $this->getUserMask($userId);
+        return response()->json([
+            'page' => 0,
+            'pagesize' => $this->defaultPageSize,
+            'pagecount' => 1,
+            'total' => 1,
+            'items' => [$rslt]
+        ]);
+    }
 }
 
 <#+
-    string GetContextModelClassName(DbContextSerializable context, string fileType) {
-        string result="";
-        if ((context == null) || string.IsNullOrEmpty(fileType)) {
-            return result;
-        }
-        if (context.CommonStaffs == null) {
-            return result;
-        }
-        CommonStaffSerializable refItem= 
-            context.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
-        if (refItem == null) {
-            return result;
-        }
-        if(string.IsNullOrEmpty(refItem.FileName)) {
-            return result;
-        }
-        string fn = refItem.FileName;
-        StringBuilder sb = new StringBuilder();
-        bool toUpper = true;
-        foreach (char c in fn)
-        {
-            if( c == '-' )
-            {
-                toUpper = true;
-            } else
-            {
-                if (toUpper)
-                {
-                    sb.Append(Char.ToUpper(c));
-                    toUpper = false;
-                }
-                else
-                {
-                    sb.Append(c);
-                }
-            }
-                
-        }
-        result = sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
-        return result.Replace(".php", "").Replace(".Php", "").Replace(".PHP", "");
-    }
-    string GetSymfonyContextNameSpace(DbContextSerializable context, string fileType, string appPrefix) {
-        string result="";
-        if ((context == null) || string.IsNullOrEmpty(fileType)) {
-            return result;
-        }
-        if (context.CommonStaffs == null) {
-            return result;
-        }
-        CommonStaffSerializable refItem = 
-            context.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
-        if (refItem == null) {
-            return result;
-        }
-        string delim = "\\";
-        string filePath = "";
-        string defaultNameSpace = (string.IsNullOrEmpty(appPrefix)) ? "" : appPrefix;
-        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
-            if (string.IsNullOrEmpty(appPrefix))
-                filePath = refItem.FileFolder;
-            else 
-                filePath = delim + refItem.FileFolder;
-        }
-        return defaultNameSpace + filePath;
-    }
 
     string GetWebApiServicePrefix(ModelViewSerializable model) {
         string result = model.WebApiServiceName;
@@ -772,6 +665,32 @@ class <#= keyAuthenticatorClassName #> extends AbstractAuthenticator
         }
         return defaultNameSpace + filePath;
     }
+
+    string GetLaravelModelNameSpace(ModelViewSerializable model, string fileType, string appPrefix) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "\\";
+        string filePath = "";
+        string defaultNameSpace = (string.IsNullOrEmpty(appPrefix)) ? "" : appPrefix;
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            if (string.IsNullOrEmpty(appPrefix))
+                filePath = refItem.FileFolder;
+            else 
+                filePath = delim + refItem.FileFolder;
+        }
+        return defaultNameSpace + filePath;
+    }
+
     string GetDoctrineEntityClassNameForStr(string ViewClassName) {
         if (string.IsNullOrEmpty(ViewClassName)) return "";
         return FirstLetterToUpper(ViewClassName + "Entity");
@@ -1105,5 +1024,104 @@ class <#= keyAuthenticatorClassName #> extends AbstractAuthenticator
         if(string.IsNullOrEmpty( prop.UnderlyingTypeName )) return false;
         return prop.UnderlyingTypeName.ToLower() == "system.guid";
     }
+
+    string GetLaravelConnectionName(DbContextSerializable context) {
+        string result = "";
+        if(context != null) {
+            result = context.DbContextClassName;
+            if(!string.IsNullOrEmpty(context.DbContextClassName)) {
+                result = context.DbContextClassName.ToLower(); 
+            }
+        }
+        return result; 
+    }
+    string GetLaravelMigrationName(DbContextSerializable context) {
+        string result = "Migration";
+        if(context != null) {
+            if(!string.IsNullOrEmpty(context.DbContextClassName)) {
+                result = context.DbContextClassName + result; 
+            }
+        }
+        return result; 
+    }
+    string GetOutputPropertyName(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+        if (model.GenerateJSonAttribute) {
+            return prop.JsonPropertyName;
+        } else {
+            return FirstLetterToLower(prop.ViewPropertyName);
+        }
+    }
+    bool IsDateTimeInput(ModelViewPropertyOfVwSerializable sclrProp, ModelViewSerializable model) {
+        if (sclrProp == null)
+        {
+            return false;
+        }
+        return ("System.DateTime".Equals(sclrProp.UnderlyingTypeName) || "DateTime".Equals(sclrProp.UnderlyingTypeName));
+    }
+    bool IsIntegerInput(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+        if(prop == null) return false;
+        if(string.IsNullOrEmpty( prop.TypeFullName )) return false;
+        string tpNm = prop.TypeFullName.ToLower();
+        return 
+            "system.int16".Equals(tpNm) ||
+            "system.int32".Equals(tpNm) ||
+            "system.int64".Equals(tpNm) ||
+            "system.uint16".Equals(tpNm) ||
+            "system.uint32".Equals(tpNm) ||
+            "system.uint64".Equals(tpNm);
+    }
+    bool IsFloatInput(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+        if(prop == null) return false;
+        if(string.IsNullOrEmpty( prop.TypeFullName )) return false;
+        string tpNm = prop.TypeFullName.ToLower();
+        return 
+            "system.single".Equals(tpNm) ||
+            "system.double".Equals(tpNm) ||
+            "system.decimal".Equals(tpNm);
+    }
+    bool IsStringInput(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+        if(prop == null) return false;
+        if(string.IsNullOrEmpty( prop.TypeFullName )) return false;
+        string tpNm = prop.TypeFullName.ToLower();
+        return  "system.string".Equals(tpNm);
+    }
+    bool IsBooleanInput(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+        if(prop == null) return false;
+        if(string.IsNullOrEmpty( prop.TypeFullName )) return false;
+        string tpNm = prop.TypeFullName.ToLower();
+        return  "system.boolean".Equals(tpNm);
+    }
+    bool IsGuidInput(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+        if(prop == null) return false;
+        if(string.IsNullOrEmpty( prop.TypeFullName )) return false;
+        string tpNm = prop.TypeFullName.ToLower();
+        return  "system.guid".Equals(tpNm);
+    }
+    bool HasAtribute(ModelViewPropertyOfVwSerializable sclrProp, string attrName) {
+        if ((sclrProp != null) && (!string.IsNullOrEmpty(attrName))) {
+            if (sclrProp.Attributes != null) {
+                foreach(ModelViewAttributeSerializable a in sclrProp.Attributes) {
+                    if (attrName.Equals(a.AttrName, StringComparison.InvariantCultureIgnoreCase)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    bool IsComputedProperty(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+        if (HasAtribute(prop, "ConcurrencyCheck") || HasAtribute(prop, "Timestamp")) {
+            return true;
+        }
+        if (HasAtributeWithValue(prop, "DatabaseGenerated", "identity") || HasAtributeWithValue(prop, "DatabaseGenerated", "computed")) {
+            return true;
+        }
+        if(HasFluentAtribute(prop, new string[] {"UseSqlServerIdentityColumn", "ForSqlServerUseSequenceHiLo", "ValueGeneratedOnAdd", "ValueGeneratedOnAddOrUpdate", "IsConcurrencyToken", "IsRowVersion"} )) {
+            return true;
+        }
+        return HasFluentAtributeWithValue(prop, "HasDatabaseGeneratedOption", "identity") || HasFluentAtributeWithValue(prop, "HasDatabaseGeneratedOption", "computed");
+    }
+
+    
 
 #>
