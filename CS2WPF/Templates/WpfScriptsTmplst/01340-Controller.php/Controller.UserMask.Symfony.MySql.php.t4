@@ -110,8 +110,7 @@
         } 
     }
     selForRolesClause += " from " + DoctrineRoleMaskEntityTableName + " t0000 INNER JOIN " + DoctrineRoleEntityTableName + " as t0001 on (t0000."
-        + RoleMaskModel.PrimaryKeyProperties[0].OriginalPropertyName + " = t0001." 
-        + RoleMaskModel.PrimaryKeyProperties[0].OriginalPropertyName + ")"  // ---- this line is correct: the column names are the same in both tables
+        + RoleMaskModel.PrimaryKeyProperties[0].OriginalPropertyName + " = t0001.Name)" 
         + " where t0001." + RoleModel.PrimaryKeyProperties[0].OriginalPropertyName 
         + " in (select " + UserRoles2RoleFK.ForeignKeyProps[0].OriginalPropertyName
             + " from " + DoctrineUserRolesEntityTableName + " t0002 "
@@ -251,9 +250,9 @@ class <#= controllerClassName #> extends AbstractController
             $userId = $user->getId();
         }
         $rslt = $this->getUserMask($userId);
-        $pgRslt = new <#= pageClassName #>();
+        $pgrslt = new <#= pageClassName #>();
         $pgrslt->setPage(0);
-        $pgrslt->setPagesize($defaultPageSize);
+        $pgrslt->setPagesize($this->defaultPageSize);
         $pgrslt->setPagecount(1); 
         $pgrslt->setTotal(1); 
         $pgrslt->setItems([$rslt]);
@@ -291,9 +290,9 @@ class <#= controllerClassName #> extends AbstractController
         }
 #>
         $rslt = $this->getUserMask($userId);
-        $pgRslt = new <#= pageClassName #>();
+        $pgrslt = new <#= pageClassName #>();
         $pgrslt->setPage(0);
-        $pgrslt->setPagesize($defaultPageSize);
+        $pgrslt->setPagesize($this->defaultPageSize);
         $pgrslt->setPagecount(1); 
         $pgrslt->setTotal(1); 
         $pgrslt->setItems([$rslt]);
