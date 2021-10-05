@@ -158,11 +158,11 @@ class <#= authServiceProviderClassName #> extends ServiceProvider
                 $today = (new \DateTime())->getTimestamp();
                 $expires = (int) ($jwt['expires']);
                 if($expires < $today) {
-                    throw new AuthenticationException('API token is expired');
+                    return null;// throw new AuthenticationException('API token is expired');
                 }
                 $usrIdentifier = $jwt['user'];
                 if (null === $usrIdentifier) {
-                    throw new AuthenticationException('No API token provided');
+                    return null;// throw new AuthenticationException('No API token provided');
                 }
                 $user = DB::connection('<#= connectionName #>')
                     ->table('<#= usersTableName #>')

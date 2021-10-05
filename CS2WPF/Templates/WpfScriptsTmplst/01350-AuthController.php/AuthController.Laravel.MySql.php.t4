@@ -263,7 +263,6 @@ class <#= authControllerClassName #> extends Controller
                         ->table('<#= usersTableName #>')
                         ->where('UserName', '=', $username)
                         ->first();
-        $oldPassword = (new BcryptHasher)->make($password);
         if(!(new BcryptHasher)->check($password, $user->PasswordHash)) {
             return response()->json([
                 'message' => 'Password is not correct'
