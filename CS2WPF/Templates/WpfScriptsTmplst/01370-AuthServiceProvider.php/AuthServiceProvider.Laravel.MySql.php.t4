@@ -72,29 +72,54 @@ use Illuminate\Auth\GenericUser;
 // the generated code expects "bootstrap/app.php"-file to have the following config parameters
 // ///////////////////////////////////////////////////////////////////////////////
 //
-// ------------- ==1== instead of -------------
+// ------------- ==1== uncomment the lines -------------
 // $app->routeMiddleware([
 //     'auth' => App\Http\Middleware\Authenticate::class,
 // ]);
-// ------------- ==1== it must be -------------
-// $app->routeMiddleware([
-//     'auth' => <#= authServiceProviderNameSpace +"\\"+ authServiceProviderClassName #>::class,
-// ]);
 // ------------- ==1== end -------------
 //
-// ------------- ==2== instead of -------------
+// ------------- ==2== uncomment the line -------------
 // $app->register(App\Providers\AuthServiceProvider::class);
-// ------------- ==2== it must be -------------
-// $app->register(<#= authServiceProviderNameSpace +"\\"+ authServiceProviderClassName #>::class);
 // ------------- ==2== End -------------
 //
+// ------------- ==3== add the line -------------
+// $app->register(<#= authServiceProviderNameSpace +"\\"+ authServiceProviderClassName #>::class);
+// ------------- ==3== End -------------
+//
+// ------------- ==4== add the line -------------
+// $app->configure('auth');
+// ------------- ==4== End -------------
+//
+// ///////////////////////////////////////////////////////////////////////////////
+// the generated code expects "config/auth.php"-file to have the following config parameters
+// ///////////////////////////////////////////////////////////////////////////////
+//
+// return [
+//
+//    'defaults' => [
+//        'guard' => env('AUTH_GUARD', 'aspnetsecurity'),
+//    ],
+//   
+//
+//    'guards' => [
+//        'aspnetsecurity' => ['driver' => 'aspnetsecurityguard'],
+//        'api' => ['driver' => 'api'],
+//    ],
+//
+// ];
 // ///////////////////////////////////////////////////////////////////////////////
 // the generated code expects ".env"-file to have the following config parameters
 // ///////////////////////////////////////////////////////////////////////////////
 //     ...
 //
+//   AUTH_GUARD=aspnetsecurity
 //   JWT_SECRET_KEY=SOME_SECRET_HERE 
 // ///////////////////////////////////////////////////////////////////////////////
+//
+//
+//
+// ///////////////////////////////////////////////////////////////////////////////
+
 
 class <#= authServiceProviderClassName #> extends ServiceProvider
 {
@@ -121,7 +146,7 @@ class <#= authServiceProviderClassName #> extends ServiceProvider
         // the User instance via an API token or any other method necessary.
 
 
-        $this->app['auth']->viaRequest('api', function ($request) {
+        $this->app['auth']->viaRequest('aspnetsecurityguard', function ($request) {
             $token = $request->headers->get('Authorization');
             if (null !== $token) {
                 $bearer = str_replace('Bearer ', '', str_replace('bearer ', '', $token));
@@ -179,9 +204,6 @@ class <#= authServiceProviderClassName #> extends ServiceProvider
                     ]
                 );
             }
-//            if ($request->input('api_token')) {
-//                return User::where('api_token', $request->input('api_token'))->first();
-//            }
             return null;
         });
     }
