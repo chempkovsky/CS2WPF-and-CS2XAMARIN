@@ -283,14 +283,14 @@ class <#= controllerClassName #> extends Controller
 <#
     if(hasDatetimePropperties) {
 #>
-    protected function resetDateTime(array $row) {
+    protected function resetDateTime(object  $row) {
         if(isset($row)) {
             if(!($row === null)) {
 <#
             foreach(ModelViewPropertyOfVwSerializable sclrProp in Model.ScalarProperties) {
                 if ("System.DateTime".Equals(sclrProp.UnderlyingTypeName) || "DateTime".Equals(sclrProp.UnderlyingTypeName)) {
 #>
-                    $row['<#= GetOutputPropertyName(sclrProp, Model) #>'] = ($row-><#= GetOutputPropertyName(sclrProp, Model) #> === null) ? null : Carbon::make($row-><#= GetOutputPropertyName(sclrProp, Model) #>)->toJSON();
+                    $row-><#= GetOutputPropertyName(sclrProp, Model) #> = ($row-><#= GetOutputPropertyName(sclrProp, Model) #> === null) ? null : Carbon::make($row-><#= GetOutputPropertyName(sclrProp, Model) #>)->toJSON();
 <#
                 }
             }

@@ -18,19 +18,13 @@
 
 
 
-
-    string controllerFolder                         = "01340-Controller.php";
-    string controllerClassName                      = GetModelClassName(Model, controllerFolder);
-    string controllerNameSpace                      = GetLaravelModelNameSpace(Model, controllerFolder, AppPrefix);
-    string controllerPrefix                         = GetWebApiServicePrefix(Model);
+    string authServiceProviderFolder                = "01370-AuthServiceProvider.php";
+    string authServiceProviderClassName             = GetModelClassName(Model, authServiceProviderFolder);
+    string authServiceProviderNameSpace             = GetLaravelModelNameSpace(Model, authServiceProviderFolder, AppPrefix);
+    string authServiceProviderPrefix                = GetWebApiServicePrefix(Model);
+    string usersTableName                           = GetDoctrineEntityTableName(Model); 
     string connectionName                           = GetLaravelConnectionName(Context);
 
-    string DoctrineEntityTableName                  = GetDoctrineEntityTableName(Model); 
-    string DoctrineEntityConnection                 = (Context.DbContextClassName + "Connection").ToLower();
-    string DoctrineEntityManager                    = (Context.DbContextClassName + "Manager").ToLower();
-    string DoctrineEntityMapping                    = FirstLetterToUpper(Context.DbContextClassName.ToLower());
-    string DoctrineEntityUrl                        = ("DATABASE_" + Context.DbContextClassName + "_URL").ToUpper();
-    
 
     string OperatorSufix            = "Oprtr";
 
@@ -41,59 +35,27 @@
     string AddOneMethodName         = "addone";
     string DeleteOneMethodName      = "deleteone";
 
-    string UserEntityName       = "aspnetuser";
-    string UserRolesEntityName  = "aspnetuserroles";
-    string RoleEntityName       = "aspnetrole";
-    string RoleMaskEntityName   = "aspnetrolemask";
 
-    ModelViewSerializable UserModel         =  Context.ModelViews.Where(f => f.RootEntityClassName == UserEntityName).FirstOrDefault();
-    ModelViewSerializable UserRolesModel    =  Context.ModelViews.Where(f => f.RootEntityClassName == UserRolesEntityName).FirstOrDefault();
-    ModelViewSerializable RoleMaskModel     =  Context.ModelViews.Where(f => f.RootEntityClassName == RoleMaskEntityName).FirstOrDefault();
-    ModelViewSerializable RoleModel         =  Context.ModelViews.Where(f => f.RootEntityClassName == RoleEntityName).FirstOrDefault();
-
-    if(UserModel == null) {
-        throw new Exception("Could not find ModelView with RootEntityClassName = aspnetuser. Make sure that such a ModelView exists in the current context, or change the UserEntityName-var value in the current script if the name for the User Entity has changed in your modeling infrastructure.");
-    }
-    if(UserRolesModel == null) {
-        throw new Exception("Could not find ModelView with RootEntityClassName = aspnetuserroles. Make sure that such a ModelView exists in the current context, or change the UserRolesEntityName-var value in the current script if the name for the UserRoles Entity has changed in your modeling infrastructure.");
-    }
-    if(RoleMaskEntityName == null) {
-        throw new Exception("Could not find ModelView with RootEntityClassName = aspnetrolemask. Make sure that such a ModelView exists in the current context, or change the RoleMaskEntityName-var value in the current script if the name for the RoleMasks Entity has changed in your modeling infrastructure.");
-    }
-    if(RoleModel == null) {
-        throw new Exception("Could not find ModelView with RootEntityClassName = aspnetrole. Make sure that such a ModelView exists in the current context, or change the RoleEntityName-var value in the current script if the name for the Role Entity has changed in your modeling infrastructure.");
-    }
-
-    string DoctrineUserEntityTableName                  = GetDoctrineEntityTableName(UserModel); 
-    string DoctrineUserRolesEntityTableName             = GetDoctrineEntityTableName(UserRolesModel); 
-    string DoctrineRoleMaskEntityTableName              = GetDoctrineEntityTableName(RoleMaskModel); 
-    string DoctrineRoleEntityTableName                  = GetDoctrineEntityTableName(RoleModel); 
-
-    if(UserRolesModel.ForeignKeys == null) {
-        throw new Exception("The list of Foreign Keys is empty for aspnetuserroles-entity.");
-    }
-    ModelViewForeignKeySerializable UserRoles2UserFK =  UserRolesModel.ForeignKeys.Where(f => f.NavigationEntityName == UserEntityName).FirstOrDefault();
-    if(UserRoles2UserFK == null) {
-        throw new Exception("Could not find ForeignKey with NavigationEntityName == " + UserEntityName + " for ModelView with a name " + UserRolesModel.ViewName);
-    }
-    ModelViewForeignKeySerializable UserRoles2RoleFK =  UserRolesModel.ForeignKeys.Where(f => f.NavigationEntityName == RoleEntityName).FirstOrDefault();
-    if(UserRoles2RoleFK == null) {
-        throw new Exception("Could not find ForeignKey with NavigationEntityName == " + RoleEntityName + " for ModelView with a name " + UserRolesModel.ViewName);
-    }
-
+    string emailPropName            = "Email";
+    string passwordPropName         = "Password";
+    string confirmPasswordPropName  = "ConfirmPassword";
+    string oldPasswordPropName      = "OldPassword";
+    string newPasswordPropName      = "NewPassword";
+    
+    
 #>
 <?php
 
-namespace <#= controllerNameSpace #>;
+namespace <#= authServiceProviderNameSpace #>;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Str;
+use App\Models\User;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\ServiceProvider;
+
+use Firebase\JWT\JWT as JWT;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Validation\ValidationException;
-use Illuminate\Database\Query\Builder;
+use Illuminate\Auth\GenericUser;
 
 // ///////////////////////////////////////////////////////////////////////////////
 // the generated code expects "config/database.php"-file to have the following config parameters
@@ -107,165 +69,121 @@ use Illuminate\Database\Query\Builder;
 //        ],
 //        ...
 // ///////////////////////////////////////////////////////////////////////////////
-// Laravel: the generated code expects "routes/api.php"-file to have the following config parameters
+// the generated code expects "bootstrap/app.php"-file to have the following config parameters
 // ///////////////////////////////////////////////////////////////////////////////
-//        ...
-// use <#= controllerNameSpace + "\\" + controllerClassName #>;
-//        ...
-// Route::get('<#= "/" + controllerPrefix + "/getcurrusermasks"  #>', [<#= controllerClassName #>::class,'getcurrusermasks']);
-// Route::get('<#= "/" + controllerPrefix + "/getUserMask"  #>', [<#= controllerClassName #>::class,'getUserMask']);
-// Route::get('<#= "/" + controllerPrefix + "/getwithfilter"  #>', [<#= controllerClassName #>::class,'getwithfilter']);
-//        ...
-// ///////////////////////////////////////////////////////////////////////////////
-// Lumen: the generated code expects "routes/web.php"-file to have the following config parameters
-// ///////////////////////////////////////////////////////////////////////////////
-//        ...
-// 
-//  //$router->group(['prefix' => 'api'], function () use ($router) {
-//  $router->group([], function () use ($router) {
-//   $router->get('<#= "/" + controllerPrefix + "/getUserMask" #>', ['uses' => '<#= controllerClassName #>@getUserMask']);
-//   $router->get('<#= "/" + controllerPrefix + "/getwithfilter" #>', ['uses' => '<#= controllerClassName #>@getwithfilter']);
-//  });
 //
-//  $router->group(['middleware' => 'auth'], function () use ($router) {
-//   $router->get('<#= "/" + controllerPrefix + "/getcurrusermasks" #>', ['uses' => '<#= controllerClassName #>@getcurrusermasks']);
-//  });
-//        ...
+// ------------- ==1== instead of -------------
+// $app->routeMiddleware([
+//     'auth' => App\Http\Middleware\Authenticate::class,
+// ]);
+// ------------- ==1== it must be -------------
+// $app->routeMiddleware([
+//     'auth' => <#= authServiceProviderNameSpace +"\\"+ authServiceProviderClassName #>::class,
+// ]);
+// ------------- ==1== end -------------
+//
+// ------------- ==2== instead of -------------
+// $app->register(App\Providers\AuthServiceProvider::class);
+// ------------- ==2== it must be -------------
+// $app->register(<#= authServiceProviderNameSpace +"\\"+ authServiceProviderClassName #>::class);
+// ------------- ==2== End -------------
+//
+// ///////////////////////////////////////////////////////////////////////////////
+// the generated code expects ".env"-file to have the following config parameters
+// ///////////////////////////////////////////////////////////////////////////////
+//     ...
+//
+//   JWT_SECRET_KEY=SOME_SECRET_HERE 
 // ///////////////////////////////////////////////////////////////////////////////
 
-
-class <#= controllerClassName #> extends Controller
+class <#= authServiceProviderClassName #> extends ServiceProvider
 {
-        protected int $defaultPageSize = 50;
-        protected int $minPageSize = 5;
-        protected int $maxPageSize = 150;
-
-    protected function getQueryBuilder(): Builder
+    /**
+     * Register any application services.
+     *
+     * @return void
+     */
+    public function register()
     {
-        return DB::connection('<#= connectionName #>')
-              ->table('<#= DoctrineRoleMaskEntityTableName #>', 't0000')
-              ->join('<#= DoctrineRoleEntityTableName #> as t0001',  function($join) {
-                    $join->on('t0000.<#= RoleMaskModel.PrimaryKeyProperties[0].OriginalPropertyName #>', '=', 't0001.Name');
-              })
-              ->select(
-<#
-    {
-            int navChainCnt = 0;
-            foreach (ModelViewKeyPropertySerializable prop in RoleMaskModel.AllProperties) {
-                ModelViewPropertyOfVwSerializable sclrProp = GetScalarProperty(prop, RoleMaskModel);
-                if(sclrProp == null) continue;
-                if (!IsIntegerInput(sclrProp, RoleMaskModel)) continue;
-                if(navChainCnt==0) { 
-#>
-                  't0000.<#=  sclrProp.OriginalPropertyName + " as " + GetOutputPropertyName(sclrProp, RoleMaskModel) #>'
-<#
-                    navChainCnt=1;
-                } else {
-#>
-                , 't0000.<#=  sclrProp.OriginalPropertyName + " as " + GetOutputPropertyName(sclrProp, RoleMaskModel) #>'
-<#
-                }
-            } 
-    }
-#>
-              );
+        //
     }
 
-    protected function getUserMask(string $userId) {
-        $rslt = [
-<#
-        ModelViewPropertyOfVwSerializable modelPkProp = 
-            Model.ScalarProperties.Where(p => ((p.OriginalPropertyName == Model.PrimaryKeyProperties[0].OriginalPropertyName) && (string.IsNullOrEmpty(p.ForeignKeyNameChain)))).FirstOrDefault();
-        foreach(ModelViewPropertyOfVwSerializable sclrProp in Model.ScalarProperties) {
-                if(modelPkProp != sclrProp) {
-#>
-            '<#= GetOutputPropertyName(sclrProp, Model) #>' => 0,
-<#
-                }
-            }
-#>
-        ];
-        if (!isset($userId) || trim($userId) === '')  {
-            $rslt ['<#= GetOutputPropertyName(modelPkProp, Model) #>']= '';
-            return $rslt;
-        }
-        $rslt ['<#= GetOutputPropertyName(modelPkProp, Model) #>']= $userId;
-        $queryResult = $this->getQueryBuilder()
-            ->whereIn('t0001.<#= RoleModel.PrimaryKeyProperties[0].OriginalPropertyName #>', function($query) use ($userId)  {
-                    $query
-                    ->select('t0002.RoleId' )
-                    ->from('<#= DoctrineUserRolesEntityTableName #>', 't0002')
-                    ->where('t0002.UserId', '=', $userId);
-            })->get();
-        foreach ($queryResult as $v) {
-<#
-            foreach(ModelViewPropertyOfVwSerializable sclrProp in Model.ScalarProperties) {
-                if(modelPkProp != sclrProp) {
-                // the correct prop name for $v is GetOutputPropertyName(XXX, RoleMaskModel) where XXX is a scalar property of RoleMaskModel
-                // but RoleMaskModel and Model(== aspnetusermaskView) have idetical names
-                // so the next line of code is correct
-#>
-            $rslt['<#= GetOutputPropertyName(sclrProp, Model) #>'] = $rslt['<#= GetOutputPropertyName(sclrProp, Model) #>'] | $v-><#= GetOutputPropertyName(sclrProp, Model) #>;
-<#
-                }
-            }
-#>
-        }
-        unset($v);
-        return $rslt;
-    }
-    public function getcurrusermasks(Request $request): JsonResponse
+    /**
+     * Boot the authentication services for the application.
+     *
+     * @return void
+     */
+    public function boot()
     {
-        $user = $request->user();
-        $userId = '';
-        if(!($user === null)) {
-            $userId = $user->Id; // GenericUser
-        }
-        $rslt = $this->getUserMask($userId);
-        return response()->json([
-            'page' => 0,
-            'pagesize' => $this->defaultPageSize,
-            'pagecount' => 1,
-            'total' => 1,
-            'items' => [$rslt]
-        ]);
-    }
+        // Here you may define how you wish users to be authenticated for your Lumen
+        // application. The callback which receives the incoming request instance
+        // should return either a User instance or null. You're free to obtain
+        // the User instance via an API token or any other method necessary.
 
-    public function getwithfilter(Request $request): JsonResponse
-    {
-        $prms = $request->query->all();
-        $userId = '';
-<#
-        {
-            ModelViewPropertyOfVwSerializable pkProp = 
-                Model.ScalarProperties.Where(p => ((p.OriginalPropertyName == Model.PrimaryKeyProperties[0].OriginalPropertyName) && (string.IsNullOrEmpty(p.ForeignKeyNameChain)))).FirstOrDefault();
-#>
-            if (array_key_exists("<#= GetFilterPropertyName(pkProp, Model) #>", $prms)) {
-                $tmpval = $prms["<#= GetFilterPropertyName(pkProp, Model) #>"];
-                if (is_array($tmpval)) {
-                    foreach($tmpval as $v) {
-                        if (!(!isset($v) || trim($v) === ''))  {
-                            $userId = $v;
-                            break;
-                        }
+
+        $this->app['auth']->viaRequest('api', function ($request) {
+            $token = $request->headers->get('Authorization');
+            if (null !== $token) {
+                $bearer = str_replace('Bearer ', '', str_replace('bearer ', '', $token));
+                $jwt = (array) JWT::decode(
+                    $bearer, 
+                    env('JWT_SECRET_KEY'),
+                    ['HS256']
+                );
+                $today = (new \DateTime())->getTimestamp();
+                $expires = (int) ($jwt['expires']);
+                if($expires < $today) {
+                    throw new AuthenticationException('API token is expired');
+                }
+                $usrIdentifier = $jwt['user'];
+                if (null === $usrIdentifier) {
+                    throw new AuthenticationException('No API token provided');
+                }
+                $user = DB::connection('<#= connectionName #>')
+                    ->table('<#= usersTableName #>')
+                    ->where('UserName', '=', $usrIdentifier)
+                    ->first();
+                if ($user === null) {
+                    return null;
+                }
+                $roles=[];
+                $queryResult = DB::connection('<#= connectionName #>')
+                                ->table('aspnetuserroles', 't0000')
+                                ->join('aspnetroles as t0001',  function($join) {
+                                    $join->on('t0000.RoleId', '=', 't0001.Id');
+                                })
+                                ->where('t0000.UserId', '=', $user->Id)
+                                ->select('t0001.Name as RoleName')
+                                ->get();
+                if($queryResult) {
+                    foreach ($queryResult as $v) {
+                        $roles[] = $v->RoleName;
                     }
                     unset($v);
-                } else {
-                    $userId = $tmpval;
                 }
-
+                return new GenericUser(
+                    [
+                        'Id' => $user->Id,
+                        'Email'=> $user->Email,
+                        'EmailConfirmed'=> $user->EmailConfirmed,
+                        'PasswordHash'=> $user->PasswordHash,
+                        'SecurityStamp'=> $user->SecurityStamp,
+                        'PhoneNumber'=> $user->PhoneNumber,
+                        'PhoneNumberConfirmed'=> $user->PhoneNumberConfirmed,
+                        'TwoFactorEnabled'=> $user->TwoFactorEnabled,
+                        'LockoutEndDateUtc'=> $user->LockoutEndDateUtc,
+                        'LockoutEnabled'=> $user->LockoutEnabled,
+                        'AccessFailedCount'=> $user->AccessFailedCount,
+                        'UserName' => $user->UserName,
+                        'roles' => $roles
+                    ]
+                );
             }
-<#
-        }
-#>
-        $rslt = $this->getUserMask($userId);
-        return response()->json([
-            'page' => 0,
-            'pagesize' => $this->defaultPageSize,
-            'pagecount' => 1,
-            'total' => 1,
-            'items' => [$rslt]
-        ]);
+//            if ($request->input('api_token')) {
+//                return User::where('api_token', $request->input('api_token'))->first();
+//            }
+            return null;
+        });
     }
 }
 
