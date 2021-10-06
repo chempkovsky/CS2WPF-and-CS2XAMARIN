@@ -77,7 +77,13 @@ class <#= entityUpdClassName #>
 <#
         foreach (ModelViewKeyPropertySerializable prop in Model.AllProperties) {
             ModelViewPropertyOfVwSerializable scalarProp = GetScalarProperty(prop, Model);
-            if(scalarProp == null) continue;
+            if(scalarProp == null) {
+#>
+// View property is not set  for the entity field "<#= prop.OriginalPropertyName #>"
+// it can cause an error at runtime
+<#
+                continue;
+            }
             string isnullableStr = prop.IsRequired ? "nullable=false" : "nullable=true";
             string isnullableVar = prop.IsRequired ? "" : "|null";
             bool isId = GetDoctrineEntityFieldIsId(prop, Model);
