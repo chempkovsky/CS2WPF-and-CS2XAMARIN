@@ -122,12 +122,12 @@ use Illuminate\Database\Query\Builder;
 //        ...
 // 
 //  //$router->group(['prefix' => 'api'], function () use ($router) {
-//  $router->group([], function () use ($router) {
+//  $router->group(['middleware' => 'auth:aspnetsecurity'], function () use ($router) { // authorised access AND to add role-based protection you should modify handle() of Middleware/Authenticate.php
 //   $router->get('<#= "/" + controllerPrefix + "/getUserMask" #>', ['uses' => '<#= controllerClassName #>@getUserMask']);
 //   $router->get('<#= "/" + controllerPrefix + "/getwithfilter" #>', ['uses' => '<#= controllerClassName #>@getwithfilter']);
 //  });
 //
-//  $router->group(['middleware' => 'auth'], function () use ($router) {
+//  $router->group(['middleware' => 'auth:aspnetsecurity'], function () use ($router) { // authorised access without role-based protection
 //   $router->get('<#= "/" + controllerPrefix + "/getcurrusermasks" #>', ['uses' => '<#= controllerClassName #>@getcurrusermasks']);
 //  });
 //        ...
