@@ -114,9 +114,56 @@ use Illuminate\Auth\GenericUser;
 //
 //   AUTH_GUARD=aspnetsecurity
 //   JWT_SECRET_KEY=SOME_SECRET_HERE 
+//
 // ///////////////////////////////////////////////////////////////////////////////
+// To protect controllers using roles modify Middleware/Authenticate.php like bellow
+// 
 //
+//    public function handle($request, Closure $next, $guard = null)
+//    {
+//       
+//        if ($this->auth->guard($guard)->guest()) {
+//            return response('Unauthorized.', 401);
+//        }
+//        $roles=null;
+//        $user = $request->user();
+//        if ($user !== null)
+//          if($user instanceof GenericUser)
+//             $roles= $user->roles;
+//        switch( $request->path() ) {
+//            case 'litgenreviewwebapi/addone':
+//                if ($roles === null)
+//                    return response('Unauthorized.', 401);
+//                // check if current user has a required role (or roles)
+//                break;
+//            case 'litgenreviewwebapi/updateone':
+//                if ($roles === null)
+//                    return response('Unauthorized.', 401);
+//                // check if current user has a required role (or roles)
+//                break;
+//            case 'litgenreviewwebapi/deleteone':
+//                if ($roles === null)
+//                    return response('Unauthorized.', 401);
+//                // check if current user has a required role (or roles)
+//                break;
+//        }
+//        return $next($request);
+//    }
 //
+//  for the paths above routes/web.php must be defined as follows:
+//
+//  // protected methods
+//  $router->group(['middleware' => 'auth:aspnetsecurity'], function () use ($router) {
+//    $router->post('/litgenreviewwebapi/addone', ['uses' => 'LitGenreViewController@addone']);
+//    $router->put('/litgenreviewwebapi/updateone', ['uses' => 'LitGenreViewController@updateone']);
+//    $router->delete('/litgenreviewwebapi/deleteone', ['uses' => 'LitGenreViewController@deleteone']);
+//  });
+//  // unprotected methods
+//  $router->group([], function () use ($router) {
+//    $router->get('/litgenreviewwebapi/getall', ['uses' => 'LitGenreViewController@getall']);
+//    $router->get('/litgenreviewwebapi/getwithfilter', ['uses' => 'LitGenreViewController@getwithfilter']);
+//    $router->get('/litgenreviewwebapi/getone', ['uses' => 'LitGenreViewController@getone']);
+//  });
 //
 // ///////////////////////////////////////////////////////////////////////////////
 
