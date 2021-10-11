@@ -97,6 +97,61 @@
                         </StackPanel>
                     </DataTemplate>
 
+                    <HierarchicalDataTemplate DataType="{x:Type mdl:ModelViewEntityPropertySerializable}">
+                        <HierarchicalDataTemplate.ItemsSource>
+                            <MultiBinding ConverterParameter="Attributes,,Fluent Api Attributes,">
+                                <MultiBinding.Converter >
+                                    <hlpui:MultiValueConverterImp />
+                                </MultiBinding.Converter>
+                                <Binding Path="Attributes" />
+                                <Binding Path="FAPIAttributes" />
+                            </MultiBinding>
+                        </HierarchicalDataTemplate.ItemsSource>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding Path=ViewPropertyName}"/>
+                            <TextBlock Text=" : "/>
+                            <TextBlock Text="{Binding Path=OriginalPropertyName}"/>
+                        </StackPanel>
+                    </HierarchicalDataTemplate>
+
+                    <HierarchicalDataTemplate DataType="{x:Type mdl:ModelViewAttributeSerializable}">
+                        <HierarchicalDataTemplate.ItemsSource>
+                            <MultiBinding ConverterParameter="Properties,">
+                                <MultiBinding.Converter >
+                                    <hlpui:MultiValueConverterImp />
+                                </MultiBinding.Converter>
+                                <Binding Path="VaueProperties" />
+                            </MultiBinding>
+                        </HierarchicalDataTemplate.ItemsSource>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding Path=AttrName}"/>
+                        </StackPanel>
+                    </HierarchicalDataTemplate>
+                    <DataTemplate DataType="{x:Type mdl:ModelViewAttributePropertySerializable}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding Path=PropName}"/>
+                        </StackPanel>
+                    </DataTemplate>
+
+                    <HierarchicalDataTemplate DataType="{x:Type mdl:ModelViewFAPIAttributeSerializable}">
+                        <HierarchicalDataTemplate.ItemsSource>
+                            <MultiBinding ConverterParameter="Properties,">
+                                <MultiBinding.Converter >
+                                    <hlpui:MultiValueConverterImp />
+                                </MultiBinding.Converter>
+                                <Binding Path="VaueProperties" />
+                            </MultiBinding>
+                        </HierarchicalDataTemplate.ItemsSource>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding Path=AttrName}"/>
+                        </StackPanel>
+                    </HierarchicalDataTemplate>
+                    <DataTemplate DataType="{x:Type mdl:ModelViewFAPIAttributePropertySerializable}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding Path=PropValue}"/>
+                        </StackPanel>
+                    </DataTemplate>
+
 
                     <DataTemplate DataType="{x:Type mdlbs:ModelViewUIFormProperty}">
                         <StackPanel Orientation="Horizontal">

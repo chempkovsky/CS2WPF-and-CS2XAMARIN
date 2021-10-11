@@ -23,7 +23,7 @@ namespace CS2WPF.Model.Serializable
         public List<ModelViewPropertyOfVwSerializable> ScalarProperties { get; set; }
         public List<ModelViewForeignKeySerializable> ForeignKeys { get; set; }
         public List<ModelViewKeyPropertySerializable> PrimaryKeyProperties { get; set; }
-        public List<ModelViewKeyPropertySerializable> AllProperties { get; set; }
+        public List<ModelViewEntityPropertySerializable> AllProperties { get; set; }
         public string WebApiServiceName { get; set; }
         public string WebApiServiceProject { get; set; }
         public string WebApiServiceDefaultProjectNameSpace { get; set; }

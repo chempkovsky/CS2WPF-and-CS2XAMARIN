@@ -2349,7 +2349,7 @@ namespace CS2WPF.Helpers
 
             if (SelectedModel.AllProperties == null)
             {
-                SelectedModel.AllProperties = new ObservableCollection<ModelViewKeyProperty>();
+                SelectedModel.AllProperties = new ObservableCollection<ModelViewEntityProperty>();
             }
             else
             {
@@ -2357,7 +2357,7 @@ namespace CS2WPF.Helpers
             }
             foreach(ModelViewProperty scalarProperty in SelectedModel.ScalarProperties)
             {
-                    SelectedModel.AllProperties.Add( new ModelViewKeyProperty()
+                    SelectedModel.AllProperties.Add( new ModelViewEntityProperty()
                     {
                         OriginalPropertyName = scalarProperty.OriginalPropertyName,
                         TypeFullName = scalarProperty.TypeFullName,
@@ -2365,7 +2365,9 @@ namespace CS2WPF.Helpers
                         IsRequired = scalarProperty.IsRequired,
                         UnderlyingTypeName = scalarProperty.UnderlyingTypeName,
                         ViewPropertyName = scalarProperty.ViewPropertyName,
-                        JsonPropertyName = scalarProperty.JsonPropertyName
+                        JsonPropertyName = scalarProperty.JsonPropertyName,
+                        Attributes = scalarProperty.Attributes.CloneModelViewAttributeCollection(),
+                        FAPIAttributes = scalarProperty.FAPIAttributes.CloneModelViewFAPIAttributeCollection()
                     });
             }
             return SelectedModel;

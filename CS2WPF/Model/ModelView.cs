@@ -178,7 +178,7 @@ namespace CS2WPF.Model
         public ObservableCollection<ModelViewProperty> ScalarProperties { get; set; }
         public ObservableCollection<ModelViewForeignKey> ForeignKeys { get; set; }
         public ObservableCollection<ModelViewKeyProperty> PrimaryKeyProperties { get; set; }
-        public ObservableCollection<ModelViewKeyProperty> AllProperties { get; set; }
+        public ObservableCollection<ModelViewEntityProperty> AllProperties { get; set; }
         public ObservableCollection<ModelViewUIFormProperty> UIFormProperties { get; set; }
         public ObservableCollection<ModelViewUIListProperty> UIListProperties { get; set; }
 

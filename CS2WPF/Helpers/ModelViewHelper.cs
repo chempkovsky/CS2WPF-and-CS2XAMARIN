@@ -54,7 +54,7 @@ namespace CS2WPF.Helpers
             selectedModel.PrimaryKeyProperties.Clear();
             if (selectedModel.AllProperties == null)
             {
-                selectedModel.AllProperties = new ObservableCollection<ModelViewKeyProperty>();
+                selectedModel.AllProperties = new ObservableCollection<ModelViewEntityProperty>();
             }
             selectedModel.AllProperties.Clear();
             return selectedModel;
@@ -83,7 +83,7 @@ namespace CS2WPF.Helpers
             selectedModel.PrimaryKeyProperties.Clear();
             if (selectedModel.AllProperties == null)
             {
-                selectedModel.AllProperties = new List<ModelViewKeyPropertySerializable>();
+                selectedModel.AllProperties = new List<ModelViewEntityPropertySerializable>();
             }
             selectedModel.AllProperties.Clear();
             if (selectedModel.UIFormProperties == null)
@@ -270,6 +270,50 @@ namespace CS2WPF.Helpers
             destProp.JsonPropertyName = srcProp.JsonPropertyName;
             return destProp;
         }
+        public static ModelViewEntityPropertySerializable ModelViewEntityPropertyAssingTo(this ModelViewEntityProperty srcProp, ModelViewEntityPropertySerializable destProp)
+        {
+            if ((srcProp == null) || (destProp == null)) return null;
+            destProp.OriginalPropertyName = srcProp.OriginalPropertyName;
+            destProp.TypeFullName = srcProp.TypeFullName;
+            destProp.IsNullable = srcProp.IsNullable;
+            destProp.IsRequired = srcProp.IsRequired;
+            destProp.UnderlyingTypeName = srcProp.UnderlyingTypeName;
+            destProp.ViewPropertyName = srcProp.ViewPropertyName;
+            destProp.JsonPropertyName = srcProp.JsonPropertyName;
+            if (srcProp.Attributes != null)
+            {
+                if (srcProp.Attributes.Count > 0)
+                {
+                    if (destProp.Attributes == null)
+                    {
+                        destProp.Attributes = new List<ModelViewAttributeSerializable>();
+                        foreach (ModelViewAttribute srcAttr in srcProp.Attributes)
+                        {
+                            destProp.Attributes.Add(srcAttr.ModelViewAttributeAssingTo(new ModelViewAttributeSerializable()));
+                        }
+
+                    }
+                }
+            }
+            if (srcProp.FAPIAttributes != null)
+            {
+                if (srcProp.FAPIAttributes.Count > 0)
+                {
+                    if (destProp.FAPIAttributes == null)
+                    {
+                        destProp.FAPIAttributes = new List<ModelViewFAPIAttributeSerializable>();
+                        foreach (ModelViewFAPIAttribute srcAttr in srcProp.FAPIAttributes)
+                        {
+                            destProp.FAPIAttributes.Add(srcAttr.ModelViewFAPIAttributeAssingTo(new ModelViewFAPIAttributeSerializable()));
+                        }
+
+                    }
+                }
+            }
+            return destProp;
+        }
+
+
         public static ModelViewForeignKeySerializable ModelViewForeignKeyAssingTo(this ModelViewForeignKey srcForeignKey, ModelViewForeignKeySerializable destForeignKey)
         {
             if ((srcForeignKey == null) || (destForeignKey == null)) return null;
@@ -381,9 +425,9 @@ namespace CS2WPF.Helpers
             }
             if (srcModel.AllProperties != null)
             {
-                foreach (ModelViewKeyProperty prop in srcModel.AllProperties)
+                foreach (ModelViewEntityProperty prop in srcModel.AllProperties)
                 {
-                    destModel.AllProperties.Add(prop.ModelViewKeyPropertyAssingTo(new ModelViewKeyPropertySerializable()));
+                    destModel.AllProperties.Add(prop.ModelViewEntityPropertyAssingTo(new ModelViewEntityPropertySerializable()));
                 }
             }
             if (srcModel.PrimaryKeyProperties != null)
@@ -1217,6 +1261,28 @@ namespace CS2WPF.Helpers
             }
             return result;
         }
+        public static List<ModelViewEntityPropertySerializable> ListModelViewEntityPropertySerializableGetCopy(this List<ModelViewEntityPropertySerializable> PrimaryEntityProperties)
+        {
+            List<ModelViewEntityPropertySerializable> result = new List<ModelViewEntityPropertySerializable>();
+            if (PrimaryEntityProperties == null) return result;
+            foreach (ModelViewEntityPropertySerializable modelViewEntityPropertySerializable in PrimaryEntityProperties)
+            {
+                ModelViewEntityPropertySerializable dest = new ModelViewEntityPropertySerializable()
+                {
+                    OriginalPropertyName = modelViewEntityPropertySerializable.OriginalPropertyName,
+                    TypeFullName = modelViewEntityPropertySerializable.TypeFullName,
+                    IsNullable = modelViewEntityPropertySerializable.IsNullable,
+                    IsRequired = modelViewEntityPropertySerializable.IsRequired,
+                    UnderlyingTypeName = modelViewEntityPropertySerializable.UnderlyingTypeName,
+                    ViewPropertyName = modelViewEntityPropertySerializable.ViewPropertyName,
+                    JsonPropertyName = modelViewEntityPropertySerializable.JsonPropertyName,
+                };
+                result.Add(dest);
+                dest.Attributes = ListModelViewAttributeSerializableGetCopy(modelViewEntityPropertySerializable.Attributes);
+                dest.FAPIAttributes = ListModelViewFAPIAttributeSerializableGetCopy(modelViewEntityPropertySerializable.FAPIAttributes);
+            }
+            return result;
+        }
         public static List<ModelViewPropertyOfFkSerializable> ListModelViewPropertyOfFkSerializableGetCopy(this List<ModelViewPropertyOfFkSerializable> ScalarProperties)
         {
             List<ModelViewPropertyOfFkSerializable> result = new List<ModelViewPropertyOfFkSerializable>();
@@ -1365,7 +1431,7 @@ namespace CS2WPF.Helpers
             };
             result.ScalarProperties = ListModelViewPropertyOfVwSerializableGetCopy(srcModelViewSerializable.ScalarProperties);
             result.PrimaryKeyProperties = ListModelViewKeyPropertySerializableGetCopy(srcModelViewSerializable.PrimaryKeyProperties);
-            result.AllProperties = ListModelViewKeyPropertySerializableGetCopy(srcModelViewSerializable.AllProperties);
+            result.AllProperties = ListModelViewEntityPropertySerializableGetCopy(srcModelViewSerializable.AllProperties);
             result.ForeignKeys = ListModelViewForeignKeySerializableGetCopy(srcModelViewSerializable.ForeignKeys, UniqueProjectName, EntityFullClassName);
             result.UIFormProperties = ListModelViewForeignKeySerializableGetCopy(srcModelViewSerializable.UIFormProperties);
             result.UIListProperties = ListModelViewForeignKeySerializableGetCopy(srcModelViewSerializable.UIListProperties);
@@ -1403,12 +1469,84 @@ namespace CS2WPF.Helpers
             };
             result.ScalarProperties = ListModelViewPropertyOfVwSerializableGetCopy(srcModelViewSerializable.ScalarProperties);
             result.PrimaryKeyProperties = ListModelViewKeyPropertySerializableGetCopy(srcModelViewSerializable.PrimaryKeyProperties);
-            result.AllProperties = ListModelViewKeyPropertySerializableGetCopy(srcModelViewSerializable.AllProperties);
+            result.AllProperties = ListModelViewEntityPropertySerializableGetCopy(srcModelViewSerializable.AllProperties);
             result.ForeignKeys = ListModelViewForeignKeySerializableGetCopy(srcModelViewSerializable.ForeignKeys, srcModelViewSerializable.RootEntityUniqueProjectName, srcModelViewSerializable.RootEntityFullClassName);
             result.UIFormProperties = ListModelViewForeignKeySerializableGetCopy(srcModelViewSerializable.UIFormProperties);
             result.UIListProperties = ListModelViewForeignKeySerializableGetCopy(srcModelViewSerializable.UIListProperties);
             return result;
         }
 
+
+        public static ModelViewAttribute CloneModelViewAttribute(this ModelViewAttribute src)
+        {
+            ModelViewAttribute dest = new ModelViewAttribute();
+            if (src == null) return dest;
+            dest.AttrName = src.AttrName;
+            dest.AttrFullName = src.AttrFullName;
+            dest.VaueProperties = new ObservableCollection<ModelViewAttributeProperty>();
+            if(src.VaueProperties != null)
+            {
+                foreach(ModelViewAttributeProperty vp in src.VaueProperties)
+                {
+                    if (vp != null)
+                    {
+                        dest.VaueProperties.Add(new ModelViewAttributeProperty()
+                        {
+                            PropName = vp.PropName,
+                            PropValue = vp.PropValue
+                        });
+                    }
+                }
+            }
+            return dest;
+        }
+        public static ObservableCollection<ModelViewAttribute> CloneModelViewAttributeCollection(this ObservableCollection<ModelViewAttribute> src)
+        {
+            ObservableCollection<ModelViewAttribute> dest = new ObservableCollection<ModelViewAttribute>();
+            if (src == null) return dest;
+            foreach(ModelViewAttribute srcItm in src)
+            {
+                if (srcItm != null)
+                {
+                    dest.Add(srcItm.CloneModelViewAttribute());
+                }
+            }
+            return dest;
+        }
+
+        public static ModelViewFAPIAttribute CloneModelViewFAPIAttribute(this ModelViewFAPIAttribute src)
+        {
+            ModelViewFAPIAttribute dest = new ModelViewFAPIAttribute();
+            if (src == null) return dest;
+            dest.AttrName = src.AttrName;
+            dest.VaueProperties = new ObservableCollection<ModelViewFAPIAttributeProperty>();
+            if (src.VaueProperties != null)
+            {
+                foreach (ModelViewFAPIAttributeProperty vp in src.VaueProperties)
+                {
+                    if (vp != null)
+                    {
+                        dest.VaueProperties.Add(new ModelViewFAPIAttributeProperty()
+                        {
+                            PropValue = vp.PropValue
+                        });
+                    }
+                }
+            }
+            return dest;
+        }
+        public static ObservableCollection<ModelViewFAPIAttribute> CloneModelViewFAPIAttributeCollection(this ObservableCollection<ModelViewFAPIAttribute> src)
+        {
+            ObservableCollection<ModelViewFAPIAttribute> dest = new ObservableCollection<ModelViewFAPIAttribute>();
+            if (src == null) return dest;
+            foreach (ModelViewFAPIAttribute srcItm in src)
+            {
+                if (srcItm != null)
+                {
+                    dest.Add(srcItm.CloneModelViewFAPIAttribute());
+                }
+            }
+            return dest;
+        }
     }
 }
