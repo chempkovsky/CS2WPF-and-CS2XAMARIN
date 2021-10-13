@@ -414,7 +414,8 @@ namespace CS2WPF.ViewModel
                             (CreateWebApiUC.DataContext as CreateWebApiViewModel).SerializableDbContext,
                             (CreateWebApiUC.DataContext as CreateWebApiViewModel).GetSelectedModelCommonShallowCopy(
                                 (SelectFolderUC.DataContext as SelectFolderViewModel).T4SelectedFolder,
-                                (SelectFolderUC.DataContext as SelectFolderViewModel).FileName
+                                (SelectFolderUC.DataContext as SelectFolderViewModel).FileName,
+                                (T4EditorUC.DataContext as T4EditorViewModel).T4SelectedTemplate
                                 ),
                                 (InvitationUC.DataContext as InvitationViewModel).DefaultProjectNameSpace
                             );
@@ -475,6 +476,8 @@ namespace CS2WPF.ViewModel
                     {
                         commonStaffSerializable.Extension =
                             (GenerateUC.DataContext as GenerateCommonStaffViewModel).FileExtension;
+                        commonStaffSerializable.T4Template =
+                            (T4EditorUC.DataContext as T4EditorViewModel).T4SelectedTemplate;
                     }
                 }
             }
@@ -492,6 +495,8 @@ namespace CS2WPF.ViewModel
                     {
                         commonStaffSerializable.Extension =
                             (GenerateUC.DataContext as GenerateCommonStaffViewModel).FileExtension;
+                        commonStaffSerializable.T4Template =
+                            (T4EditorUC.DataContext as T4EditorViewModel).T4SelectedTemplate;
                     }
                 }
 

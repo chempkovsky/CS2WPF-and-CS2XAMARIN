@@ -893,7 +893,7 @@ namespace CS2WPF.ViewModel
 
             return result;
         }
-        public ModelViewSerializable GetSelectedModelCommonShallowCopy(string FileType, string FileName)
+        public ModelViewSerializable GetSelectedModelCommonShallowCopy(string FileType, string FileName, string T4Template)
         {
             if (SelectedModel == null) return null;
             ModelViewSerializable result = SelectedModel.ModelViewSerializableGetShallowCopy();
@@ -911,7 +911,8 @@ namespace CS2WPF.ViewModel
                     FileName = c.FileName,
                     FileProject = c.FileProject,
                     FileDefaultProjectNameSpace = c.FileDefaultProjectNameSpace,
-                    FileFolder = c.FileFolder
+                    FileFolder = c.FileFolder,
+                    T4Template = c.T4Template
                 }));
             }
             CommonStaffSerializable commonStaffItem = 
@@ -928,7 +929,7 @@ namespace CS2WPF.ViewModel
             commonStaffItem.FileProject = this.DestinationProject;
             commonStaffItem.FileDefaultProjectNameSpace = this.DefaultProjectNameSpace;
             commonStaffItem.FileFolder = this.DestinationFolder;
-
+            commonStaffItem.T4Template = T4Template;
             result.ScalarProperties = new List<ModelViewPropertyOfVwSerializable>();
             if (ScalarProperties != null)
             {

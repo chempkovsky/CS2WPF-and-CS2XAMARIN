@@ -15,6 +15,7 @@ namespace CS2WPF.Model.Serializable
         public string FileDefaultProjectNameSpace { get; set; }
         public string FileFolder { get; set; }
         public string Extension { get; set; }
+        public string T4Template { get; set; }
         //public string FileTypeData { get; set; }
     }
 }
