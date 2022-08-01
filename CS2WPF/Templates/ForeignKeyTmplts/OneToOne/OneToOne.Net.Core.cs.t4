@@ -11,12 +11,16 @@
 <#@ parameter type="System.String"   name="NavigationName" #>
 <#@ parameter type="System.String"   name="InverseNavigationName" #>
 <#@ parameter type="System.String"   name="MasterClassFullName" #>
+<#@ parameter type="System.String"   name="DetailClassFullName" #>
 <#@ parameter type="System.Collections.Generic.List<System.String>"  name="ForeignKeyProperties" #>
+<#@ parameter type="System.Collections.Generic.List<System.String>"  name="MasterKeyProperties" #>
+<#@ parameter type="System.String"   name="DeleteBehavior" #>
 .HasOne( d => d.<#= NavigationName #> )
             .WithOne( m => m.<#= InverseNavigationName #> )
-            .HasForeignKey<<#= MasterClassFullName #>>( d => <#= GetForeignKeyPropertiesList(ForeignKeyProperties, "d.") #> )
+            .HasForeignKey<<#= DetailClassFullName #>>( d => <#= GetKeyPropertiesList(ForeignKeyProperties, "d.") #> )
+            .HasPrincipalKey<<#= MasterClassFullName #>>( p => <#= GetKeyPropertiesList(MasterKeyProperties, "p.") #> )
             .IsRequired(<#= GetRequiredOrOptional(IsRequired) #>)
-            .OnDelete(<#= GetWillCascadeOnDelete(WillCascadeOnDelete) #>);
+            .OnDelete(<#= DeleteBehavior #>);
 <#+
         string GetWillCascadeOnDelete(bool willCascadeOnDelete)
         {
@@ -32,7 +36,7 @@
             }
             return "false";
         }
-        string GetForeignKeyPropertiesList(System.Collections.Generic.List<System.String> primKeyProperties, string prefixName)
+        string GetKeyPropertiesList(System.Collections.Generic.List<System.String> primKeyProperties, string prefixName)
         {
             if (primKeyProperties == null) return "";
             int cnt = primKeyProperties.Count;

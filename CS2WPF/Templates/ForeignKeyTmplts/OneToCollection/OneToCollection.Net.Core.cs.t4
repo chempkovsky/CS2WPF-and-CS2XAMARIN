@@ -12,11 +12,14 @@
 <#@ parameter type="System.String"   name="InverseNavigationName" #>
 <#@ parameter type="System.String"   name="MasterClassFullName" #>
 <#@ parameter type="System.Collections.Generic.List<System.String>"  name="ForeignKeyProperties" #>
+<#@ parameter type="System.Collections.Generic.List<System.String>"  name="MasterKeyProperties" #>
+<#@ parameter type="System.String"   name="DeleteBehavior" #>
 .HasOne( d => d.<#= NavigationName #> )
             .WithMany( m => m.<#= InverseNavigationName #> )
-            .HasForeignKey( d => <#= GetForeignKeyPropertiesList(ForeignKeyProperties, "d.") #> )
+            .HasForeignKey( d => <#= GetKeyPropertiesList(ForeignKeyProperties, "d.") #> )
+            .HasPrincipalKey( p => <#= GetKeyPropertiesList(MasterKeyProperties, "p.") #> )
             .IsRequired(<#= GetRequiredOrOptional(IsRequired) #>)
-            .OnDelete(<#= GetWillCascadeOnDelete(WillCascadeOnDelete) #>);
+            .OnDelete(<#= DeleteBehavior #>);
 <#+
         string GetWillCascadeOnDelete(bool willCascadeOnDelete)
         {
@@ -32,7 +35,7 @@
             }
             return "false";
         }
-        string GetForeignKeyPropertiesList(System.Collections.Generic.List<System.String> foreignKeyProperties, string prefixName)
+        string GetKeyPropertiesList(System.Collections.Generic.List<System.String> foreignKeyProperties, string prefixName)
         {
             if (foreignKeyProperties == null) return "";
             int cnt = foreignKeyProperties.Count;
