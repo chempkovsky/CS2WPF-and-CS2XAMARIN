@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CS2WPF.Model
 {
-    public class ModelViewUIFormProperty: ModelViewUIBaseProperty
+    public class ModelViewUIFormProperty : ModelViewUIBaseProperty
     {
         #region Fields
         protected InputTypeEnum _InputTypeWhenAdd;

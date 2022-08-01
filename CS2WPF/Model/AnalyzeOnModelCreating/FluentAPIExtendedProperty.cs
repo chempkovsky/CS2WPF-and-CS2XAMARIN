@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CS2WPF.Model.AnalyzeOnModelCreating
 {
-    public class FluentAPIExtendedProperty: FluentAPIProperty
+    public class FluentAPIExtendedProperty : FluentAPIProperty
     {
         public bool IsNullable { get; set; }
         public bool IsRequired { get; set; }

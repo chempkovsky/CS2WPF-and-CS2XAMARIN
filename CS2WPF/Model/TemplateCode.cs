@@ -292,7 +292,7 @@ namespace CS2WPF.Model
             {
                 return model.PrimaryKeyProperties.Any(p => p.OriginalPropertyName == prop.OriginalPropertyName);
             }
-            if(model.ForeignKeys == null)
+            if (model.ForeignKeys == null)
             {
                 return false;
             }
@@ -317,7 +317,7 @@ namespace CS2WPF.Model
                     {
                         if (fk.ForeignKeyProps[i].OriginalPropertyName == pk.OriginalPropertyName)
                         {
-                            if((prop.OriginalPropertyName == fk.PrincipalKeyProps[i].OriginalPropertyName) && (prop.ForeignKeyNameChain == fk.NavigationName))
+                            if ((prop.OriginalPropertyName == fk.PrincipalKeyProps[i].OriginalPropertyName) && (prop.ForeignKeyNameChain == fk.NavigationName))
                             {
                                 return true;
                             }
@@ -1490,11 +1490,11 @@ namespace CS2WPF.Model
             {
                 return result;
             }
-            if(foreignKeySerializable.ForeignKeyProps.Count != foreignKeySerializable.PrincipalKeyProps.Count)
+            if (foreignKeySerializable.ForeignKeyProps.Count != foreignKeySerializable.PrincipalKeyProps.Count)
             {
                 return result;
             }
-            for(int i = 0; i < foreignKeySerializable.ForeignKeyProps.Count; i++)
+            for (int i = 0; i < foreignKeySerializable.ForeignKeyProps.Count; i++)
             {
                 ModelViewKeyPropertySerializable modelViewKeyPropertySerializable = foreignKeySerializable.ForeignKeyProps[i];
                 ModelViewPropertyOfVwSerializable prop =
@@ -1502,7 +1502,9 @@ namespace CS2WPF.Model
                 if (prop != null)
                 {
                     result.Add(prop);
-                } else {
+                }
+                else
+                {
                     modelViewKeyPropertySerializable = foreignKeySerializable.PrincipalKeyProps[i];
                     prop =
                         model.ScalarProperties.Where(p => ((p.OriginalPropertyName == modelViewKeyPropertySerializable.OriginalPropertyName) && (p.ForeignKeyName == foreignKeySerializable.NavigationName))).FirstOrDefault();
@@ -2314,7 +2316,8 @@ namespace CS2WPF.Model
             {
                 return result;
             }
-            if ((model.ScalarProperties == null) || (model.PrimaryKeyProperties == null) || (context.ModelViews == null)) {
+            if ((model.ScalarProperties == null) || (model.PrimaryKeyProperties == null) || (context.ModelViews == null))
+            {
                 return result;
             }
             if ((model.PrimaryKeyProperties.Count < 1) || (model.ScalarProperties.Count < 1))
@@ -2322,7 +2325,7 @@ namespace CS2WPF.Model
                 return result;
             }
             List<ModelViewPropertyOfVwSerializable> primKeys = GetModelPrimaryKeyProps(model);
-            if(primKeys == null)
+            if (primKeys == null)
             {
                 return result;
             }
@@ -2334,11 +2337,11 @@ namespace CS2WPF.Model
             string RootEntityUniqueProjectName = model.RootEntityUniqueProjectName;
             List<ModelViewSerializable> details =
                 context.ModelViews.Where(m => m.ForeignKeys.Any(f => (f.NavigationEntityFullName == RootEntityFullClassName) && (f.NavigationEntityUniqueProjectName == RootEntityUniqueProjectName))).ToList();
-            if(details.Count < 1)
+            if (details.Count < 1)
             {
                 return result;
             }
-            foreach(ModelViewSerializable detail in details)
+            foreach (ModelViewSerializable detail in details)
             {
                 if (detail.ScalarProperties == null) continue;
                 if (detail.ForeignKeys == null) continue;
@@ -2347,31 +2350,33 @@ namespace CS2WPF.Model
                     detail.ForeignKeys.Where(f => (f.NavigationEntityFullName == RootEntityFullClassName) && (f.NavigationEntityUniqueProjectName == RootEntityUniqueProjectName)).ToList();
                 if (ForeignKeys.Count < 1) continue;
                 bool canBeUsed = false;
-                foreach(ModelViewForeignKeySerializable ForeignKey in ForeignKeys)
+                foreach (ModelViewForeignKeySerializable ForeignKey in ForeignKeys)
                 {
                     bool hasForeignKeyProps = true;
                     if (ForeignKey.ForeignKeyProps != null)
                     {
-                        for(int i = 0; i < ForeignKey.ForeignKeyProps.Count; i++)
+                        for (int i = 0; i < ForeignKey.ForeignKeyProps.Count; i++)
                         {
                             ModelViewKeyPropertySerializable ForeignKeyProp = ForeignKey.ForeignKeyProps[i];
                             if (!(detail.ScalarProperties.Any(s => (s.OriginalPropertyName == ForeignKeyProp.OriginalPropertyName) && (string.IsNullOrEmpty(s.ForeignKeyNameChain)))))
                             {
                                 hasForeignKeyProps = false;
                             }
-                            if(!hasForeignKeyProps)
+                            if (!hasForeignKeyProps)
                             {
                                 ModelViewKeyPropertySerializable PrincipalKeyProp = ForeignKey.PrincipalKeyProps[i];
                                 if (detail.ScalarProperties.Any(s => (s.OriginalPropertyName == PrincipalKeyProp.OriginalPropertyName) && (s.ForeignKeyNameChain == ForeignKey.NavigationName)))
                                 {
                                     hasForeignKeyProps = true;
-                                } else
+                                }
+                                else
                                 {
                                     break;
                                 }
                             }
                         }
-                    } else
+                    }
+                    else
                     {
                         hasForeignKeyProps = false;
                     }
@@ -2381,9 +2386,9 @@ namespace CS2WPF.Model
                         break;
                     }
                 }
-                if(canBeUsed)
+                if (canBeUsed)
                 {
-                    if(!result.Contains(detail.ViewName))
+                    if (!result.Contains(detail.ViewName))
                     {
                         result.Add(detail.ViewName);
                     }
@@ -2440,7 +2445,7 @@ namespace CS2WPF.Model
                             {
                                 hasForeignKeyProps = true;
                             }
-                            if(!hasForeignKeyProps)
+                            if (!hasForeignKeyProps)
                             {
                                 break;
                             }
@@ -2474,7 +2479,7 @@ namespace CS2WPF.Model
                 return result;
             }
             List<ModelViewPropertyOfVwSerializable> primKeys = GetModelPrimaryKeyProps(model);
-            if(primKeys == null)
+            if (primKeys == null)
             {
                 return result;
             }
@@ -2482,12 +2487,12 @@ namespace CS2WPF.Model
             {
                 return result;
             }
-            if(!primKeys.Any(p => (p.ViewPropertyName == primKey.ViewPropertyName) && (p.OriginalPropertyName == primKey.OriginalPropertyName)))
+            if (!primKeys.Any(p => (p.ViewPropertyName == primKey.ViewPropertyName) && (p.OriginalPropertyName == primKey.OriginalPropertyName)))
             {
                 return result;
             }
             ModelViewForeignKeySerializable fk = detail.ForeignKeys.Where(f => f.NavigationName == ForeignKey.NavigationName).FirstOrDefault();
-            if(fk == null)
+            if (fk == null)
             {
                 return result;
             }
@@ -2503,14 +2508,14 @@ namespace CS2WPF.Model
             }
 
             int ind = fk.PrincipalKeyProps.FindIndex(p => p.ViewPropertyName == primKey.ViewPropertyName);
-            if(ind < 0)
+            if (ind < 0)
             {
                 return result;
             }
             ModelViewKeyPropertySerializable ForeignKeyProp = ForeignKey.ForeignKeyProps[ind];
             ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializableEx =
                 detail.ScalarProperties.FirstOrDefault(s => (s.OriginalPropertyName == ForeignKeyProp.OriginalPropertyName) && (string.IsNullOrEmpty(s.ForeignKeyNameChain)));
-            if(modelViewPropertyOfVwSerializableEx != modelViewPropertyOfVwSerializable)
+            if (modelViewPropertyOfVwSerializableEx != modelViewPropertyOfVwSerializable)
             {
                 result.Add(modelViewPropertyOfVwSerializableEx);
             }
@@ -2526,7 +2531,7 @@ namespace CS2WPF.Model
             {
                 return null;
             }
-            return context.ModelViews.Where(v => v.CommonStaffs.Any(f =>f.FileType == fileType)).FirstOrDefault();
+            return context.ModelViews.Where(v => v.CommonStaffs.Any(f => f.FileType == fileType)).FirstOrDefault();
         }
 
     }

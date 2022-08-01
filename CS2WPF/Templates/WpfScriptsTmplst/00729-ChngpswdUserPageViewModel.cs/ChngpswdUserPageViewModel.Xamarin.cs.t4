@@ -22,6 +22,10 @@ using System.Runtime.CompilerServices;
 using System.Linq;
 <#
 
+    string IAppGlblSettingsServiceFolder      = "00080-IAppGlblSettingsService.cs";
+    string IAppGlblSettingsServiceClassName   = GetModelClassName(Model, IAppGlblSettingsServiceFolder);
+    string IAppGlblSettingsServiceNameSpace   = GetModelNameSpace(Model, IAppGlblSettingsServiceFolder);
+
     string IRegisterModelFolder      = "00500-IRegisterModel.cs";
     string IRegisterModelClassName   = GetModelClassName(Model, IRegisterModelFolder);
     string IRegisterModelNameSpace   = GetModelNameSpace(Model, IRegisterModelFolder);
@@ -82,7 +86,9 @@ using System.Linq;
     string ValueErrorSufix                          = "Error"; 
 
     string AppLoginServicePropertyName              = "GlblLoginSrv";
+    string AppSettingServicePropertyName            = "GlblSettingsSrv";
     string ChangePasswordMethodName                 = "ChangePassword";
+    string NavigateToMethodName                     = "NavigateTo";
 
 
     List<string> nmSpaces = new List<string>();
@@ -92,6 +98,8 @@ using System.Linq;
         nmSpaces.Add(IRegisterModelNameSpace);
     if ((ChngpswdUserPageViewModelNameSpace != IChangePasswordModelNameSpace) && (nmSpaces.IndexOf(IChangePasswordModelNameSpace) < 0)) 
         nmSpaces.Add(IChangePasswordModelNameSpace);
+    if ((ChngpswdUserPageViewModelNameSpace != IAppGlblSettingsServiceNameSpace) && (nmSpaces.IndexOf(IAppGlblSettingsServiceNameSpace) < 0)) 
+        nmSpaces.Add(IAppGlblSettingsServiceNameSpace);
     
 #>
 <# 
@@ -120,13 +128,15 @@ using <#= ns #>;
 */
 
 namespace <#= ChngpswdUserPageViewModelNameSpace #> {
-    public class <#= ChngpswdUserPageViewModelClassName #>: INotifyPropertyChanged, INotifyDataErrorInfo  
+    public class <#= ChngpswdUserPageViewModelClassName #>: INotifyPropertyChanged, INotifyDataErrorInfo, IDestructible    
     {
+        <#= IAppGlblSettingsServiceClassName #> _<#= AppSettingServicePropertyName #>;
         <#= IAppGlblLoginServiceClassName #> _<#= AppLoginServicePropertyName #>;
-        protected INavigationService _navigationService;
-        public <#= ChngpswdUserPageViewModelClassName #>(<#= IAppGlblLoginServiceClassName #> <#= AppLoginServicePropertyName #>, INavigationService navigationService) {
+//        protected INavigationService _navigationService;
+
+        public <#= ChngpswdUserPageViewModelClassName #>(<#= IAppGlblLoginServiceClassName #> <#= AppLoginServicePropertyName #>, <#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName #>) {
             _<#= AppLoginServicePropertyName #> = <#= AppLoginServicePropertyName #>;
-            _navigationService = navigationService;
+            _<#= AppSettingServicePropertyName #> = <#= AppSettingServicePropertyName #>;
         }
 
         #region INotifyPropertyChanged
@@ -361,7 +371,10 @@ namespace <#= ChngpswdUserPageViewModelNameSpace #> {
         }
         protected async void <#= CancelCommandPropertyName #>Action(object param)
         {
-            await _navigationService.NavigateAsync("<#= HomePageClassName #>");
+            // await _navigationService.NavigateAsync("<#= HomePageClassName #>");
+            if(_<#= AppSettingServicePropertyName #> != null) {
+                _<#= AppSettingServicePropertyName #>.<#= NavigateToMethodName #>("<#= HomePageClassName #>");
+            }
         }
         protected bool <#= CancelCommandPropertyName #>CanExecute(object param)
         {
@@ -385,7 +398,10 @@ namespace <#= ChngpswdUserPageViewModelNameSpace #> {
             if (HasErrors) return;
             <#= IChangePasswordModelClassName #> model = await _<#= AppLoginServicePropertyName #>.<#= ChangePasswordMethodName #>(<#= OldPassWordPropertyName #>, <#= PassWordPropertyName #>, <#= ConfirmPassWordPropertyName #>);
             if (model == null) return;
-            await _navigationService.NavigateAsync("<#= HomePageClassName #>");
+            // await _navigationService.NavigateAsync("<#= HomePageClassName #>");
+            if(_<#= AppSettingServicePropertyName #> != null) {
+                _<#= AppSettingServicePropertyName #>.<#= NavigateToMethodName #>("<#= HomePageClassName #>");
+            }
         }
         protected bool <#= OkCommandPropertyName #>CanExecute(object param)
         {
@@ -446,6 +462,15 @@ namespace <#= ChngpswdUserPageViewModelNameSpace #> {
             return true;
         }
         #endregion
+
+        #region IDestructible  
+        public virtual void Destroy()
+        {
+            _<#= AppSettingServicePropertyName #> = null;
+            _<#= AppLoginServicePropertyName #> = null;
+        }
+        #endregion
+
     }
 }
 

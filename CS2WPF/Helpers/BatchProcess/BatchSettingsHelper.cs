@@ -15,6 +15,8 @@ using System.Collections.ObjectModel;
 
 namespace CS2WPF.Helpers.BatchProcess
 {
+#pragma warning disable VSTHRD010
+
     public static class BatchSettingsHelper
     {
         public static BatchSettings ReadBatchSettingsFromString(string jsonString)

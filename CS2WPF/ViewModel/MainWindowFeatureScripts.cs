@@ -7,16 +7,12 @@ using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TextTemplating.VSHost;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace CS2WPF.ViewModel
 {
-    #pragma warning disable VSTHRD010
+#pragma warning disable VSTHRD010
     class MainWindowFeatureScripts : MainWindowBase
     {
         #region Fieds
@@ -128,7 +124,7 @@ namespace CS2WPF.ViewModel
                         dataContext.IsReady.IsReadyEvent += CallBack_IsReady;
                         FeatureUC = new UserControlFeature(dataContext);
                     }
-                    (FeatureUC.DataContext as FeatureViewModel).SelectedDbContext = 
+                    (FeatureUC.DataContext as FeatureViewModel).SelectedDbContext =
                         (SelectDbContextUC.DataContext as SelectDbContextViewModel).SelectedCodeElement;
                     (FeatureUC.DataContext as FeatureViewModel).CheckIsReady();
                     this.CurrentUserControl = FeatureUC;
@@ -138,10 +134,10 @@ namespace CS2WPF.ViewModel
                     CurrentUiStepId = 3;
                     PrevBtnEnabled = true;
                     NextBtnEnabled = false;
-                    if (SelectFeatureFolderUC == null)  
+                    if (SelectFeatureFolderUC == null)
                     {
                         string TemplatesFld = TemplatePathHelper.GetTemplatePath();
-                        SelectFeatureFolderViewModel dataContext = new SelectFeatureFolderViewModel(Dte, TextTemplating, DialogFactory, (FeatureUC.DataContext as FeatureViewModel).SelectedDbContext, TemplatesFld, "FeatureScriptsTmplst", "BatchScriptsTmplst");
+                        SelectFeatureFolderViewModel dataContext = new SelectFeatureFolderViewModel(Dte, TextTemplating, DialogFactory, (FeatureUC.DataContext as FeatureViewModel).SelectedDbContext, TemplatesFld, "JavaFeatureScriptsTmplst", "BatchJavaScriptsTmplst");
                         dataContext.DestinationProjectRootFolder = (InvitationUC.DataContext as InvitationViewModel).DestinationProjectRootFolder;
                         dataContext.DestinationFolder = (InvitationUC.DataContext as InvitationViewModel).DestinationFolder;
                         //dataContext.ContextItemFeatureName = 

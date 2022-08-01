@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace CS2WPF.Model
 {
-    public class ModelViewAttribute: NotifyPropertyChangedViewModel
+    public class ModelViewAttribute : NotifyPropertyChangedViewModel
     {
         #region Fields
         protected string _AttrName = "";

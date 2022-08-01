@@ -8,8 +8,8 @@ namespace CS2WPF.Model
 {
     public enum InfoSourceEnum : int
     {
-        ByConvention=0,
-        ByAttribute=1,
-        ByOnModelCreating=2
+        ByConvention = 0,
+        ByAttribute = 1,
+        ByOnModelCreating = 2
     }
 }

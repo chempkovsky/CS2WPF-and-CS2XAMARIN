@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CS2WPF.Model
 {
-    public class ModelViewKeyProperty: ModelViewBaseProperty
+    public class ModelViewKeyProperty : ModelViewBaseProperty
     {
     }
 }

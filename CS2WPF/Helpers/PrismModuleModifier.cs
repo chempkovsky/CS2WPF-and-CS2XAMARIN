@@ -9,6 +9,7 @@ using System.Text;
 
 namespace CS2WPF.Helpers
 {
+#pragma warning disable VSTHRD010
 
     public class PrismModuleModifier
     {

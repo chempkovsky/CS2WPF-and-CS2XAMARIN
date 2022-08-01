@@ -4,7 +4,7 @@ using System.IO;
 
 namespace CS2WPF.ViewModel
 {
-    public class T4EditorViewModel: IsReadyViewModel
+    public class T4EditorViewModel : IsReadyViewModel
     {
         #region Fields
         string _T4TempateCaption = "T4 Tempate";
@@ -12,7 +12,7 @@ namespace CS2WPF.ViewModel
         string _T4TempatePath;
         string _T4TemplateFolder;
         string _T4SelectedTemplate;
-        string _T4TemplateExtention= "*.t4";
+        string _T4TemplateExtention = "*.t4";
         #endregion
 
         public T4EditorViewModel(string templateFolder) : base()
@@ -71,15 +71,17 @@ namespace CS2WPF.ViewModel
                 OnPropertyChanged();
             }
         }
-        public string T4TempateCaption 
+        public string T4TempateCaption
         {
-            get { 
-                return _T4TempateCaption; 
+            get
+            {
+                return _T4TempateCaption;
             }
-            set {
+            set
+            {
                 _T4TempateCaption = value;
                 OnPropertyChanged();
-            } 
+            }
         }
         public string T4TempateText
         {
@@ -117,7 +119,7 @@ namespace CS2WPF.ViewModel
         }
         public void CheckIsReady()
         {
-            IsReady.DoNotify(this, (!string.IsNullOrEmpty(this.T4TempateText)) && (!string.IsNullOrEmpty(T4TempatePath))  );
+            IsReady.DoNotify(this, (!string.IsNullOrEmpty(this.T4TempateText)) && (!string.IsNullOrEmpty(T4TempatePath)));
         }
         public void ReadTemplate()
         {

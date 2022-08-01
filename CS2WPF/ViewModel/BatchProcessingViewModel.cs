@@ -45,16 +45,17 @@ namespace CS2WPF.ViewModel
         public string ContextLevelTmplts { get; set; } = "00000-ContextLevelTmplts";
         public string ViewModelLevelTmplts { get; set; } = "01000-ViewModelLevelTmplts";
         protected string _LastError;
-        public string LastError { 
+        public string LastError
+        {
             get
             {
                 return _LastError;
-            } 
+            }
             set
             {
                 _LastError = value;
                 OnPropertyChanged();
-            } 
+            }
         }
         protected string _ReportText;
         public string ReportText
@@ -89,11 +90,14 @@ namespace CS2WPF.ViewModel
         public ObservableCollection<ModelViewUIListProperty> UIListProperties { get; set; }
 
         public SolutionCodeElement SelectedDbContext { get; set; }
-        public DbContextSerializable SerializableDbContext {
-            get {
+        public DbContextSerializable SerializableDbContext
+        {
+            get
+            {
                 return this._SerializableDbContext;
             }
-            set{
+            set
+            {
                 this._SerializableDbContext = value;
             }
         }
@@ -133,12 +137,14 @@ namespace CS2WPF.ViewModel
                 OnPropertyChanged();
             }
         }
-        public string CurrentBatchSetting 
+        public string CurrentBatchSetting
         {
-            get {
+            get
+            {
                 return _CurrentBatchSetting;
             }
-            set {
+            set
+            {
                 _CurrentBatchSetting = value;
                 OnPropertyChanged();
             }
@@ -151,7 +157,8 @@ namespace CS2WPF.ViewModel
             }
             set
             {
-                if (_SelectedFileName == value) {
+                if (_SelectedFileName == value)
+                {
                     return;
                 }
                 _SelectedFileName = value;
@@ -167,10 +174,11 @@ namespace CS2WPF.ViewModel
             if (SerializableModel != null)
             {
                 string folderNm = "";
-                if ( SerializableModel.ViewName == ContextItemViewName )
+                if (SerializableModel.ViewName == ContextItemViewName)
                 {
                     folderNm = Path.Combine(BatchRootFolder, ContextLevelTmplts);
-                } else
+                }
+                else
                 {
                     folderNm = Path.Combine(BatchRootFolder, ViewModelLevelTmplts);
                 }
@@ -185,9 +193,10 @@ namespace CS2WPF.ViewModel
                 }
             }
         }
-        public void OnSelectedFileNameChanged() {
+        public void OnSelectedFileNameChanged()
+        {
             CurrentBatchSetting = "";
-            if(string.IsNullOrEmpty(SelectedFile) || (SerializableDbContext == null) || (SerializableModel == null))
+            if (string.IsNullOrEmpty(SelectedFile) || (SerializableDbContext == null) || (SerializableModel == null))
             {
                 return;
             }
@@ -234,7 +243,7 @@ namespace CS2WPF.ViewModel
             {
                 sb.AppendLine("Json parsing started");
                 BatchSettings batchSettings = BatchSettingsHelper.ReadBatchSettingsFromString(CurrentBatchSetting);
-                if(batchSettings == null)
+                if (batchSettings == null)
                 {
                     throw new Exception("Could not Deserialize Object");
                 }
@@ -244,21 +253,22 @@ namespace CS2WPF.ViewModel
                     throw new Exception("Batch Items is empty");
                 }
                 sb.AppendLine("Batch Items processing started");
-                
-                foreach (BatchItem batchItem  in batchSettings.BatchItems)
+
+                foreach (BatchItem batchItem in batchSettings.BatchItems)
                 {
                     ModelViewSerializable currentSerializableModel = SerializableModel;
-                    if (!string.IsNullOrEmpty( batchItem.ViewModel )) {
+                    if (!string.IsNullOrEmpty(batchItem.ViewModel))
+                    {
                         currentSerializableModel = SerializableDbContext.ModelViews.Where(m => m.ViewName == batchItem.ViewModel).FirstOrDefault();
-                        if(currentSerializableModel == null)
+                        if (currentSerializableModel == null)
                         {
                             throw new Exception("Could not find [" + batchItem.ViewModel + "] of the Batch Item = " + batchItem.GeneratorType);
                         }
                     }
-                    sb.AppendLine("Processing Batch Item: [DestinationFolder]=["+batchItem.DestinationFolder+ "]");
+                    sb.AppendLine("Processing Batch Item: [DestinationFolder]=[" + batchItem.DestinationFolder + "]");
                     sb.AppendLine("    [GeneratorType]=[" + batchItem.GeneratorType + "]");
                     sb.AppendLine("        [GeneratorSript]=[" + batchItem.GeneratorSript + "]");
-                    string tmpltPath =  Path.Combine(T4RootFolder, batchItem.GeneratorType, batchItem.GeneratorSript);
+                    string tmpltPath = Path.Combine(T4RootFolder, batchItem.GeneratorType, batchItem.GeneratorSript);
                     string FileName = "";
                     if (currentSerializableModel.ViewName == ContextItemViewName)
                     {
@@ -280,7 +290,8 @@ namespace CS2WPF.ViewModel
                                                                     UIFormProperties, UIListProperties,
                                                                     DestinationProjectName, DefaultProjectNameSpace, DestinationFolder, batchItem.DestinationFolder,
                                                                     batchItem.GeneratorType, FileName, batchItem.GeneratorSript);
-                    } else
+                    }
+                    else
                     {
                         ShallowCopy =
                             BatchSettingsHelper.GetSelectedModelCommonShallowCopy(currentSerializableModel,
@@ -302,7 +313,7 @@ namespace CS2WPF.ViewModel
                                         batchItem.DestinationFolder,
                                         FileName, generatorBatchStep.FileExtension, batchItem.GeneratorSript,
                                         generatorBatchStep.GenerateText);
-                    currentSerializableModel.CommonStaffs =  ShallowCopy.CommonStaffs;
+                    currentSerializableModel.CommonStaffs = ShallowCopy.CommonStaffs;
                     sb.AppendLine("Batch Item Processing finished");
                 }
                 sb.AppendLine("Batch Items processing finished");

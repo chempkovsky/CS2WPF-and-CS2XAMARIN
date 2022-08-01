@@ -12,6 +12,7 @@ using System.Runtime.CompilerServices;
 
 namespace CS2WPF.ViewModel
 {
+#pragma warning disable VSTHRD010
     public class GenerateViewPageModel : BaseGenerateViewModel
     {
         public GenerateViewPageModel() : base()

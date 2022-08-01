@@ -19,8 +19,8 @@ using System.Windows.Input;
 
 namespace CS2WPF.ViewModel
 {
-    #pragma warning disable VSTHRD010
-    public class CreatePrimaryKeyViewModel: IsReadyViewModel
+#pragma warning disable VSTHRD010
+    public class CreatePrimaryKeyViewModel : IsReadyViewModel
     {
         #region Fields
         protected DTE2 Dte;
@@ -78,8 +78,8 @@ namespace CS2WPF.ViewModel
                 OnSelectedTemplateChanged();
             }
         }
-        public string InvitationCaption 
-        { 
+        public string InvitationCaption
+        {
             get
             {
                 return _InvitationCaption;
@@ -104,7 +104,7 @@ namespace CS2WPF.ViewModel
                 OnPropertyChanged();
             }
         }
-        public int EntityPropertiesIndex 
+        public int EntityPropertiesIndex
         {
             get
             {
@@ -169,7 +169,8 @@ namespace CS2WPF.ViewModel
                 if (_SelectedEntity == null)
                 {
                     EntityNameCaption = null;
-                } else
+                }
+                else
                 {
                     EntityNameCaption = _SelectedEntity.CodeElementFullName;
                 }
@@ -215,12 +216,18 @@ namespace CS2WPF.ViewModel
                 {
                     if (SelectedEntity.CodeElementRef != null)
                     {
-                        (SelectedEntity.CodeElementRef as CodeClass).CollectCodeClassMappedScalarNotNullProperties(EntityProperties);
+                        //(SelectedEntity.CodeElementRef as CodeClass).CollectCodeClassMappedScalarNotNullProperties(EntityProperties);
+                        CodeClass locDbContext = null;
+                        if (SelectedDbContext != null)
+                        {
+                            locDbContext = (SelectedDbContext.CodeElementRef as CodeClass);
+                        }
+                        (SelectedEntity.CodeElementRef as CodeClass).CollectCodeClassAllMappedScalarPropertiesWithDbContext(EntityProperties, null, locDbContext);
                         OnPropertyChanged("EntityProperties");
                     }
                 }
             }
-            if(PrimaryKeyProperties.Count < 1)
+            if (PrimaryKeyProperties.Count < 1)
             {
                 CollectPrimaryKeyProperties();
             }
@@ -239,11 +246,12 @@ namespace CS2WPF.ViewModel
                         {
                             FluentAPIKey primKey = new FluentAPIKey();
                             (SelectedEntity.CodeElementRef as CodeClass).CollectPrimaryKeyPropsHelper(primKey, SelectedDbContext.CodeElementRef as CodeClass);
-                            if ((primKey.KeyProperties != null) && (EntityProperties != null))
+                            if (primKey.KeyProperties != null) //&& (EntityProperties != null))
                             {
                                 int order = 0;
                                 primKey.KeyProperties.ForEach(i => i.PropOrder = order++);
-                                (SelectedEntity.CodeElementRef as CodeClass).CollectCodeClassAllMappedScalarProperties(PrimaryKeyProperties, primKey.KeyProperties);
+                                (SelectedEntity.CodeElementRef as CodeClass).CollectCodeClassAllMappedScalarPropertiesWithDbContext(PrimaryKeyProperties, primKey.KeyProperties, SelectedDbContext.CodeElementRef as CodeClass);
+                                // (SelectedEntity.CodeElementRef as CodeClass).CollectCodeClassAllMappedScalarProperties(PrimaryKeyProperties, primKey.KeyProperties);
                                 //foreach (FluentAPIProperty itm in primKey.KeyProperties)
                                 //{
                                 //    FluentAPIExtendedProperty primKeyProp = EntityProperties.FirstOrDefault(e => e.PropName == itm.PropName);
@@ -301,7 +309,7 @@ namespace CS2WPF.ViewModel
             textTemplatingSessionHost.Session = textTemplatingSessionHost.CreateSession();
             TPCallback tpCallback = new TPCallback();
             List<string> primKeyProperties = new List<string>();
-            foreach(FluentAPIExtendedProperty itm in this.PrimaryKeyProperties)
+            foreach (FluentAPIExtendedProperty itm in this.PrimaryKeyProperties)
             {
                 primKeyProperties.Add(itm.PropName);
             }
@@ -339,7 +347,7 @@ namespace CS2WPF.ViewModel
         }
         public virtual void UiBtnCommandToPrimaryAction(Object param)
         {
-            if((EntityPropertiesIndex > -1) && (EntityPropertiesIndex < EntityProperties.Count))
+            if ((EntityPropertiesIndex > -1) && (EntityPropertiesIndex < EntityProperties.Count))
             {
                 var itm = EntityProperties[EntityPropertiesIndex];
                 if (!PrimaryKeyProperties.Contains(itm))
@@ -361,14 +369,14 @@ namespace CS2WPF.ViewModel
         }
         public bool UiBtnCommandFromPrimaryCanExecute(Object param)
         {
-            return (PrimaryKeyPropertiesIndex > -1) && (PrimaryKeyPropertiesIndex < PrimaryKeyProperties.Count );
+            return (PrimaryKeyPropertiesIndex > -1) && (PrimaryKeyPropertiesIndex < PrimaryKeyProperties.Count);
         }
         public virtual void UiBtnCommandFromPrimaryAction(Object param)
         {
-            if((PrimaryKeyPropertiesIndex > -1) && (PrimaryKeyPropertiesIndex < PrimaryKeyProperties.Count ))
+            if ((PrimaryKeyPropertiesIndex > -1) && (PrimaryKeyPropertiesIndex < PrimaryKeyProperties.Count))
             {
                 PrimaryKeyProperties.RemoveAt(PrimaryKeyPropertiesIndex);
-                if(PrimaryKeyProperties.Count <= PrimaryKeyPropertiesIndex)
+                if (PrimaryKeyProperties.Count <= PrimaryKeyPropertiesIndex)
                 {
                     if (PrimaryKeyPropertiesIndex > -1) PrimaryKeyPropertiesIndex -= 1;
                 }
@@ -411,7 +419,7 @@ namespace CS2WPF.ViewModel
         }
         public virtual void UiBtnCommandUpAction(Object param)
         {
-            if((PrimaryKeyPropertiesIndex > 0) && (PrimaryKeyPropertiesIndex < PrimaryKeyProperties.Count))
+            if ((PrimaryKeyPropertiesIndex > 0) && (PrimaryKeyPropertiesIndex < PrimaryKeyProperties.Count))
             {
                 PrimaryKeyProperties.Move(PrimaryKeyPropertiesIndex, PrimaryKeyPropertiesIndex - 1);
                 //PrimaryKeyPropertiesIndex = PrimaryKeyPropertiesIndex - 1;
@@ -430,11 +438,11 @@ namespace CS2WPF.ViewModel
         }
         public bool UiBtnCommandDownCanExecute(Object param)
         {
-            return (PrimaryKeyPropertiesIndex > -1) && (PrimaryKeyPropertiesIndex < PrimaryKeyProperties.Count-1);
+            return (PrimaryKeyPropertiesIndex > -1) && (PrimaryKeyPropertiesIndex < PrimaryKeyProperties.Count - 1);
         }
         public virtual void UiBtnCommandDownAction(Object param)
         {
-            if((PrimaryKeyPropertiesIndex > -1) && (PrimaryKeyPropertiesIndex < PrimaryKeyProperties.Count - 1))
+            if ((PrimaryKeyPropertiesIndex > -1) && (PrimaryKeyPropertiesIndex < PrimaryKeyProperties.Count - 1))
             {
                 PrimaryKeyProperties.Move(PrimaryKeyPropertiesIndex, PrimaryKeyPropertiesIndex + 1);
                 //PrimaryKeyPropertiesIndex = PrimaryKeyPropertiesIndex + 1;

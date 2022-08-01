@@ -192,12 +192,12 @@ namespace CS2WPF.Helpers
             LocalFunctionStatementSyntax lfss = null;
             foreach (SyntaxNode nd in root.ChildNodes())
             {
-                if (nd.Kind() == SyntaxKind.GlobalStatement)
+                if (nd.IsKind(SyntaxKind.GlobalStatement))
                 {
                     gss = nd as GlobalStatementSyntax;
                     break;
                 }
-                if (nd.Kind() == SyntaxKind.LocalFunctionStatement)
+                if (nd.IsKind(SyntaxKind.LocalFunctionStatement))
                 {
                     lfss = nd as LocalFunctionStatementSyntax;
                     break;
@@ -208,7 +208,7 @@ namespace CS2WPF.Helpers
                 foreach (SyntaxNode nd in gss.ChildNodes())
                 {
                     SyntaxKind k = nd.Kind();
-                    if (nd.Kind() == SyntaxKind.LocalFunctionStatement)
+                    if (nd.IsKind(SyntaxKind.LocalFunctionStatement))
                     {
                         lfss = nd as LocalFunctionStatementSyntax;
                         break;
@@ -249,12 +249,12 @@ namespace CS2WPF.Helpers
             LocalFunctionStatementSyntax lfss = null;
             foreach (SyntaxNode nd in root.ChildNodes())
             {
-                if (nd.Kind() == SyntaxKind.GlobalStatement)
+                if (nd.IsKind(SyntaxKind.GlobalStatement))
                 {
                     gss = nd as GlobalStatementSyntax;
                     break;
                 }
-                if (nd.Kind() == SyntaxKind.LocalFunctionStatement)
+                if (nd.IsKind(SyntaxKind.LocalFunctionStatement))
                 {
                     lfss = nd as LocalFunctionStatementSyntax;
                     break;
@@ -265,7 +265,7 @@ namespace CS2WPF.Helpers
                 foreach (SyntaxNode nd in gss.ChildNodes())
                 {
                     SyntaxKind k = nd.Kind();
-                    if (nd.Kind() == SyntaxKind.LocalFunctionStatement)
+                    if (nd.IsKind(SyntaxKind.LocalFunctionStatement))
                     {
                         lfss = nd as LocalFunctionStatementSyntax;
                         break;
@@ -337,12 +337,12 @@ namespace CS2WPF.Helpers
             TypeOfExpressionSyntax typeOfExpressionSyntax2 = null;
             foreach (SyntaxNode nd in root.ChildNodes())
             {
-                if (nd.Kind() == SyntaxKind.GlobalStatement)
+                if (nd.IsKind(SyntaxKind.GlobalStatement))
                 {
                     gss = nd as GlobalStatementSyntax;
                     break;
                 }
-                if (nd.Kind() == SyntaxKind.TypeOfExpression)
+                if (nd.IsKind(SyntaxKind.TypeOfExpression))
                 {
                     typeOfExpressionSyntax2 = nd as TypeOfExpressionSyntax;
                     break;
@@ -404,12 +404,12 @@ namespace CS2WPF.Helpers
             LocalFunctionStatementSyntax lfss = null;
             foreach (SyntaxNode nd in root.ChildNodes())
             {
-                if (nd.Kind() == SyntaxKind.GlobalStatement)
+                if (nd.IsKind(SyntaxKind.GlobalStatement))
                 {
                     gss = nd as GlobalStatementSyntax;
                     break;
                 }
-                if (nd.Kind() == SyntaxKind.LocalFunctionStatement)
+                if (nd.IsKind(SyntaxKind.LocalFunctionStatement))
                 {
                     lfss = nd as LocalFunctionStatementSyntax;
                     break;
@@ -420,7 +420,7 @@ namespace CS2WPF.Helpers
                 foreach (SyntaxNode nd in gss.ChildNodes())
                 {
                     SyntaxKind k = nd.Kind();
-                    if (nd.Kind() == SyntaxKind.LocalFunctionStatement)
+                    if (nd.IsKind(SyntaxKind.LocalFunctionStatement))
                     {
                         lfss = nd as LocalFunctionStatementSyntax;
                         break;
@@ -470,7 +470,7 @@ namespace CS2WPF.Helpers
 
                 foreach (SyntaxNode syntaxNode in iess.ChildNodes())
                 {
-                    if (syntaxNode.Kind() != SyntaxKind.SimpleMemberAccessExpression) continue;
+                    if (!syntaxNode.IsKind(SyntaxKind.SimpleMemberAccessExpression)) continue;
                     MemberAccessExpressionSyntax memberAccessExpressionSyntax = syntaxNode as MemberAccessExpressionSyntax;
                     if (memberAccessExpressionSyntax == null) continue;
                     ExpressionSyntax expressionSyntax = memberAccessExpressionSyntax.Expression;

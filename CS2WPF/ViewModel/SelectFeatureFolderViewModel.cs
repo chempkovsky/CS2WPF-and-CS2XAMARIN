@@ -206,8 +206,7 @@ namespace CS2WPF.ViewModel
                     locFileName =
                         SelectedFeature.FeatureName + TrimPrefix(Path.GetFileNameWithoutExtension(T4SelectedFolder));
                 }
-                FileName = locFileName;
-                //FileName = GetHyphenedName(locFileName);
+                FileName = GetHyphenedName(locFileName);
             }
             locFileName = null;
             string[] files = Directory.GetFiles(Path.Combine(_T4RootFolder, T4SelectedFolder), "*.html");
@@ -321,16 +320,16 @@ namespace CS2WPF.ViewModel
             dlgContext.DestinationProjectRootFolder = this.DestinationProjectRootFolder;
             dlgContext.DestinationFolder = this.DestinationFolder;
             dlgContext.SerializableDbContext = this.SerializableDbContext;
-/*
-            dlgContext.SerializableModel = this.SelectedModel;
-            dlgContext.ContextItemViewName = this.ContextItemViewName;
-*/
+            /*
+                        dlgContext.SerializableModel = this.SelectedModel;
+                        dlgContext.ContextItemViewName = this.ContextItemViewName;
+            */
             dlgContext.SelectedDbContext = this.SelectedDbContext;
             dlgContext.DestinationProjectName = this.DestinationProjectName;
-/*
-            dlgContext.UIFormProperties = this.UIFormProperties;
-            dlgContext.UIListProperties = this.UIListProperties;
-*/
+            /*
+                        dlgContext.UIFormProperties = this.UIFormProperties;
+                        dlgContext.UIListProperties = this.UIListProperties;
+            */
             dlgContext.DestinationProject = this.DestinationProject;
             dlgContext.DefaultProjectNameSpace = this.DefaultProjectNameSpace;
 

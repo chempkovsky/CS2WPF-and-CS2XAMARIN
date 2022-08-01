@@ -1,27 +1,23 @@
 ﻿using CS2WPF.Helpers.UI;
 using CS2WPF.Model.Serializable;
+using CS2WPF.View;
+using CS2WPF.Model;
+
 using EnvDTE80;
-using Microsoft.VisualStudio.TextTemplating;
 using Microsoft.VisualStudio.TextTemplating.VSHost;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using System.Windows.Input;
-using System.Windows;
-using CS2WPF.View;
-using CS2WPF.Model;
 using Microsoft.VisualStudio.Shell.Interop;
 using EnvDTE;
 using System.Windows.Forms;
 using Newtonsoft.Json;
-//using Microsoft.Build.Tasks;
-using CS2WPF.Helpers;
 using static CS2WPF.Helpers.ContextChangedNotificationService;
+using CS2WPF.Helpers;
 
 namespace CS2WPF.ViewModel
 {
@@ -73,7 +69,8 @@ namespace CS2WPF.ViewModel
                 if (_SelectedModel == null)
                 {
                     CreatedActions = null;
-                } else
+                }
+                else
                 {
                     CreatedActions = _SelectedModel.CommonStaffs;
                 }
@@ -127,14 +124,14 @@ namespace CS2WPF.ViewModel
                 foreach (string f in folders)
                 {
                     string flnm = Path.GetFileName(f);
-                    if (isContextItem )
+                    if (isContextItem)
                     {
                         if (flnm.StartsWith(searchPattern))
                         {
                             T4Folders.Add(flnm);
                         }
-                    } 
-                    else 
+                    }
+                    else
                     {
                         if (!flnm.StartsWith(searchPattern))
                         {
@@ -206,8 +203,7 @@ namespace CS2WPF.ViewModel
                     locFileName =
                         SelectedModel.ViewName + TrimPrefix(Path.GetFileNameWithoutExtension(T4SelectedFolder));
                 }
-                // FileName = GetHyphenedName(locFileName);
-                FileName = locFileName;
+                FileName = GetHyphenedName(locFileName);
             }
             locFileName = null;
             string[] files = Directory.GetFiles(Path.Combine(_T4RootFolder, T4SelectedFolder), "*.html");
@@ -245,8 +241,9 @@ namespace CS2WPF.ViewModel
             int i = srcStr.IndexOf('-');
             if (i > -1)
             {
-                return srcStr.Substring(i+1);
-            } else
+                return srcStr.Substring(i + 1);
+            }
+            else
             {
                 return srcStr;
             }
@@ -277,7 +274,7 @@ namespace CS2WPF.ViewModel
         public string GetHyphenedName(string src)
         {
             string result = "";
-            if(string.IsNullOrEmpty(src))
+            if (string.IsNullOrEmpty(src))
             {
                 return result;
             }
@@ -287,12 +284,13 @@ namespace CS2WPF.ViewModel
                 result =
                     Regex.Replace(src.Substring(0, firstDelim), @"\B[A-Z]", m => "-" + m.ToString().ToLower()).ToLower() +
                     src.Substring(firstDelim);
-            } else
+            }
+            else
             {
                 result =
-                    Regex.Replace(src, @"\B[A-Z]", m => "-" + m.ToString().ToLower()).ToLower() ;
+                    Regex.Replace(src, @"\B[A-Z]", m => "-" + m.ToString().ToLower()).ToLower();
 
-            } 
+            }
             return result;
         }
 
@@ -364,15 +362,15 @@ namespace CS2WPF.ViewModel
             {
                 string jsonString = File.ReadAllText(ofdlg.FileName);
                 DbContextSerializable srcContext = JsonConvert.DeserializeObject<DbContextSerializable>(jsonString);
-                if(srcContext.CommonStaffs != null)
+                if (srcContext.CommonStaffs != null)
                 {
-                    if(SerializableDbContext.CommonStaffs == null)
+                    if (SerializableDbContext.CommonStaffs == null)
                     {
                         SerializableDbContext.CommonStaffs = new List<CommonStaffSerializable>();
                     }
                     foreach (CommonStaffSerializable commonStaffSerializable in srcContext.CommonStaffs)
                     {
-                        if(!SerializableDbContext.CommonStaffs.Any(s=>s.FileType == commonStaffSerializable.FileType))
+                        if (!SerializableDbContext.CommonStaffs.Any(s => s.FileType == commonStaffSerializable.FileType))
                         {
                             SerializableDbContext.CommonStaffs.Add(commonStaffSerializable);
                         }
@@ -399,13 +397,13 @@ namespace CS2WPF.ViewModel
                 {
                     OnContextChanged.DoNotify(this);
                 }
-            } 
-            catch(Exception e)
+            }
+            catch (Exception e)
             {
                 System.Windows.Forms.MessageBox.Show("Error:" + e.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            
+
         }
 
         #endregion

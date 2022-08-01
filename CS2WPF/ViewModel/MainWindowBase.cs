@@ -1,25 +1,19 @@
 ﻿using CS2WPF.Helpers;
 using CS2WPF.Helpers.UI;
-using CS2WPF.Model;
 using CS2WPF.View;
 using EnvDTE;
 using EnvDTE80;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TextTemplating.VSHost;
-using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.IO;
-using System.Runtime.CompilerServices;
 using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace CS2WPF.ViewModel
 {
     #pragma warning disable VSTHRD010
-    public class MainWindowBase: NotifyPropertyChangedViewModel
+    public class MainWindowBase : NotifyPropertyChangedViewModel
     {
         #region Fieds
         protected DTE2 Dte;
@@ -159,7 +153,8 @@ namespace CS2WPF.ViewModel
             if (selItem.Project != null)
             {
                 DestinationProject = selItem.Project;
-            } else
+            }
+            else
             {
                 if (selItem.ProjectItem == null) return;
                 DestinationProject = selItem.ProjectItem.ContainingProject;

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace CS2WPF.Model
 {
-    public class ModelViewEntityProperty: ModelViewKeyProperty
+    public class ModelViewEntityProperty : ModelViewKeyProperty
     {
         protected ObservableCollection<ModelViewAttribute> _Attributes;
         protected ObservableCollection<ModelViewFAPIAttribute> _FAPIAttributes;

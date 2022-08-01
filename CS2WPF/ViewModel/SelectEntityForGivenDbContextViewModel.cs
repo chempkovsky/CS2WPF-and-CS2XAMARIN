@@ -15,7 +15,7 @@ using System.Windows.Input;
 
 namespace CS2WPF.ViewModel
 {
-    #pragma warning disable VSTHRD010
+#pragma warning disable VSTHRD010
     public class SelectEntityForGivenDbContextViewModel : BaseSelectSourceViewModel
     {
         protected SolutionCodeElement _SelectedDbContext = null;
@@ -35,16 +35,16 @@ namespace CS2WPF.ViewModel
         public Visibility UiCommandButtonVisibility { get; set; } = Visibility.Visible;
 
         public ButtonClickedNotificationService UiCommandButtonClicked;
-        public SolutionCodeElement SelectedDbContext 
+        public SolutionCodeElement SelectedDbContext
         {
             get { return _SelectedDbContext; }
-            set 
+            set
             {
                 if (_SelectedDbContext == value) return;
                 _SelectedDbContext = value;
                 DoAnalize();
-                
-            } 
+
+            }
         }
 
         public void DefineUiCaptions()
@@ -69,7 +69,7 @@ namespace CS2WPF.ViewModel
         {
             if (HasPrimKey)
             {
-                UiCommandCaption1 = "A Prim.Key was found for the selected Entity. Detection type [" + primKey.KeySourceDisplay + "]" ;
+                UiCommandCaption1 = "A Prim.Key was found for the selected Entity. Detection type [" + primKey.KeySourceDisplay + "]";
                 UiCommandCaption2 = "Key Fileds [";
                 foreach (FluentAPIProperty pp in primKey.KeyProperties)
                 {
@@ -79,12 +79,13 @@ namespace CS2WPF.ViewModel
                 if (primKey.SourceCount > 1)
                 {
                     UiCommandCaption3 = "The setting had met more than once: " + primKey.SourceCount.ToString() + " !!!!";
-                } else
+                }
+                else
                 {
                     UiCommandCaption3 = null;
                 }
                 UiCommandCaption2BackGround = 10 + (int)primKey.KeySource;
-            } 
+            }
             else
             {
                 UiCommandCaption2BackGround = 9;
@@ -92,7 +93,7 @@ namespace CS2WPF.ViewModel
                 UiCommandCaption2 = "It is recommended to make the primary key settings in OnModelCreating(...)-method";
                 UiCommandCaption3 = null;
             }
-            
+
             UiCommandLabelCaption = " Add/Modify Primaky Key setting in OnModelCreating(...)-method ";
             UiCommandButtonCaption = "  Modify  ";
             UiCommandProppertyNameVisibility = Visibility.Collapsed;
@@ -245,18 +246,19 @@ namespace CS2WPF.ViewModel
                     {
                         if (SelectedCodeElement.CodeElementRef != null)
                         {
-                            SelectedProppertyName = 
+                            SelectedProppertyName =
                                 (SelectedDbContext.CodeElementRef as CodeClass).GetDbContextDbSetPropertyNameHelper(SelectedCodeElement.CodeElementName, SelectedCodeElement.CodeElementFullName);
                             if (string.IsNullOrEmpty(SelectedProppertyName))
                             {
-                                if(_ActionUserControl == null)
+                                if (_ActionUserControl == null)
                                 {
                                     _ActionUserControl = new UserControlOneCommand(this);
                                 }
                                 UiCommandProppertyName = SelectedCodeElement.CodeElementName + UiCommandProppertySufix;
                                 DefineUiCaptions();
                                 ActionUserControl = _ActionUserControl;
-                            } else
+                            }
+                            else
                             {
                                 // Primary key analize here
                                 FluentAPIKey primKey = new FluentAPIKey();
@@ -265,7 +267,7 @@ namespace CS2WPF.ViewModel
                                 {
                                     HasPrimKey = primKey.KeyProperties.Count > 0;
                                 }
-                                if(_PrimKeyUserControl == null)
+                                if (_PrimKeyUserControl == null)
                                 {
                                     _PrimKeyUserControl = new UserControlOneCommand(this);
                                 }
@@ -277,16 +279,16 @@ namespace CS2WPF.ViewModel
                 }
             }
 
-            
+
             OnPropertyChanged("ActionUserControl");
             OnPropertyChanged("SelectedProppertyName");
 
             CheckIsReady();
         }
-        
+
         public override void CheckIsReady()
         {
-            IsReady.DoNotify(this, !( (!HasPrimKey) ||string.IsNullOrEmpty(SelectedClassName) || (SelectedCodeElement == null) || string.IsNullOrEmpty(SelectedProppertyNameCaption)));
+            IsReady.DoNotify(this, !((!HasPrimKey) || string.IsNullOrEmpty(SelectedClassName) || (SelectedCodeElement == null) || string.IsNullOrEmpty(SelectedProppertyNameCaption)));
         }
         #endregion
 

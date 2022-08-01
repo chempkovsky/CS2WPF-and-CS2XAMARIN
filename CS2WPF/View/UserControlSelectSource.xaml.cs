@@ -17,6 +17,5 @@ namespace CS2WPF.View
         {
             this.DataContext = dataContext;
         }
-
     }
 }

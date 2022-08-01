@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace CS2WPF.Model.Serializable
 {
     [Serializable]
-    public class ModelViewUIListPropertySerializable: ModelViewUIPropertySerializable
+    public class ModelViewUIListPropertySerializable : ModelViewUIPropertySerializable
     {
     }
 }

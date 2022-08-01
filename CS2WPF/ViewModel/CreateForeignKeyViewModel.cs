@@ -19,7 +19,7 @@ using System.Windows.Input;
 
 namespace CS2WPF.ViewModel
 {
-    #pragma warning disable VSTHRD010
+#pragma warning disable VSTHRD010
     public class CreateForeignKeyViewModel : IsReadyViewModel
     {
         #region Fields
@@ -45,6 +45,9 @@ namespace CS2WPF.ViewModel
         protected bool _RefreshCanExecute = false;
         protected string _ErrorsText = null;
         protected bool _IsCascadeOnDelete = false;
+        protected int _PrimAndUniqueIndex = -1;
+        protected CodeClass _MasterCodeClass = null;
+        protected string _SelectedOnDeleteAction = "DeleteBehavior.NoAction";
         #endregion
 
         public CreateForeignKeyViewModel(DTE2 dte, ITextTemplating textTemplating) : base()
@@ -58,6 +61,7 @@ namespace CS2WPF.ViewModel
             PrimaryKeyProperties = new ObservableCollection<FluentAPIExtendedProperty>();
             PrincipalNonScalarProperties = new ObservableCollection<FluentAPINavigationProperty>();
             ForeignKeyTypes = new ObservableCollection<NavigationTypeEnum>();
+            PrimAndUniqueKeys = new ObservableCollection<FluentAPIKey>();
             TemplateExtention = "*.t4";
             InvitationCaption = "Create(Modify) Foreign key settings for:";
         }
@@ -114,6 +118,42 @@ namespace CS2WPF.ViewModel
         public ObservableCollection<FluentAPIExtendedProperty> ForeignKeyProperties { get; set; }
         public ObservableCollection<FluentAPIExtendedProperty> PrimaryKeyProperties { get; set; }
         public ObservableCollection<NavigationTypeEnum> ForeignKeyTypes { get; set; }
+        public ObservableCollection<FluentAPIKey> PrimAndUniqueKeys { get; set; }
+        public List<string> OnDeleteActions { get; set; } = new List<string>()
+        {
+            "DeleteBehavior.ClientSetNull",
+            "DeleteBehavior.Restrict",
+            "DeleteBehavior.SetNull",
+            "DeleteBehavior.Cascade",
+            "DeleteBehavior.ClientCascade",
+            "DeleteBehavior.NoAction",
+            "DeleteBehavior.ClientNoAction"
+        };
+        public string SelectedOnDeleteAction
+        {
+            get { return _SelectedOnDeleteAction; }
+            set
+            {
+                if (_SelectedOnDeleteAction != value)
+                {
+                    _SelectedOnDeleteAction = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        public int PrimAndUniqueKeysIndex
+        {
+            get { return _PrimAndUniqueIndex; }
+            set
+            {
+                if (_PrimAndUniqueIndex != value)
+                {
+                    _PrimAndUniqueIndex = value;
+                    OnPropertyChanged();
+                    OnPrimUniqueKeysIndexChanged();
+                }
+            }
+        }
         public ObservableCollection<string> Templates { get; set; }
         public bool IsCascadeOnDelete
         {
@@ -318,7 +358,6 @@ namespace CS2WPF.ViewModel
         public void DoAnalise(string navigationName = null)
         {
             OnForeignKeyTypesIndexChanged();
-
             if (EntityNonScalarProperties.Count < 1)
             {
                 CollectEntityNonScalarProperties();
@@ -331,7 +370,7 @@ namespace CS2WPF.ViewModel
             if (EntityNonScalarProperties == null) return;
             if (EntityNonScalarProperties == null) return;
             int i = EntityNonScalarProperties.IndexOf(navigationName);
-            if(i >-1)
+            if (i > -1)
             {
                 int oldval = EntityNonScalarPropertiesIndex;
                 EntityNonScalarPropertiesIndex = i;
@@ -348,11 +387,16 @@ namespace CS2WPF.ViewModel
         }
         public void OnSelectedEntityChanged()
         {
+            PrimAndUniqueKeysIndex = -1;
             ForeignKeyPropertiesIndex = -1;
             EntityPropertiesIndex = -1;
+            EntityNonScalarPropertiesIndex = -1;
             EntityProperties.Clear();
             ForeignKeyProperties.Clear();
+            PrimAndUniqueKeys.Clear();
+            EntityNonScalarProperties.Clear();
         }
+        // ready
         public void OnSelectedTemplateChanged()
         {
             T4TempateText = "";
@@ -360,6 +404,7 @@ namespace CS2WPF.ViewModel
             string tempatePath = Path.Combine(currentTempateFolder, SelectedTemplate);
             T4TempateText = File.ReadAllText(tempatePath);
         }
+        // ready
         public void CollectEntityScalarProperties()
         {
             ForeignKeyProperties.Clear();
@@ -368,23 +413,33 @@ namespace CS2WPF.ViewModel
             EntityPropertiesIndex = -1;
             if (SelectedEntity == null) return;
             if (SelectedEntity.CodeElementRef == null) return;
-            (SelectedEntity.CodeElementRef as CodeClass).
-                CollectCodeClassAllMappedScalarProperties(EntityProperties);
+            CodeClass dbContext = null;
+            if (SelectedDbContext != null)
+            {
+                dbContext = SelectedDbContext.CodeElementRef as CodeClass;
+            }
+            (SelectedEntity.CodeElementRef as CodeClass).CollectCodeClassAllMappedScalarPropertiesWithDbContext(EntityProperties, null, dbContext);
         }
+        // ready
         public void CollectEntityNonScalarProperties()
         {
-            EntityNonScalarProperties.Clear();
             EntityNonScalarPropertiesIndex = -1;
+            EntityNonScalarProperties.Clear();
             if (SelectedEntity == null) return;
             if (SelectedEntity.CodeElementRef == null) return;
+            CodeClass dbContext = null;
+            if (SelectedDbContext != null)
+            {
+                dbContext = SelectedDbContext.CodeElementRef as CodeClass;
+            }
             List<string> properties = new List<string>();
             (SelectedEntity.CodeElementRef as CodeClass).
-                CollectCodeClassAllMappedNonScalarProperties(properties);
+                CollectCodeClassAllMappedNonScalarPropertiesWithDbContext(properties, dbContext);
             properties.ForEach(s => EntityNonScalarProperties.Add(s));
         }
         public void OnSelectedForeignKeyChanged()
         {
-            if(SelectedForeignKey == null)
+            if (SelectedForeignKey == null)
             {
                 EntityNonScalarPropertiesIndex = -1;
                 return;
@@ -393,55 +448,65 @@ namespace CS2WPF.ViewModel
             {
                 int oldVal = EntityNonScalarPropertiesIndex;
                 EntityNonScalarPropertiesIndex = EntityNonScalarProperties.IndexOf(SelectedForeignKey.NavigationName);
-                if ((EntityNonScalarPropertiesIndex == oldVal) && (EntityNonScalarPropertiesIndex > -1))
-                {
-                    OnEntityNonScalarPropertiesIndexChanged();
-                }
+                // if ((EntityNonScalarPropertiesIndex == oldVal) && (EntityNonScalarPropertiesIndex > -1))
+                // {
+                OnEntityNonScalarPropertiesIndexChanged();
+                // }
             }
         }
         public void OnEntityNonScalarPropertiesIndexChanged()
         {
             _RefreshCanExecute = false;
+            _MasterCodeClass = null;
             masterCodeClassFullName = "";
             PrimaryKeyProperties.Clear();
-            PrincipalNonScalarProperties.Clear();
             PrincipalNonScalarPropertiesIndex = -1;
+            PrincipalNonScalarProperties.Clear();
+            PrimAndUniqueKeysIndex = -1;
+            PrimAndUniqueKeys.Clear();
 
-
+            _RefreshCanExecute = true;
             if (EntityNonScalarPropertiesIndex < 0) return;
             if (EntityNonScalarProperties.Count <= EntityNonScalarPropertiesIndex) return;
             string navigationName = EntityNonScalarProperties[EntityNonScalarPropertiesIndex];
-            _RefreshCanExecute = true;
+
 
             if (SelectedEntity == null) return;
-            if (SelectedEntity.CodeElementRef == null) return;
             CodeClass currentCodeClass = (SelectedEntity.CodeElementRef as CodeClass);
-            CodeProperty codeProperty = currentCodeClass.GetPublicMappedNonScalarPropertyByName(navigationName);
-            if(codeProperty == null) return;
-            CodeClass masterCodeClass = codeProperty.Type.CodeType as CodeClass;
-            if (masterCodeClass == null) return;
-            masterCodeClassFullName = masterCodeClass.Name;
-
+            if (currentCodeClass == null) return;
             CodeClass dbContext = null;
-            if(SelectedDbContext != null)
+            if (SelectedDbContext != null)
             {
-                if(SelectedDbContext.CodeElementRef != null)
-                {
-                    dbContext = SelectedDbContext.CodeElementRef as CodeClass;
-                }
+                dbContext = SelectedDbContext.CodeElementRef as CodeClass;
             }
+            CodeProperty codeProperty = currentCodeClass.GetPublicMappedNonScalarPropertyByNameWithDbContext(navigationName, dbContext);
+            if (codeProperty == null) return;
+            if (codeProperty.Type != null)
+            {
+                _MasterCodeClass = codeProperty.Type.CodeType as CodeClass;
+            }
+            if (_MasterCodeClass == null) return;
+            masterCodeClassFullName = _MasterCodeClass.Name;
+
+
+
+
+
+            _MasterCodeClass.CollectAllUniqueKeysHelper(PrimAndUniqueKeys, dbContext);
             FluentAPIKey primKey = new FluentAPIKey();
-            masterCodeClass.CollectPrimaryKeyPropsHelper(primKey, dbContext);
-            if(primKey.KeyProperties!=null)
+            _MasterCodeClass.CollectPrimaryKeyPropsHelper(primKey, dbContext);
+            if (primKey.KeyProperties != null)
             {
                 int order = 0;
                 primKey.KeyProperties.ForEach(i => i.PropOrder = order++);
-                masterCodeClass.CollectCodeClassAllMappedScalarProperties(PrimaryKeyProperties, primKey.KeyProperties);
+                PrimAndUniqueKeys.Add(primKey);
             }
+
+
             List<CodeProperty> masterNavigations =
-                masterCodeClass.GetPublicMappedNonScalarPropertiesByTypeFullName(currentCodeClass.FullName);
+                _MasterCodeClass.GetPublicMappedNonScalarPropertiesByTypeFullNameWithDbContext(currentCodeClass.FullName, dbContext);
             if (masterNavigations == null) return;
-            foreach(CodeProperty masterNavigation in masterNavigations)
+            foreach (CodeProperty masterNavigation in masterNavigations)
             {
                 PrincipalNonScalarProperties.Add(new FluentAPINavigationProperty()
                 {
@@ -495,10 +560,11 @@ namespace CS2WPF.ViewModel
                 Templates.Clear();
                 return;
             }
-            switch (ForeignKeyTypes[ForeignKeyTypesIndex]) {
+            switch (ForeignKeyTypes[ForeignKeyTypesIndex])
+            {
                 case NavigationTypeEnum.OneToMany:
                 case NavigationTypeEnum.OptionalToMany:
-                    currentTempateFolder = TemplateOneToCollectionFolder; 
+                    currentTempateFolder = TemplateOneToCollectionFolder;
                     break;
                 case NavigationTypeEnum.OneToOne:
                 case NavigationTypeEnum.OptionalToOne:
@@ -533,8 +599,11 @@ namespace CS2WPF.ViewModel
             {
                 return null;
             }
-            
 
+            if (SelectedEntity == null) return null;
+            CodeClass currentCodeClass = (SelectedEntity.CodeElementRef as CodeClass);
+            if (currentCodeClass == null) return null;
+            string detailCodeClassFullName = currentCodeClass.Name;
 
             ITextTemplatingSessionHost textTemplatingSessionHost = (ITextTemplatingSessionHost)textTemplating;
             textTemplatingSessionHost.Session = textTemplatingSessionHost.CreateSession();
@@ -544,17 +613,25 @@ namespace CS2WPF.ViewModel
             {
                 foreignKeyProperties.Add(itm.PropName);
             }
+            List<string> masterKeyProperties = new List<string>();
+            foreach (FluentAPIExtendedProperty itm in this.PrimaryKeyProperties)
+            {
+                masterKeyProperties.Add(itm.PropName);
+            }
             string tempatePath = ""; //Path.Combine(TemplateFolder, SelectedTemplate);
 
+            textTemplatingSessionHost.Session["DetailClassFullName"] = detailCodeClassFullName;
             textTemplatingSessionHost.Session["MasterClassFullName"] = masterCodeClassFullName;
-            textTemplatingSessionHost.Session["IsRequired"] = (ForeignKeyTypes[ForeignKeyTypesIndex] == NavigationTypeEnum.OneToMany) || 
-                                                              (ForeignKeyTypes[ForeignKeyTypesIndex] == NavigationTypeEnum.OneToOne) ;
-            textTemplatingSessionHost.Session["WillCascadeOnDelete"] = IsCascadeOnDelete;
+            textTemplatingSessionHost.Session["IsRequired"] = (ForeignKeyTypes[ForeignKeyTypesIndex] == NavigationTypeEnum.OneToMany) ||
+                                                              (ForeignKeyTypes[ForeignKeyTypesIndex] == NavigationTypeEnum.OneToOne);
+            textTemplatingSessionHost.Session["WillCascadeOnDelete"] = SelectedOnDeleteAction == "DeleteBehavior.Cascade";
             textTemplatingSessionHost.Session["NavigationName"] = EntityNonScalarProperties[EntityNonScalarPropertiesIndex];
             textTemplatingSessionHost.Session["InverseNavigationName"] = PrincipalNonScalarProperties[PrincipalNonScalarPropertiesIndex].PropName;
             textTemplatingSessionHost.Session["ForeignKeyProperties"] = foreignKeyProperties;
+            textTemplatingSessionHost.Session["MasterKeyProperties"] = masterKeyProperties;
+            textTemplatingSessionHost.Session["DeleteBehavior"] = SelectedOnDeleteAction;
 
-            
+
             string result = textTemplating.ProcessTemplate(tempatePath, T4TempateText, tpCallback);
             if (tpCallback.ProcessingErrors != null)
             {
@@ -581,41 +658,42 @@ namespace CS2WPF.ViewModel
             CodeClass dbContext = null;
             if (SelectedDbContext != null)
             {
-                if (SelectedDbContext.CodeElementRef != null)
-                {
-                    dbContext = SelectedDbContext.CodeElementRef as CodeClass;
-                }
+                dbContext = SelectedDbContext.CodeElementRef as CodeClass;
             }
-            List<FluentAPIForeignKey> frnKeys = 
-                (SelectedEntity.CodeElementRef as CodeClass).CollectForeignKeys(dbContext, new List<string> { navigationName });
+            List<FluentAPIForeignKey> frnKeys =
+                (SelectedEntity.CodeElementRef as CodeClass).CollectForeignKeys(dbContext, new List<string> { navigationName }, true);
             if (frnKeys == null)
             {
                 ErrorsText = "No Fk detected";
                 return;
             }
-            if (frnKeys.Count < 1) {
+            if (frnKeys.Count < 1)
+            {
                 ErrorsText = "No Fk detected";
                 return;
             }
             string className = (SelectedEntity.CodeElementRef as CodeClass).Name;
-            if(frnKeys[0].HasErrors)
+            if (frnKeys[0].HasErrors)
             {
                 ErrorsText = frnKeys[0].ErrorsText;
-            } else
+            }
+            else
             {
                 ErrorsText = null;
             }
             IsCascadeOnDelete = frnKeys[0].IsCascadeDelete;
+            SelectedOnDeleteAction = frnKeys[0].DeleteBehavior;
             if (frnKeys[0].EntityName == className)
             {
                 string navName = frnKeys[0].InverseNavigationName;
-                if(PrincipalNonScalarProperties!=null)
+                if (PrincipalNonScalarProperties != null)
                 {
                     FluentAPINavigationProperty np = PrincipalNonScalarProperties.FirstOrDefault(p => p.PropName == navName);
-                    if(np !=null)
+                    if (np != null)
                     {
                         PrincipalNonScalarPropertiesIndex = PrincipalNonScalarProperties.IndexOf(np);
-                    } else
+                    }
+                    else
                     {
                         PrincipalNonScalarPropertiesIndex = -1;
                     }
@@ -624,18 +702,28 @@ namespace CS2WPF.ViewModel
                 ForeignKeyProperties.Clear();
                 if ((frnKeys[0].ForeignKeyProps != null) && (EntityProperties != null))
                 {
-                    foreach(FluentAPIProperty itm in frnKeys[0].ForeignKeyProps)
+                    foreach (FluentAPIProperty itm in frnKeys[0].ForeignKeyProps)
                     {
                         FluentAPIExtendedProperty currItm =
                         EntityProperties.FirstOrDefault(i => i.PropName == itm.PropName);
-                        if(currItm != null)
+                        if (currItm != null)
                         {
                             ForeignKeyProperties.Add(currItm);
                         }
                     }
                 }
                 ForeignKeyTypesIndex = ForeignKeyTypes.IndexOf(frnKeys[0].NavigationType);
-            } 
+
+                // detect PrimAndUniqueKeysIndex
+                if (frnKeys[0].PrincipalKeyProps == null)
+                {
+                    PrimAndUniqueKeysIndex = PrimAndUniqueKeys.IndexOf(PrimAndUniqueKeys.FirstOrDefault(p => p.IsPrimary));
+                }
+                else
+                {
+                    PrimAndUniqueKeysIndex = PrimAndUniqueKeys.IndexOf(PrimAndUniqueKeys.GetFluentAPIKeyWithIdenticalListOfNames(frnKeys[0].PrincipalKeyProps));
+                }
+            }
             else
             {
                 PrincipalNonScalarPropertiesIndex = -1;
@@ -790,7 +878,7 @@ namespace CS2WPF.ViewModel
         }
         public bool UiBtnCommandCreateCanExecute(Object param)
         {
-            return  (ForeignKeyProperties.Count > 0) &&
+            return (ForeignKeyProperties.Count > 0) &&
                     (PrimaryKeyProperties.Count == ForeignKeyProperties.Count) &&
                     (!string.IsNullOrEmpty(SelectedTemplate)) &&
                     (PrincipalNonScalarPropertiesIndex > -1) &&
@@ -822,6 +910,26 @@ namespace CS2WPF.ViewModel
             }
         }
         #endregion
+
+        //
+        // EntityNonScalarPropertiesIndex
+        //
+        protected void OnPrimUniqueKeysIndexChanged()
+        {
+            PrimaryKeyProperties.Clear();
+            if ((PrimAndUniqueKeysIndex < 0) || (PrimAndUniqueKeys == null) || (PrincipalNonScalarProperties == null) || (PrincipalNonScalarPropertiesIndex < 0))
+            {
+                return;
+            }
+            if ((PrimAndUniqueKeys.Count <= PrimAndUniqueKeysIndex) || (PrincipalNonScalarProperties.Count <= PrincipalNonScalarPropertiesIndex)) return;
+            if (_MasterCodeClass == null) return;
+            CodeClass dbContext = null;
+            if (SelectedDbContext != null)
+            {
+                dbContext = SelectedDbContext.CodeElementRef as CodeClass;
+            }
+            _MasterCodeClass.CollectCodeClassAllMappedScalarPropertiesWithDbContext(PrimaryKeyProperties, PrimAndUniqueKeys[PrimAndUniqueKeysIndex].KeyProperties, dbContext);
+        }
 
     }
 }

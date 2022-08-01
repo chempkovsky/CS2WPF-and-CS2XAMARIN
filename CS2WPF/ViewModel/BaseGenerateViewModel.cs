@@ -69,9 +69,9 @@ namespace CS2WPF.ViewModel
         public ModelViewSerializable GeneratedModelView { get; set; } = null;
         public FeatureSerializable GeneratedFeature { get; set; } = null;
 
-        public BaseGenerateViewModel(): base()
+        public BaseGenerateViewModel() : base()
         {
-            
+
         }
 
     }

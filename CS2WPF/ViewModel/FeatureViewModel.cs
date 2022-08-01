@@ -17,7 +17,7 @@ using CS2WPF.Helpers;
 
 namespace CS2WPF.ViewModel
 {
-    #pragma warning disable VSTHRD010
+#pragma warning disable VSTHRD010
     public class FeatureViewModel : IsReadyViewModel
     {
 
@@ -31,6 +31,78 @@ namespace CS2WPF.ViewModel
 
         public ObservableCollection<FeatureSerializable> Features { get; set; }
         public ObservableCollection<FeatureItemSerializable> FeatureItemsList { get; set; } = new ObservableCollection<FeatureItemSerializable>();
+
+        FeatureItemSerializable _SelectedFeatureItem;
+        public FeatureItemSerializable SelectedFeatureItem
+        {
+            get { return _SelectedFeatureItem; }
+            set
+            {
+                if (_SelectedFeatureItem != value)
+                {
+                    _SelectedFeatureItem = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #region UiBtnCommandAdd
+        private ICommand _UiBtnCommandUp;
+        public ICommand UiBtnCommandUp
+        {
+            get
+            {
+                return _UiBtnCommandUp ?? (_UiBtnCommandUp = new CommandHandler((param) => UiBtnCommandUpAction(param), (param) => UiBtnCommandUpCanExecute(param)));
+            }
+        }
+        public bool UiBtnCommandUpCanExecute(Object param)
+        {
+            return true;
+
+        }
+        public virtual void UiBtnCommandUpAction(Object param)
+        {
+            if ((SelectedFeatureItem == null) || (_SelectedFeature == null)) return;
+            if (_SelectedFeature.FeatureItems == null) return;
+            int indx = _SelectedFeature.FeatureItems.IndexOf(SelectedFeatureItem);
+            if (indx < 1) return;
+            FeatureItemSerializable fi = _SelectedFeature.FeatureItems[indx - 1];
+            _SelectedFeature.FeatureItems[indx - 1] = _SelectedFeature.FeatureItems[indx];
+            _SelectedFeature.FeatureItems[indx] = fi;
+            FeatureItemsList.Move(indx, indx - 1);
+        }
+        #endregion
+
+        #region UiBtnCommandDown
+        private ICommand _UiBtnCommandDown;
+        public ICommand UiBtnCommandDown
+        {
+            get
+            {
+                return _UiBtnCommandDown ?? (_UiBtnCommandDown = new CommandHandler((param) => UiBtnCommandDownAction(param), (param) => UiBtnCommandDownCanExecute(param)));
+            }
+        }
+        public bool UiBtnCommandDownCanExecute(Object param)
+        {
+            return true;
+
+        }
+        public virtual void UiBtnCommandDownAction(Object param)
+        {
+            if ((SelectedFeatureItem == null) || (_SelectedFeature == null)) return;
+            if (_SelectedFeature.FeatureItems == null) return;
+            int indx = _SelectedFeature.FeatureItems.IndexOf(SelectedFeatureItem);
+            if ((indx < 0) || (indx >= _SelectedFeature.FeatureItems.Count - 1)) return;
+            FeatureItemSerializable fi = _SelectedFeature.FeatureItems[indx + 1];
+            _SelectedFeature.FeatureItems[indx + 1] = _SelectedFeature.FeatureItems[indx];
+            _SelectedFeature.FeatureItems[indx] = fi;
+            FeatureItemsList.Move(indx, indx + 1);
+        }
+        #endregion
+
+
+
+
+
         FeatureSerializable _SelectedFeature;
         public FeatureSerializable SelectedFeature
         {
@@ -40,11 +112,25 @@ namespace CS2WPF.ViewModel
             }
             set
             {
-                if(_SelectedFeature != value)
+                if (_SelectedFeature != value)
                 {
                     _SelectedFeature = value;
                     OnPropertyChanged();
                     OnSelectedFeaturePropertyChanged();
+                    bool sfi = true;
+                    if (_SelectedFeature != null)
+                    {
+                        if (_SelectedFeature.FeatureItems != null)
+                        {
+                            if (_SelectedFeature.FeatureItems.Count > 0)
+                            {
+                                SelectedFeatureItem = _SelectedFeature.FeatureItems[0];
+                                sfi = false;
+                            }
+                        }
+                    }
+                    if (sfi) SelectedFeatureItem = null;
+
                 }
             }
         }
@@ -73,7 +159,7 @@ namespace CS2WPF.ViewModel
             }
             set
             {
-                if(_DbContext != value)
+                if (_DbContext != value)
                 {
                     _DbContext = value;
                     OnPropertyChanged();
@@ -103,7 +189,7 @@ namespace CS2WPF.ViewModel
             FeatureItemsList.Clear();
             if (SelectedFeature == null) return;
             if (SelectedFeature.FeatureItems == null) return;
-            foreach(FeatureItemSerializable fi in SelectedFeature.FeatureItems)
+            foreach (FeatureItemSerializable fi in SelectedFeature.FeatureItems)
             {
                 FeatureItemsList.Add(fi);
             }
@@ -116,7 +202,7 @@ namespace CS2WPF.ViewModel
             Features.Clear();
             if (FeatureContext == null) return;
             if (FeatureContext.Features == null) return;
-            foreach(FeatureSerializable fi in FeatureContext.Features)
+            foreach (FeatureSerializable fi in FeatureContext.Features)
             {
                 Features.Add(fi);
             }
@@ -147,9 +233,10 @@ namespace CS2WPF.ViewModel
             };
             WindowModifyFeature dlg = new WindowModifyFeature(this.ModifyFeatureVM);
             Nullable<bool> dialogResult = dlg.ShowDialog();
-            if(dialogResult.HasValue)
+            if (dialogResult.HasValue)
             {
-                if (dialogResult.Value) {
+                if (dialogResult.Value)
+                {
                     if (FeatureContext == null) FeatureContext = new FeatureContextSerializable();
                     if (FeatureContext.Features == null) FeatureContext.Features = new List<FeatureSerializable>();
                     FeatureContext.Features.Add(this.ModifyFeatureVM.Feature);
@@ -171,7 +258,7 @@ namespace CS2WPF.ViewModel
         }
         public bool UiBtnCommandUpdateCanExecute(Object param)
         {
-            return (DbContext != null) && (AllowedFileTypes != null) && (SelectedFeature != null); 
+            return (DbContext != null) && (AllowedFileTypes != null) && (SelectedFeature != null);
 
         }
         public virtual void UiBtnCommandUpdateAction(Object param)
@@ -209,24 +296,24 @@ namespace CS2WPF.ViewModel
         }
         public virtual void UiBtnCommandDeleteAction(Object param)
         {
-            if(MessageBox.Show("Do you want to delete selected Feature?", "Delete Item", MessageBoxButtons.YesNo) == DialogResult.Yes)
+            if (MessageBox.Show("Do you want to delete selected Feature?", "Delete Item", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
                 if (SelectedFeature == null) return;
                 if (FeatureContext != null)
                 {
-                    if(FeatureContext.Features != null)
+                    if (FeatureContext.Features != null)
                     {
                         int ind = FeatureContext.Features.FindIndex(i => i == SelectedFeature);
-                        if(ind > -1)
+                        if (ind > -1)
                         {
                             FeatureContext.Features.RemoveAt(ind);
                         }
                     }
                 }
-                if(Features != null)
+                if (Features != null)
                 {
                     int ind = Features.IndexOf(SelectedFeature);
-                    if(ind > -1)
+                    if (ind > -1)
                     {
                         Features.RemoveAt(ind);
                     }
@@ -248,7 +335,7 @@ namespace CS2WPF.ViewModel
             }
             set
             {
-                if(_SelectedDbContext != value)
+                if (_SelectedDbContext != value)
                 {
                     _SelectedDbContext = value;
                     OnSelectedDbContextChanged();
@@ -258,7 +345,7 @@ namespace CS2WPF.ViewModel
         public void OnSelectedDbContextChanged()
         {
             Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
-            if(SelectedDbContext == null)
+            if (SelectedDbContext == null)
             {
                 DbContext = null;
                 OnSelectedFeatureContext();
@@ -289,7 +376,8 @@ namespace CS2WPF.ViewModel
                     DbContext = new DbContextSerializable();
                     OnSelectedFeatureContext();
                 }
-            } else
+            }
+            else
             {
                 DbContext = null;
                 OnSelectedFeatureContext();
@@ -298,7 +386,7 @@ namespace CS2WPF.ViewModel
         public void OnSelectedFeatureContext()
         {
             Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
-            if(DbContext == null)
+            if (DbContext == null)
             {
                 FeatureContext = null;
             }
@@ -354,7 +442,7 @@ namespace CS2WPF.ViewModel
             }
             set
             {
-                if(_AllowedFileTypesFolder != value)
+                if (_AllowedFileTypesFolder != value)
                 {
                     _AllowedFileTypesFolder = value;
                     OnAllowedFileTypesFolder();
@@ -365,7 +453,7 @@ namespace CS2WPF.ViewModel
         {
             if (AllowedFileTypes != null) AllowedFileTypes = null;
             if (string.IsNullOrEmpty(AllowedFileTypesFolder)) AllowedFileTypesFolder = "";
-            
+
             string locFileName = Path.Combine(AllowedFileTypesFolder, AllowedFileTypesFileName);
             if (File.Exists(locFileName))
             {

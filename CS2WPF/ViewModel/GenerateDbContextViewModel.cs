@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace CS2WPF.ViewModel
 {
+#pragma warning disable VSTHRD010
     public class GenerateDbContextViewModel : BaseGenerateViewModel
     {
         public GenerateDbContextViewModel() : base()

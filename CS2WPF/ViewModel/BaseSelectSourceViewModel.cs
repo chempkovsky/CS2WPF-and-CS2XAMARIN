@@ -10,6 +10,7 @@ using System.Windows.Controls;
 
 namespace CS2WPF.ViewModel
 {
+#pragma warning disable VSTHRD010
     public class BaseSelectSourceViewModel : IsReadyViewModel
     {
 
@@ -147,7 +148,7 @@ namespace CS2WPF.ViewModel
         }
         #endregion
 
-        public BaseSelectSourceViewModel(DTE2 dte): base()
+        public BaseSelectSourceViewModel(DTE2 dte) : base()
         {
             ComboItemsSourceProjects = new List<SolutionProject>();
             Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();

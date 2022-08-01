@@ -3,10 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:CS2WPF.View"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisConverter" />
     </UserControl.Resources>
@@ -25,7 +23,7 @@
         <TextBlock Margin="10 0 0 0" Grid.Row="0" Grid.Column="0" Text="{Binding SelectForeignCaption}" FontWeight="Bold" FontSize="18" />
         <TextBlock Margin="20 0 0 0" Grid.Row="1" Grid.Column="0" Text="{Binding SelectedEntityCaption}" FontWeight="Bold" FontSize="14" />
         <ListView Grid.Row="2" Grid.Column="0" Margin="5" MinHeight="300"  ItemsSource="{Binding ForeignKeys}" SelectedItem="{Binding SelectedForeignKey}">
-            
+
             <ListView.Resources>
                 <Style TargetType="{x:Type ListView}">
                     <Setter Property="ItemContainerStyle">
@@ -37,13 +35,13 @@
                     </Setter>
                 </Style>
             </ListView.Resources>
-            
+
             <ListView.View>
                 <GridView>
                     <GridViewColumn  Header="Reference navigation" >
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <StackPanel Orientation="Vertical">
+                                <StackPanel Orientation="Vertical" MinWidth="200">
                                     <TextBlock Text="{Binding NavigationName}" />
                                     <TextBlock Margin="0 3 0 3" Visibility="{Binding Path=HasErrors, Converter={StaticResource BoolToVisConverter} }" Text="Errors:" FontWeight="Bold" Foreground="Red"  />
                                     <TextBox Text="{Binding ErrorsText}" Visibility="{Binding Path=HasErrors, Converter={StaticResource BoolToVisConverter} }" 
@@ -62,7 +60,7 @@
                     <GridViewColumn  Header="Inverse navigation"  >
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                            <StackPanel Orientation="Vertical">
+                                <StackPanel Orientation="Vertical">
                                     <TextBlock Text="{Binding InverseNavigationName}" />
                                     <TextBlock Text="Detection type:" FontWeight="Bold"  />
                                     <TextBlock Margin="0 0 0 0" Text="{Binding InverseNavigationSource}" FontWeight="Bold"   >
@@ -122,7 +120,7 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    
+
                     <GridViewColumn  Header="Principal Key"  >
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
@@ -150,7 +148,7 @@
 
                                     </TextBlock>
                                     <Button Margin="0 5 0 0" Width="80" Content="Modify"
-                                            Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListView}}, Path=DataContext.UiBtnCommandPrincipalKey}" CommandParameter="{Binding}"/> 
+                                            Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListView}}, Path=DataContext.UiBtnCommandPrincipalKey}" CommandParameter="{Binding}"/>
                                 </StackPanel>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>

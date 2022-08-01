@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CS2WPF.Model.Serializable
 {
     [Serializable]
     public class ModelViewSerializable
     {
+        public string PluralTitle { get; set; }
+        public string Title { get; set; }
         public string ViewName { get; set; }
         public string PageViewName { get; set; }
         public string RootEntityDbContextPropertyName { get; set; }
@@ -24,6 +22,7 @@ namespace CS2WPF.Model.Serializable
         public List<ModelViewForeignKeySerializable> ForeignKeys { get; set; }
         public List<ModelViewKeyPropertySerializable> PrimaryKeyProperties { get; set; }
         public List<ModelViewEntityPropertySerializable> AllProperties { get; set; }
+        public string WebApiRoutePrefix { get; set; }
         public string WebApiServiceName { get; set; }
         public string WebApiServiceProject { get; set; }
         public string WebApiServiceDefaultProjectNameSpace { get; set; }
@@ -37,5 +36,6 @@ namespace CS2WPF.Model.Serializable
         public List<CommonStaffSerializable> CommonStaffs { get; set; }
         public List<ModelViewUIFormPropertySerializable> UIFormProperties { get; set; }
         public List<ModelViewUIListPropertySerializable> UIListProperties { get; set; }
+        public List<ModelViewUniqueKeySerializable> UniqueKeys { get; set; }
     }
 }

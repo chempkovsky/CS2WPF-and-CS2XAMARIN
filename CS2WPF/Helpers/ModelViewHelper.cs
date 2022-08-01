@@ -35,10 +35,13 @@ namespace CS2WPF.Helpers
             if (selectedModel == null) return selectedModel;
             selectedModel.ViewName = "";
             selectedModel.PageViewName = "";
+            selectedModel.Title = "";
+            selectedModel.PluralTitle = "";
             selectedModel.RootEntityClassName = "";
             selectedModel.RootEntityFullClassName = "";
             selectedModel.RootEntityUniqueProjectName = "";
-            if (selectedModel.ScalarProperties == null) {
+            if (selectedModel.ScalarProperties == null)
+            {
                 selectedModel.ScalarProperties = new ObservableCollection<ModelViewProperty>();
             }
             selectedModel.ScalarProperties.Clear();
@@ -57,6 +60,11 @@ namespace CS2WPF.Helpers
                 selectedModel.AllProperties = new ObservableCollection<ModelViewEntityProperty>();
             }
             selectedModel.AllProperties.Clear();
+            if (selectedModel.UniqueKeys == null)
+            {
+                selectedModel.UniqueKeys = new ObservableCollection<ModelViewUniqueKey>();
+            }
+            selectedModel.UniqueKeys.Clear();
             return selectedModel;
         }
         public static ModelViewSerializable ClearModelViewSerializable(this ModelViewSerializable selectedModel)
@@ -66,6 +74,9 @@ namespace CS2WPF.Helpers
             selectedModel.RootEntityClassName = "";
             selectedModel.RootEntityFullClassName = "";
             selectedModel.RootEntityUniqueProjectName = "";
+            selectedModel.Title = "";
+            selectedModel.PluralTitle = "";
+
             if (selectedModel.ScalarProperties == null)
             {
                 selectedModel.ScalarProperties = new List<ModelViewPropertyOfVwSerializable>();
@@ -96,6 +107,12 @@ namespace CS2WPF.Helpers
                 selectedModel.UIListProperties = new List<ModelViewUIListPropertySerializable>();
             }
             selectedModel.UIListProperties.Clear();
+
+            if (selectedModel.UniqueKeys == null)
+            {
+                selectedModel.UniqueKeys = new List<ModelViewUniqueKeySerializable>();
+            }
+            selectedModel.UniqueKeys.Clear();
 
             return selectedModel;
         }
@@ -159,10 +176,10 @@ namespace CS2WPF.Helpers
             destAttr.AttrFullName = srcAttr.AttrFullName;
             if (srcAttr.VaueProperties != null)
             {
-                if(srcAttr.VaueProperties.Count > 0)
+                if (srcAttr.VaueProperties.Count > 0)
                 {
                     destAttr.VaueProperties = new List<ModelViewAttributePropertySerializable>();
-                    foreach(ModelViewAttributeProperty srcAttributeProperty in srcAttr.VaueProperties)
+                    foreach (ModelViewAttributeProperty srcAttributeProperty in srcAttr.VaueProperties)
                     {
                         destAttr.VaueProperties.Add(srcAttributeProperty.ModelViewAttributePropertyAssingTo(new ModelViewAttributePropertySerializable()));
                     }
@@ -212,9 +229,9 @@ namespace CS2WPF.Helpers
             destProp.JsonPropertyName = srcProp.EditableJsonPropertyName;
             if (srcProp.Attributes != null)
             {
-                if(srcProp.Attributes.Count > 0)
+                if (srcProp.Attributes.Count > 0)
                 {
-                    if(destProp.Attributes == null)
+                    if (destProp.Attributes == null)
                     {
                         destProp.Attributes = new List<ModelViewAttributeSerializable>();
                         foreach (ModelViewAttribute srcAttr in srcProp.Attributes)
@@ -313,7 +330,6 @@ namespace CS2WPF.Helpers
             return destProp;
         }
 
-
         public static ModelViewForeignKeySerializable ModelViewForeignKeyAssingTo(this ModelViewForeignKey srcForeignKey, ModelViewForeignKeySerializable destForeignKey)
         {
             if ((srcForeignKey == null) || (destForeignKey == null)) return null;
@@ -350,7 +366,7 @@ namespace CS2WPF.Helpers
                     // all propertyies to copy for future use
                     //if (prop.IsSelected)
                     //{
-                        destForeignKey.ScalarProperties.Add(prop.ModelViewPropertyAssingTo(new ModelViewPropertyOfFkSerializable()));
+                    destForeignKey.ScalarProperties.Add(prop.ModelViewPropertyAssingTo(new ModelViewPropertyOfFkSerializable()));
                     //}
                 }
             }
@@ -388,12 +404,44 @@ namespace CS2WPF.Helpers
             }
             return destForeignKey;
         }
+        public static ModelViewUniqueKeySerializable ModelViewUniqueKeyAssingTo(this ModelViewUniqueKey srcUniqueKey, ModelViewUniqueKeySerializable destUniqueKey)
+        {
+            if ((srcUniqueKey == null) || (destUniqueKey == null)) return null;
+            destUniqueKey.UniqueKeyName = srcUniqueKey.UniqueKeyName;
+            destUniqueKey.IsPrimary = srcUniqueKey.IsPrimary;
+            destUniqueKey.KeySource = srcUniqueKey.KeySource;
+            if (destUniqueKey.UniqueKeyProperties == null)
+            {
+                destUniqueKey.UniqueKeyProperties = new List<ModelViewKeyPropertySerializable>();
+            }
+            destUniqueKey.UniqueKeyProperties.Clear();
+            if (srcUniqueKey.UniqueKeyProperties != null)
+            {
+                foreach (ModelViewKeyProperty uniqueKey in srcUniqueKey.UniqueKeyProperties)
+                {
+                    destUniqueKey.UniqueKeyProperties.Add(uniqueKey.ModelViewKeyPropertyAssingTo(new ModelViewKeyPropertySerializable()));
+                }
+            }
+
+            return destUniqueKey;
+        }
         public static bool ModelViewForeignKeyIsRequired(this ModelViewForeignKey srcForeignKey)
         {
             if (srcForeignKey == null) return false;
-            if(srcForeignKey.ForeignKeyProps == null) return false;
+            if (srcForeignKey.ForeignKeyProps == null) return false;
             if (srcForeignKey.ForeignKeyProps.Count < 1) return false;
-            foreach(ModelViewKeyProperty prop in srcForeignKey.ForeignKeyProps)
+            foreach (ModelViewKeyProperty prop in srcForeignKey.ForeignKeyProps)
+            {
+                if (!prop.IsRequired) return false;
+            }
+            return true;
+        }
+        public static bool ModelViewUniqueKeyIsRequired(this ModelViewUniqueKey srcUniqueKey)
+        {
+            if (srcUniqueKey == null) return false;
+            if (srcUniqueKey.UniqueKeyProperties == null) return false;
+            if (srcUniqueKey.UniqueKeyProperties.Count < 1) return false;
+            foreach (ModelViewKeyProperty prop in srcUniqueKey.UniqueKeyProperties)
             {
                 if (!prop.IsRequired) return false;
             }
@@ -413,9 +461,11 @@ namespace CS2WPF.Helpers
             destModel.ViewFolder = srcModel.ViewFolder;
             destModel.GenerateJSonAttribute = srcModel.GenerateJSonAttribute;
             destModel.PageViewName = srcModel.PageViewName;
+            destModel.Title = srcModel.Title;
+            destModel.PluralTitle = srcModel.PluralTitle;
             if (srcModel.ScalarProperties != null)
             {
-                foreach(ModelViewProperty prop in srcModel.ScalarProperties)
+                foreach (ModelViewProperty prop in srcModel.ScalarProperties)
                 {
                     if (prop.IsSelected)
                     {
@@ -443,7 +493,7 @@ namespace CS2WPF.Helpers
                 {
                     destModel.ForeignKeys.Add(foreignKey.ModelViewForeignKeyAssingTo(new ModelViewForeignKeySerializable()));
                     if (foreignKey.ScalarProperties == null) continue;
-                    if(string.IsNullOrEmpty( foreignKey.ViewName)) continue;
+                    if (string.IsNullOrEmpty(foreignKey.ViewName)) continue;
                     bool isRequired = foreignKey.ModelViewForeignKeyIsRequired();
                     foreach (ModelViewProperty prop in foreignKey.ScalarProperties)
                     {
@@ -454,6 +504,13 @@ namespace CS2WPF.Helpers
                             destModel.ScalarProperties.Add(modelViewPropertySerializable);
                         }
                     }
+                }
+            }
+            if (srcModel.UniqueKeys != null)
+            {
+                foreach (ModelViewUniqueKey uniqueKey in srcModel.UniqueKeys)
+                {
+                    destModel.UniqueKeys.Add(uniqueKey.ModelViewUniqueKeyAssingTo(new ModelViewUniqueKeySerializable()));
                 }
             }
             if (srcModel.UIFormProperties != null)
@@ -493,7 +550,7 @@ namespace CS2WPF.Helpers
         public static ModelViewForeignKey OnModelViewForeignKeyPrefixChanged(this ModelViewForeignKey srcForeignKey)
         {
             if (srcForeignKey == null) return null;
-            if(srcForeignKey.ScalarProperties != null)
+            if (srcForeignKey.ScalarProperties != null)
             {
                 string prefix = srcForeignKey.ForeignKeyPrefix;
                 if (string.IsNullOrEmpty(prefix)) prefix = "";
@@ -570,13 +627,14 @@ namespace CS2WPF.Helpers
         {
             if (srcForeignKey == null) return;
             if (srcForeignKey.ScalarProperties == null) return;
-            foreach(ModelViewProperty prop in srcForeignKey.ScalarProperties)
+            foreach (ModelViewProperty prop in srcForeignKey.ScalarProperties)
             {
                 prop.ForeignKeyName = srcForeignKey.NavigationName;
-                if(string.IsNullOrEmpty( prop.ForeignKeyNameChain))
+                if (string.IsNullOrEmpty(prop.ForeignKeyNameChain))
                 {
                     prop.ForeignKeyNameChain = srcForeignKey.NavigationName;
-                } else
+                }
+                else
                 {
                     if (!string.IsNullOrEmpty(srcForeignKey.NavigationName))
                     {
@@ -591,7 +649,7 @@ namespace CS2WPF.Helpers
             {
                 return InputParamNotDefined;
             }
-            if(srcModel.ScalarProperties == null)
+            if (srcModel.ScalarProperties == null)
             {
                 return ScalarPropertiesNotDefined;
             }
@@ -599,14 +657,14 @@ namespace CS2WPF.Helpers
             List<string> jsonprops = new List<string>();
             foreach (ModelViewProperty prop in srcModel.ScalarProperties)
             {
-                    if (string.IsNullOrEmpty(prop.EditableViewPropertyName))
-                    {
-                        return PropertyNameNotDefined + prop.ViewPropertyName + ":" + prop.OriginalPropertyName;
-                    }
-                    if (string.IsNullOrEmpty(prop.EditableJsonPropertyName))
-                    {
-                        return JSonPropertyNameNotDefined + prop.ViewPropertyName + ":" + prop.OriginalPropertyName;
-                    }
+                if (string.IsNullOrEmpty(prop.EditableViewPropertyName))
+                {
+                    return PropertyNameNotDefined + prop.ViewPropertyName + ":" + prop.OriginalPropertyName;
+                }
+                if (string.IsNullOrEmpty(prop.EditableJsonPropertyName))
+                {
+                    return JSonPropertyNameNotDefined + prop.ViewPropertyName + ":" + prop.OriginalPropertyName;
+                }
             }
             foreach (ModelViewProperty prop in srcModel.ScalarProperties)
             {
@@ -722,7 +780,7 @@ namespace CS2WPF.Helpers
                         {
                             if (foreignKey.ScalarProperties.Count > 0)
                             {
-                                for(int i = 0; i <  foreignKey.PrincipalKeyProps.Count; i++)
+                                for (int i = 0; i < foreignKey.PrincipalKeyProps.Count; i++)
                                 {
                                     ModelViewKeyProperty princProp = foreignKey.PrincipalKeyProps[i];
                                     ModelViewKeyProperty foreignProp = foreignKey.ForeignKeyProps[i];
@@ -746,7 +804,7 @@ namespace CS2WPF.Helpers
                                          (srcModel.ScalarProperties.Any(p => p.IsSelected
                                          && (p.OriginalPropertyName == foreignProp.OriginalPropertyName))))
                                     {
-                                        
+
                                         result += "\n" + UnderForeignKey + foreignKey.NavigationName + "  both " +
                                             PrincipalKeyPropertyIsIncluded + "[" + princProp.OriginalPropertyName + "]" +
                                             "\n" + ForeignKeyPropertyIsIncluded + "[" + foreignProp.OriginalPropertyName + "]" +
@@ -767,6 +825,8 @@ namespace CS2WPF.Helpers
             {
                 ViewName = srcModelViewSerializable.ViewName,
                 PageViewName = srcModelViewSerializable.PageViewName,
+                Title = srcModelViewSerializable.Title,
+                PluralTitle = srcModelViewSerializable.PluralTitle,
                 RootEntityClassName = srcModelViewSerializable.RootEntityClassName,
                 RootEntityFullClassName = srcModelViewSerializable.RootEntityFullClassName,
                 RootEntityUniqueProjectName = srcModelViewSerializable.RootEntityUniqueProjectName,
@@ -776,6 +836,7 @@ namespace CS2WPF.Helpers
                 GenerateJSonAttribute = srcModelViewSerializable.GenerateJSonAttribute,
                 ScalarProperties = srcModelViewSerializable.ScalarProperties,
                 ForeignKeys = srcModelViewSerializable.ForeignKeys,
+                UniqueKeys = srcModelViewSerializable.UniqueKeys,
                 PrimaryKeyProperties = srcModelViewSerializable.PrimaryKeyProperties,
                 AllProperties = srcModelViewSerializable.AllProperties,
                 CommonStaffs = srcModelViewSerializable.CommonStaffs,
@@ -783,17 +844,50 @@ namespace CS2WPF.Helpers
                 UIListProperties = srcModelViewSerializable.UIListProperties,
 
                 RootEntityDbContextPropertyName = srcModelViewSerializable.RootEntityDbContextPropertyName,
+                WebApiRoutePrefix = srcModelViewSerializable.WebApiRoutePrefix,
                 WebApiServiceName = srcModelViewSerializable.WebApiServiceName,
                 IsWebApiSelectAll = srcModelViewSerializable.IsWebApiSelectAll,
                 IsWebApiSelectManyWithPagination = srcModelViewSerializable.IsWebApiSelectManyWithPagination,
-                IsWebApiSelectOneByPrimarykey = srcModelViewSerializable.IsWebApiSelectOneByPrimarykey, 
-                IsWebApiAdd = srcModelViewSerializable.IsWebApiAdd, 
-                IsWebApiUpdate = srcModelViewSerializable.IsWebApiUpdate, 
-                IsWebApiDelete = srcModelViewSerializable.IsWebApiDelete, 
-                WebApiServiceProject = srcModelViewSerializable.WebApiServiceProject, 
-                WebApiServiceDefaultProjectNameSpace = srcModelViewSerializable.WebApiServiceDefaultProjectNameSpace, 
-                WebApiServiceFolder = srcModelViewSerializable.WebApiServiceFolder 
+                IsWebApiSelectOneByPrimarykey = srcModelViewSerializable.IsWebApiSelectOneByPrimarykey,
+                IsWebApiAdd = srcModelViewSerializable.IsWebApiAdd,
+                IsWebApiUpdate = srcModelViewSerializable.IsWebApiUpdate,
+                IsWebApiDelete = srcModelViewSerializable.IsWebApiDelete,
+                WebApiServiceProject = srcModelViewSerializable.WebApiServiceProject,
+                WebApiServiceDefaultProjectNameSpace = srcModelViewSerializable.WebApiServiceDefaultProjectNameSpace,
+                WebApiServiceFolder = srcModelViewSerializable.WebApiServiceFolder
             };
+        }
+        public static ModelViewKeyProperty ModelViewKeyPropertySerializableAssingTo(this ModelViewKeyPropertySerializable srcProp, ModelViewKeyProperty destProp)
+        {
+            if ((srcProp == null) || (destProp == null)) return null;
+            destProp.OriginalPropertyName = srcProp.OriginalPropertyName;
+            destProp.TypeFullName = srcProp.TypeFullName;
+            destProp.IsNullable = srcProp.IsNullable;
+            destProp.IsRequired = srcProp.IsRequired;
+            destProp.UnderlyingTypeName = srcProp.UnderlyingTypeName;
+            destProp.ViewPropertyName = srcProp.ViewPropertyName;
+            destProp.JsonPropertyName = srcProp.JsonPropertyName;
+            return destProp;
+        }
+        public static ModelViewUniqueKey ModelViewUniqueKeySerializableAssingTo(this ModelViewUniqueKeySerializable srcUniqueKey, ModelViewUniqueKey destUniqueKey)
+        {
+            if ((srcUniqueKey == null) || (destUniqueKey == null)) return destUniqueKey;
+            destUniqueKey.UniqueKeyName = srcUniqueKey.UniqueKeyName;
+            destUniqueKey.IsPrimary = srcUniqueKey.IsPrimary;
+            destUniqueKey.KeySource = srcUniqueKey.KeySource;
+            if (destUniqueKey.UniqueKeyProperties == null)
+            {
+                destUniqueKey.UniqueKeyProperties = new List<ModelViewKeyProperty>();
+            }
+            destUniqueKey.UniqueKeyProperties.Clear();
+            if (srcUniqueKey.UniqueKeyProperties != null)
+            {
+                foreach (ModelViewKeyPropertySerializable uniqueKeyPropertie in srcUniqueKey.UniqueKeyProperties)
+                {
+                    destUniqueKey.UniqueKeyProperties.Add(uniqueKeyPropertie.ModelViewKeyPropertySerializableAssingTo(new ModelViewKeyProperty()));
+                }
+            }
+            return destUniqueKey;
         }
         public static ModelView ModelViewSerializableAssingTo(this ModelViewSerializable srcModelView, ModelView destModelView, DbContextSerializable CurrentDbContext, bool copyHeader = true)
         {
@@ -809,17 +903,20 @@ namespace CS2WPF.Helpers
                 destModelView.RootEntityDbContextPropertyName = srcModelView.RootEntityDbContextPropertyName;
             }
             destModelView.ViewName = srcModelView.ViewName;
+            destModelView.Title = srcModelView.Title;
+            destModelView.PluralTitle = srcModelView.PluralTitle;
             destModelView.GenerateJSonAttribute = srcModelView.GenerateJSonAttribute;
             destModelView.PageViewName = srcModelView.PageViewName;
             if (srcModelView.ScalarProperties != null)
             {
-                if (destModelView.ScalarProperties == null) {
+                if (destModelView.ScalarProperties == null)
+                {
                     destModelView.ScalarProperties = new ObservableCollection<ModelViewProperty>();
                 }
-                foreach(ModelViewPropertyOfVwSerializable srcProp in srcModelView.ScalarProperties)
+                foreach (ModelViewPropertyOfVwSerializable srcProp in srcModelView.ScalarProperties)
                 {
                     if (!string.IsNullOrEmpty(srcProp.ForeignKeyNameChain)) continue;
-                    ModelViewProperty destProp = 
+                    ModelViewProperty destProp =
                         destModelView.ScalarProperties
                         .Where(p => p.OriginalPropertyName == srcProp.OriginalPropertyName).FirstOrDefault();
                     if (destProp != null)
@@ -834,7 +931,7 @@ namespace CS2WPF.Helpers
                 {
                     destModelView.ForeignKeys = new ObservableCollection<ModelViewForeignKey>();
                 }
-                foreach(ModelViewForeignKeySerializable srcForeignKey in srcModelView.ForeignKeys)
+                foreach (ModelViewForeignKeySerializable srcForeignKey in srcModelView.ForeignKeys)
                 {
                     if (string.IsNullOrEmpty(srcForeignKey.ViewName)) continue;
                     ModelViewForeignKey destForeignKey =
@@ -860,7 +957,7 @@ namespace CS2WPF.Helpers
                     destForeignKey.OnModelViewForeignKeyPrefixChanged();
                     destForeignKey.ModelViewForeignKeyUpdateForeignKeyNameChain();
                     if (srcForeignKey.ScalarProperties == null) continue;
-                    foreach(ModelViewPropertyOfFkSerializable srcProp in srcForeignKey.ScalarProperties)
+                    foreach (ModelViewPropertyOfFkSerializable srcProp in srcForeignKey.ScalarProperties)
                     {
                         ModelViewProperty destProp =
                             destForeignKey.ScalarProperties
@@ -875,6 +972,20 @@ namespace CS2WPF.Helpers
                     }
                 }
             }
+            /*
+            Do not copy Prim and Unique keys
+                        if (srcModelView.UniqueKeys != null) 
+                        {
+                            if (destModelView.UniqueKeys == null)
+                            {
+                                destModelView.UniqueKeys = new ObservableCollection<ModelViewUniqueKey>();
+                            }
+                            foreach (ModelViewUniqueKeySerializable srcUniqueKey in srcModelView.UniqueKeys)
+                            {
+                                destModelView.UniqueKeys.Add(srcUniqueKey.ModelViewUniqueKeySerializableAssingTo(new ModelViewUniqueKey()));
+                            }
+                        }
+            */
             if (destModelView.UIFormProperties == null)
             {
                 destModelView.UIFormProperties = new ObservableCollection<ModelViewUIFormProperty>();
@@ -887,14 +998,15 @@ namespace CS2WPF.Helpers
             destModelView.UIListProperties.Clear();
             if (destModelView.ScalarProperties != null)
             {
-                if(srcModelView.UIFormProperties != null)
+                if (srcModelView.UIFormProperties != null)
                 {
-                    foreach(ModelViewUIFormPropertySerializable prop in srcModelView.UIFormProperties)
+                    foreach (ModelViewUIFormPropertySerializable prop in srcModelView.UIFormProperties)
                     {
                         ModelViewProperty srcProp =
                          destModelView.ScalarProperties.FirstOrDefault(p => p.OriginalPropertyName == prop.OriginalPropertyName && p.ForeignKeyNameChain == prop.ForeignKeyNameChain);
-                        
-                        destModelView.UIFormProperties.Add(new ModelViewUIFormProperty() {
+
+                        destModelView.UIFormProperties.Add(new ModelViewUIFormProperty()
+                        {
                             OriginalPropertyName = prop.OriginalPropertyName,
                             InputTypeWhenAdd = prop.InputTypeWhenAdd,
                             InputTypeWhenUpdate = prop.InputTypeWhenUpdate,
@@ -1127,8 +1239,10 @@ namespace CS2WPF.Helpers
             dest.IsNewLineAfter = src.IsNewLineAfter;
             return dest;
         }
-        public static List<ModelViewSerializable> GetViewsByForeignNameChain(this DbContextSerializable context, string ViewName, string foreignKeyNameChain) {
-            if ( (context == null) || (string.IsNullOrEmpty(ViewName)) ) {
+        public static List<ModelViewSerializable> GetViewsByForeignNameChain(this DbContextSerializable context, string ViewName, string foreignKeyNameChain)
+        {
+            if ((context == null) || (string.IsNullOrEmpty(ViewName)))
+            {
                 return new List<ModelViewSerializable>();
             }
             ModelViewSerializable mv = context.ModelViews.Where(v => v.ViewName == ViewName).FirstOrDefault();
@@ -1136,7 +1250,7 @@ namespace CS2WPF.Helpers
             {
                 return new List<ModelViewSerializable>();
             }
-            
+
             if (string.IsNullOrEmpty(foreignKeyNameChain))
             {
                 return context.ModelViews
@@ -1148,7 +1262,7 @@ namespace CS2WPF.Helpers
             {
                 return new List<ModelViewSerializable>();
             }
-            ModelViewForeignKeySerializable fk = 
+            ModelViewForeignKeySerializable fk =
                 mv.ForeignKeys.Where(f => f.NavigationName == foreignKeys[0]).FirstOrDefault();
             if (fk == null)
             {
@@ -1160,7 +1274,6 @@ namespace CS2WPF.Helpers
             }
             return GetViewsByForeignNameChain(context, fk.ViewName, string.Join(".", foreignKeys, 1, foreignKeys.Length - 1));
         }
-
         public static List<ModelViewAttributeSerializable> ListModelViewAttributeSerializableGetCopy(this List<ModelViewAttributeSerializable> Attributes)
         {
             List<ModelViewAttributeSerializable> result = new List<ModelViewAttributeSerializable>();
@@ -1215,7 +1328,7 @@ namespace CS2WPF.Helpers
         }
         public static List<ModelViewPropertyOfVwSerializable> ListModelViewPropertyOfVwSerializableGetCopy(this List<ModelViewPropertyOfVwSerializable> ScalarProperties)
         {
-            List<ModelViewPropertyOfVwSerializable>  result = new List<ModelViewPropertyOfVwSerializable>();
+            List<ModelViewPropertyOfVwSerializable> result = new List<ModelViewPropertyOfVwSerializable>();
             if (ScalarProperties == null) return result;
             foreach (ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable in ScalarProperties)
             {
@@ -1311,7 +1424,7 @@ namespace CS2WPF.Helpers
         {
             if (string.IsNullOrEmpty(EntityFullName)) return NavigationEntityName;
             int ind = EntityFullName.LastIndexOf('.');
-            if(ind < 0) return NavigationEntityName;
+            if (ind < 0) return NavigationEntityName;
             return EntityFullName.Substring(0, ind) + NavigationEntityName;
         }
         public static List<ModelViewForeignKeySerializable> ListModelViewForeignKeySerializableGetCopy(this List<ModelViewForeignKeySerializable> ForeignKeys, string uniqueProjectName, string entityFullName)
@@ -1345,6 +1458,23 @@ namespace CS2WPF.Helpers
             }
             return result;
         }
+        public static List<ModelViewUniqueKeySerializable> ListModelViewUniqueKeySerializableGetCopy(this List<ModelViewUniqueKeySerializable> UniqueKeys)
+        {
+            List<ModelViewUniqueKeySerializable> result = new List<ModelViewUniqueKeySerializable>();
+            if (UniqueKeys == null) return result;
+            foreach (ModelViewUniqueKeySerializable modelViewUniqueKeySerializable in UniqueKeys)
+            {
+                result.Add(new ModelViewUniqueKeySerializable()
+                {
+                    UniqueKeyName = modelViewUniqueKeySerializable.UniqueKeyName,
+                    IsPrimary = modelViewUniqueKeySerializable.IsPrimary,
+                    KeySource = modelViewUniqueKeySerializable.KeySource,
+                    UniqueKeyProperties = ListModelViewKeyPropertySerializableGetCopy(modelViewUniqueKeySerializable.UniqueKeyProperties)
+                });
+            }
+            return result;
+        }
+
         public static List<ModelViewUIFormPropertySerializable> ListModelViewForeignKeySerializableGetCopy(this List<ModelViewUIFormPropertySerializable> UIFormProperties)
         {
             List<ModelViewUIFormPropertySerializable> result = new List<ModelViewUIFormPropertySerializable>();
@@ -1411,12 +1541,16 @@ namespace CS2WPF.Helpers
                 RootEntityUniqueProjectName = UniqueProjectName,
 
                 ViewName = srcModelViewSerializable.ViewName,
-                PageViewName = srcModelViewSerializable.PageViewName, 
-                ViewProject = destinationProject, 
+                PageViewName = srcModelViewSerializable.PageViewName,
+                Title = srcModelViewSerializable.Title,
+                PluralTitle = srcModelViewSerializable.PluralTitle,
+
+                ViewProject = destinationProject,
                 ViewDefaultProjectNameSpace = defaultProjectNameSpace,
                 ViewFolder = destinationFolder,
                 GenerateJSonAttribute = srcModelViewSerializable.GenerateJSonAttribute,
 
+                WebApiRoutePrefix = srcModelViewSerializable.WebApiRoutePrefix,
                 WebApiServiceName = srcModelViewSerializable.WebApiServiceName,
                 WebApiServiceProject = srcModelViewSerializable.WebApiServiceProject,
                 WebApiServiceDefaultProjectNameSpace = srcModelViewSerializable.WebApiServiceDefaultProjectNameSpace,
@@ -1433,6 +1567,7 @@ namespace CS2WPF.Helpers
             result.PrimaryKeyProperties = ListModelViewKeyPropertySerializableGetCopy(srcModelViewSerializable.PrimaryKeyProperties);
             result.AllProperties = ListModelViewEntityPropertySerializableGetCopy(srcModelViewSerializable.AllProperties);
             result.ForeignKeys = ListModelViewForeignKeySerializableGetCopy(srcModelViewSerializable.ForeignKeys, UniqueProjectName, EntityFullClassName);
+            result.UniqueKeys = ListModelViewUniqueKeySerializableGetCopy(srcModelViewSerializable.UniqueKeys);
             result.UIFormProperties = ListModelViewForeignKeySerializableGetCopy(srcModelViewSerializable.UIFormProperties);
             result.UIListProperties = ListModelViewForeignKeySerializableGetCopy(srcModelViewSerializable.UIListProperties);
             return result;
@@ -1450,11 +1585,14 @@ namespace CS2WPF.Helpers
 
                 ViewName = srcModelViewSerializable.ViewName,
                 PageViewName = srcModelViewSerializable.PageViewName,
+                Title = srcModelViewSerializable.Title,
+                PluralTitle = srcModelViewSerializable.PluralTitle,
                 ViewProject = destinationProject,
                 ViewDefaultProjectNameSpace = defaultProjectNameSpace,
                 ViewFolder = destinationFolder,
                 GenerateJSonAttribute = srcModelViewSerializable.GenerateJSonAttribute,
 
+                WebApiRoutePrefix = srcModelViewSerializable.WebApiRoutePrefix,
                 WebApiServiceName = srcModelViewSerializable.WebApiServiceName,
                 WebApiServiceProject = srcModelViewSerializable.WebApiServiceProject,
                 WebApiServiceDefaultProjectNameSpace = srcModelViewSerializable.WebApiServiceDefaultProjectNameSpace,
@@ -1471,12 +1609,11 @@ namespace CS2WPF.Helpers
             result.PrimaryKeyProperties = ListModelViewKeyPropertySerializableGetCopy(srcModelViewSerializable.PrimaryKeyProperties);
             result.AllProperties = ListModelViewEntityPropertySerializableGetCopy(srcModelViewSerializable.AllProperties);
             result.ForeignKeys = ListModelViewForeignKeySerializableGetCopy(srcModelViewSerializable.ForeignKeys, srcModelViewSerializable.RootEntityUniqueProjectName, srcModelViewSerializable.RootEntityFullClassName);
+            result.UniqueKeys = ListModelViewUniqueKeySerializableGetCopy(srcModelViewSerializable.UniqueKeys);
             result.UIFormProperties = ListModelViewForeignKeySerializableGetCopy(srcModelViewSerializable.UIFormProperties);
             result.UIListProperties = ListModelViewForeignKeySerializableGetCopy(srcModelViewSerializable.UIListProperties);
             return result;
         }
-
-
         public static ModelViewAttribute CloneModelViewAttribute(this ModelViewAttribute src)
         {
             ModelViewAttribute dest = new ModelViewAttribute();
@@ -1484,9 +1621,9 @@ namespace CS2WPF.Helpers
             dest.AttrName = src.AttrName;
             dest.AttrFullName = src.AttrFullName;
             dest.VaueProperties = new ObservableCollection<ModelViewAttributeProperty>();
-            if(src.VaueProperties != null)
+            if (src.VaueProperties != null)
             {
-                foreach(ModelViewAttributeProperty vp in src.VaueProperties)
+                foreach (ModelViewAttributeProperty vp in src.VaueProperties)
                 {
                     if (vp != null)
                     {
@@ -1504,7 +1641,7 @@ namespace CS2WPF.Helpers
         {
             ObservableCollection<ModelViewAttribute> dest = new ObservableCollection<ModelViewAttribute>();
             if (src == null) return dest;
-            foreach(ModelViewAttribute srcItm in src)
+            foreach (ModelViewAttribute srcItm in src)
             {
                 if (srcItm != null)
                 {
@@ -1513,7 +1650,6 @@ namespace CS2WPF.Helpers
             }
             return dest;
         }
-
         public static ModelViewFAPIAttribute CloneModelViewFAPIAttribute(this ModelViewFAPIAttribute src)
         {
             ModelViewFAPIAttribute dest = new ModelViewFAPIAttribute();
@@ -1548,5 +1684,6 @@ namespace CS2WPF.Helpers
             }
             return dest;
         }
+
     }
 }

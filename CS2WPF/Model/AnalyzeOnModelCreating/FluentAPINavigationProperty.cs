@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CS2WPF.Model.AnalyzeOnModelCreating
 {
-    public class FluentAPINavigationProperty: FluentAPIProperty
+    public class FluentAPINavigationProperty : FluentAPIProperty
     {
         public bool IsCollection { get; set; }
         public string UnderlyingTypeName { get; set; }

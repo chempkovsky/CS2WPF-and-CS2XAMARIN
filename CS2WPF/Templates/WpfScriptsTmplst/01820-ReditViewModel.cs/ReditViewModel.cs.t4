@@ -299,7 +299,7 @@ namespace <#= ReditViewModelNameSpace #> {
 
 
         #region <#= CaptionPropertyName #>
-        string _<#= CaptionPropertyName #> = "Delete item for <#= Model.ViewName #>";
+        string _<#= CaptionPropertyName #> = "Delete item for <#= Model.Title #>";
         public string <#= CaptionPropertyName #>
         { 
             get
@@ -395,11 +395,11 @@ namespace <#= ReditViewModelNameSpace #> {
                 modeToCheck = prms.GetValue<<#= EformModeEnumClassName #>>("<#= EformModeEnumClassName #>");
             }
             if ((modeToCheck == <#= EformModeEnumClassName #>.DeleteMode) && ((<#= AppSettingServicePropertyName #>.GetViewModelMask("<#= Model.ViewName #>") & 2) != 2 )) {
-                throw new Exception("Access denied to delete <#= Model.ViewName #>");
+                throw new Exception("Access denied to delete <#= Model.Title #>");
             } else if ((modeToCheck == <#= EformModeEnumClassName #>.UpdateMode) && ((<#= AppSettingServicePropertyName #>.GetViewModelMask("<#= Model.ViewName #>") & 4) != 4 )) {
-                throw new Exception("Access denied to update <#= Model.ViewName #>");
+                throw new Exception("Access denied to update <#= Model.Title #>");
             } else if ((modeToCheck == <#= EformModeEnumClassName #>.AddMode) && ((<#= AppSettingServicePropertyName #>.GetViewModelMask("<#= Model.ViewName #>") & 8) != 8 )) {
-                throw new Exception("Access denied to add <#= Model.ViewName #>");
+                throw new Exception("Access denied to add <#= Model.Title #>");
             }
             ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>> hf = new ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>();
 <#
@@ -440,9 +440,9 @@ namespace <#= ReditViewModelNameSpace #> {
                 <#= EformModeEnumClassName #> locmode = prms.GetValue<<#= EformModeEnumClassName #>>("<#= EformModeEnumClassName #>");
                 if (locmode != <#= EformModeEnumClassName #>.AddMode) {
                     if (locmode == <#= EformModeEnumClassName #>.DeleteMode) {
-                        locCaption = "Delete item for <#= Model.ViewName #>";
+                        locCaption = "Delete item for <#= Model.Title #>";
                     } else {
-                        locCaption = "Update item for <#= Model.ViewName #>";
+                        locCaption = "Update item for <#= Model.Title #>";
                     }
 <#
             foreach(ModelViewPropertyOfVwSerializable pk in primKeys) {
@@ -487,7 +487,7 @@ namespace <#= ReditViewModelNameSpace #> {
                         (e) => { }
                      );
                 } else {
-                    <#= CaptionPropertyName #> = "Add item for <#= Model.ViewName #>";
+                    <#= CaptionPropertyName #> = "Add item for <#= Model.Title #>";
                     if (resetHF) { <#= HiddenFiltersPropertyName #> = hf; }
                     <#= FormControlModelPropertyName #> = <#= FormServicePrefix #><#= Model.ViewName #>.<#= CopyToModelNotifyMethodName #>(null,null); // this is correct: cleanup twice
                     <#= EformModePropertyName #> = <#= EformModeEnumClassName #>.AddMode;

@@ -16,13 +16,13 @@ namespace CS2WPF.View
         //BackgroundWorker Worker;
         public WindowCS2WPF(MainWindowBase dataContext)
         {
-            
+
             InitializeComponent();
             this.SetDataContext(dataContext);
         }
         public void SetDataContext(MainWindowBase dataContext)
         {
-            if(dataContext != null)
+            if (dataContext != null)
             {
                 dataContext.CancelClicked.ButtonClickedEvent += CS2ANGLARMainWindowViewModel_CancelClicked;
             }
@@ -31,7 +31,7 @@ namespace CS2WPF.View
 
         private void CS2ANGLARMainWindowViewModel_CancelClicked(Object sender)
         {
-                this.Close();
+            this.Close();
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)

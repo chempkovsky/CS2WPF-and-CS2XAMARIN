@@ -5,7 +5,6 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:mdl="clr-namespace:CS2WPF.Model"
              xmlns:hlpui="clr-namespace:CS2WPF.Helpers.UI"
-             xmlns:local="clr-namespace:CS2WPF.View"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
@@ -104,7 +103,6 @@
                         </StackPanel>
                     </HierarchicalDataTemplate>
 
-
                     <DataTemplate DataType="{x:Type mdl:ModelViewKeyProperty}">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="{Binding Path=ViewPropertyName}"/>
@@ -114,7 +112,7 @@
                     </DataTemplate>
                     <HierarchicalDataTemplate DataType="{x:Type mdl:ModelViewForeignKey}">
                         <HierarchicalDataTemplate.ItemsSource>
-                            <MultiBinding ConverterParameter="Properties,IsSelected,Primary Key,,Foreign Key,">
+                            <MultiBinding ConverterParameter="Properties,IsSelected,Principal Key,,Foreign Key,">
                                 <MultiBinding.Converter >
                                     <hlpui:MultiValueConverterImp />
                                 </MultiBinding.Converter>
@@ -139,6 +137,21 @@
                             <TextBlock Text="{Binding Path=FolderName}"/>
                         </StackPanel>
                     </HierarchicalDataTemplate>
+
+                    <HierarchicalDataTemplate DataType="{x:Type mdl:ModelViewUniqueKey}">
+                        <HierarchicalDataTemplate.ItemsSource>
+                            <MultiBinding ConverterParameter="Properties,">
+                                <MultiBinding.Converter >
+                                    <hlpui:MultiValueConverterImp />
+                                </MultiBinding.Converter>
+                                <Binding Path="UniqueKeyProperties" />
+                            </MultiBinding>
+                        </HierarchicalDataTemplate.ItemsSource>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding UniqueKeyName}" />
+                        </StackPanel>
+                    </HierarchicalDataTemplate>
+
                 </TreeView.Resources>
 
                 <TreeViewItem Tag="Root" x:Name="MainTreeViewRootItem">
@@ -164,12 +177,17 @@
                     </TreeViewItem>
                     <TreeViewItem ItemsSource="{Binding SelectedModel.PrimaryKeyProperties}"  Tag="PrimaryKeyProperties">
                         <TreeViewItem.Header>
-                                <TextBlock Text="Primary Key" FontWeight="Bold"/>
+                            <TextBlock Text="Primary Key" FontWeight="Bold"/>
+                        </TreeViewItem.Header>
+                    </TreeViewItem>
+                    <TreeViewItem ItemsSource="{Binding SelectedModel.UniqueKeys}"  Tag="UniqueKeys">
+                        <TreeViewItem.Header>
+                            <TextBlock Text="Unique Keys" FontWeight="Bold"/>
                         </TreeViewItem.Header>
                     </TreeViewItem>
                     <TreeViewItem ItemsSource="{Binding SelectedModel.AllProperties}"  Tag="Entity Properties">
                         <TreeViewItem.Header>
-                                <TextBlock Text="Entity Properties" FontWeight="Bold" />
+                            <TextBlock Text="Entity Properties" FontWeight="Bold" />
                         </TreeViewItem.Header>
                     </TreeViewItem>
                 </TreeViewItem>
@@ -186,6 +204,8 @@
                 </Grid>
                 <Grid Grid.Row="0"  Visibility="{Binding RootVisibility}"  >
                     <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
@@ -229,6 +249,12 @@
 
                     <TextBlock Grid.Row="8"  Grid.Column="0" Text="Generate JsonProperty Attribute" FontWeight="Bold"/>
                     <CheckBox  Grid.Row="8"  Grid.Column="1" IsChecked="{Binding SelectedModel.GenerateJSonAttribute}"    VerticalAlignment="Center" HorizontalAlignment="Left"  />
+
+                    <TextBlock Grid.Row="9"  Grid.Column="0" Text="Title"  FontWeight="Bold"/>
+                    <TextBox   Grid.Row="9"  Grid.Column="1" Text="{Binding SelectedModel.Title, UpdateSourceTrigger=PropertyChanged}" Margin="0 0 10 0"/>
+
+                    <TextBlock Grid.Row="10"  Grid.Column="0" Text="Plural Title"  FontWeight="Bold"/>
+                    <TextBox   Grid.Row="10"  Grid.Column="1" Text="{Binding SelectedModel.PluralTitle, UpdateSourceTrigger=PropertyChanged}" Margin="0 0 10 0"/>
 
                 </Grid>
                 <Grid Grid.Row="0" Visibility="{Binding KeyPropertyVisibility}" >
@@ -345,13 +371,15 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="2*"/>
                         <ColumnDefinition Width="3*"/>
                     </Grid.ColumnDefinitions>
-                
+
                     <TextBlock Grid.Row="0"  Grid.Column="0" Text="Navigation Name"  />
                     <TextBlock Grid.Row="0"  Grid.Column="1" Text="{Binding SelectedItem.NavigationName}"  />
 
@@ -403,8 +431,6 @@
 
                     <TextBlock Grid.Row="14"  Grid.Column="0" Text="Foreign Key Prefix"  FontWeight="Bold"/>
                     <TextBox   Grid.Row="14"  Grid.Column="1" Text="{Binding SelectedItem.ForeignKeyPrefix, UpdateSourceTrigger=PropertyChanged}" Margin="0 0 10 0"/>
-
-                    
                 </Grid>
                 <StackPanel Grid.Row="1"  Orientation="Vertical">
                     <StackPanel Orientation="Horizontal" Margin="0 0 0 5">
@@ -485,6 +511,22 @@
                     <TextBlock Grid.Row="0"  Grid.Column="1" Text="{Binding SelectedItem.PropValue}"  />
                 </Grid>
 
+                <Grid Grid.Row="0" Visibility="{Binding UnuqieKeyVisibility}" >
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="3*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Row="0"  Grid.Column="0" Text="Unique Key Name"  />
+                    <TextBlock Grid.Row="0"  Grid.Column="1" Text="{Binding SelectedItem.UniqueKeyName}"  />
+                    <TextBlock Grid.Row="1"  Grid.Column="0" Text="Is sPrimary"  />
+                    <CheckBox  Grid.Row="1"  Grid.Column="1" IsChecked="{Binding SelectedItem.IsPrimary}" IsHitTestVisible="False"  VerticalAlignment="Center" HorizontalAlignment="Left" />
+                </Grid>
 
             </Grid>
         </Grid>

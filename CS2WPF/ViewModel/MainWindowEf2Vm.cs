@@ -14,7 +14,7 @@ using Microsoft.VisualStudio;
 
 namespace CS2WPF.ViewModel
 {
-    #pragma warning disable VSTHRD010
+#pragma warning disable VSTHRD010
     public class MainWindowEf2Vm : MainWindowBase
     {
         #region Fieds
@@ -189,14 +189,12 @@ namespace CS2WPF.ViewModel
                     PrevBtnEnabled = true;
                     NextBtnEnabled = false;
                     SaveBtnEnabled = false;
-                    if(SelectExistingUC == null)
+                    if (SelectExistingUC == null)
                     {
                         SelectExistingViewModel dataContext = new SelectExistingViewModel(Dte);
                         dataContext.IsReady.IsReadyEvent += SelectEntityForGivenDbContextViewModel_IsReady;
                         SelectExistingUC = new UserControlSelectExisting(dataContext);
                     }
-                    (SelectExistingUC.DataContext as SelectExistingViewModel).SelectedDbContext =
-                        (SelectSourceEntityUC.DataContext as SelectEntityForGivenDbContextViewModel).SelectedDbContext;
                     (SelectExistingUC.DataContext as SelectExistingViewModel).CurrentDbContext = CurrentDbContext;
                     (SelectExistingUC.DataContext as SelectExistingViewModel).SelectedEntity =
                         (SelectSourceEntityUC.DataContext as SelectEntityForGivenDbContextViewModel).SelectedCodeElement;
@@ -407,6 +405,8 @@ namespace CS2WPF.ViewModel
             if (existedModelViewSerializable != null)
             {
                 existedModelViewSerializable.PageViewName = modelViewSerializable.PageViewName;
+                existedModelViewSerializable.Title = modelViewSerializable.Title;
+                existedModelViewSerializable.PluralTitle = modelViewSerializable.PluralTitle;
                 existedModelViewSerializable.RootEntityClassName = modelViewSerializable.RootEntityClassName;
                 existedModelViewSerializable.RootEntityFullClassName = modelViewSerializable.RootEntityFullClassName;
                 existedModelViewSerializable.RootEntityUniqueProjectName = modelViewSerializable.RootEntityUniqueProjectName;
@@ -415,21 +415,24 @@ namespace CS2WPF.ViewModel
                 existedModelViewSerializable.ViewDefaultProjectNameSpace = modelViewSerializable.ViewDefaultProjectNameSpace;
                 existedModelViewSerializable.ViewFolder = modelViewSerializable.ViewFolder;
                 existedModelViewSerializable.GenerateJSonAttribute = modelViewSerializable.GenerateJSonAttribute;
-                if ((existedModelViewSerializable.ScalarProperties != null) && (modelViewSerializable.ScalarProperties != null)) {
+                if ((existedModelViewSerializable.ScalarProperties != null) && (modelViewSerializable.ScalarProperties != null))
+                {
                     foreach (ModelViewPropertyOfVwSerializable srcProp in existedModelViewSerializable.ScalarProperties)
                     {
                         ModelViewPropertyOfVwSerializable dest = null;
-                        if (string.IsNullOrEmpty(srcProp.ForeignKeyNameChain)) {
+                        if (string.IsNullOrEmpty(srcProp.ForeignKeyNameChain))
+                        {
                             dest =
                                 modelViewSerializable.ScalarProperties
                                 .Where(p => ((p.OriginalPropertyName == srcProp.OriginalPropertyName) && string.IsNullOrEmpty(p.ForeignKeyNameChain))).FirstOrDefault();
-                        } else
+                        }
+                        else
                         {
                             dest =
                                 modelViewSerializable.ScalarProperties
                                 .Where(p => ((p.OriginalPropertyName == srcProp.OriginalPropertyName) && (p.ForeignKeyNameChain == srcProp.ForeignKeyNameChain))).FirstOrDefault();
                         }
-                        if(dest != null)
+                        if (dest != null)
                         {
                             dest.IsUsedBySorting = srcProp.IsUsedBySorting;
                             dest.IsUsedByfilter = srcProp.IsUsedByfilter;
@@ -442,6 +445,7 @@ namespace CS2WPF.ViewModel
                 existedModelViewSerializable.AllProperties = modelViewSerializable.AllProperties;
                 existedModelViewSerializable.UIFormProperties = modelViewSerializable.UIFormProperties;
                 existedModelViewSerializable.UIListProperties = modelViewSerializable.UIListProperties;
+                existedModelViewSerializable.UniqueKeys = modelViewSerializable.UniqueKeys;
             }
             else
             {
@@ -471,37 +475,50 @@ namespace CS2WPF.ViewModel
                 string jsonString = JsonConvert.SerializeObject(CurrentDbContext);
                 File.WriteAllText(locFileName, jsonString);
             }
-            try
             {
-                
+                string FlNm = "";
                 SolutionDirectory = System.IO.Path.GetDirectoryName(Dte.Solution.FullName);
-                if (CurrentUiStepId == 6)
+                try
                 {
-                    string FlNm = Path.Combine(
-                    SolutionDirectory,
-                    Path.GetDirectoryName((CreateViewUC.DataContext as CreateViewViewModel).SelectedModel.ViewProject),
-                    (CreateViewUC.DataContext as CreateViewViewModel).SelectedModel.ViewFolder,
-                    (CreateViewUC.DataContext as CreateViewViewModel).SelectedModel.ViewName
-                    + (GenerateUC.DataContext as GenerateViewModel).FileExtension);
-                    File.WriteAllText(FlNm, (GenerateUC.DataContext as GenerateViewModel).GenerateText);
-                    DestinationProject.ProjectItems.AddFromFile(FlNm);
-                } else if (CurrentUiStepId == 8)
-                {
-                    string FlNm = Path.Combine(
-                    SolutionDirectory,
-                    Path.GetDirectoryName((CreateViewUC.DataContext as CreateViewViewModel).SelectedModel.ViewProject),
-                    (CreateViewUC.DataContext as CreateViewViewModel).SelectedModel.ViewFolder,
-                    (CreateViewUC.DataContext as CreateViewViewModel).SelectedModel.PageViewName
-                    //+ "." 
-                    + (GeneratePageUC.DataContext as GenerateViewPageModel).FileExtension);
-                    File.WriteAllText(FlNm, (GeneratePageUC.DataContext as GenerateViewPageModel).GenerateText);
-                    DestinationProject.ProjectItems.AddFromFile(FlNm);
+                    if (CurrentUiStepId == 6)
+                    {
+                        FlNm = Path.Combine(
+                        SolutionDirectory,
+                        Path.GetDirectoryName((CreateViewUC.DataContext as CreateViewViewModel).SelectedModel.ViewProject),
+                        (CreateViewUC.DataContext as CreateViewViewModel).SelectedModel.ViewFolder,
+                        (CreateViewUC.DataContext as CreateViewViewModel).SelectedModel.ViewName
+                        + (GenerateUC.DataContext as GenerateViewModel).FileExtension);
+                        File.WriteAllText(FlNm, (GenerateUC.DataContext as GenerateViewModel).GenerateText);
+                        DestinationProject.ProjectItems.AddFromFile(FlNm);
+                    }
+                    else if (CurrentUiStepId == 8)
+                    {
+                        FlNm = Path.Combine(
+                        SolutionDirectory,
+                        Path.GetDirectoryName((CreateViewUC.DataContext as CreateViewViewModel).SelectedModel.ViewProject),
+                        (CreateViewUC.DataContext as CreateViewViewModel).SelectedModel.ViewFolder,
+                        (CreateViewUC.DataContext as CreateViewViewModel).SelectedModel.PageViewName
+                        //+ "." 
+                        + (GeneratePageUC.DataContext as GenerateViewPageModel).FileExtension);
+                        File.WriteAllText(FlNm, (GeneratePageUC.DataContext as GenerateViewPageModel).GenerateText);
+                        DestinationProject.ProjectItems.AddFromFile(FlNm);
+                    }
                 }
-
-                MessageBox.Show(SuccessNotification, "Done",MessageBoxButton.OK,MessageBoxImage.Information );
-            } catch(Exception e)
-            {
-                MessageBox.Show("Error: " + e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                catch (Exception e)
+                {
+                    MessageBox.Show("Error: Could not save generated file.  This type of exception can be thrown when EXISTING project added to the solution and developer tries to update VS project repository. Original Error: " + e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+                try
+                {
+                    DestinationProject.ProjectItems.AddFromFile(FlNm);
+                    MessageBox.Show(SuccessNotification, "Done", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show("Error: Could not update VS Solution repository file. This type of exception can be thrown when existing project added to the solution and developer tries to update VS project repository.  Original Error: " + e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
             }
         }
 
@@ -521,7 +538,7 @@ namespace CS2WPF.ViewModel
             }
             if (!isChanged)
             {
-                isChanged = string.IsNullOrEmpty( CurrentDbContext.DbContextProjectUniqueName) || string.IsNullOrEmpty(CurrentDbContext.DbContextFullClassName);
+                isChanged = string.IsNullOrEmpty(CurrentDbContext.DbContextProjectUniqueName) || string.IsNullOrEmpty(CurrentDbContext.DbContextFullClassName);
             }
             if (!isChanged)
             {
@@ -531,7 +548,8 @@ namespace CS2WPF.ViewModel
             {
                 //CurrentDbContext.DbContextProject
                 isChanged = (SelectSourceEntityUC.DataContext as SelectEntityForGivenDbContextViewModel).SelectedDbContext.CodeElementRef == null;
-                if (!isChanged) {
+                if (!isChanged)
+                {
                     isChanged = (SelectSourceEntityUC.DataContext as SelectEntityForGivenDbContextViewModel).SelectedDbContext.CodeElementRef.ProjectItem == null;
                 }
                 if (!isChanged)
@@ -548,7 +566,7 @@ namespace CS2WPF.ViewModel
             if (isChanged)
             {
                 string projectName = "";
-                if((SelectSourceEntityUC.DataContext as SelectEntityForGivenDbContextViewModel).SelectedDbContext.CodeElementRef != null)
+                if ((SelectSourceEntityUC.DataContext as SelectEntityForGivenDbContextViewModel).SelectedDbContext.CodeElementRef != null)
                 {
                     if ((SelectSourceEntityUC.DataContext as SelectEntityForGivenDbContextViewModel).SelectedDbContext.CodeElementRef.ProjectItem != null)
                     {
@@ -584,7 +602,8 @@ namespace CS2WPF.ViewModel
                     if (CurrentDbContext.ModelViews == null)
                     {
                         CurrentDbContext.ModelViews = new List<ModelViewSerializable>();
-                    } else
+                    }
+                    else
                     {
                         CurrentDbContext.ModelViews.Clear();
                     }

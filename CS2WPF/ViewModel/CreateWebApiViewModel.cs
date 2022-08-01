@@ -18,13 +18,13 @@ using System.Windows.Input;
 
 namespace CS2WPF.ViewModel
 {
-    #pragma warning disable VSTHRD010
+#pragma warning disable VSTHRD010
     public class CreateWebApiViewModel : IsReadyViewModel
     {
         #region Fields
         protected DTE2 Dte;
         protected SolutionCodeElement _SelectedDbContext;
-        protected DbContextSerializable _SerializableDbContext;
+        protected DbContextSerializable _SerializableDbContext = null;
         protected ObservableCollection<ModelViewSerializable> _ModelViews;
         protected ModelViewSerializable _SelectedModel = null;
         protected Object _SelectedTreeViewItem;
@@ -48,8 +48,10 @@ namespace CS2WPF.ViewModel
 
         protected Visibility _FAPIAttributeVisibility = Visibility.Collapsed;
         protected Visibility _FAPIAttributePropertyVisibility = Visibility.Collapsed;
+        protected Visibility _UnuqieKeyVisibility = Visibility.Collapsed;
 
         protected Object _SelectedItem;
+        protected string _WebApiRoutePrefix;
         protected string _WebApiServiceName;
         protected string _WebApiSufix = "WebApiController";
         protected bool _IsWebApiDelete;
@@ -78,7 +80,7 @@ namespace CS2WPF.ViewModel
         public CreateWebApiViewModel(DTE2 dte) : base()
         {
             this.Dte = dte;
-            UiInputTypes = new ObservableCollection<InputTypeEnum>() { InputTypeEnum.Default, InputTypeEnum.ReadOnly, 
+            UiInputTypes = new ObservableCollection<InputTypeEnum>() { InputTypeEnum.Default, InputTypeEnum.ReadOnly,
                 InputTypeEnum.Combo, InputTypeEnum.Typeahead, InputTypeEnum.SearchDialog, InputTypeEnum.Hidden };
             ModelViews = new ObservableCollection<ModelViewSerializable>();
             ScalarProperties = new ObservableCollection<ModelViewPropertyOfVwNotified>();
@@ -88,6 +90,24 @@ namespace CS2WPF.ViewModel
         }
         public TreeViewItem MainTreeViewRootItem { get; set; }
         public ObservableCollection<InputTypeEnum> UiInputTypes { get; set; }
+        public bool Localize
+        {
+            get
+            {
+                return SerializableDbContext == null ? false : SerializableDbContext.Localize;
+            }
+            set
+            {
+                if (SerializableDbContext != null)
+                {
+                    if (SerializableDbContext.Localize != value)
+                    {
+                        SerializableDbContext.Localize = value;
+                        OnPropertyChanged();
+                    }
+                }
+            }
+        }
         public ObservableCollection<ModelViewSerializable> ForeignKeyChainViews
         {
             get { return _ForeignKeyChainViews; }
@@ -113,6 +133,7 @@ namespace CS2WPF.ViewModel
                 SelectedTreeViewItem = null;
                 _SelectedDbContext = value;
                 OnPropertyChanged();
+                OnPropertyChanged("Localize");
                 OnSelectedDbContextChanged();
                 if (this.MainTreeViewRootItem != null)
                 {
@@ -131,6 +152,7 @@ namespace CS2WPF.ViewModel
                 SelectedTreeViewItem = null;
                 _SerializableDbContext = value;
                 OnPropertyChanged();
+                OnPropertyChanged("Localize");
                 OnSerializableDbContextChanged();
             }
         }
@@ -161,6 +183,7 @@ namespace CS2WPF.ViewModel
                     HintVisibility = Visibility.Collapsed;
                 }
                 OnPropertyChanged();
+
             }
         }
         public ObservableCollection<ModelViewPropertyOfVwNotified> ScalarProperties
@@ -229,6 +252,7 @@ namespace CS2WPF.ViewModel
                         KeyPropertyVisibility = Visibility.Collapsed;
                         RootVisibility = Visibility.Collapsed;
                         ForeignKeyVisibility = Visibility.Collapsed;
+                        UnuqieKeyVisibility = Visibility.Collapsed;
                         UIFormPropListVisibility = Visibility.Collapsed;
                         UIListPropListVisibility = Visibility.Collapsed;
                         UIFormPropertyVisibility = Visibility.Collapsed;
@@ -248,6 +272,7 @@ namespace CS2WPF.ViewModel
                         PropertyVisibility = Visibility.Collapsed;
                         ScalarPropertyVisibility = Visibility.Collapsed;
                         ForeignKeyVisibility = Visibility.Collapsed;
+                        UnuqieKeyVisibility = Visibility.Collapsed;
                         UIFormPropListVisibility = Visibility.Collapsed;
                         UIListPropListVisibility = Visibility.Collapsed;
                         UIFormPropertyVisibility = Visibility.Collapsed;
@@ -291,6 +316,11 @@ namespace CS2WPF.ViewModel
                             else if ("UI Form Properties".Equals(treeViewItem.Tag))
                             {
                                 UIFormPropListVisibility = Visibility.Visible;
+                            }
+                            else if ("UniqueKeys".Equals(treeViewItem.Tag))
+                            {
+                                // show tabled data in the future releases
+                                HintVisibility = Visibility.Visible;
                             }
                             else
                             {
@@ -368,13 +398,13 @@ namespace CS2WPF.ViewModel
                             SelectedItem = null;
                             if (ForeignKeyChainViews == null) ForeignKeyChainViews = new ObservableCollection<ModelViewSerializable>();
                             ForeignKeyChainViews.Clear();
-                            if(SerializableDbContext != null)
+                            if (SerializableDbContext != null)
                             {
-                                if(SelectedModel !=null)
+                                if (SelectedModel != null)
                                 {
-                                    List<ModelViewSerializable> rslt = 
+                                    List<ModelViewSerializable> rslt =
                                         SerializableDbContext.GetViewsByForeignNameChain(SelectedModel.ViewName, modelViewUIFormProperty.ForeignKeyNameChain);
-                                    if(rslt != null)
+                                    if (rslt != null)
                                     {
                                         rslt.ForEach(i => ForeignKeyChainViews.Add(i));
                                     }
@@ -387,6 +417,11 @@ namespace CS2WPF.ViewModel
                         {
                             SelectedItem = _SelectedTreeViewItem;
                             UIListPropertyVisibility = Visibility.Visible;
+                        }
+                        else if (_SelectedTreeViewItem is ModelViewUniqueKeySerializable)
+                        {
+                            SelectedItem = _SelectedTreeViewItem;
+                            UnuqieKeyVisibility = Visibility.Visible;
                         }
                         else
                         {
@@ -462,6 +497,20 @@ namespace CS2WPF.ViewModel
                 OnPropertyChanged();
             }
         }
+        public Visibility UnuqieKeyVisibility
+        {
+            get
+            {
+                return _UnuqieKeyVisibility;
+            }
+            set
+            {
+                if (_UnuqieKeyVisibility == value) return;
+                _UnuqieKeyVisibility = value;
+                OnPropertyChanged();
+            }
+        }
+
         public Visibility ScalarPropertyVisibility
         {
             get
@@ -646,6 +695,22 @@ namespace CS2WPF.ViewModel
                 CheckIsReady();
             }
         }
+        public string WebApiRoutePrefix
+        {
+            get
+            {
+                return _WebApiRoutePrefix;
+            }
+            set
+            {
+                if (_WebApiRoutePrefix == value) return;
+                _WebApiRoutePrefix = value;
+                OnPropertyChanged();
+                CheckIsReady();
+            }
+        }
+
+
         public bool IsWebApiSelectAll
         {
             get
@@ -857,6 +922,7 @@ namespace CS2WPF.ViewModel
         {
             if (SelectedModel == null) return null;
             ModelViewSerializable result = SelectedModel.ModelViewSerializableGetShallowCopy();
+            result.WebApiRoutePrefix = this.WebApiRoutePrefix;
             result.WebApiServiceName = this.WebApiServiceName;
             result.IsWebApiSelectAll = this.IsWebApiSelectAll;
             result.IsWebApiSelectManyWithPagination = this.IsWebApiSelectManyWithPagination;
@@ -868,7 +934,7 @@ namespace CS2WPF.ViewModel
             result.WebApiServiceDefaultProjectNameSpace = this.DefaultProjectNameSpace;
             result.WebApiServiceFolder = this.DestinationFolder;
             result.ScalarProperties = new List<ModelViewPropertyOfVwSerializable>();
-            foreach(ModelViewPropertyOfVwNotified srcProp in ScalarProperties)
+            foreach (ModelViewPropertyOfVwNotified srcProp in ScalarProperties)
             {
                 result.ScalarProperties.Add(srcProp.ModelViewPropertyOfVwNotifiedAssignTo(new ModelViewPropertyOfVwSerializable()));
             }
@@ -898,10 +964,11 @@ namespace CS2WPF.ViewModel
             if (SelectedModel == null) return null;
             ModelViewSerializable result = SelectedModel.ModelViewSerializableGetShallowCopy();
 
-            if(result.CommonStaffs == null)
+            if (result.CommonStaffs == null)
             {
                 result.CommonStaffs = new List<CommonStaffSerializable>();
-            } else
+            }
+            else
             {
                 result.CommonStaffs = new List<CommonStaffSerializable>();
                 SelectedModel.CommonStaffs.ForEach(c => result.CommonStaffs.Add(new CommonStaffSerializable()
@@ -915,7 +982,7 @@ namespace CS2WPF.ViewModel
                     T4Template = c.T4Template
                 }));
             }
-            CommonStaffSerializable commonStaffItem = 
+            CommonStaffSerializable commonStaffItem =
                 result.CommonStaffs.Where(c => c.FileType == FileType).FirstOrDefault();
             if (commonStaffItem == null)
             {
@@ -980,7 +1047,8 @@ namespace CS2WPF.ViewModel
                 {
                     string jsonString = File.ReadAllText(locFileName);
                     SerializableDbContext = JsonConvert.DeserializeObject<DbContextSerializable>(jsonString);
-                } else
+                }
+                else
                 {
                     SerializableDbContext = new DbContextSerializable();
                 }
@@ -991,14 +1059,15 @@ namespace CS2WPF.ViewModel
             SelectedTreeViewItem = null;
             ModelViews.Clear();
             if (SerializableDbContext == null) return;
-            // if ((SerializableDbContext.ModelViews == null) && IsWebServiceEditable) return;
+            //if ((SerializableDbContext.ModelViews == null) && IsWebServiceEditable) return;
             if (SerializableDbContext.ModelViews == null) return;
 
             if ((SerializableDbContext.ModelViews.Count < 1) && IsWebServiceEditable) return;
 
-            if(!IsWebServiceEditable)
+            if (!IsWebServiceEditable)
             {
-                ModelViewSerializable contextItm = new ModelViewSerializable() {
+                ModelViewSerializable contextItm = new ModelViewSerializable()
+                {
                     ViewName = ContextItemViewName,
                     CommonStaffs = SerializableDbContext.CommonStaffs
                 };
@@ -1031,7 +1100,7 @@ namespace CS2WPF.ViewModel
         public void OnSelectedModelChanged()
         {
             SelectedTreeViewItem = null;
-            if(ScalarProperties == null) ScalarProperties = new ObservableCollection<ModelViewPropertyOfVwNotified>();
+            if (ScalarProperties == null) ScalarProperties = new ObservableCollection<ModelViewPropertyOfVwNotified>();
             if (UIFormProperties == null) UIFormProperties = new ObservableCollection<ModelViewUIFormProperty>();
             if (UIListProperties == null) UIListProperties = new ObservableCollection<ModelViewUIListProperty>();
 
@@ -1049,10 +1118,12 @@ namespace CS2WPF.ViewModel
             if (string.IsNullOrEmpty(SelectedModel.WebApiServiceName))
             {
                 WebApiServiceName = SelectedModel.ViewName + WebApiSufix;
-            } else
+            }
+            else
             {
                 WebApiServiceName = SelectedModel.WebApiServiceName;
             }
+            this.WebApiRoutePrefix = SelectedModel.WebApiRoutePrefix;
             this.IsWebApiSelectAll = SelectedModel.IsWebApiSelectAll;
             this.IsWebApiSelectManyWithPagination = SelectedModel.IsWebApiSelectManyWithPagination;
             this.IsWebApiSelectOneByPrimarykey = SelectedModel.IsWebApiSelectOneByPrimarykey;
@@ -1063,21 +1134,21 @@ namespace CS2WPF.ViewModel
             {
                 IsViewHasProperties = SelectedModel.ScalarProperties.Count > 0;
             }
-            if(_IsViewHasProperties)
+            if (_IsViewHasProperties)
             {
                 if (SelectedModel.PrimaryKeyProperties != null)
                 {
-                    if(SelectedModel.PrimaryKeyProperties.Count > 0)
+                    if (SelectedModel.PrimaryKeyProperties.Count > 0)
                     {
-                        foreach(ModelViewKeyPropertySerializable prop in SelectedModel.PrimaryKeyProperties)
+                        foreach (ModelViewKeyPropertySerializable prop in SelectedModel.PrimaryKeyProperties)
                         {
                             IsViewHasRimaryKey = false;
-                            if (!  SelectedModel.ScalarProperties.Any(p =>
-                                 ((p.OriginalPropertyName == prop.OriginalPropertyName) && (string.IsNullOrEmpty(p.ForeignKeyNameChain)))) )
+                            if (!SelectedModel.ScalarProperties.Any(p =>
+                               ((p.OriginalPropertyName == prop.OriginalPropertyName) && (string.IsNullOrEmpty(p.ForeignKeyNameChain)))))
                             {
                                 if (SelectedModel.ForeignKeys != null)
                                 {
-                                    foreach(ModelViewForeignKeySerializable fk in SelectedModel.ForeignKeys)
+                                    foreach (ModelViewForeignKeySerializable fk in SelectedModel.ForeignKeys)
                                     {
                                         if ((fk.ForeignKeyProps != null) && (fk.PrincipalKeyProps != null))
                                         {
@@ -1086,7 +1157,7 @@ namespace CS2WPF.ViewModel
                                             {
                                                 cnt = fk.PrincipalKeyProps.Count;
                                             }
-                                            for(int i = 0; i < cnt; i++)
+                                            for (int i = 0; i < cnt; i++)
                                             {
                                                 if (fk.ForeignKeyProps[i].OriginalPropertyName == prop.OriginalPropertyName)
                                                 {
@@ -1100,17 +1171,18 @@ namespace CS2WPF.ViewModel
                                                 }
                                             }
                                         }
-                                        if(_IsViewHasRimaryKey)
+                                        if (_IsViewHasRimaryKey)
                                         {
                                             break;
                                         }
                                     }
                                 }
-                            } else
+                            }
+                            else
                             {
                                 IsViewHasRimaryKey = true;
                             }
-                            
+
                             if (!_IsViewHasRimaryKey) break;
                         }
                     }
@@ -1127,7 +1199,7 @@ namespace CS2WPF.ViewModel
             IsViewHasAllRequiredProperties = false;
             if (_IsViewHasRimaryKey)
             {
-                if(SelectedModel.AllProperties != null)
+                if (SelectedModel.AllProperties != null)
                 {
                     if (SelectedModel.AllProperties.Count > 0)
                     {
@@ -1135,20 +1207,44 @@ namespace CS2WPF.ViewModel
                         foreach (ModelViewEntityPropertySerializable prop in SelectedModel.AllProperties)
                         {
                             if (!prop.IsRequired) continue;
-                            if(SelectedModel.PrimaryKeyProperties.Any(p => p.OriginalPropertyName == prop.OriginalPropertyName)) continue;
-                            IsViewHasAllRequiredProperties = 
+                            if (SelectedModel.PrimaryKeyProperties.Any(p => p.OriginalPropertyName == prop.OriginalPropertyName)) continue;
+                            IsViewHasAllRequiredProperties =
                                 SelectedModel.ScalarProperties.Any(p =>
                                 ((p.OriginalPropertyName == prop.OriginalPropertyName) && (string.IsNullOrEmpty(p.ForeignKeyNameChain))));
+                            if (!_IsViewHasAllRequiredProperties)
+                            {
+                                if (SelectedModel.ForeignKeys != null)
+                                {
+                                    foreach (ModelViewForeignKeySerializable foreignKey in SelectedModel.ForeignKeys)
+                                    {
+                                        if ((foreignKey.ForeignKeyProps == null) || (foreignKey.PrincipalKeyProps == null)) continue;
+                                        int cnt = foreignKey.ForeignKeyProps.Count;
+                                        if (cnt < foreignKey.PrincipalKeyProps.Count) cnt = foreignKey.PrincipalKeyProps.Count;
+                                        for (int i = 0; i < cnt; i++)
+                                        {
+                                            if (foreignKey.ForeignKeyProps[i].OriginalPropertyName == prop.OriginalPropertyName)
+                                            {
+                                                IsViewHasAllRequiredProperties = foreignKey.ScalarProperties.Any(s => (s.IsSelected &&
+                                                    (s.OriginalPropertyName == foreignKey.PrincipalKeyProps[i].OriginalPropertyName) &&
+                                                    // next line is correct: we do not look for deeper
+                                                    (s.ForeignKeyNameChain == foreignKey.NavigationName)));
+                                                if (_IsViewHasAllRequiredProperties) break;
+                                            }
+                                        }
+                                        if (_IsViewHasAllRequiredProperties) break;
+                                    }
+                                }
+                            }
                             if (!_IsViewHasAllRequiredProperties) break;
                         }
                     }
                 }
             }
-            if(!_IsViewHasAllRequiredProperties)
+            if (!_IsViewHasAllRequiredProperties)
             {
                 this.IsWebApiAdd = false;
             }
-            if(SelectedModel.ScalarProperties != null)
+            if (SelectedModel.ScalarProperties != null)
             {
                 if (SelectedModel.ScalarProperties.Count > 0)
                 {
@@ -1237,7 +1333,7 @@ namespace CS2WPF.ViewModel
         public void OnIsUsedByfilterChanged()
         {
             if (ScalarProperties == null) ScalarProperties = new ObservableCollection<ModelViewPropertyOfVwNotified>();
-            foreach(ModelViewPropertyOfVwNotified prop in ScalarProperties)
+            foreach (ModelViewPropertyOfVwNotified prop in ScalarProperties)
             {
                 prop.IsUsedByfilter = IsUsedByfilter;
             }
@@ -1287,13 +1383,13 @@ namespace CS2WPF.ViewModel
         {
             if (SelectedModel != null)
             {
-                if(SelectedModel.ViewName == ContextItemViewName)
+                if (SelectedModel.ViewName == ContextItemViewName)
                 {
                     IsReady.DoNotify(this, true);
                     return;
                 }
             }
-            IsReady.DoNotify(this, (!string.IsNullOrEmpty(WebApiServiceName)) && 
+            IsReady.DoNotify(this, (!string.IsNullOrEmpty(WebApiServiceName)) &&
                 (IsWebApiSelectAll || IsWebApiSelectManyWithPagination || IsWebApiSelectOneByPrimarykey ||
                 IsWebApiAdd || IsWebApiUpdate || IsWebApiDelete));
         }
@@ -1309,7 +1405,7 @@ namespace CS2WPF.ViewModel
         }
         public bool UiBtnFormCommandUpCanExecute(Object param)
         {
-            if(SelectedUIFormProperty == null) return false;
+            if (SelectedUIFormProperty == null) return false;
             int i = UIFormProperties.IndexOf(SelectedUIFormProperty);
             return i > 0;
         }

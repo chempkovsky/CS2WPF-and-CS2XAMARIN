@@ -23,7 +23,7 @@ namespace CS2WPF.Helpers
             if ((root == null) || string.IsNullOrEmpty(parameterType1) || string.IsNullOrEmpty(parameterType2)) return null;
             foreach (SyntaxNode nd in root.ChildNodes())
             {
-                if (nd.Kind() != SyntaxKind.MethodDeclaration) continue;
+                if (!nd.IsKind(SyntaxKind.MethodDeclaration)) continue;
                 MethodDeclarationSyntax methodDeclaration = nd as MethodDeclarationSyntax;
                 if (methodDeclaration == null) { continue; }
                 // method name
@@ -34,7 +34,7 @@ namespace CS2WPF.Helpers
                 if (methodDeclaration.ReturnType.Kind() != SyntaxKind.PredefinedType) continue;
                 PredefinedTypeSyntax predefinedType = methodDeclaration.ReturnType as PredefinedTypeSyntax;
                 if (predefinedType == null) continue;
-                if (predefinedType.Keyword.Kind() != SyntaxKind.VoidKeyword) continue;
+                if (!predefinedType.Keyword.IsKind(SyntaxKind.VoidKeyword)) continue;
                 // method modifiers
                 if (methodDeclaration.Modifiers == null) continue;
                 if (methodDeclaration.Modifiers.Count != 2) continue;
@@ -90,7 +90,7 @@ namespace CS2WPF.Helpers
             string parameterName = "";
             foreach (SyntaxNode nd in root.ChildNodes())
             {
-                if (nd.Kind() != SyntaxKind.MethodDeclaration) continue;
+                if (!nd.IsKind(SyntaxKind.MethodDeclaration)) continue;
                 methodDeclaration = nd as MethodDeclarationSyntax;
                 if (methodDeclaration == null) { continue; }
                 // method name
@@ -101,7 +101,7 @@ namespace CS2WPF.Helpers
                 if (methodDeclaration.ReturnType.Kind() != SyntaxKind.PredefinedType) continue;
                 PredefinedTypeSyntax predefinedType = methodDeclaration.ReturnType as PredefinedTypeSyntax;
                 if (predefinedType == null) continue;
-                if (predefinedType.Keyword.Kind() != SyntaxKind.VoidKeyword) continue;
+                if (!predefinedType.Keyword.IsKind(SyntaxKind.VoidKeyword)) continue;
                 // method modifiers
                 if (methodDeclaration.Modifiers == null) continue;
                 if (methodDeclaration.Modifiers.Count != 2) continue;
@@ -166,7 +166,7 @@ namespace CS2WPF.Helpers
             }
             foreach (SyntaxNode invchnd in invocation.ChildNodes())
             {
-                if (invchnd.Kind() == SyntaxKind.SimpleMemberAccessExpression)
+                if (invchnd.IsKind(SyntaxKind.SimpleMemberAccessExpression))
                 {
                     ExpressionSyntax exst = (invchnd as MemberAccessExpressionSyntax).Expression;
                     if (exst != null)
@@ -194,7 +194,7 @@ namespace CS2WPF.Helpers
             }
             foreach (SyntaxNode invchnd in invocation.ChildNodes())
             {
-                if (invchnd.Kind() == SyntaxKind.SimpleMemberAccessExpression)
+                if (invchnd.IsKind(SyntaxKind.SimpleMemberAccessExpression))
                 {
                     ExpressionSyntax exst = (invchnd as MemberAccessExpressionSyntax).Expression;
                     if (exst != null)
@@ -263,7 +263,7 @@ namespace CS2WPF.Helpers
             int cnt = invocation.ChildNodes().Count();
             foreach (SyntaxNode ndcn in invocation.ChildNodes())
             {
-                if (ndcn.Kind() == SyntaxKind.SimpleMemberAccessExpression)
+                if (ndcn.IsKind(SyntaxKind.SimpleMemberAccessExpression))
                 {
                     MemberAccessExpressionSyntax memberAccessExpressionSyntax = ndcn as MemberAccessExpressionSyntax;
                     entityNode = InvocationExpressionMethods(memberAccessExpressionSyntax.Expression, entityNode, methodNames);
@@ -321,7 +321,7 @@ namespace CS2WPF.Helpers
                         if (!methodNames.Any(i => string.Equals(i, methodName))) continue;
                     }
                 }
-                if (ndcn.Kind() == SyntaxKind.ArgumentList)
+                if (ndcn.IsKind(SyntaxKind.ArgumentList))
                 {
                     if (entityNode == null)
                     {

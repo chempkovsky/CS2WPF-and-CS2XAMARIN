@@ -10,7 +10,7 @@ using System.Windows.Input;
 
 namespace CS2WPF.ViewModel
 {
-    #pragma warning disable VSTHRD010
+#pragma warning disable VSTHRD010
     public class SelectDbContextViewModel : BaseSelectSourceViewModel
     {
         protected UserControlOneCommand _ActionUserControl = null;
@@ -49,14 +49,14 @@ namespace CS2WPF.ViewModel
         }
         public virtual void ReDefineUiCaptions()
         {
-            
+
             UiCommandCaption1 = "There is no \"override void OnModelCreating(...)\"-method in DbContext.";
             UiCommandCaption2 = "This method is essential for further steps.";
             UiCommandCaption3 = null;
             UiCommandLabelCaption = "     ";
             UiCommandButtonCaption = "  Create OnModelCreating() method  ";
             UiCommandProppertyNameVisibility = Visibility.Collapsed;
-            
+
             OnPropertyChanged("UiCommandCaption1");
             OnPropertyChanged("UiCommandCaption2");
             OnPropertyChanged("UiCommandCaption3");
@@ -85,7 +85,7 @@ namespace CS2WPF.ViewModel
         }
         public Visibility UiCommandProppertyNameVisibility { get; set; } = Visibility.Visible;
         public Visibility UiCommandButtonVisibility { get; set; } = Visibility.Visible;
-        
+
         public override SolutionCodeElement SelectedCodeElement
         {
             get
@@ -135,7 +135,7 @@ namespace CS2WPF.ViewModel
                         OnPropertyChanged("UiCommandProppertyName");
                     }
                 }
-            } 
+            }
             else
             {
                 DoAnaliseSelectedCodeElement();
@@ -234,7 +234,7 @@ namespace CS2WPF.ViewModel
             {
                 if (ce.Kind != vsCMElement.vsCMElementFunction) continue;
                 CodeFunction cf = ce as CodeFunction;
-                if(cf.Access != vsCMAccess.vsCMAccessProtected) continue;
+                if (cf.Access != vsCMAccess.vsCMAccessProtected) continue;
                 // vsCMFunction fk = cf.FunctionKind;
                 if ("OnModelCreating".Equals(cf.Name))
                 {
@@ -242,10 +242,10 @@ namespace CS2WPF.ViewModel
                     break;
                 }
             }
-            if(hasFunc)
+            if (hasFunc)
             {
                 ActionUserControl = null;
-            } 
+            }
             else
             {
                 if (_ActionUserControl == null)
@@ -258,7 +258,7 @@ namespace CS2WPF.ViewModel
         }
         public override void CheckIsReady()
         {
-            IsReady.DoNotify(this, !(string.IsNullOrEmpty(SelectedClassName) || (SelectedCodeElement == null) || (ActionUserControl != null) ));
+            IsReady.DoNotify(this, !(string.IsNullOrEmpty(SelectedClassName) || (SelectedCodeElement == null) || (ActionUserControl != null)));
         }
         #endregion
 
@@ -280,12 +280,12 @@ namespace CS2WPF.ViewModel
             if (SelectedCodeElement == null)
             {
                 UiCommandButtonClicked.DoNotify(this);
-            } 
+            }
             else
             {
                 CodeClass cc = SelectedCodeElement.CodeElementRef as CodeClass;
-                if(cc == null) return;
-                CodeFunction cf = cc.AddMethodHelper("OnModelCreating",  vsCMFunction.vsCMFunctionFunction, vsCMTypeRef.vsCMTypeRefVoid, vsCMAccess.vsCMAccessDefault);
+                if (cc == null) return;
+                CodeFunction cf = cc.AddMethodHelper("OnModelCreating", vsCMFunction.vsCMFunctionFunction, vsCMTypeRef.vsCMTypeRefVoid, vsCMAccess.vsCMAccessDefault);
                 if (cf == null) return;
                 string modelBuilderType = "System.Data.Entity.DbModelBuilder";
                 if (cc.IsDerivedFrom["Microsoft.EntityFrameworkCore.DbContext"])

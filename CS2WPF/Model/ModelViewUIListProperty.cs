@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CS2WPF.Model
 {
-    public class ModelViewUIListProperty: ModelViewUIBaseProperty
+    public class ModelViewUIListProperty : ModelViewUIBaseProperty
     {
     }
 }

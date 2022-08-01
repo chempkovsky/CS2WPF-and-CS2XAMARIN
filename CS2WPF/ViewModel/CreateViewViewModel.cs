@@ -14,7 +14,7 @@ using System.Windows.Input;
 
 namespace CS2WPF.ViewModel
 {
-    #pragma warning disable VSTHRD010
+#pragma warning disable VSTHRD010
     public class CreateViewViewModel : IsReadyViewModel
     {
         #region Fields
@@ -35,10 +35,11 @@ namespace CS2WPF.ViewModel
         protected Visibility _AttributePropertyVisibility = Visibility.Collapsed;
         protected Visibility _FAPIAttributeVisibility = Visibility.Collapsed;
         protected Visibility _FAPIAttributePropertyVisibility = Visibility.Collapsed;
+        protected Visibility _UnuqieKeyVisibility = Visibility.Collapsed;
         protected Object _SelectedItem;
         protected string _SelectedItemViewName = null;
         protected string _CheckErrorsText = null;
-        
+
         #endregion
         public CreateViewViewModel(DTE2 dte) : base()
         {
@@ -124,7 +125,8 @@ namespace CS2WPF.ViewModel
         public DbContextSerializable CurrentDbContext { get; set; }
         public void OnSelectedDbContextChanged()
         {
-            if (SelectedModel == null) {
+            if (SelectedModel == null)
+            {
                 SelectedModel = new ModelView();
             }
             SelectedTreeViewItem = null;
@@ -144,7 +146,7 @@ namespace CS2WPF.ViewModel
             }
             SelectedTreeViewItem = null;
             SelectedModel.ClearModelView();
-            if(this.MainTreeViewRootItem != null)
+            if (this.MainTreeViewRootItem != null)
             {
                 this.MainTreeViewRootItem.IsSelected = true;
                 HintVisibility = Visibility.Collapsed;
@@ -249,6 +251,19 @@ namespace CS2WPF.ViewModel
                 OnPropertyChanged();
             }
         }
+        public Visibility UnuqieKeyVisibility
+        {
+            get
+            {
+                return _UnuqieKeyVisibility;
+            }
+            set
+            {
+                if (_UnuqieKeyVisibility == value) return;
+                _UnuqieKeyVisibility = value;
+                OnPropertyChanged();
+            }
+        }
         public Visibility AttributeVisibility
         {
             get
@@ -329,11 +344,14 @@ namespace CS2WPF.ViewModel
         }
         public void OnSelectAllPropertiesChanged()
         {
-            if(SelectedModel.ScalarProperties != null)
+            if (SelectedModel != null)
             {
-                foreach(ModelViewProperty  modelViewProperty in SelectedModel.ScalarProperties)
+                if (SelectedModel.ScalarProperties != null)
                 {
-                    modelViewProperty.IsSelected = SelectAllProperties;
+                    foreach (ModelViewProperty modelViewProperty in SelectedModel.ScalarProperties)
+                    {
+                        modelViewProperty.IsSelected = SelectAllProperties;
+                    }
                 }
             }
         }
@@ -381,6 +399,7 @@ namespace CS2WPF.ViewModel
                         KeyPropertyVisibility = Visibility.Collapsed;
                         RootVisibility = Visibility.Collapsed;
                         ForeignKeyVisibility = Visibility.Collapsed;
+                        UnuqieKeyVisibility = Visibility.Collapsed;
                         AttributePropertyVisibility = Visibility.Collapsed;
                         AttributeVisibility = Visibility.Collapsed;
                         FAPIAttributePropertyVisibility = Visibility.Collapsed;
@@ -394,6 +413,7 @@ namespace CS2WPF.ViewModel
                         KeyPropertyVisibility = Visibility.Collapsed;
                         PropertyVisibility = Visibility.Collapsed;
                         ForeignKeyVisibility = Visibility.Collapsed;
+                        UnuqieKeyVisibility = Visibility.Collapsed;
                         AttributePropertyVisibility = Visibility.Collapsed;
                         AttributeVisibility = Visibility.Collapsed;
                         FAPIAttributePropertyVisibility = Visibility.Collapsed;
@@ -425,7 +445,13 @@ namespace CS2WPF.ViewModel
                             {
                                 // show tabled data in the future releases
                                 HintVisibility = Visibility.Visible;
-                            } else
+                            }
+                            else if ("UniqueKeys".Equals(treeViewItem.Tag))
+                            {
+                                // show tabled data in the future releases
+                                HintVisibility = Visibility.Visible;
+                            }
+                            else
                             {
                                 HintVisibility = Visibility.Visible;
                             }
@@ -467,6 +493,11 @@ namespace CS2WPF.ViewModel
                             SelectedItem = _selectedTreeViewItem;
                             SelectedItemViewName = (_selectedTreeViewItem as ModelViewForeignKey).ViewName;
                             ForeignKeyVisibility = Visibility.Visible;
+                        }
+                        else if (_selectedTreeViewItem is ModelViewUniqueKey)
+                        {
+                            SelectedItem = _selectedTreeViewItem;
+                            UnuqieKeyVisibility = Visibility.Visible;
                         }
                         else
                         {
@@ -523,7 +554,7 @@ namespace CS2WPF.ViewModel
             if (modelViewSerializable.ScalarProperties == null) return;
             modelViewSerializable.ScalarProperties.ForEach(mv => foreignKey.ScalarProperties.Add(mv.ModelViewPropertySerializableAssingTo(new ModelViewProperty())));
             bool isRequired = foreignKey.ModelViewForeignKeyIsRequired();
-            foreach (ModelViewProperty prop in foreignKey.ScalarProperties) 
+            foreach (ModelViewProperty prop in foreignKey.ScalarProperties)
             {
                 prop.IsRequiredInView = prop.IsRequiredInView && isRequired;
             }

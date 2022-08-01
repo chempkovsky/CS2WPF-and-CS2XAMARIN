@@ -28,7 +28,7 @@ namespace CS2WPF.View
         }
         public void SetDataContext(Object dataContext)
         {
-            if(dataContext is CreateWebApiViewModel)
+            if (dataContext is CreateWebApiViewModel)
             {
                 (dataContext as CreateWebApiViewModel).MainTreeViewRootItem = this.MainTreeViewRootItem;
             }

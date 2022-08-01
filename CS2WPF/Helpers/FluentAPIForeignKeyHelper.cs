@@ -32,10 +32,11 @@ namespace CS2WPF.Helpers
             if (foreignKey.PrincipalKeyProps == null)
             {
                 foreignKey.HasErrors = true;
-                if(!string.IsNullOrEmpty(foreignKey.ErrorsText)) foreignKey.ErrorsText += "\r\n";
+                if (!string.IsNullOrEmpty(foreignKey.ErrorsText)) foreignKey.ErrorsText += "\r\n";
                 foreignKey.ErrorsText += "Primary Key Props is not set.";
 
-            } else
+            }
+            else
             {
                 if (foreignKey.PrincipalKeyProps.Count < 1)
                 {
@@ -50,7 +51,7 @@ namespace CS2WPF.Helpers
             }
             if ((foreignKey.ForeignKeyProps != null) && (foreignKey.PrincipalKeyProps != null))
             {
-                if(foreignKey.ForeignKeyProps.Count != foreignKey.PrincipalKeyProps.Count)
+                if (foreignKey.ForeignKeyProps.Count != foreignKey.PrincipalKeyProps.Count)
                 {
                     foreignKey.HasErrors = true;
                     if (!string.IsNullOrEmpty(foreignKey.ErrorsText)) foreignKey.ErrorsText += "\r\n";
@@ -73,6 +74,52 @@ namespace CS2WPF.Helpers
             }
 
             return foreignKey;
+        }
+        public static bool IsTheListOfNamesIdentical(this FluentAPIKey fapks, ICollection<FluentAPIProperty> keyProperties)
+        {
+            bool result = false;
+            if ((fapks == null) || (keyProperties == null)) return result;
+            if (fapks.KeyProperties == null) return result;
+            if (fapks.KeyProperties.Count != keyProperties.Count) return result;
+            int i = 0;
+            foreach (FluentAPIProperty property in keyProperties)
+            {
+                if (!string.Equals(property.PropName, fapks.KeyProperties[i].PropName)) return result;
+                i++;
+            }
+            return true;
+        }
+        public static bool IsTheListOfNamesIdentical(this FluentAPIKey fapks, ICollection<string> keyProperties)
+        {
+            bool result = false;
+            if ((fapks == null) || (keyProperties == null)) return result;
+            if (fapks.KeyProperties == null) return result;
+            if (fapks.KeyProperties.Count != keyProperties.Count) return result;
+            int i = 0;
+            foreach (string key in keyProperties)
+            {
+                if (!string.Equals(key, fapks.KeyProperties[i].PropName)) return result;
+                i++;
+            }
+            return true;
+        }
+        public static FluentAPIKey GetFluentAPIKeyWithIdenticalListOfNames(this ICollection<FluentAPIKey> fapks, ICollection<FluentAPIProperty> keyProperties)
+        {
+            if ((fapks == null) || (keyProperties == null)) return null;
+            foreach (FluentAPIKey r in fapks)
+            {
+                if (r.IsTheListOfNamesIdentical(keyProperties)) return r;
+            }
+            return null;
+        }
+        public static FluentAPIKey GetFluentAPIKeyWithIdenticalListOfNames(this ICollection<FluentAPIKey> fapks, ICollection<string> keyProperties)
+        {
+            if ((fapks == null) || (keyProperties == null)) return null;
+            foreach (FluentAPIKey r in fapks)
+            {
+                if (r.IsTheListOfNamesIdentical(keyProperties)) return r;
+            }
+            return null;
         }
     }
 }

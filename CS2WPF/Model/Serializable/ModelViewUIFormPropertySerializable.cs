@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace CS2WPF.Model.Serializable
 {
     [Serializable]
-    public class ModelViewUIFormPropertySerializable: ModelViewUIPropertySerializable
+    public class ModelViewUIFormPropertySerializable : ModelViewUIPropertySerializable
     {
         public InputTypeEnum InputTypeWhenAdd { get; set; }
         public InputTypeEnum InputTypeWhenUpdate { get; set; }

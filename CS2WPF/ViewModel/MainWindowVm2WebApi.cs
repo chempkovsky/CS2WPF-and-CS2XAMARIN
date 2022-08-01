@@ -14,7 +14,7 @@ using System.Windows;
 
 namespace CS2WPF.ViewModel
 {
-    #pragma warning disable VSTHRD010
+#pragma warning disable VSTHRD010
     public class MainWindowVm2WebApi : MainWindowBase
     {
         #region Fieds
@@ -151,7 +151,8 @@ namespace CS2WPF.ViewModel
                     if (this.DialogFactory != null)
                     {
                         this.DialogFactory.CreateInstance(out aDialog);
-                        if (aDialog != null) {
+                        if (aDialog != null)
+                        {
                             aDialogStarted = aDialog.StartWaitDialog("Generation started", "VS is Busy", "Please wait", null, "Generation started", 0, false, true) == VSConstants.S_OK;
                         }
                     }
@@ -217,6 +218,7 @@ namespace CS2WPF.ViewModel
             if (existedModelViewSerializable != null)
             {
                 existedModelViewSerializable.ScalarProperties = modelViewSerializable.ScalarProperties;
+                existedModelViewSerializable.WebApiRoutePrefix = modelViewSerializable.WebApiRoutePrefix;
                 existedModelViewSerializable.WebApiServiceName = modelViewSerializable.WebApiServiceName;
                 existedModelViewSerializable.IsWebApiSelectAll = modelViewSerializable.IsWebApiSelectAll;
                 existedModelViewSerializable.IsWebApiSelectManyWithPagination = modelViewSerializable.IsWebApiSelectManyWithPagination;
@@ -230,6 +232,7 @@ namespace CS2WPF.ViewModel
 
                 existedModelViewSerializable.UIFormProperties = modelViewSerializable.UIFormProperties;
                 existedModelViewSerializable.UIListProperties = modelViewSerializable.UIListProperties;
+                existedModelViewSerializable.UniqueKeys = modelViewSerializable.UniqueKeys;
 
             }
             else
@@ -255,23 +258,33 @@ namespace CS2WPF.ViewModel
                 string jsonString = JsonConvert.SerializeObject(localDbContext);
                 File.WriteAllText(locFileName, jsonString);
             }
-
-            try
             {
-                SolutionDirectory = System.IO.Path.GetDirectoryName(Dte.Solution.FullName);
-                string FlNm = Path.Combine(
-                    SolutionDirectory,
-                    Path.GetDirectoryName(modelViewSerializable.WebApiServiceProject),
-                    modelViewSerializable.WebApiServiceFolder,
-                    modelViewSerializable.WebApiServiceName
-                    + (GenerateUC.DataContext as GenerateCommonStaffViewModel).FileExtension);
-                File.WriteAllText(FlNm, (GenerateUC.DataContext as GenerateCommonStaffViewModel).GenerateText);
-                DestinationProject.ProjectItems.AddFromFile(FlNm);
-                MessageBox.Show(SuccessNotification, "Done", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show("Error: " + e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                string FlNm = "";
+                try
+                {
+                    SolutionDirectory = System.IO.Path.GetDirectoryName(Dte.Solution.FullName);
+                    FlNm = Path.Combine(
+                        SolutionDirectory,
+                        Path.GetDirectoryName(modelViewSerializable.WebApiServiceProject),
+                        modelViewSerializable.WebApiServiceFolder,
+                        modelViewSerializable.WebApiServiceName
+                        + (GenerateUC.DataContext as GenerateCommonStaffViewModel).FileExtension);
+                    File.WriteAllText(FlNm, (GenerateUC.DataContext as GenerateCommonStaffViewModel).GenerateText);
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show("Error: Error: Could not save generated file. This type of exception can be thrown when EXISTING project added to the solution and developer tries to update VS project repository.  Original Error: " + e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+                try
+                {
+                    DestinationProject.ProjectItems.AddFromFile(FlNm);
+                    MessageBox.Show(SuccessNotification, "Done", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show("Error: Could not update VS Solution repository file. This type of exception can be thrown when EXISTING project added to the solution and developer tries to update VS project repository.  Original Error: " + e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
         }
         #endregion

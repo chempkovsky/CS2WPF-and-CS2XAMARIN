@@ -10,14 +10,14 @@ using System.Threading.Tasks;
 
 namespace CS2WPF.Model
 {
-    public class ModelViewProperty: ModelViewBaseProperty
+    public class ModelViewProperty : ModelViewBaseProperty
     {
         #region Fileds
-        protected bool   _IsSelected;
+        protected bool _IsSelected;
         protected string _ForeignKeyName;
         protected string _ForeignKeyNameChain;
         protected string _EditableViewPropertyName;
-        protected bool   _IsRequiredInView;
+        protected bool _IsRequiredInView;
         protected string _EditableJsonPropertyName;
         protected ObservableCollection<ModelViewAttribute> _Attributes;
         protected ObservableCollection<ModelViewFAPIAttribute> _FAPIAttributes;

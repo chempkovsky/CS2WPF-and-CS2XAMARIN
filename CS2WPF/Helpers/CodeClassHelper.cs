@@ -6,13 +6,11 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using VSLangProj;
 
 namespace CS2WPF.Helpers
 {
-    #pragma warning disable VSTHRD010
+#pragma warning disable VSTHRD010
     public static class CodeClassHelper
     {
         // System.DateTime ss; //not null (struct)
@@ -21,6 +19,96 @@ namespace CS2WPF.Helpers
         // System.Guid ss; //not null (struct)
         // Blob ->	System.Byte[] <- System.TimeSpan
 
+        public static bool IsCodePropertyNullable(this CodeProperty codeProperty)
+        {
+            if (codeProperty == null) return true;
+            int absoluteParentOffset = codeProperty.StartPoint.AbsoluteCharOffset;
+            int absoluteAttributesOffset = absoluteParentOffset;
+            CodeElements attribs = codeProperty.Attributes;
+            foreach (CodeElement attrib in attribs)
+            {
+                int i = attrib.GetEndPoint().AbsoluteCharOffset;
+                if (i > absoluteAttributesOffset) absoluteAttributesOffset = i;
+            }
+            string textToAnalise = codeProperty.StartPoint.CreateEditPoint().GetText(codeProperty.EndPoint)
+                .Substring(absoluteAttributesOffset - absoluteParentOffset).Replace("\n", " ").Replace("\r", " ").Replace("\t", " ").Replace("{", " ");
+            bool result = textToAnalise.IndexOf("?" + codeProperty.Name + " ") > 0;
+            if (!result)
+            {
+                int i = textToAnalise.IndexOf("?");
+                result = (i > -1) && (i < textToAnalise.IndexOf(" " + codeProperty.Name + " "));
+            }
+            return result;
+        }
+        public static List<FluentAPIEntityNode> GetFAPIAttributesForScalarProperties(this CodeClass srcClass, CodeClass dbContext)
+        {
+            if ((srcClass == null) || (dbContext == null)) return null;
+            string[] classNames = new string[] { srcClass.Name, srcClass.FullName };
+            CodeFunction codeFunction = dbContext.GetCodeFunctionByName(vsCMAccess.vsCMAccessProtected, "OnModelCreating");
+            if (codeFunction == null) return null;
+            List<FluentAPIEntityNode> filter = new List<FluentAPIEntityNode>()
+                    {
+                        new FluentAPIEntityNode()
+                        {
+                            Methods = new List<FluentAPIMethodNode>()
+                            {
+                                new FluentAPIMethodNode() {
+                                    MethodName = "Property"
+                                }
+                            }
+                        }
+                    };
+            return codeFunction.DoAnalyzeWithFilter(classNames, filter);
+        }
+        public static List<FluentAPIEntityNode> GetFAPIAttributesAndIgnoreForScalarProperties(this CodeClass srcClass, CodeClass dbContext)
+        {
+            if ((srcClass == null) || (dbContext == null)) return null;
+            string[] classNames = new string[] { srcClass.Name, srcClass.FullName };
+            CodeFunction codeFunction = dbContext.GetCodeFunctionByName(vsCMAccess.vsCMAccessProtected, "OnModelCreating");
+            if (codeFunction == null) return null;
+            List<FluentAPIEntityNode> filter = new List<FluentAPIEntityNode>()
+                    {
+                        new FluentAPIEntityNode()
+                        {
+                            Methods = new List<FluentAPIMethodNode>()
+                            {
+                                new FluentAPIMethodNode() {
+                                    MethodName = "Property"
+                                }
+                            }
+                        },
+                        new FluentAPIEntityNode()
+                        {
+                            Methods = new List<FluentAPIMethodNode>()
+                            {
+                                new FluentAPIMethodNode() {
+                                    MethodName = "Ignore"
+                                }
+                            }
+                        }
+                    };
+            return codeFunction.DoAnalyzeWithFilter(classNames, filter);
+        }
+        public static List<FluentAPIEntityNode> GetIgnoreNodes(this CodeClass srcClass, CodeClass dbContext)
+        {
+            if ((srcClass == null) || (dbContext == null)) return null;
+            string[] classNames = new string[] { srcClass.Name, srcClass.FullName };
+            CodeFunction codeFunction = dbContext.GetCodeFunctionByName(vsCMAccess.vsCMAccessProtected, "OnModelCreating");
+            if (codeFunction == null) return null;
+            List<FluentAPIEntityNode> filter = new List<FluentAPIEntityNode>()
+            {
+                new FluentAPIEntityNode()
+                {
+                    Methods = new List<FluentAPIMethodNode>()
+                    {
+                        new FluentAPIMethodNode() {
+                            MethodName = "Ignore"
+                        }
+                    }
+                }
+            };
+            return codeFunction.DoAnalyzeWithFilter(classNames, filter);
+        }
         public static bool IsScalarTypeOrString(this CodeTypeRef codeTypeRef)
         {
             if (codeTypeRef == null) return true;
@@ -79,7 +167,6 @@ namespace CS2WPF.Helpers
             }
             return true;
         }
-
         public static CodeFunction AddMethodHelper(this CodeClass destClass, string methodName, vsCMFunction Kind, vsCMTypeRef returnType, vsCMAccess Access)
         {
             if (destClass == null) return null;
@@ -101,7 +188,7 @@ namespace CS2WPF.Helpers
                 if (cp.Type == null) continue;
                 if (cp.Type.CodeType == null) continue;
                 if (cp.Type.CodeType.Kind != vsCMElement.vsCMElementClass) continue;
-                if (nameLookFor1.Equals(cp.Type.AsFullName, StringComparison.OrdinalIgnoreCase) || 
+                if (nameLookFor1.Equals(cp.Type.AsFullName, StringComparison.OrdinalIgnoreCase) ||
                     nameLookFor2.Equals(cp.Type.AsFullName, StringComparison.OrdinalIgnoreCase) ||
                     nameLookFor3.Equals(cp.Type.AsFullName, StringComparison.OrdinalIgnoreCase) ||
                     nameLookFor4.Equals(cp.Type.AsFullName, StringComparison.OrdinalIgnoreCase)
@@ -126,7 +213,7 @@ namespace CS2WPF.Helpers
                         {
                             usingDirective = ce;
                             string usingStr = ce.StartPoint.CreateEditPoint().GetText(ce.EndPoint);
-                            usingStr = usingStr.Replace("using", "").Replace(" ", "").Replace(";", "").Replace("\r","").Replace("\n","").Replace("\t", "");
+                            usingStr = usingStr.Replace("using", "").Replace(" ", "").Replace(";", "").Replace("\r", "").Replace("\n", "").Replace("\t", "");
                             if (nameSpace.Equals(usingStr, StringComparison.OrdinalIgnoreCase))
                             {
                                 return true;
@@ -151,11 +238,11 @@ namespace CS2WPF.Helpers
         public static CodeProperty AddDbSetPropertyHelper(this CodeClass destClass, CodeClass propertyClass, string PropertyName)
         {
             if ((destClass == null) || (propertyClass == null)) return null;
-            if ( (destClass.ProjectItem != null) && (propertyClass.ProjectItem != null))
+            if ((destClass.ProjectItem != null) && (propertyClass.ProjectItem != null))
             {
-                if ( (destClass.ProjectItem.ContainingProject != null) && (propertyClass.ProjectItem.ContainingProject != null))
+                if ((destClass.ProjectItem.ContainingProject != null) && (propertyClass.ProjectItem.ContainingProject != null))
                 {
-                    if(!string.Equals( destClass.ProjectItem.ContainingProject.UniqueName, propertyClass.ProjectItem.ContainingProject.UniqueName, StringComparison.OrdinalIgnoreCase))
+                    if (!string.Equals(destClass.ProjectItem.ContainingProject.UniqueName, propertyClass.ProjectItem.ContainingProject.UniqueName, StringComparison.OrdinalIgnoreCase))
                     {
                         VSProject destProject = destClass.ProjectItem.ContainingProject.Object as VSProject;
                         if (destProject != null)
@@ -171,7 +258,8 @@ namespace CS2WPF.Helpers
             string propertyClassName = propertyClass.Name;
             propertyNameSpace = propertyNameSpace.Replace("." + propertyClassName, "");
 
-            if (destClass.AddNameSpace(propertyNameSpace))
+
+            if (!destClass.AddNameSpace(propertyNameSpace))
             {
                 propertyClassName = propertyClass.FullName;
             }
@@ -181,11 +269,12 @@ namespace CS2WPF.Helpers
                 destClass.AddProperty(PropertyName, PropertyName, "DbSet<" + propertyClassName + ">", -1, vsCMAccess.vsCMAccessPublic, null);
             EditPoint editPoint = codeProperty.Getter.StartPoint.CreateEditPoint();
             editPoint.Delete(codeProperty.Getter.EndPoint);
-            editPoint.Insert("get ;");
+            editPoint.Insert("get => Set<" + propertyClassName + ">();");
+            //            editPoint.Insert("get ;");
 
             editPoint = codeProperty.Setter.StartPoint.CreateEditPoint();
             editPoint.Delete(codeProperty.Setter.EndPoint);
-            editPoint.Insert("set ;");
+            //            editPoint.Insert("set ;");
             if (destClass.ProjectItem != null)
             {
                 if (destClass.ProjectItem.IsDirty)
@@ -229,9 +318,10 @@ namespace CS2WPF.Helpers
             if ((srcClass == null) || (primKey == null)) return null;
             primKey.KeySource = InfoSourceEnum.ByAttribute;
             primKey.SourceCount = 0;
+            primKey.IsPrimary = true;
             if (primKey.KeyProperties != null) primKey.KeyProperties.Clear();
             string[] classNames = new string[] { srcClass.Name, srcClass.FullName };
-
+            List<FluentAPIEntityNode> ignoreNodes = null;
             if (dbContext != null)
             {
                 CodeFunction codeFunction = dbContext.GetCodeFunctionByName(vsCMAccess.vsCMAccessProtected, "OnModelCreating");
@@ -250,6 +340,8 @@ namespace CS2WPF.Helpers
                         }
                     };
                     List<FluentAPIEntityNode> entityNodes = codeFunction.DoAnalyzeWithFilter(classNames, filter);
+                    filter[0].Methods[0].MethodName = "Ignore";
+                    ignoreNodes = codeFunction.DoAnalyzeWithFilter(classNames, filter);
                     if (entityNodes != null)
                     {
                         primKey.SourceCount = entityNodes.Count;
@@ -258,24 +350,36 @@ namespace CS2WPF.Helpers
                             FluentAPIEntityNode node = entityNodes.Last();
                             primKey.KeySource = InfoSourceEnum.ByOnModelCreating;
                             if (primKey.KeyProperties == null) primKey.KeyProperties = new List<FluentAPIProperty>();
-                            foreach (FluentAPIMethodNode m in node.Methods)
+                            if (node.Methods != null)
                             {
-                                if (m.MethodName != "HasKey") continue;
-                                if (m.MethodArguments != null)
+                                FluentAPIMethodNode mthd = node.Methods.FirstOrDefault(m => "HasName".Equals(m.MethodName));
+                                if (mthd != null)
                                 {
-                                    int i = 0;
-                                    foreach (string ma in m.MethodArguments)
+                                    if (mthd.MethodArguments != null)
                                     {
-                                        primKey.KeyProperties.Add(new FluentAPIProperty()
-                                        {
-                                            PropName = ma,
-                                            PropOrder = i
-                                        });
-                                        i++;
+                                        primKey.KeyName = mthd.MethodArguments.FirstOrDefault();
                                     }
-                                    if (primKey.KeyProperties.Count > 0)
+                                }
+                                mthd = node.Methods.FirstOrDefault(m => "HasKey".Equals(m.MethodName));
+                                if (mthd != null)
+                                {
+                                    if (mthd.MethodArguments != null)
                                     {
-                                        return primKey;
+                                        int i = 0;
+                                        foreach (string ma in mthd.MethodArguments)
+                                        {
+                                            if (ignoreNodes.HoldsIgnore(ma)) continue;
+                                            primKey.KeyProperties.Add(new FluentAPIProperty()
+                                            {
+                                                PropName = ma,
+                                                PropOrder = i
+                                            });
+                                            i++;
+                                        }
+                                        if (primKey.KeyProperties.Count > 0)
+                                        {
+                                            return primKey;
+                                        }
                                     }
                                 }
                             }
@@ -295,25 +399,33 @@ namespace CS2WPF.Helpers
                 if (codeProperty.Access != vsCMAccess.vsCMAccessPublic) continue;
                 if (codeProperty.Type == null) continue;
                 if (codeProperty.Type.CodeType == null) continue;
-                if (!codeProperty.Type.IsNotNullableScalarTypeOrString()) continue;
 
-                if( codeProperty.GetCodePropertyAttributeByFullName("System.ComponentModel.DataAnnotations.Schema.NotMappedAttribute") != null)
+                if (ignoreNodes != null)
+                {
+                    if (ignoreNodes.HoldsIgnore(codeProperty.Name)) continue;
+                }
+                // nullable columns can be part of the primary key
+                // if (!codeProperty.Type.IsNotNullableScalarTypeOrString()) continue;
+                // instead of IsNotNullableScalarTypeOrString-method we should call IsScalarTypeOrString
+                if (!codeProperty.Type.IsScalarTypeOrString()) continue;
+
+                if (codeProperty.GetCodePropertyAttributeByFullName("System.ComponentModel.DataAnnotations.Schema.NotMappedAttribute") != null)
                 {
                     continue;
                 }
                 if (codeProperty.GetCodePropertyAttributeByFullName("System.ComponentModel.DataAnnotations.KeyAttribute") == null)
                 {
                     bool doAdd = "Id".Equals(codeProperty.Name, StringComparison.OrdinalIgnoreCase);
-                    if (! doAdd)
+                    if (!doAdd)
                     {
-                        doAdd = (classNames[0]+"Id").Equals(codeProperty.Name, StringComparison.OrdinalIgnoreCase);
+                        doAdd = (classNames[0] + "Id").Equals(codeProperty.Name, StringComparison.OrdinalIgnoreCase);
                     }
                     if (doAdd)
                     {
                         if (ConventionProps == null) ConventionProps = new List<CodeProperty>();
                         ConventionProps.Add(codeProperty);
                     }
-                    
+
                     continue;
                 }
                 int locOrder = codeProperty.GetColumnOrderByAttributes();
@@ -340,15 +452,15 @@ namespace CS2WPF.Helpers
                     return primKey;
                 }
             }
-            string[] propNames = new string[] { "Id", srcClass.Name + "Id", };
+            //string[] propNames = new string[] { "Id", srcClass.Name + "Id", };
             if (ConventionProps != null)
             {
                 string propName = ConventionProps[0].Name;
                 if (ConventionProps.Count > 1)
                 {
-                    foreach(CodeProperty conventionProp in ConventionProps)
+                    foreach (CodeProperty conventionProp in ConventionProps)
                     {
-                        if("Id".Equals(conventionProp.Name, StringComparison.OrdinalIgnoreCase))
+                        if ("Id".Equals(conventionProp.Name, StringComparison.OrdinalIgnoreCase))
                         {
                             propName = conventionProp.Name;
                         }
@@ -364,6 +476,96 @@ namespace CS2WPF.Helpers
             }
             return primKey;
         }
+        public static IList<FluentAPIEntityNode> CollectAllUniqueKeysHelper(this CodeClass srcClass, IList<FluentAPIEntityNode> UniqueKeys, CodeClass dbContext = null)
+        {
+            if ((srcClass == null) || (UniqueKeys == null)) return null;
+            UniqueKeys.Clear();
+            if (dbContext == null) return UniqueKeys;
+            CodeFunction codeFunction = dbContext.GetCodeFunctionByName(vsCMAccess.vsCMAccessProtected, "OnModelCreating");
+            if (codeFunction == null) return UniqueKeys;
+            string[] classNames = new string[] { srcClass.Name, srcClass.FullName };
+            List<FluentAPIEntityNode> filter = new List<FluentAPIEntityNode>()
+            {
+                new FluentAPIEntityNode()
+                {
+                    Methods = new List<FluentAPIMethodNode>()
+                    {
+                        new FluentAPIMethodNode() {
+                            MethodName = "HasAlternateKey"
+                        }
+                    }
+                }
+            };
+            List<FluentAPIEntityNode> entityNodes = codeFunction.DoAnalyzeWithFilter(classNames, filter);
+            if (entityNodes == null) return UniqueKeys;
+            if (entityNodes.Count < 1) return UniqueKeys;
+            filter[0].Methods[0].MethodName = "Ignore";
+            List<FluentAPIEntityNode> ignoreNodes = codeFunction.DoAnalyzeWithFilter(classNames, filter);
+            List<string> mappedProps = new List<string>();
+            srcClass.CollectCodeClassAllMappedScalarProperties(mappedProps);
+            foreach (FluentAPIEntityNode enttnd in entityNodes)
+            {
+                if (enttnd.Methods == null) continue;
+                if (enttnd.Methods.Count < 1) continue;
+                foreach (FluentAPIMethodNode mthd in enttnd.Methods)
+                {
+                    if (!("HasAlternateKey".Equals(mthd.MethodName, StringComparison.OrdinalIgnoreCase))) continue;
+                    if (mthd.MethodArguments == null) continue;
+                    if (mthd.MethodArguments.Count < 1) continue;
+                    List<String> newLst = new List<String>();
+                    foreach (string mthdarg in mthd.MethodArguments)
+                    {
+                        if (ignoreNodes != null)
+                        {
+                            if (ignoreNodes.HoldsIgnore(mthdarg)) continue;
+                        }
+                        if (!mappedProps.Any(x => x.Equals(mthdarg))) continue;
+                        newLst.Add(mthdarg);
+                    }
+                    mthd.MethodArguments = newLst;
+                }
+                UniqueKeys.Add(enttnd);
+            }
+            return UniqueKeys;
+        }
+        public static IList<FluentAPIKey> CollectAllUniqueKeysHelper(this CodeClass srcClass, IList<FluentAPIKey> UniqueKeys, CodeClass dbContext = null)
+        {
+            if ((srcClass == null) || (UniqueKeys == null)) return null;
+            UniqueKeys.Clear();
+            IList<FluentAPIEntityNode> fApinds = srcClass.CollectAllUniqueKeysHelper(new List<FluentAPIEntityNode>(), dbContext);
+            if (fApinds == null) return UniqueKeys;
+            foreach (FluentAPIEntityNode fApind in fApinds)
+            {
+                FluentAPIMethodNode mthd = fApind.Methods.FirstOrDefault(m => "HasAlternateKey".Equals(m.MethodName));
+                if (mthd == null) continue;
+                if (mthd.MethodArguments == null) continue;
+                if (mthd.MethodArguments.Count < 1) continue;
+
+                FluentAPIKey key = new FluentAPIKey() { KeyProperties = new List<FluentAPIProperty>() };
+                int ord = 0;
+                foreach (string mthdarg in mthd.MethodArguments)
+                {
+                    ord++;
+                    key.KeyProperties.Add(new FluentAPIProperty() { PropOrder = ord, PropName = mthdarg });
+                }
+                mthd = fApind.Methods.FirstOrDefault(m => "HasName".Equals(m.MethodName));
+                if (mthd != null)
+                {
+                    if (mthd.MethodArguments != null)
+                    {
+                        if (mthd.MethodArguments.Count > 0)
+                        {
+                            key.KeyName = mthd.MethodArguments[0];
+                            if (!string.IsNullOrEmpty(key.KeyName)) key.KeyName = key.KeyName.Replace("\"", "");
+                        }
+                    }
+                }
+                key.SourceCount = key.KeyProperties.Count;
+                key.KeySource = InfoSourceEnum.ByOnModelCreating;
+                UniqueKeys.Add(key);
+            }
+            return UniqueKeys;
+        }
         // ready
         public static IList<string> CollectCodeClassMappedScalarNotNullProperties(this CodeClass srcClass, IList<string> properties)
         {
@@ -378,14 +580,24 @@ namespace CS2WPF.Helpers
                 if (codeProperty.Access != vsCMAccess.vsCMAccessPublic) continue;
                 if (codeProperty.Type == null) continue;
                 if (codeProperty.Type.CodeType == null) continue;
-                if(!codeProperty.Type.IsNotNullableScalarTypeOrString()) continue;
+                if (!codeProperty.Type.IsNotNullableScalarTypeOrString())
+                {
+                    if (codeProperty.Type.TypeKind == vsCMTypeRef.vsCMTypeRefString)
+                    {
+                        if (codeProperty.IsCodePropertyNullable()) continue;
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
                 if (codeProperty.GetCodePropertyAttributeByFullName("System.ComponentModel.DataAnnotations.Schema.NotMappedAttribute") != null) continue;
-                
+
                 if (codeProperty.Type.TypeKind == vsCMTypeRef.vsCMTypeRefString)
                 {
                     if (codeProperty.GetCodePropertyAttributeByFullName("System.ComponentModel.DataAnnotations.RequiredAttribute") == null)
                     {
-                        continue;
+                        if (codeProperty.IsCodePropertyNullable()) continue;
                     }
                 }
                 properties.Add(codeProperty.Name);
@@ -415,7 +627,17 @@ namespace CS2WPF.Helpers
                 if (codeProperty.Access != vsCMAccess.vsCMAccessPublic) continue;
                 if (codeProperty.Type == null) continue;
                 if (codeProperty.Type.CodeType == null) continue;
-                if(!codeProperty.Type.IsNotNullableScalarTypeOrString()) continue;
+                if (!codeProperty.Type.IsNotNullableScalarTypeOrString())
+                {
+                    if (codeProperty.Type.TypeKind == vsCMTypeRef.vsCMTypeRefString)
+                    {
+                        if (codeProperty.IsCodePropertyNullable()) continue;
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
                 CodeTypeRef codeTypeRef = codeProperty.Type;
                 if (codeProperty.GetCodePropertyAttributeByFullName("System.ComponentModel.DataAnnotations.Schema.NotMappedAttribute") != null) continue;
                 bool IsNullable = false;
@@ -423,7 +645,7 @@ namespace CS2WPF.Helpers
                 {
                     if (codeProperty.GetCodePropertyAttributeByFullName("System.ComponentModel.DataAnnotations.RequiredAttribute") == null)
                     {
-                        continue;
+                        if (codeProperty.IsCodePropertyNullable()) continue;
                     }
                     IsNullable = true;
                 }
@@ -458,7 +680,7 @@ namespace CS2WPF.Helpers
                 if (codeProperty.Access != vsCMAccess.vsCMAccessPublic) continue;
                 if (codeProperty.Type == null) continue;
                 if (codeProperty.Type.CodeType == null) continue;
-                if(!codeProperty.Type.IsScalarTypeOrString()) continue;
+                if (!codeProperty.Type.IsScalarTypeOrString()) continue;
                 if (codeProperty.GetCodePropertyAttributeByFullName("System.ComponentModel.DataAnnotations.Schema.NotMappedAttribute") != null) continue;
                 properties.Add(codeProperty.Name);
             }
@@ -506,16 +728,89 @@ namespace CS2WPF.Helpers
                         ShortTypeName = ShortTypeName.Replace("System.Nullable", "").Replace("<", "").Replace(">", "").Replace(">", "").Replace("\n", "").Replace("\t", "").Replace("\r", "");
                         IsNullable = true;
                         IsRequired = false;
-                    } 
-                } else
+                    }
+                }
+                else
                 {
                     if (codeTypeRefTypeKind == vsCMTypeRef.vsCMTypeRefString)
                     {
-                        IsNullable = true;
+                        // IsNullable = true;
+                        IsNullable = codeProperty.IsCodePropertyNullable();
                         IsRequired = (codeProperty.GetCodePropertyAttributeByFullName("System.ComponentModel.DataAnnotations.RequiredAttribute") != null);
                     }
                 }
 
+                if (filterItem != null) locOrder = filterItem.PropOrder;
+                FluentAPIExtendedProperty outProp = new FluentAPIExtendedProperty()
+                {
+                    PropOrder = locOrder,
+                    PropName = codePropertyName,
+                    UnderlyingTypeName = ShortTypeName,
+                    TypeFullName = codeTypeRef.AsFullName,
+                    IsNullable = IsNullable,
+                    IsRequired = IsRequired
+                };
+                properties.Add(outProp);
+            }
+            return properties;
+        }
+        // ready
+        public static IList<FluentAPIExtendedProperty> CollectCodeClassAllMappedScalarPropertiesWithDbContext(this CodeClass srcClass, IList<FluentAPIExtendedProperty> properties, List<FluentAPIProperty> filter = null, CodeClass dbContext = null)
+        {
+            if ((srcClass == null) || (properties == null))
+            {
+                return null;
+            }
+            if (dbContext == null)
+                return srcClass.CollectCodeClassAllMappedScalarProperties(properties, filter);
+            List<FluentAPIEntityNode> localFAENs = srcClass.GetFAPIAttributesAndIgnoreForScalarProperties(dbContext);
+            int order = -1;
+            foreach (CodeElement codeElement in srcClass.Members)
+            {
+                order++;
+                if (codeElement.Kind != vsCMElement.vsCMElementProperty) continue;
+                CodeProperty codeProperty = codeElement as CodeProperty;
+                string codePropertyName = codeProperty.Name;
+                FluentAPIProperty filterItem = null;
+                if (filter != null)
+                {
+                    filterItem = filter.FirstOrDefault(f => f.PropName == codePropertyName);
+                    if (filterItem == null) continue;
+                }
+                if (codeProperty.Access != vsCMAccess.vsCMAccessPublic) continue;
+                if (codeProperty.Type == null) continue;
+                if (codeProperty.Type.CodeType == null) continue;
+                CodeTypeRef codeTypeRef = codeProperty.Type;
+                if (!codeTypeRef.IsScalarTypeOrString()) continue;
+                vsCMTypeRef codeTypeRefTypeKind = codeTypeRef.TypeKind;
+                if (codeProperty.GetCodePropertyAttributeByFullName("System.ComponentModel.DataAnnotations.Schema.NotMappedAttribute") != null) continue;
+                if (localFAENs.HoldsIgnore(codePropertyName)) continue;
+                int locOrder = codeProperty.GetColumnOrderByAttributes();
+                if (locOrder < 0) locOrder = order;
+                string ShortTypeName = "";
+                bool IsNullable = false;
+                bool IsRequired = true;
+                ShortTypeName = codeTypeRef.AsFullName;
+                if (codeTypeRefTypeKind == vsCMTypeRef.vsCMTypeRefCodeType)
+                {
+                    if (ShortTypeName.Contains("System.Nullable"))
+                    {
+                        ShortTypeName = ShortTypeName.Replace("System.Nullable", "").Replace("<", "").Replace(">", "").Replace(">", "").Replace("\n", "").Replace("\t", "").Replace("\r", "");
+                        IsNullable = true;
+                        IsRequired = false;
+                    }
+                }
+                else
+                {
+                    if (codeTypeRefTypeKind == vsCMTypeRef.vsCMTypeRefString)
+                    {
+                        // IsNullable = true;
+                        IsNullable = codeProperty.IsCodePropertyNullable();
+                        IsRequired = (codeProperty.GetCodePropertyAttributeByFullName("System.ComponentModel.DataAnnotations.RequiredAttribute") != null);
+                    }
+                }
+                bool locIsRequired;
+                if (localFAENs.HoldsIsRequired(codePropertyName, out locIsRequired)) IsRequired = locIsRequired;
                 if (filterItem != null) locOrder = filterItem.PropOrder;
                 FluentAPIExtendedProperty outProp = new FluentAPIExtendedProperty()
                 {
@@ -537,6 +832,7 @@ namespace CS2WPF.Helpers
             {
                 return null;
             }
+            properties.Clear();
             foreach (CodeElement codeElement in srcClass.Members)
             {
                 if (codeElement.Kind != vsCMElement.vsCMElementProperty) continue;
@@ -545,7 +841,7 @@ namespace CS2WPF.Helpers
                 if (codeProperty.Type == null) continue;
                 if (codeProperty.Type.CodeType == null) continue;
                 CodeTypeRef codeTypeRef = codeProperty.Type;
-                if(codeTypeRef.IsScalarTypeOrString()) continue;
+                if (codeTypeRef.IsScalarTypeOrString()) continue;
                 //if (codeTypeRef.TypeKind != vsCMTypeRef.vsCMTypeRefCodeType) continue;
                 if (codeTypeRef.TypeKind == vsCMTypeRef.vsCMTypeRefArray) continue;
                 vsCMElement codeTypeKind = codeTypeRef.CodeType.Kind;
@@ -561,6 +857,73 @@ namespace CS2WPF.Helpers
                 properties.Add(codeProperty.Name);
             }
             return properties;
+        }
+        public static IList<string> CollectCodeClassAllMappedNonScalarPropertiesWithDbContext(this CodeClass srcClass, IList<string> properties, CodeClass dbContext = null)
+        {
+            if ((srcClass == null) || (properties == null))
+            {
+                return null;
+            }
+            srcClass.CollectCodeClassAllMappedNonScalarProperties(properties);
+            List<FluentAPIEntityNode> localFAENs = srcClass.GetFAPIAttributesAndIgnoreForScalarProperties(dbContext);
+            for (int i = properties.Count - 1; i >= 0; i--)
+            {
+                if (localFAENs.HoldsIgnore(properties[i])) properties.RemoveAt(i);
+            }
+            return properties;
+        }
+        public static void RemoveUniqueKeyDeclarations(this CodeClass srcClass, CodeClass dbContext, string UniqueKeyName)
+        {
+            if ((srcClass == null) || (dbContext == null)) return;
+            CodeFunction codeFunction = dbContext.GetCodeFunctionByName(vsCMAccess.vsCMAccessProtected, "OnModelCreating");
+            if (codeFunction != null)
+            {
+                string[] classNames = new string[] { srcClass.Name, srcClass.FullName };
+                if (!string.IsNullOrEmpty(UniqueKeyName)) UniqueKeyName = "\"" + UniqueKeyName.Replace("\"", "") + "\"";
+                List<FluentAPIEntityNode> filter = new List<FluentAPIEntityNode>()
+                    {
+                        new FluentAPIEntityNode()
+                        {
+                            Methods = new List<FluentAPIMethodNode>()
+                            {
+                                new FluentAPIMethodNode() {
+                                    MethodName = "HasAlternateKey"
+                                },
+                                new FluentAPIMethodNode() {
+                                    MethodName = "HasName",
+                                    MethodArguments = new List<string> { UniqueKeyName }
+                                },
+                            }
+                        }
+                    };
+                codeFunction.DoRemoveInvocationWithFilter(classNames, filter);
+                dbContext.StartPoint.CreateEditPoint().SmartFormat(dbContext.EndPoint);
+                if (dbContext.ProjectItem != null) dbContext.ProjectItem.Save();
+            }
+        }
+        public static void AddUniqueKeyDeclaration(this CodeClass srcClass, CodeClass dbContext, string UniqueKeyStatement, string UniqueKeyName)
+        {
+            if (string.IsNullOrEmpty(UniqueKeyStatement) || string.IsNullOrEmpty(UniqueKeyName) || (srcClass == null) || (dbContext == null)) return;
+            srcClass.RemoveUniqueKeyDeclarations(dbContext, "\"" + UniqueKeyName.Replace("\"", "") + "\"");
+
+            string propertyNameSpace = srcClass.FullName;
+            string propertyClassName = srcClass.Name;
+            propertyNameSpace = propertyNameSpace.Replace("." + propertyClassName, "");
+            if (!dbContext.AddNameSpace(propertyNameSpace))
+            {
+                propertyClassName = srcClass.FullName;
+            }
+
+            CodeFunction codeFunction = dbContext.GetCodeFunctionByName(vsCMAccess.vsCMAccessProtected, "OnModelCreating");
+            if (codeFunction != null)
+            {
+                codeFunction.AddStatementsToFunctionBody(UniqueKeyStatement, propertyClassName, false);
+                dbContext.StartPoint.CreateEditPoint().SmartFormat(dbContext.EndPoint);
+                if (dbContext.ProjectItem != null)
+                {
+                    dbContext.ProjectItem.Save();
+                }
+            }
         }
         public static void RemovePrimaryKeyDeclarations(this CodeClass srcClass, CodeClass dbContext)
         {
@@ -583,7 +946,7 @@ namespace CS2WPF.Helpers
                     };
                 codeFunction.DoRemoveInvocationWithFilter(classNames, filter);
                 dbContext.StartPoint.CreateEditPoint().SmartFormat(dbContext.EndPoint);
-                if(dbContext.ProjectItem != null) dbContext.ProjectItem.Save();
+                if (dbContext.ProjectItem != null) dbContext.ProjectItem.Save();
             }
         }
         public static void AddPrimaryKeyDeclaration(this CodeClass srcClass, CodeClass dbContext, string PrimKeyStatement)
@@ -594,7 +957,7 @@ namespace CS2WPF.Helpers
             string propertyNameSpace = srcClass.FullName;
             string propertyClassName = srcClass.Name;
             propertyNameSpace = propertyNameSpace.Replace("." + propertyClassName, "");
-            if(!dbContext.AddNameSpace(propertyNameSpace))
+            if (!dbContext.AddNameSpace(propertyNameSpace))
             {
                 propertyClassName = srcClass.FullName;
             }
@@ -604,7 +967,7 @@ namespace CS2WPF.Helpers
             {
                 codeFunction.AddStatementsToFunctionBody(PrimKeyStatement, propertyClassName, false);
                 dbContext.StartPoint.CreateEditPoint().SmartFormat(dbContext.EndPoint);
-                if(dbContext.ProjectItem != null)
+                if (dbContext.ProjectItem != null)
                 {
                     dbContext.ProjectItem.Save();
                 }
@@ -619,6 +982,11 @@ namespace CS2WPF.Helpers
                 string[] classNames = new string[] { srcClass.Name, srcClass.FullName };
                 List<FluentAPIEntityNode> filter = new List<FluentAPIEntityNode>()
                     {
+                        // 
+                        // EF.Net 6
+                        //
+                        
+                       // or
                         new FluentAPIEntityNode()
                         {
                             Methods = new List<FluentAPIMethodNode>()
@@ -629,6 +997,7 @@ namespace CS2WPF.Helpers
                                 }
                             }
                         },
+                        // or 
                         new FluentAPIEntityNode()
                         {
                             Methods = new List<FluentAPIMethodNode>()
@@ -639,6 +1008,12 @@ namespace CS2WPF.Helpers
                                 }
                             }
                         },
+
+                        //
+                        //  EF.Core 6
+                        //
+
+                        // or
                         new FluentAPIEntityNode()
                         {
                             Methods = new List<FluentAPIMethodNode>()
@@ -649,6 +1024,7 @@ namespace CS2WPF.Helpers
                                 }
                             }
                         },
+                        // or
                         new FluentAPIEntityNode()
                         {
                             Methods = new List<FluentAPIMethodNode>()
@@ -708,7 +1084,7 @@ namespace CS2WPF.Helpers
             {
                 if (chld is CodeAttributeArgument)
                 {
-                    if(argumentName.Equals(chld.Name, System.StringComparison.OrdinalIgnoreCase))
+                    if (argumentName.Equals(chld.Name, System.StringComparison.OrdinalIgnoreCase))
                     {
                         return (chld as CodeAttributeArgument).Value.Replace("\"", "");
                     }
@@ -757,7 +1133,7 @@ namespace CS2WPF.Helpers
                 if (codeProperty.Access != vsCMAccess.vsCMAccessPublic) continue;
                 if (codeProperty.Type == null) continue;
                 if (codeProperty.Type.CodeType == null) continue;
-                if(!codeProperty.Type.IsScalarTypeOrString()) continue;
+                if (!codeProperty.Type.IsScalarTypeOrString()) continue;
 
                 bool isNotMapped = false;
                 int locColOrder = -1;
@@ -787,7 +1163,8 @@ namespace CS2WPF.Helpers
                     if (locColOrder < 0)
                     {
                         columnOrder = order;
-                    } else
+                    }
+                    else
                     {
                         columnOrder = locColOrder;
                     }
@@ -832,7 +1209,7 @@ namespace CS2WPF.Helpers
                                 {
                                     string[] argVals = argumentValue.Split(new string[] { splitter }, StringSplitOptions.RemoveEmptyEntries);
                                     int cnt = argVals.Length;
-                                    for(int i = 0; i < cnt; i++)
+                                    for (int i = 0; i < cnt; i++)
                                     {
                                         mustInclude = attributeArgument.Equals(argVals[i]);
                                         if (mustInclude)
@@ -873,7 +1250,7 @@ namespace CS2WPF.Helpers
                 {
                     result = new List<FluentAPIProperty>();
                 }
-                result.Add( new FluentAPIProperty()
+                result.Add(new FluentAPIProperty()
                 {
                     PropOrder = locOrder,
                     PropName = codeElement.Name
@@ -901,7 +1278,7 @@ namespace CS2WPF.Helpers
                 if (typeKind != vsCMTypeRef.vsCMTypeRefCodeType) continue;
                 //if (codeTypeRef.AsFullName.StartsWith("System.Nullable")) continue;
                 vsCMElement codeTypeKind = codeTypeRef.CodeType.Kind;
-                if (! ((codeTypeKind == vsCMElement.vsCMElementClass) || (codeTypeKind == vsCMElement.vsCMElementInterface)) ) continue;
+                if (!((codeTypeKind == vsCMElement.vsCMElementClass) || (codeTypeKind == vsCMElement.vsCMElementInterface))) continue;
                 bool isNotMapped = false;
                 bool isFound = false;
                 foreach (CodeElement lcea in codeProperty.Attributes)
@@ -957,6 +1334,19 @@ namespace CS2WPF.Helpers
             }
             return null;
         }
+        public static CodeProperty GetPublicMappedNonScalarPropertyByNameWithDbContext(this CodeClass masterCodeClass, string propertyName, CodeClass dbContext = null)
+        {
+            if (masterCodeClass == null) return null;
+            CodeProperty result = masterCodeClass.GetPublicMappedNonScalarPropertyByName(propertyName);
+            if (result == null) return null;
+            if (dbContext == null) return result;
+            List<FluentAPIEntityNode> localFAENs = masterCodeClass.GetIgnoreNodes(dbContext);
+            if (localFAENs != null)
+            {
+                if (localFAENs.HoldsIgnore(propertyName)) return null;
+            }
+            return result;
+        }
         // ready
         public static List<CodeProperty> GetPublicMappedNonScalarPropertiesByTypeFullName(this CodeClass masterCodeClass, string typeFullName)
         {
@@ -987,9 +1377,9 @@ namespace CS2WPF.Helpers
                 string codeTypeFullName = codeTypeRef.CodeType.FullName;
                 if (codeTypeKind == vsCMElement.vsCMElementClass)
                 {
-                    if( typeFullName.Equals(codeTypeFullName) )
+                    if (typeFullName.Equals(codeTypeFullName))
                     {
-                        if(result == null)
+                        if (result == null)
                         {
                             result = new List<CodeProperty>();
                         }
@@ -1010,6 +1400,24 @@ namespace CS2WPF.Helpers
             }
             return result;
         }
+
+        public static List<CodeProperty> GetPublicMappedNonScalarPropertiesByTypeFullNameWithDbContext(this CodeClass masterCodeClass, string typeFullName, CodeClass dbContext = null)
+        {
+            if (masterCodeClass == null) return null;
+            List<CodeProperty> result = masterCodeClass.GetPublicMappedNonScalarPropertiesByTypeFullName(typeFullName);
+            if (result == null) return null;
+            if (dbContext == null) return result;
+            List<FluentAPIEntityNode> localFAENs = masterCodeClass.GetIgnoreNodes(dbContext);
+            if (localFAENs != null)
+            {
+                for (int i = result.Count - 1; i >= 0; i--)
+                {
+                    if (localFAENs.HoldsIgnore(result[i].Name)) result.RemoveAt(i);
+                }
+            }
+            return result;
+        }
+
         public static FluentAPIKey CollectForeignKeyByAttributes(this CodeProperty codeProperty)
         {
             FluentAPIKey result = null;
@@ -1025,17 +1433,18 @@ namespace CS2WPF.Helpers
                 {
                     string[] propNames = attributeArgument.Split(new char[] { ',' });
                     int cnt = propNames.Length;
-                    for (int i = 0; i < cnt; i++) 
+                    for (int i = 0; i < cnt; i++)
                     {
                         if (string.IsNullOrEmpty(propNames[i])) continue;
-                        CodeProperty locCodeProperty = srcClass.GetPublicMappedScalarPropertyByName(propNames[i].Replace(" ","").Replace("\t", "").Replace("\r", "").Replace("\n", ""), out int colOrder);
+                        CodeProperty locCodeProperty = srcClass.GetPublicMappedScalarPropertyByName(propNames[i].Replace(" ", "").Replace("\t", "").Replace("\r", "").Replace("\n", ""), out int colOrder);
                         if (locCodeProperty != null)
                         {
                             int attrColOrder = locCodeProperty.GetColumnOrderByAttributes();
                             if (attrColOrder < 0) attrColOrder = colOrder;
                             if (result == null)
                             {
-                                result = new FluentAPIKey() {
+                                result = new FluentAPIKey()
+                                {
                                     KeySource = InfoSourceEnum.ByAttribute,
                                     KeyProperties = new List<FluentAPIProperty>()
                                 };
@@ -1057,7 +1466,7 @@ namespace CS2WPF.Helpers
             List<FluentAPIProperty> props =
             srcClass.GetPublicMappedScalarPropertyByAttributeArgument("System.ComponentModel.DataAnnotations.Schema.ForeignKeyAttribute", codeProperty.Name, ",");
             if (props != null)
-            { 
+            {
                 if (props.Count > 0)
                 {
                     if (result == null)
@@ -1162,7 +1571,7 @@ namespace CS2WPF.Helpers
         {
             if ((srcClass == null) || (props == null)) return false;
             if (props.Count < 1) return false;
-            foreach(FluentAPIProperty prop in props)
+            foreach (FluentAPIProperty prop in props)
             {
                 CodeProperty codeProperty = srcClass.GetPublicMappedScalarPropertyByName(prop.PropName, out int order);
                 if (codeProperty == null) return false;
@@ -1170,12 +1579,14 @@ namespace CS2WPF.Helpers
                 if (codeTypeRef.TypeKind == vsCMTypeRef.vsCMTypeRefCodeType)
                 {
                     if (codeTypeRef.AsFullName.StartsWith("System.Nullable")) return false;
-                } else {
+                }
+                else
+                {
                     if (codeTypeRef.TypeKind == vsCMTypeRef.vsCMTypeRefString)
                     {
                         if (codeProperty.GetCodePropertyAttributeByFullName("System.ComponentModel.DataAnnotations.RequiredAttribute") == null)
                         {
-                            return false;
+                            if (codeProperty.IsCodePropertyNullable()) return false;
                         }
                     }
                 }
@@ -1277,7 +1688,7 @@ namespace CS2WPF.Helpers
             if (codeTypeRef.AsFullName.StartsWith("System.Collections.Generic.List<")) return true;
             return false;
         }
-        public static FluentAPIForeignKey FluentAPIEntityNodeToForeignKey(this FluentAPIEntityNode entityNode)
+        public static FluentAPIForeignKey FluentAPIEntityNodeToForeignKey(this FluentAPIEntityNode entityNode, bool ignoreTheOpposite = false)
         {
             FluentAPIForeignKey result = null;
             if (entityNode == null) return result;
@@ -1285,9 +1696,12 @@ namespace CS2WPF.Helpers
             int methodsCount = entityNode.Methods.Count;
             if (methodsCount < 1) return result;
             FluentAPIMethodNode firstMethodNode = entityNode.Methods[0];
-            if (string.IsNullOrEmpty( firstMethodNode.MethodName )) return result;
+            if (string.IsNullOrEmpty(firstMethodNode.MethodName)) return result;
             if (firstMethodNode.MethodArguments == null) return result;
             if (firstMethodNode.MethodArguments.Count < 1) return result;
+            //
+            // EF.Net
+            //
             if ("HasRequired".Equals(firstMethodNode.MethodName))
             {
                 string InverseNavigationName = null;
@@ -1301,12 +1715,12 @@ namespace CS2WPF.Helpers
                     if (string.IsNullOrEmpty(methodNode.MethodName)) return result;
                     if ("WillCascadeOnDelete".Equals(methodNode.MethodName))
                     {
-                        if(methodNode.MethodArguments != null)
+                        if (methodNode.MethodArguments != null)
                         {
                             IsCascadeDelete = methodNode.MethodArguments.Any(ii => ii.Contains("true") || ii.Contains("True"));
                         }
                     }
-                    if ("WithMany".Equals( methodNode.MethodName ))
+                    if ("WithMany".Equals(methodNode.MethodName))
                     {
                         if (methodNode.MethodArguments == null) return result;
                         if (methodNode.MethodArguments.Count < 1) return result;
@@ -1345,7 +1759,7 @@ namespace CS2WPF.Helpers
                     };
                     result.ForeignKeyProps = new List<FluentAPIProperty>();
                     int ord = 0;
-                    foreach(string prop in foreignKeyProps)
+                    foreach (string prop in foreignKeyProps)
                     {
                         result.ForeignKeyProps.Add(
                         new FluentAPIProperty()
@@ -1356,7 +1770,7 @@ namespace CS2WPF.Helpers
                     }
                     return result;
                 }
-                if(IsWithOptional)
+                if (IsWithOptional)
                 {
                     result = new FluentAPIForeignKey()
                     {
@@ -1459,7 +1873,7 @@ namespace CS2WPF.Helpers
                     result = new FluentAPIForeignKey()
                     {
 
-                        InverseNavigationName  = firstMethodNode.MethodArguments[0], // correct !!!
+                        InverseNavigationName = firstMethodNode.MethodArguments[0], // correct !!!
                         NavigationName = InverseNavigationName, // correct !!!
 
                         ForeignKeySource = InfoSourceEnum.ByOnModelCreating,
@@ -1484,25 +1898,60 @@ namespace CS2WPF.Helpers
                 }
                 return result;
             }
+            //
+            // EF.Core
+            //
             if ("HasOne".Equals(firstMethodNode.MethodName))
             {
                 string InverseNavigationName = null;
                 List<String> foreignKeyProps = null;
+                List<String> principalKeyProps = null;
                 bool IsOneToMany = false;
                 bool IsWithOne = false;
                 bool IsRequired = false;
                 bool IsCascadeDelete = false;
-                string genericName = null;
+                string GenericForeignKeyClassName = null;
+                string GenericPrincipalKeyClassName = null;
+                string deleteBehavior = "DeleteBehavior.NoAction";
                 for (int i = 1; i < methodsCount; i++)
                 {
                     FluentAPIMethodNode methodNode = entityNode.Methods[i];
                     if (string.IsNullOrEmpty(methodNode.MethodName)) return result;
                     if ("OnDelete".Equals(methodNode.MethodName))
                     {
-                        if(methodNode.MethodArguments != null)
+                        if (methodNode.MethodArguments != null)
                         {
-                            IsCascadeDelete = methodNode.MethodArguments.Contains("Cascade");
+                            if (methodNode.MethodArguments.Contains("DeleteBehavior.Cascade"))
+                            {
+                                IsCascadeDelete = true;
+                                deleteBehavior = "DeleteBehavior.Cascade";
+                            }
+                            else if (methodNode.MethodArguments.Contains("DeleteBehavior.ClientSetNull"))
+                            {
+                                deleteBehavior = "DeleteBehavior.ClientSetNull";
+                            }
+                            else if (methodNode.MethodArguments.Contains("DeleteBehavior.Restrict"))
+                            {
+                                deleteBehavior = "DeleteBehavior.Restrict";
+                            }
+                            else if (methodNode.MethodArguments.Contains("DeleteBehavior.SetNull"))
+                            {
+                                deleteBehavior = "DeleteBehavior.SetNull";
+                            }
+                            else if (methodNode.MethodArguments.Contains("DeleteBehavior.ClientCascade"))
+                            {
+                                deleteBehavior = "DeleteBehavior.ClientCascade";
+                            }
+                            else if (methodNode.MethodArguments.Contains("DeleteBehavior.NoAction"))
+                            {
+                                deleteBehavior = "DeleteBehavior.NoAction";
+                            }
+                            else if (methodNode.MethodArguments.Contains("DeleteBehavior.ClientNoAction"))
+                            {
+                                deleteBehavior = "DeleteBehavior.ClientNoAction";
+                            }
                         }
+                        continue;
                     }
                     if ("WithMany".Equals(methodNode.MethodName))
                     {
@@ -1510,6 +1959,7 @@ namespace CS2WPF.Helpers
                         if (methodNode.MethodArguments.Count < 1) return result;
                         InverseNavigationName = methodNode.MethodArguments[0];
                         IsOneToMany = true;
+                        continue;
                     }
                     if ("WithOne".Equals(methodNode.MethodName))
                     {
@@ -1517,13 +1967,21 @@ namespace CS2WPF.Helpers
                         if (methodNode.MethodArguments.Count < 1) return result;
                         InverseNavigationName = methodNode.MethodArguments[0];
                         IsWithOne = true;
+                        continue;
                     }
                     if ("HasForeignKey".Equals(methodNode.MethodName))
                     {
                         if (methodNode.MethodArguments == null) return result;
                         if (methodNode.MethodArguments.Count < 1) return result;
-                        genericName = methodNode.GenericName;
+                        GenericForeignKeyClassName = methodNode.GenericName;
                         foreignKeyProps = methodNode.MethodArguments;
+                        continue;
+                    }
+                    if ("HasPrincipalKey".Equals(methodNode.MethodName))
+                    {
+                        principalKeyProps = methodNode.MethodArguments;
+                        GenericPrincipalKeyClassName = methodNode.GenericName;
+                        continue;
                     }
                     if ("IsRequired".Equals(methodNode.MethodName))
                     {
@@ -1551,39 +2009,96 @@ namespace CS2WPF.Helpers
                 if (IsOneToMany == IsWithOne) return result;
                 if (IsOneToMany)
                 {
-                    if (foreignKeyProps == null) return result;
-                    if (foreignKeyProps.Count < 1) return result;
                     NavigationTypeEnum NavigationType = NavigationTypeEnum.OptionalToMany;
-                    if (IsRequired)
+                    if (foreignKeyProps != null)
                     {
-                        NavigationType = NavigationTypeEnum.OneToMany;
-                    }
-                    
-                    result = new FluentAPIForeignKey()
-                    {
-                        NavigationName = firstMethodNode.MethodArguments[0],
-                        InverseNavigationName = InverseNavigationName,
-                        ForeignKeySource = InfoSourceEnum.ByOnModelCreating,
-                        PrincipalKeySource = InfoSourceEnum.ByConvention,
-                        InverseNavigationSource = InfoSourceEnum.ByOnModelCreating,
-                        NavigationType = NavigationType,
-                        IsCascadeDelete = IsCascadeDelete
-                    };
-                    result.ForeignKeyProps = new List<FluentAPIProperty>();
-                    int ord = 0;
-                    foreach (string prop in foreignKeyProps)
-                    {
-                        result.ForeignKeyProps.Add(
-                        new FluentAPIProperty()
+                        if (foreignKeyProps.Count > 0)
                         {
-                            PropName = prop,
-                            PropOrder = ord++
-                        });
+                            if (IsRequired)
+                            {
+                                NavigationType = NavigationTypeEnum.OneToMany;
+                            }
+
+                            result = new FluentAPIForeignKey()
+                            {
+                                NavigationName = firstMethodNode.MethodArguments[0],
+                                InverseNavigationName = InverseNavigationName,
+                                ForeignKeySource = InfoSourceEnum.ByOnModelCreating,
+                                PrincipalKeySource = InfoSourceEnum.ByConvention,
+                                InverseNavigationSource = InfoSourceEnum.ByOnModelCreating,
+                                NavigationType = NavigationType,
+                                IsCascadeDelete = IsCascadeDelete,
+                                DeleteBehavior = deleteBehavior,
+                            };
+                            result.ForeignKeyProps = new List<FluentAPIProperty>();
+                            int ord = 0;
+                            foreach (string prop in foreignKeyProps)
+                            {
+                                result.ForeignKeyProps.Add(
+                                new FluentAPIProperty()
+                                {
+                                    PropName = prop,
+                                    PropOrder = ord++
+                                });
+                            }
+                        }
+                    }
+                    if (principalKeyProps != null)
+                    {
+                        if (principalKeyProps.Count > 0)
+                        {
+                            if (result == null)
+                            {
+                                if (IsRequired)
+                                {
+                                    NavigationType = NavigationTypeEnum.OneToMany;
+                                }
+                                result = new FluentAPIForeignKey()
+                                {
+                                    NavigationName = firstMethodNode.MethodArguments[0],
+                                    InverseNavigationName = InverseNavigationName,
+                                    ForeignKeySource = InfoSourceEnum.ByOnModelCreating,
+                                    PrincipalKeySource = InfoSourceEnum.ByConvention,
+                                    InverseNavigationSource = InfoSourceEnum.ByOnModelCreating,
+                                    NavigationType = NavigationType,
+                                    IsCascadeDelete = IsCascadeDelete,
+                                    DeleteBehavior = deleteBehavior,
+                                };
+                            }
+                            result.PrincipalKeyProps = new List<FluentAPIProperty>();
+                            int ord = 0;
+                            foreach (string prop in principalKeyProps)
+                            {
+                                result.PrincipalKeyProps.Add(
+                                new FluentAPIProperty()
+                                {
+                                    PropName = prop,
+                                    PropOrder = ord++
+                                });
+                            }
+                        }
                     }
                     return result;
                 }
                 if (IsWithOne)
                 {
+                    if (ignoreTheOpposite)
+                    {
+                        if (string.IsNullOrEmpty(entityNode.EntityName)) return null;
+                        if (!string.IsNullOrEmpty(GenericPrincipalKeyClassName))
+                        {
+                            if ((GenericPrincipalKeyClassName == entityNode.EntityName) ||
+                                GenericPrincipalKeyClassName.EndsWith("." + entityNode.EntityName) ||
+                                entityNode.EntityName.EndsWith("." + GenericPrincipalKeyClassName)) return null;
+                        }
+                        if (!string.IsNullOrEmpty(GenericForeignKeyClassName))
+                        {
+                            if (!((GenericForeignKeyClassName == entityNode.EntityName) ||
+                                GenericForeignKeyClassName.EndsWith("." + entityNode.EntityName) ||
+                                entityNode.EntityName.EndsWith("." + GenericForeignKeyClassName))) return null;
+                        }
+                    }
+
                     NavigationTypeEnum NavigationType = NavigationTypeEnum.OptionalToOne;
                     if (IsRequired)
                     {
@@ -1593,34 +2108,55 @@ namespace CS2WPF.Helpers
 
                     result = new FluentAPIForeignKey()
                     {
-                        NavigationName = firstMethodNode.MethodArguments[0], 
-                        InverseNavigationName = InverseNavigationName, 
-                        GenericForeignKeyClassName = genericName, //
+                        NavigationName = firstMethodNode.MethodArguments[0],
+                        InverseNavigationName = InverseNavigationName,
+                        GenericForeignKeyClassName = GenericForeignKeyClassName, //
                         ForeignKeySource = InfoSourceEnum.ByOnModelCreating,
                         PrincipalKeySource = InfoSourceEnum.ByConvention,
                         InverseNavigationSource = InfoSourceEnum.ByOnModelCreating,
                         NavigationType = NavigationType,
-                        IsCascadeDelete = IsCascadeDelete
+                        IsCascadeDelete = IsCascadeDelete,
+                        DeleteBehavior = deleteBehavior,
                     };
-                    if (foreignKeyProps == null) return result;
-                    if (foreignKeyProps.Count < 1) return result;
-                    result.PrincipalKeyProps = new List<FluentAPIProperty>(); // correct !!!
-                    int ord = 0;
-                    foreach (string prop in foreignKeyProps)
+                    if (principalKeyProps != null)
                     {
-                        result.PrincipalKeyProps.Add(
-                        new FluentAPIProperty()
+                        if (principalKeyProps.Count > 0)
                         {
-                            PropName = prop,
-                            PropOrder = ord++
-                        });
+                            result.PrincipalKeyProps = new List<FluentAPIProperty>(); // correct !!!
+                            int ord = 0;
+                            foreach (string prop in principalKeyProps)
+                            {
+                                result.PrincipalKeyProps.Add(
+                                new FluentAPIProperty()
+                                {
+                                    PropName = prop,
+                                    PropOrder = ord++
+                                });
+                            }
+                        }
+                    }
+                    if (foreignKeyProps != null)
+                    {
+                        if (foreignKeyProps.Count > 0)
+                        {
+                            result.ForeignKeyProps = new List<FluentAPIProperty>();
+                            int ord = 0;
+                            foreach (string prop in foreignKeyProps)
+                            {
+                                result.ForeignKeyProps.Add(
+                                new FluentAPIProperty()
+                                {
+                                    PropName = prop,
+                                    PropOrder = ord++
+                                });
+                            }
+                        }
                     }
                 }
-
             }
             return result;
         }
-        public static List<FluentAPIForeignKey> CollectForeignKeysByDbContext(this CodeClass srcClass, CodeClass dbContext)
+        public static List<FluentAPIForeignKey> CollectForeignKeysByDbContext(this CodeClass srcClass, CodeClass dbContext, bool ignoreTheOpposite = false)
         {
             List<FluentAPIForeignKey> result = null;
             if ((srcClass == null) || (dbContext == null)) return result;
@@ -1629,6 +2165,11 @@ namespace CS2WPF.Helpers
             string[] classNames = new string[] { srcClass.Name, srcClass.FullName };
             List<FluentAPIEntityNode> filter = new List<FluentAPIEntityNode>()
                     {
+                        //   
+                        // EF.Net
+                        //
+
+                        // or
                         new FluentAPIEntityNode()
                         {
                             Methods = new List<FluentAPIMethodNode>()
@@ -1638,6 +2179,7 @@ namespace CS2WPF.Helpers
                                 }
                             }
                         },
+                        // or
                         new FluentAPIEntityNode()
                         {
                             Methods = new List<FluentAPIMethodNode>()
@@ -1647,6 +2189,13 @@ namespace CS2WPF.Helpers
                                 }
                             }
                         },
+
+                        //   
+                        // EF.Core
+                        //
+
+
+                        //or
                         new FluentAPIEntityNode()
                         {
                             Methods = new List<FluentAPIMethodNode>()
@@ -1656,6 +2205,7 @@ namespace CS2WPF.Helpers
                                 }
                             }
                         },
+                        // or
                         new FluentAPIEntityNode()
                         {
                             Methods = new List<FluentAPIMethodNode>()
@@ -1674,12 +2224,12 @@ namespace CS2WPF.Helpers
             result = new List<FluentAPIForeignKey>();
             foreach (FluentAPIEntityNode entityNode in entityNodes)
             {
-                FluentAPIForeignKey foreignKey = entityNode.FluentAPIEntityNodeToForeignKey();
+                FluentAPIForeignKey foreignKey = entityNode.FluentAPIEntityNodeToForeignKey(ignoreTheOpposite);
                 if (foreignKey != null)
                 {
-                    if(!string.IsNullOrEmpty( foreignKey.GenericForeignKeyClassName))
+                    if (!string.IsNullOrEmpty(foreignKey.GenericForeignKeyClassName))
                     {
-                        if((!classNames[0].Equals(foreignKey.GenericForeignKeyClassName)) &&
+                        if ((!classNames[0].Equals(foreignKey.GenericForeignKeyClassName)) &&
                             (!classNames[1].Equals(foreignKey.GenericForeignKeyClassName)))
                         {
                             string str = foreignKey.InverseNavigationName;
@@ -1687,13 +2237,13 @@ namespace CS2WPF.Helpers
                             foreignKey.NavigationName = str;
                             foreignKey.NavigationEntityName = classNames[0];
                             foreignKey.NavigationEntityFullName = classNames[1];
-                        } 
+                        }
                         else
                         {
                             foreignKey.EntityName = classNames[0];
                             foreignKey.EntityFullName = classNames[1];
                         }
-                    } 
+                    }
                     else
                     {
                         if (foreignKey.NavigationType == NavigationTypeEnum.OptionalToOne)
@@ -1734,24 +2284,45 @@ namespace CS2WPF.Helpers
             return result;
         }
         // ready
-        public static List<FluentAPIForeignKey> CollectForeignKeys(this CodeClass srcClass, CodeClass dbContext, List<string> propNameFilter = null)
+        public static List<FluentAPIForeignKey> CollectForeignKeys(this CodeClass srcClass, CodeClass dbContext, List<string> propNameFilter = null, bool ignoreTheOpposite = false)
         {
             List<FluentAPIForeignKey> result = null;
+            List<FluentAPIEntityNode> ignoreNodes = null;
             if (srcClass == null) return result;
             bool isCollectedByDbContext = false;
-            result = srcClass.CollectForeignKeysByDbContext(dbContext);
+            result = srcClass.CollectForeignKeysByDbContext(dbContext, ignoreTheOpposite);
             if (result != null)
             {
                 isCollectedByDbContext = result.Count > 0;
             }
             FluentAPIKey srcPrimKey = null;
             string[] classNames = new string[] { srcClass.Name, srcClass.FullName };
+            if (dbContext != null)
+            {
+                CodeFunction codeFunction = dbContext.GetCodeFunctionByName(vsCMAccess.vsCMAccessProtected, "OnModelCreating");
+                if (codeFunction != null)
+                {
+                    List<FluentAPIEntityNode> filter = new List<FluentAPIEntityNode>()
+                    {
+                        new FluentAPIEntityNode()
+                        {
+                            Methods = new List<FluentAPIMethodNode>()
+                            {
+                                new FluentAPIMethodNode() {
+                                    MethodName = "Ignore"
+                                }
+                            }
+                        }
+                    };
+                    ignoreNodes = codeFunction.DoAnalyzeWithFilter(classNames, filter);
+                }
+            }
             foreach (CodeElement codeElement in srcClass.Members)
             {
                 if (codeElement.Kind != vsCMElement.vsCMElementProperty) continue;
                 CodeProperty codeProperty = codeElement as CodeProperty;
                 string codePropertyName = codeProperty.Name;
-                if ( (propNameFilter != null) && (!isCollectedByDbContext))
+                if ((propNameFilter != null) && (!isCollectedByDbContext)) // (!isCollectedByDbContext) to remove from the result in the code below
                 {
                     if (!propNameFilter.Contains(codePropertyName)) continue;
                 }
@@ -1759,7 +2330,7 @@ namespace CS2WPF.Helpers
                 if (codeProperty.Type == null) continue;
                 if (codeProperty.Type.CodeType == null) continue;
                 CodeTypeRef codeTypeRef = codeProperty.Type;
-                if(codeTypeRef.IsScalarTypeOrString()) continue;
+                if (codeTypeRef.IsScalarTypeOrString()) continue;
                 if (codeTypeRef.TypeKind != vsCMTypeRef.vsCMTypeRefCodeType) continue;
                 //if (codeTypeRef.AsFullName.StartsWith("System.Nullable")) continue;
                 if (codeTypeRef.CodeType.Kind == vsCMElement.vsCMElementInterface) continue;
@@ -1771,14 +2342,19 @@ namespace CS2WPF.Helpers
                 CodeProperty masterCodeProperty = null;
                 CodeClass masterCodeClass = codeProperty.Type.CodeType as CodeClass;
 
-                if(isCollectedByDbContext)
+                if (isCollectedByDbContext)
                 {
-                    FluentAPIForeignKey existedForeignKey = 
+                    if (ignoreNodes != null)
+                    {
+                        if (ignoreNodes.HoldsIgnore(codePropertyName)) continue;
+                    }
+
+                    FluentAPIForeignKey existedForeignKey =
                     result.FirstOrDefault(r =>
                         (r.NavigationName == codePropertyName) && (r.EntityName == classNames[0]) ||
                         (r.InverseNavigationName == codePropertyName) && (r.NavigationEntityName == classNames[0]));
 
-                    
+
 
                     if (existedForeignKey != null)
                     {
@@ -1791,13 +2367,14 @@ namespace CS2WPF.Helpers
                             }
                         }
 
-                        if (string.IsNullOrEmpty( existedForeignKey.EntityName ))
+                        if (string.IsNullOrEmpty(existedForeignKey.EntityName))
                         {
                             existedForeignKey.EntityName = masterCodeClass.Name;
                             existedForeignKey.EntityFullName = masterCodeClass.FullName;
                             existedForeignKey.CodeElementEntityRef = masterCodeClass as CodeElement;
                             existedForeignKey.CodeElementNavigationRef = srcClass as CodeElement;
-                            if(srcPrimKey == null) {
+                            if (srcPrimKey == null)
+                            {
                                 srcPrimKey = new FluentAPIKey();
                                 srcClass.CollectPrimaryKeyPropsHelper(srcPrimKey, dbContext);
                             }
@@ -1811,7 +2388,7 @@ namespace CS2WPF.Helpers
                                 }
                             }
                             bool isNotDefined = existedForeignKey.ForeignKeyProps == null;
-                            if(!isNotDefined)
+                            if (!isNotDefined)
                             {
                                 isNotDefined = existedForeignKey.ForeignKeyProps.Count < 1;
                             }
@@ -1836,25 +2413,80 @@ namespace CS2WPF.Helpers
                             existedForeignKey.NavigationEntityFullName = masterCodeClass.FullName;
                             existedForeignKey.CodeElementNavigationRef = masterCodeClass as CodeElement;
                             existedForeignKey.CodeElementEntityRef = srcClass as CodeElement;
+                            bool isNotDefined = existedForeignKey.PrincipalKeyProps == null;
+                            if (!isNotDefined)
+                            {
+                                isNotDefined = existedForeignKey.PrincipalKeyProps.Count < 1;
+                            }
                             FluentAPIKey locPrimKey = new FluentAPIKey();
                             masterCodeClass.CollectPrimaryKeyPropsHelper(locPrimKey, dbContext);
-                            if (locPrimKey.KeyProperties != null)
+                            if (isNotDefined)
                             {
-                                if (locPrimKey.KeyProperties.Count > 0)
+                                if (locPrimKey.KeyProperties != null)
                                 {
-                                    existedForeignKey.PrincipalKeyProps = locPrimKey.KeyProperties;
-                                    existedForeignKey.PrincipalKeySource = locPrimKey.KeySource;
-                                    existedForeignKey.PrincipalKeySourceCount = locPrimKey.SourceCount;
+                                    if (locPrimKey.KeyProperties.Count > 0)
+                                    {
+                                        existedForeignKey.PrincipalKeyProps = locPrimKey.KeyProperties;
+                                        existedForeignKey.PrincipalKeySource = locPrimKey.KeySource;
+                                        existedForeignKey.PrincipalKeySourceCount = locPrimKey.SourceCount;
+                                    }
                                 }
                             }
-                            bool isNotDefined = existedForeignKey.ForeignKeyProps == null;
+                            else
+                            {
+                                bool isIdentical = false;
+                                if (locPrimKey.KeyProperties != null)
+                                {
+                                    if (locPrimKey.KeyProperties.Count > 0)
+                                    {
+                                        isIdentical = locPrimKey.IsTheListOfNamesIdentical(existedForeignKey.PrincipalKeyProps);
+                                        if (isIdentical)
+                                        {
+                                            existedForeignKey.PrincipalKeyProps = locPrimKey.KeyProperties;
+                                            existedForeignKey.PrincipalKeySource = locPrimKey.KeySource;
+                                            existedForeignKey.PrincipalKeySourceCount = locPrimKey.SourceCount;
+                                        }
+                                    }
+                                }
+                                if (!isIdentical)
+                                {
+                                    List<FluentAPIKey> masterUniqueKeys = new List<FluentAPIKey>();
+                                    masterCodeClass.CollectAllUniqueKeysHelper(masterUniqueKeys, dbContext);
+                                    FluentAPIKey masterUniqueKey = masterUniqueKeys.GetFluentAPIKeyWithIdenticalListOfNames(existedForeignKey.PrincipalKeyProps);
+                                    if (masterUniqueKey != null)
+                                    {
+                                        existedForeignKey.PrincipalKeyProps = masterUniqueKey.KeyProperties;
+                                        existedForeignKey.PrincipalKeySource = masterUniqueKey.KeySource;
+                                        existedForeignKey.PrincipalKeySourceCount = masterUniqueKey.SourceCount;
+                                    }
+                                    else
+                                    {
+
+                                        existedForeignKey.PrincipalKeySourceCount = 0;
+                                        existedForeignKey.HasErrors = true;
+                                        if (string.IsNullOrEmpty(existedForeignKey.ErrorsText)) existedForeignKey.ErrorsText = "";
+                                        existedForeignKey.ErrorsText += "For the PrincipalKeyProps \r\n {";
+                                        string prfx = "";
+                                        foreach (FluentAPIProperty pkp in existedForeignKey.PrincipalKeyProps)
+                                        {
+                                            existedForeignKey.ErrorsText += prfx + pkp.PropName;
+                                            prfx = ", ";
+                                        }
+                                        existedForeignKey.ErrorsText += "}\r\n Could not find Prim or Uniq key";
+                                        existedForeignKey.PrincipalKeyProps = null;
+                                    }
+                                }
+                            }
+
+
+                            isNotDefined = existedForeignKey.ForeignKeyProps == null;
                             if (!isNotDefined)
                             {
                                 isNotDefined = existedForeignKey.ForeignKeyProps.Count < 1;
                             }
                             if (isNotDefined)
                             {
-                                if(srcPrimKey == null)
+                                if (srcPrimKey == null)
                                 {
                                     srcPrimKey = new FluentAPIKey();
                                     srcClass.CollectPrimaryKeyPropsHelper(srcPrimKey, dbContext);
@@ -1876,13 +2508,6 @@ namespace CS2WPF.Helpers
                     }
                 }
 
-                if (propNameFilter != null)
-                {
-                    if (!propNameFilter.Contains(codePropertyName))
-                    {
-                        continue;
-                    }
-                }
 
                 FluentAPIKey masterPrimKey = new FluentAPIKey();
                 masterCodeClass.CollectPrimaryKeyPropsHelper(masterPrimKey, dbContext);
@@ -1905,7 +2530,7 @@ namespace CS2WPF.Helpers
                     {
                         masterCodeProperty = masterCodeClass.GetPublicMappedNonScalarPropertyByName(codeAttribute.GetAttributeArgument());
                     }
-                } 
+                }
                 if (masterCodeProperty == null)
                 {
                     List<CodeProperty> masterCodeProperties =
@@ -1917,7 +2542,8 @@ namespace CS2WPF.Helpers
                             masterCodeProperty = masterCodeProperties[0];
                         }
                     }
-                } else InverseNavigationSource = InfoSourceEnum.ByAttribute;
+                }
+                else InverseNavigationSource = InfoSourceEnum.ByAttribute;
                 if (masterCodeProperty == null)
                 {
                     FluentAPIForeignKey errorfluentAPIForeignKey = new FluentAPIForeignKey();
@@ -1936,7 +2562,7 @@ namespace CS2WPF.Helpers
 
                 if (foreignKey == null)
                 {
-                    if(!masterCodeProperty.IsOfCollectionType())
+                    if (!masterCodeProperty.IsOfCollectionType())
                     {
                         FluentAPIKey masterForeignKey = masterCodeProperty.CollectForeignKeyByAttributes();
                         FluentAPIKey deatilPrimKey = new FluentAPIKey();
@@ -1974,7 +2600,8 @@ namespace CS2WPF.Helpers
 
                 fluentAPIForeignKey.PrincipalKeySource = masterPrimKey.KeySource;
                 fluentAPIForeignKey.PrincipalKeySourceCount = masterPrimKey.SourceCount;
-                if (masterPrimKey.KeyProperties != null) {
+                if (masterPrimKey.KeyProperties != null)
+                {
                     if (masterPrimKey.KeyProperties.Count > 0)
                     {
                         fluentAPIForeignKey.PrincipalKeyProps = masterPrimKey.KeyProperties;
@@ -2033,7 +2660,7 @@ namespace CS2WPF.Helpers
                     foreach (CodeElement chld in codeAttribute.Children)
                     {
                         if (!(chld is CodeAttributeArgument)) continue;
-                        CodeAttributeArgument codeAttributeArgument  = chld as CodeAttributeArgument;
+                        CodeAttributeArgument codeAttributeArgument = chld as CodeAttributeArgument;
                         if (modelViewAttribute.VaueProperties == null)
                         {
                             modelViewAttribute.VaueProperties = new ObservableCollection<ModelViewAttributeProperty>();
@@ -2053,7 +2680,7 @@ namespace CS2WPF.Helpers
             }
             return SelectedModel;
         }
-        public static ModelView DefineFAPIAttributesForScalarProperties(this CodeClass srcClass, ModelView SelectedModel, CodeClass dbContext )
+        public static ModelView DefineFAPIAttributesForScalarProperties(this CodeClass srcClass, ModelView SelectedModel, CodeClass dbContext)
         {
             if ((srcClass == null) || (SelectedModel == null) || (dbContext == null)) return SelectedModel;
             if (SelectedModel.ScalarProperties == null) return SelectedModel;
@@ -2076,11 +2703,11 @@ namespace CS2WPF.Helpers
             List<FluentAPIEntityNode> entityNodes = codeFunction.DoAnalyzeWithFilter(classNames, filter);
             if (entityNodes == null) return SelectedModel;
             if (entityNodes.Count < 1) return SelectedModel;
-            foreach(FluentAPIEntityNode fluentAPIEntityNode in entityNodes)
+            foreach (FluentAPIEntityNode fluentAPIEntityNode in entityNodes)
             {
                 if (fluentAPIEntityNode.Methods == null) continue;
                 int methodsCount = fluentAPIEntityNode.Methods.Count;
-                if (methodsCount < 2 ) continue;
+                if (methodsCount < 2) continue;
                 FluentAPIMethodNode fluentAPIMethodNode = fluentAPIEntityNode.Methods[0]; // Property - node
                 if (fluentAPIMethodNode.MethodArguments == null) continue;
                 if (fluentAPIMethodNode.MethodArguments.Count < 1) continue;
@@ -2088,7 +2715,7 @@ namespace CS2WPF.Helpers
                 ModelViewProperty modelViewProperty = SelectedModel.ScalarProperties.FirstOrDefault(sp => sp.OriginalPropertyName == propName);
                 if (modelViewProperty == null) continue;
                 if (modelViewProperty.FAPIAttributes == null) modelViewProperty.FAPIAttributes = new ObservableCollection<ModelViewFAPIAttribute>();
-                for(int i = 1; i < methodsCount; i++)
+                for (int i = 1; i < methodsCount; i++)
                 {
                     ModelViewFAPIAttribute modelViewFAPIAttribute = new ModelViewFAPIAttribute()
                     {
@@ -2117,7 +2744,7 @@ namespace CS2WPF.Helpers
             string uniqueProjectName = null;
             if (srcClass.ProjectItem != null)
             {
-                if(srcClass.ProjectItem.ContainingProject != null)
+                if (srcClass.ProjectItem.ContainingProject != null)
                 {
                     uniqueProjectName = srcClass.ProjectItem.ContainingProject.UniqueName;
                 }
@@ -2127,7 +2754,7 @@ namespace CS2WPF.Helpers
             srcClass.CollectPrimaryKeyPropsHelper(primKey, dbContext);
 
             List<FluentAPIExtendedProperty> properties = new List<FluentAPIExtendedProperty>();
-            srcClass.CollectCodeClassAllMappedScalarProperties(properties, null);
+            srcClass.CollectCodeClassAllMappedScalarPropertiesWithDbContext(properties, null, dbContext);
 
             properties.Sort((a, b) => a.PropOrder - b.PropOrder);
             if (SelectedModel.ScalarProperties == null)
@@ -2158,7 +2785,7 @@ namespace CS2WPF.Helpers
                 });
                 srcClass.DefineAttributesForScalarProperties(SelectedModel);
                 srcClass.DefineFAPIAttributesForScalarProperties(SelectedModel, dbContext);
-                foreach(ModelViewProperty modelViewProperty in SelectedModel.ScalarProperties)
+                foreach (ModelViewProperty modelViewProperty in SelectedModel.ScalarProperties)
                 {
                     if (modelViewProperty.FAPIAttributes == null) continue;
                     if (modelViewProperty.FAPIAttributes.Count < 1) continue;
@@ -2168,11 +2795,20 @@ namespace CS2WPF.Helpers
                         modelViewProperty.IsRequired = false;
                         modelViewProperty.IsRequiredInView = false;
                     }
-
-                    if (modelViewProperty.FAPIAttributes.Any(a => a.AttrName == "IsRequired"))
+                    ModelViewFAPIAttribute isReqAttr = modelViewProperty.FAPIAttributes.Where(a => a.AttrName == "IsRequired").FirstOrDefault();
+                    //if (modelViewProperty.FAPIAttributes.Any(a => a.AttrName == "IsRequired"))
+                    if (isReqAttr != null)
                     {
-                        modelViewProperty.IsRequired = true;
-                        modelViewProperty.IsRequiredInView = true;
+                        if (isReqAttr.VaueProperties.Any(a => ((a.PropValue == "false") || (a.PropValue == "False") || (a.PropValue == "\"" + "false" + "\""))))
+                        {
+                            modelViewProperty.IsRequired = false;
+                            modelViewProperty.IsRequiredInView = false;
+                        }
+                        else
+                        {
+                            modelViewProperty.IsRequired = true;
+                            modelViewProperty.IsRequiredInView = true;
+                        }
                     }
                 }
             }
@@ -2223,10 +2859,10 @@ namespace CS2WPF.Helpers
             {
                 if (foreignKeys.Count > 0)
                 {
-                    foreach(FluentAPIForeignKey foreignKey in foreignKeys)
+                    foreach (FluentAPIForeignKey foreignKey in foreignKeys)
                     {
                         if (foreignKey.HasErrors) continue;
-                        if(!srcClassFullName.Equals( foreignKey.EntityFullName)) continue;
+                        if (!srcClassFullName.Equals(foreignKey.EntityFullName)) continue;
                         string containingProjectUniqueName = null;
                         CodeClass masterEntity = foreignKey.CodeElementNavigationRef as CodeClass;
                         if (masterEntity != null)
@@ -2244,7 +2880,7 @@ namespace CS2WPF.Helpers
 
                         ModelViewForeignKey destForeignKey = new ModelViewForeignKey(true)
                         {
-                            NavigationName  = foreignKey.NavigationName,
+                            NavigationName = foreignKey.NavigationName,
                             InverseNavigationName = foreignKey.InverseNavigationName,
                             EntityName = foreignKey.EntityName,
                             EntityFullName = foreignKey.EntityFullName,
@@ -2265,7 +2901,7 @@ namespace CS2WPF.Helpers
                         destForeignKey.IsAssinging = false;
                         if (foreignKey.ForeignKeyProps != null)
                         {
-                            if(foreignKey.ForeignKeyProps.Count > 0)
+                            if (foreignKey.ForeignKeyProps.Count > 0)
                             {
                                 destForeignKey.ForeignKeyProps = new List<ModelViewKeyProperty>();
                                 foreignKey.ForeignKeyProps.ForEach(fkp =>
@@ -2283,7 +2919,8 @@ namespace CS2WPF.Helpers
                                             UnderlyingTypeName = pkp.UnderlyingTypeName,
                                             ViewPropertyName = pkp.ViewPropertyName
                                         });
-                                    } else
+                                    }
+                                    else
                                     {
                                         destForeignKey.ForeignKeyProps.Add(new ModelViewKeyProperty()
                                         {
@@ -2296,13 +2933,13 @@ namespace CS2WPF.Helpers
                         }
                         if (foreignKey.PrincipalKeyProps != null)
                         {
-                            if(foreignKey.PrincipalKeyProps.Count > 0)
+                            if (foreignKey.PrincipalKeyProps.Count > 0)
                             {
                                 List<FluentAPIExtendedProperty> masterKeys = null;
                                 if (masterEntity != null)
                                 {
                                     masterKeys = new List<FluentAPIExtendedProperty>();
-                                    masterEntity.CollectCodeClassAllMappedScalarProperties(masterKeys, foreignKey.PrincipalKeyProps);
+                                    masterEntity.CollectCodeClassAllMappedScalarPropertiesWithDbContext(masterKeys, foreignKey.PrincipalKeyProps, dbContext);
                                 }
                                 destForeignKey.PrincipalKeyProps = new List<ModelViewKeyProperty>();
                                 foreignKey.PrincipalKeyProps.ForEach(fkp =>
@@ -2346,6 +2983,9 @@ namespace CS2WPF.Helpers
             SelectedModel.ViewName = srcClass.Name + viewSufix;
             SelectedModel.PageViewName = srcClass.Name + pageViewNameSufix;
 
+            SelectedModel.PluralTitle = SelectedModel.ViewName + "s";
+            SelectedModel.Title = SelectedModel.ViewName;
+
 
             if (SelectedModel.AllProperties == null)
             {
@@ -2355,26 +2995,61 @@ namespace CS2WPF.Helpers
             {
                 SelectedModel.AllProperties.Clear();
             }
-            foreach(ModelViewProperty scalarProperty in SelectedModel.ScalarProperties)
+            foreach (ModelViewProperty scalarProperty in SelectedModel.ScalarProperties)
             {
-                    SelectedModel.AllProperties.Add( new ModelViewEntityProperty()
+                SelectedModel.AllProperties.Add(new ModelViewEntityProperty()
+                {
+                    OriginalPropertyName = scalarProperty.OriginalPropertyName,
+                    TypeFullName = scalarProperty.TypeFullName,
+                    IsNullable = scalarProperty.IsNullable,
+                    IsRequired = scalarProperty.IsRequired,
+                    UnderlyingTypeName = scalarProperty.UnderlyingTypeName,
+                    ViewPropertyName = scalarProperty.ViewPropertyName,
+                    JsonPropertyName = scalarProperty.JsonPropertyName,
+                    Attributes = scalarProperty.Attributes.CloneModelViewAttributeCollection(),
+                    FAPIAttributes = scalarProperty.FAPIAttributes.CloneModelViewFAPIAttributeCollection()
+                });
+            }
+            if (SelectedModel.UniqueKeys == null)
+            {
+                SelectedModel.UniqueKeys = new ObservableCollection<ModelViewUniqueKey>();
+            }
+            else
+            {
+                SelectedModel.UniqueKeys.Clear();
+            }
+            IList<FluentAPIKey> UniqueKeys = new List<FluentAPIKey>();
+            srcClass.CollectAllUniqueKeysHelper(UniqueKeys, dbContext);
+            foreach (FluentAPIKey key in UniqueKeys)
+            {
+                ModelViewUniqueKey modelViewUniqueKey = new ModelViewUniqueKey();
+                modelViewUniqueKey.IsPrimary = key.IsPrimary;
+                modelViewUniqueKey.UniqueKeyName = key.KeyName;
+                modelViewUniqueKey.KeySource = key.KeySource;
+                if (key.KeyProperties != null)
+                {
+                    if (modelViewUniqueKey.UniqueKeyProperties == null) modelViewUniqueKey.UniqueKeyProperties = new List<ModelViewKeyProperty>();
+                    foreach (var property in key.KeyProperties)
                     {
-                        OriginalPropertyName = scalarProperty.OriginalPropertyName,
-                        TypeFullName = scalarProperty.TypeFullName,
-                        IsNullable = scalarProperty.IsNullable,
-                        IsRequired = scalarProperty.IsRequired,
-                        UnderlyingTypeName = scalarProperty.UnderlyingTypeName,
-                        ViewPropertyName = scalarProperty.ViewPropertyName,
-                        JsonPropertyName = scalarProperty.JsonPropertyName,
-                        Attributes = scalarProperty.Attributes.CloneModelViewAttributeCollection(),
-                        FAPIAttributes = scalarProperty.FAPIAttributes.CloneModelViewFAPIAttributeCollection()
-                    });
+                        ModelViewProperty pkp =
+                            SelectedModel.ScalarProperties.FirstOrDefault(sp => sp.OriginalPropertyName == property.PropName);
+                        if (pkp != null)
+                        {
+                            modelViewUniqueKey.UniqueKeyProperties.Add(new ModelViewKeyProperty()
+                            {
+                                OriginalPropertyName = pkp.OriginalPropertyName,
+                                TypeFullName = pkp.TypeFullName,
+                                IsNullable = pkp.IsNullable,
+                                IsRequired = pkp.IsRequired,
+                                UnderlyingTypeName = pkp.UnderlyingTypeName,
+                                ViewPropertyName = pkp.ViewPropertyName
+                            });
+                        }
+                    }
+                }
+                SelectedModel.UniqueKeys.Add(modelViewUniqueKey);
             }
             return SelectedModel;
-        }
-        private static ObservableCollection<T> ObservableCollection<T>()
-        {
-            throw new NotImplementedException();
         }
     }
 }

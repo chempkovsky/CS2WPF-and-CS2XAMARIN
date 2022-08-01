@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace CS2WPF.Model.Serializable.UI
 {
-    public class ModelViewPropertyOfVwNotified: NotifyPropertyChangedViewModel
+    public class ModelViewPropertyOfVwNotified : NotifyPropertyChangedViewModel
     {
         #region Fields
         protected string _OriginalPropertyName;
@@ -267,6 +267,6 @@ namespace CS2WPF.Model.Serializable.UI
             }
         }
 
-        
+
     }
 }

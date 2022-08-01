@@ -9,8 +9,8 @@ namespace CS2WPF.ViewModel
         protected string _templateFolder = "";
 
         public string TemplateExtention { get; set; }
-        public string TemplateFolder 
-        { 
+        public string TemplateFolder
+        {
             get
             {
                 return _templateFolder;
@@ -24,7 +24,7 @@ namespace CS2WPF.ViewModel
                 SelectedTemplate = "";
                 OnPropertyChanged("TemplateFolder");
                 OnPropertyChanged("Templates");
-            } 
+            }
         }
 
         protected string _selectedTemplate = "";
@@ -45,7 +45,7 @@ namespace CS2WPF.ViewModel
         public bool ShowT4Template { get; set; }
         public string ControlCaption { get; set; }
         public ObservableCollection<string> Templates { get; set; }
-        public Selectt4TemplateViewModel(): base()
+        public Selectt4TemplateViewModel() : base()
         {
             Templates = new ObservableCollection<string>();
             ControlCaption = "Template Selection";

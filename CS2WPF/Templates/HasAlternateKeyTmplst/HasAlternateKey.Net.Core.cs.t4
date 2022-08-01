@@ -1,0 +1,30 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ parameter type="System.Collections.Generic.List<System.String>"  name="UniqueKeyProperties" #>
+<#@ parameter type="System.String"  name="UniqueKeyName" #>
+.HasAlternateKey( p => <#= GetUniqueKeyPropertiesList(UniqueKeyProperties, "p.") #> ).HasName("<#= UniqueKeyName #>");
+<#+
+        string GetUniqueKeyPropertiesList(System.Collections.Generic.List<System.String> uniqueKeyProperties, string prefixName)
+        {
+            if (uniqueKeyProperties == null) return "";
+            int cnt = uniqueKeyProperties.Count;
+            if (cnt < 1) return "";
+            string result = prefixName + uniqueKeyProperties[0];
+            for (int i = 1; i < cnt; i++)
+            {
+                result = result + ", " + prefixName + uniqueKeyProperties[i];
+            }
+            if (cnt < 2)
+            {
+                return result;
+            }
+            return "new {" + result + "}";
+        }
+
+#>

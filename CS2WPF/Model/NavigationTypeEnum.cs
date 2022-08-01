@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CS2WPF.Model
 {
-    public enum NavigationTypeEnum: int
+    public enum NavigationTypeEnum : int
     {
         Unckown = 0,
         OneToMany = 1,

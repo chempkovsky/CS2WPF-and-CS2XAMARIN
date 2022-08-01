@@ -2,22 +2,19 @@
 using CS2WPF.Model;
 using CS2WPF.Model.AnalyzeOnModelCreating;
 using CS2WPF.View;
+
 using EnvDTE;
 using EnvDTE80;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TextTemplating.VSHost;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace CS2WPF.ViewModel
 {
 
-    #pragma warning disable VSTHRD010
+#pragma warning disable VSTHRD010
     public class MainWindowDbContext : MainWindowBase
     {
         #region Fieds
@@ -27,6 +24,7 @@ namespace CS2WPF.ViewModel
         UserControlGenerate GenerateDbContextUC = null;
         UserControlSelectSource SelectSourceEntityUC = null;
         UserControlCreatePrimKey CreatePrimKeyUC = null;
+        UserControlCreateUniqueKey CreateUniqueKeyUC = null;
         UserControlSelectForeignKey SelectForeignKeyUC = null;
         UserControlCreateForeignKey CreateForeignKeyUC = null;
         #endregion
@@ -125,13 +123,24 @@ namespace CS2WPF.ViewModel
                     this.CurrentUserControl = T4Editor;
                     this.OnPropertyChanged("CurrentUserControl");
                     break;
+
                 case 201:
                     CurrentUiStepId = 3;
                     PrevBtnCommandAction(param);
                     return;
+
+                case 211:
+                    CurrentUiStepId = 200;
+                    NextBtnCommandAction(param);
+                    return;
+
                 case 301:
                     CurrentUiStepId = 4;
                     PrevBtnCommandAction(param);
+                    return;
+                case 311:
+                    CurrentUiStepId = 300;
+                    NextBtnCommandAction(param);
                     return;
                 default:
                     break;
@@ -261,7 +270,7 @@ namespace CS2WPF.ViewModel
                     CurrentUiStepId = 101;
                     PrevBtnEnabled = true;
                     NextBtnEnabled = false;
-                    if(T4SelectTemplateUC == null)
+                    if (T4SelectTemplateUC == null)
                     {
                         Selectt4TemplateViewModel dataContext = new Selectt4TemplateViewModel();
                         string TemplatesFld = TemplatePathHelper.GetTemplatePath();
@@ -280,13 +289,13 @@ namespace CS2WPF.ViewModel
                     string templatePath101 = Path.Combine(
                         (T4SelectTemplateUC.DataContext as Selectt4TemplateViewModel).TemplateFolder,
                         (T4SelectTemplateUC.DataContext as Selectt4TemplateViewModel).SelectedTemplate);
-                    if (T4Editor == null) 
+                    if (T4Editor == null)
                     {
                         T4EditorViewModel dataContext = new T4EditorViewModel((T4SelectTemplateUC.DataContext as Selectt4TemplateViewModel).TemplateFolder);
                         dataContext.T4SelectedTemplate = (T4SelectTemplateUC.DataContext as Selectt4TemplateViewModel).SelectedTemplate;
                         dataContext.T4TempateCaption = (T4SelectTemplateUC.DataContext as Selectt4TemplateViewModel).SelectedTemplate;
                         T4Editor = new UserControlT4Editor(dataContext);
-                    } 
+                    }
                     else
                     {
                         if (!templatePath101.Equals((T4Editor.DataContext as T4EditorViewModel).T4TempatePath, StringComparison.OrdinalIgnoreCase))
@@ -314,7 +323,7 @@ namespace CS2WPF.ViewModel
                         GenerateDbContextViewModel dataContext = new GenerateDbContextViewModel();
                         dataContext.IsReady.IsReadyEvent += GenerateDbContext_IsReady;
                         GenerateDbContextUC = new UserControlGenerate(dataContext);
-                        
+
                     }
                     (GenerateDbContextUC.DataContext as GenerateDbContextViewModel).GenText =
                         (T4Editor.DataContext as T4EditorViewModel).T4TempateText;
@@ -355,10 +364,32 @@ namespace CS2WPF.ViewModel
                     this.OnPropertyChanged("CurrentUserControl");
                     break;
                 case 201:
+                    CurrentUiStepId = 210;
+                    NextBtnCommandAction(param);
+                    break;
+                case 210:
+                    CurrentUiStepId = 211;
+                    PrevBtnEnabled = true;
+                    NextBtnEnabled = true;
+                    if (CreateUniqueKeyUC == null)
+                    {
+                        CreateUniqueKeyViewModel dataContext = new CreateUniqueKeyViewModel(Dte, TextTemplating);
+                        string TemplatesFld = TemplatePathHelper.GetTemplatePath();
+                        dataContext.TemplateFolder = Path.Combine(TemplatesFld, "HasAlternateKeyTmplst");
+                        CreateUniqueKeyUC = new UserControlCreateUniqueKey(dataContext);
+                    }
+                    (CreateUniqueKeyUC.DataContext as CreateUniqueKeyViewModel).SelectedDbContext =
+                        (SelectSourceEntityUC.DataContext as SelectEntityForGivenDbContextViewModel).SelectedDbContext;
+                    (CreateUniqueKeyUC.DataContext as CreateUniqueKeyViewModel).SelectedEntity =
+                        (SelectSourceEntityUC.DataContext as SelectEntityForGivenDbContextViewModel).SelectedCodeElement;
+                    (CreateUniqueKeyUC.DataContext as CreateUniqueKeyViewModel).DoAnalise();
+                    this.CurrentUserControl = CreateUniqueKeyUC;
+                    this.OnPropertyChanged("CurrentUserControl");
+                    break;
+                case 211:
                     CurrentUiStepId = 1;
                     NextBtnCommandAction(param);
                     break;
-
                 case 300:
                     CurrentUiStepId = 301;
                     PrevBtnEnabled = true;
@@ -373,17 +404,38 @@ namespace CS2WPF.ViewModel
                     (CreatePrimKeyUC.DataContext as CreatePrimaryKeyViewModel).SelectedDbContext =
                         (SelectSourceEntityUC.DataContext as SelectEntityForGivenDbContextViewModel).SelectedDbContext;
                     //(CreatePrimKeyUC.DataContext as CreatePrimaryKeyViewModel).SelectedEntity = 
-                        //(SelectSourceEntityUC.DataContext as SelectEntityForGivenDbContextViewModel).SelectedCodeElement;
+                    //(SelectSourceEntityUC.DataContext as SelectEntityForGivenDbContextViewModel).SelectedCodeElement;
                     (CreatePrimKeyUC.DataContext as CreatePrimaryKeyViewModel).DoAnalise();
                     this.CurrentUserControl = CreatePrimKeyUC;
                     this.OnPropertyChanged("CurrentUserControl");
                     break;
                 case 301:
+                    CurrentUiStepId = 310;
+                    NextBtnCommandAction(param);
+                    break;
+                case 310:
+                    CurrentUiStepId = 311;
+                    PrevBtnEnabled = true;
+                    NextBtnEnabled = true;
+                    if (CreateUniqueKeyUC == null)
+                    {
+                        CreateUniqueKeyViewModel dataContext = new CreateUniqueKeyViewModel(Dte, TextTemplating);
+                        string TemplatesFld = TemplatePathHelper.GetTemplatePath();
+                        dataContext.TemplateFolder = Path.Combine(TemplatesFld, "HasAlternateKeyTmplst");
+                        CreateUniqueKeyUC = new UserControlCreateUniqueKey(dataContext);
+                    }
+                    (CreateUniqueKeyUC.DataContext as CreateUniqueKeyViewModel).SelectedDbContext =
+                        (SelectSourceEntityUC.DataContext as SelectEntityForGivenDbContextViewModel).SelectedDbContext;
+                    (CreateUniqueKeyUC.DataContext as CreateUniqueKeyViewModel).SelectedEntity =
+                        (CreatePrimKeyUC.DataContext as CreatePrimaryKeyViewModel).SelectedEntity;
+                    (CreateUniqueKeyUC.DataContext as CreateUniqueKeyViewModel).DoAnalise();
+                    this.CurrentUserControl = CreateUniqueKeyUC;
+                    this.OnPropertyChanged("CurrentUserControl");
+                    break;
+                case 311:
                     CurrentUiStepId = 4;
                     PrevBtnCommandAction(param);
                     break;
-
-
                 default:
                     break;
             }
@@ -420,9 +472,17 @@ namespace CS2WPF.ViewModel
         private void SaveDbContextGeneratedText()
         {
 
-            string FlNm = Path.Combine(GetDestinationSelItemFolder(), (SelectDbContextUC.DataContext as SelectDbContextViewModel).UiCommandProppertyName 
+            string FlNm = Path.Combine(GetDestinationSelItemFolder(), (SelectDbContextUC.DataContext as SelectDbContextViewModel).UiCommandProppertyName
                 + (GenerateDbContextUC.DataContext as GenerateDbContextViewModel).FileExtension);
-            File.WriteAllText(FlNm, (GenerateDbContextUC.DataContext as GenerateDbContextViewModel).GenerateText);
+            try
+            {
+                File.WriteAllText(FlNm, (GenerateDbContextUC.DataContext as GenerateDbContextViewModel).GenerateText);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("Error: Error: Could not save generated file. This type of exception can be thrown when EXISTING project added to the solution and developer tries to update VS project repository.  Original Error: " + e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
             try
             {
                 DestinationProject.ProjectItems.AddFromFile(FlNm);
@@ -430,7 +490,7 @@ namespace CS2WPF.ViewModel
             }
             catch (Exception e)
             {
-                MessageBox.Show("Error: " + e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Error: Could not update VS Solution repository file. This type of exception can be thrown when EXISTING project added to the solution and developer tries to update VS project repository.  Original Error: " + e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
         }
@@ -499,7 +559,7 @@ namespace CS2WPF.ViewModel
                 CodeElementFullName = codeElement.FullName,
                 CodeElementRef = codeElement
             };
-                
+
             CurrentUiStepId = 300;
             NextBtnCommandAction(sender);
         }

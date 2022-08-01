@@ -9,22 +9,56 @@ using System.Threading.Tasks;
 
 namespace CS2WPF.Model
 {
-    public class ModelView: NotifyPropertyChangedViewModel
+    public class ModelView : NotifyPropertyChangedViewModel
     {
         #region Fields
-        protected string _ViewName="";
+        protected string _ViewName = "";
         protected string _RootEntityClassName = "";
         protected string _RootEntityFullClassName = "";
         protected string _RootEntityUniqueProjectName = "";
         protected string _DestinationProject = "";
         protected string _DefaultProjectNameSpace = "";
         protected string _DestinationFolder = "";
-        protected bool   _GenerateJSonAttribute;
+        protected bool _GenerateJSonAttribute;
         protected string _RootEntityDbContextPropertyName;
         protected string _PageViewName;
+        protected string _PluralTitle = "";
+        protected string _Title = "";
+
         #endregion
-        public string ViewName 
-        { 
+        public string Title
+        {
+            get
+            {
+                return _Title;
+            }
+            set
+            {
+                if (_Title != value)
+                {
+                    _Title = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        public string PluralTitle
+        {
+            get
+            {
+                return _PluralTitle;
+            }
+            set
+            {
+                if (_PluralTitle != value)
+                {
+                    _PluralTitle = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public string ViewName
+        {
             get
             {
                 return _ViewName;
@@ -36,7 +70,7 @@ namespace CS2WPF.Model
                     _ViewName = value;
                     OnPropertyChanged();
                 }
-            } 
+            }
         }
         public string PageViewName
         {
@@ -68,7 +102,7 @@ namespace CS2WPF.Model
                 }
             }
         }
-        
+
 
         public string RootEntityClassName
         {
@@ -181,6 +215,7 @@ namespace CS2WPF.Model
         public ObservableCollection<ModelViewEntityProperty> AllProperties { get; set; }
         public ObservableCollection<ModelViewUIFormProperty> UIFormProperties { get; set; }
         public ObservableCollection<ModelViewUIListProperty> UIListProperties { get; set; }
+        public ObservableCollection<ModelViewUniqueKey> UniqueKeys { get; set; }
 
     }
 }

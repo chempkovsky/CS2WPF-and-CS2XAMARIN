@@ -3,7 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:CS2WPF.View"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="600">
     <Grid>
@@ -35,7 +34,7 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Vertical">
-                <TextBlock Margin="5">All Not Null Properties</TextBlock>
+                <TextBlock Margin="5">All Mapped Properties</TextBlock>
                 <ListBox Width="200" Height="160" ItemsSource="{Binding EntityProperties}" SelectedIndex="{Binding  EntityPropertiesIndex}">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
@@ -45,6 +44,10 @@
                                     <TextBlock  Text="{Binding Path=ShortTypeName}"/>
                                     <CheckBox Margin="5 0 5 0" IsChecked="{Binding IsNullable}" IsHitTestVisible="False" />
                                     <TextBlock  Text="Nullable"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" >
+                                    <CheckBox Margin="5 0 5 0" IsChecked="{Binding IsRequired}" IsHitTestVisible="False" />
+                                    <TextBlock  Text="Required"/>
                                 </StackPanel>
                             </StackPanel>
                         </DataTemplate>
@@ -67,6 +70,11 @@
                                     <TextBlock  Text="{Binding Path=ShortTypeName}"/>
                                     <CheckBox Margin="5 0 5 0" IsChecked="{Binding IsNullable}" IsHitTestVisible="False" />
                                     <TextBlock  Text="Nullable"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" >
+                                    <TextBlock  Text="{Binding Path=ShortTypeName}"/>
+                                    <CheckBox Margin="5 0 5 0" IsChecked="{Binding IsRequired}" IsHitTestVisible="False" />
+                                    <TextBlock  Text="Required"/>
                                 </StackPanel>
                             </StackPanel>
                         </DataTemplate>

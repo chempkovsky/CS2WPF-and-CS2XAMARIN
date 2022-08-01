@@ -30,5 +30,6 @@ namespace CS2WPF.Model.AnalyzeOnModelCreating
         public bool HasErrors { get; set; }
         public string ErrorsText { get; set; }
         public bool IsCascadeDelete { get; set; }
+        public string DeleteBehavior { get; set; } = "DeleteBehavior.NoAction";
     }
 }

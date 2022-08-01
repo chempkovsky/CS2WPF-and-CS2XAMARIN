@@ -34,7 +34,7 @@ namespace CS2WPF.Model
         #endregion
 
         public ModelViewForeignKey() { }
-        public ModelViewForeignKey(bool isAssinging) 
+        public ModelViewForeignKey(bool isAssinging)
         {
             IsAssinging = isAssinging;
         }
@@ -287,7 +287,7 @@ namespace CS2WPF.Model
                     _ViewName = value;
                     OnPropertyChanged();
                     if (IsAssinging) return;
-                    if(ScalarProperties != null)
+                    if (ScalarProperties != null)
                     {
                         ScalarProperties.Clear();
                     }
@@ -312,8 +312,8 @@ namespace CS2WPF.Model
                 }
             }
         }
-        public ObservableCollection<ModelViewProperty> ScalarProperties 
-        { 
+        public ObservableCollection<ModelViewProperty> ScalarProperties
+        {
             get
             {
                 return _ScalarProperties;
@@ -323,7 +323,8 @@ namespace CS2WPF.Model
                 if (_ScalarProperties == value) return;
                 _ScalarProperties = value;
                 OnPropertyChanged();
-            } 
+            }
         }
+
     }
 }

@@ -8,6 +8,7 @@ using System.IO;
 
 namespace CS2WPF.ViewModel
 {
+#pragma warning disable VSTHRD010
     public class GenerateCommonStaffViewModel : BaseGenerateViewModel
     {
         public GenerateCommonStaffViewModel() : base()

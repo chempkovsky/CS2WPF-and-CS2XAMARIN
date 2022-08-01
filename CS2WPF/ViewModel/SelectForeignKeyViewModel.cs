@@ -7,15 +7,11 @@ using EnvDTE80;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Input;
 
 namespace CS2WPF.ViewModel
 {
-    #pragma warning disable VSTHRD010
+#pragma warning disable VSTHRD010
     public class SelectForeignKeyViewModel : IsReadyViewModel
     {
         #region Fields
@@ -63,8 +59,8 @@ namespace CS2WPF.ViewModel
             }
         }
         public string SelectForeignCaption { get; set; } = "Foreign Keys for:";
-        public string SelectedEntityCaption 
-        { 
+        public string SelectedEntityCaption
+        {
             get
             {
                 return _SelectedEntityCaption;
@@ -74,14 +70,15 @@ namespace CS2WPF.ViewModel
                 if (_SelectedEntityCaption == value) return;
                 _SelectedEntityCaption = value;
                 OnPropertyChanged();
-            } 
+            }
         }
         public ObservableCollection<FluentAPIForeignKey> ForeignKeys { get; set; }
-        public FluentAPIForeignKey SelectedForeignKey 
-        { 
-            get { 
+        public FluentAPIForeignKey SelectedForeignKey
+        {
+            get
+            {
                 return _SelectedForeignKey;
-            } 
+            }
             set
             {
                 if (_SelectedForeignKey == value) return;
@@ -102,7 +99,8 @@ namespace CS2WPF.ViewModel
             if (SelectedEntity == null)
             {
                 SelectedEntityCaption = "";
-            } else
+            }
+            else
             {
                 SelectedEntityCaption = SelectedEntity.CodeElementFullName;
             }
@@ -134,7 +132,7 @@ namespace CS2WPF.ViewModel
             }
 
             List<FluentAPIForeignKey> result =
-                (SelectedEntity.CodeElementRef as CodeClass).CollectForeignKeys(SelectedDbContext.CodeElementRef as CodeClass);
+                (SelectedEntity.CodeElementRef as CodeClass).CollectForeignKeys(SelectedDbContext.CodeElementRef as CodeClass, null, true);
             if (result != null)
             {
                 foreach (FluentAPIForeignKey itm in result)

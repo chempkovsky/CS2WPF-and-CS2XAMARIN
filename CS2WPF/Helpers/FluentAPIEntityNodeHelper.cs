@@ -9,6 +9,7 @@ namespace CS2WPF.Helpers
 {
     public static class FluentAPIEntityNodeHelper
     {
+        // "faen" matches the filter if "faen" matches one of the list items (== List<FluentAPIEntityNode> filter)
         public static bool IsSatisfiedTheFilter(this FluentAPIEntityNode faen, List<FluentAPIEntityNode> filter)
         {
             if (faen == null) return false;
@@ -40,7 +41,7 @@ namespace CS2WPF.Helpers
                                 }
                                 if (flt.Methods[i].MethodArguments != null)
                                 {
-                                    if((flt.Methods[i].MethodArguments.Count > 0) && (faen.Methods[i].MethodArguments == null))
+                                    if ((flt.Methods[i].MethodArguments.Count > 0) && (faen.Methods[i].MethodArguments == null))
                                     {
                                         isBroken = true;
                                         break;
@@ -71,6 +72,101 @@ namespace CS2WPF.Helpers
                 }
             }
             return isSatisfied;
+        }
+        public static bool HoldsIsRequired(this FluentAPIEntityNode faen, string propName, out bool IsReq)
+        {
+            IsReq = false;
+            if ((faen == null) || string.IsNullOrEmpty(propName)) return false;
+            if (faen.Methods == null) return false;
+            bool checkProp = true;
+            bool result = false;
+            foreach (FluentAPIMethodNode m in faen.Methods)
+            {
+                if (checkProp)
+                {
+                    if (m.MethodName == "Property")
+                    {
+                        if (m.MethodArguments != null)
+                            if (m.MethodArguments.Any(p => p == propName))
+                                checkProp = false;
+                            else
+                                return false;
+                    }
+                    continue;
+                }
+                if (m.MethodName == "IsRequired")
+                {
+                    result = true;
+                    if (m.MethodArguments != null)
+                    {
+                        IsReq = m.MethodArguments.Any(a => (a == System.Boolean.TrueString) || (a == "\"" + System.Boolean.TrueString + "\""));
+                    }
+                    else
+                    {
+                        IsReq = false;
+                    }
+                }
+            }
+            return result;
+        }
+        public static bool HoldsIsRequired(this IList<FluentAPIEntityNode> faens, string propName, out bool IsReq)
+        {
+            IsReq = false;
+            bool result = false;
+            if (faens == null) return result;
+            foreach (FluentAPIEntityNode faen in faens)
+            {
+                bool locrslt = false;
+                if (faen.HoldsIsRequired(propName, out locrslt))
+                {
+                    result = true;
+                    IsReq = locrslt;
+                }
+            }
+            return result;
+        }
+        public static bool HoldsIgnore(this FluentAPIEntityNode faen, string propName)
+        {
+            if ((faen == null) || string.IsNullOrEmpty(propName)) return false;
+            if (faen.Methods == null) return false;
+            foreach (FluentAPIMethodNode m in faen.Methods)
+            {
+                if (m.MethodName == "Ignore")
+                {
+                    if (m.MethodArguments != null)
+                        if (m.MethodArguments.Any(a => (a == propName) || (a == "\"" + propName + "\"")))
+                            return true;
+                }
+            }
+            return false;
+        }
+        public static bool HoldsIgnore(this IList<FluentAPIEntityNode> faens, string propName)
+        {
+            if (faens == null) return false;
+            foreach (FluentAPIEntityNode faen in faens)
+            {
+                if (faen.HoldsIgnore(propName))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        public static FluentAPIEntityNode HoldsHasName(this IList<FluentAPIEntityNode> faens, string nameToFilter)
+        {
+            if ((faens == null) || (nameToFilter == null)) return null;
+            int cnt = faens.Count;
+
+            for (int i = cnt - 1; i >= 0; i--)
+            {
+                FluentAPIEntityNode faen = faens[i];
+                if (faen.Methods == null) continue;
+                FluentAPIMethodNode mthdNd = faen.Methods.FirstOrDefault(e => e.MethodName == "HasName");
+                if (mthdNd == null) continue;
+                if (mthdNd.MethodArguments == null) continue;
+                if (mthdNd.MethodArguments.Any(e => nameToFilter.Equals(e))) return faen;
+            }
+            return null;
         }
     }
 }

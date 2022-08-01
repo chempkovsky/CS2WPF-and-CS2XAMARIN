@@ -46,6 +46,19 @@ namespace <#= ModelNotifyNameSpace #> {
         }
         #endregion
 
+        public override string ToString()
+        {
+            return "" 
+<#
+        foreach (ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
+#>
+            + _<#= GetModelPropertyName(prop, Model) #>
+<# 
+        }
+#>
+            ;
+        }
+
 <#
         foreach (ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
 #>

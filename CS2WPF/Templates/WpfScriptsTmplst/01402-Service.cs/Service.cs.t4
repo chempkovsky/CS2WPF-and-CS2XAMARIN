@@ -233,9 +233,11 @@ namespace <#= modelServiceNameSpace #> {
             }
 #>
                             if(prms == null)
-                                prms = "?" + Uri.EscapeDataString("<#= GetFilterPropertyName(prop, Model) #>") + "[]=" + Uri.EscapeDataString(val.ToString());
+                                //prms = "?" + Uri.EscapeDataString("<#= GetFilterPropertyName(prop, Model) #>") + "[]=" + Uri.EscapeDataString(val.ToString());
+                                prms = "?" + Uri.EscapeDataString("<#= GetFilterPropertyName(prop, Model) #>") + "=" + Uri.EscapeDataString(val.ToString());
                             else 
-                                prms += "&" + Uri.EscapeDataString("<#= GetFilterPropertyName(prop, Model) #>") + "[]=" + Uri.EscapeDataString(val.ToString());
+                                //prms += "&" + Uri.EscapeDataString("<#= GetFilterPropertyName(prop, Model) #>") + "[]=" + Uri.EscapeDataString(val.ToString());
+                                prms += "&" + Uri.EscapeDataString("<#= GetFilterPropertyName(prop, Model) #>") + "=" + Uri.EscapeDataString(val.ToString());
 <#          if(prop.IsNullable) { 
 #>
                         } 
@@ -248,9 +250,11 @@ namespace <#= modelServiceNameSpace #> {
 #>
                     if(hasNull) {
                             if(prms == null)
-                                prms = "?" + Uri.EscapeDataString("<#= GetFilterPropertyName(prop, Model) #>") + "[]=" ;
+                                //prms = "?" + Uri.EscapeDataString("<#= GetFilterPropertyName(prop, Model) #>") + "[]=" ;
+                                prms = "?" + Uri.EscapeDataString("<#= GetFilterPropertyName(prop, Model) #>") + "=" ;
                             else 
-                                prms += "&" + Uri.EscapeDataString("<#= GetFilterPropertyName(prop, Model) #>") + "[]=";
+                                //prms += "&" + Uri.EscapeDataString("<#= GetFilterPropertyName(prop, Model) #>") + "[]=";
+                                prms += "&" + Uri.EscapeDataString("<#= GetFilterPropertyName(prop, Model) #>") + "=";
                     }
 <#
             }
@@ -267,14 +271,18 @@ namespace <#= modelServiceNameSpace #> {
                     foreach(var val in filter.<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix)#>) {
                         if(val != null) {
                             if(prms == null)
-                                prms = "?" + Uri.EscapeDataString("<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #>") + "[]=" +  Uri.EscapeDataString(val.ToString());
+                                //prms = "?" + Uri.EscapeDataString("<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #>") + "[]=" +  Uri.EscapeDataString(val.ToString());
+                                prms = "?" + Uri.EscapeDataString("<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #>") + "=" +  Uri.EscapeDataString(val.ToString());
                             else 
-                                prms += "&" + Uri.EscapeDataString("<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #>") + "[]=" + Uri.EscapeDataString(val.ToString());
+                                //prms += "&" + Uri.EscapeDataString("<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #>") + "[]=" + Uri.EscapeDataString(val.ToString());
+                                prms += "&" + Uri.EscapeDataString("<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #>") + "=" + Uri.EscapeDataString(val.ToString());
                         } else {
                             if(prms == null)
-                                prms = "?" + Uri.EscapeDataString("<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #>") + "[]=" +  Uri.EscapeDataString("<#= EqualOperator #>");
+                                //prms = "?" + Uri.EscapeDataString("<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #>") + "[]=" +  Uri.EscapeDataString("<#= EqualOperator #>");
+                                prms = "?" + Uri.EscapeDataString("<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #>") + "=" +  Uri.EscapeDataString("<#= EqualOperator #>");
                             else 
-                                prms += "&" + Uri.EscapeDataString("<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #>") + "[]=" + Uri.EscapeDataString("<#= EqualOperator #>");
+                                //prms += "&" + Uri.EscapeDataString("<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #>") + "[]=" + Uri.EscapeDataString("<#= EqualOperator #>");
+                                prms += "&" + Uri.EscapeDataString("<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #>") + "=" + Uri.EscapeDataString("<#= EqualOperator #>");
                         }
                     }
                 }
@@ -285,9 +293,11 @@ namespace <#= modelServiceNameSpace #> {
                     foreach(var ordb in filter.orderby) {
                         if( !string.IsNullOrEmpty(ordb) ) {
                             if(prms == null)
-                                prms = "?" + Uri.EscapeDataString("orderby") + "[]=" +  Uri.EscapeDataString(ordb);
+                                //prms = "?" + Uri.EscapeDataString("orderby") + "[]=" +  Uri.EscapeDataString(ordb);
+                                prms = "?" + Uri.EscapeDataString("orderby") + "=" +  Uri.EscapeDataString(ordb);
                             else 
-                                prms += "&" + Uri.EscapeDataString("orderby") + "[]=" + Uri.EscapeDataString(ordb);
+                                //prms += "&" + Uri.EscapeDataString("orderby") + "[]=" + Uri.EscapeDataString(ordb);
+                                prms += "&" + Uri.EscapeDataString("orderby") + "=" + Uri.EscapeDataString(ordb);
                         }
                     }
                 }

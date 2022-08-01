@@ -5,13 +5,12 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 
 namespace CS2WPF.ViewModel
 {
+#pragma warning disable VSTHRD010
     public class ModifyFeatureViewModel : NotifyPropertyChangedViewModel
     {
         public Window wnd;
@@ -21,11 +20,12 @@ namespace CS2WPF.ViewModel
         string _FeatureName;
         public ButtonClickedNotificationService UiCommandButtonClicked = new ButtonClickedNotificationService();
         public ObservableCollection<FeatureItem> ContextItemsList { get; set; }
-        public DbContextSerializable DbContext { 
+        public DbContextSerializable DbContext
+        {
             get
             {
                 return _DbContext;
-            } 
+            }
             set
             {
                 if (_DbContext != value)
@@ -37,7 +37,7 @@ namespace CS2WPF.ViewModel
             }
         }
         public AllowedFileTypesSerializable AllowedFileTypes
-        { 
+        {
             get
             {
                 return _AllowedFileTypes;
@@ -78,7 +78,7 @@ namespace CS2WPF.ViewModel
                 if (_Feature != value)
                 {
                     _Feature = value;
-                    if(_Feature == null)
+                    if (_Feature == null)
                     {
                         _FeatureName = "";
                     }
@@ -99,16 +99,18 @@ namespace CS2WPF.ViewModel
             if (AllowedFileTypes == null) return;
             if (AllowedFileTypes.Items == null) return;
             if (DbContext.ModelViews == null) return;
-            foreach(ModelViewSerializable mv in DbContext.ModelViews)
+            foreach (ModelViewSerializable mv in DbContext.ModelViews)
             {
                 if (mv.CommonStaffs == null) continue;
-                foreach(CommonStaffSerializable cmstf in mv.CommonStaffs)
+                foreach (CommonStaffSerializable cmstf in mv.CommonStaffs)
                 {
-                    if (AllowedFileTypes.Items.Any(i => i.FileType == cmstf.FileType)) {
-                        ContextItemsList.Add(new FeatureItem() {
-                                ViewName = mv.ViewName,
-                                FileType = cmstf.FileType,
-                                IsSelected = false
+                    if (AllowedFileTypes.Items.Any(i => i.FileType == cmstf.FileType))
+                    {
+                        ContextItemsList.Add(new FeatureItem()
+                        {
+                            ViewName = mv.ViewName,
+                            FileType = cmstf.FileType,
+                            IsSelected = false
                         });
                     }
                 }
@@ -117,7 +119,7 @@ namespace CS2WPF.ViewModel
         protected void OnFeature()
         {
             if (ContextItemsList == null) return;
-            foreach(FeatureItem fi in ContextItemsList)
+            foreach (FeatureItem fi in ContextItemsList)
             {
                 fi.IsSelected = false;
             }
@@ -147,14 +149,14 @@ namespace CS2WPF.ViewModel
         public virtual void UiBtnCommandSaveAction(Object param)
         {
             if (_Feature == null) return;
-            if(ContextItemsList == null) return;
+            if (ContextItemsList == null) return;
             if (ContextItemsList.Count < 1) return;
             if (_Feature.FeatureItems == null) _Feature.FeatureItems = new List<FeatureItemSerializable>();
             _Feature.FeatureName = FeatureName;
             _Feature.FeatureItems.Clear();
-            foreach(FeatureItem fi in ContextItemsList)
+            foreach (FeatureItem fi in ContextItemsList)
             {
-                if(fi.IsSelected)
+                if (fi.IsSelected)
                 {
                     _Feature.FeatureItems.Add(new FeatureItemSerializable()
                     {
@@ -164,7 +166,7 @@ namespace CS2WPF.ViewModel
                 }
             }
             // UiCommandButtonClicked.DoNotify(this);
-            if(wnd != null)
+            if (wnd != null)
             {
                 wnd.DialogResult = true;
             }
