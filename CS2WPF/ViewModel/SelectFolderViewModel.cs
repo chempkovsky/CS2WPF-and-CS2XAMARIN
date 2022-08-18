@@ -203,7 +203,8 @@ namespace CS2WPF.ViewModel
                     locFileName =
                         SelectedModel.ViewName + TrimPrefix(Path.GetFileNameWithoutExtension(T4SelectedFolder));
                 }
-                FileName = GetHyphenedName(locFileName);
+                //FileName = GetHyphenedName(locFileName);
+                FileName = locFileName;
             }
             locFileName = null;
             string[] files = Directory.GetFiles(Path.Combine(_T4RootFolder, T4SelectedFolder), "*.html");

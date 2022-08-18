@@ -18,12 +18,21 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using System.Linq;
 
 <#
 
     string IAppGlblSettingsServiceFolder      = "00080-IAppGlblSettingsService.cs";
     string IAppGlblSettingsServiceClassName   = GetContextModelClassName(Context, IAppGlblSettingsServiceFolder);
     string IAppGlblSettingsServiceNameSpace   = GetContextModelNameSpace(Context, IAppGlblSettingsServiceFolder);
+
+    string IWebServiceFilterRsltInterfaceFolder      = "00204-IWebServiceFilterRsltInterface.cs";
+    string IWebServiceFilterRsltInterfaceClassName   = GetContextModelClassName(Context, IWebServiceFilterRsltInterfaceFolder);
+    string IWebServiceFilterRsltInterfaceNameSpace   = GetContextModelNameSpace(Context, IWebServiceFilterRsltInterfaceFolder);
+
+    string WebServiceFilterRsltFolder       = "00214-WebServiceFilterRslt.cs";
+    string WebServiceFilterRsltClassName    = GetContextModelClassName(Context, WebServiceFilterRsltFolder);
+    string WebServiceFilterRsltNameSpace    = GetContextModelNameSpace(Context, WebServiceFilterRsltFolder);
 
 
     string modelInterfaceFolder             = "01100-Interface.cs";
@@ -85,48 +94,29 @@ using Newtonsoft.Json;
     string CopyToModelNotifyMethodName      = "CopyToModelNotify";
     string AppSettingServicePropertyName    = "appGlblSettings";
 
+    string ValuesSuffix                         = "Values";
+    string ValueSuffix                          = "Value";
+    string HiddenFilterByRowSuffix              = "HiddenFilterByRow";
+    string LengthSuffix                         = "Length";
+    string KeysSuffix                           = "Keys";
+    string HiddenFilterByFltRsltSuffix          = "HiddenFilterByFltRslt";
+    string HiddenFilterAsFltRsltSuffix          = "HiddenFilterAsFltRslt";
+    string HiddenFilterFieldName                = "HiddenFilter";
+    string MasterToClientKeyFieldsMapFieldName  = "m2cKeyfm";
+    string MasterToClientFieldsMapFieldName     = "m2cfm";
+    string IsDestroyedPropertyName              = "IsDestroyed";
+    string ClientToMasterFieldsMapFieldName     = "c2mfm";
+    string row2FilterRsltMethodName             = "row2FilterRslt";
+    string GetManyByRepPrimMethodNamePrefix     = "getmanybyrepprim";
+    string GetManyByRepUnqMethodNamePrefix      = "getmanybyrepunq";
+    string GetOneByMethodNamePrefix             = "getoneby";
 
-    List<ModelViewPropertyOfVwSerializable> primKeys= new List<ModelViewPropertyOfVwSerializable>();
+    List<ModelViewUniqueKeyOfVwSerializable> uniqueKeys = new List<ModelViewUniqueKeyOfVwSerializable>();
     {
-        // collect primkey props
-        if ((Model.PrimaryKeyProperties != null) && (Model.ScalarProperties != null)) {
-            foreach(ModelViewKeyPropertySerializable pk in Model.PrimaryKeyProperties) {
-                ModelViewPropertyOfVwSerializable scProp= 
-                    Model.ScalarProperties.Where(p => ((p.OriginalPropertyName == pk.OriginalPropertyName) && (string.IsNullOrEmpty(p.ForeignKeyNameChain)))).FirstOrDefault();
-                if(scProp == null) {
-                    if (Model.ForeignKeys != null) {
-                        foreach(ModelViewForeignKeySerializable fk in Model.ForeignKeys) {
-                            if ((fk.ForeignKeyProps != null) && (fk.PrincipalKeyProps != null)) {
-                                int cnt = fk.ForeignKeyProps.Count;
-                                if (cnt < fk.PrincipalKeyProps.Count)
-                                {
-                                    cnt = fk.PrincipalKeyProps.Count;
-                                }
-                                for(int i = 0; i < cnt; i++)
-                                {
-                                    if(fk.ForeignKeyProps[i].OriginalPropertyName == pk.OriginalPropertyName)
-                                    {
-                                        scProp=
-                                            Model.ScalarProperties.Where(p =>
-                                            ((p.OriginalPropertyName == fk.PrincipalKeyProps[i].OriginalPropertyName) && (p.ForeignKeyNameChain == fk.NavigationName))).FirstOrDefault();
-                                    }
-                                    if(scProp != null) {
-                                        break;
-                                    }
-                                }
-                            }
-                            if(scProp != null) {
-                                break;
-                            }
-                        }
-                    }
-                }
-                if(scProp != null) {
-                    primKeys.Add(scProp);
-                }
-            }
-        }
-    }
+        ModelViewUniqueKeyOfVwSerializable pk = GetModelPrimaryKey(Model);
+        if (pk != null) uniqueKeys.Add(pk);
+        GetModelUniqueKeys(Model, uniqueKeys);
+    } 
 
 
 
@@ -150,7 +140,12 @@ using Newtonsoft.Json;
         nmSpaces.Add(NotifyInterfaceNameSpace);
     if ((modelServiceNameSpace != modelFilterNameSpace) && (nmSpaces.IndexOf(modelFilterNameSpace) < 0)) 
         nmSpaces.Add(modelFilterNameSpace);
+    if ((modelServiceNameSpace != IWebServiceFilterRsltInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IWebServiceFilterRsltInterfaceNameSpace);
+    if ((modelServiceNameSpace != WebServiceFilterRsltNameSpace) && (nmSpaces.IndexOf(WebServiceFilterRsltNameSpace) < 0)) 
+        nmSpaces.Add(WebServiceFilterRsltNameSpace);
 
+        
 #>
 <# 
     foreach(string ns in nmSpaces) {
@@ -182,6 +177,280 @@ namespace <#= modelServiceNameSpace #> {
             this.serviceUrl = this.<#= AppSettingServicePropertyName #>.GetWebApiPrefix("<#= Model.ViewName #>") + "<#= GetWebApiServicePrefix(Model) #>";
             this.client = this.<#= AppSettingServicePropertyName #>.Client;
         }
+
+        protected Dictionary<string, (string org, string fk, string fkchain , bool isinprimkey, bool isinunqkey, bool required, bool dbgenerated, string dttp)>  _<#= ValuesSuffix #> =
+            new Dictionary<string, (string org, string fk, string fkchain , bool isinprimkey, bool isinunqkey, bool required, bool dbgenerated, string dttp)>() {
+<#
+    if (Model.ScalarProperties != null) {
+        List<ModelViewPropertyOfVwSerializable> primKeyProps = GetModelPrimaryKeyProps(Model);
+        List<ModelViewPropertyOfVwSerializable> allUnkKeyProps = GetModelAllUniqueKeysProps(Model);
+        foreach (ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) { 
+            string IsInPrimKey = "false";
+            string IsInUnkKey = "false";
+            if(primKeyProps != null) {
+                if (primKeyProps.Any(k => k == prop)) {
+                    IsInPrimKey = "true";
+                }
+            }
+            if(allUnkKeyProps != null) {
+                if (allUnkKeyProps.Any(k => k == prop)) {
+                    IsInUnkKey = "true";
+                }
+            }
+            string IsDatabaseGenerated = IsDatabaseGeneratedProperty(prop, Model) ? "true" : "false";
+            string IsRequiredInView = prop.IsRequiredInView ? "true" : "false";
+            string fk = string.IsNullOrEmpty( prop.ForeignKeyName ) ? "" : prop.ForeignKeyName;
+            string fkchain = string.IsNullOrEmpty( prop.ForeignKeyNameChain ) ? "" : prop.ForeignKeyNameChain;
+#>
+      {"<#= GetModelPropertyName(prop, Model) #>", ("<#= prop.OriginalPropertyName #>", "<#= fk #>", "<#= fkchain #>", <#= IsInPrimKey #>, <#= IsInUnkKey #>, <#= IsRequiredInView #>, <#= IsDatabaseGenerated #>, "<#= GetCCharpDatatype(prop, Model) #>")},  // <#= GetPropertyTypeName(prop) #>
+<#
+
+        }
+    }
+#>
+            };
+
+<#
+    {
+        List<string> errors = new List<string>();
+        List<ModelViewForeignKeySerializable> mtcfks = CollectMasterToClientFieldsMap(Model, errors);
+        foreach(string error in  errors) {
+#>
+<#= error #>
+<#
+        }
+#>
+
+    //
+    // first key is Master View Name, 
+    // second key is Direct Navigation Name, 
+    // third key is Master View Property Name, 
+    // value is a  Client View Property Name, i.e. Property Name of the Current View 
+    protected Dictionary<(string viewNm, string navNm, string propNm), (bool isMstrReq, string propNm)> _<#= MasterToClientKeyFieldsMapFieldName #> =
+        new Dictionary<(string viewNm, string navNm, string propNm), (bool isMstrReq, string propNm)>() {
+<#
+        if (mtcfks != null) {
+            string currentMasterView = "";
+            bool isOpened = false;
+            ModelViewSerializable masterModel = null;
+            foreach(ModelViewForeignKeySerializable mtcfk in mtcfks) {
+                if (currentMasterView != mtcfk.ViewName) {
+                    masterModel = GetModelViewByViewName(Context, mtcfk.ViewName);
+                } // if (currentMasterView != mtcfk.ViewName) {...}
+                for(int i = 0; i < mtcfk.PrincipalKeyProps.Count; i++) {
+                    ModelViewPropertyOfVwSerializable mstrProp = GetModelScalarPropByKeyProp(masterModel, mtcfk.PrincipalKeyProps[i]);
+                    if(mstrProp == null) {
+#>
+//
+// Errror: for the ModelView = <#= mtcfk.ViewName #> and PrincipalKey = <#= mtcfk.PrincipalKeyProps[i].OriginalPropertyName #>
+//         could not find scalar property
+//
+<#
+                    }
+                    string isReq = "true";
+                    if(mstrProp != null) {
+                        isReq = mstrProp.IsRequiredInView ? "true" : "false";
+                    }
+                    ModelViewPropertyOfVwSerializable cProp = GetModelScalarPropByKeyProp(Model, mtcfk.ForeignKeyProps[i]);
+                    ModelViewPropertyOfVwSerializable mProp = GetModelScalarPropByKeyProp(masterModel, mtcfk.PrincipalKeyProps[i]);
+                    if(mProp == null || cProp == null) {
+#>
+// for the foreign key <#= mtcfk.NavigationName #> not all props have included into ViewModel
+<#
+                        continue;
+                    }
+
+#>
+                    {("<#= mtcfk.ViewName #>", "<#= mtcfk.NavigationName #>", "<#= GetModelPropertyNameByKeyProperty(masterModel, mtcfk.PrincipalKeyProps[i]) #>"), (<#= isReq #>, "<#= GetModelPropertyNameByKeyProperty(Model, mtcfk.ForeignKeyProps[i]) #>")},
+<#
+                }
+                currentMasterView = mtcfk.ViewName;
+            } // foreach(ModelViewForeignKeySerializable mtcfk in mtcfks) { ... }
+        } // if (mtcfks != null) {...}
+#>
+    }; 
+    public Dictionary<(string viewNm, string navNm, string propNm), (bool isMstrReq, string propNm)> get<#= MasterToClientKeyFieldsMapFieldName #>()  {
+        return this._<#= MasterToClientKeyFieldsMapFieldName #>;
+    }
+    //
+    // first key is Master View Name, 
+    // second key is Direct Navigation Name, 
+    // third key is Master View Property Name, 
+    // value is a  Client View Property Name, i.e. Property Name of the Current View 
+    protected Dictionary<(string viewNm, string navNm, string propNm), string> _<#= MasterToClientFieldsMapFieldName #> = 
+        new Dictionary<(string viewNm, string navNm, string propNm), string>() {
+<#
+        if (mtcfks != null) {
+            string currentMasterView = "";
+            ModelViewSerializable masterModel = null;
+            foreach(ModelViewForeignKeySerializable mtcfk in mtcfks) {
+                if (currentMasterView != mtcfk.ViewName) {
+                    masterModel = GetModelViewByViewName(Context, mtcfk.ViewName);
+                } // if (currentMasterView != mtcfk.ViewName) { ... }
+                List<ModelViewPropertyOfVwSerializable> sclrProperties = Model.ScalarProperties.Where(p => p.ForeignKeyName == mtcfk.NavigationName).ToList();
+                foreach(ModelViewPropertyOfVwSerializable modelPrp in sclrProperties) {
+                    if(modelPrp.IsSelected) {
+                        // ModelViewPropertyOfVwSerializable modelPrp = GetScalarPropertyByViewPropertyName(Model, clntPrp.ViewPropertyName);
+                        ModelViewPropertyOfVwSerializable masterProp = GetDirectMasterScalarPropertyByViewPropertyName(Model, modelPrp.ViewPropertyName, Context);
+                        if ((modelPrp != null) && (masterProp != null)) {
+#>
+        {("<#= mtcfk.ViewName #>", "<#= mtcfk.NavigationName #>", "<#= GetModelPropertyName(masterProp, masterModel) #>"), "<#= GetModelPropertyName(modelPrp, Model) #>"},
+<#
+                        } 
+                    }
+                }
+                currentMasterView = mtcfk.ViewName;
+            } // foreach(ModelViewForeignKeySerializable mtcfk in mtcfks) { ... }
+        } // if (mtcfks != null) { ... }
+#>
+    };
+    public Dictionary<(string viewNm, string navNm, string propNm), string> get<#= MasterToClientFieldsMapFieldName #>() {
+        return this._<#= MasterToClientFieldsMapFieldName #>;
+    }
+
+
+
+<#
+    }
+#>
+
+
+    // master name, navigation name, master filed, master filed value
+    public Dictionary<(string viewNm, string navNm, string propNm), object> get<#= HiddenFilterByRowSuffix #>(<#= GetInterfaceName(Model) #> rw, string nvNm) {
+        Dictionary<(string viewNm, string navNm, string propNm), object> rslt = new Dictionary<(string viewNm, string navNm, string propNm), object>();
+        if( (rw is null) || string.IsNullOrEmpty(nvNm) ) return rslt;
+        foreach(string i in this._<#= ValuesSuffix #>.Keys) {
+            if(this.isInPrimkey<#= ValueSuffix #>(i) || this.IsInUnkKey<#= ValueSuffix #>(i)) {
+                rslt[("<#= Model.ViewName #>",nvNm,i)] = rw.GetType().GetProperty(i).GetValue(rw);
+            }
+        }
+        return rslt;
+    }
+    public int get<#= LengthSuffix #>()  {
+        return this._<#= ValuesSuffix #>.Count;
+    }
+    public Dictionary<string, (string org, string fk, string fkchain , bool isinprimkey, bool isinunqkey, bool required, bool dbgenerated, string dttp)>.KeyCollection get<#= KeysSuffix #>() {
+        return this._<#= ValuesSuffix #>.Keys;
+    }
+    public string getDtTp<#= ValueSuffix #>(string key) {
+        return this._<#= ValuesSuffix #>[key].dttp;
+    }
+    public string getFk<#= ValueSuffix #>(string key)  {
+        return this._<#= ValuesSuffix #>[key].fk;
+    }
+    public bool required<#= ValueSuffix #>(string key) {
+        return this._<#= ValuesSuffix #>[key].required;
+    }
+    public bool dbgenerated<#= ValueSuffix #>(string key)  {
+        return this._<#= ValuesSuffix #>[key].dbgenerated;
+    }
+    public bool isInPrimkey<#= ValueSuffix #>(string key)  {
+        return this._<#= ValuesSuffix #>[key].isinprimkey;
+    }
+    public bool IsInUnkKey<#= ValueSuffix #>(string key)  {
+        return this._<#= ValuesSuffix #>[key].isinunqkey;
+    }
+    public string getKeyByOrg<#= ValueSuffix #>(string org, string fkchain) {
+        foreach(string i in this._<#= ValuesSuffix #>.Keys)
+        {
+            if(this._<#= ValuesSuffix #>[i].org == org && this._<#= ValuesSuffix #>[i].fkchain == fkchain) return i;
+        }
+        return null;
+    }
+    public IList<<#= IWebServiceFilterRsltInterfaceClassName #>> get<#= HiddenFilterAsFltRsltSuffix #>(Dictionary<(string viewNm, string navNm, string propNm), object> <#= HiddenFilterFieldName #>)  {
+        IList<<#= IWebServiceFilterRsltInterfaceClassName #>> rslt = new List<<#= IWebServiceFilterRsltInterfaceClassName #>>();
+        if(<#= HiddenFilterFieldName #> is null) return rslt;
+        Dictionary<(string viewNm, string navNm, string propNm), (bool isMstrReq, string propNm)> <#= MasterToClientKeyFieldsMapFieldName #> = this.get<#= MasterToClientKeyFieldsMapFieldName #>();
+        foreach(var k in <#= HiddenFilterFieldName #>.Keys) {
+            if(<#= HiddenFilterFieldName #>[k] != null) {
+                if (<#= MasterToClientKeyFieldsMapFieldName #>.ContainsKey(k)) {
+                    rslt.Add(
+                        new <#= WebServiceFilterRsltClassName #>() {
+                            fltrName = <#= MasterToClientKeyFieldsMapFieldName #>[k].propNm,
+                            fltrDataType = this.getDtTp<#= ValueSuffix #>(<#= MasterToClientKeyFieldsMapFieldName #>[k].propNm),
+                            fltrOperator = "eq",
+                            fltrValue = <#= HiddenFilterFieldName #>[k],
+                            fltrError = null,
+                            <#= IsDestroyedPropertyName #> = false
+                        }
+                    );
+                }
+            }
+        }
+        return rslt;
+    }
+    public Dictionary<(string viewNm, string navNm, string propNm), object> get<#= HiddenFilterByFltRsltSuffix #>(IList<<#= IWebServiceFilterRsltInterfaceClassName #>> fr) {
+        Dictionary<(string viewNm, string navNm, string propNm), object> rslt = new Dictionary<(string viewNm, string navNm, string propNm), object>();
+        if (fr == null) return rslt;
+        foreach(var k in this._<#= MasterToClientKeyFieldsMapFieldName #>.Keys)
+        {
+            var fld = this._<#= MasterToClientKeyFieldsMapFieldName #>[k];
+            var frItm = fr.Where(e => (e.fltrName == fld.propNm)).FirstOrDefault();
+            if(frItm != null) {
+                rslt[k] = frItm.fltrValue;
+            }
+        }
+        return rslt;
+    }
+
+<#
+    {
+        List<string> errors = new List<string>();
+        List<ModelViewSerializable> clVms = CollectClientToMasterFieldsMapModelViews(Model, Context, errors);
+        foreach(string error in  errors) {
+#>
+<#= error #>
+<#
+        }
+#>
+
+
+    // first key is Client View Name, 
+    // second key is Direct Navigation Name, 
+    // third key is Client View Property Name, 
+    // value is a Master View Property Name, i.e. Property Name of the Current View 
+    protected  Dictionary<(string viewNm, string navNm, string propNm), string> _<#= ClientToMasterFieldsMapFieldName #> = 
+        new Dictionary<(string viewNm, string navNm, string propNm), string>() {
+<#
+        if(clVms != null) {
+            foreach(ModelViewSerializable clVm in clVms) {
+                errors.Clear();
+                List<ModelViewForeignKeySerializable> mlFks = CollectMasterToClientFieldsMapForMasterView(clVm, Model.ViewName, errors);
+                foreach(string error in  errors) {
+#>
+<#= error #>
+<#
+                }
+                if (mlFks != null) {
+                    foreach(ModelViewForeignKeySerializable mlFk in mlFks) {
+                        for(int i = 0; i < mlFk.ForeignKeyProps.Count; i++) {
+                            ModelViewPropertyOfVwSerializable cProp = GetModelScalarPropByKeyProp(clVm, mlFk.ForeignKeyProps[i]);
+                            ModelViewPropertyOfVwSerializable mProp = GetModelScalarPropByKeyProp(Model, mlFk.PrincipalKeyProps[i]);
+                            if(mProp == null || cProp == null) {
+#>
+// for the foreign key <#= mlFk.NavigationName #> not all props have included into ViewModel
+<#
+                                continue;
+                            }
+#>
+    {("<#= clVm.ViewName #>", "<#= mlFk.NavigationName #>", "<#= GetModelPropertyNameByKeyProperty(clVm, mlFk.ForeignKeyProps[i]) #>"), "<#= GetModelPropertyNameByKeyProperty(Model, mlFk.PrincipalKeyProps[i]) #>"},
+<#
+                        }
+                    }
+                }
+            } // end of: foreach(ModelViewSerializable clVm in clVms) {...}
+        } // end of: if(clVms != null) {...}
+#>
+    };
+    public Dictionary<(string viewNm, string navNm, string propNm), string> get<#= ClientToMasterFieldsMapFieldName #>() {
+        return this._<#= ClientToMasterFieldsMapFieldName #>;
+    }
+<#
+    }
+#>
+
+
+
 <# 
     if (Model.IsWebApiSelectAll) { 
 #>
@@ -339,15 +608,60 @@ namespace <#= modelServiceNameSpace #> {
 <#
     }
     if (Model.IsWebApiSelectOneByPrimarykey) { 
+        foreach(ModelViewUniqueKeyOfVwSerializable pk in uniqueKeys) {
+            List<ModelViewPropertyOfVwSerializable> primKeys = null;
+            string indErrrorText = "";
+            bool indIsCorrect = CheckModelIfIndexIsCorrect(Model, pk, out indErrrorText);
+            string localRouteName = GetOneMethodName;
+            string localRouteManyName = GetManyByRepPrimMethodNamePrefix;
+            if (!pk.IsPrimary) {
+                    
+                localRouteName = GetOneByMethodNamePrefix + pk.UniqueKeyName;
+                localRouteManyName = GetManyByRepUnqMethodNamePrefix + pk.UniqueKeyName;
+            }
+            if (!indIsCorrect) {
 #>
-        public async Task<<#= modelInterfaceClassName #>> <#= GetOneMethodName #>(<# 
+
+//
+// Could not generate <#= localRouteName #>
+// Primary/Unique Index Is not correct:
+// <#= indErrrorText #>
+//
+
+<#
+            } else {
+                primKeys = pk.UniqueKeyProperties;
+#>
+
+    // 
+    // HowTo: {prm1, prm2, ..., prmN} -- primary/unique key
+    //
+    // this.serviceRefInYourCode.<#= localRouteName #>(prm1, prm2, ..., prmN ).subscibe(value =>{
+    //    // handling value of type <#= GetInterfaceName(Model) #>
+    // },
+    // error => {
+    //    // handling error 
+    // });
+    // 
+    public async Task<<#= modelInterfaceClassName #>> <#= localRouteName #>(
+<# 
         {
             bool isNotFirst = false;
             foreach(ModelViewPropertyOfVwSerializable prop in primKeys) { 
-                 if(isNotFirst){#>, <#} else {isNotFirst = true;} #><#=  GetPropertyTypeName(prop) #> <#= GetModelPropertyName(prop, Model) #> <#
+                if(isNotFirst){
+#>
+        , <#=  GetPropertyTypeName(prop) #> <#= GetModelPropertyName(prop, Model) #> 
+<#                 
+                } else {
+                    isNotFirst = true;
+#>
+        <#=  GetPropertyTypeName(prop) #> <#= GetModelPropertyName(prop, Model) #> 
+<#
+                } 
             }
         }
-        #>) {
+#>
+        ) {
             string prms = null;
 <#
         foreach(ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
@@ -370,7 +684,7 @@ namespace <#= modelServiceNameSpace #> {
             }
 <#
             }
-        }
+        } // the end of foreach(ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {}
 #>
             if(prms == null) prms = "";
             try
@@ -393,8 +707,216 @@ namespace <#= modelServiceNameSpace #> {
                 return null;
             }
         }
+
+
+    public async Task<<#= modelPageInterfaceClassName #>> <#= localRouteManyName #>(<#= modelFilterInterfaceClassName #> filter) {
+        string prms = null;
+        if(filter != null) {
 <#
+        foreach(ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
+            if(! (primKeys.Contains(prop))) {
+                continue;
+            }
+#>
+                if (filter.<#= GetModelPropertyName(prop, Model) #> != null) {
+<#          if(prop.IsNullable) { 
+#>
+                    bool hasNull = false;
+<#
+            }
+#>
+                    foreach(var val in filter.<#= GetModelPropertyName(prop, Model) #>) {
+<#          if(prop.IsNullable) { 
+#>
+                        if(val != null) {
+<#
+            }
+#>
+                            if(prms == null)
+                                //prms = "?" + Uri.EscapeDataString("<#= GetFilterPropertyName(prop, Model) #>") + "[]=" + Uri.EscapeDataString(val.ToString());
+                                prms = "?" + Uri.EscapeDataString("<#= GetFilterPropertyName(prop, Model) #>") + "=" + Uri.EscapeDataString(val.ToString());
+                            else 
+                                //prms += "&" + Uri.EscapeDataString("<#= GetFilterPropertyName(prop, Model) #>") + "[]=" + Uri.EscapeDataString(val.ToString());
+                                prms += "&" + Uri.EscapeDataString("<#= GetFilterPropertyName(prop, Model) #>") + "=" + Uri.EscapeDataString(val.ToString());
+<#          if(prop.IsNullable) { 
+#>
+                        } 
+                        else hasNull = true;
+<#
+            }
+#>
+                    }
+<#          if(prop.IsNullable) { 
+#>
+                    if(hasNull) {
+                            if(prms == null)
+                                //prms = "?" + Uri.EscapeDataString("<#= GetFilterPropertyName(prop, Model) #>") + "[]=" ;
+                                prms = "?" + Uri.EscapeDataString("<#= GetFilterPropertyName(prop, Model) #>") + "=" ;
+                            else 
+                                //prms += "&" + Uri.EscapeDataString("<#= GetFilterPropertyName(prop, Model) #>") + "[]=";
+                                prms += "&" + Uri.EscapeDataString("<#= GetFilterPropertyName(prop, Model) #>") + "=";
+                    }
+<#
+            }
+#>
+                }
+<#
+        }
+        foreach(ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
+            if(! (primKeys.Contains(prop))) {
+                continue;
+            }
+#>
+            if(filter.<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix)#> != null) {
+                foreach(var val in filter.<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix)#>) {
+                    if(val != null) {
+                        if(prms == null)
+                            //prms = "?" + Uri.EscapeDataString("<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #>") + "[]=" +  Uri.EscapeDataString(val.ToString());
+                            prms = "?" + Uri.EscapeDataString("<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #>") + "=" +  Uri.EscapeDataString(val.ToString());
+                        else 
+                            //prms += "&" + Uri.EscapeDataString("<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #>") + "[]=" + Uri.EscapeDataString(val.ToString());
+                            prms += "&" + Uri.EscapeDataString("<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #>") + "=" + Uri.EscapeDataString(val.ToString());
+                    } else {
+                        if(prms == null)
+                            //prms = "?" + Uri.EscapeDataString("<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #>") + "[]=" +  Uri.EscapeDataString("<#= EqualOperator #>");
+                            prms = "?" + Uri.EscapeDataString("<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #>") + "=" +  Uri.EscapeDataString("<#= EqualOperator #>");
+                        else 
+                            //prms += "&" + Uri.EscapeDataString("<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #>") + "[]=" + Uri.EscapeDataString("<#= EqualOperator #>");
+                            prms += "&" + Uri.EscapeDataString("<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #>") + "=" + Uri.EscapeDataString("<#= EqualOperator #>");
+                    }
+                }
+            }
+<#
+        }
+        foreach(ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
+            if(!prop.IsUsedByfilter) continue;
+            if (primKeys.Any(p => p == prop)) continue;
+            if(!IsUsedByForeignKey(prop, Model)) continue;
+#>
+                if (filter.<#= GetModelPropertyName(prop, Model) #> != null) {
+<#          if(prop.IsNullable) { 
+#>
+                    bool hasNull = false;
+<#
+            }
+#>
+                    foreach(var val in filter.<#= GetModelPropertyName(prop, Model) #>) {
+<#          if(prop.IsNullable) { 
+#>
+                        if(val != null) {
+<#
+            }
+#>
+                            if(prms == null)
+                                //prms = "?" + Uri.EscapeDataString("<#= GetFilterPropertyName(prop, Model) #>") + "[]=" + Uri.EscapeDataString(val.ToString());
+                                prms = "?" + Uri.EscapeDataString("<#= GetFilterPropertyName(prop, Model) #>") + "=" + Uri.EscapeDataString(val.ToString());
+                            else 
+                                //prms += "&" + Uri.EscapeDataString("<#= GetFilterPropertyName(prop, Model) #>") + "[]=" + Uri.EscapeDataString(val.ToString());
+                                prms += "&" + Uri.EscapeDataString("<#= GetFilterPropertyName(prop, Model) #>") + "=" + Uri.EscapeDataString(val.ToString());
+<#          if(prop.IsNullable) { 
+#>
+                        } 
+                        else hasNull = true;
+<#
+            }
+#>
+                    }
+<#          if(prop.IsNullable) { 
+#>
+                    if(hasNull) {
+                            if(prms == null)
+                                //prms = "?" + Uri.EscapeDataString("<#= GetFilterPropertyName(prop, Model) #>") + "[]=" ;
+                                prms = "?" + Uri.EscapeDataString("<#= GetFilterPropertyName(prop, Model) #>") + "=" ;
+                            else 
+                                //prms += "&" + Uri.EscapeDataString("<#= GetFilterPropertyName(prop, Model) #>") + "[]=";
+                                prms += "&" + Uri.EscapeDataString("<#= GetFilterPropertyName(prop, Model) #>") + "=";
+                    }
+<#
+            }
+#>
+                }
+<#
+        }
+        foreach(ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
+            if(!prop.IsUsedByfilter) continue;
+            if (primKeys.Any(p => p == prop)) continue;
+            if(!IsUsedByForeignKey(prop, Model)) continue;
+#>
+            if(filter.<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix)#> != null) {
+                foreach(var val in filter.<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix)#>) {
+                    if(val != null) {
+                        if(prms == null)
+                            //prms = "?" + Uri.EscapeDataString("<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #>") + "[]=" +  Uri.EscapeDataString(val.ToString());
+                            prms = "?" + Uri.EscapeDataString("<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #>") + "=" +  Uri.EscapeDataString(val.ToString());
+                        else 
+                            //prms += "&" + Uri.EscapeDataString("<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #>") + "[]=" + Uri.EscapeDataString(val.ToString());
+                            prms += "&" + Uri.EscapeDataString("<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #>") + "=" + Uri.EscapeDataString(val.ToString());
+                    } else {
+                        if(prms == null)
+                            //prms = "?" + Uri.EscapeDataString("<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #>") + "[]=" +  Uri.EscapeDataString("<#= EqualOperator #>");
+                            prms = "?" + Uri.EscapeDataString("<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #>") + "=" +  Uri.EscapeDataString("<#= EqualOperator #>");
+                        else 
+                            //prms += "&" + Uri.EscapeDataString("<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #>") + "[]=" + Uri.EscapeDataString("<#= EqualOperator #>");
+                            prms += "&" + Uri.EscapeDataString("<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #>") + "=" + Uri.EscapeDataString("<#= EqualOperator #>");
+                    }
+                }
+            }
+<#
+        }
+#>
+            if(filter.orderby != null) {
+                foreach(var ordb in filter.orderby) {
+                    if( !string.IsNullOrEmpty(ordb) ) {
+                        if(prms == null)
+                            //prms = "?" + Uri.EscapeDataString("orderby") + "[]=" +  Uri.EscapeDataString(ordb);
+                            prms = "?" + Uri.EscapeDataString("orderby") + "=" +  Uri.EscapeDataString(ordb);
+                        else 
+                            //prms += "&" + Uri.EscapeDataString("orderby") + "[]=" + Uri.EscapeDataString(ordb);
+                            prms += "&" + Uri.EscapeDataString("orderby") + "=" + Uri.EscapeDataString(ordb);
+                    }
+                }
+            }
+            if(filter.page.HasValue) {
+                if(prms == null)
+                    prms = "?" + Uri.EscapeDataString("page") + "=" +  Uri.EscapeDataString(filter.page.Value.ToString());
+                else 
+                    prms += "&" + Uri.EscapeDataString("page") + "=" + Uri.EscapeDataString(filter.page.Value.ToString());
+            }
+            if(filter.pagesize.HasValue) {
+                if(prms == null)
+                    prms = "?" + Uri.EscapeDataString("pagesize") + "=" +  Uri.EscapeDataString(filter.pagesize.Value.ToString());
+                else 
+                    prms += "&" + Uri.EscapeDataString("pagesize") + "=" + Uri.EscapeDataString(filter.pagesize.Value.ToString());
+            }
+        } // the end of if(filter != null) {...}
+        if(prms == null) prms = "";
+        try
+        {
+            HttpResponseMessage response = await client.GetAsync(serviceUrl + "/" + "<#= localRouteManyName #>" + prms);
+            response.EnsureSuccessStatusCode();
+            string responseBody = await response.Content.ReadAsStringAsync();
+            return  JsonConvert.DeserializeObject<<#= modelPageClassName #>>(responseBody) ;
+        } 
+        catch(Exception e)
+        {
+            string exceptionMsg = "<#= modelServiceClassName #>.<#= localRouteManyName #> : " + e.Message;
+            Exception inner = e.InnerException;
+            while (inner != null)
+            {
+                exceptionMsg = exceptionMsg + ": " + inner.Message;
+                inner = inner.InnerException;
+            }
+            <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("http", exceptionMsg);
+            return null;
+        }
     }
+
+
+<#
+            } // the end of: if (!indIsCorrect) {...} else {}
+        } // the end of: foreach(ModelViewUniqueKeyOfVwSerializable pk uniqueKeys) {}
+    } // if (Model.IsWebApiSelectOneByPrimarykey) { ... }
+
     if (Model.IsWebApiUpdate) { 
 #>
         public async Task<<#= modelInterfaceClassName #>> <#= UpdateOneMethodName #>(<#= modelInterfaceClassName #> item) {
@@ -468,6 +990,28 @@ namespace <#= modelServiceNameSpace #> {
 <#
     }
     if (Model.IsWebApiDelete) { 
+        List<ModelViewPropertyOfVwSerializable> primKeys = null;
+        ModelViewUniqueKeyOfVwSerializable locPrimKey = GetModelPrimKeyFromList(uniqueKeys);
+        string indErrrorText = "";
+        bool indIsCorrect = locPrimKey != null;
+        if (!indIsCorrect) {
+            indErrrorText = "Could not find primary key";
+        }
+        if (indIsCorrect) {
+            indIsCorrect = CheckModelIfIndexIsCorrect(Model, locPrimKey, out indErrrorText);
+        }
+        if(!indIsCorrect) {
+#>
+//
+// Could not generate <#= DeleteOneMethodName #>
+// Primary Index Is not correct:
+// <#= indErrrorText #>
+//
+<#
+
+        } else {
+            primKeys = locPrimKey.UniqueKeyProperties;
+
 #>
         public async Task<<#= modelInterfaceClassName #>> <#= DeleteOneMethodName #>(<# 
         {
@@ -523,7 +1067,8 @@ namespace <#= modelServiceNameSpace #> {
             }
         }
 <#
-    }
+        }
+    } // the end of if (Model.IsWebApiDelete) { ... }
 #>
         public <#= NotifyInterfaceClassName #> <#= CopyToModelNotifyMethodName #>(<#= modelInterfaceClassName #>  src, <#= NotifyInterfaceClassName #> dest = null) {
             if(dest == null) dest = new <#= ModelNotifyClassName #>();
@@ -553,6 +1098,23 @@ namespace <#= modelServiceNameSpace #> {
         public <#= modelFilterInterfaceClassName #> GetFilter() {
             return new <#= modelFilterClassName #>();
         }
+
+        public IList<<#= IWebServiceFilterRsltInterfaceClassName #>> <#= row2FilterRsltMethodName #>(<#= GetInterfaceName(Model) #> r) {
+            IList<<#= IWebServiceFilterRsltInterfaceClassName #>> rslt = new List<<#= IWebServiceFilterRsltInterfaceClassName #>>();
+            if (r == null) return rslt;
+            foreach(string i in this._<#= ValuesSuffix #>.Keys) {
+                if (!(r.GetType().GetProperty(i).GetValue(r) is null)) {
+                    rslt.Add(new <#= WebServiceFilterRsltClassName #>{
+                        fltrName = i,
+                        fltrDataType = this._Values[i].dttp,
+                        fltrOperator = "eq",
+                        fltrValue = r.GetType().GetProperty(i).GetValue(r)
+                    });
+                }
+            }
+            return rslt;
+        }
+
     }
 }
 

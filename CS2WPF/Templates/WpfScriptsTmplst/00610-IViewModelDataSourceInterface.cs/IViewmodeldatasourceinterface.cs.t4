@@ -1,0 +1,213 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
+<#
+
+
+    string UpdateOneMethodName              = "updateone";
+    string AddOneMethodName                 = "addone";
+    string DeleteOneMethodName              = "deleteone";
+
+    string CurrentViewNameFieldName             = "CurrentViewName";
+    string ClientViewNameFieldName              = "ClientViewName";
+    string DirectNavigationFieldName            = "DirectNavigation";
+    string IsTopDetailFieldName                 = "IsTopDetail";
+    string IsDefinedFieldName                   = "IsDefined";
+    string ValueSuffix                          = "Value";
+    string IsNewSuffix                          = "IsNew";
+
+
+    string OnDetailChangedPropName              = "OnDetailChanged";
+    string OnMasterChangedPropName              = "OnMasterChanged";
+    string OnIsDefinedChangedPropName           = "OnIsDefinedChanged";
+    string OnUpdatePropName                     = "OnUpdate";
+    string OnAddPropName                        = "OnAdd";
+    string OnDeletePropName                     = "OnDelete";
+    string AfterMasterChangedPropName           = "AfterMasterChanged";
+    string AfterPropsChangedPropName            = "AfterPropsChanged";
+    string submitOnDetailChangedMethodName      = "submitOnDetailChanged";
+    string submitOnMasterChangedMethodName      = "submitOnMasterChanged";
+    string DoEmitEventMethodName                = "doEmitEvent";
+    string RefreshIsDefinedMethodName           = "refreshIsDefined";
+
+    string LengthSuffix                         = "Length";
+    string KeysSuffix                           = "Keys";
+    string CalcIsDefinedMethodName              = "calcIsDefined";
+    string ClearMethodName                      = "clear";
+    string ClearPartiallyMethodName             = "clearPartially";
+
+
+    string HiddenFilterByFltRsltSuffix          = "HiddenFilterByFltRslt";
+    string UnderHiddenFilterFieldsFieldName     = "UnderHiddenFilterFields";
+    string UpdateByHiddenFilterFieldsMethodName = "updateByHiddenFilterFields";
+
+    string UIFormChainFieldName                 = "UIFormChain";
+    string HiddenFilterFieldName                = "HiddenFilter";
+
+    string IsSetFilterByCurrDirMstrsMethodName  = "isSetFilterByCurrDirMstrs";
+    string RefreshMethodName                    = "refresh";
+
+
+    string IWebServiceFilterRsltInterfaceFolder      = "00204-IWebServiceFilterRsltInterface.cs";
+    string IWebServiceFilterRsltInterfaceClassName   = GetModelClassName(Model, IWebServiceFilterRsltInterfaceFolder);
+    string IWebServiceFilterRsltInterfaceNameSpace   = GetModelNameSpace(Model, IWebServiceFilterRsltInterfaceFolder);
+    
+    string IViewmodeldatasourceinterfaceFolder       = "00610-IViewModelDataSourceInterface.cs";
+    string IViewmodeldatasourceinterfaceClassName    = GetModelClassName(Model, IViewmodeldatasourceinterfaceFolder);
+    string IViewmodeldatasourceinterfaceNameSpace    = GetModelNameSpace(Model, IViewmodeldatasourceinterfaceFolder);
+
+
+
+    List<string> nmSpaces = new List<string>();
+    if ((IViewmodeldatasourceinterfaceNameSpace != IWebServiceFilterRsltInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IWebServiceFilterRsltInterfaceNameSpace);
+
+#>
+<# 
+    foreach(string ns in nmSpaces) {
+#>
+using <#= ns #>;
+<#
+    }
+#>
+
+namespace <#= IViewmodeldatasourceinterfaceNameSpace #> {
+    public interface <#= IViewmodeldatasourceinterfaceClassName #>
+    {
+        Dictionary<(string viewNm, string navNm, string propNm), object> get<#= HiddenFilterByFltRsltSuffix #>(IList<<#= IWebServiceFilterRsltInterfaceClassName #>> fr);
+        string get<#= UIFormChainFieldName #>();
+        Dictionary<(string viewNm, string navNm, string propNm), object> get<#= HiddenFilterFieldName #>();
+        void set<#= HiddenFilterFieldName #>(Dictionary<(string viewNm, string navNm, string propNm), object> fltr);
+        string get<#= CurrentViewNameFieldName #>();
+        string get<#= ClientViewNameFieldName #>();
+        string get<#= DirectNavigationFieldName #>();
+        bool get<#= IsTopDetailFieldName #>();
+        bool get<#= IsDefinedFieldName #>();
+        int get<#= LengthSuffix #>();
+        Dictionary<string, (string org, string fk, string fkchain , bool isinprimkey, bool isinunqkey, bool required, bool dbgenerated, string dttp)>.KeyCollection get<#= KeysSuffix #>();
+        object get<#= ValueSuffix #>(string key);
+        void set<#= ValueSuffix #>(string key, object value);
+        bool required<#= ValueSuffix #>(string key);
+        bool dbgenerated<#= ValueSuffix #>(string key);
+        bool isInPrimkey<#= ValueSuffix #>(string key);
+        bool isSet<#= ValueSuffix #>(string key); 
+        void clear<#= ValueSuffix #>(string key);
+        bool <#= ClearMethodName #>(bool doNotify);
+        bool isEqual(object src, object dest, string dttp);
+
+        event EventHandler <#= OnDetailChangedPropName #>;
+        event EventHandler <#= OnMasterChangedPropName #>;
+        event EventHandler <#= AfterMasterChangedPropName #>;
+        event EventHandler <#= AfterPropsChangedPropName #>;
+        event EventHandler <#= OnIsDefinedChangedPropName #>;
+        event EventHandler <#= OnUpdatePropName #>;
+        event EventHandler <#= OnAddPropName #>;
+        event EventHandler <#= OnDeletePropName #>;
+
+        bool <#= ClearPartiallyMethodName #>(bool doNotify);
+        Task <#= submitOnDetailChangedMethodName #>(<#= IViewmodeldatasourceinterfaceClassName #> v);
+        void <#= submitOnMasterChangedMethodName #>(<#= IViewmodeldatasourceinterfaceClassName #> v);
+        bool <#= CalcIsDefinedMethodName #>();
+        void <#= DoEmitEventMethodName #>(bool aftrMstrChngd=false);
+
+        bool <#= RefreshIsDefinedMethodName #>();
+        bool <#= IsSetFilterByCurrDirMstrsMethodName #>();
+        Task <#= UpdateOneMethodName #>();
+        Task <#= AddOneMethodName #>();
+        Task <#= DeleteOneMethodName #>();
+        Task <#= RefreshMethodName #>();
+        bool is<#= UnderHiddenFilterFieldsFieldName #>(string fld);
+        bool <#= UpdateByHiddenFilterFieldsMethodName #>(bool doNotify = true);
+        bool get<#= IsNewSuffix #>();
+        void set<#= IsNewSuffix #>(bool v);
+        bool isReadonly<#= ValueSuffix #>(string key);
+        
+    }
+}
+
+<#+
+
+    string GetModelNameSpace(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem = 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        string delim = "";
+        string filePath = "";
+        string defaultNameSpace = "";
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            filePath = refItem.FileFolder.Replace("\\",".");
+        }
+        if(!string.IsNullOrEmpty(refItem.FileDefaultProjectNameSpace)) {
+            defaultNameSpace = refItem.FileDefaultProjectNameSpace;
+        }
+        if (!(string.IsNullOrEmpty(defaultNameSpace) || string.IsNullOrEmpty(filePath))) {
+            delim = ".";
+        }
+        return defaultNameSpace + delim + filePath;
+    }
+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName;
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString().Replace(".xaml", "").Replace(".Xaml", "").Replace(".XAML", "");
+    }
+
+#>

@@ -12,9 +12,14 @@
 <#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
 <#@ include file="..\..\CommonScripts\ViewLevel.t4" #>
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 <#
+
+    string IWebServiceFilterRsltInterfaceFolder      = "00204-IWebServiceFilterRsltInterface.cs";
+    string IWebServiceFilterRsltInterfaceClassName   = GetContextModelClassName(Context, IWebServiceFilterRsltInterfaceFolder);
+    string IWebServiceFilterRsltInterfaceNameSpace   = GetContextModelNameSpace(Context, IWebServiceFilterRsltInterfaceFolder);
 
     string modelInterfaceFolder             = "01100-Interface.cs";
     string modelInterfaceClassName          = GetInterfaceName(Model);
@@ -47,49 +52,29 @@ using System.Threading.Tasks;
     string CopyToModelMethodName        = "CopyToModel";
     string CopyToModelNotifyMethodName  = "CopyToModelNotify";
 
+    string MasterToClientKeyFieldsMapFieldName  = "m2cKeyfm";
+    string MasterToClientFieldsMapFieldName     = "m2cfm";
+    string HiddenFilterByRowSuffix              = "HiddenFilterByRow";
+    string LengthSuffix                         = "Length";
+    string KeysSuffix                           = "Keys";
+    string ValuesSuffix                         = "Values";
+    string ValueSuffix                          = "Value";
+    string HiddenFilterAsFltRsltSuffix          = "HiddenFilterAsFltRslt";
+    string HiddenFilterFieldName                = "HiddenFilter";
+    string HiddenFilterByFltRsltSuffix          = "HiddenFilterByFltRslt";
+    string ClientToMasterFieldsMapFieldName     = "c2mfm";
+    string GetManyByRepPrimMethodNamePrefix     = "getmanybyrepprim";
+    string GetOneByMethodNamePrefix             = "getoneby";
+    string GetManyByRepUnqMethodNamePrefix      = "getmanybyrepunq";
+    string row2FilterRsltMethodName             = "row2FilterRslt";
 
-    List<ModelViewPropertyOfVwSerializable> primKeys= new List<ModelViewPropertyOfVwSerializable>();
+
+    List<ModelViewUniqueKeyOfVwSerializable> uniqueKeys = new List<ModelViewUniqueKeyOfVwSerializable>();
     {
-        // collect primkey props
-        if ((Model.PrimaryKeyProperties != null) && (Model.ScalarProperties != null)) {
-            foreach(ModelViewKeyPropertySerializable pk in Model.PrimaryKeyProperties) {
-                ModelViewPropertyOfVwSerializable scProp= 
-                    Model.ScalarProperties.Where(p => ((p.OriginalPropertyName == pk.OriginalPropertyName) && (string.IsNullOrEmpty(p.ForeignKeyNameChain)))).FirstOrDefault();
-                if(scProp == null) {
-                    if (Model.ForeignKeys != null) {
-                        foreach(ModelViewForeignKeySerializable fk in Model.ForeignKeys) {
-                            if ((fk.ForeignKeyProps != null) && (fk.PrincipalKeyProps != null)) {
-                                int cnt = fk.ForeignKeyProps.Count;
-                                if (cnt < fk.PrincipalKeyProps.Count)
-                                {
-                                    cnt = fk.PrincipalKeyProps.Count;
-                                }
-                                for(int i = 0; i < cnt; i++)
-                                {
-                                    if(fk.ForeignKeyProps[i].OriginalPropertyName == pk.OriginalPropertyName)
-                                    {
-                                        scProp=
-                                            Model.ScalarProperties.Where(p =>
-                                            ((p.OriginalPropertyName == fk.PrincipalKeyProps[i].OriginalPropertyName) && (p.ForeignKeyNameChain == fk.NavigationName))).FirstOrDefault();
-                                    }
-                                    if(scProp != null) {
-                                        break;
-                                    }
-                                }
-                            }
-                            if(scProp != null) {
-                                break;
-                            }
-                        }
-                    }
-                }
-                if(scProp != null) {
-                    primKeys.Add(scProp);
-                }
-            }
-        }
-    }
-
+        ModelViewUniqueKeyOfVwSerializable pk = GetModelPrimaryKey(Model);
+        if (pk != null) uniqueKeys.Add(pk);
+        GetModelUniqueKeys(Model, uniqueKeys);
+    } 
 
 
     List<string> nmSpaces = new List<string>();
@@ -100,6 +85,10 @@ using System.Threading.Tasks;
         nmSpaces.Add(modelFilterInterfaceNameSpace);
     if ((modelServiceInterfaceNameSpace != NotifyInterfaceNameSpace) && (nmSpaces.IndexOf(NotifyInterfaceNameSpace) < 0)) 
         nmSpaces.Add(NotifyInterfaceNameSpace);
+    if ((modelServiceInterfaceNameSpace != IWebServiceFilterRsltInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IWebServiceFilterRsltInterfaceNameSpace);
+
+        
 
 #>
 <# 
@@ -113,6 +102,22 @@ using <#= ns #>;
 namespace <#= modelServiceInterfaceNameSpace #> {
     public interface <#= modelServiceInterfaceClassName #>
     {
+        Dictionary<(string viewNm, string navNm, string propNm), (bool isMstrReq, string propNm)> get<#= MasterToClientKeyFieldsMapFieldName #>();
+        Dictionary<(string viewNm, string navNm, string propNm), string> get<#= MasterToClientFieldsMapFieldName #>();
+        Dictionary<(string viewNm, string navNm, string propNm), object> get<#= HiddenFilterByRowSuffix #>(<#= GetInterfaceName(Model) #> rw, string nvNm);
+        int get<#= LengthSuffix #>();
+        Dictionary<string, (string org, string fk, string fkchain , bool isinprimkey, bool isinunqkey, bool required, bool dbgenerated, string dttp)>.KeyCollection get<#= KeysSuffix #>();
+        string getDtTp<#= ValueSuffix #>(string key);
+        string getFk<#= ValueSuffix #>(string key);
+        bool required<#= ValueSuffix #>(string key);
+        bool dbgenerated<#= ValueSuffix #>(string key);
+        bool isInPrimkey<#= ValueSuffix #>(string key);
+        bool IsInUnkKey<#= ValueSuffix #>(string key);
+        string getKeyByOrg<#= ValueSuffix #>(string org, string fkchain);
+        IList<<#= IWebServiceFilterRsltInterfaceClassName #>> get<#= HiddenFilterAsFltRsltSuffix #>(Dictionary<(string viewNm, string navNm, string propNm), object> <#= HiddenFilterFieldName #>);
+        Dictionary<(string viewNm, string navNm, string propNm), object> get<#= HiddenFilterByFltRsltSuffix #>(IList<<#= IWebServiceFilterRsltInterfaceClassName #>> fr);
+        Dictionary<(string viewNm, string navNm, string propNm), string> get<#= ClientToMasterFieldsMapFieldName #>();
+
 <# 
     if (Model.IsWebApiSelectAll) { 
 #>
@@ -125,17 +130,55 @@ namespace <#= modelServiceInterfaceNameSpace #> {
 <#
     }
     if (Model.IsWebApiSelectOneByPrimarykey) { 
+        foreach(ModelViewUniqueKeyOfVwSerializable pk in uniqueKeys) {
+            List<ModelViewPropertyOfVwSerializable> primKeys = null;
+            string indErrrorText = "";
+            bool indIsCorrect = CheckModelIfIndexIsCorrect(Model, pk, out indErrrorText);
+            string localRouteName = GetOneMethodName;
+            string localRouteManyName = GetManyByRepPrimMethodNamePrefix;
+            if (!pk.IsPrimary) {
+                    
+                localRouteName = GetOneByMethodNamePrefix + pk.UniqueKeyName;
+                localRouteManyName = GetManyByRepUnqMethodNamePrefix + pk.UniqueKeyName;
+            }
+            if (!indIsCorrect) {
 #>
-        Task<<#= modelInterfaceClassName #>> <#= GetOneMethodName #>(<# 
+
+//
+// Could not generate <#= localRouteName #>
+// Primary/Unique Index Is not correct:
+// <#= indErrrorText #>
+//
+
+<#
+            } else {
+                primKeys = pk.UniqueKeyProperties;
+#>
+        Task<<#= modelInterfaceClassName #>> <#= localRouteName #>(
+<# 
         {
             bool isNotFirst = false;
             foreach(ModelViewPropertyOfVwSerializable prop in primKeys) { 
-                 if(isNotFirst){#>, <#} else {isNotFirst = true;} #><#=  GetPropertyTypeName(prop) #> <#= GetModelPropertyName(prop, Model) #> <#
+                if(isNotFirst){
+#>
+        , <#=  GetPropertyTypeName(prop) #> <#= GetModelPropertyName(prop, Model) #> 
+<#                 
+                } else {
+                    isNotFirst = true;
+#>
+        <#=  GetPropertyTypeName(prop) #> <#= GetModelPropertyName(prop, Model) #> 
+<#
+                } 
             }
         }
-        #>);
+#>
+        );
+        Task<<#= modelPageInterfaceClassName #>> <#= localRouteManyName #>(<#= modelFilterInterfaceClassName #> filter);
+
 <#
-    }
+            } // the end of: if (!indIsCorrect) {...} else {}
+        } // the end of: foreach(ModelViewUniqueKeyOfVwSerializable pk uniqueKeys) {}
+    } // if (Model.IsWebApiSelectOneByPrimarykey) { ... }
     if (Model.IsWebApiUpdate) { 
 #>
         Task<<#= modelInterfaceClassName #>> <#= UpdateOneMethodName #>(<#= modelInterfaceClassName #> item);
@@ -147,6 +190,29 @@ namespace <#= modelServiceInterfaceNameSpace #> {
 <#
     }
     if (Model.IsWebApiDelete) { 
+        List<ModelViewPropertyOfVwSerializable> primKeys = null;
+        ModelViewUniqueKeyOfVwSerializable locPrimKey = GetModelPrimKeyFromList(uniqueKeys);
+        string indErrrorText = "";
+        bool indIsCorrect = locPrimKey != null;
+        if (!indIsCorrect) {
+            indErrrorText = "Could not find primary key";
+        }
+        if (indIsCorrect) {
+            indIsCorrect = CheckModelIfIndexIsCorrect(Model, locPrimKey, out indErrrorText);
+        }
+        if(!indIsCorrect) {
+#>
+//
+// Could not generate <#= DeleteOneMethodName #>
+// Primary Index Is not correct:
+// <#= indErrrorText #>
+//
+<#
+
+        } else {
+            primKeys = locPrimKey.UniqueKeyProperties;
+
+
 #>
         Task<<#= modelInterfaceClassName #>> <#= DeleteOneMethodName #>(<# 
         {
@@ -157,11 +223,13 @@ namespace <#= modelServiceInterfaceNameSpace #> {
         }
         #>);
 <#
-    }
+        }
+    } // the end of if (Model.IsWebApiDelete) { ... }
 #>
         <#= NotifyInterfaceClassName #> <#= CopyToModelNotifyMethodName #>(<#= modelInterfaceClassName #>  src, <#= NotifyInterfaceClassName #> dest = null);
         <#= modelInterfaceClassName #> <#= CopyToModelMethodName #>(<#= modelInterfaceClassName #>  src, <#= modelInterfaceClassName #> dest = null);
         <#= modelFilterInterfaceClassName #> GetFilter();
+        IList<<#= IWebServiceFilterRsltInterfaceClassName #>> <#= row2FilterRsltMethodName #>(<#= GetInterfaceName(Model) #> r);
     }
 }
 

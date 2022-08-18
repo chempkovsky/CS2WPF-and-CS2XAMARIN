@@ -1,0 +1,1586 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ include file="..\..\CommonScripts\ViewLevel.t4" #>
+using System;
+using System.Text;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
+using System.Linq;
+
+<#
+
+    string IAppGlblSettingsServiceFolder      = "00080-IAppGlblSettingsService.cs";
+    string IAppGlblSettingsServiceClassName   = GetContextModelClassName(Context, IAppGlblSettingsServiceFolder);
+    string IAppGlblSettingsServiceNameSpace   = GetContextModelNameSpace(Context, IAppGlblSettingsServiceFolder);
+
+    string IWebServiceFilterRsltInterfaceFolder     = "00204-IWebServiceFilterRsltInterface.cs";
+    string IWebServiceFilterRsltInterfaceClassName  = GetContextModelClassName(Context, IWebServiceFilterRsltInterfaceFolder);
+    string IWebServiceFilterRsltInterfaceNameSpace  = GetContextModelNameSpace(Context, IWebServiceFilterRsltInterfaceFolder);
+
+    string WebServiceFilterRsltFolder               = "00214-WebServiceFilterRslt.cs";
+    string WebServiceFilterRsltClassName            = GetContextModelClassName(Context, WebServiceFilterRsltFolder);
+    string WebServiceFilterRsltNameSpace            = GetContextModelNameSpace(Context, WebServiceFilterRsltFolder);
+
+    string IViewmodeldatasourceinterfaceFolder      = "00610-IViewModelDataSourceInterface.cs";
+    string IViewmodeldatasourceinterfaceClassName   = GetContextModelClassName(Context, IViewmodeldatasourceinterfaceFolder);
+    string IViewmodeldatasourceinterfaceNameSpace   = GetContextModelNameSpace(Context, IViewmodeldatasourceinterfaceFolder);
+
+
+    string modelInterfaceFolder             = "01100-Interface.cs";
+    string modelInterfaceClassName          = GetInterfaceName(Model);
+    string modelInterfaceNameSpace          = GetModelNameSpace(Model, modelInterfaceFolder);
+
+    string modelFolder                      = "01102-Model.cs";
+    string modelClassName                   = GetModelName(Model);
+    string modelNameSpace                   = GetModelNameSpace(Model, modelFolder);
+
+    string NotifyInterfaceFolder            = "01104-NotifyInterface.cs";
+    string NotifyInterfaceClassName         = GetNotifyInterfaceName(Model);
+    string NotifyInterfaceNameSpace         = GetModelNameSpace(Model, NotifyInterfaceFolder);
+
+    string ModelNotifyFolder                = "01106-ModelNotify.cs";
+    string ModelNotifyClassName             = GetModelNotifyName(Model);
+    string ModelNotifyNameSpace             = GetModelNameSpace(Model, ModelNotifyFolder);
+
+    string modelPageInterfaceFolder         = "01200-Page.interface.cs";
+    string modelPageInterfaceClassName      = GetPageInterfaceName(Model);
+    string modelPageInterfaceNameSpace      = GetModelNameSpace(Model, modelPageInterfaceFolder);
+
+    string modelPageFolder                  = "01202-Page.model.cs";
+    string modelPageClassName               = GetModelPageName(Model);
+    string modelPageNameSpace               = GetModelNameSpace(Model, modelPageFolder);
+
+    string modelFilterInterfaceFolder       = "01300-Filter.interface.cs";
+    string modelFilterInterfaceClassName    = GetFilterInterfaceName(Model);
+    string modelFilterInterfaceNameSpace    = GetModelNameSpace(Model, modelFilterInterfaceFolder);
+
+    string modelFilterFolder                = "01302-Filter.model.cs";
+    string modelFilterClassName             = GetFilterName(Model);
+    string modelFilterNameSpace             = GetModelNameSpace(Model, modelFilterFolder);
+
+
+    string modelServiceInterfaceFolder       = "01400-Service.interface.cs";
+    string modelServiceInterfaceClassName    = GetModelServiceInterfaceName(Model);
+    string modelServiceInterfaceNameSpace    = GetModelNameSpace(Model, modelServiceInterfaceFolder);
+
+    string modelServiceFolder                = "01402-Service.cs";
+    string modelServiceClassName             = GetModelServiceName(Model);
+    string modelServiceNameSpace             = GetModelNameSpace(Model, modelServiceFolder);
+
+    string datasourceInterfaceFolder         = "01416-Datasource.interface.cs";
+    string datasourceInterfaceClassName      = GetModelDatasourceInterfaceName(Model);
+    string datasourceInterfaceNameSpace      = GetModelNameSpace(Model, datasourceInterfaceFolder);
+
+    string datasourceFolder                  = "01418-Datasource.cs";
+    string datasourceClassName               = GetModelDatasourceName(Model);
+    string datasourceNameSpace               = GetModelNameSpace(Model, datasourceFolder);
+
+
+
+
+
+    string FilterOperatorSuffix = "Oprtr";
+    string EqualOperator = "eq";
+    string LikeOperator  = "lk";
+    string getAuthInfoHeaderMethodName      = "GetAuthInfoHeader";
+    string ShowErrorMethodName              = "ShowErrorMessage";
+
+
+    string GetAllMethodName                 = "getall";
+    string GetWithFilterMethodName          = "getwithfilter";
+    string GetOneMethodName                 = "getone";
+    string UpdateOneMethodName              = "updateone";
+    string AddOneMethodName                 = "addone";
+    string DeleteOneMethodName              = "deleteone";
+    string CopyToModelMethodName            = "CopyToModel";
+    string CopyToModelNotifyMethodName      = "CopyToModelNotify";
+    string AppSettingServicePropertyName    = "appGlblSettings";
+
+
+    string ValuesSuffix                         = "Values";
+    string ValueSuffix                          = "Value";
+    string HiddenFilterByRowSuffix              = "HiddenFilterByRow";
+    string LengthSuffix                         = "Length";
+    string KeysSuffix                           = "Keys";
+    string HiddenFilterByFltRsltSuffix          = "HiddenFilterByFltRslt";
+    string HiddenFilterAsFltRsltSuffix          = "HiddenFilterAsFltRslt";
+    string HiddenFilterFieldName                = "HiddenFilter";
+    string MasterToClientKeyFieldsMapFieldName  = "m2cKeyfm";
+    string MasterToClientFieldsMapFieldName     = "m2cfm";
+    string IsDestroyedPropertyName              = "IsDestroyed";
+    string ClientToMasterFieldsMapFieldName     = "c2mfm";
+    string row2FilterRsltMethodName             = "row2FilterRslt";
+    string GetManyByRepPrimMethodNamePrefix     = "getmanybyrepprim";
+    string GetManyByRepUnqMethodNamePrefix      = "getmanybyrepunq";
+    string GetOneByMethodNamePrefix             = "getoneby";
+    string CurrentViewNameFieldName             = "CurrentViewName";
+    string ClientViewNameFieldName              = "ClientViewName";
+    string DirectNavigationFieldName            = "DirectNavigation";
+    string IsDefinedFieldName                   = "IsDefined";
+    string CurrDirectMasterNavsFieldName        = "CurrentlyDirectMasterNavs";
+    string UnderHiddenFilterFieldsFieldName     = "UnderHiddenFilterFields";
+    string IsNewSuffix                          = "IsNew";
+    string UIFormChainFieldName                 = "UIFormChain";
+    string formRootService                      = "frmRootSrv";
+    string OnDetailChangedPropName              = "OnDetailChanged";
+    string OnMasterChangedPropName              = "OnMasterChanged";
+    string AfterMasterChangedPropName           = "AfterMasterChanged";
+    string AfterPropsChangedPropName            = "AfterPropsChanged";
+    string OnIsDefinedChangedPropName           = "OnIsDefinedChanged";
+    string OnUpdatePropName                     = "OnUpdate";
+    string OnAddPropName                        = "OnAdd";
+    string OnDeletePropName                     = "OnDelete";
+    string DoEmitEventMethodName                = "doEmitEvent";
+    string CalcIsDefinedMethodName              = "calcIsDefined";
+    string GetFilterByCurrDirMstrsMethodName    = "getFilterByCurrDirMstrs";
+    string GetWSFltrRsltByCurrDirMstrsMethodName= "getWSFltrRsltByCurrDirMstrs";
+    string IsSetFilterByCurrDirMstrsMethodName  = "isSetFilterByCurrDirMstrs";
+    string DefineFilterOnePropMethodName        = "DefineFilterOneProp";
+    string RefreshMethodName                    = "refresh";
+    string GetCllctByFldFilterMethodName        = "getCllctionByFldFilter";
+    string GetCllctByCurrDirMstrsMethodName     = "getCllctionByCurrDirMstrs";
+    string submitOnDetailChangedMethodName      = "submitOnDetailChanged";
+    string submitOnMasterChangedMethodName      = "submitOnMasterChanged";
+    string ClearPartiallyMethodName             = "clearPartially";
+    string Interface2ValuesMethodName           = "interface2Values";
+    string Values2InterfaceMethodName           = "values2Interface";
+    string ClearMethodName                      = "clear";
+    string UpdateByHiddenFilterFieldsMethodName = "updateByHiddenFilterFields";
+    string RefreshIsDefinedMethodName           = "refreshIsDefined";
+    string IsTopDetailFieldName                 = "IsTopDetail";
+
+
+    List<ModelViewUniqueKeyOfVwSerializable> uniqueKeys = new List<ModelViewUniqueKeyOfVwSerializable>();
+    {
+        ModelViewUniqueKeyOfVwSerializable pk = GetModelPrimaryKey(Model);
+        if (pk != null) uniqueKeys.Add(pk);
+        GetModelUniqueKeys(Model, uniqueKeys);
+    } 
+
+
+
+    List<string> nmSpaces = new List<string>();
+    if (datasourceNameSpace != modelInterfaceNameSpace) nmSpaces.Add(modelInterfaceNameSpace);
+    if ((datasourceNameSpace != modelPageInterfaceNameSpace) && (nmSpaces.IndexOf(modelPageInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(modelPageInterfaceNameSpace);
+    if ((datasourceNameSpace != modelFilterInterfaceNameSpace) && (nmSpaces.IndexOf(modelFilterInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(modelFilterInterfaceNameSpace);
+    if ((datasourceNameSpace != modelServiceInterfaceNameSpace) && (nmSpaces.IndexOf(modelServiceInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(modelServiceInterfaceNameSpace);
+    if ((datasourceNameSpace != modelNameSpace) && (nmSpaces.IndexOf(modelNameSpace) < 0)) 
+        nmSpaces.Add(modelNameSpace);
+    if ((datasourceNameSpace != modelPageNameSpace) && (nmSpaces.IndexOf(modelPageNameSpace) < 0)) 
+        nmSpaces.Add(modelPageNameSpace);
+    if ((datasourceNameSpace != IAppGlblSettingsServiceNameSpace) && (nmSpaces.IndexOf(IAppGlblSettingsServiceNameSpace) < 0)) 
+        nmSpaces.Add(IAppGlblSettingsServiceNameSpace);
+    if ((datasourceNameSpace != ModelNotifyNameSpace) && (nmSpaces.IndexOf(ModelNotifyNameSpace) < 0)) 
+        nmSpaces.Add(ModelNotifyNameSpace);
+    if ((datasourceNameSpace != NotifyInterfaceNameSpace) && (nmSpaces.IndexOf(NotifyInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(NotifyInterfaceNameSpace);
+    if ((datasourceNameSpace != modelFilterNameSpace) && (nmSpaces.IndexOf(modelFilterNameSpace) < 0)) 
+        nmSpaces.Add(modelFilterNameSpace);
+    if ((datasourceNameSpace != IWebServiceFilterRsltInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IWebServiceFilterRsltInterfaceNameSpace);
+    if ((datasourceNameSpace != WebServiceFilterRsltNameSpace) && (nmSpaces.IndexOf(WebServiceFilterRsltNameSpace) < 0)) 
+        nmSpaces.Add(WebServiceFilterRsltNameSpace);
+    if ((datasourceNameSpace != IViewmodeldatasourceinterfaceNameSpace) && (nmSpaces.IndexOf(IViewmodeldatasourceinterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IViewmodeldatasourceinterfaceNameSpace);
+    if ((datasourceNameSpace != datasourceInterfaceNameSpace) && (nmSpaces.IndexOf(datasourceInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(datasourceInterfaceNameSpace);
+
+        
+#>
+<# 
+    foreach(string ns in nmSpaces) {
+#>
+using <#= ns #>;
+<#
+    }
+#>
+
+/*
+    In the file of IModule-class of the project for the current service the following lines of code must be inserted:
+
+        public void RegisterTypes(IContainerRegistry containerRegistry)
+        {
+            ...
+            containerRegistry.Register<<#= datasourceInterfaceClassName #>, <#= datasourceClassName #>>();
+            ...
+        }
+
+*/
+namespace <#= datasourceNameSpace #> {
+    public class <#= datasourceClassName #>: <#= datasourceInterfaceClassName #>
+    {
+        protected readonly string _<#= CurrentViewNameFieldName #>   = "<#= Model.ViewName #>";
+        protected readonly string _<#= ClientViewNameFieldName #>;
+        protected readonly string _<#= DirectNavigationFieldName #>;
+        protected bool _<#= IsDefinedFieldName #> = false;
+        protected IList<string> _<#= CurrDirectMasterNavsFieldName #> = new List<string>();
+        protected Dictionary<(string viewNm, string navNm, string propNm), object> _<#= HiddenFilterFieldName #> = new Dictionary<(string viewNm, string navNm, string propNm), object>();
+        protected IList<string> _<#= UnderHiddenFilterFieldsFieldName #>  = new List<string>();
+        protected bool _<#= IsNewSuffix #> = true;
+        protected string _<#= UIFormChainFieldName #>  = "";
+        protected Dictionary<string,object> _<#= ValuesSuffix #> = new Dictionary<string,object> {
+<#
+    if (Model.ScalarProperties != null) {
+        List<ModelViewPropertyOfVwSerializable> primKeyProps = GetModelPrimaryKeyProps(Model);
+        foreach (ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) { 
+            string defVal = IsBooleanTypeName(prop) ? "false" : "null";
+#>
+            {"<#= GetModelPropertyName(prop, Model) #>", <#= defVal #>},  // <#= GetPropertyTypeName(prop) #>
+<#
+
+        }
+    }
+#>
+        };
+        protected <#= modelServiceInterfaceClassName #> <#= formRootService #>;
+        protected <#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName #>;
+
+        public <#= datasourceClassName #>(<#= modelServiceInterfaceClassName #> frs,
+            <#= IAppGlblSettingsServiceClassName #> agstt,
+            string <#= ClientViewNameFieldName #>, 
+            string <#= DirectNavigationFieldName #>,
+            IList<string> <#= CurrDirectMasterNavsFieldName #>,
+            string <#= UIFormChainFieldName #>) {
+            <#= formRootService #> = frs;
+            <#= AppSettingServicePropertyName #> = agstt;
+            this._<#= ClientViewNameFieldName #> = <#= ClientViewNameFieldName #>;
+            this._<#= DirectNavigationFieldName #> = <#= DirectNavigationFieldName #>;
+            this._<#= CurrDirectMasterNavsFieldName #> = <#= CurrDirectMasterNavsFieldName #>;
+            this._<#= UIFormChainFieldName #> = <#= UIFormChainFieldName #>;
+        }
+        public event EventHandler <#= OnDetailChangedPropName #>;
+        public event EventHandler <#= OnMasterChangedPropName #>;
+        public event EventHandler <#= AfterMasterChangedPropName #>;
+        public event EventHandler <#= AfterPropsChangedPropName #>;
+        public event EventHandler <#= OnIsDefinedChangedPropName #>;
+        public event EventHandler <#= OnUpdatePropName #>;
+        public event EventHandler <#= OnAddPropName #>;
+        public event EventHandler <#= OnDeletePropName #>;
+
+        public void <#= DoEmitEventMethodName #>(bool aftrMstrChngd=false) {
+            bool isDef = this.<#= CalcIsDefinedMethodName #>();
+            if(this._<#= IsDefinedFieldName #> != isDef) {
+                this._<#= IsDefinedFieldName #> = isDef;
+                this.<#= OnIsDefinedChangedPropName #>?.Invoke(this,new EventArgs());
+            }
+            this.<#= OnDetailChangedPropName #>?.Invoke(this,new EventArgs());
+            this.<#= OnMasterChangedPropName #>?.Invoke(this,new EventArgs());
+            if(aftrMstrChngd) this.<#= AfterMasterChangedPropName #>?.Invoke(this,new EventArgs());
+            this.<#= AfterPropsChangedPropName #>?.Invoke(this,new EventArgs());
+        }
+        public Dictionary<(string viewNm, string navNm, string propNm), object>  get<#= HiddenFilterByRowSuffix #>(<#= modelInterfaceClassName #> rw, string nvNm) {
+            return this.<#= formRootService #>.get<#= HiddenFilterByRowSuffix #>(rw, nvNm);
+        }
+        public Dictionary<(string viewNm, string navNm, string propNm), object> get<#= HiddenFilterByFltRsltSuffix #>(IList<<#= IWebServiceFilterRsltInterfaceClassName #>> fr) {
+            return this.<#= formRootService #>.get<#= HiddenFilterByFltRsltSuffix #>(fr);
+        }
+        public bool <#= RefreshIsDefinedMethodName #>() {
+            this._<#= IsDefinedFieldName #> = this.<#= CalcIsDefinedMethodName #>();
+            return this._<#= IsDefinedFieldName #>;
+        }
+        public bool <#= CalcIsDefinedMethodName #>()  {
+            foreach(string i in this._<#= ValuesSuffix #>.Keys) {
+                if((!this.<#= formRootService #>.dbgenerated<#= ValueSuffix #>(i)) && 
+                    this.<#= formRootService #>.required<#= ValueSuffix #>(i)) {
+                    if(!this.isSet<#= ValueSuffix #>(i)) return false;        
+                }
+            }
+            return true;
+        }
+        public string get<#= UIFormChainFieldName #>() {
+            return this._<#= UIFormChainFieldName #>;
+        }
+        public Dictionary<(string viewNm, string navNm, string propNm), object> get<#= HiddenFilterFieldName #>() {
+            return this._<#= HiddenFilterFieldName #>;
+        }
+        public IList<<#= IWebServiceFilterRsltInterfaceClassName #>> get<#= HiddenFilterAsFltRsltSuffix #>() {
+            return this.<#= formRootService #>.get<#= HiddenFilterAsFltRsltSuffix #>(this._<#= HiddenFilterFieldName #>);
+        }
+        public void set<#= HiddenFilterFieldName #>(Dictionary<(string viewNm, string navNm, string propNm), object> fltr) {
+            this._<#= HiddenFilterFieldName #> = fltr;
+            this.set<#= UnderHiddenFilterFieldsFieldName #>();
+        }
+        public bool get<#= IsTopDetailFieldName #>() {
+            return string.IsNullOrEmpty(this._<#= UIFormChainFieldName #>);
+        }
+        public bool get<#= IsDefinedFieldName #>() {
+            return this._<#= IsDefinedFieldName #>;
+        }
+        public string get<#= CurrentViewNameFieldName #>() {
+            return this._<#= CurrentViewNameFieldName #>;
+        }
+        public string get<#= ClientViewNameFieldName #>() {
+            return this._<#= ClientViewNameFieldName #>;
+        }
+        public string get<#= DirectNavigationFieldName #>() {
+            return this._<#= DirectNavigationFieldName #>;
+        }
+
+
+        public int get<#= LengthSuffix #>() {
+            return this.<#= formRootService #>.get<#= LengthSuffix #>();
+        }
+        public Dictionary<string, (string org, string fk, string fkchain , bool isinprimkey, bool isinunqkey, bool required, bool dbgenerated, string dttp)>.KeyCollection get<#= KeysSuffix #>() {
+            return this.<#= formRootService #>.get<#= KeysSuffix #>();
+        }
+        public string getDtTp<#= ValueSuffix #>(string key) {
+            return this.<#= formRootService #>.getDtTp<#= ValueSuffix #>(key);
+        }
+        public object get<#= ValueSuffix #>(string key) {
+            return this._<#= ValuesSuffix #>[key];
+        }
+        public void set<#= ValueSuffix #>(string key, object value) {
+            if( this.<#= formRootService #>.getDtTp<#= ValueSuffix #>(key) == "boolean" ) {
+                if(value == null) { this._<#= ValuesSuffix #>[key] = false; } else { this._<#= ValuesSuffix #>[key] = value; }
+            } else {
+                this._<#= ValuesSuffix #>[key] = value;
+            }
+        }
+        public object getByOrg<#= ValueSuffix #>(string org, string fkchain) {
+            string i = this.<#= formRootService #>.getKeyByOrg<#= ValueSuffix #>(org, fkchain);
+            if(string.IsNullOrEmpty(i)) return null;
+            return this._<#= ValuesSuffix #>[i];
+        }
+        public void setByOrg<#= ValueSuffix #>(string org, string fkchain, object value)  {
+            string i = this.<#= formRootService #>.getKeyByOrg<#= ValueSuffix #>(org, fkchain);
+            if(!string.IsNullOrEmpty(i)) this._<#= ValuesSuffix #>[i] = value; 
+        }
+        public bool required<#= ValueSuffix #>(string key) {
+            return this.<#= formRootService #>.required<#= ValueSuffix #>(key);
+        }
+        public bool dbgenerated<#= ValueSuffix #>(string key) {
+            return this.<#= formRootService #>.dbgenerated<#= ValueSuffix #>(key);
+        }
+        public bool isInPrimkey<#= ValueSuffix #>(string key) {
+            return this.<#= formRootService #>.isInPrimkey<#= ValueSuffix #>(key);
+        }
+        public bool isSet<#= ValueSuffix #>(string key) {
+            if(!this._<#= ValuesSuffix #>.ContainsKey(key)) return false;
+            object v = this._<#= ValuesSuffix #>[key];
+            if (this.required<#= ValueSuffix #>(key) && (v == null)) return false;
+            return true;
+        }
+        public void clear<#= ValueSuffix #>(string key) {
+            if( this.<#= formRootService #>.getDtTp<#= ValueSuffix #>(key) == "boolean" ) {
+                this._<#= ValuesSuffix #>[key] = false;
+            } else {
+                this._<#= ValuesSuffix #>[key] = null;
+            }
+        }
+        public bool <#= ClearMethodName #>(bool doNotify = true) {
+            bool hasChanged = false;
+            foreach(string i in this._<#= ValuesSuffix #>.Keys) {
+                if( this.<#= formRootService #>.getDtTp<#= ValueSuffix #>(i) == "boolean" ) {
+                    if ((bool)this._<#= ValuesSuffix #>[i] != false) hasChanged = true;
+                    this._<#= ValuesSuffix #>[i] = false;
+                } else {
+                    if (!(this._<#= ValuesSuffix #>[i] == null)) hasChanged = true;
+                    this._<#= ValuesSuffix #>[i] = null;
+                }
+            }
+            if(!hasChanged) return hasChanged;
+            if(doNotify) this.<#= DoEmitEventMethodName #>(true);
+            return hasChanged;
+        }
+        public bool isEqual(object src, object dest, string dttp) {
+            if (src == null) {
+                return dest == null;
+            }
+            if (dest == null) {
+                return false;
+            }
+            switch(dttp) {
+                case "int16":
+                    return Convert.ToInt16(src) == Convert.ToInt16(dest);
+                case "int32":
+                    return Convert.ToInt32(src) == Convert.ToInt32(dest);
+                case "int64":
+                    return Convert.ToInt64(src) == Convert.ToInt64(dest);
+                case "uint16":
+                    return Convert.ToUInt16(src) == Convert.ToUInt16(dest);
+                case "uint32":
+                    return Convert.ToUInt32(src) == Convert.ToUInt32(dest);
+                case "uint64":
+                    return Convert.ToUInt64(src) == Convert.ToUInt64(dest);
+                case "double":
+                    return Convert.ToDouble(src) == Convert.ToDouble(dest);
+                case "decimal":
+                    return Convert.ToDecimal(src) == Convert.ToDecimal(dest);
+                case "single":
+                    return Convert.ToSingle(src) == Convert.ToSingle(dest);
+                case "guid":
+                    Guid gs,gd;
+                    if (Guid.TryParse(Convert.ToString(src), out gs) && Guid.TryParse(Convert.ToString(dest), out gd)) {
+                        return (gs == gd);
+                    }
+                    return false;
+                case "date":
+                case "datetime":
+                    return Convert.ToDateTime(src) == Convert.ToDateTime(dest);
+                default:
+                    return Convert.ToString(src) == Convert.ToString(dest);
+            }
+            return src.Equals(dest);
+        }
+        public bool <#= Interface2ValuesMethodName #>(<#= modelInterfaceClassName #> data, bool doNotify = true) {
+            if(data == null) {
+                return this.<#= ClearMethodName #>(doNotify);
+            }
+            bool hasChanged  = false;
+            bool aftrMstrChngd = false;
+<#
+        if (Model.ScalarProperties != null) {
+            foreach (ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) { 
+                string nvName = "";
+                if(string.IsNullOrEmpty(prop.ForeignKeyName)) {
+                    if (Model.ForeignKeys != null) {
+                        foreach(ModelViewForeignKeySerializable fk in Model.ForeignKeys) {
+                            if (fk.ForeignKeyProps.Any(p => p.OriginalPropertyName == prop.OriginalPropertyName)) {
+                                nvName = fk.NavigationName;
+                                break;
+                            }
+                        }
+                    }
+                } else {
+                    if ((Model.ForeignKeys != null) && (prop.ForeignKeyName == prop.ForeignKeyNameChain)) {
+                        foreach(ModelViewForeignKeySerializable fk in Model.ForeignKeys) {
+                            if (fk.PrincipalKeyProps.Any(p => p.OriginalPropertyName == prop.OriginalPropertyName)) {
+                                nvName = fk.NavigationName;
+                                break;
+                            }
+                        }
+                    }
+                }
+                if(string.IsNullOrEmpty(nvName)) {
+#>
+            if(!this.isEqual(this.get<#= ValueSuffix #>("<#= GetModelPropertyName(prop, Model) #>"), data.<#= GetModelPropertyName(prop, Model) #>, "<#= GetCCharpDatatype(prop, Model) #>")) {
+                this.set<#= ValueSuffix #>("<#= GetModelPropertyName(prop, Model) #>", data.<#= GetModelPropertyName(prop, Model) #>);
+                hasChanged = true;
+            }
+<#
+                } else {
+#>
+            if(!this.isEqual(this.get<#= ValueSuffix #>("<#= GetModelPropertyName(prop, Model) #>"), data.<#= GetModelPropertyName(prop, Model) #>, "<#= GetCCharpDatatype(prop, Model) #>")) {
+                this.set<#= ValueSuffix #>("<#= GetModelPropertyName(prop, Model) #>", data.<#= GetModelPropertyName(prop, Model) #>);
+                aftrMstrChngd = (this._<#= CurrDirectMasterNavsFieldName #>.IndexOf("<#= nvName #>") >= 0) || aftrMstrChngd;
+                hasChanged = true;
+            }
+<#
+                }
+            }
+        }
+#>
+            if(!hasChanged) return hasChanged;
+            if(doNotify) this.<#= DoEmitEventMethodName #>(aftrMstrChngd);
+            return hasChanged;
+        }
+        public <#= modelInterfaceClassName #> <#= Values2InterfaceMethodName #>() {
+            object locobjval;
+
+<#
+        if (Model.ScalarProperties != null) {
+            foreach (ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) { 
+                if (GetCCharpDatatype(prop, Model) == "guid") {
+#>
+            Guid prs;
+<#
+                    break;
+                }
+            }
+        }
+#>
+            <#= modelClassName #> rslt = new <#= modelClassName #>(); 
+<#
+        if (Model.ScalarProperties != null) {
+            foreach (ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) { 
+#>
+            locobjval = this.get<#= ValueSuffix #>("<#= GetModelPropertyName(prop, Model) #>");
+<#
+                if (IsStringTypeName(prop)) {
+#>
+            if(locobjval is null) {
+                rslt.<#= GetModelPropertyName(prop, Model) #> =  null;
+            } else {
+                rslt.<#= GetModelPropertyName(prop, Model) #> =  locobjval.ToString();
+            }
+<#
+                } else if (prop.IsNullable || (!prop.IsRequiredInView)) {
+                    if (GetCCharpDatatype(prop, Model) == "guid") {
+#>
+            if(locobjval is null) {
+                rslt.<#= GetModelPropertyName(prop, Model) #> = null;
+            } else {
+                if(Guid.TryParce(locobjval.ToString(), out prs)) {
+                    rslt.<#= GetModelPropertyName(prop, Model) #> = prs;
+                } else {
+                    rslt.<#= GetModelPropertyName(prop, Model) #> = null;
+                }
+            }
+<#
+                    } else {
+#>
+            if(locobjval is null) {
+                rslt.<#= GetModelPropertyName(prop, Model) #> = null;
+            } else {
+                rslt.<#= GetModelPropertyName(prop, Model) #> = <#= GetPropertyConvertMethod(prop, Model) #>(locobjval);
+            }
+<#
+                    }
+                } else {
+                    if (GetCCharpDatatype(prop, Model) == "guid") {
+#>
+            if(locobjval is null) {
+                rslt.<#= GetModelPropertyName(prop, Model) #> = Guid.Empty;
+            } else {
+                if(Guid.TryParce(locobjval.ToString(), out prs)) {
+                    rslt.<#= GetModelPropertyName(prop, Model) #> = prs;
+                } else {
+                    rslt.<#= GetModelPropertyName(prop, Model) #> = Guid.Empty;
+                }
+            }
+<#
+                    } else {
+#>
+            rslt.<#= GetModelPropertyName(prop, Model) #> = <#= GetPropertyConvertMethod(prop, Model) #>(locobjval);
+<#
+                    }
+                }
+            }
+        }
+#>
+            return rslt;
+        }
+
+        public async Task <#= submitOnDetailChangedMethodName #>(<#= IViewmodeldatasourceinterfaceClassName #> v)  {
+            if ((this._<#= ClientViewNameFieldName #> == null) || (this._<#= DirectNavigationFieldName #> == null) || (v == null)) return;
+            if(v.get<#= CurrentViewNameFieldName #>() != this._<#= ClientViewNameFieldName #>) return;
+            bool clntNtChngd = true;
+            Dictionary<(string viewNm, string navNm, string propNm), string> <#= ClientToMasterFieldsMapFieldName #> = this.<#= formRootService #>.get<#= ClientToMasterFieldsMapFieldName #>();
+            foreach(var lkey in <#= ClientToMasterFieldsMapFieldName #>.Keys) {
+                if ((lkey.viewNm != this._<#= ClientViewNameFieldName #>) || (lkey.navNm != this._<#= DirectNavigationFieldName #>)) continue;
+                object src = v.get<#= ValueSuffix #>(lkey.propNm);
+                object dst = this.get<#= ValueSuffix #>(<#= ClientToMasterFieldsMapFieldName #>[lkey]);
+                if (this.isEqual(src, dst, <#= formRootService #>.getDtTp<#= ValueSuffix #>(<#= ClientToMasterFieldsMapFieldName #>[lkey]))) continue;
+                clntNtChngd = false;
+                this.set<#= ValueSuffix #>(<#= ClientToMasterFieldsMapFieldName #>[lkey], src);
+            }
+            if (clntNtChngd) return;
+<#
+        {
+            List<string> errors = new List<string>();
+            if (Model.IsWebApiSelectOneByPrimarykey) { 
+                List<ModelViewSerializable> clVms = CollectClientToMasterFieldsMapModelViews(Model, Context, errors);
+                foreach(string error in  errors) {
+#>
+<#= error #>
+<#
+                }
+                bool isFirstClnt = true;
+
+                if(clVms != null) {
+                    foreach(ModelViewSerializable clVm in clVms) {
+                        errors.Clear();
+                        List<ModelViewForeignKeySerializable> mlFks = CollectMasterToClientFieldsMapForMasterView(clVm, Model.ViewName, errors);
+                        foreach(string error in  errors) {
+#>
+<#= error #>
+<#
+                        }
+                        if (mlFks != null) {
+                            if (isFirstClnt) {
+                                isFirstClnt = false;
+#>
+            if (this._<#= ClientViewNameFieldName #> == "<#= clVm.ViewName #>") {
+<#
+                            } else {
+#>
+            else if (this._<#= ClientViewNameFieldName #> == "<#= clVm.ViewName #>") {
+<#
+                            }
+                            bool ismlFk = true;
+                            foreach(ModelViewForeignKeySerializable mlFk in mlFks) {
+                                if (ismlFk) {
+                                    ismlFk = false;
+#>
+                if (this._<#= DirectNavigationFieldName #> == "<#= mlFk.NavigationName #>") {
+<#
+                                } else {
+#>
+                else if (this._<#= DirectNavigationFieldName #> == "<#= mlFk.NavigationName #>") {
+<#
+                                }
+                                ModelViewUniqueKeyOfVwSerializable mvuk = GetIndexByEntityProps(uniqueKeys, mlFk.PrincipalKeyProps, Model);
+                                if(mvuk == null) {
+#>
+//
+// Error: For the detail = "<#= clVm.ViewName #>", master = "<#= Model.ViewName #>" and navigation name = "<#= mlFk.NavigationName #>"
+//        Could not find unique or primary index in the "<#= Model.ViewName #>" to be used as a Principal Key
+//        
+<#
+                                } else {
+#>
+                    bool isKeyCrrct = true;
+                    object dtFrTst;
+<# 
+                                    foreach(ModelViewPropertyOfVwSerializable prop in mvuk.UniqueKeyProperties) {
+                                        if(prop.IsRequiredInView) {
+#>
+                    if(isKeyCrrct) {
+                        dtFrTst = this.get<#= ValueSuffix #>("<#= GetModelPropertyName(prop, Model) #>");
+                        if (dtFrTst == null) {
+                            isKeyCrrct = false;
+                        }
+                    }
+<#
+                                        }
+                                    }
+
+
+                                    string localRouteName = GetOneMethodName;
+                                    if (!mvuk.IsPrimary) {
+                    
+                                        localRouteName = GetOneByMethodNamePrefix + mvuk.UniqueKeyName;
+                                    }
+#>
+                    if(isKeyCrrct) {
+                        object locobjval;
+                        Guid prs;
+<#
+        {
+            foreach(ModelViewPropertyOfVwSerializable prop in mvuk.UniqueKeyProperties) {
+#>  
+                    <#= GetPropertyTypeName(prop) #>  <#= "loc" + GetModelPropertyName(prop, Model) #>;
+                    locobjval = this.get<#= ValueSuffix #>("<#= GetModelPropertyName(prop, Model) #>"); 
+<#
+                if (prop.IsNullable || (!prop.IsRequiredInView)) {
+#>
+                    if(locobjval is null) {
+                        <#= "loc" + GetModelPropertyName(prop, Model) #> = null;
+                    } else {
+<#
+                    if (IsStringTypeName(prop)) {
+#>
+                        <#= "loc" + GetModelPropertyName(prop, Model) #> = locobjval.ToString();
+<#
+                    } else if (GetCCharpDatatype(prop, Model) == "guid") {
+#>
+                        if(Guid.TryParce(locobjval.ToString(), out prs) ) {
+                            <#= "loc" + GetModelPropertyName(prop, Model) #> = prs;
+                        } else { 
+                            <#= "loc" + GetModelPropertyName(prop, Model) #> = null;
+                        }
+<#
+                    } else {
+#>
+                        <#= "loc" + GetModelPropertyName(prop, Model) #> = locobjval as Nullable<<#= prop.UnderlyingTypeName #>>;
+<#
+                    }
+#>
+                }
+<#
+                } else {
+#>
+                    if(locobjval is null) {
+                        <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("http", "Not all propertes are correctly defined");
+                        return;
+                    } else {
+<#
+                    if (IsStringTypeName(prop)) {
+#>
+                        <#= "loc" + GetModelPropertyName(prop, Model) #> = locobjval.ToString();
+<#
+                    } else if (GetCCharpDatatype(prop, Model) == "guid") {
+#>
+                        if(Guid.TryParce(locobjval.ToString(), out prs) ) {
+                            <#= "loc" + GetModelPropertyName(prop, Model) #> = prs;
+                        } else { 
+                            <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("http", "Not all propertes are correctly defined");
+                            return;
+                        }
+<#
+                    } else {
+#>
+                        <#= "loc" + GetModelPropertyName(prop, Model) #> = <#= GetPropertyConvertMethod(prop, Model) #>(locobjval);
+<#
+                    }
+#>
+                    }
+<#
+                }
+            }
+        }
+#>
+                        <#= modelInterfaceClassName #> data = await this.<#= formRootService #>.<#= localRouteName #>(
+<#
+                                    {
+                                        int counter = 0;
+                                        foreach(ModelViewPropertyOfVwSerializable prop in mvuk.UniqueKeyProperties) {
+                                            if(counter > 0) { 
+#>
+                        ,<#= "loc" + GetModelPropertyName(prop, Model) #>
+<#
+                                            } else {
+#>
+                         <#= "loc" + GetModelPropertyName(prop, Model) #>
+<#
+                                                counter++;
+                                            }
+                                        }
+                                    }
+#>
+                        );
+                        if(data == null) {
+                            this.<#= Interface2ValuesMethodName #>(data, true);
+                        } else {
+                            this.<#= ClearMethodName #>(true);
+                        }
+                    } else {
+                        this.<#= ClearMethodName #>(true);
+                    }
+<#
+                                }
+#>
+                }
+<#
+                            }
+#>
+            }
+<#
+                        }
+                    }
+                }
+            }
+        }
+#>
+        }
+
+
+        public bool <#= ClearPartiallyMethodName #>(bool doNotify)  {
+            bool hasChanged = false;
+<#
+    {
+        foreach (ModelViewPropertyOfVwSerializable sclrProp in Model.ScalarProperties) { 
+                if(string.IsNullOrEmpty(sclrProp.ForeignKeyName)) {
+                    bool codenotadded =true;
+                    if (Model.ForeignKeys != null) {
+                        foreach(ModelViewForeignKeySerializable fk in Model.ForeignKeys) {
+                            if (fk.ForeignKeyProps.Any(p => p.OriginalPropertyName == sclrProp.OriginalPropertyName)) {
+                                codenotadded = false;
+#>
+            if(!this.is<#= UnderHiddenFilterFieldsFieldName #>("<#= GetModelPropertyName(sclrProp, Model) #>")) {
+                if(this._<#= CurrDirectMasterNavsFieldName #>.IndexOf("<#= fk.NavigationName #>") < 0) {
+                    if(this.isSet<#= ValueSuffix #>("<#= GetModelPropertyName(sclrProp, Model) #>")) {
+                        this.clear<#= ValueSuffix #>("<#= GetModelPropertyName(sclrProp, Model) #>");
+                        hasChanged = true;
+                    }
+                }
+            }
+<#
+                            }
+                        }
+                    }
+                    if(codenotadded) {
+#>
+            if(!this.is<#= UnderHiddenFilterFieldsFieldName #>("<#= GetModelPropertyName(sclrProp, Model) #>")) {
+                if(this.isSet<#= ValueSuffix #>("<#= GetModelPropertyName(sclrProp, Model) #>")) {
+                    this.clear<#= ValueSuffix #>("<#= GetModelPropertyName(sclrProp, Model) #>");
+                    hasChanged = true;
+                }
+            }
+<#
+                    }
+                } else {
+#>
+            if(!this.is<#= UnderHiddenFilterFieldsFieldName #>("<#= GetModelPropertyName(sclrProp, Model) #>")) {
+                if(this._<#= CurrDirectMasterNavsFieldName #>.IndexOf(this.<#= formRootService #>.getFk<#= ValueSuffix #>("<#= GetModelPropertyName(sclrProp, Model) #>")) < 0) {
+                    if(this.isSet<#= ValueSuffix #>("<#= GetModelPropertyName(sclrProp, Model) #>")) {
+                        this.clear<#= ValueSuffix #>("<#= GetModelPropertyName(sclrProp, Model) #>");
+                        hasChanged = true;
+                    }
+                }
+            }
+<#
+                }
+        }
+    }
+
+#>
+            if(!hasChanged) return hasChanged;
+            if(doNotify) this.<#= DoEmitEventMethodName #>(false);
+            return hasChanged;
+        }
+
+
+        public void <#= submitOnMasterChangedMethodName #>(<#= IViewmodeldatasourceinterfaceClassName #> v) {
+            if(v == null) return;
+            string masterDirNav = v.get<#= DirectNavigationFieldName #>();
+            string masterClnt = v.get<#= ClientViewNameFieldName #>();
+            if ((masterDirNav == null) || (masterClnt == null)) return;
+            if (masterClnt != this.get<#= CurrentViewNameFieldName #>()) return;
+            bool clntNtChngd = true;
+            string masterVw = v.getCurrentViewName();
+            Dictionary<(string viewNm, string navNm, string propNm), (bool isMstrReq, string propNm)> <#= MasterToClientKeyFieldsMapFieldName #> = this.<#= formRootService #>.get<#= MasterToClientKeyFieldsMapFieldName #>();
+            Dictionary<(string viewNm, string navNm, string propNm), string> <#= MasterToClientFieldsMapFieldName #> = this.<#= formRootService #>.get<#= MasterToClientFieldsMapFieldName #>();
+            foreach(var lkey in <#= MasterToClientKeyFieldsMapFieldName #>.Keys) {
+                if ((lkey.viewNm != masterVw) || (lkey.navNm != masterDirNav)) continue;
+                object src = v.get<#= ValueSuffix #>(lkey.propNm);
+                object dst = this.get<#= ValueSuffix #>(<#= MasterToClientKeyFieldsMapFieldName #>[lkey].propNm);
+                if (this.isEqual(src, dst, <#= formRootService #>.getDtTp<#= ValueSuffix #>(<#= MasterToClientKeyFieldsMapFieldName #>[lkey].propNm))) continue;
+                clntNtChngd = false;
+                this.set<#= ValueSuffix #>(<#= MasterToClientKeyFieldsMapFieldName #>[lkey].propNm, src);
+            }
+
+            foreach(var kkey in <#= MasterToClientFieldsMapFieldName #>.Keys) {
+                object ksrc = v.get<#= ValueSuffix #>(kkey.propNm);
+                object kdst = this.get<#= ValueSuffix #>(<#= MasterToClientFieldsMapFieldName #>[kkey]);
+                if (this.isEqual(ksrc, kdst, <#= formRootService #>.getDtTp<#= ValueSuffix #>(<#= MasterToClientFieldsMapFieldName #>[kkey]))) continue;
+                clntNtChngd = false;
+                this.set<#= ValueSuffix #>(<#= MasterToClientFieldsMapFieldName #>[kkey], ksrc);
+            }
+            if (clntNtChngd) return;
+            // clear primary and unique key props of the current ViewModel. Eliminate those associated with the current direct master props.
+            if(!this.get<#= IsTopDetailFieldName #>()) {
+                this.<#= ClearPartiallyMethodName #>(false);
+            }
+            this.<#= DoEmitEventMethodName #>(true);
+        }
+        public bool <#= IsSetFilterByCurrDirMstrsMethodName #>()  {
+            Dictionary<(string viewNm, string navNm, string propNm), (bool isMstrReq, string propNm)> <#= MasterToClientKeyFieldsMapFieldName #> = this.<#= formRootService #>.get<#= MasterToClientKeyFieldsMapFieldName #>();
+            foreach(var lkey in <#= MasterToClientKeyFieldsMapFieldName #>.Keys) {
+                if (<#= MasterToClientKeyFieldsMapFieldName #>[lkey].isMstrReq && (!this.isSet<#= ValueSuffix #>(<#= MasterToClientKeyFieldsMapFieldName #>[lkey].propNm))) return false; 
+            }
+            return true;
+        }
+        public IList<<#= IWebServiceFilterRsltInterfaceClassName #>> <#= GetWSFltrRsltByCurrDirMstrsMethodName #>() {
+            IList<<#= IWebServiceFilterRsltInterfaceClassName #>> rslt = new List<<#= IWebServiceFilterRsltInterfaceClassName #>>();
+            Dictionary<(string viewNm, string navNm, string propNm), (bool isMstrReq, string propNm)> <#= MasterToClientKeyFieldsMapFieldName #> = this.<#= formRootService #>.get<#= MasterToClientKeyFieldsMapFieldName #>();
+            foreach(var lkey in <#= MasterToClientKeyFieldsMapFieldName #>.Keys) {
+                if(this._<#= CurrDirectMasterNavsFieldName #>.IndexOf(lkey.propNm) < 0) continue;
+                if (this.isSet<#= ValueSuffix #>(<#= MasterToClientKeyFieldsMapFieldName #>[lkey].propNm)) {
+                    rslt.Add(new <#= WebServiceFilterRsltClassName #>{
+                        fltrName = <#= MasterToClientKeyFieldsMapFieldName #>[lkey].propNm,
+                        fltrDataType = this.getDtTp<#= ValueSuffix #>(<#= MasterToClientKeyFieldsMapFieldName #>[lkey].propNm),
+                        fltrOperator = "eq",
+                        fltrValue = this.get<#= ValueSuffix #>(<#= MasterToClientKeyFieldsMapFieldName #>[lkey].propNm)
+                    });
+
+                }
+            }
+            return rslt;
+        }
+        protected <#= modelFilterInterfaceClassName #> <#= DefineFilterOnePropMethodName #>(<#=  modelFilterInterfaceClassName #> flt, string propNm, object value, string Oprtr) {
+            if(flt == null) flt = new <#= modelFilterClassName #>(); 
+            if (string.IsNullOrEmpty(propNm)) return flt;
+            if(string.IsNullOrEmpty(Oprtr)) Oprtr = "<#= EqualOperator #>";
+<#
+        if (Model.ScalarProperties != null) {
+            foreach (ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) { 
+                if (GetCCharpDatatype(prop, Model) == "guid") {
+#>
+            Guid prs;
+<#
+                    break;
+                }
+            }
+        }
+#>
+            switch(propNm) {
+<#
+    foreach(ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) { 
+        if (prop.IsUsedByfilter) {
+#>
+                case "<#= prop.ViewPropertyName #>":
+<#
+            if (IsStringTypeName(prop)) {
+#>
+                    if(flt.<#= GetModelPropertyName(prop, Model) #> == null) flt.<#= GetModelPropertyName(prop, Model) #> = new List<<#= GetPropertyTypeName(prop) #>>();
+                    if(flt.<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #> == null) flt.<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #> = new List< string > ();
+                    flt.<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #>.Add(Oprtr);
+                    if (value is null) {
+                        flt.<#= GetModelPropertyName(prop, Model) #>.Add(null);
+                    } else {
+                        flt.<#= GetModelPropertyName(prop, Model) #>.Add(value.ToString());
+                    }
+<#
+            } else if (prop.IsNullable || (!prop.IsRequiredInView)) {
+                if (GetCCharpDatatype(prop, Model) == "guid") {
+#>
+                    if(flt.<#= GetModelPropertyName(prop, Model) #> == null) flt.<#= GetModelPropertyName(prop, Model) #> = new List<<#= GetPropertyTypeName(prop) #>>();
+                    if(flt.<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #> == null) flt.<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix)#> = new List< string > ();
+                    flt.<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #>.Add(Oprtr);
+                    if(value is null) {
+                        flt.<#= GetModelPropertyName(prop, Model) #>.Add(null);
+                    } else {
+                        if(Guid.TryParce(this.get<#= ValueSuffix #>("<#= GetModelPropertyName(prop, Model) #>").ToString(), out prs)) {
+                            flt.<#= GetModelPropertyName(prop, Model) #>.Add(prs);
+                        } else {
+                            flt.<#= GetModelPropertyName(prop, Model) #>.Add(null);
+                        }
+                    }
+<#
+                } else {
+#>
+                    if(flt.<#= GetModelPropertyName(prop, Model) #> == null) flt.<#= GetModelPropertyName(prop, Model) #> = new List<<#= GetPropertyTypeName(prop) #>>();
+                    if(flt.<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #> == null) flt.<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #> = new List< string > ();
+                    flt.<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #>.Add(Oprtr);
+                    if(value is null) {
+                        flt.<#= GetModelPropertyName(prop, Model) #>.Add(null);
+                    } else {
+                        flt.<#= GetModelPropertyName(prop, Model) #>.Add(<#= GetPropertyConvertMethod(prop, Model) #>(value));
+                    }
+<#
+                }
+            } else {
+#>
+                    if (value is null) break;
+<#
+                if (GetCCharpDatatype(prop, Model) == "guid") {
+#>
+                    if ( Guid.TryParce(value.ToString(), out prs) ) {
+                        if(flt.<#= GetModelPropertyName(prop, Model) #> == null) flt.<#= GetModelPropertyName(prop, Model) #> = new List<<#= GetPropertyTypeName(prop) #>>();
+                        if(flt.<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #> == null) flt.<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #> = new List< string > ();
+                        flt.<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #>.Add(Oprtr);
+                        flt.<#= GetModelPropertyName(prop, Model) #>.Add(prs);
+                    }
+<#
+                } else {
+#>
+                    if(flt.<#= GetModelPropertyName(prop, Model) #> == null) flt.<#= GetModelPropertyName(prop, Model) #> = new List<<#= GetPropertyTypeName(prop) #>>();
+                    if(flt.<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #> == null) flt.<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #> = new List< string > ();
+                    flt.<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #>.Add(Oprtr);
+                    flt.<#= GetModelPropertyName(prop, Model) #>.Add(<#= GetPropertyConvertMethod(prop, Model) #>(value));
+<#
+                }
+            }
+#>
+                    break;
+<#
+        }
+    }
+#>
+            }
+            return flt;
+        }
+        protected <#=  modelFilterInterfaceClassName #> <#= GetFilterByCurrDirMstrsMethodName #>() {
+            <#=  modelFilterInterfaceClassName #> flt = new <#= modelFilterClassName #>(); 
+            Dictionary<(string viewNm, string navNm, string propNm), (bool isMstrReq, string propNm)> <#= MasterToClientKeyFieldsMapFieldName #> = this.<#= formRootService #>.get<#= MasterToClientKeyFieldsMapFieldName #>();
+            foreach(var lkey in <#= MasterToClientKeyFieldsMapFieldName #>.Keys) {
+                if (this.isSet<#= ValueSuffix #>(<#= MasterToClientKeyFieldsMapFieldName #>[lkey].propNm)) {
+                    this.<#= DefineFilterOnePropMethodName #>(flt, <#= MasterToClientKeyFieldsMapFieldName #>[lkey].propNm, this.get<#= ValueSuffix #>(<#= MasterToClientKeyFieldsMapFieldName #>[lkey].propNm), "<#= EqualOperator #>");
+                }
+            }
+            return flt;
+        }
+
+        // add input string to define flt.orderby prop
+        public async Task<IList<<#= modelInterfaceClassName #>>> <#= GetCllctByCurrDirMstrsMethodName #>() {
+<#
+        if (Model.IsWebApiSelectManyWithPagination) {
+#>
+            if (!this.<#= IsSetFilterByCurrDirMstrsMethodName #>()) {
+                return new List<<#= modelInterfaceClassName #>>();
+            }
+            <#= modelPageInterfaceClassName #> prslt = await this.<#= formRootService #>.<#= GetWithFilterMethodName #>(this.<#= GetFilterByCurrDirMstrsMethodName #>());
+            if(prslt == null) {
+                return new List<<#= modelInterfaceClassName #>>();
+            }
+            if(prslt.items == null) {
+                return new List<<#= modelInterfaceClassName #>>();
+            }
+            return prslt.items;
+<#
+        } else {
+#>
+            return new List<<#= modelInterfaceClassName #>>();
+<#
+        }
+#>
+        }
+
+
+
+        public async Task<IList<<#= modelInterfaceClassName #>>> <#= GetCllctByFldFilterMethodName #>(string fldName, object fldVal) {
+<#
+        if (Model.IsWebApiSelectManyWithPagination) {
+#>
+            if((fldVal == null) || (string.IsNullOrEmpty(fldName))) {
+                return await this.<#= GetCllctByCurrDirMstrsMethodName #>();
+            }
+            if (!this.<#= IsSetFilterByCurrDirMstrsMethodName #>()) {
+                return new List<<#= modelInterfaceClassName #>>();
+            }
+            <#=  modelFilterInterfaceClassName #> flt = this.<#= GetFilterByCurrDirMstrsMethodName #>();
+            this.<#= DefineFilterOnePropMethodName #>(flt, fldName, fldVal, "<#= LikeOperator #>");
+            if (flt.orderby == null) flt.orderby = new List<string>();
+            flt.orderby.Add(fldName);
+            <#= modelPageInterfaceClassName #> prslt = await this.<#= formRootService #>.<#= GetWithFilterMethodName #>(flt);
+            if(prslt == null) {
+                return new List<<#= modelInterfaceClassName #>>();
+            }
+            if(prslt.items == null) {
+                return new List<<#= modelInterfaceClassName #>>();
+            }
+            return prslt.items;
+<#
+        } else {
+#>
+                return new List<<#= modelInterfaceClassName #>>();
+<#
+        }
+#>
+        }
+
+
+
+
+
+<#
+    if (Model.IsWebApiSelectOneByPrimarykey) { 
+        foreach(ModelViewUniqueKeyOfVwSerializable pk in uniqueKeys) {
+            List<ModelViewPropertyOfVwSerializable> primKeys = null;
+            string indErrrorText = "";
+            bool indIsCorrect = CheckModelIfIndexIsCorrect(Model, pk, out indErrrorText);
+            string localRouteName = GetOneMethodName;
+            if (!pk.IsPrimary) {
+                    
+                localRouteName = GetOneByMethodNamePrefix + pk.UniqueKeyName;
+            }
+            if (!indIsCorrect) {
+#>
+
+//
+// Could not generate <#= localRouteName #>
+// Primary/Unique Index Is not correct:
+// <#= indErrrorText #>
+//
+
+<#
+            } else {
+                primKeys = pk.UniqueKeyProperties;
+#>
+        public async Task <#= localRouteName #>(
+<# 
+                {
+                    int counter = 0;
+                    foreach(ModelViewPropertyOfVwSerializable prop in primKeys) {
+                        if(counter > 0) { 
+#>
+                , <#= GetPropertyTypeName(prop) #> <#= GetModelPropertyName(prop, Model) #>  
+<#
+                        } else {
+#>
+                  <#= GetPropertyTypeName(prop) #> <#= GetModelPropertyName(prop, Model) #>
+<#
+                            counter++;
+                        }
+                    }
+                }
+#>
+        ) {
+            <#= modelInterfaceClassName #> data = await this.<#= formRootService #>.<#= localRouteName #>(
+<# 
+                {
+                    int counter = 0;
+                    foreach(ModelViewPropertyOfVwSerializable prop in primKeys) {
+                        if(counter > 0) { 
+#>
+                , <#= GetModelPropertyName(prop, Model) #>
+<#
+                        } else {
+#>
+                  <#= GetModelPropertyName(prop, Model) #>
+<#
+                            counter++;
+                        }
+                    }
+                }
+#>
+            );
+            if(data != null) {
+                if(!this.<#= Interface2ValuesMethodName #>(data, true)) {
+                    this.<#= DoEmitEventMethodName #>(true);
+                }
+            }
+        }
+<#
+            } // if (!indIsCorrect) { ... } else { ... }
+        } // foreach(ModelViewUniqueKeyOfVwSerializable pk in uniqueKeys) { ... }
+    } // if (Model.IsWebApiSelectOneByPrimarykey) { ... }
+#>
+
+
+        public async Task <#= RefreshMethodName #>() {
+                object locobjval;
+                Guid prs;
+<#
+    if (Model.IsWebApiSelectOneByPrimarykey) {
+        ModelViewUniqueKeyOfVwSerializable prk = GetModelPrimaryKey(Model);
+        if(prk != null) {
+            List<ModelViewPropertyOfVwSerializable> prmKeys = prk.UniqueKeyProperties;
+#>
+            if (
+<#
+            int cntr = 0;
+            foreach(ModelViewPropertyOfVwSerializable prop in prmKeys) {
+                if(cntr > 0) { 
+#>
+                && this.isSet<#= ValueSuffix #>("<#= GetModelPropertyName(prop, Model) #>")
+<#
+                } else {
+                    cntr++;
+#>
+                    this.isSet<#= ValueSuffix #>("<#= GetModelPropertyName(prop, Model) #>")
+<#
+                }
+            } // foreach(ModelViewPropertyOfVwSerializable prop in prmKeys) {...}else{...}
+#>
+            ) {
+<#
+        {
+            foreach(ModelViewPropertyOfVwSerializable prop in prmKeys) {
+#>  
+                <#= GetPropertyTypeName(prop) #>  <#= "loc" + GetModelPropertyName(prop, Model) #>;
+                locobjval = this.get<#= ValueSuffix #>("<#= GetModelPropertyName(prop, Model) #>"); 
+<#
+                if (prop.IsNullable || (!prop.IsRequiredInView)) {
+#>
+                if(locobjval is null) {
+                    <#= "loc" + GetModelPropertyName(prop, Model) #> = null;
+                } else {
+<#
+                    if (IsStringTypeName(prop)) {
+#>
+                    <#= "loc" + GetModelPropertyName(prop, Model) #> = locobjval.ToString();
+<#
+                    } else if (GetCCharpDatatype(prop, Model) == "guid") {
+#>
+                    if(Guid.TryParce(locobjval.ToString(), out prs) ) {
+                        <#= "loc" + GetModelPropertyName(prop, Model) #> = prs;
+                    } else { 
+                        <#= "loc" + GetModelPropertyName(prop, Model) #> = null;
+                    }
+<#
+                    } else {
+#>
+                    <#= "loc" + GetModelPropertyName(prop, Model) #> = locobjval as Nullable<<#= prop.UnderlyingTypeName #>>;
+<#
+                    }
+#>
+                }
+<#
+                } else {
+#>
+                if(locobjval is null) {
+                    <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("http", "Not all propertes are correctly defined");
+                    return;
+                } else {
+<#
+                    if (IsStringTypeName(prop)) {
+#>
+                    <#= "loc" + GetModelPropertyName(prop, Model) #> = locobjval.ToString();
+<#
+                    } else if (GetCCharpDatatype(prop, Model) == "guid") {
+#>
+                    if(Guid.TryParce(locobjval.ToString(), out prs) ) {
+                        <#= "loc" + GetModelPropertyName(prop, Model) #> = prs;
+                    } else { 
+                        <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("http", "Not all propertes are correctly defined");
+                        return;
+                    }
+<#
+                    } else {
+#>
+                    <#= "loc" + GetModelPropertyName(prop, Model) #> = <#= GetPropertyConvertMethod(prop, Model) #>(locobjval);
+<#
+                    }
+#>
+                }
+<#
+                }
+            }
+        }
+#>
+                await this.<#= GetOneMethodName #>(
+<#
+            cntr = 0;
+            foreach(ModelViewPropertyOfVwSerializable prop in prmKeys) {
+                if(cntr > 0) { 
+#>
+                    , <#= "loc" + GetModelPropertyName(prop, Model) #>
+<#
+                } else {
+                    cntr++;
+#>
+                      <#= "loc" + GetModelPropertyName(prop, Model) #>
+<#
+                }
+            }
+#>
+                );
+                return;
+            }
+<#
+        } // if(prk != null) {...}
+        foreach(ModelViewUniqueKeyOfVwSerializable pk in uniqueKeys) {
+            if (pk.IsPrimary) continue;
+            string localRouteName = GetOneByMethodNamePrefix + pk.UniqueKeyName;
+
+            List<ModelViewPropertyOfVwSerializable> prmKeys = pk.UniqueKeyProperties;
+#>
+            if (
+<#
+            int cntr = 0;
+            foreach(ModelViewPropertyOfVwSerializable prop in prmKeys) {
+                if(cntr > 0) { 
+#>
+                && this.isSet<#= ValueSuffix #>("<#= GetModelPropertyName(prop, Model) #>")
+<#
+                } else {
+                    cntr++;
+#>
+                    this.isSet<#= ValueSuffix #>("<#= GetModelPropertyName(prop, Model) #>")
+<#
+                }
+            } // foreach(ModelViewPropertyOfVwSerializable prop in prmKeys) {...}else{...}
+#>
+            ) {
+<#
+        {
+            foreach(ModelViewPropertyOfVwSerializable prop in prmKeys) {
+#>  
+                <#= GetPropertyTypeName(prop) #>  <#= "loc" + GetModelPropertyName(prop, Model) #>;
+                locobjval = this.get<#= ValueSuffix #>("<#= GetModelPropertyName(prop, Model) #>"); 
+<#
+                if (prop.IsNullable || (!prop.IsRequiredInView)) {
+#>
+                if(locobjval is null) {
+                    <#= "loc" + GetModelPropertyName(prop, Model) #> = null;
+                } else {
+<#
+                    if (IsStringTypeName(prop)) {
+#>
+                    <#= "loc" + GetModelPropertyName(prop, Model) #> = locobjval.ToString();
+<#
+                    } else if (GetCCharpDatatype(prop, Model) == "guid") {
+#>
+                    if(Guid.TryParce(locobjval.ToString(), out prs) ) {
+                        <#= "loc" + GetModelPropertyName(prop, Model) #> = prs;
+                    } else { 
+                        <#= "loc" + GetModelPropertyName(prop, Model) #> = null;
+                    }
+<#
+                    } else {
+#>
+                    <#= "loc" + GetModelPropertyName(prop, Model) #> = locobjval as Nullable<<#= prop.UnderlyingTypeName #>>;
+<#
+                    }
+#>
+                }
+<#
+                } else {
+#>
+                if(locobjval is null) {
+                    <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("http", "Not all propertes are correctly defined");
+                    return;
+                } else {
+<#
+                    if (IsStringTypeName(prop)) {
+#>
+                    <#= "loc" + GetModelPropertyName(prop, Model) #> = locobjval.ToString();
+<#
+                    } else if (GetCCharpDatatype(prop, Model) == "guid") {
+#>
+                    if(Guid.TryParce(locobjval.ToString(), out prs) ) {
+                        <#= "loc" + GetModelPropertyName(prop, Model) #> = prs;
+                    } else { 
+                        <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("http", "Not all propertes are correctly defined");
+                        return;
+                    }
+<#
+                    } else {
+#>
+                    <#= "loc" + GetModelPropertyName(prop, Model) #> = <#= GetPropertyConvertMethod(prop, Model) #>(locobjval);
+<#
+                    }
+#>
+                }
+<#
+                }
+            }
+        }
+#>
+                await this.<#= localRouteName #>(
+<#
+            cntr = 0;
+            foreach(ModelViewPropertyOfVwSerializable prop in prmKeys) {
+                if(cntr > 0) { 
+#>
+                    , <#= "loc" + GetModelPropertyName(prop, Model) #>
+<#
+                } else {
+                    cntr++;
+#>
+                      <#= "loc" + GetModelPropertyName(prop, Model) #>
+<#
+                }
+            }
+#>
+                );
+                return;
+            }
+<#
+        } // foreach(ModelViewUniqueKeyOfVwSerializable pk in uniqueKeys) {...}
+    } // if (Model.IsWebApiSelectOneByPrimarykey) {...}
+#>
+            <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("http", "Not all Unique or Primary key properties are defined to call Refresh-method");
+        }
+
+        public async Task <#= UpdateOneMethodName #>() {
+<#
+    if (Model.IsWebApiUpdate) { 
+#>
+            if(!this.get<#= IsDefinedFieldName #>()) {
+                <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("http", "Not all propertes are correctly defined");
+                return;
+            }
+            <#= modelInterfaceClassName #> itm = this.<#= Values2InterfaceMethodName #>();
+            <#= modelInterfaceClassName #> data = await this.<#= formRootService #>.<#= UpdateOneMethodName #>(itm);
+            if(data != null) {
+                this.<#= Interface2ValuesMethodName #>(data, false);
+                this.<#= OnUpdatePropName #>?.Invoke(this,new EventArgs());
+            }
+<#
+    } else {
+#>
+            <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("http", "Update is not implemeted for the current ViewModel");
+<#
+    } // if (Model.IsWebApiUpdate) { ... } else { ... }
+#>
+        }
+
+
+
+
+        public async Task <#= AddOneMethodName #>() {
+<#
+    if (Model.IsWebApiAdd) { 
+#>
+            if(!this.get<#= IsDefinedFieldName #>()) {
+                <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("http", "Not all propertes are correctly defined");
+                return;
+            }
+            <#= modelInterfaceClassName #> itm = this.<#= Values2InterfaceMethodName #>();
+            <#= GetInterfaceName(Model) #> data = await this.<#= formRootService #>.<#= AddOneMethodName #>(itm);
+            if(data != null) {
+                this.<#= Interface2ValuesMethodName #>(data, false);
+                this.<#= OnAddPropName #>?.Invoke(this,new EventArgs());
+            }
+<#
+    } else {
+#>
+            <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("http", "Insert is not implemeted for the current ViewModel");
+<#
+    } // if (Model.IsWebApiUpdate) { ... } else { ... }
+#>
+        }
+
+
+
+
+        public async Task <#= DeleteOneMethodName #>() {
+<#
+    if (Model.IsWebApiDelete) { 
+        List<ModelViewPropertyOfVwSerializable> primKeys = null;
+        ModelViewUniqueKeyOfVwSerializable locPrimKey = GetModelPrimKeyFromList(uniqueKeys);
+        string indErrrorText = "";
+        bool indIsCorrect = locPrimKey != null;
+        if (!indIsCorrect) {
+            indErrrorText = "Could not find primary key";
+        }
+        if (indIsCorrect) {
+            indIsCorrect = CheckModelIfIndexIsCorrect(Model, locPrimKey, out indErrrorText);
+        }
+        if(!indIsCorrect) {
+#>
+//
+// Could not generate <#= DeleteOneMethodName #>
+// Primary Index Is not correct:
+// <#= indErrrorText #>
+//
+<#
+
+        } else {
+            primKeys = locPrimKey.UniqueKeyProperties;
+#>
+            if(!this.get<#= IsDefinedFieldName #>()) {
+                <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("http", "Not all propertes are correctly defined");
+                return;
+            }
+<#
+        {
+#>
+            object locobjval;
+            Guid prs;
+<#
+            foreach(ModelViewPropertyOfVwSerializable prop in primKeys) {
+#>  
+            <#= GetPropertyTypeName(prop) #>  <#= "loc" + GetModelPropertyName(prop, Model) #>;
+            locobjval = this.get<#= ValueSuffix #>("<#= GetModelPropertyName(prop, Model) #>"); 
+<#
+                if (prop.IsNullable || (!prop.IsRequiredInView)) {
+#>
+            if(locobjval is null) {
+                <#= "loc" + GetModelPropertyName(prop, Model) #> = null;
+            } else {
+<#
+                    if (IsStringTypeName(prop)) {
+#>
+                <#= "loc" + GetModelPropertyName(prop, Model) #> = locobjval.ToString();
+<#
+                    } else if (GetCCharpDatatype(prop, Model) == "guid") {
+#>
+                if(Guid.TryParce(locobjval.ToString(), out prs) ) {
+                    <#= "loc" + GetModelPropertyName(prop, Model) #> = prs;
+                } else { 
+                    <#= "loc" + GetModelPropertyName(prop, Model) #> = null;
+                }
+<#
+                    } else {
+#>
+                <#= "loc" + GetModelPropertyName(prop, Model) #> = locobjval as Nullable<<#= prop.UnderlyingTypeName #>>;
+<#
+                    }
+#>
+            }
+<#
+                } else {
+#>
+            if(locobjval is null) {
+                <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("http", "Not all propertes are correctly defined");
+                return;
+            } else {
+<#
+                    if (IsStringTypeName(prop)) {
+#>
+                <#= "loc" + GetModelPropertyName(prop, Model) #> = locobjval.ToString();
+<#
+                    } else if (GetCCharpDatatype(prop, Model) == "guid") {
+#>
+                if(Guid.TryParce(locobjval.ToString(), out prs) ) {
+                    <#= "loc" + GetModelPropertyName(prop, Model) #> = prs;
+                } else { 
+                    <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("http", "Not all propertes are correctly defined");
+                    return;
+                }
+<#
+                    } else {
+#>
+                <#= "loc" + GetModelPropertyName(prop, Model) #> = <#= GetPropertyConvertMethod(prop, Model) #>(locobjval);
+<#
+                    }
+#>
+            }
+<#
+
+
+                }
+            }
+        }
+#>
+
+            await this.<#= formRootService #>.<#= DeleteOneMethodName #>(<# 
+        {
+            int counter = 0;
+            foreach(ModelViewPropertyOfVwSerializable prop in primKeys) {
+                if(counter > 0) { #>, <#} #>  <#= "loc" + GetModelPropertyName(prop, Model) #> <#
+                counter++;
+            }
+        }
+            #>);
+<#
+        }
+    } else {
+#>
+            <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("http", "Delete is not implemeted for the current ViewModel");
+<#
+    } // if (Model.IsWebApiUpdate) { ... } else { ... }
+#>
+        }
+        protected void set<#= UnderHiddenFilterFieldsFieldName #>() {
+            this._<#= UnderHiddenFilterFieldsFieldName #> = new List<string>();
+            Dictionary<(string viewNm, string navNm, string propNm), (bool isMstrReq, string propNm)>  <#= MasterToClientKeyFieldsMapFieldName #> = this.<#= formRootService #>.get<#= MasterToClientKeyFieldsMapFieldName #>();
+            Dictionary<(string viewNm, string navNm, string propNm), string> <#= MasterToClientFieldsMapFieldName #> = this.<#= formRootService #>.get<#= MasterToClientFieldsMapFieldName #>();
+            if(this._<#= HiddenFilterFieldName #> == null) return;
+            foreach(var hkey in this._<#= HiddenFilterFieldName #>.Keys) {
+                foreach(var kkey in <#= MasterToClientKeyFieldsMapFieldName #>.Keys) {
+                    if ((hkey.viewNm == kkey.viewNm) && (hkey.navNm == kkey.navNm)) {
+                        this._<#= UnderHiddenFilterFieldsFieldName #>.Add(<#= MasterToClientKeyFieldsMapFieldName #>[kkey].propNm);
+                    }
+                }
+                foreach(var fkey in <#= MasterToClientFieldsMapFieldName #>.Keys) {
+                    if ((hkey.viewNm == fkey.viewNm) && (hkey.navNm == fkey.navNm)) {
+                        this._<#= UnderHiddenFilterFieldsFieldName #>.Add(<#= MasterToClientFieldsMapFieldName #>[fkey]);
+                    }
+                }
+            }
+        }
+        public bool is<#= UnderHiddenFilterFieldsFieldName #>(string fld) {
+            if(string.IsNullOrEmpty(fld)) return false;
+            return this._<#= UnderHiddenFilterFieldsFieldName #>.IndexOf(fld) > -1;
+        }
+        public bool <#= UpdateByHiddenFilterFieldsMethodName #>(bool doNotify = true) {
+            bool hasChanged = false;
+            bool aftrMstrChngd = false;
+            if(this._<#= HiddenFilterFieldName #> == null) return hasChanged;
+            Dictionary<(string viewNm, string navNm, string propNm), (bool isMstrReq, string propNm)> <#= MasterToClientKeyFieldsMapFieldName #> = this.<#= formRootService #>.get<#= MasterToClientKeyFieldsMapFieldName #>();
+            foreach(var hkey in this._<#= HiddenFilterFieldName #>.Keys) {
+                if(<#= MasterToClientKeyFieldsMapFieldName #>.ContainsKey(hkey)) {
+                    object src = this._<#= HiddenFilterFieldName #>[hkey];
+                    object dest = this.get<#= ValueSuffix #>(<#= MasterToClientKeyFieldsMapFieldName #>[hkey].propNm);
+                    if (!this.isEqual(src, dest, <#= formRootService #>.getDtTp<#= ValueSuffix #>(<#= MasterToClientKeyFieldsMapFieldName #>[hkey].propNm))) {
+                        this.set<#= ValueSuffix #>(<#= MasterToClientKeyFieldsMapFieldName #>[hkey].propNm, dest);
+                        aftrMstrChngd = (this._<#= CurrDirectMasterNavsFieldName #>.IndexOf(hkey.navNm) >= 0) || aftrMstrChngd;
+                        hasChanged = true;
+                    }
+                }
+            }
+            if(!hasChanged) return hasChanged;
+            if(doNotify) this.<#= DoEmitEventMethodName #>(aftrMstrChngd);
+            return hasChanged;
+        }
+        public bool get<#= IsNewSuffix #>() {
+            return this._<#= IsNewSuffix #>;
+        }
+        public void set<#= IsNewSuffix #>(bool v) {
+            this._<#= IsNewSuffix #> = v;
+        }
+        public bool isReadonly<#= ValueSuffix #>(string key) {
+            bool rslt = this.dbgenerated<#= ValueSuffix #>(key);
+            if(!rslt) rslt = this.is<#= UnderHiddenFilterFieldsFieldName #>(key);
+            if ((!rslt) && (!this.get<#= IsNewSuffix #>())) {
+                rslt = this.<#= formRootService #>.isInPrimkey<#= ValueSuffix #>(key);
+            }
+            return rslt;
+        }
+
+
+    }
+}
+
+

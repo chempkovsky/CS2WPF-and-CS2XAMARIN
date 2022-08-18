@@ -1,0 +1,77 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="jsonpmm2txt" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ include file="..\..\CommonScripts\ViewLevel.t4" #>
+<#
+
+    string datasourceInterfaceFolder         = "01416-Datasource.interface.cs";
+    string datasourceInterfaceClassName      = GetModelDatasourceInterfaceName(Model);
+    string datasourceInterfaceNameSpace      = GetModelNameSpace(Model, datasourceInterfaceFolder);
+
+    string datasourceFolder                  = "01418-Datasource.cs";
+    string datasourceClassName               = GetModelDatasourceName(Model);
+    string datasourceNameSpace               = GetModelNameSpace(Model, datasourceFolder);
+
+#>
+{
+"PrismMMMCallItems": [
+    {
+    "Description": [
+    'In the file of IModule-class of the project for the current service the following lines of code must be inserted:',
+    ' ',
+    '    public void RegisterTypes(IContainerRegistry containerRegistry)',
+    '    {',
+    '        ...',
+    '        containerRegistry.Register<<#= datasourceInterfaceClassName #>, <#= datasourceClassName #>>();',
+    '        ...',
+    '    }'
+    ],
+    
+<#  
+{
+    string datasourceInterfaceNameSpaceAndClassName         = datasourceInterfaceNameSpace + "." + datasourceInterfaceClassName;
+    string datasourceNameSpaceAndClassName                  = datasourceNameSpace + "." + datasourceClassName;
+    string destProjectName                                  = GetModelProjectUniqueName(Model, datasourceFolder);
+    string destImplementedInterface                         = "Prism.Modularity.IModule";
+    string destMethodName                                   = "RegisterTypes";
+    string[] destMethodParamTypes                           = new string[] {"Prism.Ioc.IContainerRegistry"};
+    string destMethodAccessType                             = "public";
+    string invocationParamType                              = "Prism.Ioc.IContainerRegistry";
+    string invocationMethodName                             = "Register";
+    string[] invocationGenerics                             = new string[]{datasourceInterfaceNameSpaceAndClassName, datasourceNameSpaceAndClassName};
+    string[] invocationParams                               = new string[]{};
+    //result = PrismModifier.UpdateMethodWithParamIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType,
+    //                    invocationParamType, invocationMethodName, invocationGenerics, invocationParams);
+#>  
+    "MethodName": 'UpdateMethodWithParamIdentifier',
+    "DestProjectName": '<#= destProjectName #>',
+    "DestImplementedInterface": '<#= destImplementedInterface #>',
+    "DestMethodName": '<#= destMethodName #>',
+    "DestMethodParamTypes": ['<#= destMethodParamTypes[0] #>'],
+    "DestMethodAccessType": '<#= destMethodAccessType #>',
+    "DestMethodParamTypeForVar": '',
+    "InvocationVarType": '',
+    "InvocationParamType": '<#= invocationParamType #>',
+    "InvocationClassType": '',
+    "InvocationMethodName": '<#= invocationMethodName #>',
+    "InvocationGenerics": ['<#= invocationGenerics[0] #>','<#= invocationGenerics[1] #>'],
+    "InvocationParams": [],
+    "StepDescription": 'Insertion the line : containerRegistry.Register<<#= datasourceInterfaceClassName #>, <#= datasourceClassName #>>();'
+    },
+<#
+
+}
+#>
+    ]
+}
+
