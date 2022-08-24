@@ -1,0 +1,115 @@
+﻿<#
+
+    string EformModeEnumFolder                      = "00026-EformModeEnum.cs";
+    string EformModeEnumClassName                   = GetContextModelClassName(Context, EformModeEnumFolder);
+    string EformModeEnumNameSpace                   = GetContextModelNameSpace(Context, EformModeEnumFolder);
+
+    string IWebServiceFilterDefInterfaceFolder      = "00200-IWebServiceFilterDefInterface.cs";
+    string IWebServiceFilterDefInterfaceClassName   = GetContextModelClassName(Context, IWebServiceFilterDefInterfaceFolder);
+    string IWebServiceFilterDefInterfaceNameSpace   = GetContextModelNameSpace(Context, IWebServiceFilterDefInterfaceFolder);
+
+    string modelInterfaceFolder                     = "01100-Interface.cs";
+    string modelInterfaceClassName                  = GetInterfaceName(Model);
+    string modelInterfaceNameSpace                  = GetModelNameSpace(Model, modelInterfaceFolder);
+
+    string IAppGlblSettingsServiceFolder            = "00080-IAppGlblSettingsService.cs";
+    string IAppGlblSettingsServiceClassName         = GetContextModelClassName(Context, IAppGlblSettingsServiceFolder);
+    string IAppGlblSettingsServiceNameSpace         = GetContextModelNameSpace(Context, IAppGlblSettingsServiceFolder);
+
+    string IWebServiceFilterRsltInterfaceFolder     = "00204-IWebServiceFilterRsltInterface.cs";
+    string IWebServiceFilterRsltInterfaceClassName  = GetContextModelClassName(Context, IWebServiceFilterRsltInterfaceFolder);
+    string IWebServiceFilterRsltInterfaceNameSpace  = GetContextModelNameSpace(Context, IWebServiceFilterRsltInterfaceFolder);
+
+    string EdlgViewModelBaseFolder                  = "00638-EdlgViewModelBase.cs";
+    string EdlgViewModelBaseClassName               = GetContextModelClassName(Context, EdlgViewModelBaseFolder);
+    string EdlgViewModelBaseNameSpace               = GetContextModelNameSpace(Context, EdlgViewModelBaseFolder);
+
+    string AUDVformUserControlClassName                = GetModelClassName(Model, AUDVformUserControlFolder);
+    string AUDVformUserControlNameSpace                = GetModelNameSpace(Model, AUDVformUserControlFolder);
+    string AUDVformUserControlProject                  = GetModelProjectName(Model, AUDVformUserControlFolder);
+
+    string AUDVdlgUserControlClassName                 = GetModelClassName(Model, AUDVdlgUserControlFolder);
+    string AUDVdlgUserControlNameSpace                 = GetModelNameSpace(Model, AUDVdlgUserControlFolder);
+    string AUDVdlgUserControlProject                   = GetModelProjectName(Model, AUDVdlgUserControlFolder);
+
+    string AUDVdlgViewModelClassName                   = GetModelClassName(Model, AUDVdlgViewModelFolder);
+    string AUDVdlgViewModelNameSpace                   = GetModelNameSpace(Model, AUDVdlgViewModelFolder);
+    string AUDVdlgViewModelProject                     = GetModelProjectName(Model, AUDVdlgViewModelFolder);
+
+
+    string CaptionPropertyName                  = "Caption";
+    string HiddenFiltersPropertyName            = "HiddenFilters";
+    string EformModePropertyName                = "EformMode";
+    string FormControlModelPropertyName         = "FormControlModel";
+    string ShowSubmitPropertyName               = "ShowSubmit";
+
+    string RegionPropertyName                   = "Region";
+    string DialogRegionPropertyName             = "DialogRegion";
+
+
+    string AppSettingServicePropertyName        = "GlblSettingsSrv";
+    string RoutedCommandHandlersPropertyName    = "RoutedCommandHandlers";
+
+    string SubmitCommandPropertyName            = "SubmitCommand";
+    string CancelCommandPropertyName            = "CancelCommand";
+
+
+    List<string> nmSpaces = new List<string>();
+    if ((AUDVdlgViewModelNameSpace != IWebServiceFilterRsltInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IWebServiceFilterRsltInterfaceNameSpace);
+    if ((AUDVdlgViewModelNameSpace != IAppGlblSettingsServiceNameSpace) && (nmSpaces.IndexOf(IAppGlblSettingsServiceNameSpace) < 0)) 
+        nmSpaces.Add(IAppGlblSettingsServiceNameSpace);
+    if ((AUDVdlgViewModelNameSpace != AUDVformUserControlNameSpace) && (nmSpaces.IndexOf(AUDVformUserControlNameSpace) < 0)) 
+        nmSpaces.Add(AUDVformUserControlNameSpace);
+    if ((AUDVdlgViewModelNameSpace != modelInterfaceNameSpace) && (nmSpaces.IndexOf(modelInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(modelInterfaceNameSpace);
+    if ((AUDVdlgViewModelNameSpace != EformModeEnumNameSpace) && (nmSpaces.IndexOf(EformModeEnumNameSpace) < 0)) 
+        nmSpaces.Add(EformModeEnumNameSpace);
+
+
+    bool IsInTheSameModule = (AUDVformUserControlProject == AUDVdlgUserControlProject);
+    
+#>
+
+/*
+
+There is no code in this file. It is correct.
+
+<#
+    if(!IsInTheSameModule) {
+#>
+    "<#= AUDVformUserControlClassName #>"-UserControl is defined in the "<#= AUDVformUserControlProject #>"-project.
+    In the file of IModule-class of "<#= AUDVformUserControlProject #>"-project the following line of code must be inserted:
+
+        public void OnInitialized(IContainerProvider containerProvider)
+        {
+            ...
+            IRegionManager regionManager = containerProvider.Resolve(typeof(IRegionManager)) as IRegionManager;
+            if (regionManager != null)
+            {
+                ...
+                // According to requirements of the "<#= AUDVdlgViewModelClassName #>.cs"-file of "<#= AUDVdlgViewModelProject #>"-project. 
+                regionManager.RegisterViewWithRegion("<#= AUDVformUserControlClassName #><#= DialogRegionPropertyName #>", typeof(<#= AUDVformUserControlClassName #>));
+                ...
+            }
+            ...
+        }
+
+<#       
+    }
+#>
+
+
+    "<#= AUDVdlgUserControlClassName #>" UserControl is defined in the "<#= AUDVdlgUserControlProject #>"-project.
+    In the file of IModule-class of "<#= AUDVdlgUserControlProject #>"-project the following line of code must be inserted:
+
+        public void RegisterTypes(IContainerRegistry containerRegistry)
+        {
+            ...
+            // According to requirements of the "<#= AUDVdlgViewModelClassName #>.cs"-file of "<#= AUDVdlgViewModelProject #>"-project. 
+            containerRegistry.RegisterDialog<<#= AUDVdlgUserControlClassName #>, <#= EdlgViewModelBaseClassName #>>("<#= AUDVdlgViewModelClassName #>");
+            ...
+        }
+*/
+
+

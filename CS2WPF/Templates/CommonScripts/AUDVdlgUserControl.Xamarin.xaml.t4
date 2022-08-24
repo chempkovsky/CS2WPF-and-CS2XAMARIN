@@ -1,0 +1,98 @@
+﻿<#
+
+    string ProxyUserControlFolder           = "00280-ProxyUserControl.xaml.cs";
+    string ProxyUserControlClassName        = GetContextModelClassName(Context, ProxyUserControlFolder);
+    string ProxyUserControlNameSpace        = GetContextModelNameSpace(Context, ProxyUserControlFolder);
+    string ProxyUserControlProject          = GetContextModelProjectName(Context, ProxyUserControlFolder);
+
+
+    string AUDVformUserControlClassName        = GetModelClassName(Model, AUDVformUserControlFolder);
+    string AUDVformUserControlNameSpace        = GetModelNameSpace(Model, AUDVformUserControlFolder);
+    string AUDVformUserControlProject          = GetModelProjectName(Model, AUDVformUserControlFolder);
+
+    string AUDVdlgUserControlClassName         = GetModelClassName(Model, AUDVdlgUserControlFolder);
+    string AUDVdlgUserControlNameSpace         = GetModelNameSpace(Model, AUDVdlgUserControlFolder);
+    string AUDVdlgUserControlProject           = GetModelProjectName(Model, AUDVdlgUserControlFolder);
+
+    string AUDVdlgUserControlXamlClassName     = GetModelClassName(Model, AUDVdlgUserControlXamlFolder);
+    string AUDVdlgUserControlXamlNameSpace     = GetModelNameSpace(Model, AUDVdlgUserControlXamlFolder);
+    string AUDVdlgUserControlXamlProject       = GetModelProjectName(Model, AUDVdlgUserControlXamlFolder);
+
+    
+
+    string CaptionPropertyName              = "Caption";
+    string HiddenFiltersPropertyName        = "HiddenFilters";
+    string ShowSubmitPropertyName           = "ShowSubmit";
+    string FormControlModelPropertyName     = "FormControlModel";
+    string EformModePropertyName            = "EformMode";
+
+    string SubmitCommandPropertyName        = "SubmitCommand";
+    string CancelCommandPropertyName        = "CancelCommand";
+
+    string IsParentLoadedPropertyName       = "IsParentLoaded";
+
+    string RegionPropertyName               = "Region";
+    string DialogRegionPropertyName         = "DialogRegion";
+    string IsDestroyedPropertyName          = "IsDestroyed";
+
+    string proxyPrefix = "clr-namespace:" + ProxyUserControlNameSpace;
+    if(ProxyUserControlProject != AUDVdlgUserControlProject) {
+        proxyPrefix = proxyPrefix + ";assembly=" + ProxyUserControlProject;
+    }
+    string eformPrefix = "clr-namespace:" + AUDVformUserControlNameSpace;
+    if(AUDVformUserControlProject != AUDVdlgUserControlProject) {
+        eformPrefix = eformPrefix + ";assembly=" + AUDVformUserControlProject;
+    }
+
+    bool IsInTheSameModule = (AUDVformUserControlProject == AUDVdlgUserControlProject);
+
+#>
+
+<ContentView x:Class="<#= AUDVdlgUserControlNameSpace #>.<#= AUDVdlgUserControlClassName #>"
+             xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+
+             xmlns:prism="http://prismlibrary.com"
+             prism:ViewModelLocator.AutowireViewModel="True"
+             prism:DialogLayout.RelativeHeightRequest="0.99"
+<#
+    if(IsInTheSameModule) {
+#>
+             xmlns:efrm="<#= eformPrefix #>" 
+<#
+    } else {
+#>
+             xmlns:prx="<#= proxyPrefix #>" 
+<#
+    }
+#>
+             BackgroundColor="{DynamicResource ModifyItemDlgBackgroundColor}"
+             x:Name="edlgUserControlRoot">
+    <ScrollView Orientation="Vertical" VerticalOptions="StartAndExpand">
+<#
+    if(IsInTheSameModule) {
+#>
+        <efrm:<#= AUDVformUserControlClassName #> VerticalOptions="FillAndExpand"
+<#
+    } else {
+#>
+        <prx:<#= ProxyUserControlClassName #> VerticalOptions="FillAndExpand"
+            prism:RegionManager.RegionName="<#= AUDVformUserControlClassName #><#= DialogRegionPropertyName #>"
+<#
+    }
+#>
+
+            <#= IsDestroyedPropertyName #>="{Binding BindingContext.<#= IsDestroyedPropertyName #>, Mode=OneWay, Source={x:Reference edlgUserControlRoot}}" 
+            <#= CaptionPropertyName #>="{Binding BindingContext.<#= CaptionPropertyName #>, Mode=OneWay, Source={x:Reference edlgUserControlRoot}}" 
+            <#= HiddenFiltersPropertyName #>="{Binding BindingContext.<#= HiddenFiltersPropertyName #>, Mode=OneWay, Source={x:Reference edlgUserControlRoot}}" 
+            <#= ShowSubmitPropertyName #>="{Binding BindingContext.<#= ShowSubmitPropertyName #>, Mode=OneWay, Source={x:Reference edlgUserControlRoot}}" 
+            <#= FormControlModelPropertyName #>="{Binding BindingContext.<#= FormControlModelPropertyName #>, Mode=OneWay, Source={x:Reference edlgUserControlRoot}}" 
+            <#= EformModePropertyName #>="{Binding BindingContext.<#= EformModePropertyName #>, Mode=OneWay, Source={x:Reference edlgUserControlRoot}}" 
+            <#= SubmitCommandPropertyName #>="{Binding BindingContext.<#= SubmitCommandPropertyName #>, Mode=OneWay, Source={x:Reference edlgUserControlRoot}}" 
+            <#= CancelCommandPropertyName #>="{Binding BindingContext.<#= CancelCommandPropertyName #>, Mode=OneWay, Source={x:Reference edlgUserControlRoot}}" 
+            <#= IsParentLoadedPropertyName #>="{Binding BindingContext.<#= IsParentLoadedPropertyName #>, Mode=OneWay, Source={x:Reference edlgUserControlRoot}}" 
+            />
+    </ScrollView>
+</ContentView>
+
+

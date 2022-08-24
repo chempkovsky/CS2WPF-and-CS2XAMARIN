@@ -19,16 +19,27 @@ using System.Threading.Tasks;
 <#
 
 
+    string IWebServiceFilterRsltInterfaceFolder     = "00204-IWebServiceFilterRsltInterface.cs";
+    string IWebServiceFilterRsltInterfaceClassName  = GetContextModelClassName(Context, IWebServiceFilterRsltInterfaceFolder);
+    string IWebServiceFilterRsltInterfaceNameSpace  = GetContextModelNameSpace(Context, IWebServiceFilterRsltInterfaceFolder);
 
-    string IViewmodeldatasourceinterfaceFolder       = "00610-IViewModelDataSourceInterface.cs";
-    string IViewmodeldatasourceinterfaceClassName    = GetContextModelClassName(Context, IViewmodeldatasourceinterfaceFolder);
-    string IViewmodeldatasourceinterfaceNameSpace    = GetContextModelNameSpace(Context, IViewmodeldatasourceinterfaceFolder);
+    string IViewmodeldatasourceinterfaceFolder      = "00610-IViewModelDataSourceInterface.cs";
+    string IViewmodeldatasourceinterfaceClassName   = GetContextModelClassName(Context, IViewmodeldatasourceinterfaceFolder);
+    string IViewmodeldatasourceinterfaceNameSpace   = GetContextModelNameSpace(Context, IViewmodeldatasourceinterfaceFolder);
 
-    string datasourceInterfaceFolder         = "01416-Datasource.interface.cs";
-    string datasourceInterfaceClassName      = GetModelDatasourceInterfaceName(Model);
-    string datasourceInterfaceNameSpace      = GetModelNameSpace(Model, datasourceInterfaceFolder);
+    string datasourceInterfaceFolder                = "01416-Datasource.interface.cs";
+    string datasourceInterfaceClassName             = GetModelDatasourceInterfaceName(Model);
+    string datasourceInterfaceNameSpace             = GetModelNameSpace(Model, datasourceInterfaceFolder);
 
+    string modelInterfaceFolder                     = "01100-Interface.cs";
+    string modelInterfaceClassName                  = GetInterfaceName(Model);
+    string modelInterfaceNameSpace                  = GetModelNameSpace(Model, modelInterfaceFolder);
 
+    string Values2InterfaceMethodName               = "Values2Interface";
+    string GetClActByCurrDirMstrsMethodName         = "GetClActionByCurrDirMstrs";
+    string Interface2ValuesMethodName               = "Interface2Values";
+    string GetWSFltrRsltByCurrDirMstrsMethodName    = "GetWSFltrRsltByCurrDirMstrs";
+    string GetClActByFldFilterMethodName            = "GetClActionByFldFilter";
 
 
 
@@ -36,6 +47,10 @@ using System.Threading.Tasks;
     List<string> nmSpaces = new List<string>();
     if ((datasourceInterfaceNameSpace != IViewmodeldatasourceinterfaceNameSpace) && (nmSpaces.IndexOf(IViewmodeldatasourceinterfaceNameSpace) < 0)) 
         nmSpaces.Add(IViewmodeldatasourceinterfaceNameSpace);
+    if ((datasourceInterfaceNameSpace != modelInterfaceNameSpace) && (nmSpaces.IndexOf(modelInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(modelInterfaceNameSpace);
+    if ((datasourceInterfaceNameSpace != IWebServiceFilterRsltInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IWebServiceFilterRsltInterfaceNameSpace);
 
         
 #>
@@ -50,7 +65,11 @@ using <#= ns #>;
 namespace <#= datasourceInterfaceNameSpace #> {
     public interface <#= datasourceInterfaceClassName #>: <#= IViewmodeldatasourceinterfaceClassName #>
     {
-
+        <#= modelInterfaceClassName #> <#= Values2InterfaceMethodName #>();
+        Task<IList<<#= modelInterfaceClassName #>>> <#= GetClActByCurrDirMstrsMethodName #>();
+        bool <#= Interface2ValuesMethodName #>(<#= modelInterfaceClassName #> data, bool doNotify = true);
+        IList<<#= IWebServiceFilterRsltInterfaceClassName #>> <#= GetWSFltrRsltByCurrDirMstrsMethodName #>();
+        Task<IList<<#= modelInterfaceClassName #>>> <#= GetClActByFldFilterMethodName #>(string fldName, object fldVal);
     }
 }
 

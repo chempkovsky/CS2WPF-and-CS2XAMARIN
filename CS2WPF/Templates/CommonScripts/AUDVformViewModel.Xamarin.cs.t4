@@ -1,0 +1,1677 @@
+﻿using System;
+using Xamarin.Forms;
+using System.Collections;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using System.Windows.Input;
+using System.Collections.ObjectModel;
+using System.Collections.Generic;
+using System.Linq;
+using Prism.Mvvm;
+using Prism.Services.Dialogs;
+using System.Threading.Tasks;
+using System.Reflection;
+using System.ComponentModel.DataAnnotations;
+using Xamarin.Essentials;
+<#
+
+    string EformModeEnumFolder                      = "00026-EformModeEnum.cs";
+    string EformModeEnumClassName                   = GetContextModelClassName(Context, EformModeEnumFolder);
+    string EformModeEnumNameSpace                   = GetContextModelNameSpace(Context, EformModeEnumFolder);
+
+    string IAppGlblSettingsServiceFolder            = "00080-IAppGlblSettingsService.cs";
+    string IAppGlblSettingsServiceClassName         = GetContextModelClassName(Context, IAppGlblSettingsServiceFolder);
+    string IAppGlblSettingsServiceNameSpace         = GetContextModelNameSpace(Context, IAppGlblSettingsServiceFolder);
+
+    string BindingContextFeedbackFolder             = "00166-BindingContextFeedback.cs";
+    string BindingContextFeedbackClassName          = GetContextModelClassName(Context, BindingContextFeedbackFolder);
+    string BindingContextFeedbackNameSpace          = GetContextModelNameSpace(Context, BindingContextFeedbackFolder);
+
+    string IEformViewModelInterfaceFolder           = "00199-IEformViewModelInterface.cs";
+    string IEformViewModelInterfaceClassName        = GetContextModelClassName(Context, IEformViewModelInterfaceFolder);
+    string IEformViewModelInterfaceNameSpace        = GetContextModelNameSpace(Context, IEformViewModelInterfaceFolder);
+
+
+    string IWebServiceFilterRsltInterfaceFolder     = "00204-IWebServiceFilterRsltInterface.cs";
+    string IWebServiceFilterRsltInterfaceClassName  = GetContextModelClassName(Context, IWebServiceFilterRsltInterfaceFolder);
+    string IWebServiceFilterRsltInterfaceNameSpace  = GetContextModelNameSpace(Context, IWebServiceFilterRsltInterfaceFolder);
+
+    string WebServiceFilterRsltViewModelFolder      = "00215-WebServiceFilterRsltViewModel.cs";
+    string WebServiceFilterRsltViewModelClassName   = GetContextModelClassName(Context, WebServiceFilterRsltViewModelFolder);
+    string WebServiceFilterRsltViewModelNameSpace   = GetContextModelNameSpace(Context, WebServiceFilterRsltViewModelFolder);
+
+    string IBindingContextChangedFolder             = "00220-IBindingContextChanged.cs";
+    string IBindingContextChangedClassName          = GetContextModelClassName(Context, IBindingContextChangedFolder);
+    string IBindingContextChangedNameSpace          = GetContextModelNameSpace(Context, IBindingContextChangedFolder);
+
+    string IViewmodeldatasourceinterfaceFolder       = "00610-IViewModelDataSourceInterface.cs";
+    string IViewmodeldatasourceinterfaceClassName    = GetContextModelClassName(Context, IViewmodeldatasourceinterfaceFolder);
+    string IViewmodeldatasourceinterfaceNameSpace    = GetContextModelNameSpace(Context, IViewmodeldatasourceinterfaceFolder);
+
+    string SdlgViewModelBaseFolder                  = "00633-SdlgViewModelBase.cs";
+    string SdlgViewModelBaseClassName               = GetContextModelClassName(Context, SdlgViewModelBaseFolder);
+    string SdlgViewModelBaseNameSpace               = GetContextModelNameSpace(Context, SdlgViewModelBaseFolder);
+
+    string modelInterfaceFolder                     = "01100-Interface.cs";
+    string modelInterfaceClassName                  = GetInterfaceName(Model);
+    string modelInterfaceNameSpace                  = GetModelNameSpace(Model, modelInterfaceFolder);
+
+    string NotifyInterfaceFolder                    = "01104-NotifyInterface.cs";
+    string NotifyInterfaceClassName                 = GetNotifyInterfaceName(Model);
+    string NotifyInterfaceNameSpace                 = GetModelNameSpace(Model, NotifyInterfaceFolder);
+
+    string modelPageInterfaceFolder                 = "01200-Page.interface.cs";
+    string modelPageInterfaceClassName              = GetPageInterfaceName(Model);
+    string modelPageInterfaceNameSpace              = GetModelNameSpace(Model, modelPageInterfaceFolder);
+
+    string modelFilterInterfaceFolder               = "01300-Filter.interface.cs";
+    string modelFilterInterfaceClassName            = GetFilterInterfaceName(Model);
+    string modelFilterInterfaceNameSpace            = GetModelNameSpace(Model, modelFilterInterfaceFolder);
+
+    string modelFilterFolder                        = "01302-Filter.model.cs";
+    string modelFilterClassName                     = GetFilterName(Model);
+    string modelFilterNameSpace                     = GetModelNameSpace(Model, modelFilterFolder);
+
+    string modelServiceInterfaceFolder              = "01400-Service.interface.cs";
+    string modelServiceInterfaceClassName           = GetModelServiceInterfaceName(Model);
+    string modelServiceInterfaceNameSpace           = GetModelNameSpace(Model, modelServiceInterfaceFolder);
+
+    string SdlgViewModelFolder                      = "01440-SdlgViewModel.cs";
+    string datasourceInterfaceFolder                = "01416-Datasource.interface.cs";
+
+    string AUDVformUserControlClassName             = GetModelClassName(Model, AUDVformUserControlFolder);
+    string AUDVformUserControlNameSpace             = GetModelNameSpace(Model, AUDVformUserControlFolder);
+    string AUDVformUserControlProject               = GetModelProjectName(Model, AUDVformUserControlFolder);
+
+    string AUDVformViewModelClassName               = GetModelClassName(Model, AUDVformViewModelFolder);
+    string AUDVformViewModelNameSpace               = GetModelNameSpace(Model, AUDVformViewModelFolder);
+    string AUDVformViewModelProject                 = GetModelProjectName(Model, AUDVformViewModelFolder);
+
+
+    string EformModePropertyName                        = "EformMode";
+    string EformModeVMPropertyName                      = "EformModeVM";
+    string OnEformModeChangedPropertyName               = "OnEformModeChanged";
+    string EformModeChangedPropertyName                 = "EformModeChanged";
+
+    string FormControlModelPropertyName                 = "FormControlModel";
+    string FormControlModelVMPropertyName               = "FormControlModelVM";
+    string OnFormControlModelChangedPropertyName        = "OnFormControlModelChanged";
+    string FormControlModelChangedPropertyName          = "FormControlModelChanged";
+
+    string HiddenFiltersPropertyName                    = "HiddenFilters";
+    string HiddenFiltersVMPropertyName                  = "HiddenFiltersVM";
+
+    string OnHiddenFiltersChangedPropertyName           = "OnHiddenFiltersChanged";
+    string HiddenFiltersPropertyChangedPropertyName     = "HiddenFiltersPropertyChanged";
+
+    string IsOnLoadedCalledPropertyName                 = "IsOnLoadedCalled";
+    string IsLoadingPropertyName                        = "IsLoading";
+    string OnLoadedPropertyName                         = "OnLoaded";
+
+    string OnAutoSuggestBoxTextChangedPropertyName      = "OnAutoSuggestBoxTextChanged";
+    string OnAutoSuggestBoxQuerySubmittedPropertyName   = "OnAutoSuggestBoxQuerySubmitted";
+
+
+    string ComboSufix                = "CmbCntrl";
+    string ComboErrorSufix           = "CmbCntrlSuffixError"; // ComboSufix  + "SuffixError" it is used by RaiseErrorsChanged(string propertyName)
+    string ButtonSufix               = "BttnItm";
+    string ButtonErrorSufix          = "BttnItmSuffixError"; // ButtonSufix + "SuffixError" it is used by RaiseErrorsChanged(string propertyName)
+    string TypeaheadSufix            = "TphdCntrl";
+    string TypeaheadErrorSufix       = "TphdCntrlSuffixError"; // TypeaheadSufix + "SuffixError" it is used by RaiseErrorsChanged(string propertyName)
+    string TypeaheadTextSufix        = "TphdCntrlText";
+    string TypeaheadItemsSourceSufix = "TphdCntrlItemsSource";
+    string TypeaheadCalledSufix      = "TphdCntrlCalled";
+    string ValueErrorSufix           = "SuffixError"; // ValueField + "SuffixError" it is used by RaiseErrorsChanged(string propertyName)
+
+    string FormServicePrefix        = "FrmSrv";
+    string EnabledSufix             = "Enabled";
+    string FilterOperatorSuffix     = "Oprtr";
+    string SearchClickSufix         = "SrchClck";
+
+
+    string RegionPropertyName       = "Region";
+    string DisplayLabelProperty     = "Name";
+    string DisplayHintProperty      = "Prompt";
+
+
+    string FormRootServicePropertyName      = "FrmRootSrv";
+    string AppSettingServicePropertyName    = "GlblSettingsSrv";
+    string TitleCaptionVal                  = "Select Item";
+
+
+    string GetAllMethodName                 = "getall";
+    string GetWithFilterMethodName          = "getwithfilter";
+    string GetOneMethodName                 = "getone";
+    string UpdateOneMethodName              = "updateone";
+    string AddOneMethodName                 = "addone";
+    string DeleteOneMethodName              = "deleteone";
+    string CopyToModelMethodName            = "CopyToModel";
+    string CopyToModelNotifyMethodName      = "CopyToModelNotify";
+    string ShowErrorMethodName              = "ShowErrorMessage";
+
+    string SubmitCommandPropertyName        = "SubmitCommand";
+    string CancelCommandPropertyName        = "CancelCommand";
+
+    string BindingContextFeedbackRefPropertyName    = "BindingContextFeedbackRef";
+    string OnDestroyPropertyName                    = "OnDestroy";
+    string IsDestroyedPropertyName                  = "IsDestroyed";
+
+    string UIDispatcherInvokePropertyName   =       "await MainThread.InvokeOnMainThreadAsync";
+
+
+    string RootDataSource                       = "rootDataSource";
+    string DataSourceSufix                      = "DtSrc";
+    string InitMethodName                       = "Init";
+    string AfterPropsChangedPropName            = "AfterPropsChanged";
+    string AfterMasterChangedPropName           = "AfterMasterChanged";
+    string IsNewSuffix                          = "IsNew";
+    string OnMasterChangedPropName              = "OnMasterChanged";
+    string OnDetailChangedPropName              = "OnDetailChanged";
+    string SubmitOnDetailChangedMethodName      = "SubmitOnDetailChanged";
+    string DoSubmitOnDetailChangedMethodName    = "DoSubmitOnDetailChanged";
+    string SubmitOnMasterChangedMethodName      = "SubmitOnMasterChanged";
+    string DoSubmitOnMasterChangedMethodName    = "DoSubmitOnMasterChanged";
+    string PatchMethodName                      = "Patch";
+    string ValuesSuffix                         = "Values";
+    string ValueSuffix                          = "Value";
+    string UnderHiddenFilterFieldsFieldName     = "UnderHiddenFilterFields";
+    string IsSetFilterByCurrDirMstrsMethodName  = "IsSetFilterByCurrDirMstrs";
+    string CalcIsDefinedMethodName              = "CalcIsDefined";
+    string Values2InterfaceMethodName           = "Values2Interface";
+    string GetClActByCurrDirMstrsMethodName     = "GetClActionByCurrDirMstrs";
+    string GetWSFltrRsltByCurrDirMstrsMethodName= "GetWSFltrRsltByCurrDirMstrs";
+    string Interface2ValuesMethodName           = "Interface2Values";
+    string DoSubmitMethodName                   = "DoSubmit";
+    string OnAddPropName                        = "OnAdd";
+    string OnUpdatePropName                     = "OnUpdate";
+    string OnDeletePropName                     = "OnDelete";
+    string RefreshIsDefinedMethodName           = "RefreshIsDefined";
+    string ClearPartiallyMethodName             = "ClearPartially";
+    string GetClActByFldFilterMethodName        = "GetClActionByFldFilter";
+    string UpdateByHiddenFilterFieldsMethodName = "UpdateByHiddenFilterFields";
+    string HiddenFilterFieldName                = "HiddenFilter";
+    string HiddenFilterByFltRsltSuffix          = "HiddenFilterByFltRslt";
+    string DoEmitEventMethodName                = "DoEmitEvent";
+    string ClearMethodName                      = "Clear";
+    string RefreshMethodName                    = "Refresh";
+
+    int CurrentInputTypeId = AddUpdDelViewInputTypeId < 4 ? AddUpdDelViewInputTypeId : 3;
+
+
+
+   
+
+
+    List<string> SearchDialogViewsList = new List<string>();
+    List<string> ViewsList = new List<string>();
+    List<Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum>> ForeignKeyNameChainList = 
+        GetForeignKeyNameChainStructList(Model, Context, CurrentInputTypeId, new List<Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum>>());
+    foreach(Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> fk in ForeignKeyNameChainList) {
+        if (string.IsNullOrEmpty(fk.Item1)) {
+            throw new Exception("[Foreign Key Name Chain] Can not be empty string");
+        }
+        if (fk.Item2 == null) {
+            throw new Exception("For [Foreign Key Name Chain]=" + ForeignKeyNameChainList + " can not find ViewModel");
+        }
+        
+        if (ForeignKeyNameChainList.Count(f => f.Item1 == fk.Item1) > 1) {
+            throw new Exception("[Foreign Key Name Chain]=" +  fk + " occurs more than once");
+        }
+
+        if (fk.Item3.InputTypeWhenUpdate == InputTypeEnum.SearchDialog) {
+            if(!SearchDialogViewsList.Contains(fk.Item2.ViewName)) {
+                SearchDialogViewsList.Add(fk.Item2.ViewName);
+            }
+        }
+        if(!ViewsList.Contains(fk.Item2.ViewName)) {
+            ViewsList.Add(fk.Item2.ViewName);
+        }
+    }
+    if(!ViewsList.Contains(Model.ViewName)) {
+        ViewsList.Add(Model.ViewName);
+    }
+    foreach(Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> fk in ForeignKeyNameChainList) {
+        string[] fks = fk.Item1.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
+        if (fks.Length <= 1) continue;
+        string subfk = string.Join(".", fks, 0, fks.Length - 1);
+        if( !ForeignKeyNameChainList.Any(f => f.Item1 == subfk) ) {
+            throw new Exception("[Foreign Key Name Chain]=" +  fk.Item1 + " could not find direct detail with [Foreign Key Name Chain] = " + subfk);
+        }
+    }
+    //
+    // check if the list of available fields is enough to insert/update/delete the ModelView entity 
+    //
+    foreach(ModelViewEntityPropertySerializable entityProp in Model.AllProperties) {
+        bool isNotExists = true;
+        if(!entityProp.IsRequired) continue;
+        ModelViewPropertyOfVwSerializable scalarProp = Model.ScalarProperties.Where(s => ((s.OriginalPropertyName == entityProp.OriginalPropertyName) && string.IsNullOrEmpty(s.ForeignKeyNameChain))).FirstOrDefault();
+        if (scalarProp != null) {
+            if(Model.UIFormProperties.Any(u => (u.IsShownInView &&  (u.ViewPropertyName == scalarProp.ViewPropertyName)))) continue;
+            if(Model.ForeignKeys != null) {
+                foreach(ModelViewForeignKeySerializable fk in Model.ForeignKeys) {
+                    if(ForeignKeyNameChainList.Any(f => f.Item1 == fk.NavigationName)) {
+                        if ((fk.PrincipalKeyProps != null) && (fk.ForeignKeyProps != null)) {
+                            for(int i =0; i <  fk.ForeignKeyProps.Count; i++) {
+                                if(i < fk.PrincipalKeyProps.Count) {
+                                    if(fk.ForeignKeyProps[i].OriginalPropertyName == entityProp.OriginalPropertyName) {
+                                            isNotExists = false;                             
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if(!isNotExists) break;
+                }
+            }
+            if(isNotExists) {
+                if(!IsDatabaseGeneratedProperty(scalarProp, Model)) {
+                    throw new Exception("For the [Not Database Generated Required Entity Property] =" +  entityProp.OriginalPropertyName + " could not find mapped UIFormProperty which is not hidden and which is shown In View");
+                }
+            }
+            continue;
+        }
+        foreach(ModelViewForeignKeySerializable fk in Model.ForeignKeys) {
+//
+// we have to applay check only for Add operation
+// if(ForeignKeyNameChainList.Any(f => f.Item1 == fk.NavigationName))
+//
+//
+                if ((fk.PrincipalKeyProps != null) && (fk.ForeignKeyProps != null)) {
+                    for(int i =0; i <  fk.ForeignKeyProps.Count; i++) {
+                        if(i < fk.PrincipalKeyProps.Count) {
+                            if(fk.ForeignKeyProps[i].OriginalPropertyName == entityProp.OriginalPropertyName) {
+                                    isNotExists = false;                             
+                            }
+                        }
+                    }
+                }
+            if(!isNotExists) break;
+        }
+        if(isNotExists) {
+            throw new Exception("For the [Required Entity Property] =" +  entityProp.OriginalPropertyName + " could not find mapped UIFormProperty which is not hidden and which is shown In View");
+        }
+    }
+
+
+
+
+    List<string> nmSpaces = new List<string>();
+    if ((AUDVformViewModelNameSpace != IWebServiceFilterRsltInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IWebServiceFilterRsltInterfaceNameSpace);
+    if ((AUDVformViewModelNameSpace != modelInterfaceNameSpace) && (nmSpaces.IndexOf(modelInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(modelInterfaceNameSpace);
+    if ((AUDVformViewModelNameSpace != EformModeEnumNameSpace) && (nmSpaces.IndexOf(EformModeEnumNameSpace) < 0)) 
+        nmSpaces.Add(EformModeEnumNameSpace);
+    if ((AUDVformViewModelNameSpace != IAppGlblSettingsServiceNameSpace) && (nmSpaces.IndexOf(IAppGlblSettingsServiceNameSpace) < 0)) 
+        nmSpaces.Add(IAppGlblSettingsServiceNameSpace);
+    if ((AUDVformViewModelNameSpace != WebServiceFilterRsltViewModelNameSpace) && (nmSpaces.IndexOf(WebServiceFilterRsltViewModelNameSpace) < 0)) 
+        nmSpaces.Add(WebServiceFilterRsltViewModelNameSpace);
+    if ((AUDVformViewModelNameSpace != NotifyInterfaceNameSpace) && (nmSpaces.IndexOf(NotifyInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(NotifyInterfaceNameSpace);
+    if ((AUDVformViewModelNameSpace != BindingContextFeedbackNameSpace) && (nmSpaces.IndexOf(BindingContextFeedbackNameSpace) < 0)) 
+        nmSpaces.Add(BindingContextFeedbackNameSpace);
+    if ((AUDVformViewModelNameSpace != IBindingContextChangedNameSpace) && (nmSpaces.IndexOf(IBindingContextChangedNameSpace) < 0)) 
+        nmSpaces.Add(IBindingContextChangedNameSpace);
+    if ((AUDVformViewModelNameSpace != IEformViewModelInterfaceNameSpace) && (nmSpaces.IndexOf(IEformViewModelInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IEformViewModelInterfaceNameSpace);
+    if ((AUDVformViewModelNameSpace != IViewmodeldatasourceinterfaceNameSpace) && (nmSpaces.IndexOf(IViewmodeldatasourceinterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IViewmodeldatasourceinterfaceNameSpace);
+        
+
+    foreach(string viewNm in ViewsList) {
+        ModelViewSerializable mdl = GetModelByName(Context, viewNm);
+        string nmSp = GetModelNameSpace(mdl, datasourceInterfaceFolder);
+        if (nmSpaces.IndexOf(nmSp) < 0) {
+            nmSpaces.Add(nmSp);
+        }
+    }
+
+
+    foreach(string ns in nmSpaces) {
+#>
+using <#= ns #>;
+<#
+    }
+#>
+/*
+
+<#
+    {
+        foreach(string searchViewName in SearchDialogViewsList) {
+            ModelViewSerializable searchView = GetModelByName(Context, searchViewName);
+            string localSdlgUserControlFolder       = "01436-SdlgUserControl.xaml.cs";
+            string localSdlgUserControlClassName    = GetModelClassName(searchView, localSdlgUserControlFolder);
+            string localSdlgUserControlNameSpace    = GetModelNameSpace(searchView, localSdlgUserControlFolder);
+            string localSdlgUserControlProject      = GetModelProjectName(searchView, localSdlgUserControlFolder);
+            string localSdlgViewModelFolder         = "01440-SdlgViewModel.cs";
+            string localSdlgViewModelClassName      = GetModelClassName(searchView, localSdlgViewModelFolder);
+            string localSdlgViewModelNameSpace      = GetModelNameSpace(searchView, localSdlgViewModelFolder);
+            string localSdlgViewModelProject        = GetModelProjectName(searchView, localSdlgViewModelFolder);
+
+#>
+
+        Reminder:
+        "<#= localSdlgUserControlClassName #>" UserControl is defined in the "<#= localSdlgUserControlProject #>"-project.
+        In the file of IModule-class of "<#= localSdlgUserControlProject #>"-project the following line of code must be inserted:
+
+            public void RegisterTypes(IContainerRegistry containerRegistry)
+            {
+                ...
+                // According to requirements of the "<#= localSdlgViewModelClassName #>.cs"-file of "<#= localSdlgViewModelProject #>"-project. 
+                containerRegistry.RegisterDialog<<#= localSdlgUserControlClassName #>, <#= SdlgViewModelBaseClassName #>>("<#= localSdlgViewModelClassName #>");
+                ...
+            }
+<#
+        }
+    }
+#>
+
+
+
+    "<#= AUDVformUserControlClassName #>" UserControl is defined in the "<#= AUDVformUserControlProject #>"-project.
+    In the file of IModule-class of "<#= AUDVformUserControlProject #>"-project the following line of code must be inserted:
+
+        public void RegisterTypes(IContainerRegistry containerRegistry)
+        {
+            ...
+            // According to requirements of the "<#= AUDVformViewModelClassName #>.cs"-file of "<#= AUDVformViewModelProject #>"-project. 
+            ViewModelLocationProvider.Register<<#= AUDVformUserControlClassName #>, <#= AUDVformViewModelClassName #>>();
+            // According to requirements of the "<#= AUDVformViewModelClassName #>.cs"-file of "<#= AUDVformViewModelProject #>"-project. 
+            containerRegistry.Register<ContentView, <#= AUDVformUserControlClassName #>>("<#= AUDVformUserControlClassName #>");
+            ...
+        }
+
+*/
+
+namespace <#= AUDVformViewModelNameSpace #> {
+    public class <#= AUDVformViewModelClassName #>: INotifyPropertyChanged, INotifyDataErrorInfo, <#= IEformViewModelInterfaceClassName #>, <#= IBindingContextChangedClassName #>
+    {
+        #region INotifyPropertyChanged
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string name = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+        #endregion
+
+        #region BindingContextFeedbackRef
+        object _<#= BindingContextFeedbackRefPropertyName #> = null;
+        public object <#= BindingContextFeedbackRefPropertyName #> {
+            get { return _<#= BindingContextFeedbackRefPropertyName #>; }
+            set { 
+                if(_<#= BindingContextFeedbackRefPropertyName #> != value) {
+                    _<#= BindingContextFeedbackRefPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+
+        #region MVVM props
+<#
+    foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) {
+        bool MustResetDataSource = 
+            (modelViewUIFormPropertySerializable.IsShownInView) && 
+            (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, CurrentInputTypeId) != InputTypeEnum.Combo) &&
+            (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, CurrentInputTypeId) != InputTypeEnum.SearchDialog) &&
+            (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, CurrentInputTypeId) != InputTypeEnum.Typeahead) &&
+            (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, CurrentInputTypeId) != InputTypeEnum.ReadOnly);
+#>
+        protected <#= GetUnderlyingTypeNameAsNullableEx(modelViewUIFormPropertySerializable, Model)  #> _<#= GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #> = null;
+        public <#= GetUnderlyingTypeNameAsNullableEx(modelViewUIFormPropertySerializable, Model)  #> <#=  GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #> {
+            get { return _<#= GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>; }
+            set { 
+                if((_<#= GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #> != value)||(value == null)) { 
+                    _<#= GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #> = value; 
+                    OnPropertyChanged();
+                    ValidateField(value);
+<#
+        if(MustResetDataSource) {
+#>
+                    this.<#= RootDataSource #>.set<#= ValueSuffix #>("<#= GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>", value);
+<#
+        }
+#>
+                } 
+            }
+        }
+        public void <#= PatchMethodName + GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>(object value) {
+<#
+            if (IsStringPropertyEx(modelViewUIFormPropertySerializable, Model)) {
+#>
+            if (value == null) {
+                if(string.IsNullOrEmpty(this._<#=  GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>))  return;
+                this._<#=  GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #> = null;
+            } else {
+                if(value.ToString() == this._<#=  GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>) return;
+                this._<#=  GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #> = value.ToString();
+            }
+<#
+            } else {
+#>
+            if(value == null) {
+                if(!this._<#=  GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>.HasValue) return;
+                this._<#=  GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #> = null;
+            } else {
+<#
+                if (GetCCharpDatatypeEx(modelViewUIFormPropertySerializable, Model) == "guid") {
+#>
+                Guid prs;
+                if(Guid.TryParce(locobjval.ToString(), out prs)) {
+                    if(this._<#=  GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #> == prs) return;
+                    this._<#=  GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #> = prs;
+                } else {
+                    (!this._<#=  GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>.HasValue) return;
+                    this._<#=  GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #> = null;
+                }
+<#
+                } else {
+#>
+                    var vl = <#= GetPropertyConvertMethodEx(modelViewUIFormPropertySerializable, Model) #>(value);
+                    if(this._<#=  GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>.HasValue) {
+                        if(this._<#=  GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>.Value == vl) return;
+                    }
+                    this._<#=  GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #> = vl;
+<#
+                }
+#>
+            }
+<#
+            } 
+#>
+            OnPropertyChanged("<#=  GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>");
+            ValidateField(this._<#=  GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>, "<#=  GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>");
+        }
+<#
+        if(modelViewUIFormPropertySerializable.IsShownInView) {
+#>
+        protected bool _<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, EnabledSufix) #> = false;
+        public bool <#=  GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, EnabledSufix) #> {
+            get { return _<#=  GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, EnabledSufix) #>; }
+            set { 
+                if(_<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, EnabledSufix) #> != value) 
+                { 
+                    _<#=  GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, EnabledSufix) #> = value; 
+                    OnPropertyChanged(); 
+<#
+                    if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, CurrentInputTypeId) == InputTypeEnum.SearchDialog) { 
+#>
+                    (<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, SearchClickSufix) #>Command as Command).ChangeCanExecute();
+<#
+                    }
+#>
+                } 
+            }
+        }
+        public string <#=  GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ValueErrorSufix) #> {
+            get {
+                return GetFirstError("<#=  GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>");
+            }
+        }
+
+<#
+        }
+    }
+#>
+        #endregion
+
+        #region Helper objects and vars
+        protected <#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName #> = null;
+        protected IDialogService dialogService = null;
+        protected <#=  GetModelDatasourceInterfaceName(Model) #> <#= RootDataSource #> = null;
+<#
+{
+    foreach(Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> fk in ForeignKeyNameChainList) {
+
+        if ((GetInputTypeWhenXXX(fk.Item3, CurrentInputTypeId) == InputTypeEnum.Combo) && fk.Item3.IsShownInView) { 
+#>
+        protected <#=  GetModelDatasourceInterfaceNameEx(Context, fk.Item2.ViewName) #> <#= GetModelPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #> = null;
+        protected object _<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, ComboSufix) #> = null;
+        public object <#=  GetModelPropertyNameWithSufix(fk.Item3, Model, ComboSufix) #> {
+            get { 
+                return _<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, ComboSufix) #>; 
+            }
+            set { 
+                var val = value as <#= GetInterfaceName(fk.Item2) #>;
+                if(_<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, ComboSufix) #> != val) { 
+                    _<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, ComboSufix) #> = val; 
+                    this.<#= GetModelPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= Interface2ValuesMethodName #>(val, true);
+                    OnPropertyChanged(); 
+                    ValidateField(value);
+                } 
+            }
+        }
+        public string <#=  GetModelPropertyNameWithSufix(fk.Item3, Model, ComboErrorSufix) #> {
+            get {
+                return GetFirstError("<#= GetModelPropertyNameWithSufix(fk.Item3, Model, ComboSufix) #>");
+            }
+        }
+        protected IList<<#= GetInterfaceNameEx(Context, fk.Item2.ViewName) #>> _<#=  GetExpressionForControlList(fk.Item3, Model, ComboSufix) #> = null;
+        public IList<<#= GetInterfaceNameEx(Context, fk.Item2.ViewName) #>> <#=  GetExpressionForControlList(fk.Item3, Model, ComboSufix) #> {
+            get { 
+                return _<#=  GetExpressionForControlList(fk.Item3, Model, ComboSufix) #>; 
+            }
+            set { 
+                if(_<#=  GetExpressionForControlList(fk.Item3, Model, ComboSufix) #> != value) { 
+                    _<#=  GetExpressionForControlList(fk.Item3, Model, ComboSufix) #> = value; 
+                    OnPropertyChanged(); 
+                } 
+            }
+        }
+<#
+        } else if ((GetInputTypeWhenXXX(fk.Item3, CurrentInputTypeId) == InputTypeEnum.SearchDialog) && fk.Item3.IsShownInView) {  
+#>
+        protected <#=  GetModelDatasourceInterfaceNameEx(Context, fk.Item2.ViewName) #> <#= GetModelPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #> = null;
+/*
+        protected object _<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, ButtonSufix) #> = null;
+        public object <#=  GetModelPropertyNameWithSufix(fk.Item3, Model, ButtonSufix) #> {
+            get { 
+                return _<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, ButtonSufix) #>; 
+            }
+            set { 
+                if(_<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, ButtonSufix) #> != value) { 
+                    _<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, ButtonSufix) #> = value; 
+                    OnPropertyChanged(); 
+                } 
+            }
+        }
+        public string <#=  GetModelPropertyNameWithSufix(fk.Item3, Model, ButtonErrorSufix) #> {
+            get {
+                return GetFirstError("<#= GetModelPropertyNameWithSufix(fk.Item3, Model, ButtonSufix) #>");
+            }
+        }
+*/
+<#
+        } else if ((GetInputTypeWhenXXX(fk.Item3, CurrentInputTypeId) == InputTypeEnum.Typeahead) && fk.Item3.IsShownInView) {  
+#>
+        protected <#=  GetModelDatasourceInterfaceNameEx(Context, fk.Item2.ViewName) #> <#= GetModelPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #> = null;
+        public IList<<#= GetInterfaceNameEx(Context, fk.Item2.ViewName) #>> _<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, TypeaheadItemsSourceSufix) #> = null;
+        public IList<<#= GetInterfaceNameEx(Context, fk.Item2.ViewName) #>> <#=  GetModelPropertyNameWithSufix(fk.Item3, Model, TypeaheadItemsSourceSufix) #> {
+            get { 
+                return _<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, TypeaheadItemsSourceSufix) #>; 
+            }
+            set { 
+                if(_<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, TypeaheadItemsSourceSufix) #> != value) { 
+                    _<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, TypeaheadItemsSourceSufix) #> = value;
+                    OnPropertyChanged(); 
+                }    
+            }
+        }
+        public object _<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, TypeaheadSufix) #> = null;
+        public object <#=  GetModelPropertyNameWithSufix(fk.Item3, Model, TypeaheadSufix) #> {
+            get { 
+                return _<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, TypeaheadSufix) #>; 
+            }
+            set { 
+                if(_<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, TypeaheadSufix) #> != value) { 
+                    _<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, TypeaheadSufix) #> = value; 
+                    OnPropertyChanged(); 
+                    OnPropertyChanged("<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, TypeaheadTextSufix) #>"); 
+                }
+            }
+        }
+        public string <#=  GetModelPropertyNameWithSufix(fk.Item3, Model, TypeaheadErrorSufix) #> {
+            get {
+                return GetFirstError("<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, TypeaheadSufix) #>");
+            }
+        }
+        object _<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, TypeaheadTextSufix) #> = null;
+        public object <#=  GetModelPropertyNameWithSufix(fk.Item3, Model, TypeaheadTextSufix) #> {
+            get 
+            {
+<#
+                ModelViewSerializable locView = GetViewForControlList(fk.Item3, Model, Context, CurrentInputTypeId);
+                if(locView == null) {
+#>
+//
+// error: Could not find model for for the property <#= fk.Item3.ViewPropertyName #> with a method GetViewForControlList
+// 
+<#  
+                } else {
+#>
+                <#= GetInterfaceName(locView) #> dmObj = <#=  GetModelPropertyNameWithSufix(fk.Item3, Model, TypeaheadSufix) #> as <#= GetInterfaceName(locView) #>;
+                if(dmObj!= null) {
+                    return dmObj.<#= GetControlListPropertyName(fk.Item3, Model, Context, CurrentInputTypeId) #>;
+                } else {
+                    return _<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, TypeaheadTextSufix) #>;
+                }
+
+<#  
+                }
+#>
+            }
+            set 
+            {
+                if(_<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, TypeaheadTextSufix) #> != value) {
+                    _<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, TypeaheadTextSufix) #> = value;
+                    OnPropertyChanged(); 
+                }
+            }
+        }
+<#
+        }
+    }
+}
+#>
+        #endregion
+
+        #region Constructor
+        public <#= AUDVformViewModelClassName #>(<#= GetModelDatasourceInterfaceName(Model) #> _<#= RootDataSource #>,
+<#
+    foreach(Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> fk in ForeignKeyNameChainList) {
+#>
+            <#=  GetModelDatasourceInterfaceNameEx(Context, fk.Item2.ViewName) #> _<#= GetModelPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>,
+<#
+    }
+#>
+            <#= IAppGlblSettingsServiceClassName #> _<#= AppSettingServicePropertyName  #>, 
+            IDialogService _dialogService) {
+            this.<#= AppSettingServicePropertyName #> = _<#= AppSettingServicePropertyName #>;
+            this.dialogService = _dialogService;
+            this.<#= RootDataSource #> = _<#= RootDataSource #>;
+            this.<#= RootDataSource #>.<#= InitMethodName #>(null, null, new List<string>{<#= GetCurrentDirectNavs(ForeignKeyNameChainList, "") #>},"");
+            this.<#= RootDataSource #>.set<#= IsNewSuffix #>(false);
+            this.<#= RootDataSource #>.<#= AfterPropsChangedPropName #> += this.<#= RootDataSource + AfterPropsChangedPropName #>;
+
+<#
+            if(AddUpdDelViewInputTypeId == 1) {
+#>
+            this.<#= RootDataSource #>.<#= OnAddPropName #> += this.<#= RootDataSource + OnAddPropName #>;
+<#
+            } else if(AddUpdDelViewInputTypeId == 2) {
+#>
+            this.<#= RootDataSource #>.<#= OnUpdatePropName #> += this.<#= RootDataSource + OnUpdatePropName #>;
+<#
+            } else if(AddUpdDelViewInputTypeId == 3) {
+#>
+            this.<#= RootDataSource #>.<#= OnDeletePropName #> += this.<#= RootDataSource + OnDeletePropName #>;
+<#
+            } 
+#>
+
+
+<#
+    foreach(Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> fk in ForeignKeyNameChainList) {
+        Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> detailFk = GetDirectDetail(ForeignKeyNameChainList, fk.Item1);
+        string detailViewName = Model.ViewName;
+        string directNavigation = GetDirectNavName(fk.Item1);
+        if(detailFk != null) {
+            detailViewName = detailFk.Item2.ViewName;
+        }
+        if(string.IsNullOrEmpty(directNavigation)){
+            throw new Exception("For [Foreign Key Name Chain]=" + fk.Item1 + " can not find direct detail");
+        }
+#>
+            this.<#= GetModelPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #> = _<#= GetModelPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>;
+            this.<#= GetModelPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= InitMethodName #>("<#= detailViewName #>", "<#= directNavigation #>", new List<string>{<#= GetCurrentDirectNavs(ForeignKeyNameChainList, fk.Item1) #>},"<#= fk.Item1 #>");
+            this.<#= GetModelPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.set<#= IsNewSuffix #>(false);
+            this.<#= GetModelPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= AfterPropsChangedPropName #> += this.<#= GetModelPropertyNameWithSufix(fk.Item3, Model, AfterPropsChangedPropName) #>;
+            this.<#= GetModelPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= AfterMasterChangedPropName #> += this.<#= GetModelPropertyNameWithSufix(fk.Item3, Model, AfterMasterChangedPropName) #>;
+<#
+            if(detailFk == null) {
+#>
+            this.<#= GetModelPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= OnMasterChangedPropName #> += this.<#= RootDataSource #>.<#= SubmitOnMasterChangedMethodName #>;
+            this.<#= RootDataSource #>.<#= OnDetailChangedPropName #> += this.<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= SubmitOnDetailChangedMethodName #>;
+
+<#
+            } else {
+#>
+            this.<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= OnMasterChangedPropName #> += this.<#= GetModelPropertyNameWithSufix(detailFk.Item3, Model, DataSourceSufix) #>.<#= SubmitOnMasterChangedMethodName #>;
+            this.<#= GetModelPropertyNameWithSufix(detailFk.Item3, Model, DataSourceSufix) #>.<#= OnDetailChangedPropName #> += this.<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= SubmitOnDetailChangedMethodName #>;
+<#
+            }
+    }
+#>
+        }
+        #endregion
+
+        #region Validation
+        Dictionary<string, ICollection<string>> ValidationErrors = new Dictionary<string, ICollection<string>>();
+        Dictionary<string, ICollection<string>> ValidationDataErrors = new Dictionary<string, ICollection<string>>();
+        public bool HasErrors { get { return (ValidationErrors.Count > 0) || (ValidationDataErrors.Count > 0); } }
+        public System.Collections.IEnumerable GetErrors(string propertyName)
+        {
+            if (string.IsNullOrEmpty(propertyName)) {
+                return null;
+            }
+            if(ValidationErrors.ContainsKey(propertyName)) 
+                return ValidationErrors[propertyName];
+            if (ValidationDataErrors.ContainsKey(propertyName))
+                return ValidationDataErrors[propertyName];
+            return null;
+        }
+        public string GetFirstError(string propertyName)
+        {
+            if (string.IsNullOrEmpty(propertyName)) {
+                return "";
+            }
+            string str = null;
+            if(ValidationErrors.ContainsKey(propertyName)) 
+                str = ValidationErrors[propertyName].FirstOrDefault(i => !string.IsNullOrEmpty(i));
+            if(string.IsNullOrEmpty(str))
+                if (ValidationDataErrors.ContainsKey(propertyName))
+                    str = ValidationDataErrors[propertyName].FirstOrDefault(i => !string.IsNullOrEmpty(i));
+            return str==null ? "" : str;
+        }
+        public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
+        private void RaiseErrorsChanged(string propertyName)
+        {
+            //if (ErrorsChanged != null)
+            //    ErrorsChanged(this, new DataErrorsChangedEventArgs(propertyName));
+            OnPropertyChanged(propertyName + "<#= ValueErrorSufix #>");
+        }
+        public void ValidateField(object value, [CallerMemberName] string filedName = null) {
+            if(<#= IsLoadingPropertyName #>) return;
+            if (string.IsNullOrEmpty(filedName)) return;
+            PropertyInfo propertyInfo = typeof(<#= GetInterfaceName(Model) #>).GetProperty(filedName);
+            if(propertyInfo == null) return;
+            IList<string> rslt = 
+                    (from validationAttribute in propertyInfo.GetCustomAttributes(true).OfType<ValidationAttribute>()
+                     where !validationAttribute.IsValid(value)
+                     select validationAttribute.FormatErrorMessage(string.Empty)).ToList();
+            bool hasErrors = rslt != null;
+            hasErrors = hasErrors ? (rslt.Count > 0) : false;
+            if(hasErrors) {
+                ValidationDataErrors[filedName] = rslt;
+                RaiseErrorsChanged(filedName);
+            } else {
+                if(ValidationDataErrors.ContainsKey(filedName))  {
+                    ValidationDataErrors.Remove(filedName);
+                    RaiseErrorsChanged(filedName);
+                }
+            }
+        }
+        public void ValidateObjectField(object value, [CallerMemberName] string filedName = null) {
+            if(<#= IsLoadingPropertyName #>) return;
+            if (string.IsNullOrEmpty(filedName)) return;
+            if (value != null) {
+                if(ValidationDataErrors.ContainsKey(filedName))  {
+                    ValidationDataErrors.Remove(filedName);
+                    RaiseErrorsChanged(filedName);
+                }
+                return;
+            }
+            string msgfiledName = filedName;
+            RequiredAttribute requiredAttribute;
+            string msg = null;
+            switch(filedName) {
+<#
+            foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) {
+                if ((GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, CurrentInputTypeId) == InputTypeEnum.Combo) && modelViewUIFormPropertySerializable.IsShownInView) { 
+                    if(IsPropertyRequiredInViewEx(modelViewUIFormPropertySerializable, Model)) {
+#>
+                case "<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #>":
+                    requiredAttribute = new RequiredAttribute();
+                    msg = requiredAttribute.FormatErrorMessage(string.Empty);
+                    break;
+<#
+                    }
+                }
+                if ((GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, CurrentInputTypeId) == InputTypeEnum.SearchDialog)  && modelViewUIFormPropertySerializable.IsShownInView) {
+#>
+/*
+                case "<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ButtonSufix) #>":
+                    requiredAttribute = new RequiredAttribute();
+                    msg = requiredAttribute.FormatErrorMessage(string.Empty);
+                    msgfiledName = "<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ButtonSufix) #>";
+                    break;
+*/
+<#
+                }
+                if ((GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, CurrentInputTypeId) == InputTypeEnum.Typeahead)  && modelViewUIFormPropertySerializable.IsShownInView) {
+#>
+                case "<#=  GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>":
+                    requiredAttribute = new RequiredAttribute();
+                    msg = requiredAttribute.FormatErrorMessage(string.Empty);
+                    break;
+<#
+                }
+            }
+#>
+                default:
+                    break;
+            }
+            if (!string.IsNullOrEmpty(msg)) {
+                ValidationDataErrors[msgfiledName] = new List<string>() { msg };
+                RaiseErrorsChanged(msgfiledName);
+            }
+        }
+        public void CheckIsValid() {
+<#
+    foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) {
+#>
+            ValidateField(<#= GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>, "<#= GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>");
+<#
+    }
+    {
+        InputTypeEnum InputTypeWhenXXX ;
+        int InputTypeId = CurrentInputTypeId;
+        {
+            foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) {
+                switch(InputTypeId) {
+                    case 1:
+                        InputTypeWhenXXX = modelViewUIFormPropertySerializable.InputTypeWhenAdd;
+                        break;
+                    case 2:
+                        InputTypeWhenXXX = modelViewUIFormPropertySerializable.InputTypeWhenUpdate;
+                        break;
+                    default: 
+                        InputTypeWhenXXX = modelViewUIFormPropertySerializable.InputTypeWhenDelete;
+                        break;
+                }
+                if (modelViewUIFormPropertySerializable.IsShownInView ) {
+                    if(InputTypeWhenXXX == InputTypeEnum.Combo) {
+#>
+            ValidateObjectField(<#=  GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #>, "<#=  GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #>");
+<#
+                    }
+                    if(InputTypeWhenXXX == InputTypeEnum.Typeahead) {
+#>
+            ValidateObjectField(<#=  GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>, "<#=  GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>");
+<#
+                    }
+                    if(InputTypeWhenXXX == InputTypeEnum.SearchDialog) {
+#>
+/*
+            ValidateObjectField(<#=  GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ButtonSufix) #>, "<#=  GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ButtonSufix) #>");
+*/
+<#
+                    }
+                }
+            }
+        }
+    }
+#>
+        }
+        public void ClearValidationMessages() {
+            ValidationErrors.Clear();
+            ValidationDataErrors.Clear();
+<#
+    foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) {
+#>
+            RaiseErrorsChanged("<#= GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>");
+<#
+    }
+    {
+        InputTypeEnum InputTypeWhenXXX ;
+        int InputTypeId = CurrentInputTypeId;
+        {
+            foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) {
+                switch(InputTypeId) {
+                    case 1:
+                        InputTypeWhenXXX = modelViewUIFormPropertySerializable.InputTypeWhenAdd;
+                        break;
+                    case 2:
+                        InputTypeWhenXXX = modelViewUIFormPropertySerializable.InputTypeWhenUpdate;
+                        break;
+                    default: 
+                        InputTypeWhenXXX = modelViewUIFormPropertySerializable.InputTypeWhenDelete;
+                        break;
+                }
+                if (modelViewUIFormPropertySerializable.IsShownInView ) {
+                    if(InputTypeWhenXXX == InputTypeEnum.Combo) {
+#>
+            RaiseErrorsChanged("<#=  GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #>");
+<#
+                    }
+                    if(InputTypeWhenXXX == InputTypeEnum.Typeahead) {
+#>
+            RaiseErrorsChanged("<#=  GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>");
+<#
+                    }
+                    if(InputTypeWhenXXX == InputTypeEnum.SearchDialog) {
+#>
+/*
+            RaiseErrorsChanged("<#=  GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ButtonSufix) #>");
+*/
+<#
+                    }
+                }
+            }
+        }
+    }
+#>
+        }
+        #endregion
+
+
+        #region <#= RootDataSource + AfterPropsChangedPropName #>
+        public async void <#= RootDataSource + AfterPropsChangedPropName #>(object sender, EventArgs e) {
+            <#= UIDispatcherInvokePropertyName #>(() => {
+<#
+    {
+        
+        foreach(ModelViewUIFormPropertySerializable mvUIFormProp in Model.UIFormProperties) {
+            if ((!mvUIFormProp.IsShownInView)) continue;
+            if (ForeignKeyNameChainList.Any(f => ((f.Item1 == mvUIFormProp.ForeignKeyName) || (f.Item3 == mvUIFormProp)))) continue;
+#>
+                this.<#= PatchMethodName + GetModelPropertyNameEx(mvUIFormProp, Model) #>(this.<#=  RootDataSource #>.get<#= ValueSuffix #>("<#= GetModelPropertyNameEx(mvUIFormProp, Model) #>"));
+<#
+        } 
+        foreach(Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> fk in ForeignKeyNameChainList) {
+            if(fk.Item4 == InputTypeEnum.Typeahead) {
+#>
+                this.<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, EnabledSufix) #> = !this.<#= RootDataSource #>.is<#= UnderHiddenFilterFieldsFieldName #>("<#= GetModelPropertyNameEx(fk.Item3, Model) #>");
+<#
+            } else if(fk.Item4 == InputTypeEnum.Combo) {
+#>
+                this.<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, EnabledSufix) #> = !this.<#= RootDataSource #>.is<#= UnderHiddenFilterFieldsFieldName #>("<#= GetModelPropertyNameEx(fk.Item3, Model) #>");
+<#
+            } else if(fk.Item4 == InputTypeEnum.SearchDialog) {
+#>
+                this.<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, EnabledSufix) #> = !this.<#= RootDataSource #>.is<#= UnderHiddenFilterFieldsFieldName #>("<#= GetModelPropertyNameEx(fk.Item3, Model) #>");
+<#
+            }
+        }
+    }
+#>
+            });
+        }
+        #endregion
+
+<#
+            if(AddUpdDelViewInputTypeId == 1) {
+#>
+        #region <#= RootDataSource + OnAddPropName #>
+        public async void <#= RootDataSource + OnAddPropName #>(object sender, EventArgs e) { 
+            object  itm = this.<#= RootDataSource #>.<#= Values2InterfaceMethodName #>();
+            <#= UIDispatcherInvokePropertyName #>(() => {
+                <#= BindingContextFeedbackRefPropertyName #> = new <#= BindingContextFeedbackClassName #>() {
+		            BcfName = "<#= SubmitCommandPropertyName #>",
+		            BcfData = itm
+                };
+            });
+        }
+        #endregion
+<#
+            } else if(AddUpdDelViewInputTypeId == 2) {
+#>
+        #region <#= RootDataSource + OnUpdatePropName #>
+        public async void <#= RootDataSource + OnUpdatePropName #>(object sender, EventArgs e) { 
+            object  itm = this.<#= RootDataSource #>.<#= Values2InterfaceMethodName #>();
+            <#= UIDispatcherInvokePropertyName #>(() => {
+                <#= BindingContextFeedbackRefPropertyName #> = new <#= BindingContextFeedbackClassName #>() {
+		            BcfName = "<#= SubmitCommandPropertyName #>",
+		            BcfData = itm
+                };
+            });
+        }
+        #endregion
+<#
+            } else if(AddUpdDelViewInputTypeId == 3) {
+#>
+        #region <#= RootDataSource + OnDeletePropName #>
+        public async void <#= RootDataSource + OnDeletePropName #>(object sender, EventArgs e) { 
+            object  itm = this.<#= RootDataSource #>.<#= Values2InterfaceMethodName #>();
+            <#= UIDispatcherInvokePropertyName #>(() => {
+                <#= BindingContextFeedbackRefPropertyName #> = new <#= BindingContextFeedbackClassName #>() {
+		            BcfName = "<#= SubmitCommandPropertyName #>",
+		            BcfData = itm
+                };
+            });
+        }
+        #endregion
+<#
+            } 
+#>
+
+<#
+    {
+        foreach(Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> fk in ForeignKeyNameChainList) {
+            if(fk.Item4 == InputTypeEnum.Typeahead) {
+                string dispPropName = GetControlListPropertyName(fk.Item3, Model, Context, CurrentInputTypeId);
+#>
+        #region <#= GetModelPropertyNameWithSufix(fk.Item3, Model, AfterMasterChangedPropName) #>
+        public async void <#= GetModelPropertyNameWithSufix(fk.Item3, Model, AfterMasterChangedPropName) #>(object sender, EventArgs e) {
+            <#= UIDispatcherInvokePropertyName #>(() => {
+                if(this.<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= IsSetFilterByCurrDirMstrsMethodName #>() &&
+                  (!this.<#= RootDataSource #>.is<#= UnderHiddenFilterFieldsFieldName #>("<#= GetModelPropertyNameEx(fk.Item3, Model) #>"))) {
+                    this.<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, EnabledSufix) #> = true;
+                } else {
+                    this.<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, EnabledSufix) #> = false;
+                }
+                if(this.<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= CalcIsDefinedMethodName #>()) {
+                    this.<#= PatchMethodName +  GetModelPropertyNameEx(fk.Item3, Model) #>(this.<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.get<#= ValueSuffix #>("<#= dispPropName #>"));
+                    this.<#= GetModelPropertyNameWithSufix(fk.Item3, Model, TypeaheadSufix) #> = this.<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= Values2InterfaceMethodName #>();
+                } else {
+                    this.<#= PatchMethodName +  GetModelPropertyNameEx(fk.Item3, Model) #>(null);
+                    this.<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, TypeaheadSufix) #> = null;
+                }
+            });
+        }
+        #endregion
+<#
+            } else if(fk.Item4 == InputTypeEnum.Combo) {
+                string dispPropName = GetControlListPropertyName(fk.Item3, Model, Context, CurrentInputTypeId);
+#>
+        #region <#= GetModelPropertyNameWithSufix(fk.Item3, Model, AfterMasterChangedPropName) #>
+        public async void <#= GetModelPropertyNameWithSufix(fk.Item3, Model, AfterMasterChangedPropName) #>(object sender, EventArgs ea) {
+                IList<<#= GetInterfaceNameEx(Context, fk.Item2.ViewName) #>> data = null;
+                <#= GetInterfaceNameEx(Context, fk.Item2.ViewName) #> newItm = null;
+                try {
+                    data = await this.<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= GetClActByCurrDirMstrsMethodName #>();
+                    if(data != null) {
+                        if(this.<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= CalcIsDefinedMethodName #>()) {
+                            <#= GetInterfaceNameEx(Context, fk.Item2.ViewName) #> currItm = this.<#= GetModelPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= Values2InterfaceMethodName #>();
+                            newItm = data.Where(e => <#= GetPrimKeyFilterForFindIndexMethod(Context, fk.Item2.ViewName, "e", "currItm")  #>).FirstOrDefault();
+                        }
+                    }
+                } catch(Exception ex)
+                {
+                    string exceptionMsg = "<#= GetModelPropertyNameWithSufix(fk.Item3, Model, AfterMasterChangedPropName) #> : " + ex.Message;
+                    Exception inner = ex.InnerException;
+                    while (inner != null)
+                    {
+                        exceptionMsg = exceptionMsg + ": " + inner.Message;
+                        inner = inner.InnerException;
+                    }
+                    <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("http", exceptionMsg);
+                }
+
+
+            <#= UIDispatcherInvokePropertyName #>(async () => {
+                _<#= GetModelPropertyNameWithSufix(fk.Item3, Model, ComboSufix) #> = null;
+                OnPropertyChanged("<#= GetModelPropertyNameWithSufix(fk.Item3, Model, ComboSufix) #>");
+                this._<#= GetExpressionForControlList(fk.Item3, Model, ComboSufix) #> = data;
+                OnPropertyChanged("<#= GetExpressionForControlList(fk.Item3, Model, ComboSufix) #>");
+                this._<#= GetModelPropertyNameWithSufix(fk.Item3, Model, ComboSufix) #> = newItm;
+                OnPropertyChanged("<#= GetModelPropertyNameWithSufix(fk.Item3, Model, ComboSufix) #>");
+                ValidateObjectField(newItm, "<#= GetModelPropertyNameWithSufix(fk.Item3, Model, ComboSufix) #>");
+                if(newItm != null)
+                    this.<#= GetModelPropertyNameEx(fk.Item3, Model) #> = newItm.<#= dispPropName #>;
+                else
+                    this.<#= GetModelPropertyNameEx(fk.Item3, Model) #> = null;
+                if(this.<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= IsSetFilterByCurrDirMstrsMethodName #>() &&
+                  (!this.<#= RootDataSource #>.is<#= UnderHiddenFilterFieldsFieldName #>("<#= GetModelPropertyNameEx(fk.Item3, Model) #>"))) {
+                    this.<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, EnabledSufix) #> = true;
+                } else {
+                    this.<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, EnabledSufix) #> = false;
+                }
+
+            });
+        }
+        #endregion
+<#
+            } else if(fk.Item4 == InputTypeEnum.SearchDialog) {
+#>
+        #region <#= GetModelPropertyNameWithSufix(fk.Item3, Model, AfterMasterChangedPropName) #>
+        public async void <#= GetModelPropertyNameWithSufix(fk.Item3, Model, AfterMasterChangedPropName) #>(object sender, EventArgs e) {
+            <#= UIDispatcherInvokePropertyName #>(() => {
+                this.<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, EnabledSufix) #> =
+                    (!this.<#= RootDataSource #>.is<#= UnderHiddenFilterFieldsFieldName #>("<#= GetModelPropertyNameEx(fk.Item3, Model) #>")) ||
+                    this.<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= IsSetFilterByCurrDirMstrsMethodName #>();
+            });
+        }
+        #endregion
+
+        #region <#= GetModelPropertyNameWithSufix(fk.Item3, Model, SearchClickSufix) #>Command
+        private ICommand _<#= GetModelPropertyNameWithSufix(fk.Item3, Model, SearchClickSufix) #>Command;
+        public ICommand <#= GetModelPropertyNameWithSufix(fk.Item3, Model, SearchClickSufix) #>Command
+        {
+            get
+            {
+                return _<#= GetModelPropertyNameWithSufix(fk.Item3, Model, SearchClickSufix) #>Command ?? 
+                    (_<#= GetModelPropertyNameWithSufix(fk.Item3, Model, SearchClickSufix) #>Command = 
+                        new Command(
+                            (param) => <#= GetModelPropertyNameWithSufix(fk.Item3, Model, SearchClickSufix) #>(param), 
+                            (param) => <#= GetModelPropertyNameWithSufix(fk.Item3, Model, SearchClickSufix) #>CanExecute(param)));
+            }
+        }
+        public bool <#= GetModelPropertyNameWithSufix(fk.Item3, Model, SearchClickSufix) #>CanExecute(object param)
+        {
+            return <#=  GetModelPropertyNameWithSufix(fk.Item3, Model, EnabledSufix) #>;
+        }
+        public void <#= GetModelPropertyNameWithSufix(fk.Item3, Model, SearchClickSufix) #>(object param) {
+            if (<#= IsDestroyedPropertyName #>) return;
+            if(!this.<#= GetModelPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#=  IsSetFilterByCurrDirMstrsMethodName #>()) {
+                this.<#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("Form Error", "Could not start dialog: not all master data is defined.");
+                return;
+            }
+
+            IDialogParameters dlgParams = new DialogParameters();
+            dlgParams.Add("Caption", "<#= TitleCaptionVal #>");
+            dlgParams.Add("HiddenFilters", this.<#= GetModelPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= GetWSFltrRsltByCurrDirMstrsMethodName #>());
+            dialogService.ShowDialog("<#= GetModelClassName(fk.Item2, SdlgViewModelFolder) #>", dlgParams, (rslt) => {
+                if (rslt == null) return;
+                if (rslt.Parameters == null) return;
+                if (!rslt.Parameters.ContainsKey("Result")) return;
+                if (!rslt.Parameters.GetValue<bool>("Result")) return;
+                if (rslt.Parameters.ContainsKey("SelectedItem"))
+                {
+                    <#= GetInterfaceName(fk.Item2) #> itm = rslt.Parameters.GetValue<<#= GetInterfaceName(fk.Item2) #>>("SelectedItem");
+                    if (itm != null) {
+//// call must be async
+                        this.<#= GetModelPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= Interface2ValuesMethodName #>(itm, true);
+                    }
+                }
+            });
+
+        }
+        #endregion
+
+<#
+            }  // if(fk.Item4 == InputTypeEnum.Typeahead) {} else if(fk.Item4 == InputTypeEnum.Combo) {}else if(fk.Item4 == InputTypeEnum.SearchDialog) {}
+#>
+        #region <#= GetModelPropertyNameWithSufix(fk.Item3, Model,  AfterPropsChangedPropName) #>
+        public async void <#= GetModelPropertyNameWithSufix(fk.Item3, Model,  AfterPropsChangedPropName) #>(object sender, EventArgs ea) {
+            <#= UIDispatcherInvokePropertyName #>(() => {
+
+<#
+    {
+        foreach(ModelViewUIFormPropertySerializable mvUIFormProp in Model.UIFormProperties) {
+            if ((!mvUIFormProp.IsShownInView) || string.IsNullOrEmpty(mvUIFormProp.ForeignKeyNameChain)) continue;
+            if ((!mvUIFormProp.ForeignKeyNameChain.StartsWith(fk.Item1)) || ForeignKeyNameChainList.Any(f => (f.Item3 == mvUIFormProp))) continue;
+            if ((mvUIFormProp.ForeignKeyNameChain != fk.Item1) && (ForeignKeyNameChainList.Any(f => f.Item1.StartsWith(fk.Item1 + ".")))) continue;
+            string navChain = "";
+            if(mvUIFormProp.ForeignKeyNameChain != fk.Item1) {
+                navChain = mvUIFormProp.ForeignKeyNameChain.Replace(fk.Item1 + ".", "");
+            }
+            
+#>
+            this.<#= PatchMethodName +  GetModelPropertyNameEx(mvUIFormProp, Model) #>(this.<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.getByOrg<#= ValueSuffix #>("<#= mvUIFormProp.OriginalPropertyName #>", "<#= navChain #>"));
+<#
+        } // foreach(ModelViewUIFormPropertySerializable mvUIFormProp in Model.UIFormProperties) {...}
+        if(fk.Item4 == InputTypeEnum.Typeahead) {
+            string dispPropName = GetControlListPropertyName(fk.Item3, Model, Context, CurrentInputTypeId);
+#>
+            this.<#= PatchMethodName + GetModelPropertyNameEx(fk.Item3, Model) #>(this.<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.get<#= ValueSuffix #>("<#= dispPropName #>"));
+            this.<#= PatchMethodName + GetModelPropertyNameWithSufix(fk.Item3, Model, TypeaheadSufix) #>(this.<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= Values2InterfaceMethodName #>());
+<#
+        } else if(fk.Item4 == InputTypeEnum.Combo) {
+            string dispPropName = GetControlListPropertyName(fk.Item3, Model, Context, CurrentInputTypeId);
+#>
+            if(this.<#= GetExpressionForControlList(fk.Item3, Model, ComboSufix) #> != null) {
+                <#= GetInterfaceName(fk.Item2) #> currItm = this.<#= GetModelPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= Values2InterfaceMethodName #>();
+                <#= GetInterfaceName(fk.Item2) #> newItm = null;
+                if(currItm != null) {
+                    newItm = this.<#= GetExpressionForControlList(fk.Item3, Model, ComboSufix) #>.Where(e => <#= GetPrimKeyFilterForFindIndexMethod(Context, fk.Item2.ViewName, "e", "currItm")  #>).FirstOrDefault();
+                }
+                this._<#= GetModelPropertyNameWithSufix(fk.Item3, Model, ComboSufix) #> = newItm;
+                OnPropertyChanged("<#= GetModelPropertyNameWithSufix(fk.Item3, Model, ComboSufix) #>");
+                ValidateObjectField(newItm, "<#= GetModelPropertyNameWithSufix(fk.Item3, Model, ComboSufix) #>");
+                if(newItm != null)
+                    this.<#= PatchMethodName + GetModelPropertyNameEx(fk.Item3, Model) #>(newItm.<#= dispPropName #>);
+                else 
+                    this.<#= PatchMethodName + GetModelPropertyNameEx(fk.Item3, Model) #>(newItm.<#= dispPropName #>);
+            } else {
+                this._<#= GetModelPropertyNameWithSufix(fk.Item3, Model, ComboSufix) #> = null;
+                OnPropertyChanged("<#= GetModelPropertyNameWithSufix(fk.Item3, Model, ComboSufix) #>");
+                ValidateObjectField(null, "<#= GetModelPropertyNameWithSufix(fk.Item3, Model, ComboSufix) #>");
+                this.<#= PatchMethodName + GetModelPropertyNameEx(fk.Item3, Model) #>(null);
+            }
+<#
+        } else if(fk.Item4 == InputTypeEnum.SearchDialog) {
+            string dispPropName = GetControlListPropertyName(fk.Item3, Model, Context, CurrentInputTypeId);
+#>
+            this.<#= PatchMethodName + GetModelPropertyNameEx(fk.Item3, Model) #>(this.<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.get<#= ValueSuffix #>("<#= dispPropName #>"));
+<#
+        } // if(fk.Item4 == InputTypeEnum.Typeahead) {...} else  if(fk.Item4 == InputTypeEnum.Combo) {...} else if(fk.Item4 == InputTypeEnum.SearchDialog) {...}
+    }
+#>
+            });
+        }
+        #endregion
+<#
+        } // foreach(Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> fk in ForeignKeyNameChainList) {}
+    }
+#>
+
+        #region <#= SubmitCommandPropertyName #>
+        private ICommand _<#= SubmitCommandPropertyName #>;
+        public ICommand <#= SubmitCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= SubmitCommandPropertyName #> ?? (_<#= SubmitCommandPropertyName #> = new Command(() => <#= SubmitCommandPropertyName #>Action(), () => <#= SubmitCommandPropertyName #>CanExecute()));
+            }
+        }
+        protected void <#= SubmitCommandPropertyName #>Action()
+        {
+            this.<#= DoSubmitMethodName #>();
+        }
+        protected bool <#= SubmitCommandPropertyName #>CanExecute()
+        {
+            return !HasErrors;
+        }
+        #endregion
+        #region <#= CancelCommandPropertyName #>
+        private ICommand _<#= CancelCommandPropertyName #>;
+        public ICommand <#= CancelCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= CancelCommandPropertyName #> ?? (_<#= CancelCommandPropertyName #> = new Command((param) => <#= CancelCommandPropertyName #>Action(param), (param) => <#= CancelCommandPropertyName #>CanExecute(param)));
+            }
+        }
+        protected void <#= CancelCommandPropertyName #>Action(object param)
+        {
+            // notify EformUserControl
+            if (<#= IsDestroyedPropertyName #>) return;
+            <#= BindingContextFeedbackRefPropertyName #> = new <#= BindingContextFeedbackClassName #>() {
+		        BcfName = "<#= CancelCommandPropertyName #>",
+		        BcfData = null
+            };
+        }
+        protected bool <#= CancelCommandPropertyName #>CanExecute(object param)
+        {
+            return true;
+        }
+        #endregion
+
+        #region <#= DoSubmitMethodName #>
+        public void <#= DoSubmitMethodName #>() {
+            if (<#= IsDestroyedPropertyName #>) return;
+            CheckIsValid();
+            if(HasErrors) return;
+            if (!this.<#= RootDataSource #>.<#= RefreshIsDefinedMethodName #>()) {
+                <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("Http Error", "Could not update. Not all properties are set.");
+                return;
+            }
+<#
+            if(AddUpdDelViewInputTypeId == 1) {
+#>
+            Task.Run(() => {
+                this.<#= RootDataSource #>.<#= AddOneMethodName #>();
+            }).ConfigureAwait(false);
+<#
+            } else if(AddUpdDelViewInputTypeId == 2) {
+#>
+            Task.Run(() => {
+                this.<#= RootDataSource #>.<#= UpdateOneMethodName #>();
+            }).ConfigureAwait(false);
+<#
+            } else if(AddUpdDelViewInputTypeId == 3) {
+#>
+            Task.Run(() => {
+                this.<#= RootDataSource #>.<#= DeleteOneMethodName #>();
+            }).ConfigureAwait(false);
+<#
+            } else if(AddUpdDelViewInputTypeId == 4) {
+#>
+                this.<#= CancelCommandPropertyName #>Action(null);
+<#
+            }
+#>
+
+        }
+        #endregion
+
+        #region AutoSuggestBox
+
+        // Reason: UserInput = 0, ProgrammaticChange = 1, SuggestionChosen = 2
+        public void <#= OnAutoSuggestBoxTextChangedPropertyName #>(object Sender, object AutoSggstBx, string PropName, int Reason, string QueryText)
+        {
+            if (<#= IsDestroyedPropertyName #>) return;
+<#  
+            {
+            bool switchNotInserter = true;
+            foreach(Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> fk in ForeignKeyNameChainList) {
+                if(fk.Item4 == InputTypeEnum.Typeahead) { 
+                        if(switchNotInserter) {
+                            switchNotInserter = false;
+#>
+            switch(PropName) {
+<#
+                        }
+#>
+                case "<#= GetModelPropertyNameEx(fk.Item3, Model) #>":
+                    // Clear ItemsSource
+                    if(Reason == 0) {
+                        Task.Run(async () => {
+                            IList<<#= GetInterfaceNameEx(Context, fk.Item2.ViewName) #>> itms = null;
+                            try {
+                                this.<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= ClearPartiallyMethodName #>(true);
+                                itms = await this.<#= GetModelPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= GetClActByFldFilterMethodName #>("<#= GetControlListPropertyName(fk.Item3, Model, Context, CurrentInputTypeId) #>", QueryText);
+                            } catch(Exception ex) {
+                                string exceptionMsg = "<#= GetModelPropertyNameWithSufix(fk.Item3, Model, AfterMasterChangedPropName) #> : " + ex.Message;
+                                Exception inner = ex.InnerException;
+                                while (inner != null)
+                                {
+                                    exceptionMsg = exceptionMsg + ": " + inner.Message;
+                                    inner = inner.InnerException;
+                                }
+                                <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("http", exceptionMsg);
+                            }
+                            <#= UIDispatcherInvokePropertyName #>(() => {
+                                this.<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, TypeaheadItemsSourceSufix) #> = itms;
+                            });
+                        });
+                    }
+                    break;
+<#
+                    }
+                }
+                if(!switchNotInserter) {
+#>
+                default:
+                    break;
+            }
+<#            
+            }
+        }
+#>
+        }
+        // IF (ChosenSuggestion != null) THEN User selected an item from the suggestion list, take an action on it here.
+        public async void <#= OnAutoSuggestBoxQuerySubmittedPropertyName #>(object Sender, object AutoSggstBx, string PropName, object ChosenSuggestion, string QueryText)
+        {
+            if (<#= IsDestroyedPropertyName #>) return;
+<#  
+            {
+                bool switchNotInserter = true;
+                foreach(Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> fk in ForeignKeyNameChainList) {
+                    if(fk.Item4 == InputTypeEnum.Typeahead) { 
+                            if(switchNotInserter) {
+                                switchNotInserter = false;
+#>
+            switch(PropName) {
+<#
+                            }
+#>
+                case "<#= GetModelPropertyNameEx(fk.Item3, Model) #>":
+                    <#=  GetModelPropertyNameWithSufix(fk.Item3, Model, TypeaheadItemsSourceSufix) #> = null;
+                    Task.Run(() => {
+                        this.<#= GetModelPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= Interface2ValuesMethodName #>(ChosenSuggestion as <#= GetInterfaceNameEx(Context, fk.Item2.ViewName) #>, true);
+                    });
+                    break;
+<#
+                    }
+                }
+                if(!switchNotInserter) {
+#>
+                default:
+                    break;
+            }
+<#            
+                }
+            }
+#>
+        }
+        #endregion
+
+        #region HiddenFilter
+        public async Task <#= HiddenFiltersPropertyChangedPropertyName #>(object sender, object OldValue, object NewValue) {
+            if(<#= IsDestroyedPropertyName #>) return;
+            IList<<#= IWebServiceFilterRsltInterfaceClassName #>> nwval = NewValue as IList<<#= IWebServiceFilterRsltInterfaceClassName #>>;
+            IList<<#= IWebServiceFilterRsltInterfaceClassName #>> curval = new List<<#= IWebServiceFilterRsltInterfaceClassName #>>();
+            if(nwval != null) {
+                if(nwval != <#= HiddenFiltersVMPropertyName #>) {
+                    foreach(<#= IWebServiceFilterRsltInterfaceClassName #> hf  in nwval) { 
+                        curval.Add( new <#= WebServiceFilterRsltViewModelClassName #>() {fltrName=hf.fltrName, fltrDataType=hf.fltrDataType,  fltrOperator=hf.fltrOperator, fltrValue=hf.fltrValue, fltrError=hf.fltrError } );
+                    }
+                }
+            }
+            <#= UIDispatcherInvokePropertyName #>(() => {
+                this._<#= HiddenFiltersVMPropertyName #> = curval;
+                OnPropertyChanged("<#= HiddenFiltersVMPropertyName #>");
+            });
+            if(<#= IsOnLoadedCalledPropertyName #>) {
+                try {
+                    <#= UIDispatcherInvokePropertyName #>(() => {
+                        <#= IsLoadingPropertyName #> = true;
+                    });
+                    await this.<#= OnFormControlModelChangedPropertyName #>();
+                } finally {
+                    <#= UIDispatcherInvokePropertyName #>(() => {
+                        <#= IsLoadingPropertyName #> = false;
+                    });
+                }
+            }
+        }
+        protected IList<<#= IWebServiceFilterRsltInterfaceClassName #>> _<#= HiddenFiltersVMPropertyName #> = new List<<#= IWebServiceFilterRsltInterfaceClassName #>>();
+        public IList<<#= IWebServiceFilterRsltInterfaceClassName #>> <#= HiddenFiltersVMPropertyName #>
+        {
+            get
+            {
+                return _<#= HiddenFiltersVMPropertyName #>;
+            }
+            set
+            {
+                if (_<#= HiddenFiltersVMPropertyName #> != value) {
+                    _<#= HiddenFiltersVMPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+
+        #region <#= FormControlModelVMPropertyName #>
+        protected async Task <#= OnFormControlModelChangedPropertyName #>() {
+<#
+            if (CurrentInputTypeId == 1) { // AddMode
+#>
+            this.<#= RootDataSource #>.<#= ClearMethodName #>(false);
+<#
+                foreach(ModelViewPropertyOfVwSerializable sclrPrp in Model.ScalarProperties) {
+                    if(IsDatabaseGeneratedProperty(sclrPrp, Model) && (!IsMasterDefinedProperty(sclrPrp, Model))) {
+#>
+            this.<#= RootDataSource #>.set<#= ValueSuffix #>("<#= GetModelPropertyName(sclrPrp, Model) #>", <#= GetDefaultVal(sclrPrp) #>);
+<#
+                    }
+                }
+#>
+            this.<#= RootDataSource #>.<#= UpdateByHiddenFilterFieldsMethodName #>(false);
+            this.<#= RootDataSource #>.<#= DoEmitEventMethodName #>(false);
+<#
+            } // the end of: if(CurrentInputTypeId == 1) { // AddMode }
+            else
+            {
+#>
+            bool hasChanged  = this.<#= RootDataSource #>.<#= Interface2ValuesMethodName #>(this._<#= FormControlModelVMPropertyName #>, false);
+            hasChanged = this.<#= RootDataSource #>.<#= UpdateByHiddenFilterFieldsMethodName #>(false) || hasChanged;
+            if(hasChanged) {
+                await this.<#= RootDataSource #>.<#= RefreshMethodName #>();
+            } else {
+                this.<#= RootDataSource #>.<#= DoEmitEventMethodName #>(false);
+            }
+<#
+            } // the end of: if(CurrentInputTypeId == 1) { // AddMode } else {}
+#>
+            <#= UIDispatcherInvokePropertyName #>(() => {
+                ClearValidationMessages();
+            });
+        }
+        public async Task <#= FormControlModelChangedPropertyName #>(object sender, object OldValue, object NewValue) {
+            if (<#= IsDestroyedPropertyName #>) return;
+            <#= UIDispatcherInvokePropertyName #>(() => {
+                _<#= FormControlModelVMPropertyName #> =  NewValue as <#= modelInterfaceClassName #>;
+                OnPropertyChanged("<#= FormControlModelVMPropertyName #>");
+            });
+            if(<#= IsOnLoadedCalledPropertyName #>) {
+                try {
+                    <#= UIDispatcherInvokePropertyName #>(() => {
+                        <#= IsLoadingPropertyName #> = true;
+                    });
+
+                    await <#= OnFormControlModelChangedPropertyName #>();
+
+                    <#= UIDispatcherInvokePropertyName #>(() => {
+                        ClearValidationMessages();
+                    });
+                } finally {
+                    <#= UIDispatcherInvokePropertyName #>(() => {
+                        <#= IsLoadingPropertyName #> = false;
+                    });
+                }
+            }
+
+        }
+        protected <#= modelInterfaceClassName #> _<#= FormControlModelVMPropertyName #> = null;
+        public <#= modelInterfaceClassName #> <#= FormControlModelVMPropertyName #>
+        {
+            get
+            {
+                return _<#= FormControlModelVMPropertyName #>;
+            }
+            set
+            {
+                if (_<#= FormControlModelVMPropertyName #> != value) {
+                    _<#= FormControlModelVMPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+
+        #region <#= EformModeVMPropertyName #>
+        public async Task <#= EformModeChangedPropertyName #>(object sender, object OldValue, object NewValue) {
+            if (<#= IsDestroyedPropertyName #>) return;
+            if(NewValue != null) {
+                <#= EformModeEnumClassName #> nwval = (<#= EformModeEnumClassName #>)NewValue; 
+                <#= UIDispatcherInvokePropertyName #>(() => {
+                    _<#= EformModeVMPropertyName #> = nwval;
+                    OnPropertyChanged("<#= EformModeVMPropertyName #>");
+                });
+            }
+        }
+        protected <#= EformModeEnumClassName #> _<#= EformModeVMPropertyName #> = <#= EformModeEnumClassName #>.DeleteMode;
+        public <#= EformModeEnumClassName #> <#= EformModeVMPropertyName #>
+        {
+            get
+            {
+                return _<#= EformModeVMPropertyName #>;
+            }
+            set
+            {
+                if (_<#= EformModeVMPropertyName #> != value) {
+                    _<#= EformModeVMPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+
+        #region <#= OnLoadedPropertyName #>
+        public async Task <#= OnLoadedPropertyName #>(object sender, object newValue) {
+            if (<#= IsDestroyedPropertyName #>) return;
+            if (newValue is bool) {
+                bool v = (bool)newValue;
+                if ((!<#= IsOnLoadedCalledPropertyName #>) && v) {
+                    try {
+                        <#= UIDispatcherInvokePropertyName #>(() => {
+                            <#= IsLoadingPropertyName #> = true;
+                        });
+                        await <#= OnFormControlModelChangedPropertyName #>();
+<#
+            foreach(Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> fk in ForeignKeyNameChainList) {
+                if( !ForeignKeyNameChainList.Any(f => f.Item1.StartsWith(fk.Item1+".")) ) {
+#>
+                        this.<#= GetModelPropertyNameWithSufix(fk.Item3, Model, AfterMasterChangedPropName) #>(this.<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>,null);
+<#
+                }
+            }
+#>
+                    } finally {
+                        <#= UIDispatcherInvokePropertyName #>(() => {
+                            <#= IsLoadingPropertyName #> = false;
+                        });
+                    }
+
+                } else {
+                    <#= IsOnLoadedCalledPropertyName #> = v;
+                }
+            }
+        }
+        #endregion
+
+        #region Loaded and Loading
+        protected bool <#= IsOnLoadedCalledPropertyName #> = false;
+        protected bool _<#= IsLoadingPropertyName #> = true;
+        public bool <#= IsLoadingPropertyName #>
+        {
+            get { return _<#= IsLoadingPropertyName #>; }
+            set { if(_<#= IsLoadingPropertyName #> != value) { _<#= IsLoadingPropertyName #> = value; OnPropertyChanged(); } }
+        }
+        #endregion
+
+        #region <#= IsDestroyedPropertyName #>
+        protected bool _<#= IsDestroyedPropertyName #> = false;
+        public bool <#= IsDestroyedPropertyName #> {
+            get { return _<#= IsDestroyedPropertyName #>; }
+            set { 
+                if(_<#= IsDestroyedPropertyName #> != value) {
+                    _<#= IsDestroyedPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+
+
+        #region <#= OnDestroyPropertyName #>
+        public void <#= OnDestroyPropertyName #>() {
+            <#= IsDestroyedPropertyName #> = true;
+            <#= IsLoadingPropertyName #> = false;
+            <#= IsOnLoadedCalledPropertyName #> = false;
+            _<#= HiddenFiltersVMPropertyName #> = null;
+            _<#= FormControlModelVMPropertyName #> = null;
+            _<#= BindingContextFeedbackRefPropertyName #> = null;
+
+
+            this.<#= RootDataSource #>.<#= AfterPropsChangedPropName #> -= this.<#= RootDataSource + AfterPropsChangedPropName #>;
+<#
+            if(AddUpdDelViewInputTypeId == 1) {
+#>
+            this.<#= RootDataSource #>.<#= OnAddPropName #> -= this.<#= RootDataSource + OnAddPropName #>;
+<#
+            } else if(AddUpdDelViewInputTypeId == 2) {
+#>
+            this.<#= RootDataSource #>.<#= OnUpdatePropName #> -= this.<#= RootDataSource + OnUpdatePropName #>;
+<#
+            } else if(AddUpdDelViewInputTypeId == 3) {
+#>
+            this.<#= RootDataSource #>.<#= OnDeletePropName #> -= this.<#= RootDataSource + OnDeletePropName #>;
+<#
+            } 
+    foreach(Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> fk in ForeignKeyNameChainList) {
+        Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> detailFk = GetDirectDetail(ForeignKeyNameChainList, fk.Item1);
+        string detailViewName = Model.ViewName;
+        string directNavigation = GetDirectNavName(fk.Item1);
+        if(detailFk != null) {
+            detailViewName = detailFk.Item2.ViewName;
+        }
+        if(string.IsNullOrEmpty(directNavigation)){
+            throw new Exception("For [Foreign Key Name Chain]=" + fk.Item1 + " can not find direct detail");
+        }
+#>
+            this.<#= GetModelPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= AfterPropsChangedPropName #> -= this.<#= GetModelPropertyNameWithSufix(fk.Item3, Model, AfterPropsChangedPropName) #>;
+            this.<#= GetModelPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= AfterMasterChangedPropName #> -= this.<#= GetModelPropertyNameWithSufix(fk.Item3, Model, AfterMasterChangedPropName) #>;
+<#
+            if(detailFk == null) {
+#>
+            this.<#= GetModelPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= OnMasterChangedPropName #> -= this.<#= RootDataSource #>.<#= SubmitOnMasterChangedMethodName #>;
+            this.<#= RootDataSource #>.<#= OnDetailChangedPropName #> -= this.<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= SubmitOnDetailChangedMethodName #>;
+
+<#
+            } else {
+#>
+            this.<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= OnMasterChangedPropName #> -= this.<#= GetModelPropertyNameWithSufix(detailFk.Item3, Model, DataSourceSufix) #>.<#= SubmitOnMasterChangedMethodName #>;
+            this.<#= GetModelPropertyNameWithSufix(detailFk.Item3, Model, DataSourceSufix) #>.<#= OnDetailChangedPropName #> -= this.<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= SubmitOnDetailChangedMethodName #>;
+<#
+            }
+
+        if ((GetInputTypeWhenXXX(fk.Item3, CurrentInputTypeId) == InputTypeEnum.Combo) && fk.Item3.IsShownInView) {
+#>
+            _<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, ComboSufix) #> = null;
+            _<#=  GetExpressionForControlList(fk.Item3, Model, ComboSufix) #> = null;
+<#
+        } else if ((GetInputTypeWhenXXX(fk.Item3, CurrentInputTypeId) == InputTypeEnum.SearchDialog) && fk.Item3.IsShownInView) {
+#>
+/*
+            _<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, ButtonSufix) #> = null;
+*/
+<#
+
+        } else if ((GetInputTypeWhenXXX(fk.Item3, CurrentInputTypeId) == InputTypeEnum.Typeahead) && fk.Item3.IsShownInView) {  
+#>
+            _<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, TypeaheadItemsSourceSufix) #> = null;
+            _<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, TypeaheadSufix) #> = null;
+            _<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, TypeaheadTextSufix) #>=null;
+<#
+        }
+    }
+#>
+        }
+        #endregion
+
+    }
+}

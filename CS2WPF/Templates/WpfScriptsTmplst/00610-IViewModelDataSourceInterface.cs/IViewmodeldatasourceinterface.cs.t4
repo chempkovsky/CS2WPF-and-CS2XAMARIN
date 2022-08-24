@@ -39,27 +39,31 @@ using System.Threading.Tasks;
     string OnDeletePropName                     = "OnDelete";
     string AfterMasterChangedPropName           = "AfterMasterChanged";
     string AfterPropsChangedPropName            = "AfterPropsChanged";
-    string submitOnDetailChangedMethodName      = "submitOnDetailChanged";
-    string submitOnMasterChangedMethodName      = "submitOnMasterChanged";
-    string DoEmitEventMethodName                = "doEmitEvent";
-    string RefreshIsDefinedMethodName           = "refreshIsDefined";
+    string SubmitOnDetailChangedMethodName      = "SubmitOnDetailChanged";
+    string DoSubmitOnDetailChangedMethodName    = "DoSubmitOnDetailChanged";
+    string SubmitOnMasterChangedMethodName      = "SubmitOnMasterChanged";
+    string DoSubmitOnMasterChangedMethodName    = "DoSubmitOnMasterChanged";
+    string DoEmitEventMethodName                = "DoEmitEvent";
+    string RefreshIsDefinedMethodName           = "RefreshIsDefined";
 
     string LengthSuffix                         = "Length";
     string KeysSuffix                           = "Keys";
-    string CalcIsDefinedMethodName              = "calcIsDefined";
-    string ClearMethodName                      = "clear";
-    string ClearPartiallyMethodName             = "clearPartially";
+    string CalcIsDefinedMethodName              = "CalcIsDefined";
+    string ClearMethodName                      = "Clear";
+    string ClearPartiallyMethodName             = "ClearPartially";
 
 
     string HiddenFilterByFltRsltSuffix          = "HiddenFilterByFltRslt";
     string UnderHiddenFilterFieldsFieldName     = "UnderHiddenFilterFields";
-    string UpdateByHiddenFilterFieldsMethodName = "updateByHiddenFilterFields";
+    string UpdateByHiddenFilterFieldsMethodName = "UpdateByHiddenFilterFields";
 
     string UIFormChainFieldName                 = "UIFormChain";
     string HiddenFilterFieldName                = "HiddenFilter";
 
-    string IsSetFilterByCurrDirMstrsMethodName  = "isSetFilterByCurrDirMstrs";
-    string RefreshMethodName                    = "refresh";
+    string IsSetFilterByCurrDirMstrsMethodName  = "IsSetFilterByCurrDirMstrs";
+    string RefreshMethodName                    = "Refresh";
+    string InitMethodName                       = "Init";
+    string CurrDirectMasterNavsFieldName        = "CurrentlyDirectMasterNavs";
 
 
     string IWebServiceFilterRsltInterfaceFolder      = "00204-IWebServiceFilterRsltInterface.cs";
@@ -119,8 +123,10 @@ namespace <#= IViewmodeldatasourceinterfaceNameSpace #> {
         event EventHandler <#= OnDeletePropName #>;
 
         bool <#= ClearPartiallyMethodName #>(bool doNotify);
-        Task <#= submitOnDetailChangedMethodName #>(<#= IViewmodeldatasourceinterfaceClassName #> v);
-        void <#= submitOnMasterChangedMethodName #>(<#= IViewmodeldatasourceinterfaceClassName #> v);
+        void <#= SubmitOnDetailChangedMethodName #>(object sender, EventArgs e);
+        Task <#= DoSubmitOnDetailChangedMethodName #>(object sender);
+        void <#= SubmitOnMasterChangedMethodName #>(object sender, EventArgs e);
+        void <#= DoSubmitOnMasterChangedMethodName #>(object sender);
         bool <#= CalcIsDefinedMethodName #>();
         void <#= DoEmitEventMethodName #>(bool aftrMstrChngd=false);
 
@@ -135,7 +141,7 @@ namespace <#= IViewmodeldatasourceinterfaceNameSpace #> {
         bool get<#= IsNewSuffix #>();
         void set<#= IsNewSuffix #>(bool v);
         bool isReadonly<#= ValueSuffix #>(string key);
-        
+        void <#= InitMethodName #>(string <#= ClientViewNameFieldName #>, string <#= DirectNavigationFieldName #>, IList<string> <#= CurrDirectMasterNavsFieldName #>, string <#= UIFormChainFieldName #>);
     }
 }
 

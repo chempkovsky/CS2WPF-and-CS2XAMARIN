@@ -118,11 +118,11 @@ using System.Linq;
     string HiddenFilterByFltRsltSuffix          = "HiddenFilterByFltRslt";
     string HiddenFilterAsFltRsltSuffix          = "HiddenFilterAsFltRslt";
     string HiddenFilterFieldName                = "HiddenFilter";
-    string MasterToClientKeyFieldsMapFieldName  = "m2cKeyfm";
-    string MasterToClientFieldsMapFieldName     = "m2cfm";
+    string MasterToClientKeyFieldsMapFieldName  = "M2cKeyfm";
+    string MasterToClientFieldsMapFieldName     = "M2cfm";
     string IsDestroyedPropertyName              = "IsDestroyed";
-    string ClientToMasterFieldsMapFieldName     = "c2mfm";
-    string row2FilterRsltMethodName             = "row2FilterRslt";
+    string ClientToMasterFieldsMapFieldName     = "C2mfm";
+    string row2FilterRsltMethodName             = "Row2FilterRslt";
     string GetManyByRepPrimMethodNamePrefix     = "getmanybyrepprim";
     string GetManyByRepUnqMethodNamePrefix      = "getmanybyrepunq";
     string GetOneByMethodNamePrefix             = "getoneby";
@@ -143,24 +143,27 @@ using System.Linq;
     string OnUpdatePropName                     = "OnUpdate";
     string OnAddPropName                        = "OnAdd";
     string OnDeletePropName                     = "OnDelete";
-    string DoEmitEventMethodName                = "doEmitEvent";
-    string CalcIsDefinedMethodName              = "calcIsDefined";
-    string GetFilterByCurrDirMstrsMethodName    = "getFilterByCurrDirMstrs";
-    string GetWSFltrRsltByCurrDirMstrsMethodName= "getWSFltrRsltByCurrDirMstrs";
-    string IsSetFilterByCurrDirMstrsMethodName  = "isSetFilterByCurrDirMstrs";
+    string DoEmitEventMethodName                = "DoEmitEvent";
+    string CalcIsDefinedMethodName              = "CalcIsDefined";
+    string GetFilterByCurrDirMstrsMethodName    = "GetFilterByCurrDirMstrs";
+    string GetWSFltrRsltByCurrDirMstrsMethodName= "GetWSFltrRsltByCurrDirMstrs";
+    string IsSetFilterByCurrDirMstrsMethodName  = "IsSetFilterByCurrDirMstrs";
     string DefineFilterOnePropMethodName        = "DefineFilterOneProp";
-    string RefreshMethodName                    = "refresh";
-    string GetCllctByFldFilterMethodName        = "getCllctionByFldFilter";
-    string GetCllctByCurrDirMstrsMethodName     = "getCllctionByCurrDirMstrs";
-    string submitOnDetailChangedMethodName      = "submitOnDetailChanged";
-    string submitOnMasterChangedMethodName      = "submitOnMasterChanged";
-    string ClearPartiallyMethodName             = "clearPartially";
-    string Interface2ValuesMethodName           = "interface2Values";
-    string Values2InterfaceMethodName           = "values2Interface";
-    string ClearMethodName                      = "clear";
-    string UpdateByHiddenFilterFieldsMethodName = "updateByHiddenFilterFields";
-    string RefreshIsDefinedMethodName           = "refreshIsDefined";
+    string RefreshMethodName                    = "Refresh";
+    string GetClActByFldFilterMethodName        = "GetClActionByFldFilter";
+    string GetClActByCurrDirMstrsMethodName     = "GetClActionByCurrDirMstrs";
+    string SubmitOnDetailChangedMethodName      = "SubmitOnDetailChanged";
+    string DoSubmitOnDetailChangedMethodName    = "DoSubmitOnDetailChanged";
+    string SubmitOnMasterChangedMethodName      = "SubmitOnMasterChanged";
+    string DoSubmitOnMasterChangedMethodName    = "DoSubmitOnMasterChanged";
+    string ClearPartiallyMethodName             = "ClearPartially";
+    string Interface2ValuesMethodName           = "Interface2Values";
+    string Values2InterfaceMethodName           = "Values2Interface";
+    string ClearMethodName                      = "Clear";
+    string UpdateByHiddenFilterFieldsMethodName = "UpdateByHiddenFilterFields";
+    string RefreshIsDefinedMethodName           = "RefreshIsDefined";
     string IsTopDetailFieldName                 = "IsTopDetail";
+    string InitMethodName                       = "Init";
 
 
     List<ModelViewUniqueKeyOfVwSerializable> uniqueKeys = new List<ModelViewUniqueKeyOfVwSerializable>();
@@ -226,8 +229,8 @@ namespace <#= datasourceNameSpace #> {
     public class <#= datasourceClassName #>: <#= datasourceInterfaceClassName #>
     {
         protected readonly string _<#= CurrentViewNameFieldName #>   = "<#= Model.ViewName #>";
-        protected readonly string _<#= ClientViewNameFieldName #>;
-        protected readonly string _<#= DirectNavigationFieldName #>;
+        protected string _<#= ClientViewNameFieldName #> = null;
+        protected string _<#= DirectNavigationFieldName #> = null;
         protected bool _<#= IsDefinedFieldName #> = false;
         protected IList<string> _<#= CurrDirectMasterNavsFieldName #> = new List<string>();
         protected Dictionary<(string viewNm, string navNm, string propNm), object> _<#= HiddenFilterFieldName #> = new Dictionary<(string viewNm, string navNm, string propNm), object>();
@@ -252,18 +255,26 @@ namespace <#= datasourceNameSpace #> {
         protected <#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName #>;
 
         public <#= datasourceClassName #>(<#= modelServiceInterfaceClassName #> frs,
-            <#= IAppGlblSettingsServiceClassName #> agstt,
-            string <#= ClientViewNameFieldName #>, 
+            <#= IAppGlblSettingsServiceClassName #> agstt) {
+            <#= formRootService #> = frs;
+            <#= AppSettingServicePropertyName #> = agstt;
+        }
+        public void <#= InitMethodName #>(string <#= ClientViewNameFieldName #>, 
             string <#= DirectNavigationFieldName #>,
             IList<string> <#= CurrDirectMasterNavsFieldName #>,
             string <#= UIFormChainFieldName #>) {
-            <#= formRootService #> = frs;
-            <#= AppSettingServicePropertyName #> = agstt;
-            this._<#= ClientViewNameFieldName #> = <#= ClientViewNameFieldName #>;
-            this._<#= DirectNavigationFieldName #> = <#= DirectNavigationFieldName #>;
-            this._<#= CurrDirectMasterNavsFieldName #> = <#= CurrDirectMasterNavsFieldName #>;
+            if(string.IsNullOrEmpty(<#= ClientViewNameFieldName #>)) this._<#= ClientViewNameFieldName #> = null;
+                else this._<#= ClientViewNameFieldName #> = <#= ClientViewNameFieldName #>;
+            if(string.IsNullOrEmpty(<#= DirectNavigationFieldName #>)) this._<#= DirectNavigationFieldName #> = null;
+                else this._<#= DirectNavigationFieldName #> = <#= DirectNavigationFieldName #>;
+            if(<#= CurrDirectMasterNavsFieldName #> == null) {
+                this._<#= CurrDirectMasterNavsFieldName #> = new List<string>();
+            } else {
+                this._<#= CurrDirectMasterNavsFieldName #> = <#= CurrDirectMasterNavsFieldName #>;
+            }
             this._<#= UIFormChainFieldName #> = <#= UIFormChainFieldName #>;
         }
+
         public event EventHandler <#= OnDetailChangedPropName #>;
         public event EventHandler <#= OnMasterChangedPropName #>;
         public event EventHandler <#= AfterMasterChangedPropName #>;
@@ -277,12 +288,12 @@ namespace <#= datasourceNameSpace #> {
             bool isDef = this.<#= CalcIsDefinedMethodName #>();
             if(this._<#= IsDefinedFieldName #> != isDef) {
                 this._<#= IsDefinedFieldName #> = isDef;
-                this.<#= OnIsDefinedChangedPropName #>?.Invoke(this,new EventArgs());
+                this.<#= OnIsDefinedChangedPropName #>?.Invoke(this,null);
             }
-            this.<#= OnDetailChangedPropName #>?.Invoke(this,new EventArgs());
-            this.<#= OnMasterChangedPropName #>?.Invoke(this,new EventArgs());
-            if(aftrMstrChngd) this.<#= AfterMasterChangedPropName #>?.Invoke(this,new EventArgs());
-            this.<#= AfterPropsChangedPropName #>?.Invoke(this,new EventArgs());
+            this.<#= OnDetailChangedPropName #>?.Invoke(this,null);
+            this.<#= OnMasterChangedPropName #>?.Invoke(this,null);
+            if(aftrMstrChngd) this.<#= AfterMasterChangedPropName #>?.Invoke(this,null);
+            this.<#= AfterPropsChangedPropName #>?.Invoke(this,null);
         }
         public Dictionary<(string viewNm, string navNm, string propNm), object>  get<#= HiddenFilterByRowSuffix #>(<#= modelInterfaceClassName #> rw, string nvNm) {
             return this.<#= formRootService #>.get<#= HiddenFilterByRowSuffix #>(rw, nvNm);
@@ -295,7 +306,8 @@ namespace <#= datasourceNameSpace #> {
             return this._<#= IsDefinedFieldName #>;
         }
         public bool <#= CalcIsDefinedMethodName #>()  {
-            foreach(string i in this._<#= ValuesSuffix #>.Keys) {
+            var keys = this._<#= ValuesSuffix #>.Keys.ToList();
+            foreach(string i in keys) {
                 if((!this.<#= formRootService #>.dbgenerated<#= ValueSuffix #>(i)) && 
                     this.<#= formRootService #>.required<#= ValueSuffix #>(i)) {
                     if(!this.isSet<#= ValueSuffix #>(i)) return false;        
@@ -385,7 +397,8 @@ namespace <#= datasourceNameSpace #> {
         }
         public bool <#= ClearMethodName #>(bool doNotify = true) {
             bool hasChanged = false;
-            foreach(string i in this._<#= ValuesSuffix #>.Keys) {
+            var keys = this._<#= ValuesSuffix #>.Keys.ToList();
+            foreach(string i in keys) {
                 if( this.<#= formRootService #>.getDtTp<#= ValueSuffix #>(i) == "boolean" ) {
                     if ((bool)this._<#= ValuesSuffix #>[i] != false) hasChanged = true;
                     this._<#= ValuesSuffix #>[i] = false;
@@ -436,7 +449,7 @@ namespace <#= datasourceNameSpace #> {
                 default:
                     return Convert.ToString(src) == Convert.ToString(dest);
             }
-            return src.Equals(dest);
+            //return src.Equals(dest);
         }
         public bool <#= Interface2ValuesMethodName #>(<#= modelInterfaceClassName #> data, bool doNotify = true) {
             if(data == null) {
@@ -567,7 +580,12 @@ namespace <#= datasourceNameSpace #> {
             return rslt;
         }
 
-        public async Task <#= submitOnDetailChangedMethodName #>(<#= IViewmodeldatasourceinterfaceClassName #> v)  {
+        public async void <#= SubmitOnDetailChangedMethodName #>(object sender, EventArgs e)  {
+            await this.<#= DoSubmitOnDetailChangedMethodName #>(sender);
+        }
+
+        public async Task <#= DoSubmitOnDetailChangedMethodName #>(object sender)  {
+            <#= IViewmodeldatasourceinterfaceClassName #> v = sender as <#= IViewmodeldatasourceinterfaceClassName #>;
             if ((this._<#= ClientViewNameFieldName #> == null) || (this._<#= DirectNavigationFieldName #> == null) || (v == null)) return;
             if(v.get<#= CurrentViewNameFieldName #>() != this._<#= ClientViewNameFieldName #>) return;
             bool clntNtChngd = true;
@@ -660,7 +678,17 @@ namespace <#= datasourceNameSpace #> {
 #>
                     if(isKeyCrrct) {
                         object locobjval;
+<#
+    foreach(ModelViewPropertyOfVwSerializable prop in mvuk.UniqueKeyProperties) {
+                if (GetCCharpDatatype(prop, Model) == "guid") {
+#>  
                         Guid prs;
+<#
+                    break;
+                }
+    }
+#>  
+
 <#
         {
             foreach(ModelViewPropertyOfVwSerializable prop in mvuk.UniqueKeyProperties) {
@@ -826,8 +854,12 @@ namespace <#= datasourceNameSpace #> {
             return hasChanged;
         }
 
+        public void <#= SubmitOnMasterChangedMethodName #>(object sender, EventArgs e) {
+            this.<#= DoSubmitOnMasterChangedMethodName #>(sender);
+        }
 
-        public void <#= submitOnMasterChangedMethodName #>(<#= IViewmodeldatasourceinterfaceClassName #> v) {
+        public void <#= DoSubmitOnMasterChangedMethodName #>(object sender) {
+            <#= IViewmodeldatasourceinterfaceClassName #> v = sender as <#= IViewmodeldatasourceinterfaceClassName #>;
             if(v == null) return;
             string masterDirNav = v.get<#= DirectNavigationFieldName #>();
             string masterClnt = v.get<#= ClientViewNameFieldName #>();
@@ -847,6 +879,7 @@ namespace <#= datasourceNameSpace #> {
             }
 
             foreach(var kkey in <#= MasterToClientFieldsMapFieldName #>.Keys) {
+                if ((kkey.viewNm != masterVw) || (kkey.navNm != masterDirNav)) continue;
                 object ksrc = v.get<#= ValueSuffix #>(kkey.propNm);
                 object kdst = this.get<#= ValueSuffix #>(<#= MasterToClientFieldsMapFieldName #>[kkey]);
                 if (this.isEqual(ksrc, kdst, <#= formRootService #>.getDtTp<#= ValueSuffix #>(<#= MasterToClientFieldsMapFieldName #>[kkey]))) continue;
@@ -989,7 +1022,7 @@ namespace <#= datasourceNameSpace #> {
         }
 
         // add input string to define flt.orderby prop
-        public async Task<IList<<#= modelInterfaceClassName #>>> <#= GetCllctByCurrDirMstrsMethodName #>() {
+        public async Task<IList<<#= modelInterfaceClassName #>>> <#= GetClActByCurrDirMstrsMethodName #>() {
 <#
         if (Model.IsWebApiSelectManyWithPagination) {
 #>
@@ -1015,12 +1048,12 @@ namespace <#= datasourceNameSpace #> {
 
 
 
-        public async Task<IList<<#= modelInterfaceClassName #>>> <#= GetCllctByFldFilterMethodName #>(string fldName, object fldVal) {
+        public async Task<IList<<#= modelInterfaceClassName #>>> <#= GetClActByFldFilterMethodName #>(string fldName, object fldVal) {
 <#
         if (Model.IsWebApiSelectManyWithPagination) {
 #>
             if((fldVal == null) || (string.IsNullOrEmpty(fldName))) {
-                return await this.<#= GetCllctByCurrDirMstrsMethodName #>();
+                return await this.<#= GetClActByCurrDirMstrsMethodName #>();
             }
             if (!this.<#= IsSetFilterByCurrDirMstrsMethodName #>()) {
                 return new List<<#= modelInterfaceClassName #>>();
@@ -1126,13 +1159,22 @@ namespace <#= datasourceNameSpace #> {
 
 
         public async Task <#= RefreshMethodName #>() {
-                object locobjval;
-                Guid prs;
 <#
     if (Model.IsWebApiSelectOneByPrimarykey) {
         ModelViewUniqueKeyOfVwSerializable prk = GetModelPrimaryKey(Model);
         if(prk != null) {
+#>
+            object locobjval;
+<#
             List<ModelViewPropertyOfVwSerializable> prmKeys = prk.UniqueKeyProperties;
+            foreach(ModelViewPropertyOfVwSerializable prop in prmKeys) {
+                    if (GetCCharpDatatype(prop, Model) == "guid") {
+#>
+            Guid prs;
+<#
+                        break;
+                    }
+            }
 #>
             if (
 <#
@@ -1436,8 +1478,15 @@ namespace <#= datasourceNameSpace #> {
         {
 #>
             object locobjval;
+<#
+            foreach(ModelViewPropertyOfVwSerializable prop in primKeys) {
+                if (GetCCharpDatatype(prop, Model) == "guid") {
+#>
             Guid prs;
 <#
+                    break;
+                }
+            }
             foreach(ModelViewPropertyOfVwSerializable prop in primKeys) {
 #>  
             <#= GetPropertyTypeName(prop) #>  <#= "loc" + GetModelPropertyName(prop, Model) #>;
@@ -1504,7 +1553,7 @@ namespace <#= datasourceNameSpace #> {
         }
 #>
 
-            await this.<#= formRootService #>.<#= DeleteOneMethodName #>(<# 
+            <#= GetInterfaceName(Model) #> data = await this.<#= formRootService #>.<#= DeleteOneMethodName #>(<# 
         {
             int counter = 0;
             foreach(ModelViewPropertyOfVwSerializable prop in primKeys) {
@@ -1521,6 +1570,12 @@ namespace <#= datasourceNameSpace #> {
 <#
     } // if (Model.IsWebApiUpdate) { ... } else { ... }
 #>
+            if(data != null) {
+                this.<#= Interface2ValuesMethodName #>(data, false);
+                this.<#= OnDeletePropName #>?.Invoke(this,new EventArgs());
+            }
+
+
         }
         protected void set<#= UnderHiddenFilterFieldsFieldName #>() {
             this._<#= UnderHiddenFilterFieldsFieldName #> = new List<string>();

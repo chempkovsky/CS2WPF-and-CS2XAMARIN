@@ -196,6 +196,12 @@
                     return "Convert.ToString";
             }
         }
+        string GetPropertyConvertMethodEx(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model)
+        {
+            if ((prop == null) || (model == null)) return "";
+            ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
+            return GetPropertyConvertMethod(sclrProp, model);
+        }
         string GetModelNotifyName(ModelViewSerializable model)
         {
             return GetModelName(model) + "Notify";
@@ -259,14 +265,27 @@
         {
             return GetModelName(model) + "Service";
         }
-        string GetModelDatasourceInterfaceName(ModelViewSerializable model)
-        {
-            return "I" + GetModelDatasourceName(model);
-        }
         string GetModelDatasourceName(ModelViewSerializable model)
         {
             return GetModelName(model) + "Datasource";
         }
+        string GetModelDatasourceInterfaceName(ModelViewSerializable model)
+        {
+            return "I" + GetModelDatasourceName(model);
+        }
+        string GetModelDatasourceInterfaceNameEx(DbContextSerializable context, string viewName)
+        {
+            return "I" + GetModelDatasourceName(GetModelByName(context, viewName));
+        }
+        string GetModelDatasourceVarName(ModelViewSerializable model, string varSuffix)
+        {
+            return GetModelDatasourceName(model) + varSuffix;
+        }
+        string GetModelDatasourceVarName(DbContextSerializable context, string viewName, string varSuffix)
+        {
+            return GetModelDatasourceVarName(GetModelByName(context, viewName), varSuffix);
+        }
+
         string GetWebApiServicePrefix(ModelViewSerializable model)
         {
             string result = model.WebApiServiceName;
@@ -3352,5 +3371,193 @@
             if (prop == null) return false;
             return ("System.String".Equals(prop.UnderlyingTypeName) || "String".Equals(prop.UnderlyingTypeName) || "string".Equals(prop.UnderlyingTypeName));
         }
+        List<Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum>> GetCurrentDirectNavList(List<Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum>> foreignKeyNameChainList, string chain)
+        {
+            List<Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum>> rslt = new List<Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum>>();
+            if (foreignKeyNameChainList == null) return rslt;
+            int len = 1;
+            string[] fks = null;
+            if (!string.IsNullOrEmpty(chain))
+            {
+                fks = chain.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
+                len = fks.Length + 1;
+            }
+            foreach (Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> fk in foreignKeyNameChainList)
+            {
+                fks = fk.Item1.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
+                if (fks.Length != len) continue;
+                if (len == 1)
+                {
+                    rslt.Add(fk);
+                }
+                else
+                {
+                    if (fk.Item1.StartsWith(chain + "."))
+                    {
+                        rslt.Add(fk);
+                    }
+                }
+            }
+            return rslt;
+        }
+        string GetCurrentDirectNavs(List<Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum>> foreignKeyNameChainList, string chain)
+        {
+            List<Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum>> lst = GetCurrentDirectNavList(foreignKeyNameChainList, chain);
+            int len = 0;
+            if (!string.IsNullOrEmpty(chain))
+            {
+                len = chain.Length + 1;
+            }
+            string rslt = "";
+            if (len == 0)
+            {
+                foreach (Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> fk in lst)
+                {
+                    if (rslt != "") rslt += ", ";
+                    rslt += "\"" + fk.Item1 + "\"";
+                }
+            }
+            else
+            {
+                foreach (Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> fk in lst)
+                {
+                    if (rslt != "") rslt += ", ";
+                    rslt += "\"" + fk.Item1.Substring(len) + "\"";
+                }
+            }
+            return rslt;
+        }
+        ModelViewSerializable GetViewByForeignNameChainEx(DbContextSerializable context, string ViewName, string foreignKeyNameChain)
+        {
+            if ((context == null) || (string.IsNullOrEmpty(ViewName)))
+            {
+                return null;
+            }
+            ModelViewSerializable mv = context.ModelViews.Where(v => v.ViewName == ViewName).FirstOrDefault();
+            if (mv == null)
+            {
+                return mv;
+            }
+            if (string.IsNullOrEmpty(foreignKeyNameChain))
+            {
+                return mv;
+            }
+            string[] foreignKeys = foreignKeyNameChain.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
+            if (foreignKeys.Length < 1)
+            {
+                return mv;
+            }
+            ModelViewForeignKeySerializable fk = mv.ForeignKeys.Where(f => f.NavigationName == foreignKeys[0]).FirstOrDefault();
+            if (fk == null)
+            {
+                return mv;
+            }
+            if (foreignKeys.Length == 1)
+            {
+                return GetViewByForeignNameChainEx(context, fk.ViewName, "");
+            }
+            return GetViewByForeignNameChainEx(context, fk.ViewName, string.Join(".", foreignKeys, 1, foreignKeys.Length - 1));
+        }
+        List<Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum>> GetForeignKeyNameChainStructList(ModelViewSerializable model,
+                                                                                            DbContextSerializable context,
+                                                                                            int currentInputTypeId,
+                                                                                            List<Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum>> foreignKeyNameChainList)
+        {
+            if ((model == null) || (context == null) || (foreignKeyNameChainList == null))
+            {
+                return foreignKeyNameChainList;
+            }
+            if (model.ScalarProperties == null || model.UIFormProperties == null)
+            {
+                return foreignKeyNameChainList;
+            }
+            ModelViewSerializable mv = null;
+            foreach (ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in model.UIFormProperties)
+            {
+                if (!modelViewUIFormPropertySerializable.IsShownInView) continue;
+                if (currentInputTypeId == 1)
+                {
+                    if ((modelViewUIFormPropertySerializable.InputTypeWhenAdd == InputTypeEnum.Combo) ||
+                        (modelViewUIFormPropertySerializable.InputTypeWhenAdd == InputTypeEnum.SearchDialog) ||
+                        (modelViewUIFormPropertySerializable.InputTypeWhenAdd == InputTypeEnum.Typeahead))
+                    {
+                        mv = GetViewByForeignNameChainEx(context, model.ViewName, modelViewUIFormPropertySerializable.ForeignKeyNameChain);
+                        foreignKeyNameChainList.Add(new Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum>(
+                                modelViewUIFormPropertySerializable.ForeignKeyNameChain,
+                                mv,
+                                modelViewUIFormPropertySerializable,
+                                modelViewUIFormPropertySerializable.InputTypeWhenAdd));
+                    }
+                }
+                else if (currentInputTypeId == 2)
+                {
+                    if ((modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.Combo) ||
+                        (modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.SearchDialog) ||
+                        (modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.Typeahead))
+                    {
+                        mv = GetViewByForeignNameChainEx(context, model.ViewName, modelViewUIFormPropertySerializable.ForeignKeyNameChain);
+                        foreignKeyNameChainList.Add(new Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum>(
+                                modelViewUIFormPropertySerializable.ForeignKeyNameChain,
+                                mv,
+                                modelViewUIFormPropertySerializable,
+                                modelViewUIFormPropertySerializable.InputTypeWhenUpdate));
+                    }
+                }
+                else
+                {
+                    if ((modelViewUIFormPropertySerializable.InputTypeWhenDelete == InputTypeEnum.Combo) ||
+                        (modelViewUIFormPropertySerializable.InputTypeWhenDelete == InputTypeEnum.SearchDialog) ||
+                        (modelViewUIFormPropertySerializable.InputTypeWhenDelete == InputTypeEnum.Typeahead))
+                    {
+                        mv = GetViewByForeignNameChainEx(context, model.ViewName, modelViewUIFormPropertySerializable.ForeignKeyNameChain);
+                        foreignKeyNameChainList.Add(new Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum>(
+                                modelViewUIFormPropertySerializable.ForeignKeyNameChain,
+                                mv,
+                                modelViewUIFormPropertySerializable,
+                                modelViewUIFormPropertySerializable.InputTypeWhenDelete));
+                    }
+                }
+            }
+            return foreignKeyNameChainList;
+        }
+        Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> GetDirectDetail(List<Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum>> foreignKeyNameChainList, string chain)
+        {
+            if (foreignKeyNameChainList == null) return null;
+            if (string.IsNullOrEmpty(chain)) return null; // this is RootDataSource
+            string[] fks = chain.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
+            int len = fks.Length;
+            if (len == 1) return null; // direct detail is RootDataSource
+            foreach (Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> fk in foreignKeyNameChainList)
+            {
+                if (chain.StartsWith(fk.Item1 + "."))
+                {
+                    fks = fk.Item1.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
+                    if (fks.Length == len - 1) return fk;
+                }
+            }
+            return null;
+        }
+        string GetDirectNavName(string chain)
+        {
+            if (string.IsNullOrEmpty(chain)) return "";
+            string[] fks = chain.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
+            return fks[fks.Length - 1];
+        }
+
+        bool IsMasterDefinedProperty(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model)
+        {
+            if ((prop == null) || (model == null)) return false;
+            if (!string.IsNullOrEmpty(prop.ForeignKeyName)) return true;
+            if (model.ForeignKeys == null) return false;
+            foreach (ModelViewForeignKeySerializable fk in model.ForeignKeys)
+            {
+                if (fk.ForeignKeyProps != null)
+                {
+                    if (fk.ForeignKeyProps.Any(p => p.OriginalPropertyName == prop.OriginalPropertyName)) return true;
+                }
+            }
+            return false;
+        }
+
 
 #>

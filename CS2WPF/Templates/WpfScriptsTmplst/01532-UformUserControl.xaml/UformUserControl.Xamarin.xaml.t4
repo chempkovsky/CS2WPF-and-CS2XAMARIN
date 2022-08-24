@@ -1,0 +1,727 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="xaml" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ include file="..\..\CommonScripts\ViewLevel.t4" #>
+<#
+
+    string gridFlexModelFolder                              = "00100-GridFlex.cs";
+    string gridFlexModelClassName                           = GetContextModelClassName(Context, gridFlexModelFolder);
+    string gridFlexModelNameSpace                           = GetContextModelNameSpace(Context, gridFlexModelFolder);
+    string gridFlexModelProject                             = GetContextModelProjectName(Context, gridFlexModelFolder);
+
+    string NullableBackConverterFolder                      = "00169-NullableBackConverter.cs";
+    string NullableBackConverterClassName                   = GetContextModelClassName(Context, NullableBackConverterFolder);
+    string NullableBackConverterNameSpace                   = GetContextModelNameSpace(Context, NullableBackConverterFolder);
+    string NullableBackConverterProject                     = GetContextModelProjectName(Context, NullableBackConverterFolder);
+
+    string InverseBooleanConverterFolder                    = "00170-InverseBooleanConverter.cs";
+    string InverseBooleanConverterClassName                 = GetContextModelClassName(Context, InverseBooleanConverterFolder);
+    string InverseBooleanConverterNameSpace                 = GetContextModelNameSpace(Context, InverseBooleanConverterFolder);
+    string InverseBooleanConverterProject                   = GetContextModelProjectName(Context, InverseBooleanConverterFolder);
+
+    string StringNullOrEmptyToBoolConverterFolder           = "00171-StringNullOrEmptyToBoolConverter.cs";
+    string StringNullOrEmptyToBoolConverterClassName        = GetContextModelClassName(Context, StringNullOrEmptyToBoolConverterFolder);
+    string StringNullOrEmptyToBoolConverterNameSpace        = GetContextModelNameSpace(Context, StringNullOrEmptyToBoolConverterFolder);
+    string StringNullOrEmptyToBoolConverterProject          = GetContextModelProjectName(Context, StringNullOrEmptyToBoolConverterFolder);
+
+
+    string AddEformModeEnumToVisibilityConverterFolder      = "00172-AddEformModeEnumToVisibilityConverter.cs";
+    string AddEformModeEnumToVisibilityConverterClassName   = GetContextModelClassName(Context, AddEformModeEnumToVisibilityConverterFolder);
+    string AddEformModeEnumToVisibilityConverterNameSpace   = GetContextModelNameSpace(Context, AddEformModeEnumToVisibilityConverterFolder);
+    string AddEformModeEnumToVisibilityConverterProject     = GetContextModelProjectName(Context, AddEformModeEnumToVisibilityConverterFolder);
+
+    string UpdEformModeEnumToVisibilityConverterFolder      = "00174-UpdEformModeEnumToVisibilityConverter.cs";
+    string UpdEformModeEnumToVisibilityConverterClassName   = GetContextModelClassName(Context, UpdEformModeEnumToVisibilityConverterFolder);
+    string UpdEformModeEnumToVisibilityConverterNameSpace   = GetContextModelNameSpace(Context, UpdEformModeEnumToVisibilityConverterFolder);
+    string UpdEformModeEnumToVisibilityConverterProject     = GetContextModelProjectName(Context, UpdEformModeEnumToVisibilityConverterFolder);
+
+    string DelEformModeEnumToVisibilityConverterFolder      = "00176-DelEformModeEnumToVisibilityConverter.cs";
+    string DelEformModeEnumToVisibilityConverterClassName   = GetContextModelClassName(Context, DelEformModeEnumToVisibilityConverterFolder);
+    string DelEformModeEnumToVisibilityConverterNameSpace   = GetContextModelNameSpace(Context, DelEformModeEnumToVisibilityConverterFolder);
+    string DelEformModeEnumToVisibilityConverterProject     = GetContextModelProjectName(Context, DelEformModeEnumToVisibilityConverterFolder);
+
+    string IconFontFolder                                   = "00178-IconFont.cs";
+    string IconFontClassName                                = GetContextModelClassName(Context, IconFontFolder);
+    string IconFontNameSpace                                = GetContextModelNameSpace(Context, IconFontFolder);
+    string IconFontNameProject                              = GetContextModelProjectName(Context, IconFontFolder);
+
+    string NullableDatePickerFolder                         = "00180-NullableDatePicker.cs";
+    string NullableDatePickerClassName                      = GetContextModelClassName(Context, NullableDatePickerFolder);
+    string NullableDatePickerNameSpace                      = GetContextModelNameSpace(Context, NullableDatePickerFolder);
+    string NullableDatePickerProject                        = GetContextModelProjectName(Context, NullableDatePickerFolder);
+
+    string EformUserControlBaseFolder                       = "00635-EformUserControlBase.xaml.cs";
+    string EformUserControlBaseClassName                    = GetContextModelClassName(Context, EformUserControlBaseFolder);
+    string EformUserControlBaseNameSpace                    = GetContextModelNameSpace(Context, EformUserControlBaseFolder);
+    string EformUserControlBaseProject                      = GetContextModelProjectName(Context, EformUserControlBaseFolder);
+
+
+    string SformUserControlFolder           = "01420-SformUserControl.xaml.cs";
+    string SformUserControlClassName        = GetModelClassName(Model, SformUserControlFolder);
+    string SformUserControlNameSpace        = GetModelNameSpace(Model, SformUserControlFolder);
+
+
+    string UformUserControlFolder            = "01530-UformUserControl.xaml.cs";
+    string UformUserControlClassName         = GetModelClassName(Model, UformUserControlFolder);
+    string UformUserControlNameSpace         = GetModelNameSpace(Model, UformUserControlFolder);
+    string UformUserControlProject           = GetModelProjectName(Model, UformUserControlFolder);
+
+
+    string UformUserControlXamlFolder       = "01532-UformUserControl.xaml";
+    string UformUserControlXamlClassName    = GetModelClassName(Model, UformUserControlXamlFolder);
+    string UformUserControlXamlNameSpace    = GetModelNameSpace(Model, UformUserControlXamlFolder);
+    string UformUserControlXamlProject      = GetModelProjectName(Model, UformUserControlXamlFolder);
+
+
+    string ComboSufix                   = "CmbCntrl";
+    string ComboErrorSufix              = "CmbCntrlSuffixError"; // ComboSufix  + "SuffixError" it is used by RaiseErrorsChanged(string propertyName)
+    string ButtonSufix                  = "BttnItm";
+    string ButtonErrorSufix             = "BttnItmSuffixError"; // ButtonSufix + "SuffixError" it is used by RaiseErrorsChanged(string propertyName)
+    string TypeaheadSufix               = "TphdCntrl";
+    string TypeaheadErrorSufix          = "TphdCntrlSuffixError"; // TypeaheadSufix + "SuffixError" it is used by RaiseErrorsChanged(string propertyName)
+    string TypeaheadTextSufix           = "TphdCntrlText";
+    string TypeaheadItemsSourceSufix    = "TphdCntrlItemsSource";
+    string ValueErrorSufix              = "SuffixError"; // ValueField + "SuffixError" it is used by RaiseErrorsChanged(string propertyName) 
+
+    string EnabledSufix             = "Enabled";
+
+    string SearchClickSufix         = "SrchClck";
+
+    string DisplayLabelProperty     = "Name";
+    string DisplayHintProperty      = "Prompt";
+
+
+    string EformModePropertyName                    = "EformMode";
+    string EformModeVMPropertyName                  = "EformModeVM";
+
+    string IsLoadingPropertyName                    = "IsLoading";
+
+    string CaptionPropertyName                      = "Caption";
+    string ShowSubmitPropertyName                   = "ShowSubmit";
+    string SubmitCommandPropertyName                = "SubmitCommand";
+    string CancelCommandPropertyName                = "CancelCommand";
+
+    string ContainerMenuItemsPropertyName           = "ContainerMenuItems";
+    string OnContainerMenuItemsCommandPropertyName  = "OnContainerMenuItemsCommand";
+    string FontFamilyPropertyName                   = "CustomIconFontAlias";
+
+    string BindingContextFeedbackRefPropertyName    = "BindingContextFeedbackRef";
+    string IsGridFlexPropertyName                   = "IsGridFlex";
+
+
+    string gridflexPrefix = "clr-namespace:" + gridFlexModelNameSpace;
+    if(UformUserControlProject != gridFlexModelProject) {
+        gridflexPrefix = gridflexPrefix + ";assembly=" + gridFlexModelProject;
+    }
+    string invboolconvPrefix = "clr-namespace:" + InverseBooleanConverterNameSpace;
+    if(UformUserControlProject != InverseBooleanConverterProject) {
+        invboolconvPrefix = invboolconvPrefix + ";assembly=" + InverseBooleanConverterProject;
+    }
+    string strnulltoboolPrefix = "clr-namespace:" + StringNullOrEmptyToBoolConverterNameSpace;
+    if(UformUserControlProject != StringNullOrEmptyToBoolConverterProject) {
+        strnulltoboolPrefix = strnulltoboolPrefix + ";assembly=" + StringNullOrEmptyToBoolConverterProject;
+    }
+    string nullablebackPrefix = "clr-namespace:" + NullableBackConverterNameSpace;
+    if(UformUserControlProject != NullableBackConverterProject) {
+        nullablebackPrefix = nullablebackPrefix + ";assembly=" + NullableBackConverterProject;
+    }
+
+
+
+    string NullableDatePickerPrefix = "clr-namespace:" + NullableDatePickerNameSpace;
+    if(UformUserControlProject != NullableDatePickerProject) {
+        NullableDatePickerPrefix = NullableDatePickerPrefix + ";assembly=" + NullableDatePickerProject;
+    }
+    string IconFontPrefix = "clr-namespace:" + IconFontNameSpace;
+    if(UformUserControlProject != IconFontNameProject) {
+        IconFontPrefix = IconFontPrefix + ";assembly=" + IconFontNameProject;
+    }
+    string efrmBasePrefix = "clr-namespace:" + EformUserControlBaseNameSpace;
+    if(UformUserControlProject != EformUserControlBaseProject) {
+        efrmBasePrefix = efrmBasePrefix + ";assembly=" + EformUserControlBaseProject;
+    }
+
+    bool ModelHasAutoCompleteTextBox = false;
+    foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) {
+        ModelHasAutoCompleteTextBox = ModelHasAutoCompleteTextBox ?  ModelHasAutoCompleteTextBox :
+            (modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.Typeahead) ;
+    }
+
+    string RootNodeName = UformUserControlClassName.ToLower() + "rootnode";
+    
+#>
+<efrmbs:<#= EformUserControlBaseClassName #> x:Class="<#= UformUserControlNameSpace #>.<#= UformUserControlClassName #>"
+             xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+
+             xmlns:prism="http://prismlibrary.com"
+             prism:ViewModelLocator.AutowireViewModel="True"
+
+             xmlns:efrmbs="<#= efrmBasePrefix #>" 
+
+             xmlns:nullableDatePicker="<#= NullableDatePickerPrefix #>" 
+             xmlns:fontIcons="<#= IconFontPrefix #>"
+
+
+             xmlns:gridflex="<#= gridflexPrefix #>"
+             xmlns:invboolconv="<#= invboolconvPrefix #>"
+             xmlns:str2boolconv="<#= strnulltoboolPrefix #>"
+             xmlns:nullableback="<#= nullablebackPrefix #>"
+             
+
+<# 
+    if (ModelHasAutoCompleteTextBox) {
+#>
+             xmlns:acttb="clr-namespace:dotMorten.Xamarin.Forms;assembly=dotMorten.Xamarin.Forms.AutoSuggestBox"
+<# 
+    }
+#>
+
+             <#= BindingContextFeedbackRefPropertyName #>="{Binding BindingContext.<#= BindingContextFeedbackRefPropertyName #>, Source={x:Reference <#= RootNodeName #>}}"
+
+             x:Name="<#= RootNodeName #>"
+             >
+    <efrmbs:<#= EformUserControlBaseClassName #>.Resources>
+        <invboolconv:<#= InverseBooleanConverterClassName #> x:Key="InverseBooleanConverter"/>
+        <str2boolconv:<#= StringNullOrEmptyToBoolConverterClassName #> x:Key="StringNullOrEmptyToBoolConverter"/>
+        <nullableback:<#= NullableBackConverterClassName #> x:Key="NullableBackConverter"/>
+    </efrmbs:<#= EformUserControlBaseClassName #>.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions> 
+        <Grid Grid.Row="0" gridflex:<#= gridFlexModelClassName #>.HorizontalFlex="{Binding Path=<#= IsGridFlexPropertyName #>, Mode=OneWay, Source={x:Reference <#= RootNodeName #>}}"
+            RowDefinitions="Auto,Auto" ColumnDefinitions="*" >
+            <Label Grid.Row="0" Grid.Column="0"
+                Margin="8, 0, 0, 0"  Text="{Binding Path=<#= CaptionPropertyName #>, Source={x:Reference <#= RootNodeName #>}}" FontAttributes="Bold"/>
+            <ScrollView Grid.Row="1" Grid.Column="0"
+                Orientation="Horizontal" VerticalScrollBarVisibility="Never" HorizontalScrollBarVisibility="Default" HorizontalOptions="End">
+                <StackLayout Orientation="Horizontal" 
+                                BindableLayout.ItemsSource="{Binding <#= ContainerMenuItemsPropertyName #>, Source={x:Reference <#= RootNodeName #>}}">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate>
+                            <Button WidthRequest="45"
+                                Command="{Binding <#= OnContainerMenuItemsCommandPropertyName #>, Source={x:Reference <#= RootNodeName #>}}"
+                                CommandParameter="{Binding}"
+                                IsEnabled="{Binding Enabled}"
+                                Text="{Binding IconName}" 
+                                FontFamily="CustomIconFontAlias" 
+                                BackgroundColor="{DynamicResource IconButtonBackgroundColor}" 
+                                TextColor="{Binding IconColor}" 
+                                FontSize="{OnPlatform iOS=Large, Android=Medium, UWP=Medium }"/>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </StackLayout>
+            </ScrollView>
+        </Grid>
+        <ActivityIndicator Grid.Row="1" IsRunning="{Binding BindingContext.<#= IsLoadingPropertyName #>, Mode=OneWay, Source={x:Reference <#= RootNodeName #>}}"/>
+        <ContentView  Grid.Row="2">
+
+<#
+    string rowDefinitionsRowDefinitionsString = "Auto";
+    {
+        int gridRowCount=0;
+        for(int i = 0; i < Model.UIFormProperties.Count; i++) {
+            ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable = Model.UIFormProperties[i];
+            if(modelViewUIFormPropertySerializable.IsNewLineAfter) gridRowCount++;
+        }
+        
+        rowDefinitionsRowDefinitionsString = rowDefinitionsRowDefinitionsString + string.Concat(Enumerable.Repeat(", Auto", gridRowCount+1));
+    }
+    {
+        int InputTypeId = 2;
+        int curGridRow = -1;
+#>
+            <Grid RowDefinitions="<#= rowDefinitionsRowDefinitionsString #>" ColumnDefinitions="*">    
+<#
+
+        bool isNewLine = false;
+        bool gridOpened = false;
+        int  currGridFlexRow = 0;
+        for(int i = 0; i < Model.UIFormProperties.Count; i++) {
+            ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable = Model.UIFormProperties[i];
+            if (! modelViewUIFormPropertySerializable.IsShownInView ) {
+                if(modelViewUIFormPropertySerializable.IsNewLineAfter && gridOpened) {
+#>
+                    </Grid>
+<#
+                    gridOpened = false;
+                }
+                continue;
+            }
+            if (((modelViewUIFormPropertySerializable.InputTypeWhenAdd == InputTypeEnum.Hidden) && (InputTypeId==1)) ||
+                ((modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.Hidden) && (InputTypeId==2)) ||
+                ((modelViewUIFormPropertySerializable.InputTypeWhenDelete == InputTypeEnum.Hidden) && (InputTypeId==3)) )  {
+                if(modelViewUIFormPropertySerializable.IsNewLineAfter && gridOpened) {
+#>
+                    </Grid>
+<#
+                    gridOpened = false;
+                }
+                continue;
+            }
+            InputTypeEnum InputTypeWhenXXX ;
+            switch(InputTypeId) {
+                case 1:
+                    InputTypeWhenXXX = modelViewUIFormPropertySerializable.InputTypeWhenAdd;
+                    break;
+                case 2:
+                    InputTypeWhenXXX = modelViewUIFormPropertySerializable.InputTypeWhenUpdate;
+                    break;
+                default: 
+                    InputTypeWhenXXX = modelViewUIFormPropertySerializable.InputTypeWhenDelete;
+                    break;
+            }
+            if(InputTypeWhenXXX == InputTypeEnum.Combo) {
+                if(! gridOpened) {
+                    curGridRow++;
+#>
+                    <Grid Grid.Row="<#= curGridRow #>" Grid.Column="0"
+                          RowDefinitions="<#= GetGridFlexRowDefs(Model, i) #>" ColumnDefinitions="*"
+                          gridflex:<#= gridFlexModelClassName #>.HorizontalFlex="{Binding Path=<#= IsGridFlexPropertyName #>, Mode=OneWay, Source={x:Reference <#= RootNodeName #>}}" Margin="0 0 8 0">
+<#
+                    currGridFlexRow = 0;
+                    gridOpened = true;
+                }
+#>
+                        <Grid Grid.Row="<#= currGridFlexRow #>" Grid.Column="0" RowSpacing="0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Label Grid.Row="0" FontSize="Caption" Text="<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty)#>" />
+                            <Picker Grid.Row="1" 
+                                      IsEnabled="{Binding BindingContext.<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, EnabledSufix) #>, Mode=OneWay, Source={x:Reference <#= RootNodeName #>}}"
+                                      x:Uid="<#=  GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #>"
+                                      ItemsSource="{Binding BindingContext.<#= GetExpressionForControlList(modelViewUIFormPropertySerializable, Model, ComboSufix) #>, Mode=OneWay, Source={x:Reference <#= RootNodeName #>}}" 
+                                      ItemDisplayBinding="{Binding <#= GetComboControlListPropertyName(modelViewUIFormPropertySerializable, Model, Context, InputTypeId) #>}" 
+                                      SelectedItem="{Binding BindingContext.<#=  GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #>, Mode=TwoWay, Source={x:Reference <#= RootNodeName #>}}"/>
+                            <Label Grid.Row="2" FontSize="Caption" 
+                                    Text="<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayHintProperty) #>"
+                                    Opacity="0.3"
+                                    TextColor="Default">
+                                <Label.Triggers>
+                                    <DataTrigger TargetType="Label" Binding="{Binding BindingContext.<#=  GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboErrorSufix) #>, Converter={StaticResource StringNullOrEmptyToBoolConverter}, Source={x:Reference <#= RootNodeName #>}}" Value="False">
+                                        <Setter Property="TextColor" Value="{x:DynamicResource ValidationErrorColor}" />
+                                        <Setter Property="Text" Value="{Binding BindingContext.<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboErrorSufix) #>, Mode=OneWay, Source={x:Reference <#= RootNodeName #>}}"/>
+                                        <Setter Property="Opacity" Value="0.7" />
+                                    </DataTrigger>
+                                </Label.Triggers>
+                            </Label>
+                        </Grid>
+<#
+                if(modelViewUIFormPropertySerializable.IsNewLineAfter && gridOpened) {
+#>
+                    </Grid>
+<#
+                    gridOpened = false;
+                } else {
+                    currGridFlexRow++;
+                }
+                continue;
+            }
+            if(InputTypeWhenXXX == InputTypeEnum.Typeahead) {
+                if(! gridOpened) {
+                    curGridRow++;
+#>
+                    <Grid Grid.Row="<#= curGridRow #>" Grid.Column="0"
+                          RowDefinitions="<#= GetGridFlexRowDefs(Model, i) #>" ColumnDefinitions="*"
+                          gridflex:<#= gridFlexModelClassName #>.HorizontalFlex="{Binding Path=<#= IsGridFlexPropertyName #>, Mode=OneWay, Source={x:Reference <#= RootNodeName #>}}" Margin="0 0 8 0">
+<#
+                    currGridFlexRow = 0;
+                    gridOpened = true;
+                }
+#>
+                        <Grid Grid.Row="<#= currGridFlexRow #>" Grid.Column="0" RowSpacing="0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Label Grid.Row="0" FontSize="Caption" Text="<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty)#>" />
+	                        <acttb:AutoSuggestBox Grid.Row="1"  
+                                        x:Uid="<#=  GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>"
+<#
+                if (InputTypeWhenXXX == InputTypeEnum.ReadOnly) {
+#>
+                                        IsEnabled="False"
+<#
+                } else {
+#>
+                                        IsEnabled="{Binding BindingContext.<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, EnabledSufix) #>, Mode=OneWay, Source={x:Reference <#= RootNodeName #>}}"
+<#
+                }
+#>
+                                        PlaceholderText="<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayHintProperty) #>" 
+
+                                        TextChanged="<#=  GetModelPropertyNameWithSufixForInputTypeMode(modelViewUIFormPropertySerializable, Model, TypeaheadSufix, InputTypeId) #>_TextChanged"
+                                        QuerySubmitted="<#=  GetModelPropertyNameWithSufixForInputTypeMode(modelViewUIFormPropertySerializable, Model, TypeaheadSufix, InputTypeId) #>_QuerySubmitted"
+
+                                        ItemsSource="{Binding BindingContext.<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadItemsSourceSufix) #>, Source={x:Reference <#= RootNodeName #>}}"
+                                        Text="{Binding BindingContext.<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadTextSufix) #>, Mode=TwoWay, Source={x:Reference <#= RootNodeName #>}}"
+                                        DisplayMemberPath="<#= GetControlListPropertyName(modelViewUIFormPropertySerializable, Model, Context, InputTypeId) #>" 
+                                        TextMemberPath="<#= GetControlListPropertyName(modelViewUIFormPropertySerializable, Model, Context, InputTypeId) #>"/>
+                            <Label Grid.Row="2" FontSize="Caption" 
+                                    Text="<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayHintProperty) #>"
+                                    Opacity="0.3"
+                                    TextColor="Default">
+                                <Label.Triggers>
+                                    <DataTrigger TargetType="Label" Binding="{Binding BindingContext.<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadErrorSufix) #>, Converter={StaticResource StringNullOrEmptyToBoolConverter}, Source={x:Reference <#= RootNodeName #>}}" Value="False">
+                                        <Setter Property="TextColor" Value="{x:DynamicResource ValidationErrorColor}" />
+                                        <Setter Property="Text" Value="{Binding BindingContext.<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadErrorSufix) #>, Mode=OneWay, Source={x:Reference <#= RootNodeName #>}}"/>
+                                        <Setter Property="Opacity" Value="0.7" />
+                                    </DataTrigger>
+                                </Label.Triggers>
+                            </Label>
+                        </Grid>
+<#
+                if(modelViewUIFormPropertySerializable.IsNewLineAfter && gridOpened) {
+#>
+                    </Grid>
+<#
+                    gridOpened = false;
+                } else {
+                    currGridFlexRow++;
+                }
+                continue;
+            }
+            if(InputTypeWhenXXX == InputTypeEnum.SearchDialog) {
+                if(! gridOpened) {
+                    curGridRow++;
+#>
+                    <Grid Grid.Row="<#= curGridRow #>" Grid.Column="0"
+                          RowDefinitions="<#= GetGridFlexRowDefs(Model, i) #>" ColumnDefinitions="*"
+                          gridflex:<#= gridFlexModelClassName #>.HorizontalFlex="{Binding Path=<#= IsGridFlexPropertyName #>, Mode=OneWay, Source={x:Reference <#= RootNodeName #>}}" Margin="0 0 8 0">
+<#
+                    currGridFlexRow = 0;
+                    gridOpened = true;
+                }
+#>
+                        <Grid Grid.Row="<#= currGridFlexRow #>" Grid.Column="0" RowSpacing="0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Label Grid.Row="0" FontSize="Caption" Text="<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty)#>" />
+                            <Grid Grid.Row="1">
+                                <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+<#
+                if(IsDateInput(modelViewUIFormPropertySerializable, Model)) {
+#>
+                                <nullableDatePicker:<#= NullableDatePickerClassName #>  x:Uid="<#=  GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>"
+                                        IsEnabled="False" Grid.Column="0"
+                                        MinimumDate="1/1/1700"
+                                        NullableDate="{Binding BindingContext.<#= GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #> <#= GetNullableConverterDecl(modelViewUIFormPropertySerializable, Model, "NullableBackConverter")  #>, Mode=TwoWay, Source={x:Reference <#= RootNodeName #>}}"/>
+<#
+                } else {
+#>
+                                <Entry  x:Uid="<#=  GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>"
+                                        IsReadOnly="True" Grid.Column="0"
+                                        Text="{Binding BindingContext.<#= GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #> <#= GetNullableConverterDecl(modelViewUIFormPropertySerializable, Model, "NullableBackConverter")  #>, Mode=TwoWay, Source={x:Reference <#= RootNodeName #>}}"/>
+<#
+                }
+#>
+                                <Button Grid.Column="1" WidthRequest="45"
+                                        Command="{Binding BindingContext.<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, SearchClickSufix) #>Command, Mode=OneWay, Source={x:Reference <#= RootNodeName #>}}"
+                                        Text="{x:Static fontIcons:<#= IconFontClassName #>.Search}" FontFamily="<#= FontFamilyPropertyName #>" BackgroundColor="{DynamicResource IconButtonBackgroundColor}" 
+                                        TextColor="{DynamicResource IconButtonPrimaryColor}" 
+                                        FontSize="{OnPlatform iOS=Default, Android=Large, UWP=Default}">
+                                </Button>
+                            </Grid>
+                            <Label Grid.Row="2" FontSize="Caption" 
+                                    Text="<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayHintProperty) #>"
+                                    Opacity="0.3"
+                                    TextColor="Default">
+                                <Label.Triggers>
+                                    <DataTrigger TargetType="Label" Binding="{Binding BindingContext.<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ButtonErrorSufix) #>, Converter={StaticResource StringNullOrEmptyToBoolConverter}, Source={x:Reference <#= RootNodeName #>}}" Value="False">
+                                        <Setter Property="TextColor" Value="{x:DynamicResource ValidationErrorColor}" />
+                                        <Setter Property="Text" Value="{Binding BindingContext.<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ButtonErrorSufix) #>, Mode=OneWay, Source={x:Reference <#= RootNodeName #>}}"/>
+                                        <Setter Property="Opacity" Value="0.7" />
+                                    </DataTrigger>
+                                </Label.Triggers>
+                            </Label>
+                        </Grid>
+<#
+                if(modelViewUIFormPropertySerializable.IsNewLineAfter && gridOpened) {
+#>
+                    </Grid>
+<#
+                    gridOpened = false;
+                } else {
+                    currGridFlexRow++;
+                }
+                continue;
+            }
+            if(IsBooleanInput(modelViewUIFormPropertySerializable, Model)) {
+                if(! gridOpened) {
+                    curGridRow++;
+#>
+                    <Grid Grid.Row="<#= curGridRow #>" Grid.Column="0"
+                          RowDefinitions="<#= GetGridFlexRowDefs(Model, i) #>" ColumnDefinitions="*"
+                          gridflex:<#= gridFlexModelClassName #>.HorizontalFlex="{Binding Path=<#= IsGridFlexPropertyName #>, Mode=OneWay, Source={x:Reference <#= RootNodeName #>}}" Margin="0 0 8 0">
+<#
+                    currGridFlexRow = 0;
+                    gridOpened = true;
+                }
+#>
+                        <Grid Grid.Row="<#= currGridFlexRow #>" Grid.Column="0" RowSpacing="0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Label Grid.Row="0" FontSize="Caption" Text=" " />
+                            <StackLayout Grid.Row="1" Orientation="Horizontal">
+                                <CheckBox  x:Uid="<#= GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>"
+<#
+                if (InputTypeWhenXXX == InputTypeEnum.ReadOnly) {
+#>
+                                IsEnabled="False"
+<#
+                } else {
+#>
+                                IsEnabled="{Binding BindingContext.<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, EnabledSufix) #>, Mode=OneWay, , Source={x:Reference <#= RootNodeName #>}}"
+<#
+                }
+#>
+                                IsChecked="{Binding BindingContext.<#= GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>, Mode=TwoWay, Source={x:Reference <#= RootNodeName #>}}"
+                                />
+                                <Label Text="<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty)#>" />
+                            </StackLayout>
+                            <Label Grid.Row="2" FontSize="Caption" 
+                                    Text="<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayHintProperty) #>"
+                                    Opacity="0.3"
+                                    TextColor="Default">
+                                <Label.Triggers>
+                                    <DataTrigger TargetType="Label" Binding="{Binding BindingContext.<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ValueErrorSufix) #>, Converter={StaticResource StringNullOrEmptyToBoolConverter}, Source={x:Reference <#= RootNodeName #>}}" Value="False">
+                                        <Setter Property="TextColor" Value="{x:DynamicResource ValidationErrorColor}" />
+                                        <Setter Property="Text" Value="{Binding BindingContext.<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ValueErrorSufix) #>, Mode=OneWay, Source={x:Reference <#= RootNodeName #>}}"/>
+                                        <Setter Property="Opacity" Value="0.7" />
+                                    </DataTrigger>
+                                </Label.Triggers>
+                            </Label>
+                        </Grid>
+<#
+                if(modelViewUIFormPropertySerializable.IsNewLineAfter && gridOpened) {
+#>
+                    </Grid>
+<#
+                    gridOpened = false;
+                } else {
+                    currGridFlexRow++;
+                }
+                continue;
+            }
+            if(IsDateInput(modelViewUIFormPropertySerializable, Model)) {
+                if(! gridOpened) {
+                    curGridRow++;
+#>
+                    <Grid Grid.Row="<#= curGridRow #>" Grid.Column="0"
+                          RowDefinitions="<#= GetGridFlexRowDefs(Model, i) #>" ColumnDefinitions="*"
+                          gridflex:<#= gridFlexModelClassName #>.HorizontalFlex="{Binding Path=<#= IsGridFlexPropertyName #>, Mode=OneWay, Source={x:Reference <#= RootNodeName #>}}" Margin="0 0 8 0">
+<#
+                    currGridFlexRow = 0;
+                    gridOpened = true;
+                }
+#>
+                        <Grid Grid.Row="<#= currGridFlexRow #>" Grid.Column="0" RowSpacing="0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Label Grid.Row="0" FontSize="Caption" Text="<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty)#>" />
+                            <nullableDatePicker:<#= NullableDatePickerClassName #> Grid.Row="1"
+                                    x:Uid="<#= GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>"
+                                    MinimumDate="1/1/1700"
+<#
+                if (InputTypeWhenXXX == InputTypeEnum.ReadOnly) {
+#>
+                                    IsEnabled="False"
+<#
+                } else {
+#>
+                                    IsEnabled="{Binding BindingContext.<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, EnabledSufix) #>, Mode=OneWay, Source={x:Reference <#= RootNodeName #>}}"  
+<#
+                }
+#>
+                                    NullableDate="{Binding BindingContext.<#=  GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>, Mode=TwoWay, Source={x:Reference <#= RootNodeName #>}}"/>
+                            <Label Grid.Row="2" FontSize="Caption" 
+                                    Text="<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayHintProperty) #>"
+                                    Opacity="0.3"
+                                    TextColor="Default">
+                                <Label.Triggers>
+                                    <DataTrigger TargetType="Label" Binding="{Binding BindingContext.<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ValueErrorSufix) #>, Converter={StaticResource StringNullOrEmptyToBoolConverter}, Source={x:Reference <#= RootNodeName #>}}" Value="False">
+                                        <Setter Property="TextColor" Value="{x:DynamicResource ValidationErrorColor}" />
+                                        <Setter Property="Text" Value="{Binding BindingContext.<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ValueErrorSufix) #>, Mode=OneWay, Source={x:Reference <#= RootNodeName #>}}"/>
+                                        <Setter Property="Opacity" Value="0.7" />
+                                    </DataTrigger>
+                                </Label.Triggers>
+                            </Label>
+                        </Grid>
+<#
+                if(modelViewUIFormPropertySerializable.IsNewLineAfter && gridOpened) {
+#>
+                    </Grid>
+<#
+                    gridOpened = false;
+                } else {
+                    currGridFlexRow++;
+                }
+                continue;
+            }
+            if(IsMemoInput(modelViewUIFormPropertySerializable, Model)) {
+                if(! gridOpened) {
+                    curGridRow++;
+#>
+                    <Grid Grid.Row="<#= curGridRow #>" Grid.Column="0"
+                          RowDefinitions="<#= GetGridFlexRowDefs(Model, i) #>" ColumnDefinitions="*"
+                          gridflex:<#= gridFlexModelClassName #>.HorizontalFlex="{Binding Path=<#= IsGridFlexPropertyName #>, Mode=OneWay, Source={x:Reference <#= RootNodeName #>}}" Margin="0 0 8 0">
+<#
+                    currGridFlexRow = 0;
+                    gridOpened = true;
+                }
+#>
+                        <Grid Grid.Row="<#= currGridFlexRow #>" Grid.Column="0" RowSpacing="0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Label Grid.Row="0" FontSize="Caption" Text="<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty)#>" />
+                            <Editor  Grid.Row="1" x:Uid="<#= GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>"
+<#
+                if (InputTypeWhenXXX == InputTypeEnum.ReadOnly) {
+#>
+                                        IsReadOnly="True"
+<#
+                } else {
+#>
+                                        IsReadOnly="{Binding BindingContext.<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, EnabledSufix) #>, Converter={StaticResource InverseBooleanConverter}, Mode=OneWay, Source={x:Reference <#= RootNodeName #>}}"
+<#
+                }
+#>
+                                        Text="{Binding BindingContext.<#= GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #> <#= GetNullableConverterDecl(modelViewUIFormPropertySerializable, Model, "NullableBackConverter")  #>, Mode=TwoWay, Source={x:Reference <#= RootNodeName #>}}"/>
+                            <Label Grid.Row="2" FontSize="Caption" 
+                                    Text="<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayHintProperty) #>"
+                                    Opacity="0.3"
+                                    TextColor="Default">
+                                <Label.Triggers>
+                                    <DataTrigger TargetType="Label" Binding="{Binding BindingContext.<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ValueErrorSufix) #>, Converter={StaticResource StringNullOrEmptyToBoolConverter}, Source={x:Reference <#= RootNodeName #>}}" Value="False">
+                                        <Setter Property="TextColor" Value="{x:DynamicResource ValidationErrorColor}" />
+                                        <Setter Property="Text" Value="{Binding BindingContext.<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ValueErrorSufix) #>, Mode=OneWay, Source={x:Reference <#= RootNodeName #>}}"/>
+                                        <Setter Property="Opacity" Value="0.7" />
+                                    </DataTrigger>
+                                </Label.Triggers>
+                            </Label>
+                        </Grid>
+<#
+                if(modelViewUIFormPropertySerializable.IsNewLineAfter && gridOpened) {
+#>
+                    </Grid>
+<#
+                    gridOpened = false;
+                } else {
+                    currGridFlexRow++;
+                }
+                continue;
+            }
+// TextBox: Readonly and NotReadonly
+            if(! gridOpened) {
+                curGridRow++;
+#>
+                    <Grid Grid.Row="<#= curGridRow #>" Grid.Column="0" 
+                          RowDefinitions="<#= GetGridFlexRowDefs(Model, i) #>" ColumnDefinitions="*"
+                          gridflex:<#= gridFlexModelClassName #>.HorizontalFlex="{Binding Path=<#= IsGridFlexPropertyName #>, Mode=OneWay, Source={x:Reference <#= RootNodeName #>}}" Margin="0 0 8 0">
+<#
+                    currGridFlexRow = 0;
+                    gridOpened = true;
+            }
+
+#>
+                        <Grid Grid.Row="<#= currGridFlexRow #>" Grid.Column="0" RowSpacing="0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Label Grid.Row="0" FontSize="Caption" Text="<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty)#>" />
+                            <Entry  Grid.Row="1" x:Uid="<#= GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>"
+<#
+                if (InputTypeWhenXXX == InputTypeEnum.ReadOnly) {
+#>
+                                        IsReadOnly="True"
+<#
+                } else {
+#>
+                                        IsReadOnly="{Binding BindingContext.<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, EnabledSufix) #>, Converter={StaticResource InverseBooleanConverter}, Mode=OneWay, Source={x:Reference <#= RootNodeName #>}}"
+<#
+                }
+#>
+                                        Text="{Binding BindingContext.<#= GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #> <#= GetNullableConverterDecl(modelViewUIFormPropertySerializable, Model, "NullableBackConverter")  #>, Mode=TwoWay, Source={x:Reference <#= RootNodeName #>}}"/>
+                            <Label Grid.Row="2" FontSize="Caption" 
+                                    Text="<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayHintProperty) #>"
+                                    Opacity="0.3"
+                                    TextColor="Default">
+                                <Label.Triggers>
+                                    <DataTrigger TargetType="Label" Binding="{Binding BindingContext.<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ValueErrorSufix) #>, Converter={StaticResource StringNullOrEmptyToBoolConverter}, Source={x:Reference <#= RootNodeName #>}}" Value="False">
+                                        <Setter Property="TextColor" Value="{x:DynamicResource ValidationErrorColor}" />
+                                        <Setter Property="Text" Value="{Binding BindingContext.<#= GetModelPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ValueErrorSufix) #>, Mode=OneWay, Source={x:Reference <#= RootNodeName #>}}"/>
+                                        <Setter Property="Opacity" Value="0.7" />
+                                    </DataTrigger>
+                                </Label.Triggers>
+                            </Label>
+                        </Grid>
+<#
+             if(modelViewUIFormPropertySerializable.IsNewLineAfter && gridOpened) {
+#>
+                    </Grid>
+<#
+                    gridOpened = false;
+             } else {
+                currGridFlexRow++;
+             }
+
+        }
+                if(gridOpened) {
+#>
+                    </Grid>
+<#
+                    gridOpened = false;
+                } else {
+                    currGridFlexRow++;
+                }
+                curGridRow++;
+#>
+                <StackLayout Orientation="Horizontal" Grid.Row="<#= curGridRow #>" Grid.Column="0" Margin="8" IsVisible="{Binding <#= ShowSubmitPropertyName #>, Mode=OneWay,  Source={x:Reference <#= RootNodeName #>} }">
+                    <Button Text="Submit" Command="{Binding BindingContext.<#= SubmitCommandPropertyName #>, Source={x:Reference <#= RootNodeName #>}}" />
+                    <Button Text="Cancel" Command="{Binding BindingContext.<#= CancelCommandPropertyName #>, Source={x:Reference <#= RootNodeName #>}}" />
+                </StackLayout>
+            </Grid>
+
+<#
+    }
+#>
+        </ContentView>
+    </Grid>
+</efrmbs:<#= EformUserControlBaseClassName #>>
+
+

@@ -121,6 +121,7 @@ using Prism.Navigation;
     string SformAddItemCommandPropertyName      = "SformAddItemCommand";
     string SformUpdItemCommandPropertyName      = "SformUpdItemCommand";
     string SformDelItemCommandPropertyName      = "SformDelItemCommand";
+    string SformViewItemCommandPropertyName     = "SformViewItemCommand";
     string SformAfterAddItemCommandPropertyName = "SformAfterAddItemCommand";
     string SformAfterUpdItemCommandPropertyName = "SformAfterUpdItemCommand";
     string SformAfterDelItemCommandPropertyName = "SformAfterDelItemCommand";
@@ -136,6 +137,10 @@ using Prism.Navigation;
     string OnLoadedPropertyName                     = "OnLoaded";
 
     string edialogNamePropertyName                  = "edialogName";
+    string adialogNamePropertyName                  = "adialogName";
+    string udialogNamePropertyName                  = "udialogName";
+    string ddialogNamePropertyName                  = "ddialogName";
+    string vdialogNamePropertyName                  = "vdialogName";
     string IsParentLoadedPropertyName               = "IsParentLoaded";
     string OnDestroyPropertyName                    = "OnDestroy";
     string IsDestroyedPropertyName                  = "IsDestroyed";
@@ -181,6 +186,12 @@ namespace <#= LformViewModelBaseNameSpace #> {
         protected <#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName #>=null;
         protected IDialogService _dialogService=null;
         protected string <#= edialogNamePropertyName #> = "noname";
+        protected string <#= adialogNamePropertyName #> = "noname";
+        protected string <#= udialogNamePropertyName #> = "noname";
+        protected string <#= ddialogNamePropertyName #> = "noname";
+        protected string <#= vdialogNamePropertyName #> = "noname";
+
+
         public <#= LformViewModelBaseClassName #>(<#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName  #>, IDialogService dialogService) {
             this.<#= AppSettingServicePropertyName #> = <#= AppSettingServicePropertyName #>;
             this._dialogService = dialogService;
@@ -301,6 +312,7 @@ namespace <#= LformViewModelBaseNameSpace #> {
             return new ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>>()  {
                 new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "RowUpdMI", Caption="Update item", IconName="TableEdit", IconColor=Color.Default, Enabled=true, Data=null, Command = <#= RowMenuItemsCommandPropertyName #>},
                 new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "RowDelMI", Caption="Delete item", IconName="TableRemove", IconColor=Color.Default, Enabled=true, Data=null, Command = <#= RowMenuItemsCommandPropertyName #>},
+                new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "RowViewMI", Caption="View item", IconName="TableEdit", IconColor=Color.Default, Enabled=true, Data=null, Command = <#= RowMenuItemsCommandPropertyName #>},
             };
         }
         public void <#= RowMenuItemsPropertyChangedPropertyName #>(object Sender, object OldValue, object NewValue) {
@@ -451,6 +463,10 @@ namespace <#= LformViewModelBaseNameSpace #> {
                     <#= SformDelItemCommandPropertyName #>(mi.FeedbackData);
                     return;
                 }
+                if(mi.Id == "RowViewMI") {
+                    <#= SformViewItemCommandPropertyName #>(mi.FeedbackData);
+                    return;
+                }
             }
             <#= BindingContextFeedbackRefPropertyName #> = new <#= BindingContextFeedbackClassName #>() {
 		        BcfName = "<#= RowMenuItemsCommandPropertyName #>",
@@ -558,7 +574,7 @@ namespace <#= LformViewModelBaseNameSpace #> {
             prms.Add("<#= EformModePropertyName #>", <#= EformModeEnumClassName #>.AddMode);
             prms.Add("<#= ShowSubmitPropertyName  #>", true);
             // prms.Add("<#= FormControlModelPropertyName #>", null);
-            _dialogService.ShowDialog(<#= edialogNamePropertyName #>, prms, (rslt) => {
+            _dialogService.ShowDialog(<#= adialogNamePropertyName #>, prms, (rslt) => {
                 if(rslt == null) return;
                 var rtprms = rslt.Parameters;
                 if (rtprms == null) return;
@@ -598,7 +614,7 @@ namespace <#= LformViewModelBaseNameSpace #> {
             prms.Add("<#= EformModePropertyName #>", <#= EformModeEnumClassName #>.UpdateMode);
             prms.Add("<#= ShowSubmitPropertyName  #>", true);
             prms.Add("<#= FormControlModelPropertyName #>", selected);
-            _dialogService.ShowDialog(<#= edialogNamePropertyName #>, prms, (rslt) => {
+            _dialogService.ShowDialog(<#= udialogNamePropertyName #>, prms, (rslt) => {
                 if(rslt == null) return;
                 var rtprms = rslt.Parameters;
                 if (rtprms == null) return;
@@ -638,7 +654,7 @@ namespace <#= LformViewModelBaseNameSpace #> {
             prms.Add("<#= EformModePropertyName #>", <#= EformModeEnumClassName #>.DeleteMode);
             prms.Add("<#= ShowSubmitPropertyName  #>", true);
             prms.Add("<#= FormControlModelPropertyName #>", selected);
-            _dialogService.ShowDialog(<#= edialogNamePropertyName #>, prms, (rslt) => {
+            _dialogService.ShowDialog(<#= ddialogNamePropertyName #>, prms, (rslt) => {
                 if(rslt == null) return;
                 var rtprms = rslt.Parameters;
                 if (rtprms == null) return;
@@ -654,6 +670,19 @@ namespace <#= LformViewModelBaseNameSpace #> {
                     };
                 }
             });
+        }
+        #endregion
+        #region <#= SformViewItemCommandPropertyName #>
+        public void <#= SformViewItemCommandPropertyName #>(object selected) {
+            if(<#= IsDestroyedPropertyName #>) return;
+            if ((!<#= CanDelVMPropertyName #>) || (selected == null)) return;
+            IDialogParameters prms = new DialogParameters();
+            prms.Add("<#= CaptionPropertyName #>", "View Item");
+            prms.Add("<#= HiddenFiltersPropertyName #>", <#= HiddenFiltersVMPropertyName #>);
+            prms.Add("<#= EformModePropertyName #>", <#= EformModeEnumClassName #>.DeleteMode);
+            prms.Add("<#= ShowSubmitPropertyName  #>", true);
+            prms.Add("<#= FormControlModelPropertyName #>", selected);
+            _dialogService.ShowDialog(<#= vdialogNamePropertyName #>, prms, (rslt) => {});
         }
         #endregion
 

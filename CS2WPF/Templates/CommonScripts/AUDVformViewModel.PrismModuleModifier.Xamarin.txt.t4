@@ -1,0 +1,112 @@
+﻿<#
+
+
+    string AUDVformUserControlClassName             = GetModelClassName(Model, AUDVformUserControlFolder);
+    string AUDVformUserControlNameSpace             = GetModelNameSpace(Model, AUDVformUserControlFolder);
+    string AUDVformUserControlProject               = GetModelProjectName(Model, AUDVformUserControlFolder);
+
+    string AUDVformViewModelClassName               = GetModelClassName(Model, AUDVformViewModelFolder);
+    string AUDVformViewModelNameSpace               = GetModelNameSpace(Model, AUDVformViewModelFolder);
+    string AUDVformViewModelProject                 = GetModelProjectName(Model, AUDVformViewModelFolder);
+
+
+#>
+{
+"PrismMMMCallItems": [
+
+
+    {
+    "Description": [
+
+    '"<#= AUDVformUserControlClassName #>" UserControl is defined in the "<#= AUDVformUserControlProject #>"-project.',
+    'In the file of IModule-class of "<#= AUDVformUserControlProject #>"-project the following line of code must be inserted:',
+    ' ',
+    '    public void RegisterTypes(IContainerRegistry containerRegistry)',
+    '    {',
+    '        ...',
+    '        // According to requirements of the "<#= AUDVformViewModelClassName #>.cs"-file of "<#= AUDVformViewModelProject #>"-project. ',
+    '        ViewModelLocationProvider.Register<<#= AUDVformUserControlClassName #>, <#= AUDVformViewModelClassName #>>();',
+    '        // According to requirements of the "<#= AUDVformViewModelClassName #>.cs"-file of "<#= AUDVformViewModelProject #>"-project. ',
+    '        containerRegistry.Register<ContentView, <#= AUDVformUserControlClassName #>>("<#= AUDVformUserControlClassName #>");',
+    '        ...',
+    '    }'
+    ],
+    
+
+<#
+    {
+    string AUDVformUserControlNameSpaceAndClassName         = AUDVformUserControlNameSpace + "." + AUDVformUserControlClassName;
+    string AUDVformViewModelNameSpaceAndClassName           = AUDVformViewModelNameSpace + "." + AUDVformViewModelClassName;
+    string destProjectName                                  = GetModelProjectUniqueName(Model, AUDVformUserControlFolder);
+    string destImplementedInterface                         = "Prism.Modularity.IModule";
+    string destMethodName                                   = "RegisterTypes";
+    string[] destMethodParamTypes                           = new string[] {"Prism.Ioc.IContainerRegistry"};
+    string destMethodAccessType                             = "public";
+    string invocationClassType                              = "Prism.Mvvm.ViewModelLocationProvider";
+    string invocationMethodName                             = "Register";
+    string[] invocationGenerics                             = new string[]{AUDVformUserControlNameSpaceAndClassName, AUDVformViewModelNameSpaceAndClassName};
+    string[] invocationParams                               = new string[]{};
+    //result = PrismModifier.UpdateMethodWithClassIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType,
+    //                    invocationClassType, invocationMethodName, invocationGenerics, invocationParams);
+#>
+    "MethodName": 'UpdateMethodWithClassIdentifier',
+    "DestProjectName": '<#= destProjectName #>',
+    "DestImplementedInterface": '<#= destImplementedInterface #>',
+    "DestMethodName": '<#= destMethodName #>',
+    "DestMethodParamTypes": ['<#= destMethodParamTypes[0] #>'],
+    "DestMethodAccessType": '<#= destMethodAccessType #>',
+    "DestMethodParamTypeForVar": '',
+    "InvocationVarType": '',
+    "InvocationParamType": '',
+    "InvocationClassType": '<#= invocationClassType #>',
+    "InvocationMethodName": '<#= invocationMethodName #>',
+    "InvocationGenerics": ['<#= invocationGenerics[0] #>','<#= invocationGenerics[1] #>'],
+    "InvocationParams": [],
+    "StepDescription": 'Insertion the line : ViewModelLocationProvider.Register<<#= AUDVformUserControlClassName #>, <#= AUDVformViewModelClassName #>>();'
+    },
+<#
+    }
+#>
+
+
+<#
+{
+    string AUDVformUserControlNameSpaceAndClassName         = AUDVformUserControlNameSpace + "." + AUDVformUserControlClassName;
+    string AUDVformViewModelNameSpaceAndClassName           = AUDVformViewModelNameSpace + "." + AUDVformViewModelClassName;
+    string destProjectName                                  = GetModelProjectUniqueName(Model, AUDVformUserControlFolder);
+    string destImplementedInterface                         = "Prism.Modularity.IModule";
+    string destMethodName                                   = "RegisterTypes";
+    string[] destMethodParamTypes                           = new string[] {"Prism.Ioc.IContainerRegistry"};
+    string destMethodAccessType                             = "public";
+    string invocationParamType                              = "Prism.Ioc.IContainerRegistry";
+    string invocationMethodName                             = "Register";
+    string[] invocationGenerics                             = new string[]{"Xamarin.Forms.ContentView",AUDVformUserControlNameSpaceAndClassName};
+    string[] invocationParams                               = new string[]{"\""+ AUDVformUserControlClassName +"\""};
+    //result = PrismModifier.UpdateMethodWithParamIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType,
+    //                    invocationParamType, invocationMethodName, invocationGenerics, invocationParams);
+#>  
+   {
+    "Description": [],
+    "MethodName": 'UpdateMethodWithParamIdentifier',
+    "DestProjectName": '<#= destProjectName #>',
+    "DestImplementedInterface": '<#= destImplementedInterface #>',
+    "DestMethodName": '<#= destMethodName #>',
+    "DestMethodParamTypes": ['<#= destMethodParamTypes[0] #>'],
+    "DestMethodAccessType": '<#= destMethodAccessType #>',
+    "DestMethodParamTypeForVar": '',
+    "InvocationVarType": '',
+    "InvocationParamType": '<#= invocationParamType #>',
+    "InvocationClassType": '',
+    "InvocationMethodName": '<#= invocationMethodName #>',
+    "InvocationGenerics": ['<#= invocationGenerics[0] #>','<#= invocationGenerics[1] #>'],
+    "InvocationParams": ['<#= invocationParams[0]  #>'],
+    "StepDescription": 'Insertion the line : containerRegistry.Register<ContentView, <#= AUDVformUserControlClassName #>>("<#= AUDVformUserControlClassName #>");'
+    },
+<#
+
+}
+#>
+    ]
+}
+
+
