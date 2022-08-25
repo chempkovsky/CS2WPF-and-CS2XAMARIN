@@ -174,6 +174,17 @@
 
              x:Name="<#= RootNodeName #>"
              >
+<!--
+To reset FormControlModel and(or) HiddenFilters do the following:
+set IsParentLoaded = false;
+set FormControlModel and(or) HiddenFilters
+set IsParentLoaded = true;
+
+resetting FormControlModel and(or) HiddenFilters without 
+    { IsParentLoaded = false; IsParentLoaded = true; }
+will not affect the behavior of current component
+-->
+
     <efrmbs:<#= EformUserControlBaseClassName #>.Resources>
         <invboolconv:<#= InverseBooleanConverterClassName #> x:Key="InverseBooleanConverter"/>
         <str2boolconv:<#= StringNullOrEmptyToBoolConverterClassName #> x:Key="StringNullOrEmptyToBoolConverter"/>

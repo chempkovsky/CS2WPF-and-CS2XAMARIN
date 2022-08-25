@@ -940,15 +940,21 @@ namespace <#= AUDVformViewModelNameSpace #> {
         foreach(Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> fk in ForeignKeyNameChainList) {
             if(fk.Item4 == InputTypeEnum.Typeahead) {
 #>
-                this.<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, EnabledSufix) #> = !this.<#= RootDataSource #>.is<#= UnderHiddenFilterFieldsFieldName #>("<#= GetModelPropertyNameEx(fk.Item3, Model) #>");
+                this.<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, EnabledSufix) #> = 
+                    (!this.<#= RootDataSource #>.is<#= UnderHiddenFilterFieldsFieldName #>("<#= GetModelPropertyNameEx(fk.Item3, Model) #>")) &&
+                    this.<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= IsSetFilterByCurrDirMstrsMethodName #>();
 <#
             } else if(fk.Item4 == InputTypeEnum.Combo) {
 #>
-                this.<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, EnabledSufix) #> = !this.<#= RootDataSource #>.is<#= UnderHiddenFilterFieldsFieldName #>("<#= GetModelPropertyNameEx(fk.Item3, Model) #>");
+                this.<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, EnabledSufix) #> = 
+                    (!this.<#= RootDataSource #>.is<#= UnderHiddenFilterFieldsFieldName #>("<#= GetModelPropertyNameEx(fk.Item3, Model) #>")) &&
+                    this.<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= IsSetFilterByCurrDirMstrsMethodName #>();
 <#
             } else if(fk.Item4 == InputTypeEnum.SearchDialog) {
 #>
-                this.<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, EnabledSufix) #> = !this.<#= RootDataSource #>.is<#= UnderHiddenFilterFieldsFieldName #>("<#= GetModelPropertyNameEx(fk.Item3, Model) #>");
+                this.<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, EnabledSufix) #> = 
+                    (!this.<#= RootDataSource #>.is<#= UnderHiddenFilterFieldsFieldName #>("<#= GetModelPropertyNameEx(fk.Item3, Model) #>")) &&
+                    this.<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= IsSetFilterByCurrDirMstrsMethodName #>();
 <#
             }
         }
@@ -1064,7 +1070,7 @@ namespace <#= AUDVformViewModelNameSpace #> {
                 }
 
 
-            <#= UIDispatcherInvokePropertyName #>(async () => {
+            <#= UIDispatcherInvokePropertyName #>(() => {
                 _<#= GetModelPropertyNameWithSufix(fk.Item3, Model, ComboSufix) #> = null;
                 OnPropertyChanged("<#= GetModelPropertyNameWithSufix(fk.Item3, Model, ComboSufix) #>");
                 this._<#= GetExpressionForControlList(fk.Item3, Model, ComboSufix) #> = data;
@@ -1358,7 +1364,7 @@ namespace <#= AUDVformViewModelNameSpace #> {
 #>
         }
         // IF (ChosenSuggestion != null) THEN User selected an item from the suggestion list, take an action on it here.
-        public async void <#= OnAutoSuggestBoxQuerySubmittedPropertyName #>(object Sender, object AutoSggstBx, string PropName, object ChosenSuggestion, string QueryText)
+        public void <#= OnAutoSuggestBoxQuerySubmittedPropertyName #>(object Sender, object AutoSggstBx, string PropName, object ChosenSuggestion, string QueryText)
         {
             if (<#= IsDestroyedPropertyName #>) return;
 <#  
@@ -1375,9 +1381,16 @@ namespace <#= AUDVformViewModelNameSpace #> {
 #>
                 case "<#= GetModelPropertyNameEx(fk.Item3, Model) #>":
                     <#=  GetModelPropertyNameWithSufix(fk.Item3, Model, TypeaheadItemsSourceSufix) #> = null;
-                    Task.Run(() => {
-                        this.<#= GetModelPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= Interface2ValuesMethodName #>(ChosenSuggestion as <#= GetInterfaceNameEx(Context, fk.Item2.ViewName) #>, true);
-                    }).ConfigureAwait(false);
+                    {
+                        _= Task.Run(() => {
+                            <#= GetInterfaceNameEx(Context, fk.Item2.ViewName) #> itm = ChosenSuggestion as <#= GetInterfaceNameEx(Context, fk.Item2.ViewName) #>;
+                            if(itm == null) {
+                                this.<#=  GetModelPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= ClearPartiallyMethodName #>(true);
+                            } else {
+                                this.<#= GetModelPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= Interface2ValuesMethodName #>(itm, true);
+                            }
+                        }).ConfigureAwait(false);
+                    }
                     break;
 <#
                     }
@@ -1514,7 +1527,7 @@ namespace <#= AUDVformViewModelNameSpace #> {
                         <#= UIDispatcherInvokePropertyName #>(() => {
                             <#= IsLoadingPropertyName #> = true;
                         });
-                        Task.Run(async () => {
+                        _ = Task.Run(async () => {
                             try {
                                 await <#= OnFormControlModelChangedPropertyName #>();
 <#
@@ -1526,6 +1539,7 @@ namespace <#= AUDVformViewModelNameSpace #> {
                 }
             }
 #>
+                                await Do<#= RootDataSource + AfterPropsChangedPropName #>(this.<#= RootDataSource #>);
                                 <#= UIDispatcherInvokePropertyName #>(() => {
                                     ClearValidationMessages();
                                     <#= IsOnLoadedCalledPropertyName #> = true;
@@ -1535,7 +1549,7 @@ namespace <#= AUDVformViewModelNameSpace #> {
                                     <#= IsLoadingPropertyName #> = false;
                                 });
                             }
-                        }).ConfigureAwait(false);;
+                        }).ConfigureAwait(false);
                 } else {
                     <#= IsOnLoadedCalledPropertyName #> = v;
                 }
