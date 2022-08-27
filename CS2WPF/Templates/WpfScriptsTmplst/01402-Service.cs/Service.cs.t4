@@ -110,6 +110,8 @@ using System.Linq;
     string GetManyByRepPrimMethodNamePrefix     = "getmanybyrepprim";
     string GetManyByRepUnqMethodNamePrefix      = "getmanybyrepunq";
     string GetOneByMethodNamePrefix             = "getoneby";
+    string Dict2TupleMethodName                 = "Dict2Tuple";
+    string Tuple2DictMethodName                 = "Tuple2Dict";
 
     List<ModelViewUniqueKeyOfVwSerializable> uniqueKeys = new List<ModelViewUniqueKeyOfVwSerializable>();
     {
@@ -169,6 +171,25 @@ using <#= ns #>;
 namespace <#= modelServiceNameSpace #> {
     public class <#= modelServiceClassName #>: <#= modelServiceInterfaceClassName #>
     {
+        public Dictionary<(string viewNm, string navNm, string propNm), object> <#= Dict2TupleMethodName #>(Dictionary<string, object> src) {
+            Dictionary<(string viewNm, string navNm, string propNm), object> dest = new Dictionary<(string viewNm, string navNm, string propNm), object>();
+            if(src == null) return dest;
+            var keys = src.Keys.ToList();
+            foreach(var key in keys) {
+                string[] vnp = key.Split(new char[] { '.' });
+                dest[(vnp[0],vnp[1],vnp[2])] = src[key];
+            }
+        }
+        public Dictionary<string, object> <#= Tuple2DictMethodName #>(Dictionary<(string viewNm, string navNm, string propNm), object> src) {
+            Dictionary<string, object> <#= Tuple2DictMethodName #> dest = new Dictionary<string, object>();
+            if(src == null) return dest;
+            var keys = src.Keys.ToList();
+            foreach(var key in keys) {
+                dest[key.viewNm + "." + key.navNm + "." + key.propNm] = src[key];
+            }
+        }
+
+
         protected <#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName #> = null;
         protected string serviceUrl = null;
         protected HttpClient client = null;

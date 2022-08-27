@@ -1,0 +1,41 @@
+﻿using Xamarin.Forms;
+<#
+
+    string RegionAwareUserControlBaseFolder       = "00650-RegionAwareUserControlBase.xaml.cs";
+    string RegionAwareUserControlBaseClassName    = GetContextModelClassName(Context, RegionAwareUserControlBaseFolder);
+    string RegionAwareUserControlBaseNameSpace    = GetContextModelNameSpace(Context, RegionAwareUserControlBaseFolder);
+    string RegionAwareUserControlBaseProject      = GetContextModelProjectName(Context, RegionAwareUserControlBaseFolder);
+
+    string RAUDVUserControlClassName                 = GetModelClassName(Model, RAUDVUserControlFolder);
+    string RAUDVUserControlNameSpace                 = GetModelNameSpace(Model, RAUDVUserControlFolder);
+
+    string OnLoadedPropertyName                     = "OnLoaded";
+
+    List<string> nmSpaces = new List<string>();
+    if ((RAUDVUserControlClassName != RegionAwareUserControlBaseNameSpace) && (nmSpaces.IndexOf(RegionAwareUserControlBaseNameSpace) < 0)) 
+        nmSpaces.Add(RegionAwareUserControlBaseNameSpace);
+    
+#>
+<# 
+    foreach(string ns in nmSpaces) {
+#>
+using <#= ns #>;
+<#
+    }
+#>
+
+
+namespace <#= RAUDVUserControlNameSpace #> {
+    /// <summary>
+    /// Interaction logic for <#= RAUDVUserControlClassName #>.xaml
+    /// </summary>
+    public partial class <#= RAUDVUserControlClassName #>: <#= RegionAwareUserControlBaseClassName  #>
+    {
+        public <#= RAUDVUserControlClassName #>()
+        {
+            InitializeComponent();
+            <#= OnLoadedPropertyName #>(); 
+        }
+    }
+}
+

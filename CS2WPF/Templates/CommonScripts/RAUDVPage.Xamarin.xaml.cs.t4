@@ -1,0 +1,74 @@
+﻿using Xamarin.Forms;
+using Prism.Navigation;
+<#
+
+    string RAUDVPageClassName                        = GetModelClassName(Model, RAUDVPageFolder);
+    string RAUDVPageNameSpace                        = GetModelNameSpace(Model, RAUDVPageFolder);
+
+    string IsDestroyedPropertyName = "IsDestroyed";
+    string OnDestroyedPropertyName = "OnDestroyed";
+
+    List<string> nmSpaces = new List<string>();
+    
+#>
+<# 
+    foreach(string ns in nmSpaces) {
+#>
+using <#= ns #>;
+<#
+    }
+#>
+
+
+namespace <#= RAUDVPageNameSpace #> {
+    /// <summary>
+    /// Interaction logic for <#= RAUDVPageClassName #>.xaml
+    /// </summary>
+    public partial class <#= RAUDVPageClassName #>: ContentPage, IDestructible
+    {
+        public <#= RAUDVPageClassName #>()
+        {
+            InitializeComponent();
+        }
+        #region IDestructible
+        public virtual void <#= OnDestroyedPropertyName #>()
+        {
+            IDestructible bc = BindingContext as IDestructible;
+            if(bc != null) bc.Destroy();
+            BindingContext = null;
+            Content = null;
+        }
+        private static void <#= IsDestroyedPropertyName #>Changed(BindableObject d, object oldValue, object newValue)
+        {
+            <#= RAUDVPageClassName #> inst = d as <#= RAUDVPageClassName #>;
+            if (inst != null)
+            {
+                inst.<#= OnDestroyedPropertyName #>();
+            }
+        }
+        public static readonly BindableProperty <#= IsDestroyedPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= IsDestroyedPropertyName #>", typeof(bool),
+                typeof(<#= RAUDVPageClassName #>),
+                false, propertyChanged: <#= IsDestroyedPropertyName #>Changed);
+        public bool <#= IsDestroyedPropertyName #>
+        {
+            get
+            {
+                return (bool)GetValue(<#= IsDestroyedPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= IsDestroyedPropertyName #>Property, value);
+            }
+        }
+
+        public void Destroy()
+        {
+            <#= IsDestroyedPropertyName #> = true;
+        }
+        #endregion
+
+    }
+}
+

@@ -67,7 +67,8 @@ using System.Threading.Tasks;
     string GetOneByMethodNamePrefix             = "getoneby";
     string GetManyByRepUnqMethodNamePrefix      = "getmanybyrepunq";
     string row2FilterRsltMethodName             = "Row2FilterRslt";
-
+    string Dict2TupleMethodName                 = "Dict2Tuple";
+    string Tuple2DictMethodName                 = "Tuple2Dict";
 
     List<ModelViewUniqueKeyOfVwSerializable> uniqueKeys = new List<ModelViewUniqueKeyOfVwSerializable>();
     {
@@ -117,6 +118,9 @@ namespace <#= modelServiceInterfaceNameSpace #> {
         IList<<#= IWebServiceFilterRsltInterfaceClassName #>> get<#= HiddenFilterAsFltRsltSuffix #>(Dictionary<(string viewNm, string navNm, string propNm), object> <#= HiddenFilterFieldName #>);
         Dictionary<(string viewNm, string navNm, string propNm), object> get<#= HiddenFilterByFltRsltSuffix #>(IList<<#= IWebServiceFilterRsltInterfaceClassName #>> fr);
         Dictionary<(string viewNm, string navNm, string propNm), string> get<#= ClientToMasterFieldsMapFieldName #>();
+        Dictionary<(string viewNm, string navNm, string propNm), object> <#= Dict2TupleMethodName #>(Dictionary<string, object> src);
+        Dictionary<string, object> <#= Tuple2DictMethodName #>(Dictionary<(string viewNm, string navNm, string propNm), object> src);
+
 
 <# 
     if (Model.IsWebApiSelectAll) { 
