@@ -1,0 +1,303 @@
+﻿<#
+
+    string EformModeEnumFolder                      = "00026-EformModeEnum.cs";
+    string EformModeEnumClassName                   = GetContextModelClassName(Context, EformModeEnumFolder);
+    string EformModeEnumNameSpace                   = GetContextModelNameSpace(Context, EformModeEnumFolder);
+
+    string IAppGlblSettingsServiceFolder            = "00080-IAppGlblSettingsService.cs";
+    string IAppGlblSettingsServiceClassName         = GetContextModelClassName(Context, IAppGlblSettingsServiceFolder);
+    string IAppGlblSettingsServiceNameSpace         = GetContextModelNameSpace(Context, IAppGlblSettingsServiceFolder);
+
+    string IWebServiceFilterRsltInterfaceFolder     = "00204-IWebServiceFilterRsltInterface.cs";
+    string IWebServiceFilterRsltInterfaceClassName  = GetContextModelClassName(Context, IWebServiceFilterRsltInterfaceFolder);
+    string IWebServiceFilterRsltInterfaceNameSpace  = GetContextModelNameSpace(Context, IWebServiceFilterRsltInterfaceFolder);
+
+    string IWebServiceFilterMenuInterfaceFolder     = "00206-IWebServiceFilterMenuInterface.cs";
+    string IWebServiceFilterMenuInterfaceClassName  = GetContextModelClassName(Context, IWebServiceFilterMenuInterfaceFolder);
+    string IWebServiceFilterMenuInterfaceNameSpace  = GetContextModelNameSpace(Context, IWebServiceFilterMenuInterfaceFolder);
+
+    string WebServiceFilterRsltViewModelFolder      = "00215-WebServiceFilterRsltViewModel.cs";
+    string WebServiceFilterRsltViewModelClassName   = GetContextModelClassName(Context, WebServiceFilterRsltViewModelFolder);
+    string WebServiceFilterRsltViewModelNameSpace   = GetContextModelNameSpace(Context, WebServiceFilterRsltViewModelFolder);
+
+    string WebServiceFilterMenuViewModelFolder      = "00217-WebServiceFilterMenuViewModel.cs";
+    string WebServiceFilterMenuViewModelClassName   = GetContextModelClassName(Context, WebServiceFilterMenuViewModelFolder);
+    string WebServiceFilterMenuViewModelNameSpace   = GetContextModelNameSpace(Context, WebServiceFilterMenuViewModelFolder);
+
+
+    string modelInterfaceFolder                     = "01100-Interface.cs";
+    string modelInterfaceClassName                  = GetInterfaceName(Model);
+    string modelInterfaceNameSpace                  = GetModelNameSpace(Model, modelInterfaceFolder);
+
+
+
+
+    string AUDVformUserControlClassName                = GetModelClassName(Model, AUDVformUserControlFolder);
+    string AUDVformUserControlNameSpace                = GetModelNameSpace(Model, AUDVformUserControlFolder);
+    string AUDVformUserControlProject                  = GetModelProjectName(Model, AUDVformUserControlFolder);
+
+
+    string RAUDVPageClassName                       = GetModelClassName(Model, RAUDVPageFolder);
+    string RAUDVPageNameSpace                       = GetModelNameSpace(Model, RAUDVPageFolder);
+    string RAUDVPageProject                         = GetModelProjectName(Model, RAUDVPageFolder);
+
+    
+    string RAUDVPageViewModelClassName              = GetModelClassName(Model, RAUDVPageViewModelFolder);
+    string RAUDVPageViewModelNameSpace              = GetModelNameSpace(Model, RAUDVPageViewModelFolder);
+    string RAUDVPageViewModelProject                = GetModelProjectName(Model, RAUDVPageViewModelFolder);
+
+    string HiddenFiltersPropertyName                = "HiddenFilters";
+    string OnHiddenFiltersChangedPropertyName       = "OnHiddenFiltersChanged";
+    string HiddenFiltersPropertyChangedPropertyName = "HiddenFiltersPropertyChanged";
+
+
+
+    string IsOnLoadedCalledPropertyName         = "IsOnLoadedCalled";
+    string IsCanceledPropertyName               = "IsCanceled";
+
+    string RegionPropertyName                   = "Region";
+    string ReditPageRegionPropertyName          = "ReditPageRegion";
+
+    string DisplayLabelProperty                 = "Name";
+    string DisplayHintProperty                  = "Prompt";
+
+    string FormRootServicePropertyName          = "FrmRootSrv";
+    string AppSettingServicePropertyName        = "GlblSettingsSrv";
+    string GetWithFilterMethodName              = "getwithfilter";
+    string ColumnSelectorDlgPropertyName        = "ColumnSelectorDlg";
+
+
+    string FormControlModelPropertyName         = "FormControlModel";
+    string CaptionPropertyName                  = "Caption";
+    string EformModePropertyName                = "EformMode";
+    string ShowSubmitPropertyName               = "ShowSubmit";
+    string FormServicePrefix                    = "FrmSrv";
+
+    string RowMIPrefixPropertyName              = "RowMI";
+    string NavigationBackCommandPropertyName    = "NavigationBackCommand";
+
+
+    string UIDispatcherInvokePropertyName       = "Application.Current.Dispatcher.Invoke";
+    string GetOneMethodName                     = "getone";
+    string CopyToModelNotifyMethodName          = "CopyToModelNotify";
+
+    string SubmitCommandPropertyName            = "SubmitCommand";
+    string CancelCommandPropertyName            = "CancelCommand";
+    string IsParentLoadedPropertyName           = "IsParentLoaded";
+    
+
+    List<string> detailViews = GetDetailViews(Model, Context, null);
+    List<ModelViewPropertyOfVwSerializable> primKeys = GetModelPrimaryKeyProps(Model);
+
+
+    List<string> nmSpaces = new List<string>();
+    if ((RAUDVPageViewModelNameSpace != IWebServiceFilterRsltInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IWebServiceFilterRsltInterfaceNameSpace);
+    if ((RAUDVPageViewModelNameSpace != WebServiceFilterRsltViewModelNameSpace) && (nmSpaces.IndexOf(WebServiceFilterRsltViewModelNameSpace) < 0)) 
+        nmSpaces.Add(WebServiceFilterRsltViewModelNameSpace);
+    if ((RAUDVPageViewModelNameSpace != IAppGlblSettingsServiceNameSpace) && (nmSpaces.IndexOf(IAppGlblSettingsServiceNameSpace) < 0)) 
+        nmSpaces.Add(IAppGlblSettingsServiceNameSpace);
+    if ((RAUDVPageViewModelNameSpace != WebServiceFilterMenuViewModelNameSpace) && (nmSpaces.IndexOf(WebServiceFilterMenuViewModelNameSpace) < 0)) 
+        nmSpaces.Add(WebServiceFilterMenuViewModelNameSpace);
+    if ((RAUDVPageViewModelNameSpace != IWebServiceFilterMenuInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterMenuInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IWebServiceFilterMenuInterfaceNameSpace);
+    if ((RAUDVPageViewModelNameSpace != IWebServiceFilterMenuInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterMenuInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IWebServiceFilterMenuInterfaceNameSpace);
+    if ((RAUDVPageViewModelNameSpace != EformModeEnumNameSpace) && (nmSpaces.IndexOf(EformModeEnumNameSpace) < 0)) 
+        nmSpaces.Add(EformModeEnumNameSpace);
+    if ((RAUDVPageViewModelNameSpace != modelInterfaceNameSpace) && (nmSpaces.IndexOf(modelInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(modelInterfaceNameSpace);
+
+    bool IsInTheSameModule = (AUDVformUserControlProject == RAUDVPageProject);
+    
+    
+#>
+{
+"PrismMMMCallItems": [
+
+
+<#
+    if(!IsInTheSameModule) {
+#>
+    {
+    "Description": [
+    '"<#= AUDVformUserControlClassName #>"-UserControl is defined in the "<#= AUDVformUserControlProject #>"-project.',
+    'In the file of IModule-class of "<#= AUDVformUserControlProject #>"-project the following line of code must be inserted:',
+    ' ',
+    '    public void OnInitialized(IContainerProvider containerProvider)',
+    '    {',
+    '        ...',
+    '        IRegionManager regionManager = containerProvider.Resolve(typeof(IRegionManager)) as IRegionManager;',
+    '        if (regionManager != null)',
+    '        {',
+    '            ...',
+    '            // According to requirements of the "<#= RAUDVPageViewModelClassName #>.cs"-file of "<#= RAUDVPageViewModelProject #>"-project. ',
+    '            regionManager.RegisterViewWithRegion("<#= AUDVformUserControlClassName #><#= ReditPageRegionPropertyName #>", typeof(<#= AUDVformUserControlClassName #>));',
+    '            ...',
+    '        }',
+    '        ...',
+    '    }'
+    ],
+<#
+{
+    string AUDVformUserControlNameSpaceAndClassName            = AUDVformUserControlNameSpace + "." + AUDVformUserControlClassName;
+    string destProjectName                                  = GetModelProjectUniqueName(Model, AUDVformUserControlFolder);
+    string destImplementedInterface                         = "Prism.Modularity.IModule";
+    string destMethodName                                   = "OnInitialized";
+    string[] destMethodParamTypes                           = new string[] {"Prism.Ioc.IContainerProvider"};
+    string destMethodAccessType                             = "public";
+    string destMethodParamTypeForVar                        = "Prism.Ioc.IContainerProvider";
+    string invocationVarType                                = "Prism.Regions.IRegionManager";
+    string invocationMethodName                             = "RegisterViewWithRegion";
+    string[] invocationGenerics                             = new string[]{};
+    string[] invocationParams                               = new string[]{"\"" + AUDVformUserControlClassName + ReditPageRegionPropertyName  +"\"", "typeof("+AUDVformUserControlNameSpaceAndClassName+")"};
+    //result = PrismModifier.UpdateMethodWithVarIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType, destMethodParamTypeForVar,
+    //                    invocationVarType, invocationMethodName, invocationGenerics, invocationParams);
+#>
+    "MethodName": 'UpdateMethodWithVarIdentifier',
+    "DestProjectName": '<#= destProjectName #>',
+    "DestImplementedInterface": '<#= destImplementedInterface #>',
+    "DestMethodName": '<#= destMethodName #>',
+    "DestMethodParamTypes": ['<#= destMethodParamTypes[0] #>'],
+    "DestMethodAccessType": '<#= destMethodAccessType #>',
+    "DestMethodParamTypeForVar": '<#= destMethodParamTypeForVar #>',
+    "InvocationVarType": '<#= invocationVarType #>',
+    "InvocationParamType": '',
+    "InvocationClassType": '',
+    "InvocationMethodName": '<#= invocationMethodName #>',
+    "InvocationGenerics": [],
+    "InvocationParams": ['<#= invocationParams[0] #>','<#= invocationParams[1] #>'],
+    "StepDescription": 'Insertion the line : regionManager.RegisterViewWithRegion("<#= AUDVformUserControlClassName #><#= ReditPageRegionPropertyName #>", typeof(<#= AUDVformUserControlClassName #>));'
+    },
+<#
+
+}
+    }
+#>
+    {
+    "Description": [
+    '"<#= RAUDVPageClassName #>" UserControl is defined in the "<#= RAUDVPageProject #>"-project.',
+    'In the file of IModule-class of "<#= RAUDVPageProject #>"-project the following line of code must be inserted:',
+    ' ',
+    '    public void RegisterTypes(IContainerRegistry containerRegistry)',
+    '    {',
+    '        ...',
+    '        // According to requirements of the "<#= RAUDVPageViewModelClassName #>.cs"-file of "<#= RAUDVPageViewModelProject #>"-project. ',
+    '        ViewModelLocationProvider.Register<<#= RAUDVPageClassName #>, <#= RAUDVPageViewModelClassName #>>();',
+    '        // According to requirements of the "<#= RAUDVPageViewModelClassName #>.cs"-file of "<#= RAUDVPageViewModelProject #>"-project. ',
+    '        containerRegistry.RegisterForNavigation<<#= RAUDVPageClassName #>, <#= RAUDVPageViewModelClassName #>>("<#= RAUDVPageClassName #>");',
+    '        // Only if you need to get an instance of controls, insert two lines below',
+    '        // According to requirements of the "<#= RAUDVPageViewModelClassName #>.cs"-file of "<#= RAUDVPageViewModelProject #>"-project. ',
+    '        // containerRegistry.Register<ContentPage, <#= RAUDVPageClassName #>>("<#= RAUDVPageClassName #>");',
+    '        ...',
+    '    }'
+    ],
+<#
+    {
+    string RAUDVPageNameSpaceAndClassName                   = RAUDVPageNameSpace + "." + RAUDVPageClassName;
+    string RAUDVPageViewModelNameSpaceAndClassName          = RAUDVPageViewModelNameSpace + "." + RAUDVPageViewModelClassName;
+    string destProjectName                                  = GetModelProjectUniqueName(Model, RAUDVPageFolder);
+    string destImplementedInterface                         = "Prism.Modularity.IModule";
+    string destMethodName                                   = "RegisterTypes";
+    string[] destMethodParamTypes                           = new string[] {"Prism.Ioc.IContainerRegistry"};
+    string destMethodAccessType                             = "public";
+    string invocationClassType                              = "Prism.Mvvm.ViewModelLocationProvider";
+    string invocationMethodName                             = "Register";
+    string[] invocationGenerics                             = new string[]{RAUDVPageNameSpaceAndClassName, RAUDVPageViewModelNameSpaceAndClassName};
+    string[] invocationParams                               = new string[]{};
+    //result = PrismModifier.UpdateMethodWithClassIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType,
+    //                    invocationClassType, invocationMethodName, invocationGenerics, invocationParams);
+#>
+    "MethodName": 'UpdateMethodWithClassIdentifier',
+    "DestProjectName": '<#= destProjectName #>',
+    "DestImplementedInterface": '<#= destImplementedInterface #>',
+    "DestMethodName": '<#= destMethodName #>',
+    "DestMethodParamTypes": ['<#= destMethodParamTypes[0] #>'],
+    "DestMethodAccessType": '<#= destMethodAccessType #>',
+    "DestMethodParamTypeForVar": '',
+    "InvocationVarType": '',
+    "InvocationParamType": '',
+    "InvocationClassType": '<#= invocationClassType #>',
+    "InvocationMethodName": '<#= invocationMethodName #>',
+    "InvocationGenerics": ['<#= invocationGenerics[0] #>','<#= invocationGenerics[1] #>'],
+    "InvocationParams": [],
+    "StepDescription": 'Insertion the line : ViewModelLocationProvider.Register<<#= RAUDVPageClassName #>, <#= RAUDVPageViewModelClassName #>>();'
+    },
+<#
+
+    }
+{
+    string RAUDVPageNameSpaceAndClassName                   = RAUDVPageNameSpace + "." + RAUDVPageClassName;
+    string RAUDVPageViewModelNameSpaceAndClassName          = RAUDVPageViewModelNameSpace + "." + RAUDVPageViewModelClassName;
+    string destProjectName                                  = GetModelProjectUniqueName(Model, RAUDVPageFolder);
+    string destImplementedInterface                         = "Prism.Modularity.IModule";
+    string destMethodName                                   = "RegisterTypes";
+    string[] destMethodParamTypes                           = new string[] {"Prism.Ioc.IContainerRegistry"};
+    string destMethodAccessType                             = "public";
+    string invocationParamType                              = "Prism.Ioc.IContainerRegistry";
+    string invocationMethodName                             = "RegisterForNavigation";
+    string[] invocationGenerics                             = new string[]{RAUDVPageNameSpaceAndClassName,RAUDVPageViewModelNameSpaceAndClassName};
+    string[] invocationParams                               = new string[]{"\"" + RAUDVPageClassName + "\""};
+    //result = PrismModifier.UpdateMethodWithParamIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType,
+    //                    invocationParamType, invocationMethodName, invocationGenerics, invocationParams);
+#>  
+   {
+    "Description": [],
+    "MethodName": 'UpdateMethodWithParamIdentifier',
+    "DestProjectName": '<#= destProjectName #>',
+    "DestImplementedInterface": '<#= destImplementedInterface #>',
+    "DestMethodName": '<#= destMethodName #>',
+    "DestMethodParamTypes": ['<#= destMethodParamTypes[0] #>'],
+    "DestMethodAccessType": '<#= destMethodAccessType #>',
+    "DestMethodParamTypeForVar": '',
+    "InvocationVarType": '',
+    "InvocationParamType": '<#= invocationParamType #>',
+    "InvocationClassType": '',
+    "InvocationMethodName": '<#= invocationMethodName #>',
+    "InvocationGenerics": ['<#= invocationGenerics[0] #>','<#= invocationGenerics[1] #>'],
+    "InvocationParams": ['<#= invocationParams[0]  #>'],
+    "StepDescription": 'Insertion the line : containerRegistry.RegisterForNavigation<<#= RAUDVPageClassName #>, <#= RAUDVPageViewModelClassName #>>("<#= RAUDVPageClassName #>");'
+    },
+<#
+}
+{
+    string RAUDVPageNameSpaceAndClassName                   = RAUDVPageNameSpace + "." + RAUDVPageClassName;
+    string RAUDVPageViewModelNameSpaceAndClassName          = RAUDVPageViewModelNameSpace + "." + RAUDVPageViewModelClassName;
+    string destProjectName                                  = GetModelProjectUniqueName(Model, RAUDVPageFolder);
+    string destImplementedInterface                         = "Prism.Modularity.IModule";
+    string destMethodName                                   = "RegisterTypes";
+    string[] destMethodParamTypes                           = new string[] {"Prism.Ioc.IContainerRegistry"};
+    string destMethodAccessType                             = "public";
+    string invocationParamType                              = "Prism.Ioc.IContainerRegistry";
+    string invocationMethodName                             = "Register";
+    string[] invocationGenerics                             = new string[]{"Xamarin.Forms.ContentPage",RAUDVPageNameSpaceAndClassName};
+    string[] invocationParams                               = new string[]{"\"" + RAUDVPageClassName + "\""};
+//    result = PrismModifier.UpdateMethodWithParamIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType,
+//                        invocationParamType, invocationMethodName, invocationGenerics, invocationParams);
+#>  
+   {
+    "Description": [],
+    "MethodName": 'UpdateMethodWithParamIdentifier',
+    "DestProjectName": '<#= destProjectName #>',
+    "DestImplementedInterface": '<#= destImplementedInterface #>',
+    "DestMethodName": '<#= destMethodName #>',
+    "DestMethodParamTypes": ['<#= destMethodParamTypes[0] #>'],
+    "DestMethodAccessType": '<#= destMethodAccessType #>',
+    "DestMethodParamTypeForVar": '',
+    "InvocationVarType": '',
+    "InvocationParamType": '<#= invocationParamType #>',
+    "InvocationClassType": '',
+    "InvocationMethodName": '<#= invocationMethodName #>',
+    "InvocationGenerics": ['<#= invocationGenerics[0] #>','<#= invocationGenerics[1] #>'],
+    "InvocationParams": ['<#= invocationParams[0]  #>'],
+    "StepDescription": 'Insertion the line : containerRegistry.Register<ContentPage, <#= RAUDVPageClassName #>>("<#= RAUDVPageClassName #>");'
+    },
+<#
+}
+#>
+    ]
+}
+
+
+
+

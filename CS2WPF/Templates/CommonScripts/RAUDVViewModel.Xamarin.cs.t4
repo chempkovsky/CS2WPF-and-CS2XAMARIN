@@ -1,0 +1,545 @@
+﻿using System;
+using Xamarin.Forms;
+using System.Linq;
+using System.ComponentModel;
+using Prism.Regions.Navigation;
+using System.Windows.Input;
+using System.Collections.ObjectModel;
+using System.Threading.Tasks;
+using System.Runtime.CompilerServices;
+using System.Collections.Generic;
+using Prism.Navigation;
+using Xamarin.Essentials;
+
+<#
+
+    string EformModeEnumFolder                      = "00026-EformModeEnum.cs";
+    string EformModeEnumClassName                   = GetContextModelClassName(Context, EformModeEnumFolder);
+    string EformModeEnumNameSpace                   = GetContextModelNameSpace(Context, EformModeEnumFolder);
+
+    string IAppGlblSettingsServiceFolder            = "00080-IAppGlblSettingsService.cs";
+    string IAppGlblSettingsServiceClassName         = GetContextModelClassName(Context, IAppGlblSettingsServiceFolder);
+    string IAppGlblSettingsServiceNameSpace         = GetContextModelNameSpace(Context, IAppGlblSettingsServiceFolder);
+
+    string IWebServiceFilterRsltInterfaceFolder     = "00204-IWebServiceFilterRsltInterface.cs";
+    string IWebServiceFilterRsltInterfaceClassName  = GetContextModelClassName(Context, IWebServiceFilterRsltInterfaceFolder);
+    string IWebServiceFilterRsltInterfaceNameSpace  = GetContextModelNameSpace(Context, IWebServiceFilterRsltInterfaceFolder);
+
+    string IWebServiceFilterMenuInterfaceFolder     = "00206-IWebServiceFilterMenuInterface.cs";
+    string IWebServiceFilterMenuInterfaceClassName  = GetContextModelClassName(Context, IWebServiceFilterMenuInterfaceFolder);
+    string IWebServiceFilterMenuInterfaceNameSpace  = GetContextModelNameSpace(Context, IWebServiceFilterMenuInterfaceFolder);
+
+    string WebServiceFilterRsltViewModelFolder      = "00215-WebServiceFilterRsltViewModel.cs";
+    string WebServiceFilterRsltViewModelClassName   = GetContextModelClassName(Context, WebServiceFilterRsltViewModelFolder);
+    string WebServiceFilterRsltViewModelNameSpace   = GetContextModelNameSpace(Context, WebServiceFilterRsltViewModelFolder);
+
+    string WebServiceFilterMenuViewModelFolder      = "00217-WebServiceFilterMenuViewModel.cs";
+    string WebServiceFilterMenuViewModelClassName   = GetContextModelClassName(Context, WebServiceFilterMenuViewModelFolder);
+    string WebServiceFilterMenuViewModelNameSpace   = GetContextModelNameSpace(Context, WebServiceFilterMenuViewModelFolder);
+
+    string RegionAwareViewModelBaseFolder           = "00648-RegionAwareViewModelBase.cs";
+    string RegionAwareViewModelBaseClassName        = GetContextModelClassName(Context, RegionAwareViewModelBaseFolder);
+    string RegionAwareViewModelBaseNameSpace        = GetContextModelNameSpace(Context, RegionAwareViewModelBaseFolder);
+
+
+    string modelInterfaceFolder                     = "01100-Interface.cs";
+    string modelInterfaceClassName                  = GetInterfaceName(Model);
+    string modelInterfaceNameSpace                  = GetModelNameSpace(Model, modelInterfaceFolder);
+
+    string AUDVformUserControlClassName             = GetModelClassName(Model, AUDVformUserControlFolder);
+    string AUDVformUserControlNameSpace             = GetModelNameSpace(Model, AUDVformUserControlFolder);
+    string AUDVformUserControlProject               = GetModelProjectName(Model, AUDVformUserControlFolder);
+
+    string RAUDVUserControlClassName                = GetModelClassName(Model, RAUDVUserControlFolder);
+    string RAUDVUserControlNameSpace                = GetModelNameSpace(Model, RAUDVUserControlFolder);
+    string RAUDVUserControlProject                  = GetModelProjectName(Model, RAUDVUserControlFolder);
+
+    string RAUDVViewModelClassName                  = GetModelClassName(Model, RAUDVViewModelFolder);
+    string RAUDVViewModelNameSpace                  = GetModelNameSpace(Model, RAUDVViewModelFolder);
+    string RAUDVViewModelProject                    = GetModelProjectName(Model, RAUDVViewModelFolder);
+
+
+    string HiddenFiltersPropertyName                = "HiddenFilters";
+    string OnHiddenFiltersChangedPropertyName       = "OnHiddenFiltersChanged";
+    string HiddenFiltersPropertyChangedPropertyName = "HiddenFiltersPropertyChanged";
+
+
+
+    string IsOnLoadedCalledPropertyName             = "IsOnLoadedCalled";
+    string IsCanceledPropertyName                   = "IsCanceled";
+
+    string RegionPropertyName                       = "Region";
+    string ReditReditUserControlRegionPropertyName  = "ReditUserControlRegion";
+
+    string DisplayLabelProperty                     = "Name";
+    string DisplayHintProperty                      = "Prompt";
+
+    string FormRootServicePropertyName              = "FrmRootSrv";
+    string AppSettingServicePropertyName            = "GlblSettingsSrv";
+    string GetWithFilterMethodName                  = "getwithfilter";
+    string ColumnSelectorDlgPropertyName            = "ColumnSelectorDlg";
+
+
+    string FormControlModelPropertyName             = "FormControlModel";
+    string CaptionPropertyName                      = "Caption";
+    string EformModePropertyName                    = "EformMode";
+    string ShowSubmitPropertyName                   = "ShowSubmit";
+    string FormServicePrefix                        = "FrmSrv";
+
+    string RowMIPrefixPropertyName                  = "RowMI";
+    string NavigationBackCommandPropertyName        = "NavigationBackCommand";
+
+
+    string UIDispatcherInvokePropertyName           = "Application.Current.Dispatcher.Invoke";
+    string GetOneMethodName                         = "getone";
+    string CopyToModelNotifyMethodName              = "CopyToModelNotify";
+
+    string SubmitCommandPropertyName                = "SubmitCommand";
+    string CancelCommandPropertyName                = "CancelCommand";
+    string IsParentLoadedPropertyName               = "IsParentLoaded";
+    
+    string CanAddPropertyName                       = "CanAdd";
+    string CanUpdPropertyName                       = "CanUpdate";
+    string CanDelPropertyName                       = "CanDelete";
+    string CanAddParentPropertyName                 = "CanAddParent";
+    string CanUpdParentPropertyName                 = "CanUpdateParent";
+    string CanDelParentPropertyName                 = "CanDeleteParent";
+
+    string CanAddDetailPropertyName                 = "CanAddDetail"; 
+    string CanUpdDetailPropertyName                 = "CanUpdateDetail"; 
+    string CanDelDetailPropertyName                 = "CanDeleteDetail"; 
+    string CanAddDetailParentPropertyName           = "CanAddDetailParent"; 
+    string CanUpdDetailParentPropertyName           = "CanUpdateDetailParent"; 
+    string CanDelDetailParentPropertyName           = "CanDeleteDetailParent"; 
+
+    string CurrentNavigationContextPropertyName     = "CurrentNavigationContext";
+    string IsDestroyedPropertyName                  = "IsDestroyed";
+    string OnDestroyPropertyName                    = "OnDestroy";
+
+    List<string> detailViews = GetDetailViews(Model, Context, null);
+    List<ModelViewPropertyOfVwSerializable> primKeys = GetModelPrimaryKeyProps(Model);
+
+
+    List<string> nmSpaces = new List<string>();
+    if ((RAUDVViewModelNameSpace != IWebServiceFilterRsltInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IWebServiceFilterRsltInterfaceNameSpace);
+    if ((RAUDVViewModelNameSpace != WebServiceFilterRsltViewModelNameSpace) && (nmSpaces.IndexOf(WebServiceFilterRsltViewModelNameSpace) < 0)) 
+        nmSpaces.Add(WebServiceFilterRsltViewModelNameSpace);
+    if ((RAUDVViewModelNameSpace != IAppGlblSettingsServiceNameSpace) && (nmSpaces.IndexOf(IAppGlblSettingsServiceNameSpace) < 0)) 
+        nmSpaces.Add(IAppGlblSettingsServiceNameSpace);
+    if ((RAUDVViewModelNameSpace != WebServiceFilterMenuViewModelNameSpace) && (nmSpaces.IndexOf(WebServiceFilterMenuViewModelNameSpace) < 0)) 
+        nmSpaces.Add(WebServiceFilterMenuViewModelNameSpace);
+    if ((RAUDVViewModelNameSpace != IWebServiceFilterMenuInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterMenuInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IWebServiceFilterMenuInterfaceNameSpace);
+    if ((RAUDVViewModelNameSpace != IWebServiceFilterMenuInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterMenuInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IWebServiceFilterMenuInterfaceNameSpace);
+    if ((RAUDVViewModelNameSpace != EformModeEnumNameSpace) && (nmSpaces.IndexOf(EformModeEnumNameSpace) < 0)) 
+        nmSpaces.Add(EformModeEnumNameSpace);
+    if ((RAUDVViewModelNameSpace != modelInterfaceNameSpace) && (nmSpaces.IndexOf(modelInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(modelInterfaceNameSpace);
+    if ((RAUDVViewModelNameSpace != RegionAwareViewModelBaseNameSpace) && (nmSpaces.IndexOf(RegionAwareViewModelBaseNameSpace) < 0)) 
+        nmSpaces.Add(RegionAwareViewModelBaseNameSpace);
+    
+    bool IsInTheSameModule = (AUDVformUserControlProject == RAUDVUserControlProject);
+    
+    
+#>
+<# 
+    foreach(string ns in nmSpaces) {
+#>
+using <#= ns #>;
+<#
+    }
+#>
+/*
+
+<#
+    if(!IsInTheSameModule) {
+#>
+    "<#= AUDVformUserControlClassName #>"-UserControl is defined in the "<#= AUDVformUserControlProject #>"-project.
+    In the file of IModule-class of "<#= AUDVformUserControlProject #>"-project the following line of code must be inserted:
+
+        public void OnInitialized(IContainerProvider containerProvider)
+        {
+            ...
+            IRegionManager regionManager = containerProvider.Resolve(typeof(IRegionManager)) as IRegionManager;
+            if (regionManager != null)
+            {
+                ...
+                // According to requirements of the "<#= RAUDVViewModelClassName #>.cs"-file of "<#= RAUDVViewModelProject #>"-project. 
+                regionManager.RegisterViewWithRegion("<#= AUDVformUserControlClassName #><#= ReditReditUserControlRegionPropertyName #>", typeof(<#= AUDVformUserControlClassName #>));
+                ...
+            }
+            ...
+        }
+<#       
+    }
+#>
+
+
+    "<#= RAUDVUserControlClassName #>" UserControl is defined in the "<#= RAUDVUserControlProject #>"-project.
+    In the file of IModule-class of "<#= RAUDVUserControlProject #>"-project the following line of code must be inserted:
+
+        public void RegisterTypes(IContainerRegistry containerRegistry)
+        {
+            ...
+            // According to requirements of the "<#= RAUDVViewModelClassName #>.cs"-file of "<#= RAUDVViewModelProject #>"-project. 
+            ViewModelLocationProvider.Register<<#= RAUDVUserControlClassName #>, <#= RAUDVViewModelClassName #>>();
+            // According to requirements of the "<#= RAUDVViewModelClassName #>.cs"-file of "<#= RAUDVViewModelProject #>"-project. 
+            containerRegistry.RegisterForRegionNavigation<<#= RAUDVUserControlClassName #>, <#= RAUDVViewModelClassName #>>("<#= RAUDVUserControlClassName #>");
+            // According to requirements of the "<#= RAUDVViewModelClassName #>.cs"-file of "<#= RAUDVViewModelProject #>"-project. 
+            containerRegistry.Register<ContentView, <#= RAUDVUserControlClassName #>>("<#= RAUDVUserControlClassName #>");
+            ...
+        }
+*/
+
+namespace <#= RAUDVViewModelNameSpace #> {
+    public class <#= RAUDVViewModelClassName #>: <#= RegionAwareViewModelBaseClassName #>, IRegionAware 
+    {
+        protected <#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName #>=null;
+        protected <#= GetModelServiceInterfaceName(Model) #> <#= FormServicePrefix #><#= Model.ViewName #> = null;
+
+        public <#= RAUDVViewModelClassName #>(<#= GetModelServiceInterfaceName(Model) #> _<#= FormServicePrefix #><#= Model.ViewName #>, <#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName  #>) {
+            this.<#= AppSettingServicePropertyName #> = <#= AppSettingServicePropertyName #>;
+            this.<#= FormServicePrefix #><#= Model.ViewName #> = _<#= FormServicePrefix #><#= Model.ViewName #>;
+            PermissionMask = <#= AppSettingServicePropertyName #>.GetViewModelMask("<#= Model.ViewName #>");
+        }
+
+
+        protected int PermissionMask = 0; 
+
+
+        protected bool <#= IsCanceledPropertyName #> = true;
+        protected <#= modelInterfaceClassName #> modelToReturn = null;
+
+
+        public bool <#= CanAddPropertyName #>
+        { 
+            get
+            {
+                return ((PermissionMask & 8) == 8) && <#= CanAddParentPropertyName #>;
+            }
+        }
+        public bool <#= CanUpdPropertyName #>
+        { 
+            get
+            {
+                return ((PermissionMask & 4) == 4) && <#= CanUpdParentPropertyName #>;
+            }
+        }
+        public bool <#= CanDelPropertyName #>
+        { 
+            get
+            {
+                return ((PermissionMask & 2) == 2) && <#= CanDelParentPropertyName #>;
+            }
+        }
+
+        public bool <#= CanAddDetailPropertyName #>
+        { 
+            get
+            {
+                return <#= CanAddDetailParentPropertyName #>;
+            }
+        }
+        public bool <#= CanUpdDetailPropertyName #>
+        { 
+            get
+            {
+                return <#= CanUpdDetailParentPropertyName #>;
+            }
+        }
+        public bool <#= CanDelDetailPropertyName #>
+        { 
+            get
+            {
+                return <#= CanDelDetailParentPropertyName #>;
+            }
+        }
+
+        #region <#= CaptionPropertyName #>
+        string _<#= CaptionPropertyName #> = "Delete item for <#= Model.Title #>";
+        public string <#= CaptionPropertyName #>
+        { 
+            get
+            {
+                return _<#= CaptionPropertyName #>;
+            }
+            set {
+                if(_<#= CaptionPropertyName #> != value) {
+                    _<#= CaptionPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+        #region <#= EformModePropertyName #>
+        protected <#= EformModeEnumClassName #> _<#= EformModePropertyName #> = <#= EformModeEnumClassName #>.DeleteMode;
+        public <#= EformModeEnumClassName #> <#= EformModePropertyName #>
+        {
+            get
+            {
+                return _<#= EformModePropertyName #>;
+            }
+            set
+            {
+                if (_<#= EformModePropertyName #> != value) {
+                    _<#= EformModePropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+        #region <#= FormControlModelPropertyName #>
+        protected <#= modelInterfaceClassName #> _<#= FormControlModelPropertyName #> = null;
+        public <#= modelInterfaceClassName #> <#= FormControlModelPropertyName #>
+        {
+            get
+            {
+                return _<#= FormControlModelPropertyName #>;
+            }
+            set
+            {
+                if (_<#= FormControlModelPropertyName #> != value) {
+                    _<#= FormControlModelPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+
+
+        #region <#= HiddenFiltersPropertyName #>
+        IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>> _<#= HiddenFiltersPropertyName #> = new ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>();
+        public IEnumerable<IWebServiceFilterRsltInterface> <#= HiddenFiltersPropertyName #>
+        {
+            get
+            {
+                return _<#= HiddenFiltersPropertyName #>;
+            }
+            set
+            {
+                if (_<#= HiddenFiltersPropertyName #> != value)
+                {
+                    _<#= HiddenFiltersPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+        #region <#= IsParentLoadedPropertyName #>
+        bool _<#= IsParentLoadedPropertyName #> = false;
+        public bool <#= IsParentLoadedPropertyName #>
+        { 
+            get
+            {
+                return _<#= IsParentLoadedPropertyName #>;
+            }
+            set {
+                if(_<#= IsParentLoadedPropertyName #> != value) {
+                    _<#= IsParentLoadedPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+        #region IRegionAware
+
+        public bool IsNavigationTarget(INavigationContext navigationContext) {
+            return true;
+        }
+        public void OnNavigatedFrom(INavigationContext navigationContext) {
+            if (<#= IsDestroyedPropertyName #>) return;
+            if(!<#= IsCanceledPropertyName #>) {
+                INavigationParameters prms = navigationContext.Parameters;
+<#
+            foreach(ModelViewPropertyOfVwSerializable pk in primKeys) {
+#>
+                prms.Add("<#= GetPrimKeyVarName(pk) #>", modelToReturn.<#= GetModelPropertyName(pk, Model) #>);
+<#
+            }
+#>
+                prms.Add("<#= EformModeEnumClassName #>", <#= EformModePropertyName #>);
+            }
+            <#= CurrentNavigationContextPropertyName #> = null;
+            <#= IsParentLoadedPropertyName #> = false; // important to set
+        }
+        public void OnNavigatedTo(INavigationContext navigationContext) {
+            if (<#= IsDestroyedPropertyName #>) return;
+            INavigationParameters prms = navigationContext.Parameters;
+            <#= IsCanceledPropertyName #> = true;
+            <#= EformModeEnumClassName #> modeToCheck = <#= EformModeEnumClassName #>.DeleteMode;
+            if(prms.ContainsKey("<#= EformModeEnumClassName #>")) {
+                modeToCheck = prms.GetValue<<#= EformModeEnumClassName #>>("<#= EformModeEnumClassName #>");
+            }
+            if ((modeToCheck == <#= EformModeEnumClassName #>.DeleteMode) && (!<#= CanDelPropertyName #>)) {
+                throw new Exception("Access denied to delete <#= Model.ViewName #>");
+            } else if ((modeToCheck == <#= EformModeEnumClassName #>.UpdateMode) && (!<#= CanUpdPropertyName #>)) {
+                throw new Exception("Access denied to update <#= Model.ViewName #>");
+            } else if ((modeToCheck == <#= EformModeEnumClassName #>.AddMode) && (!<#= CanAddPropertyName #>)) {
+                throw new Exception("Access denied to add <#= Model.ViewName #>");
+            }
+            <#= CurrentNavigationContextPropertyName #> = navigationContext;
+
+            ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>> hf = new ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>();
+<#
+            foreach(ModelViewPropertyOfVwSerializable sclrProp in Model.ScalarProperties) {
+#>          
+            if(prms.ContainsKey("<#= GetModelPropertyName(sclrProp, Model) #>")) {
+                    hf.Add(new <#= WebServiceFilterRsltViewModelClassName #>() {
+                        fltrName = "<#= GetModelPropertyName(sclrProp, Model) #>",
+                        fltrDataType = "<#= GetCCharpDatatype(sclrProp, Model) #>",
+                        fltrOperator = "eq",
+                        fltrValue = prms.GetValue<<#= GetPropertyTypeName(sclrProp) #>>("<#= GetModelPropertyName(sclrProp, Model) #>"),
+                        fltrError = null
+                    });
+            }
+<#
+            }
+#>          
+            ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>> chf = <#= HiddenFiltersPropertyName #> as ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>;
+            bool resetHF = chf.Count != hf.Count;
+            if ((!resetHF) && (hf.Count > 0)) {
+                foreach(<#= IWebServiceFilterRsltInterfaceClassName #> citm in chf) {
+                    <#= IWebServiceFilterRsltInterfaceClassName #> itm = hf.Where(h => h.fltrName == citm.fltrName).FirstOrDefault();
+                    if(itm == null)
+                    {
+                        resetHF = true;
+                        break;
+                    }
+                    if (!(itm.fltrValue == citm.fltrValue))
+                    {
+                        resetHF = true;
+                        break;
+                    }
+                }
+            } 
+
+            if(prms.ContainsKey("<#= EformModeEnumClassName #>")) {
+                string locCaption = null;
+                <#= EformModeEnumClassName #> locmode = prms.GetValue<<#= EformModeEnumClassName #>>("<#= EformModeEnumClassName #>");
+                if (locmode != <#= EformModeEnumClassName #>.AddMode) {
+                    if (locmode == <#= EformModeEnumClassName #>.DeleteMode) {
+                        locCaption = "Delete item for <#= Model.Title #>";
+                    } else {
+                        locCaption = "Update item for <#= Model.Title #>";
+                    }
+<#
+            foreach(ModelViewPropertyOfVwSerializable pk in primKeys) {
+#>
+                    <#= GetPropertyTypeName(pk) #> <#= GetPrimKeyVarName(pk) #> = default(<#= GetPropertyTypeName(pk) #>);
+                    if(prms.ContainsKey("<#= GetPrimKeyVarName(pk) #>")) {
+                        <#= GetPrimKeyVarName(pk) #> = prms.GetValue<<#= GetPropertyTypeName(pk) #>>("<#= GetPrimKeyVarName(pk) #>");
+                    }
+<#
+            }
+#>
+                    // <#= GetInterfaceName(Model) #> data
+                    _ = <#= FormServicePrefix #><#= Model.ViewName #>.<#= GetOneMethodName #>(
+<#
+            {
+                bool isFirst= true;
+                foreach(ModelViewPropertyOfVwSerializable pk in primKeys) {
+                    if (isFirst) {
+                        isFirst = false;
+#>
+                            <#= GetPrimKeyVarName(pk) #>
+<#
+                    } else {
+#>
+                          , <#= GetPrimKeyVarName(pk) #>
+<#
+                    }
+                }
+            }
+#>
+                        ).ContinueWith((data) => {
+                                MainThread.InvokeOnMainThreadAsync(() =>
+                                {
+                                    <#= CaptionPropertyName #> = locCaption;
+                                    if (resetHF) { <#= HiddenFiltersPropertyName #> = hf; }
+                                    <#= EformModePropertyName #> = locmode;
+                                    <#= FormControlModelPropertyName #> = <#= FormServicePrefix #><#= Model.ViewName #>.<#= CopyToModelNotifyMethodName #>(data.Result, null);
+                                    <#= IsParentLoadedPropertyName #> = true;
+                                });
+                        });
+                } else {
+                    <#= CaptionPropertyName #> = "Add item for <#= Model.Title #>";
+                    if (resetHF) { <#= HiddenFiltersPropertyName #> = hf; }
+                    <#= FormControlModelPropertyName #> = <#= FormServicePrefix #><#= Model.ViewName #>.<#= CopyToModelNotifyMethodName #>(null,null); // this is correct: cleanup twice
+                    <#= EformModePropertyName #> = <#= EformModeEnumClassName #>.AddMode;
+                    <#= FormControlModelPropertyName #> = null; // since DateTime-issue this is correct: <#= FormServicePrefix #><#= Model.ViewName #>.<#= CopyToModelNotifyMethodName #>(null,null);
+                    <#= IsParentLoadedPropertyName #> = true;
+                }
+            } else {
+                if (resetHF) { <#= HiddenFiltersPropertyName #> = hf; }
+                <#= IsParentLoadedPropertyName #> = true;
+            }
+        }
+        #endregion
+        #region NavigationBackCommand
+        public void  <#= NavigationBackCommandPropertyName #>() { 
+            if (<#= IsDestroyedPropertyName #>) return;
+            if (<#= CurrentNavigationContextPropertyName #> != null) {
+                if(<#= CurrentNavigationContextPropertyName #>.NavigationService.Journal.CanGoBack) {
+                    <#= CurrentNavigationContextPropertyName #>.NavigationService.Journal.GoBack();
+                }
+            }
+        } 
+        #endregion
+
+
+        #region <#= SubmitCommandPropertyName #>
+        private ICommand _<#= SubmitCommandPropertyName #>;
+        public ICommand <#= SubmitCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= SubmitCommandPropertyName #> ?? (_<#= SubmitCommandPropertyName #> = new Command((param) => <#= SubmitCommandPropertyName #>Action(param), (param) => <#= SubmitCommandPropertyName #>CanExecute(param)));
+            }
+        }
+        protected void <#= SubmitCommandPropertyName #>Action(object param)
+        {
+            if (<#= IsDestroyedPropertyName #>) return;
+            modelToReturn = param as <#= modelInterfaceClassName #>;
+            <#= IsCanceledPropertyName #> = false;
+            <#= NavigationBackCommandPropertyName #>();
+        }
+        protected bool <#= SubmitCommandPropertyName #>CanExecute(object param)
+        {
+            return true;
+        }
+        #endregion
+
+        #region <#= CancelCommandPropertyName #>
+        private ICommand _<#= CancelCommandPropertyName #>;
+        public ICommand <#= CancelCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= CancelCommandPropertyName #> ?? (_<#= CancelCommandPropertyName #> = new Command((param) => <#= CancelCommandPropertyName #>Action(param), (param) => <#= CancelCommandPropertyName #>CanExecute(param)));
+            }
+        }
+        protected void <#= CancelCommandPropertyName #>Action(object param)
+        {
+            <#= IsCanceledPropertyName #> = true;
+            <#= NavigationBackCommandPropertyName #>();
+        }
+        protected bool <#= CancelCommandPropertyName #>CanExecute(object param)
+        {
+            return true;
+        }
+        #endregion
+
+        public override void <#= OnDestroyPropertyName #>() {
+            base.<#= OnDestroyPropertyName #>();
+            _<#= HiddenFiltersPropertyName #> = null;
+            _<#= FormControlModelPropertyName #> = null;
+            _<#= CaptionPropertyName #> = null;
+        }
+
+    }
+}
+
+
+
