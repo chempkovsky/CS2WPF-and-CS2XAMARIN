@@ -24,5 +24,7 @@ namespace CS2WPF.Model.Serializable
         public int ColSmallBreakpointMult { get; set; }
         public int RowLargeBreakpointMult { get; set; }
         public int RowSmallBreakpointMult { get; set; }
+        public bool IsO2m { get; set; }
+
     }
 }

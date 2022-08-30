@@ -10,9 +10,9 @@
     string RegionAwareUserControlBaseNameSpace    = GetContextModelNameSpace(Context, RegionAwareUserControlBaseFolder);
     string RegionAwareUserControlBaseProject      = GetContextModelProjectName(Context, RegionAwareUserControlBaseFolder);
 
-    string RAUDUserControlClassName        = GetModelClassName(Model, RAUDVUserControlFolder);
-    string RAUDUserControlNameSpace        = GetModelNameSpace(Model, RAUDVUserControlFolder);
-    string RAUDUserControlProject          = GetModelProjectName(Model, RAUDVUserControlFolder);
+    string AUDVformUserControlClassName     = GetModelClassName(Model, AUDVformUserControlFolder);
+    string AUDVformUserControlNameSpace     = GetModelNameSpace(Model, AUDVformUserControlFolder);
+    string AUDVformUserControlProject       = GetModelProjectName(Model, AUDVformUserControlFolder);
 
     string RAUDVUserControlClassName        = GetModelClassName(Model, RAUDVUserControlFolder);
     string RAUDVUserControlNameSpace        = GetModelNameSpace(Model, RAUDVUserControlFolder);
@@ -47,16 +47,16 @@
     if(ProxyUserControlProject != RAUDVUserControlProject) {
         proxyPrefix = proxyPrefix + ";assembly=" + ProxyUserControlProject;
     }
-    string eformPrefix = "clr-namespace:" + RAUDUserControlNameSpace;
-    if(RAUDUserControlProject != RAUDVUserControlProject) {
-        eformPrefix = eformPrefix + ";assembly=" + RAUDUserControlProject;
+    string eformPrefix = "clr-namespace:" + AUDVformUserControlNameSpace;
+    if(AUDVformUserControlProject != RAUDVUserControlProject) {
+        eformPrefix = eformPrefix + ";assembly=" + AUDVformUserControlProject;
     }
     string ucwcmPrefix = "clr-namespace:" + RegionAwareUserControlBaseNameSpace;
     if(RegionAwareUserControlBaseProject != RAUDVUserControlProject) {
         ucwcmPrefix = ucwcmPrefix + ";assembly=" + RegionAwareUserControlBaseProject;
     }
 
-    bool IsInTheSameModule = (RAUDUserControlProject == RAUDVUserControlProject);
+    bool IsInTheSameModule = (AUDVformUserControlProject == RAUDVUserControlProject);
 
 
 #>
@@ -84,12 +84,12 @@
 <#
     if(IsInTheSameModule) {
 #>
-        <efrm:<#= RAUDUserControlClassName #>  
+        <efrm:<#= AUDVformUserControlClassName #>  
 <#
     } else {
 #>
         <prx:<#= ProxyUserControlClassName #> 
-            prism:RegionManager.RegionName="<#= RAUDUserControlClassName #><#= ReditReditUserControlRegionPropertyName #>"
+            prism:RegionManager.RegionName="<#= AUDVformUserControlClassName #><#= ReditReditUserControlRegionPropertyName #>"
 <#
     }
 #>

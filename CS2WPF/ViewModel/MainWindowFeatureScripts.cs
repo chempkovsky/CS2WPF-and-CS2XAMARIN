@@ -137,7 +137,7 @@ namespace CS2WPF.ViewModel
                     if (SelectFeatureFolderUC == null)
                     {
                         string TemplatesFld = TemplatePathHelper.GetTemplatePath();
-                        SelectFeatureFolderViewModel dataContext = new SelectFeatureFolderViewModel(Dte, TextTemplating, DialogFactory, (FeatureUC.DataContext as FeatureViewModel).SelectedDbContext, TemplatesFld, "JavaFeatureScriptsTmplst", "BatchJavaScriptsTmplst");
+                        SelectFeatureFolderViewModel dataContext = new SelectFeatureFolderViewModel(Dte, TextTemplating, DialogFactory, (FeatureUC.DataContext as FeatureViewModel).SelectedDbContext, TemplatesFld, "FeatureScriptsTmplst", "BatchScriptsTmplst");
                         dataContext.DestinationProjectRootFolder = (InvitationUC.DataContext as InvitationViewModel).DestinationProjectRootFolder;
                         dataContext.DestinationFolder = (InvitationUC.DataContext as InvitationViewModel).DestinationFolder;
                         //dataContext.ContextItemFeatureName = 
