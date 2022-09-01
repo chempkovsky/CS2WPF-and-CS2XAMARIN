@@ -24,6 +24,7 @@ using System.Runtime.CompilerServices;
 using System.Collections.Generic;
 using Prism.Navigation;
 using Xamarin.Essentials;
+using Newtonsoft.Json;
 
 <#
 
@@ -106,6 +107,7 @@ using Xamarin.Essentials;
     string HiddenFiltersPropertyName                 = "HiddenFilters";
     string OnHiddenFiltersChangedPropertyName        = "OnHiddenFiltersChanged";
     string HiddenFiltersPropertyChangedPropertyName  = "HiddenFiltersPropertyChanged";
+    string HiddenFiltersParamPropertyName            = "HiddenFilter";
 
     string TableMenuItemsPropertyName                = "TableMenuItems";
     string TableMenuItemsPropertyChangedPropertyName = "TableMenuItemsPropertyChanged";
@@ -188,6 +190,12 @@ using Xamarin.Essentials;
     string TableAddMIPropertyName               =  "TableAddMI";
     string RowUpdMIPropertyName                 =  "RowUpdMI";
     string RowDelMIPropertyName                 =  "RowDelMI";
+
+    string HiddenFilterByRowSuffix              = "HiddenFilterByRow";
+    string HiddenFilterAsFltRsltSuffix          = "HiddenFilterAsFltRslt";
+    string Dict2TupleMethodName                 = "Dict2Tuple";
+    string Tuple2DictMethodName                 = "Tuple2Dict";
+
 
     List<string> detailViews = GetDetailViews(Model, Context, null);
     List<ModelViewPropertyOfVwSerializable> primKeys = GetModelPrimaryKeyProps(Model);
@@ -348,6 +356,7 @@ namespace <#= RlistViewModelNameSpace #> {
             return new ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>>()  {
                 new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "<#= RowUpdMIPropertyName #>", Caption="Update item", IconName="TableEdit", IconColor=Color.Default, Enabled=true, Data=null, Command = <#= RowMenuItemsCommandPropertyName #>},
                 new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "<#= RowDelMIPropertyName #>", Caption="Delete item", IconName="TableRemove", IconColor=Color.Default, Enabled=true, Data=null, Command = <#= RowMenuItemsCommandPropertyName #>},
+                new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "<#= RowViewMIPropertyName #>", Caption="View item", IconName="TableEdit", IconColor=Color.Default, Enabled=true, Data=null, Command = <#= RowMenuItemsCommandPropertyName #>},
 <#
         foreach(string detailViewName in detailViews) {
             ModelViewSerializable detailView = GetModelViewByName(Context, detailViewName);
@@ -474,6 +483,14 @@ namespace <#= RlistViewModelNameSpace #> {
             }
             if(selected == null) return;
             NavigationParameters navigationParameters = new NavigationParameters();
+//            string fltStr = JsonConvert.SerializeObject(
+//                this.<#= FormServicePrefix #><#= Model.ViewName #>.<#= Tuple2DictMethodName #>(
+//                    this.<#= FormServicePrefix #><#= Model.ViewName #>.get<#= HiddenFilterByRowSuffix #>(selected, "<#= foreignKey.NavigationName #>")
+//                )
+//            );
+//            navigationParameters.Add("<#= HiddenFiltersParamPropertyName #>", fltStr);
+              navigationParameters.Add("<#= HiddenFiltersParamPropertyName #>", this.<#= FormServicePrefix #><#= Model.ViewName #>.get<#= HiddenFilterByRowSuffix #>(selected, "<#= foreignKey.NavigationName #>"));  
+
 <#
                     foreach(ModelViewPropertyOfVwSerializable primKey in primKeys) {
                         List<ModelViewPropertyOfVwSerializable> detailProps = GetDetailViewForeignKeyProps(Model, primKey, detailView, foreignKey, null);
@@ -564,7 +581,7 @@ namespace <#= RlistViewModelNameSpace #> {
                 navigationParameters.Add(hf.fltrName, hf.fltrValue);
             }
             navigationParameters.Add("<#= EformModeEnumClassName #>", <#= EformModeEnumClassName #>.AddMode);
-            <#= CurrentNavigationContextPropertyName #>.NavigationService.RequestNavigate(new Uri("<#= ReditUserControlClassName #>", UriKind.Relative), OnNavigationResult, navigationParameters);
+            <#= CurrentNavigationContextPropertyName #>.NavigationService.RequestNavigate(new Uri("<#= RaddUserControlClassName #>", UriKind.Relative), OnNavigationResult, navigationParameters);
         }
         #endregion
         #region <#= TableMenuItemsCommandPropertyName #>
@@ -620,7 +637,7 @@ namespace <#= RlistViewModelNameSpace #> {
 <#
             }
 #>
-            <#= CurrentNavigationContextPropertyName #>.NavigationService.RequestNavigate(new Uri("<#= ReditUserControlClassName #>", UriKind.Relative), OnNavigationResult, navigationParameters);
+            <#= CurrentNavigationContextPropertyName #>.NavigationService.RequestNavigate(new Uri("<#= RupdUserControlClassName #>", UriKind.Relative), OnNavigationResult, navigationParameters);
         }
         #endregion
         #region <#= SformDelItemCommandPropertyName #>
@@ -644,9 +661,35 @@ namespace <#= RlistViewModelNameSpace #> {
 <#
             }
 #>
-            <#= CurrentNavigationContextPropertyName #>.NavigationService.RequestNavigate(new Uri("<#= ReditUserControlClassName #>", UriKind.Relative), OnNavigationResult, navigationParameters);
+            <#= CurrentNavigationContextPropertyName #>.NavigationService.RequestNavigate(new Uri("<#= RdelUserControlClassName #>", UriKind.Relative), OnNavigationResult, navigationParameters);
         }
         #endregion
+        
+        #region <#= SformViewItemCommandPropertyName #>
+        public void <#= SformViewItemCommandPropertyName #>(<#= modelInterfaceClassName #> selected) {
+            if (<#= IsDestroyedPropertyName #>) return;
+            if (selected == null) return;
+//            if(!<#= CanDelPropertyName #>) {
+//                <#= CurrentNavigationContextPropertyName #>.NavigationService.RequestNavigate(new Uri("<#= AccessDeniedUserControlClassName #>", UriKind.Relative), OnNavigationResult);
+//                return;
+//            }
+
+            NavigationParameters navigationParameters = new NavigationParameters();
+            foreach(<#= IWebServiceFilterRsltInterfaceClassName #> hf in <#= HiddenFiltersPropertyName #>) {
+                navigationParameters.Add(hf.fltrName, hf.fltrValue);
+            }
+            navigationParameters.Add("<#= EformModeEnumClassName #>", <#= EformModeEnumClassName #>.DeleteMode);
+<#
+            foreach(ModelViewPropertyOfVwSerializable pk in primKeys) {
+#>
+            navigationParameters.Add("<#= GetPrimKeyVarName(pk) #>", selected.<#= GetModelPropertyName(pk, Model) #>);
+<#
+            }
+#>
+            <#= CurrentNavigationContextPropertyName #>.NavigationService.RequestNavigate(new Uri("<#= RviewUserControlClassName #>", UriKind.Relative), OnNavigationResult, navigationParameters);
+        }
+        #endregion
+
         #region <#= RowMenuItemsCommandPropertyName #>
         protected ICommand _<#= RowMenuItemsCommandPropertyName #> = null;
         public ICommand <#= RowMenuItemsCommandPropertyName #>
@@ -670,6 +713,10 @@ namespace <#= RlistViewModelNameSpace #> {
                 case "<#= RowDelMIPropertyName #>":
                     <#= SformDelItemCommandPropertyName #>(arow);
                     break;
+                case "<#= RowViewMIPropertyName #>":
+                    <#= SformViewItemCommandPropertyName #>(arow);
+                    break;
+
 <#
         foreach(string detailViewName in detailViews) {
             ModelViewSerializable detailView = GetModelViewByName(Context, detailViewName);
@@ -829,6 +876,7 @@ namespace <#= RlistViewModelNameSpace #> {
             if ((!<#= IsParentLoadedPropertyName #>) || (<#= IsNavigatedBackPropertyName #>)) {
                 ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>> hf = new ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>();
 <#
+        if(false) {
             foreach(ModelViewPropertyOfVwSerializable sclrProp in Model.ScalarProperties) {
 #>          
                 if(prms.ContainsKey("<#= GetModelPropertyName(sclrProp, Model) #>")) {
@@ -842,7 +890,26 @@ namespace <#= RlistViewModelNameSpace #> {
                 }
 <#
             }
+        }
 #>          
+//                hf.Clear();
+                if(prms.ContainsKey("<#= HiddenFiltersParamPropertyName #>")) {
+//                    string hfltStr = prms.GetValue<string>("<#= HiddenFiltersParamPropertyName #>");
+//                    IList<<#= IWebServiceFilterRsltInterfaceClassName #>> hflts = 
+//                        <#= FormServicePrefix #><#= Model.ViewName #>.get<#= HiddenFilterAsFltRsltSuffix #>(
+//                            <#= FormServicePrefix #><#= Model.ViewName #>.<#= Dict2TupleMethodName #>(
+//                                JsonConvert.DeserializeObject<Dictionary<string, object>>(hfltStr)
+//                            )
+//                        );
+                    IList<<#= IWebServiceFilterRsltInterfaceClassName #>> hflts = 
+                        <#= FormServicePrefix #><#= Model.ViewName #>.get<#= HiddenFilterAsFltRsltSuffix #>(
+                            prms.GetValue<Dictionary<(string viewNm, string navNm, string propNm), object>>("<#= HiddenFiltersParamPropertyName #>")
+                        );
+                    foreach(var hflt in hflts) {
+                        hf.Add(hflt);
+                    }
+                }
+
                 ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>> chf = <#= HiddenFiltersPropertyName #> as ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>;
                 bool resetHF = chf.Count != hf.Count;
                 if ((!resetHF) && (hf.Count > 0)) {

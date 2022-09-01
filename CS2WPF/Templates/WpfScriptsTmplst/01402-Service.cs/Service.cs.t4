@@ -179,14 +179,16 @@ namespace <#= modelServiceNameSpace #> {
                 string[] vnp = key.Split(new char[] { '.' });
                 dest[(vnp[0],vnp[1],vnp[2])] = src[key];
             }
+            return dest;
         }
         public Dictionary<string, object> <#= Tuple2DictMethodName #>(Dictionary<(string viewNm, string navNm, string propNm), object> src) {
-            Dictionary<string, object> <#= Tuple2DictMethodName #> dest = new Dictionary<string, object>();
+            Dictionary<string, object> dest = new Dictionary<string, object>();
             if(src == null) return dest;
             var keys = src.Keys.ToList();
             foreach(var key in keys) {
                 dest[key.viewNm + "." + key.navNm + "." + key.propNm] = src[key];
             }
+            return dest;
         }
 
 
