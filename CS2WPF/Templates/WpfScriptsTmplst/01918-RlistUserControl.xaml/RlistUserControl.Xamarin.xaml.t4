@@ -72,6 +72,11 @@
     string NavigationBackCommandPropertyName        = "NavigationBackCommand";
     string OnNavigationBackCommandPropertyName      = "OnNavigationBackCommand";
     string IsDestroyedPropertyName                  = "IsDestroyed";
+    string ShowMasterPanelComboPropertyName         = "ShowMasterPanelCombo";
+    string MasterPanelRegionPropertyName            = "MasterPanelRegion";
+    string MasterPanelComboItemsPropertyName        = "MasterPanelComboItems";
+    string MasterPanelComboItemPropertyName         = "MasterPanelComboItem";
+
 
     string proxyPrefix = "clr-namespace:" + ProxyUserControlNameSpace;
     if(ProxyUserControlProject != RlistUserControlProject) {
@@ -113,39 +118,67 @@
 <#
     if(IsInTheSameModule) {
 #>
-        <sfrm:<#= SformUserControlClassName #>  
+            <sfrm:<#= SformUserControlClassName #>  
 <#
     } else {
 #>
-        <prx:<#= ProxyUserControlClassName #> 
-            prism:RegionManager.RegionName="<#= SformUserControlClassName #><#= RlistUserControlRegionPropertyName #>"
+            <prx:<#= ProxyUserControlClassName #> 
+                prism:RegionManager.RegionName="<#= SformUserControlClassName #><#= RlistUserControlRegionPropertyName #>"
 <#
     }
 #>
-            <#= IsDestroyedPropertyName #>="{Binding <#= IsDestroyedPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}" 
-            <#= ContainerMenuItemsPropertyName #>="{Binding <#= ContainerMenuItemsPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}" 
-            <#= ContainerMenuItemsCommandPropertyName #>="{Binding <#= OnContainerMenuItemsCommandPropertyName #>, Mode=OneWay,Source={x:Reference rlistUsrCntrlRootNode}}"
+                <#= IsDestroyedPropertyName #>="{Binding <#= IsDestroyedPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}" 
+                <#= ContainerMenuItemsPropertyName #>="{Binding <#= ContainerMenuItemsPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}" 
+                <#= ContainerMenuItemsCommandPropertyName #>="{Binding <#= OnContainerMenuItemsCommandPropertyName #>, Mode=OneWay,Source={x:Reference rlistUsrCntrlRootNode}}"
 
-            <#= ShowBackBtnPropertyName #>="{Binding BindingContext.<#= ShowBackBtnPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}" 
-            <#= NavigationBackCommandPropertyName #>="{Binding BindingContext.<#= OnNavigationBackCommandPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}"                                
+                <#= ShowBackBtnPropertyName #>="{Binding BindingContext.<#= ShowBackBtnPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}" 
+                <#= NavigationBackCommandPropertyName #>="{Binding BindingContext.<#= OnNavigationBackCommandPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}"                                
 
 
-            <#= CaptionPropertyName #>="{Binding BindingContext.<#= CaptionPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}" 
-            <#= FilterHeightPropertyName #>="{Binding BindingContext.<#= FilterHeightPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}" 
-            <#= ShowFilterPropertyName #>="{Binding BindingContext.<#= ShowFilterPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}" 
-            <#= ShowAddFilterBtnPropertyName #>="{Binding BindingContext.<#= ShowAddFilterBtnPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}" 
-            <#= GridHeightPropertyName #>="{Binding BindingContext.<#= GridHeightPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}" 
-            <#= HiddenFiltersPropertyName #>="{Binding BindingContext.<#= HiddenFiltersPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}" 
-            <#= SelectedRowCommandPropertyName #>="{Binding BindingContext.<#= SelectedRowCommandPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}" 
-            <#= SformAfterAddItemPropertyName #>="{Binding BindingContext.<#= SformAfterAddItemPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}" 
-            <#= SformAfterUpdItemPropertyName #>="{Binding BindingContext.<#= SformAfterUpdItemPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}" 
-            <#= SformAfterDelItemPropertyName #>="{Binding BindingContext.<#= SformAfterDelItemPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}" 
-            <#= TableMenuItemsCommandPropertyName #>="{Binding BindingContext.<#= TableMenuItemsCommandPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}" 
-            <#= RowMenuItemsCommandPropertyName #>="{Binding BindingContext.<#= RowMenuItemsCommandPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}" 
-            <#= TableMenuItemsPropertyName #>="{Binding BindingContext.<#= TableMenuItemsPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}" 
-            <#= RowMenuItemsPropertyName #>="{Binding BindingContext.<#= RowMenuItemsPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}" 
-            <#= IsParentLoadedPropertyName #>="{Binding BindingContext.<#= IsParentLoadedPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}" 
-            />
+                <#= CaptionPropertyName #>="{Binding BindingContext.<#= CaptionPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}" 
+                <#= FilterHeightPropertyName #>="{Binding BindingContext.<#= FilterHeightPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}" 
+                <#= ShowFilterPropertyName #>="{Binding BindingContext.<#= ShowFilterPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}" 
+                <#= ShowAddFilterBtnPropertyName #>="{Binding BindingContext.<#= ShowAddFilterBtnPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}" 
+                <#= GridHeightPropertyName #>="{Binding BindingContext.<#= GridHeightPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}" 
+                <#= HiddenFiltersPropertyName #>="{Binding BindingContext.<#= HiddenFiltersPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}" 
+                <#= SelectedRowCommandPropertyName #>="{Binding BindingContext.<#= SelectedRowCommandPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}" 
+                <#= SformAfterAddItemPropertyName #>="{Binding BindingContext.<#= SformAfterAddItemPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}" 
+                <#= SformAfterUpdItemPropertyName #>="{Binding BindingContext.<#= SformAfterUpdItemPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}" 
+                <#= SformAfterDelItemPropertyName #>="{Binding BindingContext.<#= SformAfterDelItemPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}" 
+                <#= TableMenuItemsCommandPropertyName #>="{Binding BindingContext.<#= TableMenuItemsCommandPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}" 
+                <#= RowMenuItemsCommandPropertyName #>="{Binding BindingContext.<#= RowMenuItemsCommandPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}" 
+                <#= TableMenuItemsPropertyName #>="{Binding BindingContext.<#= TableMenuItemsPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}" 
+                <#= RowMenuItemsPropertyName #>="{Binding BindingContext.<#= RowMenuItemsPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}" 
+                <#= IsParentLoadedPropertyName #>="{Binding BindingContext.<#= IsParentLoadedPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}" 
+                />
+<#
+    if(false) {
+#>
+        <ContentView ControlTemplate="{StaticResource <#= RlistUserControlXamlClassName #>1}" >
+            <ContentView.Resources>
+                <ResourceDictionary>
+                  <ControlTemplate x:Key="<#= RlistUserControlXamlClassName #>1">
+                    <StackLayout/>
+                  </ControlTemplate>
+                  <ControlTemplate x:Key="<#= RlistUserControlXamlClassName #>2">
+                    <StackLayout Orientation="Vertical">
+                      <Picker ItemsSource="{TemplateBinding  Parent.BindingContext.<#= MasterPanelComboItemsPropertyName #>}"
+                              ItemDisplayBinding="{Binding Caption}"
+                              SelectedItem="{TemplateBinding Parent.BindingContext.<#= MasterPanelComboItemPropertyName #>, Mode=TwoWay}" />
+                      <ContentView prism:RegionManager.RegionName="{TemplateBinding Parent.BindingContext.<#= MasterPanelRegionPropertyName #>}" />
+                    </StackLayout>
+                  </ControlTemplate>
+                </ResourceDictionary>
+            </ContentView.Resources>
+            <ContentView.Triggers>
+                <DataTrigger TargetType="ContentView" Binding="{Binding <#= ShowMasterPanelComboPropertyName #>, Mode=OneWay}" Value="1">
+                    <Setter Property="ControlTemplate" Value="{StaticResource <#= RlistUserControlXamlClassName #>2}" />
+                </DataTrigger>
+            </ContentView.Triggers>
+        </ContentView>
+<#
+    }
+#>
 </ucwcm:<#= RegionAwareUserControlBaseClassName #>>
 
 

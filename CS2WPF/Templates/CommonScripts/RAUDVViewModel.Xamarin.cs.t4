@@ -115,6 +115,7 @@ using Xamarin.Essentials;
     string CurrentNavigationContextPropertyName     = "CurrentNavigationContext";
     string IsDestroyedPropertyName                  = "IsDestroyed";
     string OnDestroyPropertyName                    = "OnDestroy";
+    string IsMasterPanelPropertyName                = "IsMasterPanel";
 
     List<string> detailViews = GetDetailViews(Model, Context, null);
     List<ModelViewPropertyOfVwSerializable> primKeys = GetModelPrimaryKeyProps(Model);
@@ -213,6 +214,21 @@ namespace <#= RAUDVViewModelNameSpace #> {
         protected <#= modelInterfaceClassName #> modelToReturn = null;
 
 
+        protected bool _<#= IsMasterPanelPropertyName #> = true;
+        public string <#= IsMasterPanelPropertyName #>
+        { 
+            get
+            {
+                return _<#= IsMasterPanelPropertyName #>;
+            }
+            set {
+                if(_<#= IsMasterPanelPropertyName #> != value) {
+                    _<#= IsMasterPanelPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         public bool <#= CanAddPropertyName #>
         { 
             get
@@ -274,7 +290,7 @@ namespace <#= RAUDVViewModelNameSpace #> {
         }
         #endregion
         #region <#= EformModePropertyName #>
-        protected <#= EformModeEnumClassName #> _<#= EformModePropertyName #> = <#= EformModeEnumClassName #>.DeleteMode;
+        protected <#= EformModeEnumClassName #> _<#= EformModePropertyName #> = <#= EformModeEnumClassName #>.ViewMode;
         public <#= EformModeEnumClassName #> <#= EformModePropertyName #>
         {
             get
@@ -368,7 +384,12 @@ namespace <#= RAUDVViewModelNameSpace #> {
             if (<#= IsDestroyedPropertyName #>) return;
             INavigationParameters prms = navigationContext.Parameters;
             <#= IsCanceledPropertyName #> = true;
-            <#= EformModeEnumClassName #> modeToCheck = <#= EformModeEnumClassName #>.DeleteMode;
+            <#= EformModeEnumClassName #> modeToCheck = <#= EformModeEnumClassName #>.ViewMode;
+
+            
+            if(prms.ContainsKey("<#= IsMasterPanelPropertyName #>")) {
+                this.<#= IsMasterPanelPropertyName #> = prms.GetValue<bool>("<#= IsMasterPanelPropertyName #>");
+            }
             if(prms.ContainsKey("<#= EformModeEnumClassName #>")) {
                 modeToCheck = prms.GetValue<<#= EformModeEnumClassName #>>("<#= EformModeEnumClassName #>");
             }
@@ -415,27 +436,41 @@ namespace <#= RAUDVViewModelNameSpace #> {
                 }
             } 
 
-            if(prms.ContainsKey("<#= EformModeEnumClassName #>")) {
-                string locCaption = null;
-                <#= EformModeEnumClassName #> locmode = prms.GetValue<<#= EformModeEnumClassName #>>("<#= EformModeEnumClassName #>");
-                if (locmode != <#= EformModeEnumClassName #>.AddMode) {
-                    if (locmode == <#= EformModeEnumClassName #>.DeleteMode) {
-                        locCaption = "Delete item for <#= Model.Title #>";
-                    } else {
-                        locCaption = "Update item for <#= Model.Title #>";
-                    }
 <#
-            foreach(ModelViewPropertyOfVwSerializable pk in primKeys) {
+            switch(AddUpdDelViewInputTypeId) {
+                case 1: // add
+                    break; // just break here
+                case 2: // update
 #>
-                    <#= GetPropertyTypeName(pk) #> <#= GetPrimKeyVarName(pk) #> = default(<#= GetPropertyTypeName(pk) #>);
-                    if(prms.ContainsKey("<#= GetPrimKeyVarName(pk) #>")) {
-                        <#= GetPrimKeyVarName(pk) #> = prms.GetValue<<#= GetPropertyTypeName(pk) #>>("<#= GetPrimKeyVarName(pk) #>");
-                    }
+                <#= EformModeEnumClassName #> locmode = <#= EformModeEnumClassName #>.UpdateMode;
+                string locCaption = "Update item for <#= Model.Title #>";
 <#
+                    break;
+                case 3: // delete
+#>
+                <#= EformModeEnumClassName #> locmode = <#= EformModeEnumClassName #>.DeleteMode;
+                string locCaption = "Delete item for <#= Model.Title #>";
+<#
+                    break;
+                default: // view
+#>
+                <#= EformModeEnumClassName #> locmode = <#= EformModeEnumClassName #>.ViewMode;
+                string locCaption = "Delete item for <#= Model.Title #>";
+<#
+                    break;
             }
+            if(AddUpdDelViewInputTypeId != 1) {
+                foreach(ModelViewPropertyOfVwSerializable pk in primKeys) {
 #>
-                    // <#= GetInterfaceName(Model) #> data
-                    _ = <#= FormServicePrefix #><#= Model.ViewName #>.<#= GetOneMethodName #>(
+                <#= GetPropertyTypeName(pk) #> <#= GetPrimKeyVarName(pk) #> = default(<#= GetPropertyTypeName(pk) #>);
+                if(prms.ContainsKey("<#= GetPrimKeyVarName(pk) #>")) {
+                    <#= GetPrimKeyVarName(pk) #> = prms.GetValue<<#= GetPropertyTypeName(pk) #>>("<#= GetPrimKeyVarName(pk) #>");
+                }
+<#
+                }
+#>
+                // <#= GetInterfaceName(Model) #> data
+                _ = <#= FormServicePrefix #><#= Model.ViewName #>.<#= GetOneMethodName #>(
 <#
             {
                 bool isFirst= true;
@@ -443,38 +478,38 @@ namespace <#= RAUDVViewModelNameSpace #> {
                     if (isFirst) {
                         isFirst = false;
 #>
-                            <#= GetPrimKeyVarName(pk) #>
+                    <#= GetPrimKeyVarName(pk) #>
 <#
                     } else {
 #>
-                          , <#= GetPrimKeyVarName(pk) #>
+                  , <#= GetPrimKeyVarName(pk) #>
 <#
                     }
                 }
             }
 #>
-                        ).ContinueWith((data) => {
-                                MainThread.InvokeOnMainThreadAsync(() =>
-                                {
-                                    <#= CaptionPropertyName #> = locCaption;
-                                    if (resetHF) { <#= HiddenFiltersPropertyName #> = hf; }
-                                    <#= EformModePropertyName #> = locmode;
-                                    <#= FormControlModelPropertyName #> = <#= FormServicePrefix #><#= Model.ViewName #>.<#= CopyToModelNotifyMethodName #>(data.Result, null);
-                                    <#= IsParentLoadedPropertyName #> = true;
-                                });
+                ).ContinueWith((data) => {
+                        MainThread.InvokeOnMainThreadAsync(() =>
+                        {
+                            <#= CaptionPropertyName #> = locCaption;
+                            if (resetHF) { <#= HiddenFiltersPropertyName #> = hf; }
+                            <#= EformModePropertyName #> = locmode;
+                            <#= FormControlModelPropertyName #> = <#= FormServicePrefix #><#= Model.ViewName #>.<#= CopyToModelNotifyMethodName #>(data.Result, null);
+                            <#= IsParentLoadedPropertyName #> = true;
                         });
-                } else {
-                    <#= CaptionPropertyName #> = "Add item for <#= Model.Title #>";
-                    if (resetHF) { <#= HiddenFiltersPropertyName #> = hf; }
-                    <#= FormControlModelPropertyName #> = <#= FormServicePrefix #><#= Model.ViewName #>.<#= CopyToModelNotifyMethodName #>(null,null); // this is correct: cleanup twice
-                    <#= EformModePropertyName #> = <#= EformModeEnumClassName #>.AddMode;
-                    <#= FormControlModelPropertyName #> = null; // since DateTime-issue this is correct: <#= FormServicePrefix #><#= Model.ViewName #>.<#= CopyToModelNotifyMethodName #>(null,null);
-                    <#= IsParentLoadedPropertyName #> = true;
-                }
-            } else {
+                });
+<#
+            } else { // if(AddUpdDelViewInputTypeId != 1) { ... }
+#>
+                <#= CaptionPropertyName #> = "Add item for <#= Model.Title #>";
                 if (resetHF) { <#= HiddenFiltersPropertyName #> = hf; }
+                <#= FormControlModelPropertyName #> = <#= FormServicePrefix #><#= Model.ViewName #>.<#= CopyToModelNotifyMethodName #>(null,null); // this is correct: cleanup twice
+                <#= EformModePropertyName #> = <#= EformModeEnumClassName #>.AddMode;
+                <#= FormControlModelPropertyName #> = null; // since DateTime-issue this is correct: <#= FormServicePrefix #><#= Model.ViewName #>.<#= CopyToModelNotifyMethodName #>(null,null);
                 <#= IsParentLoadedPropertyName #> = true;
+<#
             }
+#>
         }
         #endregion
         #region NavigationBackCommand

@@ -151,6 +151,11 @@ using Xamarin.Essentials;
     string IsDestroyedPropertyName              = "IsDestroyed";
     string IsNavigatedBackPropertyName          = "IsNavigatedBack";
     string OnDestroyPropertyName                = "OnDestroy";
+    string NavigateToDetailCommandPropertyName  = "NavigateToDetailCommand";
+    string HiddenFiltersParamPropertyName       = "HiddenFilter";
+    string HiddenFilterByRowSuffix              = "HiddenFilterByRow";
+    string HiddenFilterAsFltRsltSuffix          = "HiddenFilterAsFltRslt";
+
 
     List<string> detailViews = GetDetailViews(Model, Context, null);
     List<ModelViewPropertyOfVwSerializable> primKeys = GetModelPrimaryKeyProps(Model);
@@ -390,6 +395,7 @@ namespace <#= RdlistViewModelNameSpace #> {
         }
         #endregion
 
+        #region OnNavigationResult
         protected void OnNavigationResult(IRegionNavigationResult navResult) {
             if (<#= IsDestroyedPropertyName #>) return;
             if (navResult.Result.HasValue) {
@@ -409,48 +415,21 @@ namespace <#= RdlistViewModelNameSpace #> {
             navResult.Context.NavigationService.RequestNavigate(new Uri("<#= PageNotFoundUserControlClassName #>", UriKind.Relative));
             <#= AppSettingServicePropertyName #>.ShowErrorMessage("Navigation Exception", navErrorMsg);
         }
-<#
-        foreach(string detailViewName in detailViews) {
-            ModelViewSerializable detailView = GetModelViewByName(Context, detailViewName);
-            if(detailView == null) {
-#>
-///// can not find the view by Name <#= detailViewName #>
-<#
-                continue;
-            }
-            string detailViewClassName = GetModelClassName(detailView, RdlistUserControlFolder);
-            List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detailView, null);
-            if (foreignKeys == null) continue;
-            if (foreignKeys.Count < 1) continue;
-            foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
-#>
-        #region <#= detailViewClassName #><#= foreignKey.NavigationName #>Command
-        public void <#= detailViewClassName #><#= foreignKey.NavigationName #>Command(<#= modelInterfaceClassName #> selected) { 
+        #endregion
+
+        #region <#= NavigateToDetailCommandPropertyName #>
+        public void <#= NavigateToDetailCommandPropertyName #>(<#= modelInterfaceClassName #> selected, string detailVwNm, string fkNvNm, string detailVwClNm) { 
             if (<#= IsDestroyedPropertyName #>) return;
-            if (((<#= AppSettingServicePropertyName #>.GetViewModelMask("<#= detailView.ViewName #>") & 1) != 1 )) {
+            if (((<#= AppSettingServicePropertyName #>.GetViewModelMask(detailVwNm) & 1) != 1 )) {
                 <#= CurrentNavigationContextPropertyName #>.NavigationService.RequestNavigate(new Uri("<#= AccessDeniedUserControlClassName #>", UriKind.Relative), OnNavigationResult);
                 return;
             }
             if(selected == null) return;
             NavigationParameters navigationParameters = new NavigationParameters();
-<#
-                    foreach(ModelViewPropertyOfVwSerializable primKey in primKeys) {
-                        List<ModelViewPropertyOfVwSerializable> detailProps = GetDetailViewForeignKeyProps(Model, primKey, detailView, foreignKey, null);
-                        foreach(ModelViewPropertyOfVwSerializable detailProp in detailProps) {
-#>
-            
-            navigationParameters.Add("<#= GetModelPropertyName(detailProp, detailView) #>", selected.<#= GetModelPropertyName(primKey, Model) #>);
-<#
-                        }
-                    }
-#>
-            <#= CurrentNavigationContextPropertyName #>.NavigationService.RequestNavigate(new Uri("<#= detailViewClassName #>", UriKind.Relative), OnNavigationResult, navigationParameters);
+            navigationParameters.Add("<#= HiddenFiltersParamPropertyName #>", this.<#= FormServicePrefix #><#= Model.ViewName #>.get<#= HiddenFilterByRowSuffix #>(selected, fkNvNm));  
+            <#= CurrentNavigationContextPropertyName #>.NavigationService.RequestNavigate(new Uri(detailVwClNm, UriKind.Relative), OnNavigationResult, navigationParameters);
         }
         #endregion
-<#
-            }
-        }
-#>
 
 
 
@@ -506,7 +485,7 @@ namespace <#= RdlistViewModelNameSpace #> {
             foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
 #>
                 case "<#= RowMIPrefixPropertyName #><#= detailViewClassName #><#= foreignKey.NavigationName #>":
-                    <#= detailViewClassName #><#= foreignKey.NavigationName #>Command(arow);
+                    <#= NavigateToDetailCommandPropertyName #>(arow, "<#= detailView.ViewName #>", "<#= foreignKey.NavigationName #>", "<#= detailViewClassName #>");
                     break;
 <#
             }
@@ -611,7 +590,7 @@ namespace <#= RdlistViewModelNameSpace #> {
        public void OnNavigatedFrom(INavigationContext navigationContext) {
             <#= CurrentNavigationContextPropertyName #> = null;
        }
-       public void OnNavigatedTo(INavigationContext navigationContext) {
+       public async void OnNavigatedTo(INavigationContext navigationContext) {
             if (<#= IsDestroyedPropertyName #>) return;
             INavigationParameters prms = navigationContext.Parameters;
             PermissionMask = <#= AppSettingServicePropertyName #>.GetViewModelMask("<#= Model.ViewName #>");
@@ -631,21 +610,17 @@ namespace <#= RdlistViewModelNameSpace #> {
                 }
             }
             <#= CurrentNavigationContextPropertyName #> = navigationContext;
-            Task.Run(() =>
-            {
-                MainThread.BeginInvokeOnMainThread(() =>
-                {
-                    OnPropertyChanged("<#= ShowBackBtnPropertyName #>");
-                    (<#= OnNavigationBackCommandPropertyName #> as Command).ChangeCanExecute();
-                });
+            await  MainThread.InvokeOnMainThreadAsync(() => {
+                OnPropertyChanged("<#= ShowBackBtnPropertyName #>");
+                (<#= OnNavigationBackCommandPropertyName #> as Command).ChangeCanExecute();
+                OnPropertyChanged("<#= CanAddPropertyName  #>");
+                OnPropertyChanged("<#= CanUpdPropertyName  #>");
+                OnPropertyChanged("<#= CanDelPropertyName  #>");
             });
-            OnPropertyChanged("<#= CanAddPropertyName  #>");
-            OnPropertyChanged("<#= CanUpdPropertyName  #>");
-            OnPropertyChanged("<#= CanDelPropertyName  #>");
-
             if((!<#= IsParentLoadedPropertyName #>) || (<#= IsNavigatedBackPropertyName #>)) {
                 ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>> hf = new ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>();
 <#
+        if(false) {
             foreach(ModelViewPropertyOfVwSerializable sclrProp in Model.ScalarProperties) {
 #>          
                 if(prms.ContainsKey("<#= GetModelPropertyName(sclrProp, Model) #>")) {
@@ -659,7 +634,17 @@ namespace <#= RdlistViewModelNameSpace #> {
                 }
 <#
             }
+        }
 #>          
+                if(prms.ContainsKey("<#= HiddenFiltersParamPropertyName #>")) {
+                    IList<<#= IWebServiceFilterRsltInterfaceClassName #>> hflts = 
+                        <#= FormServicePrefix #><#= Model.ViewName #>.get<#= HiddenFilterAsFltRsltSuffix #>(
+                            prms.GetValue<Dictionary<(string viewNm, string navNm, string propNm), object>>("<#= HiddenFiltersParamPropertyName #>")
+                        );
+                    foreach(var hflt in hflts) {
+                        hf.Add(hflt);
+                    }
+                }
                 ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>> chf = <#= HiddenFiltersPropertyName #> as ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>;
                 bool resetHF = chf.Count != hf.Count;
                 if ((!resetHF) && (hf.Count > 0)) {
