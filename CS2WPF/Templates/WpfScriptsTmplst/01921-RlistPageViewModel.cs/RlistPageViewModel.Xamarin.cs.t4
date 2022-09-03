@@ -76,7 +76,16 @@ using Xamarin.Essentials;
 
     string ReditPageFolder                  = "01817-ReditPage.xaml.cs";
     string ReditPageClassName               = GetModelClassName(Model, ReditPageFolder);
-    string ReditPageNameSpace               = GetModelNameSpace(Model, ReditPageFolder);
+
+    string RviewPageFolder                  = "01752-RviewPage.xaml.cs";
+    string RviewPageClassName               = GetModelClassName(Model, RviewPageFolder);
+    string RaddPageFolder                   = "01772-RaddPage.xaml.cs";
+    string RaddPageClassName                = GetModelClassName(Model, RaddPageFolder);
+    string RupdPageFolder                   = "01832-RupdPage.xaml.cs";
+    string RupdPageClassName                = GetModelClassName(Model, RupdPageFolder);
+    string RdelPageFolder                   = "01852-RdelPage.xaml.cs";
+    string RdelPageClassName                = GetModelClassName(Model, RdelPageFolder);
+
 
     string RlistPageFolder                  = "01917-RlistPage.xaml.cs";
     string RlistPageClassName               = GetModelClassName(Model, RlistPageFolder);
@@ -124,6 +133,7 @@ using Xamarin.Essentials;
     string SformAddItemCommandPropertyName      = "SformAddItemCommand";
     string SformUpdItemCommandPropertyName      = "SformUpdItemCommand";
     string SformDelItemCommandPropertyName      = "SformDelItemCommand";
+    string SformViewItemCommandPropertyName     = "SformViewItemCommand";
     string SformAfterAddItemCommandPropertyName = "SformAfterAddItemCommand";
     string SformAfterUpdItemCommandPropertyName = "SformAfterUpdItemCommand";
     string SformAfterDelItemCommandPropertyName = "SformAfterDelItemCommand";
@@ -135,6 +145,10 @@ using Xamarin.Essentials;
     string SelectedRowPropertyName              = "SelectedRow";
     string SelectedRowCommandPropertyName       = "SelectedRowCommand";
 
+    string RowViewMIPropertyName                =  "RowViewMI";
+    string TableAddMIPropertyName               =  "TableAddMI";
+    string RowUpdMIPropertyName                 =  "RowUpdMI";
+    string RowDelMIPropertyName                 =  "RowDelMI";
 
     string FormControlModelPropertyName         = "FormControlModel";
     string CaptionPropertyName                  = "Caption";
@@ -318,8 +332,10 @@ namespace <#= RlistPageViewModelNameSpace #> {
         #region <#= RowMenuItemsPropertyName #>
         protected ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>> GetDefault<#= RowMenuItemsPropertyName #>() {
             return new ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>>()  {
-                new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "RowUpdMI", Caption="Update item", IconName="TableEdit", IconColor=Color.Default, Enabled=true, Data=null, Command = <#= RowMenuItemsCommandPropertyName #>},
-                new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "RowDelMI", Caption="Delete item", IconName="TableRemove", IconColor=Color.Default, Enabled=true, Data=null, Command = <#= RowMenuItemsCommandPropertyName #>},
+                new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "<#= RowUpdMIPropertyName #>", Caption="Update item", IconName="TableEdit", IconColor=Color.Default, Enabled=true, Data=null, Command = <#= RowMenuItemsCommandPropertyName #>},
+                new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "<#= RowDelMIPropertyName #>", Caption="Delete item", IconName="TableRemove", IconColor=Color.Default, Enabled=true, Data=null, Command = <#= RowMenuItemsCommandPropertyName #>},
+                new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "<#= RowViewMIPropertyName #>", Caption="View item", IconName="TableEdit", IconColor=Color.Default, Enabled=true, Data=null, Command = <#= RowMenuItemsCommandPropertyName #>},
+
 <#
         foreach(string detailViewName in detailViews) {
             ModelViewSerializable detailView = GetModelViewByName(Context, detailViewName);
@@ -363,7 +379,7 @@ namespace <#= RlistPageViewModelNameSpace #> {
         #region <#= TableMenuItemsPropertyName #>
         protected ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>> GetDefault<#= TableMenuItemsPropertyName #>() {
             return new ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>>()  {
-                new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "TableAddMI", Caption="Add Item", IconName="TablePlus", IconColor=Color.Default, Enabled=true, Data=null, Command = <#= TableMenuItemsCommandPropertyName #>},
+                new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "<#= TableAddMIPropertyName #>", Caption="Add Item", IconName="TablePlus", IconColor=Color.Default, Enabled=true, Data=null, Command = <#= TableMenuItemsCommandPropertyName #>},
             };
         }
         protected IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> _<#= TableMenuItemsPropertyName #> = null;
@@ -534,7 +550,7 @@ namespace <#= RlistPageViewModelNameSpace #> {
                 navigationParameters.Add(hf.fltrName, hf.fltrValue);
             }
             navigationParameters.Add("<#= EformModeEnumClassName #>", <#= EformModeEnumClassName #>.AddMode);
-            INavigationResult nr2 = await _navigationService.NavigateAsync("<#= ReditPageClassName #>", navigationParameters);
+            INavigationResult nr2 = await _navigationService.NavigateAsync("<#= RaddPageClassName #>", navigationParameters);
             OnNavigationResult(nr2);
         }
         #endregion
@@ -553,7 +569,7 @@ namespace <#= RlistPageViewModelNameSpace #> {
             if(prm == null) return;
             <#= IWebServiceFilterMenuInterfaceClassName #> mi = prm as <#= IWebServiceFilterMenuInterfaceClassName #>;
             if (mi == null) return;
-            if(mi.Id == "TableAddMI") {
+            if(mi.Id == "<#= TableAddMIPropertyName #>") {
                 await <#= SformAddItemCommandPropertyName #>();
             }
         }
@@ -561,14 +577,13 @@ namespace <#= RlistPageViewModelNameSpace #> {
         {
             <#= IWebServiceFilterMenuInterfaceClassName #> mi = prm as <#= IWebServiceFilterMenuInterfaceClassName #>;
             if (mi != null) {
-                if(mi.Id == "TableAddMI") {
+                if(mi.Id == "<#= TableAddMIPropertyName #>") {
                     return ((PermissionMask & 8) == 8);
                 }
             }
             return false; 
         }
         #endregion
-
 
         #region <#= SformUpdItemCommandPropertyName #>
         public async Task <#= SformUpdItemCommandPropertyName #>(<#= modelInterfaceClassName #> selected) {
@@ -592,10 +607,11 @@ namespace <#= RlistPageViewModelNameSpace #> {
 <#
             }
 #>
-            INavigationResult nr2 = await _navigationService.NavigateAsync("<#= ReditPageClassName #>", navigationParameters);
+            INavigationResult nr2 = await _navigationService.NavigateAsync("<#= RupdPageClassName #>", navigationParameters);
             OnNavigationResult(nr2);
         }
         #endregion
+
         #region <#= SformDelItemCommandPropertyName #>
         public async Task <#= SformDelItemCommandPropertyName #>(<#= modelInterfaceClassName #> selected) {
             if(<#= IsDestroyedPropertyName #>) return;
@@ -618,10 +634,32 @@ namespace <#= RlistPageViewModelNameSpace #> {
 <#
             }
 #>
-            INavigationResult nr2 = await _navigationService.NavigateAsync("<#= ReditPageClassName #>", navigationParameters);
+            INavigationResult nr2 = await _navigationService.NavigateAsync("<#= RdelPageClassName #>", navigationParameters);
             OnNavigationResult(nr2);
         }
         #endregion
+
+        #region <#= SformViewItemCommandPropertyName #>
+        public async Task <#= SformViewItemCommandPropertyName #>(<#= modelInterfaceClassName #> selected) {
+            if (<#= IsDestroyedPropertyName #>) return;
+            if (selected == null) return;
+            NavigationParameters navigationParameters = new NavigationParameters();
+            foreach(<#= IWebServiceFilterRsltInterfaceClassName #> hf in <#= HiddenFiltersPropertyName #>) {
+                navigationParameters.Add(hf.fltrName, hf.fltrValue);
+            }
+            navigationParameters.Add("<#= EformModeEnumClassName #>", <#= EformModeEnumClassName #>.ViewMode);
+<#
+            foreach(ModelViewPropertyOfVwSerializable pk in primKeys) {
+#>
+            navigationParameters.Add("<#= GetPrimKeyVarName(pk) #>", selected.<#= GetModelPropertyName(pk, Model) #>);
+<#
+            }
+#>
+            INavigationResult nr2 = await _navigationService.NavigateAsync("<#= RviewPageClassName #>", navigationParameters);
+            OnNavigationResult(nr2);
+        }
+        #endregion
+
         #region <#= RowMenuItemsCommandPropertyName #>
         protected ICommand _<#= RowMenuItemsCommandPropertyName #> = null;
         public ICommand <#= RowMenuItemsCommandPropertyName #>
@@ -639,12 +677,16 @@ namespace <#= RlistPageViewModelNameSpace #> {
             <#= modelInterfaceClassName #> arow = mi.FeedbackData as <#= modelInterfaceClassName #>;
             if (arow == null) return;
             switch(mi.Id) {
-                case "RowUpdMI":
+                case "<#= RowUpdMIPropertyName #>":
                     await <#= SformUpdItemCommandPropertyName #>(arow);
                     break;
-                case "RowDelMI":
+                case "<#= RowDelMIPropertyName #>":
                     await <#= SformDelItemCommandPropertyName #>(arow);
                     break;
+                case "<#= RowViewMIPropertyName #>":
+                    await <#= SformViewItemCommandPropertyName #>(arow);
+                    break;
+
 <#
         foreach(string detailViewName in detailViews) {
             ModelViewSerializable detailView = GetModelViewByName(Context, detailViewName);
@@ -678,10 +720,13 @@ namespace <#= RlistPageViewModelNameSpace #> {
             <#= IWebServiceFilterMenuInterfaceClassName #> mi = prm as <#= IWebServiceFilterMenuInterfaceClassName #>;
             if (mi != null) {
                 switch(mi.Id) {
-                    case "RowUpdMI":
+                    case "<#= RowUpdMIPropertyName #>":
                         return ((PermissionMask & 4) == 4);
-                    case "RowDelMI":
+                    case "<#= RowDelMIPropertyName #>":
                         return ((PermissionMask & 2) == 2);
+                    case "<#= RowViewMIPropertyName #>":
+                        return true;
+
 <#
         foreach(string detailViewName in detailViews) {
             ModelViewSerializable detailView = GetModelViewByName(Context, detailViewName);
