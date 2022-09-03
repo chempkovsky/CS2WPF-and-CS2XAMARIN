@@ -105,6 +105,11 @@ using Xamarin.Essentials;
     string HiddenFiltersPropertyName                 = "HiddenFilters";
     string OnHiddenFiltersChangedPropertyName        = "OnHiddenFiltersChanged";
     string HiddenFiltersPropertyChangedPropertyName  = "HiddenFiltersPropertyChanged";
+    string HiddenFiltersParamPropertyName            = "HiddenFilter";
+    string NavigateToDetailCommandPropertyName       = "NavigateToDetailCommand";
+    string HiddenFilterByRowSuffix                   = "HiddenFilterByRow";
+    string HiddenFilterAsFltRsltSuffix               = "HiddenFilterAsFltRslt";
+
 
     string TableMenuItemsPropertyName                = "TableMenuItems";
     string TableMenuItemsPropertyChangedPropertyName = "TableMenuItemsPropertyChanged";
@@ -437,50 +442,22 @@ namespace <#= RlistPageViewModelNameSpace #> {
             <#= AppSettingServicePropertyName #>.NavigateTo("<#= PageNotFoundPageClassName #>");
             <#= AppSettingServicePropertyName #>.ShowErrorMessage("Navigation Exception", navErrorMsg);
         }
-<#
-        foreach(string detailViewName in detailViews) {
-            ModelViewSerializable detailView = GetModelViewByName(Context, detailViewName);
-            if(detailView == null) {
-#>
-///// can not find the view by Name <#= detailViewName #>
-<#
-                continue;
-            }
-            string detailViewClassName = GetModelClassName(detailView, RlistPageFolder);
-            List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detailView, null);
-            if (foreignKeys == null) continue;
-            if (foreignKeys.Count < 1) continue;
-            foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
-#>
-        #region <#= detailViewClassName #><#= foreignKey.NavigationName #>Command
-        public async Task <#= detailViewClassName #><#= foreignKey.NavigationName #>Command(<#= modelInterfaceClassName #> selected) { 
+
+        #region <#= NavigateToDetailCommandPropertyName #>
+        public async Task <#= NavigateToDetailCommandPropertyName #>(<#= modelInterfaceClassName #> selected, string detailVwNm, string fkNvNm, string detailVwClNm) { 
             if(<#= IsDestroyedPropertyName #>) return;
-            if (((<#= AppSettingServicePropertyName #>.GetViewModelMask("<#= detailView.ViewName #>") & 1) != 1 )) {
+            if (((<#= AppSettingServicePropertyName #>.GetViewModelMask(detailVwNm) & 1) != 1 )) {
                 INavigationResult nr1 = await _navigationService.NavigateAsync("<#= AccessDeniedPageClassName #>");
                 OnNavigationResult(nr1);
                 return;
             }
             if(selected == null) return;
             NavigationParameters navigationParameters = new NavigationParameters();
-<#
-                    foreach(ModelViewPropertyOfVwSerializable primKey in primKeys) {
-                        List<ModelViewPropertyOfVwSerializable> detailProps = GetDetailViewForeignKeyProps(Model, primKey, detailView, foreignKey, null);
-                        foreach(ModelViewPropertyOfVwSerializable detailProp in detailProps) {
-#>
-            
-            navigationParameters.Add("<#= GetModelPropertyName(detailProp, detailView) #>", selected.<#= GetModelPropertyName(primKey, Model) #>);
-<#
-                        }
-                    }
-#>
-            INavigationResult nr2 = await _navigationService.NavigateAsync("<#= detailViewClassName #>", navigationParameters);
+            navigationParameters.Add("<#= HiddenFiltersParamPropertyName #>", this.<#= FormServicePrefix #><#= Model.ViewName #>.get<#= HiddenFilterByRowSuffix #>(selected, fkNvNm));  
+            INavigationResult nr2 = await _navigationService.NavigateAsync(detailVwClNm, navigationParameters);
             OnNavigationResult(nr2);
         }
         #endregion
-<#
-            }
-        }
-#>
 
         #region <#= SformAfterAddItemPropertyName #>
         protected object _<#= SformAfterAddItemPropertyName #> = null;
@@ -703,7 +680,7 @@ namespace <#= RlistPageViewModelNameSpace #> {
             foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
 #>
                 case "<#= RowMIPrefixPropertyName #><#= detailViewClassName #><#= foreignKey.NavigationName #>":
-                    await <#= detailViewClassName #><#= foreignKey.NavigationName #>Command(arow);
+                    await <#= NavigateToDetailCommandPropertyName #>(arow, "<#= detailView.ViewName #>", "<#= foreignKey.NavigationName #>", "<#= detailViewClassName #>");
                     break;
 <#
             }
@@ -825,6 +802,7 @@ namespace <#= RlistPageViewModelNameSpace #> {
             if(!<#= IsParentLoadedPropertyName #>) {
                 ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>> hf = new ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>();
 <#
+        if(false) {
             foreach(ModelViewPropertyOfVwSerializable sclrProp in Model.ScalarProperties) {
 #>          
                 if(prms.ContainsKey("<#= GetModelPropertyName(sclrProp, Model) #>")) {
@@ -838,7 +816,17 @@ namespace <#= RlistPageViewModelNameSpace #> {
                 }
 <#
             }
+        }
 #>          
+                if(prms.ContainsKey("<#= HiddenFiltersParamPropertyName #>")) {
+                    IList<<#= IWebServiceFilterRsltInterfaceClassName #>> hflts = 
+                        <#= FormServicePrefix #><#= Model.ViewName #>.get<#= HiddenFilterAsFltRsltSuffix #>(
+                            prms.GetValue<Dictionary<(string viewNm, string navNm, string propNm), object>>("<#= HiddenFiltersParamPropertyName #>")
+                        );
+                    foreach(var hflt in hflts) {
+                        hf.Add(hflt);
+                    }
+                }
                 ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>> chf = <#= HiddenFiltersPropertyName #> as ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>;
                 bool resetHF = chf.Count != hf.Count;
                 if ((!resetHF) && (hf.Count > 0)) {
