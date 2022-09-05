@@ -108,7 +108,10 @@ namespace <#= MainFlyoutPageViewModelNameSpace #> {
                                                    // bindable region names trow exception as well
                                                    // so it's the only way: do not navigate to the same page
             if (ns != null)  {
-                await ns.GoBackToRootAsync();
+                //
+                //  ns.GoBackToRootAsync();
+                //  returns error
+                //
                 INavigationResult nrslt = await ns.NavigateAsync(name: $"/<#= MainFlyoutPageClassName #>/NavigationPage/{navPath}");
                 if (!nrslt.Success)
                 {
