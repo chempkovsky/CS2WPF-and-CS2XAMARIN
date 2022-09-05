@@ -104,6 +104,9 @@ namespace <#= MainFlyoutPageViewModelNameSpace #> {
         {
             INavigationService ns = _navigationService;
             IAppGlblSettingsService gss = _GlblSettingsSrv;
+            if(gss.CurrNavPath == navPath) return; // static region trows exception if to navigate to the same Feature-Page
+                                                   // bindable region names trow exception as well
+                                                   // so it's the only way: do not navigate to the same page
             if (ns != null)  {
                 await ns.GoBackToRootAsync();
                 INavigationResult nrslt = await ns.NavigateAsync(name: $"/<#= MainFlyoutPageClassName #>/NavigationPage/{navPath}");
@@ -113,6 +116,8 @@ namespace <#= MainFlyoutPageViewModelNameSpace #> {
                     if (nrslt.Exception != null) msg = ": " + nrslt.Exception.Message;
                     await ns.NavigateAsync(name: $"/<#= MainFlyoutPageClassName #>/NavigationPage/<#= PageNotFoundPageClassName #>");
                     if (gss != null) gss.ShowErrorMessage("Navigation Error", msg);
+                } else {
+                    gss.CurrNavPath = navPath;
                 }
             }
         }
