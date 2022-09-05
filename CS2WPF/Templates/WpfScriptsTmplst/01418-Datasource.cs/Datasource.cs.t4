@@ -1584,13 +1584,17 @@ namespace <#= datasourceNameSpace #> {
             if(this._<#= HiddenFilterFieldName #> == null) return;
             foreach(var hkey in this._<#= HiddenFilterFieldName #>.Keys) {
                 foreach(var kkey in <#= MasterToClientKeyFieldsMapFieldName #>.Keys) {
-                    if ((hkey.viewNm == kkey.viewNm) && (hkey.navNm == kkey.navNm)) {
-                        this._<#= UnderHiddenFilterFieldsFieldName #>.Add(<#= MasterToClientKeyFieldsMapFieldName #>[kkey].propNm);
+                    if ((hkey.viewNm == kkey.viewNm) && (hkey.navNm == kkey.navNm) && (hkey.propNm == kkey.propNm)) {
+                        string pNm = <#= MasterToClientKeyFieldsMapFieldName #>[kkey].propNm;
+                        if(!this._<#= UnderHiddenFilterFieldsFieldName #>.Any(s => s == pNm))
+                            this._<#= UnderHiddenFilterFieldsFieldName #>.Add(pNm);
                     }
                 }
                 foreach(var fkey in <#= MasterToClientFieldsMapFieldName #>.Keys) {
-                    if ((hkey.viewNm == fkey.viewNm) && (hkey.navNm == fkey.navNm)) {
-                        this._<#= UnderHiddenFilterFieldsFieldName #>.Add(<#= MasterToClientFieldsMapFieldName #>[fkey]);
+                    if ((hkey.viewNm == fkey.viewNm) && (hkey.navNm == fkey.navNm) && (hkey.propNm == fkey.propNm)) {
+                        string pNm = <#= MasterToClientFieldsMapFieldName #>[fkey];
+                        if(!this._<#= UnderHiddenFilterFieldsFieldName #>.Any(s => s == pNm))
+                            this._<#= UnderHiddenFilterFieldsFieldName #>.Add(pNm);
                     }
                 }
             }

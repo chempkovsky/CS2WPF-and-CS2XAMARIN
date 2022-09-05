@@ -296,7 +296,7 @@ namespace <#= RdlistViewModelNameSpace #> {
         }
 
         #region <#= CaptionPropertyName #>
-        string _<#= CaptionPropertyName #> = "<#= Model.ViewName #>";
+        string _<#= CaptionPropertyName #> = "<#= Model.PluralTitle #>";
         public string <#= CaptionPropertyName #>
         { 
             get
@@ -329,7 +329,7 @@ namespace <#= RdlistViewModelNameSpace #> {
             if (foreignKeys.Count < 1) continue;
             foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
 #>
-                new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "<#= RowMIPrefixPropertyName #><#= detailViewClassName #><#= foreignKey.NavigationName #>", <#= CaptionPropertyName #>="<#= detailViewName #>: <#= foreignKey.NavigationName #>", IconName="ArrowRightBold", IconColor=Color.Default, Enabled=true, Data=null, FeedbackData=null, Command = <#= RowMenuItemsCommandPropertyName #>},
+                new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "<#= RowMIPrefixPropertyName #><#= detailViewClassName #><#= foreignKey.NavigationName #>", <#= CaptionPropertyName #>="<#= detailView.PluralTitle #>: <#= foreignKey.NavigationName #>", IconName="ArrowRightBold", IconColor=Color.Default, Enabled=true, Data=null, FeedbackData=null, Command = <#= RowMenuItemsCommandPropertyName #>},
 <#
             }
         }

@@ -331,7 +331,7 @@ namespace <#= O2mPageViewModelNameSpace #> {
         #endregion
 
         #region <#= CaptionPropertyName #>
-        string _<#= CaptionPropertyName #> = "<#= Model.ViewName #>";
+        string _<#= CaptionPropertyName #> = "<#= Model.PluralTitle #>";
         public string <#= CaptionPropertyName #>
         { 
             get
@@ -902,7 +902,7 @@ namespace <#= O2mPageViewModelNameSpace #> {
             if (foreignKeys.Count < 1) continue;
             foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
 #>
-            new <#= O2mListItemViewModelClassName #>() {<#= CaptionPropertyName #> = "<#= detailViewName #>: <#= foreignKey.NavigationName #>", <#= ForeignKeyDetailsName #> = "<#= detailViewClassName #>:<#= foreignKey.NavigationName #>",  <#= RegionPropertyName #> = "<#= detailViewClassName #><#= DetailRegionPropertyName #>" },
+            new <#= O2mListItemViewModelClassName #>() {<#= CaptionPropertyName #> = "<#= detailView.PluralTitle #>: <#= foreignKey.NavigationName #>", <#= ForeignKeyDetailsName #> = "<#= detailViewClassName #>:<#= foreignKey.NavigationName #>",  <#= RegionPropertyName #> = "<#= detailViewClassName #><#= DetailRegionPropertyName #>" },
 <#
             }
         }

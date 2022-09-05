@@ -214,21 +214,6 @@ namespace <#= RAUDVViewModelNameSpace #> {
         protected <#= modelInterfaceClassName #> modelToReturn = null;
 
 
-        protected bool _<#= IsMasterPanelPropertyName #> = true;
-        public string <#= IsMasterPanelPropertyName #>
-        { 
-            get
-            {
-                return _<#= IsMasterPanelPropertyName #>;
-            }
-            set {
-                if(_<#= IsMasterPanelPropertyName #> != value) {
-                    _<#= IsMasterPanelPropertyName #> = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
         public bool <#= CanAddPropertyName #>
         { 
             get
@@ -359,8 +344,8 @@ namespace <#= RAUDVViewModelNameSpace #> {
             }
         }
         #endregion
-        #region IRegionAware
 
+        #region IRegionAware
         public bool IsNavigationTarget(INavigationContext navigationContext) {
             return true;
         }
@@ -386,10 +371,6 @@ namespace <#= RAUDVViewModelNameSpace #> {
             <#= IsCanceledPropertyName #> = true;
             <#= EformModeEnumClassName #> modeToCheck = <#= EformModeEnumClassName #>.ViewMode;
 
-            
-            if(prms.ContainsKey("<#= IsMasterPanelPropertyName #>")) {
-                this.<#= IsMasterPanelPropertyName #> = prms.GetValue<bool>("<#= IsMasterPanelPropertyName #>");
-            }
             if(prms.ContainsKey("<#= EformModeEnumClassName #>")) {
                 modeToCheck = prms.GetValue<<#= EformModeEnumClassName #>>("<#= EformModeEnumClassName #>");
             }
@@ -512,6 +493,7 @@ namespace <#= RAUDVViewModelNameSpace #> {
 #>
         }
         #endregion
+
         #region NavigationBackCommand
         public void  <#= NavigationBackCommandPropertyName #>() { 
             if (<#= IsDestroyedPropertyName #>) return;
