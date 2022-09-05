@@ -131,6 +131,7 @@ using Prism.Navigation;
     string SelectedRowCommandDetailPropertyName     = "SelectedRowCommandDetail";
     string HiddenFiltersDetailPropertyName          = "HiddenFiltersDetail"; 
     string IsDetailReadyPropertyName                = "IsDetailReady"; 
+    string IsDetailDestroyedPropertyName            = "IsDetailDestroyed";
 
     string SelectedDetailsListItemPropertyName      = "SelectedDetailsListItem"; 
     string DetailsListPropertyName                  = "DetailsList"; 
@@ -780,6 +781,7 @@ namespace <#= O2mViewModelNameSpace #> {
                 {
                     _<#= HiddenFiltersDetailPropertyName #> = value;
                     OnPropertyChanged();
+                    OnPropertyChanged("<#= IsDetailDestroyedPropertyName #>");
                     OnPropertyChanged("<#= IsDetailReadyPropertyName #>");
                     OnPropertyChanged("<#= CanDelDetailPropertyName #>");
                     OnPropertyChanged("<#= CanUpdDetailPropertyName #>");
@@ -795,6 +797,8 @@ namespace <#= O2mViewModelNameSpace #> {
             get { return _<#= SelectedDetailsListItemPropertyName #>; }
             set {
                 if(_<#= SelectedDetailsListItemPropertyName #> != value) {
+                    <#= IsDetailDestroyedPropertyName #> = true;
+                    <#= IsDetailDestroyedPropertyName #> = false;
                     _<#= SelectedDetailsListItemPropertyName #> = value;
                     OnPropertyChanged();
                     DefineHiddenDetailFilter();
@@ -900,8 +904,10 @@ namespace <#= O2mViewModelNameSpace #> {
         }
         #endregion
 
+        #region <#= OnDestroyPropertyName #>
         public override void <#= OnDestroyPropertyName #>() {
             base.<#= OnDestroyPropertyName #>();
+            OnPropertyChanged("<#= IsDetailDestroyedPropertyName #>");
             _<#= TableMenuItemsPropertyName #> = null;
             _<#= RowMenuItemsPropertyName #> = null;
             _<#= TableMenuItemsDetailPropertyName #> = null;
@@ -910,6 +916,22 @@ namespace <#= O2mViewModelNameSpace #> {
             _<#= SelectedRowDetailPropertyName #> = null;
             _<#= SelectedRowPropertyName #> = null;
         }
+        #endregion
+
+        #region <#= IsDetailDestroyedPropertyName #>
+        protected bool _<#= IsDetailDestroyedPropertyName #> = false;
+        public bool <#= IsDetailDestroyedPropertyName #> {
+            get {
+                return _<#= IsDetailDestroyedPropertyName #> || <#= IsDestroyedPropertyName #> || (!<#= IsDetailReadyPropertyName #>);
+            }
+            set {
+                if(_<#= IsDetailDestroyedPropertyName #> != value) {
+                    _<#= IsDetailDestroyedPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
 
     }
 }

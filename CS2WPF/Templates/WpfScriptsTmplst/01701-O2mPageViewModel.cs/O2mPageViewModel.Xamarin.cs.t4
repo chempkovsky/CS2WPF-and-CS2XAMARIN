@@ -136,6 +136,7 @@ using Prism.Navigation;
     string GridHeightDetailPropertyName             = "GridHeightDetail"; 
     string FilterHeightDetailPropertyName           = "FilterHeightDetail"; 
     string IsDetailReadyPropertyName                = "IsDetailReady"; 
+    string IsDetailDestroyedPropertyName            = "IsDetailDestroyed";
 
     string SelectedDetailsListItemPropertyName      = "SelectedDetailsListItem"; 
     string DetailsListPropertyName                  = "DetailsList"; 
@@ -816,6 +817,7 @@ namespace <#= O2mPageViewModelNameSpace #> {
                 {
                     _<#= HiddenFiltersDetailPropertyName #> = value;
                     OnPropertyChanged();
+                    OnPropertyChanged("<#= IsDetailDestroyedPropertyName #>");
                     OnPropertyChanged("<#= IsDetailReadyPropertyName #>");
                     OnPropertyChanged("<#= CanDelDetailPropertyName #>");
                     OnPropertyChanged("<#= CanUpdDetailPropertyName #>");
@@ -867,6 +869,8 @@ namespace <#= O2mPageViewModelNameSpace #> {
             get { return _<#= SelectedDetailsListItemPropertyName #>; }
             set {
                 if(_<#= SelectedDetailsListItemPropertyName #> != value) {
+                    <#= IsDetailDestroyedPropertyName #> = true;
+                    <#= IsDetailDestroyedPropertyName #> = false;
                     _<#= SelectedDetailsListItemPropertyName #> = value;
                     OnPropertyChanged();
                     DefineHiddenDetailFilter();
@@ -976,13 +980,22 @@ namespace <#= O2mPageViewModelNameSpace #> {
         bool _<#= IsDestroyedPropertyName #> = false;
         public bool <#= IsDestroyedPropertyName #> {
             get { return _<#= IsDestroyedPropertyName #>; }
-            set { if (_<#= IsDestroyedPropertyName #> != value) { _<#= IsDestroyedPropertyName #> = value; OnPropertyChanged();} }
+            set { 
+                if (_<#= IsDestroyedPropertyName #> != value) { 
+                    if(value) {
+                        _<#= IsDestroyedPropertyName #> = value; 
+                        OnPropertyChanged();
+                        OnPropertyChanged("<#= IsDetailDestroyedPropertyName #>");
+                    }
+                } 
+            }
         }
 
         public void Destroy()
         {
             if(<#= IsDestroyedPropertyName #>) return;
             <#= IsDestroyedPropertyName #> = true;
+            OnPropertyChanged("<#= IsDetailDestroyedPropertyName #>");
             _navigationService = null;
             _<#= TableMenuItemsPropertyName #> = null;
             _<#= RowMenuItemsPropertyName #> = null;
@@ -1001,6 +1014,22 @@ namespace <#= O2mPageViewModelNameSpace #> {
 
         }
         #endregion
+
+        #region <#= IsDetailDestroyedPropertyName #>
+        protected bool _<#= IsDetailDestroyedPropertyName #> = false;
+        public bool <#= IsDetailDestroyedPropertyName #> {
+            get {
+                return _<#= IsDetailDestroyedPropertyName #> || <#= IsDestroyedPropertyName #> || (!<#= IsDetailReadyPropertyName #>);
+            }
+            set {
+                if(_<#= IsDetailDestroyedPropertyName #> != value) {
+                    _<#= IsDetailDestroyedPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+
     }
 }
 

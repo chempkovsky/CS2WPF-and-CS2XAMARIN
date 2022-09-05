@@ -62,14 +62,14 @@
     string IconFontNameProject = GetModelProjectName(Model, IconFontFolder);
 
 
-    string WebServiceFilterUserControlFolder      = "00242-WebServiceFilterUserControl.xaml.cs";
-    string WebServiceFilterUserControlClassName   = GetModelClassName(Model, WebServiceFilterUserControlFolder);
-    string WebServiceFilterUserControlNameSpace   = GetModelNameSpace(Model, WebServiceFilterUserControlFolder);
+    string UniqServiceFilterUserControlFolder     = "00246-UniqServiceFilterUserControl.xaml.cs";
+    string UniqServiceFilterUserControlClassName  = GetModelClassName(Model, UniqServiceFilterUserControlFolder);
+    string UniqServiceFilterUserControlNameSpace  = GetModelNameSpace(Model, UniqServiceFilterUserControlFolder);
 
-    string WebServiceFilterUserControlXamlFolder      = "00244-WebServiceFilterUserControl.xaml";
-    string WebServiceFilterUserControlXamlClassName   = GetModelClassName(Model, WebServiceFilterUserControlXamlFolder);
-    string WebServiceFilterUserControlXamlNameSpace   = GetModelNameSpace(Model, WebServiceFilterUserControlXamlFolder);
-    string WebServiceFilterUserControlXamlProject     = GetModelProjectName(Model, WebServiceFilterUserControlXamlFolder);
+    string UniqServiceFilterUserControlXamlFolder     = "00248-UniqServiceFilterUserControl.xaml";
+    string UniqServiceFilterUserControlXamlClassName  = GetModelClassName(Model, UniqServiceFilterUserControlXamlFolder);
+    string UniqServiceFilterUserControlXamlNameSpace  = GetModelNameSpace(Model, UniqServiceFilterUserControlXamlFolder);
+    string UniqServiceFilterUserControlXamlProject    = GetModelProjectName(Model, UniqServiceFilterUserControlXamlFolder);
     
     string CaptionPropertyName = "Caption";
     string FilterHeightPropertyName = "FilterHeight";
@@ -109,39 +109,35 @@
 
 
     string IconFontPrefix = "clr-namespace:" + IconFontNameSpace;
-    if(IconFontNameProject != WebServiceFilterUserControlXamlProject) {
+    if(IconFontNameProject != UniqServiceFilterUserControlXamlProject) {
         IconFontPrefix = IconFontPrefix + ";assembly=" + IconFontNameProject;
     }
-    string fltitmPrefix = "clr-namespace:"+ WebServiceFilterItemUserControlXamlNameSpace;
-    if(WebServiceFilterItemUserControlXamlProject != WebServiceFilterUserControlXamlProject) {
-        fltitmPrefix = fltitmPrefix + ";assembly=" + WebServiceFilterItemUserControlXamlProject;
-    }
     string frgrndPrefix = "clr-namespace:" + foregroundHelperModelNameSpace;
-    if(foregroundHelperModelProject != WebServiceFilterUserControlXamlProject) {
+    if(foregroundHelperModelProject != UniqServiceFilterUserControlXamlProject) {
         frgrndPrefix = frgrndPrefix + ";assembly=" + foregroundHelperModelProject;
     }
     string pthPrefix = "clr-namespace:" + pathHelperModelNameSpace;
-    if(pathHelperModelProject != WebServiceFilterUserControlXamlProject) {
+    if(pathHelperModelProject != UniqServiceFilterUserControlXamlProject) {
         pthPrefix = pthPrefix + ";assembly=" + pathHelperModelProject;
     }
     string fllPrefix = "clr-namespace:" + FillHelperModelNameSpace;
-    if(FillHelperModelProject != WebServiceFilterUserControlXamlProject) {
+    if(FillHelperModelProject != UniqServiceFilterUserControlXamlProject) {
         fllPrefix = fllPrefix + ";assembly=" + foregroundHelperModelProject;
     }
     string gridflexPrefix = "clr-namespace:" + gridFlexModelNameSpace;
-    if(gridFlexModelProject != WebServiceFilterUserControlXamlProject) {
+    if(gridFlexModelProject != UniqServiceFilterUserControlXamlProject) {
         gridflexPrefix = gridflexPrefix + ";assembly=" + gridFlexModelProject;
     }
     string InternalContentPrefix = "clr-namespace:" + InternalContentChangedNameSpace;
-    if(InternalContentChangedProject != WebServiceFilterUserControlXamlProject) {
+    if(InternalContentChangedProject != UniqServiceFilterUserControlXamlProject) {
         InternalContentPrefix = InternalContentPrefix + ";assembly=" + InternalContentChangedProject;
     }
     string MaxScrollViewHeightPrefix = "clr-namespace:" + MaxScrollViewHeightNameSpace;
-    if(MaxScrollViewHeightProject != WebServiceFilterUserControlXamlProject) {
+    if(MaxScrollViewHeightProject != UniqServiceFilterUserControlXamlProject) {
         MaxScrollViewHeightPrefix = MaxScrollViewHeightPrefix + ";assembly=" + MaxScrollViewHeightProject;
     }
     string ButtonDestroyedPrefix = "clr-namespace:" + ButtonDestroyedNameSpace;
-    if(ButtonDestroyedProject != WebServiceFilterUserControlXamlProject) {
+    if(ButtonDestroyedProject != UniqServiceFilterUserControlXamlProject) {
         ButtonDestroyedPrefix = ButtonDestroyedPrefix + ";assembly=" + ButtonDestroyedProject;
     }
 
@@ -149,15 +145,16 @@
     
 #>
 <?xml version="1.0" encoding="UTF-8"?>
-<ContentView x:Class="<#= WebServiceFilterUserControlNameSpace #>.<#= WebServiceFilterUserControlClassName #>"
+<ContentView x:Class="<#= UniqServiceFilterUserControlNameSpace #>.<#= UniqServiceFilterUserControlClassName #>"
              xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:fltitm="<#= fltitmPrefix #>"
              xmlns:gridflex="<#= gridflexPrefix #>"
              xmlns:fontIcons="<#= IconFontPrefix #>"
              xmlns:intcntxt="<#= InternalContentPrefix #>"
              xmlns:maxscrlvw="<#= MaxScrollViewHeightPrefix #>"
              xmlns:btnDstr="<#= ButtonDestroyedPrefix #>"
+             xmlns:acttb="clr-namespace:dotMorten.Xamarin.Forms;assembly=dotMorten.Xamarin.Forms.AutoSuggestBox"
+
              x:Name="fltrUsrCntrlRootNode">
     <StackLayout Orientation="Vertical">
         <Grid gridflex:<#= gridFlexModelClassName #>.HorizontalFlex="{Binding Path=<#= IsGridFlexPropertyName #>, Mode=OneWay, Source={x:Reference fltrUsrCntrlRootNode}}" 
@@ -217,23 +214,13 @@
         <ScrollView Orientation="Vertical" VerticalScrollBarVisibility="Default" 
                     intcntxt:<#= InternalContentChangedClassName #>.<#= InternalContentProperty #>="{Binding <#= InternalContentProperty #>, Source={x:Reference fltrUsrCntrlRootNode}}"
                     maxscrlvw:<#= MaxScrollViewHeightClassName #>.<#= MaxHeightProperty #>="{Binding FilterHeight, Source={x:Reference fltrUsrCntrlRootNode}}">
-            <StackLayout BindableLayout.ItemsSource="{Binding <#= FiltersPropertyName #>, Source={x:Reference fltrUsrCntrlRootNode}}" >
-                <BindableLayout.ItemTemplate>
-                    <DataTemplate>
-<!-- <#= IsDestroyedPropertyName #> must be the first -->
-                        <fltitm:WebServiceFilterItemUserControl
-                            <#= IsDestroyedPropertyName #>="{Binding <#= IsDestroyedPropertyName #>, Mode=OneWay}"
-                            <#= FilterOperatorsPropertyName #>="{Binding <#= FilterOperatorsPropertyName #>, Source={x:Reference fltrUsrCntrlRootNode}}" 
-                            <#= FilterDefinitionsPropertyName #>="{Binding <#= FilterDefinitionsPropertyName #>, Source={x:Reference fltrUsrCntrlRootNode}}"
-                            <#= FilterErrorPropertyName #>="{Binding fltrError, Mode=OneWayToSource}"
-                            <#= FilterValuePropertyName #>="{Binding fltrValue, Mode=OneWayToSource}"
-                            <#= SelectedFilterOperatorNamePropertyName #>="{Binding fltrOperator, Mode=OneWayToSource}"
-                            <#= SelectedFilterDataTypePropertyName #>="{Binding fltrDataType, Mode=OneWayToSource}"
-                            <#= SelectedFilterNamePropertyName #>="{Binding fltrName, Mode=OneWayToSource}"
-                            <#= RemoveWebServiceFilterItemCommandPropertyName #>="{Binding <#= OnRemoveWebServiceFilterItemCommandPropertyName #>, Source={x:Reference fltrUsrCntrlRootNode}}"
-                            SelectedModelRef="{Binding}" />
-                    </DataTemplate>
-                </BindableLayout.ItemTemplate>
+            <StackLayout>
+                <Grid gridflex:<#= gridFlexModelClassName #>.HorizontalFlex="{Binding Path=<#= IsGridFlexPropertyName #>, Mode=OneWay, Source={x:Reference fltrUsrCntrlRootNode}}" 
+                    RowDefinitions="Auto,Auto,Auto,Auto" ColumnDefinitions="*">
+                </Grid>
+                <Grid gridflex:<#= gridFlexModelClassName #>.HorizontalFlex="{Binding Path=<#= IsGridFlexPropertyName #>, Mode=OneWay, Source={x:Reference fltrUsrCntrlRootNode}}" 
+                    RowDefinitions="Auto,Auto,Auto,Auto" ColumnDefinitions="*">
+                </Grid>
             </StackLayout>
         </ScrollView>
     </StackLayout>

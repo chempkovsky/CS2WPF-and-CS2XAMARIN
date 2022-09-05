@@ -163,7 +163,10 @@ namespace <#= MainFlyoutPageViewModelNameSpace #> {
             IAppGlblSettingsService gss = _GlblSettingsSrv;
             if (ns != null) {
                 await MainThread.InvokeOnMainThreadAsync(async () => {
-                    await ns.GoBackToRootAsync();
+                    //
+                    // next line returns (Success == false)
+                    // await ns.GoBackToRootAsync();
+                    //
                     INavigationResult nrslt = await ns.NavigateAsync(name: $"/<#= MainFlyoutPageClassName #>/NavigationPage/{navPath}");
                     if (!nrslt.Success)
                     {

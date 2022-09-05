@@ -689,9 +689,6 @@ namespace <#= LformViewModelBaseNameSpace #> {
         #region <#= OnDestroyPropertyName #>
         public void <#= OnDestroyPropertyName #>() {
             <#= IsDestroyedPropertyName #> = true;
-            <#= RowMenuItemsVMPropertyName #> = null; // correct: notify children
-            <#= TableMenuItemsVMPropertyName #> = null;
-            <#= HiddenFiltersVMPropertyName #> = null;
         }
         #endregion
 
@@ -700,8 +697,13 @@ namespace <#= LformViewModelBaseNameSpace #> {
             get { return _<#= IsDestroyedPropertyName #>; }
             set { 
                 if (_<#= IsDestroyedPropertyName #> != value) { 
-                    _<#= IsDestroyedPropertyName #> = value;
-                    OnPropertyChanged();
+                    if(value) {
+                        _<#= IsDestroyedPropertyName #> = value;
+                        <#= RowMenuItemsVMPropertyName #> = null; // correct: notify children
+                        <#= TableMenuItemsVMPropertyName #> = null;
+                        <#= HiddenFiltersVMPropertyName #> = null;
+                        OnPropertyChanged();
+                    }
                 }
             }
         }
