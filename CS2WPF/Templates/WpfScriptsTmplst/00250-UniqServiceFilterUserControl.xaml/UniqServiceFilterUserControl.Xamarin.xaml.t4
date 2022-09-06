@@ -45,40 +45,34 @@
     string foregroundHelperModelNameSpace   = GetModelNameSpace(Model, foregroundHelperModelFolder);
     string foregroundHelperModelProject     = GetModelProjectName(Model, foregroundHelperModelFolder);
 
-    string FillHelperModelFolder      = "00160-FillHelper.cs";
-    string FillHelperModelClassName   = GetModelClassName(Model, FillHelperModelFolder);
-    string FillHelperModelNameSpace   = GetModelNameSpace(Model, FillHelperModelFolder);
-    string FillHelperModelProject     = GetModelProjectName(Model, FillHelperModelFolder);
+    string FillHelperModelFolder        = "00160-FillHelper.cs";
+    string FillHelperModelClassName     = GetModelClassName(Model, FillHelperModelFolder);
+    string FillHelperModelNameSpace     = GetModelNameSpace(Model, FillHelperModelFolder);
+    string FillHelperModelProject       = GetModelProjectName(Model, FillHelperModelFolder);
 
+    string pathHelperModelFolder        = "00120-PathHelper.cs";
+    string pathHelperModelClassName     = GetModelClassName(Model, pathHelperModelFolder);
+    string pathHelperModelNameSpace     = GetModelNameSpace(Model, pathHelperModelFolder);
+    string pathHelperModelProject       = GetModelProjectName(Model, pathHelperModelFolder);
 
-    string pathHelperModelFolder      = "00120-PathHelper.cs";
-    string pathHelperModelClassName   = GetModelClassName(Model, pathHelperModelFolder);
-    string pathHelperModelNameSpace   = GetModelNameSpace(Model, pathHelperModelFolder);
-    string pathHelperModelProject     = GetModelProjectName(Model, pathHelperModelFolder);
+    string IconFontFolder               = "00178-IconFont.cs";
+    string IconFontClassName            = GetModelClassName(Model, IconFontFolder);
+    string IconFontNameSpace            = GetModelNameSpace(Model, IconFontFolder);
+    string IconFontNameProject          = GetModelProjectName(Model, IconFontFolder);
 
-    string IconFontFolder      = "00178-IconFont.cs";
-    string IconFontClassName   = GetModelClassName(Model, IconFontFolder);
-    string IconFontNameSpace   = GetModelNameSpace(Model, IconFontFolder);
-    string IconFontNameProject = GetModelProjectName(Model, IconFontFolder);
+    string UniqServiceFilterUserControlFolder           = "00248-UniqServiceFilterUserControl.xaml.cs";
+    string UniqServiceFilterUserControlClassName        = GetModelClassName(Model, UniqServiceFilterUserControlFolder);
+    string UniqServiceFilterUserControlNameSpace        = GetModelNameSpace(Model, UniqServiceFilterUserControlFolder);
 
-
-    string UniqServiceFilterUserControlFolder     = "00246-UniqServiceFilterUserControl.xaml.cs";
-    string UniqServiceFilterUserControlClassName  = GetModelClassName(Model, UniqServiceFilterUserControlFolder);
-    string UniqServiceFilterUserControlNameSpace  = GetModelNameSpace(Model, UniqServiceFilterUserControlFolder);
-
-    string UniqServiceFilterUserControlXamlFolder     = "00248-UniqServiceFilterUserControl.xaml";
-    string UniqServiceFilterUserControlXamlClassName  = GetModelClassName(Model, UniqServiceFilterUserControlXamlFolder);
-    string UniqServiceFilterUserControlXamlNameSpace  = GetModelNameSpace(Model, UniqServiceFilterUserControlXamlFolder);
-    string UniqServiceFilterUserControlXamlProject    = GetModelProjectName(Model, UniqServiceFilterUserControlXamlFolder);
+    string UniqServiceFilterUserControlXamlFolder       = "00250-UniqServiceFilterUserControl.xaml";
+    string UniqServiceFilterUserControlXamlClassName    = GetModelClassName(Model, UniqServiceFilterUserControlXamlFolder);
+    string UniqServiceFilterUserControlXamlNameSpace    = GetModelNameSpace(Model, UniqServiceFilterUserControlXamlFolder);
+    string UniqServiceFilterUserControlXamlProject      = GetModelProjectName(Model, UniqServiceFilterUserControlXamlFolder);
     
     string CaptionPropertyName = "Caption";
     string FilterHeightPropertyName = "FilterHeight";
-    string HiddenFiltersPropertyName = "HiddenFilters";
-    string FiltersPropertyName = "Filters";
-    string FilterOperatorsPropertyName = "FilterOperators";
     string FilterDefinitionsPropertyName = "FilterDefinitions";
     string ShowBackBtnPropertyName = "ShowBackBtn";
-    string ShowAddFilterBtnPropertyName = "ShowAddFilterBtn";
     string ContainerMenuItemsPropertyName = "ContainerMenuItems";
     string CurrentContainerMenuItemsPropertyName = "CurrentContainerMenuItems";
     string ApplyFilterBtnClickedCommandPropertyName = "ApplyFilterBtnClickedCommand";
@@ -97,8 +91,6 @@
     string NavigationBackCommandPropertyName = "NavigationBackCommand";
     string OnNavigationBackCommandPropertyName = "OnNavigationBackCommand";
     string OnFilterCommandPropertyName = "OnFilterCommand";
-    string OnAddWebServiceFilterItemCommandPropertyName = "OnAddWebServiceFilterItemCommand";
-    string OnRemoveAllWebServiceFilterItemCommandPropertyName = "OnRemoveAllWebServiceFilterItemCommand";
     string OnRemoveWebServiceFilterItemCommandPropertyName = "OnRemoveWebServiceFilterItemCommand";
     string OnContainerMenuItemsCommandPropertyName = "OnContainerMenuItemsCommand";
     ////////////////////////////////
@@ -155,49 +147,35 @@
              xmlns:btnDstr="<#= ButtonDestroyedPrefix #>"
              xmlns:acttb="clr-namespace:dotMorten.Xamarin.Forms;assembly=dotMorten.Xamarin.Forms.AutoSuggestBox"
 
-             x:Name="fltrUsrCntrlRootNode">
+             x:Name="ufltrUsrCntrlRootNode">
     <StackLayout Orientation="Vertical">
-        <Grid gridflex:<#= gridFlexModelClassName #>.HorizontalFlex="{Binding Path=<#= IsGridFlexPropertyName #>, Mode=OneWay, Source={x:Reference fltrUsrCntrlRootNode}}" 
+        <Grid gridflex:<#= gridFlexModelClassName #>.HorizontalFlex="{Binding Path=<#= IsGridFlexPropertyName #>, Mode=OneWay, Source={x:Reference ufltrUsrCntrlRootNode}}" 
             RowDefinitions="Auto,Auto" ColumnDefinitions="*" >
             <Label Grid.Row="0" Grid.Column="0"
-                Margin="8, 0, 0, 0"  Text="{Binding Path=<#= CaptionPropertyName #>, Source={x:Reference fltrUsrCntrlRootNode}}" FontAttributes="Bold"/>
+                Margin="8, 0, 0, 0"  Text="{Binding Path=<#= CaptionPropertyName #>, Source={x:Reference ufltrUsrCntrlRootNode}}" FontAttributes="Bold"/>
             <ScrollView Grid.Row="1" Grid.Column="0"
                 Orientation="Horizontal" VerticalScrollBarVisibility="Never" HorizontalScrollBarVisibility="Default" HorizontalOptions="End">
                 <StackLayout Orientation="Horizontal" HeightRequest="45">
                     <btnDstr:<#= ButtonDestroyedClassName #> WidthRequest="45" 
-                            <#= IsDestroyedPropertyName #>="{Binding <#= IsDestroyedPropertyName #>, Mode=OneWay, Source={x:Reference fltrUsrCntrlRootNode}}"
-                            IsVisible="{Binding Path=<#= ShowBackBtnPropertyName #>, Mode=OneWay, Source={x:Reference fltrUsrCntrlRootNode}}"
-                            Command="{Binding Path=<#= OnNavigationBackCommandPropertyName #>, Mode=OneTime, Source={x:Reference fltrUsrCntrlRootNode}}"
+                            <#= IsDestroyedPropertyName #>="{Binding <#= IsDestroyedPropertyName #>, Mode=OneWay, Source={x:Reference ufltrUsrCntrlRootNode}}"
+                            IsVisible="{Binding Path=<#= ShowBackBtnPropertyName #>, Mode=OneWay, Source={x:Reference ufltrUsrCntrlRootNode}}"
+                            Command="{Binding Path=<#= OnNavigationBackCommandPropertyName #>, Mode=OneTime, Source={x:Reference ufltrUsrCntrlRootNode}}"
                             Text="{x:Static fontIcons:IconFont.Arrow_back}" FontFamily="CustomIconFontAlias" BackgroundColor="{DynamicResource IconButtonBackgroundColor}" 
                             TextColor="{DynamicResource IconButtonPrimaryColor}" 
                             FontSize="{OnPlatform iOS=Large, Android=Medium, UWP=Medium}"/>
                     <btnDstr:<#= ButtonDestroyedClassName #> WidthRequest="45"
-                        <#= IsDestroyedPropertyName #>="{Binding <#= IsDestroyedPropertyName #>, Mode=OneWay, Source={x:Reference fltrUsrCntrlRootNode}}"
-                        IsVisible="{Binding Path=<#= ShowAddFilterBtnPropertyName #>, Mode=OneWay, Source={x:Reference fltrUsrCntrlRootNode}}"
-                        Command="{Binding Path=<#= OnAddWebServiceFilterItemCommandPropertyName #>, Mode=OneTime, Source={x:Reference fltrUsrCntrlRootNode}}"
-                        Text="{x:Static fontIcons:IconFont.Filter_9_plus}" FontFamily="CustomIconFontAlias" BackgroundColor="{DynamicResource IconButtonBackgroundColor}" 
-                        TextColor="{DynamicResource IconButtonPrimaryColor}" 
-                        FontSize="{OnPlatform iOS=Large, Android=Medium, UWP=Medium}"/>
-                    <btnDstr:<#= ButtonDestroyedClassName #> WidthRequest="45"
-                        <#= IsDestroyedPropertyName #>="{Binding <#= IsDestroyedPropertyName #>, Mode=OneWay, Source={x:Reference fltrUsrCntrlRootNode}}"
-                        IsVisible="{Binding Path=<#= ShowAddFilterBtnPropertyName #>, Mode=OneWay, Source={x:Reference fltrUsrCntrlRootNode}}"
-                        Command="{Binding Path=<#= OnRemoveAllWebServiceFilterItemCommandPropertyName #>, Mode=OneTime, Source={x:Reference fltrUsrCntrlRootNode}}"
-                        Text="{x:Static fontIcons:IconFont.Filter_none}" FontFamily="CustomIconFontAlias" BackgroundColor="{DynamicResource IconButtonBackgroundColor}" 
-                        TextColor="{DynamicResource IconButtonDangerColor}" 
-                        FontSize="{OnPlatform iOS=Large, Android=Medium, UWP=Medium}"/>
-                    <btnDstr:<#= ButtonDestroyedClassName #> WidthRequest="45"
-                        <#= IsDestroyedPropertyName #>="{Binding <#= IsDestroyedPropertyName #>, Mode=OneWay, Source={x:Reference fltrUsrCntrlRootNode}}"
-                        Command="{Binding Path=<#= OnFilterCommandPropertyName #>, Mode=OneTime, Source={x:Reference fltrUsrCntrlRootNode}}"
+                        <#= IsDestroyedPropertyName #>="{Binding <#= IsDestroyedPropertyName #>, Mode=OneWay, Source={x:Reference ufltrUsrCntrlRootNode}}"
+                        Command="{Binding Path=<#= OnFilterCommandPropertyName #>, Mode=OneTime, Source={x:Reference ufltrUsrCntrlRootNode}}"
                         Text="{x:Static fontIcons:IconFont.Refresh}" FontFamily="CustomIconFontAlias" BackgroundColor="{DynamicResource IconButtonBackgroundColor}" 
                         TextColor="{DynamicResource IconButtonPrimaryColor}" 
                         FontSize="{OnPlatform iOS=Large, Android=Large, UWP=Medium}"/>
                     <StackLayout Orientation="Horizontal" 
-                                 BindableLayout.ItemsSource="{Binding <#= CurrentContainerMenuItemsPropertyName #>, Source={x:Reference fltrUsrCntrlRootNode}}">
+                                 BindableLayout.ItemsSource="{Binding <#= CurrentContainerMenuItemsPropertyName #>, Source={x:Reference ufltrUsrCntrlRootNode}}">
                         <BindableLayout.ItemTemplate>
                             <DataTemplate>
                                 <btnDstr:<#= ButtonDestroyedClassName #> WidthRequest="45"
                                     <#= IsDestroyedPropertyName #>="{Binding <#= IsDestroyedPropertyName #>, Mode=OneWay}"
-                                    Command="{Binding <#= OnContainerMenuItemsCommandPropertyName #>, Mode=OneTime, Source={x:Reference fltrUsrCntrlRootNode}}"
+                                    Command="{Binding <#= OnContainerMenuItemsCommandPropertyName #>, Mode=OneTime, Source={x:Reference ufltrUsrCntrlRootNode}}"
                                     CommandParameter="{Binding ., Mode=OneTime}"
                                     IsEnabled="{Binding Enabled}"
                                     Text="{Binding IconName}" 
@@ -212,15 +190,34 @@
             </ScrollView>
         </Grid>
         <ScrollView Orientation="Vertical" VerticalScrollBarVisibility="Default" 
-                    intcntxt:<#= InternalContentChangedClassName #>.<#= InternalContentProperty #>="{Binding <#= InternalContentProperty #>, Source={x:Reference fltrUsrCntrlRootNode}}"
-                    maxscrlvw:<#= MaxScrollViewHeightClassName #>.<#= MaxHeightProperty #>="{Binding FilterHeight, Source={x:Reference fltrUsrCntrlRootNode}}">
+                    intcntxt:<#= InternalContentChangedClassName #>.<#= InternalContentProperty #>="{Binding <#= InternalContentProperty #>, Source={x:Reference ufltrUsrCntrlRootNode}}"
+                    maxscrlvw:<#= MaxScrollViewHeightClassName #>.<#= MaxHeightProperty #>="{Binding FilterHeight, Source={x:Reference ufltrUsrCntrlRootNode}}">
             <StackLayout>
-                <Grid gridflex:<#= gridFlexModelClassName #>.HorizontalFlex="{Binding Path=<#= IsGridFlexPropertyName #>, Mode=OneWay, Source={x:Reference fltrUsrCntrlRootNode}}" 
+<#
+    for (int i = 0; i < 2; i++) {
+#>
+                <Grid gridflex:<#= gridFlexModelClassName #>.HorizontalFlex="{Binding Path=<#= IsGridFlexPropertyName #>, Mode=OneWay, Source={x:Reference ufltrUsrCntrlRootNode}}" 
                     RowDefinitions="Auto,Auto,Auto,Auto" ColumnDefinitions="*">
+<#
+        for(int j = 0; j < 4;j++) {
+            int k = i * 4 + j+1;
+#>
+	                <acttb:AutoSuggestBox Grid.Row="<#= j #>" x:Uid="Asb<#= k #>" IsEnabled="True"
+                        IsVisible="{Binding Path=IsVisible<#= k #>, Mode=OneWay, Source={x:Reference ufltrUsrCntrlRootNode}}"
+                        TextChanged="TextChanged<#= k #>"
+                        QuerySubmitted="QuerySubmitted<#= k #>"
+                        ItemsSource="{Binding Path=ItemsSource<#= k #>, Mode=OneWay, Source={x:Reference ufltrUsrCntrlRootNode}}"
+                        Text="{Binding Path=Text<#= k #>, Source={x:Reference ufltrUsrCntrlRootNode}}"
+                        DisplayMemberPath="{Binding Path=DisplayMemberPath<#= k #>, Mode=OneWay, Source={x:Reference ufltrUsrCntrlRootNode}}"
+                        TextMemberPath="{Binding Path=TextMemberPath<#= k #>, Mode=OneWay, Source={x:Reference ufltrUsrCntrlRootNode}}"/>
+                    />
+<#
+        }
+#>
                 </Grid>
-                <Grid gridflex:<#= gridFlexModelClassName #>.HorizontalFlex="{Binding Path=<#= IsGridFlexPropertyName #>, Mode=OneWay, Source={x:Reference fltrUsrCntrlRootNode}}" 
-                    RowDefinitions="Auto,Auto,Auto,Auto" ColumnDefinitions="*">
-                </Grid>
+<#
+    }
+#>
             </StackLayout>
         </ScrollView>
     </StackLayout>
