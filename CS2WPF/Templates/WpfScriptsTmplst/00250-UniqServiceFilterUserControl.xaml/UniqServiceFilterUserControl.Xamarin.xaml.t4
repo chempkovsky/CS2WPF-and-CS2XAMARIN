@@ -202,15 +202,21 @@
         for(int j = 0; j < 4;j++) {
             int k = i * 4 + j+1;
 #>
-	                <acttb:AutoSuggestBox Grid.Row="<#= j #>" x:Uid="Asb<#= k #>" IsEnabled="True"
-                        IsVisible="{Binding Path=IsVisible<#= k #>, Mode=OneWay, Source={x:Reference ufltrUsrCntrlRootNode}}"
-                        TextChanged="TextChanged<#= k #>"
-                        QuerySubmitted="QuerySubmitted<#= k #>"
-                        ItemsSource="{Binding Path=ItemsSource<#= k #>, Mode=OneWay, Source={x:Reference ufltrUsrCntrlRootNode}}"
-                        Text="{Binding Path=Text<#= k #>, Source={x:Reference ufltrUsrCntrlRootNode}}"
-                        DisplayMemberPath="{Binding Path=DisplayMemberPath<#= k #>, Mode=OneWay, Source={x:Reference ufltrUsrCntrlRootNode}}"
-                        TextMemberPath="{Binding Path=TextMemberPath<#= k #>, Mode=OneWay, Source={x:Reference ufltrUsrCntrlRootNode}}"/>
-                    />
+                    <Grid Grid.Row="<#= j #>" RowSpacing="0" IsVisible="{Binding Path=IsVisible<#= k #>, Mode=OneWay, Source={x:Reference ufltrUsrCntrlRootNode}}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Label Grid.Row="0" FontSize="Caption" Text="{Binding Path=Caption<#= k #>, Mode=OneWay, Source={x:Reference ufltrUsrCntrlRootNode}}" />
+	                    <acttb:AutoSuggestBox Grid.Row="1"  x:Uid="Asb<#= k #>" IsEnabled="True"
+                            TextChanged="TextChanged<#= k #>"
+                            QuerySubmitted="QuerySubmitted<#= k #>"
+                            ItemsSource="{Binding Path=ItemsSource<#= k #>, Mode=OneWay, Source={x:Reference ufltrUsrCntrlRootNode}}"
+                            Text="{Binding Path=Text<#= k #>, Source={x:Reference ufltrUsrCntrlRootNode}}"
+                            DisplayMemberPath="{Binding Path=DisplayMemberPath<#= k #>, Mode=OneWay, Source={x:Reference ufltrUsrCntrlRootNode}}"
+                            TextMemberPath="{Binding Path=TextMemberPath<#= k #>, Mode=OneWay, Source={x:Reference ufltrUsrCntrlRootNode}}"
+                        />
+                    </Grid>
 <#
         }
 #>

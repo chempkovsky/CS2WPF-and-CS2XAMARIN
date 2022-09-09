@@ -1044,7 +1044,6 @@ namespace CS2WPF.Model
             if ((prop == null) || (model == null)) return false;
             return ("System.String".Equals(prop.UnderlyingTypeName) || "String".Equals(prop.UnderlyingTypeName) || "string".Equals(prop.UnderlyingTypeName));
         }
-
         int GetGridColumnWidth(ModelViewUIListPropertySerializable prop, ModelViewSerializable model)
         {
             string s = GetDisplayAttributeValueString2(prop, model, "ShortName");
@@ -3571,7 +3570,6 @@ namespace CS2WPF.Model
             string[] fks = chain.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
             return fks[fks.Length - 1];
         }
-
         bool IsMasterDefinedProperty(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model)
         {
             if ((prop == null) || (model == null)) return false;
@@ -3585,6 +3583,329 @@ namespace CS2WPF.Model
                 }
             }
             return false;
+        }
+        bool IsTableMatchesIndex(ModelViewSerializable model)
+        {
+            if (model == null) return false;
+            if ((model.ScalarProperties == null) || (model.PrimaryKeyProperties == null)) return false;
+            if ((model.ScalarProperties.Count != model.PrimaryKeyProperties.Count) || (model.ScalarProperties.Count < 1)) return false;
+            foreach (ModelViewKeyPropertySerializable pkp in model.PrimaryKeyProperties)
+            {
+                if (GetScalarPropByOriginaPropName(pkp.OriginalPropertyName, model) == null) return false;
+            }
+            return true;
+        }
+        bool IsForeigKeyMapedToTailOfPrimKey(ModelViewForeignKeySerializable fk, ModelViewSerializable model)
+        {
+            if ((model == null) || (fk == null)) return false;
+            if ((model.PrimaryKeyProperties == null) || (model.ForeignKeys == null) || (fk.PrincipalKeyProps == null) || (fk.ForeignKeyProps == null)) return false;
+            if ((model.PrimaryKeyProperties.Count < 1) || (fk.PrincipalKeyProps.Count != fk.ForeignKeyProps.Count) || (fk.ForeignKeyProps.Count < 1) || (fk.ForeignKeyProps.Count >= model.PrimaryKeyProperties.Count)) return false;
+            for (int i = 0; i < fk.ForeignKeyProps.Count; i++)
+            {
+                if (fk.ForeignKeyProps[fk.ForeignKeyProps.Count - (1 + i)].OriginalPropertyName != model.PrimaryKeyProperties[model.PrimaryKeyProperties.Count - (1 + i)].OriginalPropertyName) return false;
+            }
+            return true;
+        }
+        bool IsForeigKeyMapedToScalars(ModelViewForeignKeySerializable fk, ModelViewSerializable model)
+        {
+            if ((model == null) || (fk == null)) return false;
+            if ((model.ScalarProperties == null) || (fk.ForeignKeyProps == null)) return false;
+            if (fk.ForeignKeyProps.Count < 1) return false;
+            foreach (ModelViewKeyPropertySerializable fkp in fk.ForeignKeyProps)
+            {
+                if (GetScalarPropByOriginaPropName(fkp.OriginalPropertyName, model) == null) return false;
+            }
+            return true;
+        }
+        bool IsForeigKeyMapedToScalarsEx(ModelViewForeignKeySerializable detailFk, ModelViewSerializable detailModel, ModelViewSerializable model)
+        {
+            if ((detailModel == null) || (detailFk == null) || (model == null)) return false;
+            if ((detailModel.ScalarProperties == null) || (detailFk.ForeignKeyProps == null) || (model.ScalarProperties == null) || (detailFk.PrincipalKeyProps == null) || (model.PrimaryKeyProperties == null)) return false;
+            if ((detailFk.ForeignKeyProps.Count < 1) || (model.ScalarProperties.Count < 1) || (model.PrimaryKeyProperties.Count != detailFk.ForeignKeyProps.Count) || (detailFk.PrincipalKeyProps.Count != detailFk.ForeignKeyProps.Count) || (model.PrimaryKeyProperties.Count != detailFk.ForeignKeyProps.Count)) return false;
+            for (int i = 0; i < detailFk.ForeignKeyProps.Count; i++)
+            {
+                ModelViewPropertyOfVwSerializable detailsprp = GetScalarPropByOriginaPropName(detailFk.ForeignKeyProps[i].OriginalPropertyName, detailModel);
+                if (detailsprp == null) return false;
+                ModelViewPropertyOfVwSerializable modelsprp = GetScalarPropByOriginaPropName(detailFk.PrincipalKeyProps[i].OriginalPropertyName, model);
+                if (modelsprp == null) return false;
+                if (modelsprp.ViewPropertyName != detailsprp.ViewPropertyName) return false;
+            }
+            return true;
+        }
+        bool IsForeigKeyMapedToScalarsExEx(ModelViewForeignKeySerializable detailFk, ModelViewSerializable detailModel, ModelViewSerializable model)
+        {
+            if ((detailModel == null) || (detailFk == null) || (model == null)) return false;
+            if ((detailModel.ScalarProperties == null) || (detailFk.ForeignKeyProps == null) || (model.ScalarProperties == null) || (detailFk.PrincipalKeyProps == null) || (model.ForeignKeys == null)) return false;
+            if ((detailFk.ForeignKeyProps.Count < 1) || (model.ScalarProperties.Count < 1) || (detailFk.PrincipalKeyProps.Count != detailFk.ForeignKeyProps.Count)) return false;
+            List<ModelViewForeignKeySerializable> modelFks = model.ForeignKeys.Where(f => f.ViewName == detailFk.ViewName).ToList();
+            if (modelFks.Count < 1) return false;
+            for (int i = 0; i < detailFk.ForeignKeyProps.Count; i++)
+            {
+                ModelViewPropertyOfVwSerializable detailsprp = GetScalarPropByOriginaPropName(detailFk.ForeignKeyProps[i].OriginalPropertyName, detailModel);
+                if (detailsprp == null) return false;
+            }
+            foreach (ModelViewForeignKeySerializable modelFk in modelFks)
+            {
+                if (modelFk.ForeignKeyProps == null) continue;
+                if (modelFk.ForeignKeyProps.Count != detailFk.ForeignKeyProps.Count) continue;
+                bool passed = false;
+                for (int i = 0; i < detailFk.ForeignKeyProps.Count; i++)
+                {
+                    ModelViewPropertyOfVwSerializable detailsprp = GetScalarPropByOriginaPropName(detailFk.ForeignKeyProps[i].OriginalPropertyName, detailModel);
+                    ModelViewPropertyOfVwSerializable modelsprp = GetScalarPropByOriginaPropName(modelFk.ForeignKeyProps[i].OriginalPropertyName, model);
+                    passed = modelsprp != null;
+                    if (!passed) break;
+                    passed = modelsprp.ViewPropertyName == detailsprp.ViewPropertyName;
+                    if (!passed) break;
+                }
+                if (passed) return true;
+            }
+            return false;
+        }
+        bool IsOnePropForeigKey(ModelViewForeignKeySerializable searchFk)
+        {
+            if (searchFk == null) return false;
+            if ((searchFk.PrincipalKeyProps == null) || (searchFk.ForeignKeyProps == null)) return false;
+            if ((searchFk.PrincipalKeyProps.Count == searchFk.ForeignKeyProps.Count) && (searchFk.ForeignKeyProps.Count == 1)) return true;
+            return false;
+        }
+        bool IsLookUpTable(ModelViewSerializable searchMdl)
+        {
+            if (searchMdl == null) return false;
+            if ((searchMdl.ScalarProperties == null) || (searchMdl.PrimaryKeyProperties == null) || (searchMdl.UniqueKeys == null)) return false;
+            if ((searchMdl.ScalarProperties.Count != 2) || (searchMdl.PrimaryKeyProperties.Count != 1) || (searchMdl.UniqueKeys.Count != 1)) return false;
+            if (searchMdl.UniqueKeys[0].UniqueKeyProperties == null) return false;
+            if (searchMdl.UniqueKeys[0].UniqueKeyProperties.Count != 1) return false;
+            if (searchMdl.UniqueKeys[0].UniqueKeyProperties[0].OriginalPropertyName == searchMdl.PrimaryKeyProperties[0].OriginalPropertyName) return false;
+            if ((GetScalarPropByOriginaPropName(searchMdl.UniqueKeys[0].UniqueKeyProperties[0].OriginalPropertyName, searchMdl) == null) ||
+                (GetScalarPropByOriginaPropName(searchMdl.PrimaryKeyProperties[0].OriginalPropertyName, searchMdl) == null)) return false;
+            return true;
+        }
+        bool IsUniqKeyMapedToScalarsEx(ModelViewUniqueKeySerializable searchUk, ModelViewSerializable searchModel, ModelViewSerializable model)
+        {
+            if ((searchModel == null) || (searchUk == null) || (model == null)) return false;
+            if ((searchModel.ScalarProperties == null) || (searchUk.UniqueKeyProperties == null) || (model.ScalarProperties == null)) return false;
+            if ((searchUk.UniqueKeyProperties.Count < 1) || (model.ScalarProperties.Count < 1)) return false;
+            foreach (ModelViewKeyPropertySerializable ukp in searchUk.UniqueKeyProperties)
+            {
+                ModelViewPropertyOfVwSerializable sprp = GetScalarPropByOriginaPropName(ukp.OriginalPropertyName, searchModel);
+                if (sprp == null) return false;
+                if (!model.ScalarProperties.Any(p => p.ViewPropertyName == sprp.ViewPropertyName)) return false;
+            }
+            return true;
+        }
+        int GetForeigKeyMaxPropsPosition(ModelViewForeignKeySerializable otherFk, ModelViewSerializable m2mMdl)
+        {
+            if ((m2mMdl == null) || (otherFk == null)) return -1;
+            if ((m2mMdl.PrimaryKeyProperties == null) || (otherFk.ForeignKeyProps == null)) return -1;
+            if ((m2mMdl.PrimaryKeyProperties.Count < 1) || (otherFk.ForeignKeyProps.Count < 1)) return -1;
+            int rslt = 0;
+            foreach (ModelViewKeyPropertySerializable fkp in otherFk.ForeignKeyProps)
+            {
+                int index = m2mMdl.PrimaryKeyProperties.FindIndex(delegate (ModelViewKeyPropertySerializable pkp) { return pkp.OriginalPropertyName == fkp.OriginalPropertyName; });
+                if (index < 0) return -1;
+                if (rslt < index) rslt = index;
+            }
+            return rslt;
+        }
+        bool IsForeigKeyMapedToPrimKey(ModelViewForeignKeySerializable fk, ModelViewSerializable model)
+        {
+            if ((model == null) || (fk == null)) return false;
+            if ((model.PrimaryKeyProperties == null) || (model.ForeignKeys == null) || (fk.PrincipalKeyProps == null) || (fk.ForeignKeyProps == null)) return false;
+            if ((model.PrimaryKeyProperties.Count < 1) || (fk.PrincipalKeyProps.Count != fk.ForeignKeyProps.Count) || (fk.ForeignKeyProps.Count < 1) || (fk.ForeignKeyProps.Count >= model.PrimaryKeyProperties.Count)) return false;
+            foreach (ModelViewKeyPropertySerializable fkp in fk.ForeignKeyProps)
+            {
+                if (!model.PrimaryKeyProperties.Any(p => p.OriginalPropertyName == fkp.OriginalPropertyName)) return false;
+            }
+            return true;
+        }
+        bool IsForeigKeyWithCorrectPropsOrder(ModelViewForeignKeySerializable otherFk, ModelViewSerializable m2mMdl)
+        {
+            if ((m2mMdl == null) || (otherFk == null)) return false;
+            if ((m2mMdl.PrimaryKeyProperties == null) || (otherFk.ForeignKeyProps == null)) return false;
+            if ((m2mMdl.PrimaryKeyProperties.Count < 1) || (otherFk.ForeignKeyProps.Count < 1)) return false;
+            List<int> positions = new List<int>();
+            foreach (ModelViewKeyPropertySerializable fkp in otherFk.ForeignKeyProps)
+            {
+                int index = m2mMdl.PrimaryKeyProperties.FindIndex(delegate (ModelViewKeyPropertySerializable pkp) { return pkp.OriginalPropertyName == fkp.OriginalPropertyName; });
+                if (index < 0) return false;
+                positions.Add(index);
+            }
+            positions.Sort();
+            for (int i = 0; i < positions.Count - 1; i++)
+            {
+                if (positions[i] + 1 != positions[i + 1]) return false;
+            }
+            return true;
+        }
+        List<Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, List<KeyValuePair<ModelViewForeignKeySerializable, int>>, List<KeyValuePair<ModelViewForeignKeySerializable, int>>, List<KeyValuePair<ModelViewForeignKeySerializable, int>>>> GetSearchResources(ModelViewSerializable model, DbContextSerializable context)
+        {
+            if ((context == null) || (model == null)) return null;
+            if ((context.ModelViews == null) || (model.PrimaryKeyProperties == null) || (model.ScalarProperties == null)) return null;
+            if ((model.PrimaryKeyProperties.Count < 1) || (model.ScalarProperties.Count < 1)) return null;
+            List<ModelViewSerializable> m2mMdls = context.ModelViews.Where(p => (p.ForeignKeys.Any(f => f.ViewName == model.ViewName) && (p.ForeignKeys.Count > 1))).ToList();
+            if (m2mMdls.Count < 1)
+            {
+                return null;
+            }
+            // m2mModel, m2mForeignKey, List<Tuple< model.ForeignKey, m2mModel.additionalForeignKey >>, searchModel, searchFk, searchUk, ukpropsMpt, ukpropsToFrgn
+            List<Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, List<KeyValuePair<ModelViewForeignKeySerializable, int>>, List<KeyValuePair<ModelViewForeignKeySerializable, int>>, List<KeyValuePair<ModelViewForeignKeySerializable, int>>>> result = null;
+            foreach (ModelViewSerializable m2mMdl in m2mMdls)
+            {
+                if (!IsTableMatchesIndex(m2mMdl))
+                {
+                    continue;
+                }
+                List<ModelViewForeignKeySerializable> m2mFks = m2mMdl.ForeignKeys.Where(f => f.ViewName == model.ViewName).ToList();
+                foreach (ModelViewForeignKeySerializable m2mFk in m2mFks)
+                {
+                    if (!IsForeigKeyMapedToTailOfPrimKey(m2mFk, m2mMdl)) continue;
+                    if (!IsForeigKeyMapedToScalarsEx(m2mFk, m2mMdl, model)) continue;
+                    // m2mMdl - m2mModel, m2mFk - m2mForeignKey,
+                    List<KeyValuePair<ModelViewForeignKeySerializable, int>> searchFks = null;
+                    //List<int> searchFkPosition = null;
+                    foreach (ModelViewForeignKeySerializable searchFk in m2mMdl.ForeignKeys)
+                    {
+                        if (m2mFk == searchFk) continue;
+                        if (!IsOnePropForeigKey(searchFk)) continue;
+                        ModelViewSerializable searchMdl = context.ModelViews.Where(mv => (mv.ViewName == searchFk.ViewName)).FirstOrDefault();
+                        if (searchMdl == null) continue;
+                        if (!IsLookUpTable(searchMdl)) continue;
+                        if (!IsUniqKeyMapedToScalarsEx(searchMdl.UniqueKeys[0], searchMdl, model)) continue;
+                        if (searchFks == null) searchFks = new List<KeyValuePair<ModelViewForeignKeySerializable, int>>();
+                        searchFks.Add(new KeyValuePair<ModelViewForeignKeySerializable, int>(searchFk, GetForeigKeyMaxPropsPosition(searchFk, m2mMdl)));
+                    }
+                    if (searchFks == null)
+                    {
+                        continue;
+                    }
+                    int lastValidPosition = m2mMdl.PrimaryKeyProperties.Count - model.PrimaryKeyProperties.Count - 1;
+                    if (searchFks != null)
+                    {
+                        if (searchFks.Any(p => p.Value < 0)) continue;
+                        searchFks = searchFks.OrderBy(p => p.Value).ToList();
+                        bool IsCorrect = true;
+                        for (int i = 0; i < searchFks.Count - 1; i++)
+                        {
+                            IsCorrect = searchFks[i].Value == searchFks[i + 1].Value - 1;
+                            if (!IsCorrect) break;
+                        }
+                        if (!IsCorrect)
+                        {
+                            continue;
+                        }
+                        if (searchFks[searchFks.Count - 1].Value != lastValidPosition)
+                        {
+                            continue;
+                        }
+                        lastValidPosition = searchFks[0].Value - 1;
+                    }
+
+
+                    List<KeyValuePair<ModelViewForeignKeySerializable, int>> otherFks = null;
+                    foreach (ModelViewForeignKeySerializable otherFk in m2mMdl.ForeignKeys)
+                    {
+                        if (m2mFk == otherFk) continue;
+                        if (searchFks != null)
+                        {
+                            if (searchFks.Any(p => p.Key == otherFk)) continue;
+                        }
+                        if (!IsForeigKeyMapedToPrimKey(otherFk, m2mMdl)) continue;
+                        if (!IsForeigKeyMapedToScalarsExEx(otherFk, m2mMdl, model)) continue;
+                        if (!IsForeigKeyWithCorrectPropsOrder(otherFk, m2mMdl)) continue;
+                        int mxPs = GetForeigKeyMaxPropsPosition(otherFk, m2mMdl);
+                        if ((mxPs < 0) || (mxPs > lastValidPosition)) continue;
+                        if (otherFks == null) otherFks = new List<KeyValuePair<ModelViewForeignKeySerializable, int>>();
+                        otherFks.Add(new KeyValuePair<ModelViewForeignKeySerializable, int>(otherFk, mxPs));
+                    }
+                    if (otherFks != null)
+                    {
+                        otherFks = otherFks.OrderBy(p => p.Value).ToList();
+                        bool IsCorrect = true;
+                        for (int i = 0; i < otherFks.Count - 1; i++)
+                        {
+                            IsCorrect = otherFks[i].Value == otherFks[i + 1].Value - otherFks[i].Key.ForeignKeyProps.Count;
+                            if (!IsCorrect) break;
+                        }
+                        if (!IsCorrect) continue;
+                        if (otherFks[otherFks.Count - 1].Value != lastValidPosition)
+                            continue;
+                        lastValidPosition = otherFks[0].Value - otherFks[0].Key.ForeignKeyProps.Count;
+                    }
+
+
+                    List<KeyValuePair<ModelViewForeignKeySerializable, int>> externalFks = null;
+                    foreach (ModelViewForeignKeySerializable externalFk in m2mMdl.ForeignKeys)
+                    {
+                        if (externalFk == m2mFk) continue;
+                        if (searchFks != null)
+                        {
+                            if (searchFks.Any(p => p.Key == externalFk)) continue;
+                        }
+                        if (otherFks != null)
+                        {
+                            if (otherFks.Any(p => p.Key == externalFk)) continue;
+                        }
+                        if (!IsForeigKeyMapedToPrimKey(externalFk, m2mMdl)) continue;
+                        if (!IsForeigKeyMapedToScalars(externalFk, m2mMdl)) continue;
+                        if (!IsForeigKeyWithCorrectPropsOrder(externalFk, m2mMdl)) continue;
+                        int mxPs = GetForeigKeyMaxPropsPosition(externalFk, m2mMdl);
+                        if ((mxPs < 0) || (mxPs > lastValidPosition)) continue;
+                        if (externalFks == null) externalFks = new List<KeyValuePair<ModelViewForeignKeySerializable, int>>();
+                        externalFks.Add(new KeyValuePair<ModelViewForeignKeySerializable, int>(externalFk, mxPs));
+                    }
+                    if (externalFks != null)
+                    {
+                        externalFks = externalFks.OrderBy(p => p.Value).ToList();
+                        bool IsCorrect = true;
+                        for (int i = 0; i < externalFks.Count - 1; i++)
+                        {
+                            IsCorrect = externalFks[i].Value == externalFks[i + 1].Value - externalFks[i].Key.ForeignKeyProps.Count;
+                            if (!IsCorrect) break;
+                        }
+                        if (!IsCorrect) continue;
+                        if (externalFks[externalFks.Count - 1].Value != lastValidPosition) continue;
+                        lastValidPosition = externalFks[0].Value - externalFks[0].Key.ForeignKeyProps.Count;
+                    }
+                    if (lastValidPosition != -1) continue;
+                    int AllFkCount = (searchFks == null ? 0 : searchFks.Count) +
+                                    (otherFks == null ? 0 : otherFks.Count) +
+                                    (externalFks == null ? 0 : externalFks.Count);
+                    if (AllFkCount != (m2mMdl.ForeignKeys.Count - 1)) continue;
+                    if (result == null)
+                    {
+                        result = new List<Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, List<KeyValuePair<ModelViewForeignKeySerializable, int>>, List<KeyValuePair<ModelViewForeignKeySerializable, int>>, List<KeyValuePair<ModelViewForeignKeySerializable, int>>>>();
+                    }
+                    result.Add(new Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, List<KeyValuePair<ModelViewForeignKeySerializable, int>>, List<KeyValuePair<ModelViewForeignKeySerializable, int>>, List<KeyValuePair<ModelViewForeignKeySerializable, int>>>(
+                        m2mMdl, m2mFk, searchFks, otherFks, externalFks
+                    ));
+                }
+            }
+            return result;
+        }
+        ModelViewSerializable GetViewByName(DbContextSerializable context, string ViewName)
+        {
+            if ((context == null) || (string.IsNullOrEmpty(ViewName)))
+            {
+                return null;
+            }
+            return context.ModelViews.Where(v => v.ViewName == ViewName).FirstOrDefault();
+        }
+        ModelViewPropertyOfVwSerializable GetFirstPropOfFirstUniqueKey(ModelViewSerializable model)
+        {
+            if (model == null) return null;
+            if (model.UniqueKeys == null) return null;
+            if (model.UniqueKeys.Count < 1) return null;
+            if (model.UniqueKeys[0].UniqueKeyProperties == null) return null;
+            if (model.UniqueKeys[0].UniqueKeyProperties.Count < 1) return null;
+            return GetScalarPropByOriginaPropName(model.UniqueKeys[0].UniqueKeyProperties[0].OriginalPropertyName, model);
+        }
+        bool IsUsebByForeignKey(ModelViewSerializable model, ModelViewPropertyOfVwSerializable sclProp)
+        {
+            if ((model == null) || (sclProp == null)) return false;
+            if (model.ForeignKeys == null) return false;
+            if (!string.IsNullOrEmpty(sclProp.ForeignKeyName)) return true;
+            return model.ForeignKeys.Any(f => f.ForeignKeyProps.Any(p => p.OriginalPropertyName == sclProp.OriginalPropertyName));
         }
 
     }

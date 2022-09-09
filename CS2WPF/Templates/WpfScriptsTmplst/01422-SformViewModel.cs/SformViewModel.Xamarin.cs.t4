@@ -12,9 +12,8 @@
 <#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
 <#@ include file="..\..\CommonScripts\ViewLevel.t4" #>
-using System;
 using Xamarin.Forms;
-using System.Windows;
+using System.Collections;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
@@ -77,6 +76,14 @@ using Prism.Navigation;
     string IBindingContextChangedFolder      = "00220-IBindingContextChanged.cs";
     string IBindingContextChangedClassName   = GetContextModelClassName(Context, IBindingContextChangedFolder);
     string IBindingContextChangedNameSpace   = GetContextModelNameSpace(Context, IBindingContextChangedFolder);
+
+    string IUniqServiceFilterDefInterfaceFolder     = "00246-IUniqServiceFilterDefInterface.cs";
+    string IUniqServiceFilterDefInterfaceClassName  = GetContextModelClassName(Context, IUniqServiceFilterDefInterfaceFolder);
+    string IUniqServiceFilterDefInterfaceNameSpace  = GetContextModelNameSpace(Context, IUniqServiceFilterDefInterfaceFolder);
+
+    string UniqServiceFilterDefFolder               = "00247-UniqServiceFilterDef.cs";
+    string UniqServiceFilterDefClassName            = GetContextModelClassName(Context, UniqServiceFilterDefFolder);
+    string UniqServiceFilterDefNameSpace            = GetContextModelNameSpace(Context, UniqServiceFilterDefFolder);
 
     string TablePaginationUserControlFolder      = "00252-TablePaginationUserControl.xaml.cs";
     string TablePaginationUserControlClassName   = GetContextModelClassName(Context, TablePaginationUserControlFolder);
@@ -173,8 +180,12 @@ using Prism.Navigation;
     string DisplayHintProperty      = "Prompt";
 
     string FormRootServicePropertyName      = "FrmRootSrv";
+    string FormServicePrefixPropertyName    = "FrmSrv";
+
     string AppSettingServicePropertyName    = "GlblSettingsSrv";
     string FilterOperatorSuffix             = "Oprtr";
+    string EqualOperator                    = "eq";
+    string LikeOperator                     = "lk";
     string GetWithFilterMethodName          = "getwithfilter";
     string ColumnSelectorDlgPropertyName    = "ColumnSelectorDlg";
 
@@ -188,6 +199,17 @@ using Prism.Navigation;
     string InternalContentProperty                  = "InternalContent";
     string IsDsDestroyedPropertyName                = "IsDsDestroyed";
     string IsDestroyedPropertyName                  = "IsDestroyed";
+    string IsSearchDestroyedPropertyName            = "IsSearchDestroyed";
+    string IsSearchGridFlexPropertyName             = "IsSearchGridFlex";
+    string SearchMethodPropertyName                 = "SearchMethod";
+    string NoSearchMethodPropertyName               = "NoSearchMethod";
+    string ScanByUkModePropertyName                 = "ScanByUk";
+    string ScanByVwModePropertyName                 = "ScanByVw";
+    string TextChangedCommandPropertyName           = "TextChangedCommand";
+    string QuerySubmittedCommandPropertyName        = "QuerySubmitted";
+    string GetManyByRepUnqMethodNamePrefix          = "getmanybyrepunq";
+    string GetManyByRepPrimMethodNamePrefix         = "getmanybyrepprim";
+
     string OnDestroyPropertyName                    = "OnDestroy";
 
     List<string> nmSpaces = new List<string>();
@@ -225,7 +247,45 @@ using Prism.Navigation;
         nmSpaces.Add(ValueChangedCmdParamNameSpace);
     if ((SformViewModelNameSpace != BindingContextFeedbackNameSpace) && (nmSpaces.IndexOf(BindingContextFeedbackNameSpace) < 0)) 
         nmSpaces.Add(BindingContextFeedbackNameSpace);
+    if ((SformViewModelNameSpace != IUniqServiceFilterDefInterfaceNameSpace) && (nmSpaces.IndexOf(IUniqServiceFilterDefInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IUniqServiceFilterDefInterfaceNameSpace);
+    if ((SformViewModelNameSpace != UniqServiceFilterDefNameSpace) && (nmSpaces.IndexOf(UniqServiceFilterDefNameSpace) < 0)) 
+        nmSpaces.Add(UniqServiceFilterDefNameSpace);
     
+
+    List<ModelViewUniqueKeyOfVwSerializable> uniqueKeys = GetModelUniqueKeys(Model, new List<ModelViewUniqueKeyOfVwSerializable>());
+    ModelViewUniqueKeyOfVwSerializable pk = GetModelPrimaryKey(Model);
+    if(pk!= null) uniqueKeys.Add(pk);
+
+    // m2mMdl, m2mFk, searchFks, otherFks, externalFks
+    List<Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>>> searchSchemas =
+        GetSearchResources(Model, Context);
+
+
+    if(searchSchemas!= null) {
+        string msi = null;
+        List<ModelViewSerializable> smds = new List<ModelViewSerializable>();
+        foreach(var sch in searchSchemas) {
+            ModelViewSerializable m2mModel = sch.Item1;
+            msi = GetModelNameSpace(m2mModel, modelServiceInterfaceFolder);
+            if ((SformViewModelNameSpace != msi) && (nmSpaces.IndexOf(msi) < 0)) nmSpaces.Add(msi);
+            msi = GetModelNameSpace(m2mModel, modelFilterInterfaceFolder);
+            if ((SformViewModelNameSpace != msi) && (nmSpaces.IndexOf(msi) < 0)) nmSpaces.Add(msi);
+            msi = GetModelNameSpace(m2mModel, modelPageInterfaceFolder);
+            if ((SformViewModelNameSpace != msi) && (nmSpaces.IndexOf(msi) < 0)) nmSpaces.Add(msi);
+            foreach(KeyValuePair<ModelViewForeignKeySerializable,int> kvp in sch.Item3) {
+                ModelViewSerializable searchModel = GetViewByName(Context, kvp.Key.ViewName);
+                if(smds.Any(p => p == searchModel)) continue;
+                smds.Add(searchModel);
+                msi = GetModelNameSpace(searchModel, modelServiceInterfaceFolder);
+                if ((SformViewModelNameSpace != msi) && (nmSpaces.IndexOf(msi) < 0)) nmSpaces.Add(msi);
+                msi = GetModelNameSpace(searchModel, modelFilterInterfaceFolder);
+                if ((SformViewModelNameSpace != msi) && (nmSpaces.IndexOf(msi) < 0)) nmSpaces.Add(msi);
+                msi = GetModelNameSpace(searchModel, modelPageInterfaceFolder);
+                if ((SformViewModelNameSpace != msi) && (nmSpaces.IndexOf(msi) < 0)) nmSpaces.Add(msi);
+            }
+        }
+    } // if(searchSchemas!= null) {...}
 
 
 #>
@@ -259,10 +319,72 @@ namespace <#= SformViewModelNameSpace #> {
         protected <#= modelServiceInterfaceClassName #> <#= FormRootServicePropertyName #>=null;
         protected <#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName #>=null;
         protected IDialogService _dialogService=null;
-        public <#= SformViewModelClassName #>(<#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName  #>, <#= modelServiceInterfaceClassName #> <#= FormRootServicePropertyName #>, IDialogService dialogService) {
+<#
+        if(searchSchemas!= null) {
+            List<ModelViewSerializable> smds = new List<ModelViewSerializable>();
+            foreach(var sch in searchSchemas) {
+                ModelViewSerializable m2mModel = sch.Item1;
+#>
+        protected <#= GetModelServiceInterfaceName(m2mModel) #> <#= FormServicePrefixPropertyName + m2mModel.ViewName #>;
+<#
+                foreach(KeyValuePair<ModelViewForeignKeySerializable,int> kvp in sch.Item3) {
+                    ModelViewSerializable searchModel = GetViewByName(Context, kvp.Key.ViewName);
+                    if(smds.Any(p => p == searchModel)) continue;
+                    smds.Add(searchModel);
+#>
+        protected <#= GetModelServiceInterfaceName(searchModel) #> <#= FormServicePrefixPropertyName + searchModel.ViewName #>;
+<#
+                }
+            }
+        } // if(searchSchemas!= null) {...}
+#>    
+
+
+        public <#= SformViewModelClassName #>(<#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName  #>, <#= modelServiceInterfaceClassName #> <#= FormRootServicePropertyName #>, 
+<#
+        if(searchSchemas!= null) {
+            List<ModelViewSerializable> smds = new List<ModelViewSerializable>();
+            foreach(var sch in searchSchemas) {
+                ModelViewSerializable m2mModel = sch.Item1;
+#>
+                <#= GetModelServiceInterfaceName(m2mModel) #> <#= FormServicePrefixPropertyName + m2mModel.ViewName #>,
+<#
+                foreach(KeyValuePair<ModelViewForeignKeySerializable,int> kvp in sch.Item3) {
+                    ModelViewSerializable searchModel = GetViewByName(Context, kvp.Key.ViewName);
+                    if(smds.Any(p => p == searchModel)) continue;
+                    smds.Add(searchModel);
+#>
+                <#= GetModelServiceInterfaceName(searchModel) #> <#= FormServicePrefixPropertyName + searchModel.ViewName #>,
+<#
+                }
+            }
+        } // if(searchSchemas!= null) {...}
+#>    
+
+            IDialogService dialogService) {
             this.<#= AppSettingServicePropertyName #> = <#= AppSettingServicePropertyName #>;
             this.<#= FormRootServicePropertyName #> = <#= FormRootServicePropertyName #>;
             this._dialogService = dialogService;
+
+<#
+        if(searchSchemas!= null) {
+            List<ModelViewSerializable> smds = new List<ModelViewSerializable>();
+            foreach(var sch in searchSchemas) {
+                ModelViewSerializable m2mModel = sch.Item1;
+#>
+                this.<#= FormServicePrefixPropertyName + m2mModel.ViewName #> = <#= FormServicePrefixPropertyName + m2mModel.ViewName #>;
+<#
+                foreach(KeyValuePair<ModelViewForeignKeySerializable,int> kvp in sch.Item3) {
+                    ModelViewSerializable searchModel = GetViewByName(Context, kvp.Key.ViewName);
+                    if(smds.Any(p => p == searchModel)) continue;
+                    smds.Add(searchModel);
+#>
+                this.<#= FormServicePrefixPropertyName + searchModel.ViewName #> = <#= FormServicePrefixPropertyName + searchModel.ViewName #>;
+<#
+                }
+            }
+        } // if(searchSchemas!= null) {...}
+#>    
             _<#= TableMenuItemsVMPropertyName #> = GetDefault<#= TableMenuItemsVMPropertyName #>();
         }
         #region INotifyPropertyChanged
@@ -927,11 +1049,16 @@ namespace <#= SformViewModelNameSpace #> {
         public bool <#= IsDestroyedPropertyName #>
         {
             get { return _<#= IsDestroyedPropertyName #>; }
-            set { if (_<#= IsDestroyedPropertyName #> != value) { _<#= IsDestroyedPropertyName #> = value; OnPropertyChanged(); } }
+            set { 
+                if (_<#= IsDestroyedPropertyName #> != value) { 
+                    _<#= IsDestroyedPropertyName #> = value; 
+                    OnPropertyChanged(); 
+                    OnPropertyChanged("<#= IsSearchDestroyedPropertyName #>");
+                } 
+            }
         }
         #endregion
 
-        
         #region Filter
         protected async Task onFilter() {
             if(<#= IsDsDestroyedPropertyName #>) return;
@@ -1113,6 +1240,473 @@ namespace <#= SformViewModelNameSpace #> {
         }
         #endregion
 
+
+        #region <#= SearchMethodPropertyName #>
+        protected string _<#= SearchMethodPropertyName #> = "<#= NoSearchMethodPropertyName #>";
+        public string <#= SearchMethodPropertyName #> {
+            get {
+                return _<#= SearchMethodPropertyName #>;
+            }
+            set {
+                if(_<#= SearchMethodPropertyName #> != value) {
+                    _<#= SearchMethodPropertyName #> = value;
+                    OnPropertyChanged(); 
+                }
+            }
+        }
+        #endregion
+
+        #region <#= IsSearchDestroyedPropertyName #>
+        protected bool _<#= IsSearchDestroyedPropertyName #> = false;
+        public bool <#= IsSearchDestroyedPropertyName #>
+        {
+            get { return _<#= IsSearchDestroyedPropertyName #> || _<#= IsDestroyedPropertyName #>; }
+            set { 
+                if (_<#= IsSearchDestroyedPropertyName #> != value) { 
+                    _<#= IsSearchDestroyedPropertyName #> = value; 
+                    OnPropertyChanged(); 
+                } 
+            }
+        }
+        #endregion
+
+        #region <#= IsSearchGridFlexPropertyName #>
+        protected bool _<#= IsSearchGridFlexPropertyName #> = false;
+        public bool <#= IsSearchGridFlexPropertyName #>
+        {
+            get { return _<#= IsSearchGridFlexPropertyName #>; }
+            set { 
+                if (_<#= IsSearchGridFlexPropertyName #> != value) { 
+                    _<#= IsSearchGridFlexPropertyName #> = value; 
+                    OnPropertyChanged(); 
+                } 
+            }
+        }
+        #endregion
+
+<#
+    if(searchSchemas != null) {
+        foreach(var sch in searchSchemas) {
+            ModelViewSerializable m2mModel = sch.Item1;
+#>
+        #region <#= ScanByVwModePropertyName + m2mModel.ViewName + FilterDefinitionsPropertyName #>
+        protected IList<<#= IUniqServiceFilterDefInterfaceClassName #>> _<#= ScanByVwModePropertyName + m2mModel.ViewName + FilterDefinitionsPropertyName #> = 
+            new List<<#= IUniqServiceFilterDefInterfaceClassName #>>() {
+<#
+            foreach(KeyValuePair<ModelViewForeignKeySerializable,int> kvp in sch.Item3) {
+                ModelViewSerializable searchModel = GetViewByName(Context, kvp.Key.ViewName);
+                ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable = GetFirstPropOfFirstUniqueKey(searchModel);
+#>
+                new <#= UniqServiceFilterDefClassName #>() { fltrName = "<#= GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) #>", fltrDispMemb = "<#= GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel)#>", fltrTextMemb = "<#= GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel)#>", fltrCaption = "<#=  GetDisplayAttributeValueString(modelViewPropertyOfVwSerializable, searchModel, DisplayLabelProperty) #>", fltrDataType = "<#= GetCCharpDatatype(modelViewPropertyOfVwSerializable, searchModel) #>", fltrMaxLen = <#= GetMaxLen(modelViewPropertyOfVwSerializable, searchModel) #>, fltrMin = <#= GetMinVal(modelViewPropertyOfVwSerializable, searchModel) #>, fltrMax = <#= GetMaxVal(modelViewPropertyOfVwSerializable, searchModel) #> },
+<#
+            }
+#>
+            };
+        public IList<<#= IUniqServiceFilterDefInterfaceClassName #>> <#= ScanByVwModePropertyName + m2mModel.ViewName + FilterDefinitionsPropertyName #> {
+            get {
+                return _<#= ScanByVwModePropertyName + m2mModel.ViewName + FilterDefinitionsPropertyName #>;
+            }
+        }
+<#
+            foreach(KeyValuePair<ModelViewForeignKeySerializable,int> kvp in sch.Item3) {
+                ModelViewSerializable searchModel = GetViewByName(Context, kvp.Key.ViewName);
+                ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable = GetFirstPropOfFirstUniqueKey(searchModel);
+#>
+        protected <#= GetInterfaceName(searchModel) #> _<#= ScanByVwModePropertyName + m2mModel.ViewName + GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) + "Item" #> = null;
+        public <#= GetInterfaceName(searchModel) #> <#= ScanByVwModePropertyName + m2mModel.ViewName + GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) + "Item" #> {
+            get {
+                return _<#= ScanByVwModePropertyName + m2mModel.ViewName + GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) + "Item" #>;
+            }
+            set {
+                if (_<#= ScanByVwModePropertyName + m2mModel.ViewName + GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) + "Item" #> != value) {
+                    _<#= ScanByVwModePropertyName + m2mModel.ViewName + GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) + "Item" #> = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged("<#= ScanByVwModePropertyName + m2mModel.ViewName + GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) + "Text" #>");
+                }
+            }
+        }
+        protected IList<<#= GetInterfaceName(searchModel) #>> _<#= ScanByVwModePropertyName + m2mModel.ViewName + GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) +  "ItemsSource" #> = null;
+        public IList<<#= GetInterfaceName(searchModel) #>> <#= ScanByVwModePropertyName + m2mModel.ViewName + GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) + "ItemsSource" #> {
+            get {
+                return _<#= ScanByVwModePropertyName + m2mModel.ViewName + GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) + "ItemsSource" #>;
+            }
+            set {
+                if(_<#= ScanByVwModePropertyName + m2mModel.ViewName + GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) + "ItemsSource" #> != value) {
+                    _<#= ScanByVwModePropertyName + m2mModel.ViewName + GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) + "ItemsSource" #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        protected string _<#= ScanByVwModePropertyName + m2mModel.ViewName + GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) + "Text" #> = null;
+        public string <#= ScanByVwModePropertyName + m2mModel.ViewName + GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) + "Text" #> {
+            get {
+                <#= GetInterfaceName(searchModel) #> dmObj = <#= ScanByVwModePropertyName + m2mModel.ViewName + GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) + "Item" #> as <#= GetInterfaceName(searchModel) #>;
+                if(dmObj!= null) {
+<#
+        if(IsStringInputEx(modelViewPropertyOfVwSerializable, searchModel)) {
+#>
+                    return dmObj.<#= GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) #>;
+<#
+
+        } else if(IsPropertyNullable(modelViewPropertyOfVwSerializable)) {
+#>
+                    // it's possible to write only: return dmObj.<#= GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) #>.ToString();
+                    if (dmObj.<#= GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) #>.HasValue) {
+                        return dmObj.<#= GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) #>.Value.ToString();
+                    } else {
+                        return "";
+                    }
+<#
+        } else {
+#>
+                    return dmObj.<#= GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) #>.ToString();
+<#
+        }
+#>
+                } else {
+                    return _<#= ScanByVwModePropertyName + m2mModel.ViewName + GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) + "Text" #>;
+                }
+            }
+            set {
+                if(_<#= ScanByVwModePropertyName + m2mModel.ViewName + GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) + "Text" #> != value) {
+                    _<#= ScanByVwModePropertyName + m2mModel.ViewName + GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) + "Text" #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+<#
+            }
+#>
+
+        protected ICommand _<#= ScanByVwModePropertyName + m2mModel.ViewName +  TextChangedCommandPropertyName #> = null;
+        public ICommand <#= ScanByVwModePropertyName + m2mModel.ViewName +  TextChangedCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= ScanByVwModePropertyName + m2mModel.ViewName +  TextChangedCommandPropertyName #> ?? (_<#= ScanByVwModePropertyName + m2mModel.ViewName +  TextChangedCommandPropertyName #> = new Command((prm) => <#= ScanByVwModePropertyName + m2mModel.ViewName +  TextChangedCommandPropertyName #>Execute(prm), (prm) => <#= ScanByVwModePropertyName + m2mModel.ViewName +  TextChangedCommandPropertyName #>CanExecute(prm)));
+            }
+        }
+        // Reason: UserInput = 0, ProgrammaticChange = 1, SuggestionChosen = 2
+        protected async void <#= ScanByVwModePropertyName + m2mModel.ViewName +  TextChangedCommandPropertyName #>Execute(object prm)
+        {
+            if ((<#= IsDsDestroyedPropertyName #>) || (prm is null)) return;
+            (object Cmpnt, object Sender, <#= IUniqServiceFilterDefInterfaceClassName #> FltDef, int Reason, string QueryText) tprm  = ((object Cmpnt, object Sender, <#= IUniqServiceFilterDefInterfaceClassName #> FltDef, int Reason, string QueryText))prm;
+            if(tprm.Reason != 0) return;
+            switch(tprm.FltDef.fltrName) {
+<#
+            foreach(KeyValuePair<ModelViewForeignKeySerializable,int> kvp in sch.Item3) {
+                ModelViewSerializable searchModel = GetViewByName(Context, kvp.Key.ViewName);
+                ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable = GetFirstPropOfFirstUniqueKey(searchModel);
+#>
+                case "<#= GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) #>":
+                    <#= ScanByVwModePropertyName + m2mModel.ViewName + GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) + "Item" #> = null;
+                    <#= ScanByVwModePropertyName + m2mModel.ViewName + GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) + "Text" #> = tprm.QueryText;
+                    {
+                        <#= GetFilterInterfaceName(searchModel) #> fltr = <#= FormServicePrefixPropertyName + searchModel.ViewName #>.GetFilter();
+                        fltr.page = 0;
+                        fltr.pagesize = 15;
+<#
+                if(IsPropertyString(modelViewPropertyOfVwSerializable)) {
+#>
+                        fltr.<#= GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel)#> = new List<string>() { tprm.QueryText };
+<#
+                } else {
+#>
+                        <#= GetPropertyTypeName(modelViewPropertyOfVwSerializable) #> val;
+                        if (<#= GetPropertyTypeName(modelViewPropertyOfVwSerializable) #>.TryParse(tprm.QueryText, out val)) {
+                            fltr.<#= GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel)#> = new List<<#= GetPropertyTypeName(modelViewPropertyOfVwSerializable) #>>() { val };
+                        }
+<#
+                }
+#>
+                        fltr.<#= GetFilterPropertyOperatorName(modelViewPropertyOfVwSerializable, searchModel, FilterOperatorSuffix) #> = new List<string>() { "<#= LikeOperator #>" };
+                        <#= GetPageInterfaceName(searchModel) #> rslt = await <#= FormServicePrefixPropertyName + searchModel.ViewName #>.<#= GetManyByRepUnqMethodNamePrefix + searchModel.UniqueKeys[0].UniqueKeyName #>(fltr);
+                        if(rslt is null) {
+                            <#= ScanByVwModePropertyName + m2mModel.ViewName + GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) + "ItemsSource" #> = null;
+                        } else {
+                            <#= ScanByVwModePropertyName + m2mModel.ViewName + GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) + "ItemsSource" #> = rslt.items;
+                        }
+                    }
+                    break;
+<#
+            }
+#>
+                default:
+                    break;
+            }            
+        }
+        protected bool <#= ScanByVwModePropertyName + m2mModel.ViewName +  TextChangedCommandPropertyName #>CanExecute(object prm)
+        {
+            return true;
+        }
+
+        protected ICommand _<#= ScanByVwModePropertyName + m2mModel.ViewName +  QuerySubmittedCommandPropertyName #> = null;
+        public ICommand <#= ScanByVwModePropertyName + m2mModel.ViewName +  QuerySubmittedCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= ScanByVwModePropertyName + m2mModel.ViewName +  QuerySubmittedCommandPropertyName #> ?? (_<#= ScanByVwModePropertyName + m2mModel.ViewName +  QuerySubmittedCommandPropertyName #> = new Command((prm) => <#= ScanByVwModePropertyName + m2mModel.ViewName +  QuerySubmittedCommandPropertyName #>Execute(prm), (prm) => <#= ScanByVwModePropertyName + m2mModel.ViewName +  QuerySubmittedCommandPropertyName #>CanExecute(prm)));
+            }
+        }
+        protected void <#= ScanByVwModePropertyName + m2mModel.ViewName +  QuerySubmittedCommandPropertyName #>Execute(object prm)
+        {
+            if ((<#= IsDsDestroyedPropertyName #>) || (prm is null)) return;
+            (object Cmpnt, object Sender, <#= IUniqServiceFilterDefInterfaceClassName #> FltDef, object ChosenSuggestion, string QueryText) tprm  = 
+                ((object Cmpnt, object Sender, <#= IUniqServiceFilterDefInterfaceClassName #> FltDef, object ChosenSuggestion, string QueryText))prm;
+            switch(tprm.FltDef.fltrName) {
+<#
+            foreach(KeyValuePair<ModelViewForeignKeySerializable,int> kvp in sch.Item3) {
+                ModelViewSerializable searchModel = GetViewByName(Context, kvp.Key.ViewName);
+                ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable = GetFirstPropOfFirstUniqueKey(searchModel);
+#>
+                case "<#= GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) #>":
+                    <#= ScanByVwModePropertyName + m2mModel.ViewName + GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) + "Item" #> = tprm.ChosenSuggestion as <#= GetInterfaceName(searchModel) #>;
+                    break;
+<#
+            }
+#>
+                default:
+                    break;
+            }
+        }
+        protected bool <#= ScanByVwModePropertyName + m2mModel.ViewName +  QuerySubmittedCommandPropertyName #>CanExecute(object prm)
+        {
+            return true;
+        }
+        #endregion
+<#
+        }
+    }
+    if (Model.IsWebApiSelectOneByPrimarykey) {
+        for(int i = 0; i < uniqueKeys.Count; i++) { 
+            string indErrrorText = "";
+            bool indIsCorrect = CheckModelIfIndexIsCorrect(Model, uniqueKeys[i], out indErrrorText);
+            if (!indIsCorrect) {
+#>
+
+//
+// Could not generate fragment of code
+// Primary/Unique Index Is not correct:
+// <#= indErrrorText #>
+//
+
+<#
+            } else {
+                string caption = "Primary";
+                string localRouteManyName = GetManyByRepPrimMethodNamePrefix;
+                if(!uniqueKeys[i].IsPrimary) {
+                    caption = uniqueKeys[i].UniqueKeyName;
+                }
+                if(!uniqueKeys[i].IsPrimary) {
+                    localRouteManyName = GetManyByRepUnqMethodNamePrefix + caption;
+                }
+
+#>
+        #region <#= ScanByUkModePropertyName + caption + FilterDefinitionsPropertyName #>
+        protected IList<<#= IUniqServiceFilterDefInterfaceClassName #>> _<#= ScanByUkModePropertyName + caption + FilterDefinitionsPropertyName #> =
+            new List<<#= IUniqServiceFilterDefInterfaceClassName #>>() {
+<#
+            foreach(ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable in uniqueKeys[i].UniqueKeyProperties) {
+#>
+                new <#= UniqServiceFilterDefClassName #>() { fltrName = "<#= GetModelPropertyName(modelViewPropertyOfVwSerializable, Model) #>", fltrDispMemb = "<#= GetModelPropertyName(modelViewPropertyOfVwSerializable, Model)#>", fltrTextMemb = "<#= GetModelPropertyName(modelViewPropertyOfVwSerializable, Model)#>", fltrCaption = "<#=  GetDisplayAttributeValueString(modelViewPropertyOfVwSerializable, Model, DisplayLabelProperty) #>", fltrDataType = "<#= GetCCharpDatatype(modelViewPropertyOfVwSerializable, Model) #>", fltrMaxLen = <#= GetMaxLen(modelViewPropertyOfVwSerializable, Model) #>, fltrMin = <#= GetMinVal(modelViewPropertyOfVwSerializable, Model) #>, fltrMax = <#= GetMaxVal(modelViewPropertyOfVwSerializable, Model) #> },
+<#
+            }
+#>
+            };
+        public IList<<#= IUniqServiceFilterDefInterfaceClassName #>> <#= ScanByUkModePropertyName + caption + FilterDefinitionsPropertyName #> {
+            get {
+                return _<#= ScanByUkModePropertyName + caption + FilterDefinitionsPropertyName #>;
+            }
+        }
+
+        protected <#= GetInterfaceName(Model) #> _<#= ScanByUkModePropertyName + caption + "Item" #> = null;
+        public <#= GetInterfaceName(Model) #> <#= ScanByUkModePropertyName + caption + "Item" #> {
+            get {
+                return _<#= ScanByUkModePropertyName + caption + "Item" #>;
+            }
+            set {
+                if (_<#= ScanByUkModePropertyName + caption + "Item" #> != value) {
+                    _<#= ScanByUkModePropertyName + caption + "Item" #> = value;
+                    OnPropertyChanged();
+<#
+            foreach(ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable in uniqueKeys[i].UniqueKeyProperties) {
+#>
+                    OnPropertyChanged("<#= ScanByUkModePropertyName + caption + GetModelPropertyName(modelViewPropertyOfVwSerializable, Model) + "Text" #>");
+<#
+            }
+#>
+                }
+            }
+        }
+        
+        protected IList<<#= GetInterfaceName(Model) #>> _<#= ScanByUkModePropertyName + caption +  "ItemsSource" #> = null;
+        public IList<<#= GetInterfaceName(Model) #>> <#= ScanByUkModePropertyName + caption + "ItemsSource" #> {
+            get {
+                return _<#= ScanByUkModePropertyName + caption + "ItemsSource" #>;
+            }
+            set {
+                if(_<#= ScanByUkModePropertyName + caption + "ItemsSource" #> != value) {
+                    _<#= ScanByUkModePropertyName + caption + "ItemsSource" #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+<#
+            foreach(ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable in uniqueKeys[i].UniqueKeyProperties) {
+#>
+        protected string _<#= ScanByUkModePropertyName + caption + GetModelPropertyName(modelViewPropertyOfVwSerializable, Model) + "Text" #> = null;
+        public string <#= ScanByUkModePropertyName + caption + GetModelPropertyName(modelViewPropertyOfVwSerializable, Model) + "Text" #> {
+            get {
+                <#= GetInterfaceName(Model) #> dmObj = <#= ScanByUkModePropertyName + caption + "Item" #>;
+                if(dmObj != null) {
+<#
+        if(IsStringInputEx(modelViewPropertyOfVwSerializable, Model)) {
+#>
+                    return dmObj.<#= GetModelPropertyName(modelViewPropertyOfVwSerializable, Model) #>;
+<#
+
+        } else if(IsPropertyNullable(modelViewPropertyOfVwSerializable)) {
+#>
+                    // it's possible to write only: return dmObj.<#= GetModelPropertyName(modelViewPropertyOfVwSerializable, Model) #>.ToString();
+                    if (dmObj.<#= GetModelPropertyName(modelViewPropertyOfVwSerializable, Model) #>.HasValue) {
+                        return dmObj.<#= GetModelPropertyName(modelViewPropertyOfVwSerializable, Model) #>.Value.ToString();
+                    } else {
+                        return "";
+                    }
+<#
+        } else {
+#>
+                    return dmObj.<#= GetModelPropertyName(modelViewPropertyOfVwSerializable, Model) #>.ToString();
+<#
+        }
+#>
+                } else {
+                    return _<#= ScanByUkModePropertyName + caption + GetModelPropertyName(modelViewPropertyOfVwSerializable, Model) + "Text" #>;
+                }
+
+            }
+            set {
+                if(_<#= ScanByUkModePropertyName + caption + GetModelPropertyName(modelViewPropertyOfVwSerializable, Model) + "Text" #> != value) {
+                    _<#= ScanByUkModePropertyName + caption + GetModelPropertyName(modelViewPropertyOfVwSerializable, Model) + "Text" #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+<#
+            }
+#>
+        protected ICommand _<#= ScanByUkModePropertyName + caption + TextChangedCommandPropertyName #> = null;
+        public ICommand <#= ScanByUkModePropertyName + caption + TextChangedCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= ScanByUkModePropertyName + caption + TextChangedCommandPropertyName #> ?? (_<#= ScanByUkModePropertyName + caption + TextChangedCommandPropertyName #> = new Command((prm) => <#= ScanByUkModePropertyName + caption + TextChangedCommandPropertyName #>Execute(prm), (prm) => <#= ScanByUkModePropertyName + caption + TextChangedCommandPropertyName #>CanExecute(prm)));
+            }
+        }
+        // Reason: UserInput = 0, ProgrammaticChange = 1, SuggestionChosen = 2
+        protected async void <#= ScanByUkModePropertyName + caption + TextChangedCommandPropertyName #>Execute(object prm)
+        {
+            if ((<#= IsDsDestroyedPropertyName #>) || (prm is null)) return;
+            (object Cmpnt, object Sender, <#= IUniqServiceFilterDefInterfaceClassName #> FltDef, int Reason, string QueryText) tprm  = ((object Cmpnt, object Sender, <#= IUniqServiceFilterDefInterfaceClassName #> FltDef, int Reason, string QueryText))prm;
+            if(tprm.Reason != 0) return;
+            int k = -1;
+            switch(tprm.FltDef.fltrName) {
+<#
+        {
+            int k = -1;
+            foreach(ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable in uniqueKeys[i].UniqueKeyProperties) {
+                k++;
+                if (!modelViewPropertyOfVwSerializable.IsUsedByfilter) continue;
+                if(IsUsebByForeignKey(Model, modelViewPropertyOfVwSerializable)) continue;
+#>
+                case "<#= GetModelPropertyName(modelViewPropertyOfVwSerializable, Model) #>":
+                    k = <#= k #>;
+                    break;
+<#
+            }
+        }
+#>
+                default:
+                    return;
+            }
+            <#= GetInterfaceName(Model) #> itm = <#= ScanByUkModePropertyName + caption + "Item" #>;
+            <#= GetFilterInterfaceName(Model) #> fltr = <#= FormRootServicePropertyName #>.GetFilter();
+            fltr.page = 0;
+            fltr.pagesize = 15;
+            
+<#
+        {
+            int k = -1;
+            foreach(ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable in uniqueKeys[i].UniqueKeyProperties) {
+                k++;
+                if (!modelViewPropertyOfVwSerializable.IsUsedByfilter) continue;
+                if(IsUsebByForeignKey(Model, modelViewPropertyOfVwSerializable)) continue;
+#>
+            if ((k > <#= k #>) && (!(itm is null))) { 
+                fltr.<#= GetModelPropertyName(modelViewPropertyOfVwSerializable, Model) #> = new List<<#= GetPropertyTypeName(modelViewPropertyOfVwSerializable) #>>() { itm.<#= GetModelPropertyName(modelViewPropertyOfVwSerializable, Model)#> }; 
+                fltr.<#= GetFilterPropertyOperatorName(modelViewPropertyOfVwSerializable, Model, FilterOperatorSuffix)#> = new List<string>() { "<#= EqualOperator #>" };
+             } else if(k == <#= k #>) { 
+                <#= ScanByUkModePropertyName + caption + "Item" #> = null;
+                <#= ScanByUkModePropertyName + caption + GetModelPropertyName(modelViewPropertyOfVwSerializable, Model) + "Text" #> = tprm.QueryText;
+<#
+                if(IsPropertyString(modelViewPropertyOfVwSerializable)) {
+#>
+                    fltr.<#= GetModelPropertyName(modelViewPropertyOfVwSerializable, Model)#> = new List<string>() { tprm.QueryText };
+<#
+                } else {
+#>
+                {
+                    <#= GetPropertyTypeName(modelViewPropertyOfVwSerializable) #> val;
+                    if (<#= GetPropertyTypeName(modelViewPropertyOfVwSerializable) #>.TryParse(tprm.QueryText, out val)) {
+                        fltr.<#= GetModelPropertyName(modelViewPropertyOfVwSerializable, Model)#> = new List<<#= GetPropertyTypeName(modelViewPropertyOfVwSerializable) #>>() { val };
+                    }
+                }
+<#
+                }
+#>
+                fltr.<#= GetFilterPropertyOperatorName(modelViewPropertyOfVwSerializable, Model, FilterOperatorSuffix)#> = new List<string>() { "<#= LikeOperator #>" };
+             }
+<#
+            }
+        }
+#>
+            <#= GetPageInterfaceName(Model) #> rslt = await <#= FormRootServicePropertyName #>.<#= localRouteManyName #>(fltr);
+            if(rslt is null) {
+                <#= ScanByUkModePropertyName + caption + "ItemsSource" #> = null;
+            } else {
+                <#= ScanByUkModePropertyName + caption + "ItemsSource" #> = rslt.items;
+            }
+        }
+        protected bool <#= ScanByUkModePropertyName + caption + TextChangedCommandPropertyName #>CanExecute(object prm)
+        {
+            return true;
+        }
+        protected ICommand _<#= ScanByUkModePropertyName + caption + QuerySubmittedCommandPropertyName #> = null;
+        public ICommand <#= ScanByUkModePropertyName + caption + QuerySubmittedCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= ScanByUkModePropertyName + caption + QuerySubmittedCommandPropertyName #> ?? (_<#= ScanByUkModePropertyName + caption +  QuerySubmittedCommandPropertyName #> = new Command((prm) => <#= ScanByUkModePropertyName + caption +  QuerySubmittedCommandPropertyName #>Execute(prm), (prm) => <#= ScanByUkModePropertyName + caption +  QuerySubmittedCommandPropertyName #>CanExecute(prm)));
+            }
+        }
+        protected void <#= ScanByUkModePropertyName + caption +  QuerySubmittedCommandPropertyName #>Execute(object prm)
+        {
+            if ((<#= IsDsDestroyedPropertyName #>) || (prm is null)) return;
+            (object Cmpnt, object Sender, <#= IUniqServiceFilterDefInterfaceClassName #> FltDef, object ChosenSuggestion, string QueryText) tprm  = 
+                ((object Cmpnt, object Sender, <#= IUniqServiceFilterDefInterfaceClassName #> FltDef, object ChosenSuggestion, string QueryText))prm;
+            <#= ScanByUkModePropertyName + caption + "Item" #> = tprm.ChosenSuggestion as <#= GetInterfaceName(Model) #>;
+        }
+        protected bool <#= ScanByUkModePropertyName + caption +  QuerySubmittedCommandPropertyName #>CanExecute(object prm) {
+            return true;
+        }
+        #endregion
+<#
+            } // if (!indIsCorrect) { ... } else { ... }
+        } // for(int i = 0; i < uniqueKeys.Count; i++) { ... }
+    } // if (Model.IsWebApiSelectOneByPrimarykey) { ... }
+#>
     }
 }
 

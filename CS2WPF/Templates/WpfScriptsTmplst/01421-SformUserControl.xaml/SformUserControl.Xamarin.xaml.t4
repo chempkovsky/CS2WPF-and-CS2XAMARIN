@@ -50,6 +50,12 @@
     string WebServiceFilterUserControlNameSpace   = GetContextModelNameSpace(Context, WebServiceFilterUserControlFolder);
     string WebServiceFilterUserControlProject     = GetContextModelProjectName(Context, WebServiceFilterUserControlFolder);
 
+    string UniqServiceFilterUserControlFolder     = "00248-UniqServiceFilterUserControl.xaml.cs";
+    string UniqServiceFilterUserControlClassName  = GetContextModelClassName(Context, UniqServiceFilterUserControlFolder);
+    string UniqServiceFilterUserControlNameSpace  = GetContextModelNameSpace(Context, UniqServiceFilterUserControlFolder);
+    string UniqServiceFilterUserControlProject    = GetContextModelProjectName(Context, UniqServiceFilterUserControlFolder);
+
+
     string TablePaginationUserControlFolder      = "00252-TablePaginationUserControl.xaml.cs";
     string TablePaginationUserControlClassName   = GetContextModelClassName(Context, TablePaginationUserControlFolder);
     string TablePaginationUserControlNameSpace   = GetContextModelNameSpace(Context, TablePaginationUserControlFolder);
@@ -64,9 +70,6 @@
     string SformUserControlClassName        = GetModelClassName(Model, SformUserControlFolder);
     string SformUserControlNameSpace        = GetModelNameSpace(Model, SformUserControlFolder);
     string SformUserControlProject          = GetModelProjectName(Model, SformUserControlFolder);
-
-
-
 
     string SformUserControlXamlFolder      = "01421-SformUserControl.xaml";
     string SformUserControlXamlClassName   = GetModelClassName(Model, SformUserControlXamlFolder);
@@ -143,14 +146,28 @@
     string InternalContentProperty           = "InternalContent";
     string MaxHeightProperty                 = "MaxHeight";
 
-    string IsDestroyedPropertyName = "IsDestroyed";
-    string OnDestroyedPropertyName = "OnDestroyed";
-    string IsDsDestroyedPropertyName = "IsDsDestroyed";
-    
+    string IsDestroyedPropertyName           = "IsDestroyed";
+    string IsSearchDestroyedPropertyName     = "IsSearchDestroyed";
+
+    string OnDestroyedPropertyName           = "OnDestroyed";
+    string IsDsDestroyedPropertyName         = "IsDsDestroyed";
+    string FullScanPropertyName              = "FullScan";
+    string ScanByUkModePropertyName          = "ScanByUk";
+    string ScanByVwModePropertyName          = "ScanByVw";
+    string IsGridFlexPropertyName            = "IsGridFlex";
+    string TextChangedCommandPropertyName    = "TextChangedCommand";
+    string QuerySubmittedCommandPropertyName = "QuerySubmitted";
+    string SearchMethodPropertyName          = "SearchMethod";
+    string NoSearchMethodPropertyName        = "NoSearchMethod";
+    string IsSearchGridFlexPropertyName      = "IsSearchGridFlex";
 
     string wsfucPrefix = "clr-namespace:" + WebServiceFilterUserControlNameSpace;
     if(SformUserControlProject != WebServiceFilterUserControlProject) {
         wsfucPrefix = wsfucPrefix + ";assembly=" + WebServiceFilterUserControlProject;
+    }
+    string usfucPrefix = "clr-namespace:" + UniqServiceFilterUserControlNameSpace;
+    if(SformUserControlProject != UniqServiceFilterUserControlProject) {
+        usfucPrefix = usfucPrefix + ";assembly=" + UniqServiceFilterUserControlProject;
     }
     string tpgnucPrefix = "clr-namespace:" + TablePaginationUserControlNameSpace;
     if(SformUserControlProject != TablePaginationUserControlProject) {
@@ -185,6 +202,15 @@
         RadioDestroyedPrefix = ButtonDestroyedPrefix + ";assembly=" + RadioDestroyedProject;
     }
     
+    List<ModelViewUniqueKeyOfVwSerializable> uniqueKeys = GetModelUniqueKeys(Model, new List<ModelViewUniqueKeyOfVwSerializable>());
+    ModelViewUniqueKeyOfVwSerializable pk = GetModelPrimaryKey(Model);
+    if(pk!= null) uniqueKeys.Add(pk);
+
+    // m2mMdl, m2mFk, searchFks, otherFks, externalFks
+    List<Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>>> searchSchemas =
+        GetSearchResources(Model, Context);
+
+
 #>
 
 <sfrmbs:<#= SformUserControlBaseClassName #> 
@@ -198,6 +224,7 @@
 
              xmlns:sfrmbs="<#= sfrmBasePrefix #>" 
              xmlns:wsfuc="<#= wsfucPrefix #>" 
+             xmlns:usfuc="<#= usfucPrefix #>" 
              xmlns:fontIcons="<#= IconFontPrefix #>"
              xmlns:tpgnuc="<#= tpgnucPrefix #>" 
              xmlns:invboolcnv="<#= invboolcnvPrefix #>"
@@ -220,21 +247,195 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <wsfuc:<#= WebServiceFilterUserControlClassName #> Grid.Row="0" 
-                <#= IsDestroyedPropertyName #>="{Binding <#= IsDestroyedPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
-                IsVisible="{Binding <#= ShowFilterPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
-                IsEnabled="{Binding BindingContext.<#= IsInQueryPropertyName #>, Mode=OneWay, Converter={StaticResource <#= InverseBooleanConverterClassName #>}, Source={x:Reference sformUsrCntrlRootNode}}"
-                <#= CaptionPropertyName #>="{Binding <#= CaptionPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
-                <#= ShowBackBtnPropertyName #>="{Binding <#= ShowBackBtnPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
-                <#= ShowAddFilterBtnPropertyName #>="{Binding <#= ShowAddFilterBtnPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
-                <#= HiddenFiltersPropertyName #>="{Binding BindingContext.<#= HiddenFiltersVMPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
-                <#= FilterDefinitionsPropertyName #>="{Binding BindingContext.<#= FilterDefinitionsPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
-                <#= ContainerMenuItemsPropertyName #>="{Binding <#= ContainerMenuItemsPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
-                <#= FilterHeightPropertyName #>="{Binding <#= FilterHeightPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
-                <#= ContainerMenuItemsCommandPropertyName #>="{Binding <#= OnContainerMenuItemsCommandPropertyName #>, Mode=OneTime, Source={x:Reference sformUsrCntrlRootNode}}"
-                <#= NavigationBackCommandPropertyName #>="{Binding <#= OnNavigationBackCommandPropertyName #>, Mode=OneTime, Source={x:Reference sformUsrCntrlRootNode}}"   
-                <#= FilterCommandPropertyName #>="{Binding BindingContext.<#= ApplyFilterCommandPropertyName #>, Mode=OneTime, Source={x:Reference sformUsrCntrlRootNode} }"
-                />
+            <ContentView ControlTemplate="{StaticResource <#= NoSearchMethodPropertyName #>}" Grid.Row="0" >
+                <ContentView.Resources>
+                    <ResourceDictionary>
+                        <ControlTemplate x:Key="<#= NoSearchMethodPropertyName #>">
+                                <Label Text="Search Method has not been selected"/>
+                        </ControlTemplate> 
+
+<#
+    if(searchSchemas != null) {
+        foreach(var sch in searchSchemas) {
+            ModelViewSerializable m2mModel = sch.Item1;
+#>
+                        <ControlTemplate x:Key="<#= ScanByVwModePropertyName + m2mModel.ViewName #>">
+                            <usfuc:<#= UniqServiceFilterUserControlClassName #>
+                                <#= IsDestroyedPropertyName #>="{Binding BindingContext.<#= IsSearchDestroyedPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
+
+                                <#= CaptionPropertyName #>="{Binding <#= CaptionPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
+                                <#= ShowBackBtnPropertyName #>="{Binding <#= ShowBackBtnPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
+                                <#= NavigationBackCommandPropertyName #>="{Binding <#= OnNavigationBackCommandPropertyName #>, Mode=OneTime, Source={x:Reference sformUsrCntrlRootNode}}"   
+                                <#= ContainerMenuItemsPropertyName #>="{Binding <#= ContainerMenuItemsPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
+                                <#= FilterHeightPropertyName #>="{Binding <#= FilterHeightPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
+                                <#= ContainerMenuItemsCommandPropertyName #>="{Binding <#= OnContainerMenuItemsCommandPropertyName #>, Mode=OneTime, Source={x:Reference sformUsrCntrlRootNode}}"
+
+                                <#= FilterDefinitionsPropertyName #>="{Binding BindingContext.<#= ScanByVwModePropertyName + m2mModel.ViewName + FilterDefinitionsPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
+                                <#= FilterCommandPropertyName #>="{Binding BindingContext.<#= ApplyFilterCommandPropertyName #>, Mode=OneTime, Source={x:Reference sformUsrCntrlRootNode} }"
+                                <#= IsGridFlexPropertyName #>="{Binding BindingContext.<#= IsSearchGridFlexPropertyName #>, Mode=OneTime, Source={x:Reference sformUsrCntrlRootNode} }"
+                                <#= TextChangedCommandPropertyName #>="{Binding BindingContext.<#= ScanByVwModePropertyName + m2mModel.ViewName +  TextChangedCommandPropertyName #>, Mode=OneTime, Source={x:Reference sformUsrCntrlRootNode} }"
+                                <#= QuerySubmittedCommandPropertyName #>="{Binding BindingContext.<#= ScanByVwModePropertyName + m2mModel.ViewName +  QuerySubmittedCommandPropertyName #>, Mode=OneTime, Source={x:Reference sformUsrCntrlRootNode} }"
+<#
+        {
+            int k = 1;
+            foreach(KeyValuePair<ModelViewForeignKeySerializable,int> kvp in sch.Item3) {
+                ModelViewSerializable searchModel = GetViewByName(Context, kvp.Key.ViewName);
+                ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable = GetFirstPropOfFirstUniqueKey(searchModel);
+
+#>
+                                ItemsSource<#= k #>="{Binding BindingContext.<#= ScanByVwModePropertyName + m2mModel.ViewName + GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) + "ItemsSource" #>, Mode=OneTime, Source={x:Reference sformUsrCntrlRootNode} }"
+                                Text<#= k #>="{Binding BindingContext.<#= ScanByVwModePropertyName + m2mModel.ViewName + GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) + "Text" #>, Mode=OneTime, Source={x:Reference sformUsrCntrlRootNode} }"
+<#
+                k++;
+            }
+        }
+#>            
+                            />
+                        </ControlTemplate> 
+<#
+        }
+    }
+    if (Model.IsWebApiSelectOneByPrimarykey) {
+        for(int i = 0; i < uniqueKeys.Count; i++) { 
+            string indErrrorText = "";
+            bool indIsCorrect = CheckModelIfIndexIsCorrect(Model, uniqueKeys[i], out indErrrorText);
+            if (!indIsCorrect) {
+#>
+<!--
+
+ Could not generate fragment of code
+ Primary/Unique Index Is not correct:
+ <#= indErrrorText #>
+
+ -->
+ <#
+            } else {
+                string caption = "Primary";
+                if(!uniqueKeys[i].IsPrimary) {
+                    caption = uniqueKeys[i].UniqueKeyName;
+                }
+#>
+                        <ControlTemplate x:Key="<#= ScanByUkModePropertyName + caption #>">
+                            <usfuc:<#= UniqServiceFilterUserControlClassName #>
+                                <#= IsDestroyedPropertyName #>="{Binding BindingContext.<#= IsSearchDestroyedPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
+
+                                <#= CaptionPropertyName #>="{Binding <#= CaptionPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
+                                <#= ShowBackBtnPropertyName #>="{Binding <#= ShowBackBtnPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
+                                <#= NavigationBackCommandPropertyName #>="{Binding <#= OnNavigationBackCommandPropertyName #>, Mode=OneTime, Source={x:Reference sformUsrCntrlRootNode}}"   
+                                <#= ContainerMenuItemsPropertyName #>="{Binding <#= ContainerMenuItemsPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
+                                <#= FilterHeightPropertyName #>="{Binding <#= FilterHeightPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
+                                <#= ContainerMenuItemsCommandPropertyName #>="{Binding <#= OnContainerMenuItemsCommandPropertyName #>, Mode=OneTime, Source={x:Reference sformUsrCntrlRootNode}}"
+
+                                <#= FilterDefinitionsPropertyName #>="{Binding BindingContext.<#= ScanByUkModePropertyName + caption + FilterDefinitionsPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
+                                <#= FilterCommandPropertyName #>="{Binding BindingContext.<#= ApplyFilterCommandPropertyName #>, Mode=OneTime, Source={x:Reference sformUsrCntrlRootNode} }"
+                                <#= IsGridFlexPropertyName #>="{Binding BindingContext.<#= IsSearchGridFlexPropertyName #>, Mode=OneTime, Source={x:Reference sformUsrCntrlRootNode} }"
+
+                                <#= TextChangedCommandPropertyName #>="{Binding BindingContext.<#= ScanByUkModePropertyName + caption +  TextChangedCommandPropertyName #>, Mode=OneTime, Source={x:Reference sformUsrCntrlRootNode} }"
+                                <#= QuerySubmittedCommandPropertyName #>="{Binding BindingContext.<#= ScanByUkModePropertyName + caption +  QuerySubmittedCommandPropertyName #>, Mode=OneTime, Source={x:Reference sformUsrCntrlRootNode} }"
+<#
+        {
+            int k = 1;
+            foreach(ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable in uniqueKeys[i].UniqueKeyProperties) {
+#>
+                                Text<#= k #>="{Binding BindingContext.<#= ScanByUkModePropertyName + caption + GetModelPropertyName(modelViewPropertyOfVwSerializable, Model) + "Text" #>, Mode=OneTime, Source={x:Reference sformUsrCntrlRootNode} }"
+                                ItemsSource<#= k #>="{Binding BindingContext.<#= ScanByUkModePropertyName + caption + "ItemsSource" #>, Mode=OneTime, Source={x:Reference sformUsrCntrlRootNode} }"
+<#
+                k++;
+            }
+        }
+#>
+                            />
+                        </ControlTemplate> 
+<#
+            }
+        }
+    }
+#>
+                        <ControlTemplate x:Key="<#= FullScanPropertyName #>">
+                            <wsfuc:<#= WebServiceFilterUserControlClassName #> 
+                                <#= IsDestroyedPropertyName #>="{Binding BindingContext.<#= IsSearchDestroyedPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
+                                IsVisible="{Binding <#= ShowFilterPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
+                                IsEnabled="{Binding BindingContext.<#= IsInQueryPropertyName #>, Mode=OneWay, Converter={StaticResource <#= InverseBooleanConverterClassName #>}, Source={x:Reference sformUsrCntrlRootNode}}"
+                                <#= CaptionPropertyName #>="{Binding <#= CaptionPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
+                                <#= ShowBackBtnPropertyName #>="{Binding <#= ShowBackBtnPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
+                                <#= ShowAddFilterBtnPropertyName #>="{Binding <#= ShowAddFilterBtnPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
+                                <#= HiddenFiltersPropertyName #>="{Binding BindingContext.<#= HiddenFiltersVMPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
+                                <#= FilterDefinitionsPropertyName #>="{Binding BindingContext.<#= FilterDefinitionsPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
+                                <#= ContainerMenuItemsPropertyName #>="{Binding <#= ContainerMenuItemsPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
+                                <#= FilterHeightPropertyName #>="{Binding <#= FilterHeightPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
+                                <#= ContainerMenuItemsCommandPropertyName #>="{Binding <#= OnContainerMenuItemsCommandPropertyName #>, Mode=OneTime, Source={x:Reference sformUsrCntrlRootNode}}"
+                                <#= NavigationBackCommandPropertyName #>="{Binding <#= OnNavigationBackCommandPropertyName #>, Mode=OneTime, Source={x:Reference sformUsrCntrlRootNode}}"   
+                                <#= FilterCommandPropertyName #>="{Binding BindingContext.<#= ApplyFilterCommandPropertyName #>, Mode=OneTime, Source={x:Reference sformUsrCntrlRootNode} }"
+                                />
+                        </ControlTemplate> 
+
+                    </ResourceDictionary>
+                </ContentView.Resources>
+                <ContentView.Triggers>
+
+                    <MultiTrigger TargetType="ContentView">
+                        <MultiTrigger.Conditions>
+                            <BindingCondition Binding="{Binding BindingContext.<#= SearchMethodPropertyName #>, Source={x:Reference sformUsrCntrlRootNode}}" Value="<#= FullScanPropertyName #>"/>
+                        </MultiTrigger.Conditions>
+                        <Setter Property="ControlTemplate" Value="{StaticResource <#= FullScanPropertyName #>}" />
+                    </MultiTrigger>
+
+<#
+    if(searchSchemas != null) {
+        foreach(var sch in searchSchemas) {
+            ModelViewSerializable m2mModel = sch.Item1;
+#>
+                    <MultiTrigger TargetType="ContentView">
+                        <MultiTrigger.Conditions>
+                            <BindingCondition Binding="{Binding BindingContext.<#= SearchMethodPropertyName #>, Source={x:Reference sformUsrCntrlRootNode}}" Value="<#= ScanByVwModePropertyName + m2mModel.ViewName #>"/>
+                        </MultiTrigger.Conditions>
+                        <Setter Property="ControlTemplate" Value="{StaticResource <#= ScanByVwModePropertyName + m2mModel.ViewName #>}" />
+                    </MultiTrigger>
+<#
+        }
+    }
+    if (Model.IsWebApiSelectOneByPrimarykey) {
+        for(int i = 0; i < uniqueKeys.Count; i++) { 
+            string indErrrorText = "";
+            bool indIsCorrect = CheckModelIfIndexIsCorrect(Model, uniqueKeys[i], out indErrrorText);
+            if (!indIsCorrect) {
+#>
+<!--
+
+ Could not generate fragment of code
+ Primary/Unique Index Is not correct:
+ <#= indErrrorText #>
+
+ -->
+ <#
+            } else {
+                string caption = "Primary";
+                if(!uniqueKeys[i].IsPrimary) {
+                    caption = uniqueKeys[i].UniqueKeyName;
+                }
+#>
+                    <MultiTrigger TargetType="ContentView">
+                        <MultiTrigger.Conditions>
+                            <BindingCondition Binding="{Binding BindingContext.<#= SearchMethodPropertyName #>, Source={x:Reference sformUsrCntrlRootNode}}" Value="<#= ScanByUkModePropertyName + caption #>"/>
+                        </MultiTrigger.Conditions>
+                        <Setter Property="ControlTemplate" Value="{StaticResource <#= ScanByUkModePropertyName + caption #>}" />
+                    </MultiTrigger>
+<#
+            }
+        }
+    }
+#>
+
+                    <MultiTrigger TargetType="ContentView">
+                        <MultiTrigger.Conditions>
+                            <BindingCondition Binding="{Binding BindingContext.<#= SearchMethodPropertyName #>, Source={x:Reference sformUsrCntrlRootNode}}" Value="<#= NoSearchMethodPropertyName #>"/>
+                        </MultiTrigger.Conditions>
+                        <Setter Property="ControlTemplate" Value="{StaticResource <#= NoSearchMethodPropertyName #>}" />
+                    </MultiTrigger>
+                </ContentView.Triggers>
+            </ContentView>
+
+
 <!--
             FilterOperators="{Binding FilterOperators, Source={x:Reference sformUsrCntrlRootNode}}"
 -->

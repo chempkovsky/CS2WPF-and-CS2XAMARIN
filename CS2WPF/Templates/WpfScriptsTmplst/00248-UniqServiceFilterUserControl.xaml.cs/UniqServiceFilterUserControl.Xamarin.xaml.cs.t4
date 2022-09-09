@@ -19,6 +19,8 @@ using Xamarin.Forms.Xaml;
 using Xamarin.Essentials;
 using System.Threading.Tasks;
 using System.Linq;
+using System.Collections;
+
 <#
     string convertHelperModelFolder      = "00150-ConvertHelper.cs";
     string convertHelperModelClassName   = GetModelClassName(Model, convertHelperModelFolder);
@@ -32,7 +34,7 @@ using System.Linq;
     string WebServiceFilterMenuViewModelClassName       = GetModelClassName(Model, WebServiceFilterMenuViewModelFolder);
     string WebServiceFilterMenuViewModelNameSpace       = GetModelNameSpace(Model, WebServiceFilterMenuViewModelFolder);
 
-    string IUniqServiceFilterDefInterfaceFolder         = "00201-IUniqServiceFilterDefInterface.cs";
+    string IUniqServiceFilterDefInterfaceFolder         = "00246-IUniqServiceFilterDefInterface.cs";
     string IUniqServiceFilterDefInterfaceClassName      = GetModelClassName(Model, IUniqServiceFilterDefInterfaceFolder);
     string IUniqServiceFilterDefInterfaceNameSpace      = GetModelNameSpace(Model, IUniqServiceFilterDefInterfaceFolder);
 
@@ -74,6 +76,8 @@ using System.Linq;
     string IsDestroyedPropertyName              = "IsDestroyed";
     string OnDestroyedPropertyName              = "OnDestroyed";
     string IsGridFlexPropertyName               = "IsGridFlex";
+    string TextChangedCommandPropertyName       = "TextChangedCommand";
+    string QuerySubmittedCommandPropertyName    = "QuerySubmitted";
 
 
     List<string> nmSpaces = new List<string>();
@@ -198,6 +202,19 @@ namespace <#= UniqServiceFilterUserControlNameSpace #> {
             if (inst != null)
             {
                 if(inst.<#= IsDestroyedPropertyName #>) return;
+                bool gf = inst.<#= IsGridFlexPropertyName #>;
+                if(gf) inst.<#= IsGridFlexPropertyName #> = false;
+<#
+    for (int i = 1; i < 9; i++) {
+#>
+                inst.OnPropertyChanged("IsVisible<#= i #>");
+                inst.OnPropertyChanged("DisplayMemberPath<#= i #>");
+                inst.OnPropertyChanged("TextMemberPath<#= i #>");
+                inst.OnPropertyChanged("Caption<#= i #>");
+<#
+    }
+#>
+                if(gf) inst.<#= IsGridFlexPropertyName #> = true;
                 inst.<#= InternalContentProperty #>Changed();
             }
         }
@@ -383,6 +400,7 @@ namespace <#= UniqServiceFilterUserControlNameSpace #> {
         }
         #endregion
 
+        #region <#= IsDestroyedPropertyName #>
         public virtual void <#= OnDestroyedPropertyName #>()
         {
             RemoveBinding(<#= IsDestroyedPropertyName #>Property);
@@ -396,12 +414,17 @@ namespace <#= UniqServiceFilterUserControlNameSpace #> {
             RemoveBinding(<#= FilterCommandPropertyName #>Property);
             RemoveBinding(<#= ContainerMenuItemsCommandPropertyName #>Property);
             RemoveBinding(<#= FilterHeightPropertyName #>Property);
+            RemoveBinding(<#= TextChangedCommandPropertyName #>Property);
+            RemoveBinding(<#= QuerySubmittedCommandPropertyName #>Property);
             <#= IsGridFlexPropertyName #> = false;
             <#= FilterHeightPropertyName #> = -1d; // unsubscribe from event
             <#= NavigationBackCommandPropertyName #> = null;
             <#= ContainerMenuItemsPropertyName #> = null;
             <#= FilterCommandPropertyName #> = null;
+            <#= TextChangedCommandPropertyName #> = null;
+            <#= QuerySubmittedCommandPropertyName #> = null;
             <#= ContainerMenuItemsCommandPropertyName #> = null;
+            <#= FilterDefinitionsPropertyName #> = null;
             <#= CurrentContainerMenuItemsPropertyName #>Clear();
         }
         private static void <#= IsDestroyedPropertyName #>Changed(BindableObject d, object oldValue, object newValue)
@@ -428,12 +451,67 @@ namespace <#= UniqServiceFilterUserControlNameSpace #> {
                 SetValue(<#= IsDestroyedPropertyName #>Property, value);
             }
         }
+        #endregion
+
+        #region AutoSuggestBox
+        public static readonly BindableProperty <#= TextChangedCommandPropertyName #>Property =
+            BindableProperty.Create(nameof(<#= TextChangedCommandPropertyName #>), typeof(ICommand), typeof(<#= UniqServiceFilterUserControlClassName #>), 
+            null); 
+        public ICommand <#= TextChangedCommandPropertyName #>
+        {
+            get { return (ICommand)GetValue(<#= TextChangedCommandPropertyName #>Property); }
+            set { SetValue(<#= TextChangedCommandPropertyName #>Property, value); }
+        }
+        
+        public static readonly BindableProperty <#= QuerySubmittedCommandPropertyName #>Property =
+            BindableProperty.Create(nameof(<#= QuerySubmittedCommandPropertyName #>), typeof(ICommand), typeof(<#= UniqServiceFilterUserControlClassName #>), 
+            null); 
+        public ICommand <#= QuerySubmittedCommandPropertyName #>
+        {
+            get { return (ICommand)GetValue(<#= QuerySubmittedCommandPropertyName #>Property); }
+            set { SetValue(<#= QuerySubmittedCommandPropertyName #>Property, value); }
+        }
+        protected void TextChanged(object sender, dotMorten.Xamarin.Forms.AutoSuggestBoxTextChangedEventArgs e, int k) {
+            if((<#= IsDestroyedPropertyName #>) || (<#= FilterDefinitionsPropertyName #> == null)) return;
+            if ((e == null) || (<#= FilterDefinitionsPropertyName #>.Count() < k ))  return;
+            dotMorten.Xamarin.Forms.AutoSuggestBox asbsender = sender as dotMorten.Xamarin.Forms.AutoSuggestBox;
+            if(asbsender == null) return;
+            ICommand cmd = <#= TextChangedCommandPropertyName #>;
+            if (cmd != null)
+            {
+                (object Cmpnt, object Sender, <#= IUniqServiceFilterDefInterfaceClassName #> FltDef, int Reason, string QueryText) prm = 
+                    (this, sender, <#= FilterDefinitionsPropertyName #>[k-1], (int)e.Reason, asbsender.Text);
+                if(cmd.CanExecute(prm)) cmd.Execute(prm);
+            }
+        }
+        protected void QuerySubmitted<#= k #>(object sender, dotMorten.Xamarin.Forms.AutoSuggestBoxQuerySubmittedEventArgs e, int k) {
+            if ((<#= IsDestroyedPropertyName #>) || (<#= FilterDefinitionsPropertyName #> == null)) return;
+            if ((e == null) || (<#= FilterDefinitionsPropertyName #>.Count() < k ))  return;
+            dotMorten.Xamarin.Forms.AutoSuggestBox asbsender = sender as dotMorten.Xamarin.Forms.AutoSuggestBox;
+            if(asbsender == null) return;
+            ICommand cmd = <#= QuerySubmittedCommandPropertyName #>;
+            if (cmd != null)
+            {
+                (object Cmpnt, object Sender, <#= IUniqServiceFilterDefInterfaceClassName #> FltDef, object ChosenSuggestion, string QueryText) prm = 
+                    (this, sender, <#= FilterDefinitionsPropertyName #>[k-1], e.ChosenSuggestion, e.QueryText);
+                if(cmd.CanExecute(prm)) cmd.Execute(prm);
+            }
+        }
 
 <#
     for (int i = 0; i < 2; i++) {
         for(int j = 0; j < 4;j++) {
             int k = i * 4 + j+1;
 #>
+        public string Caption<#= k #> {
+            get {
+                if(<#= FilterDefinitionsPropertyName #> != null) {
+                    if(<#= FilterDefinitionsPropertyName #>.Count() >= <#= k #>)
+                        return <#= FilterDefinitionsPropertyName #>[<#= k-1 #>].fltrCaption;
+                }
+                return "";
+            }
+        }
         public bool IsVisible<#= k #> {
             get {
                 if(<#= FilterDefinitionsPropertyName #> != null) {
@@ -487,14 +565,16 @@ namespace <#= UniqServiceFilterUserControlNameSpace #> {
             }
         }
         public void TextChanged<#= k #>(object sender, dotMorten.Xamarin.Forms.AutoSuggestBoxTextChangedEventArgs e) {
+            TextChanged(sender, e, <#= k #>);
         }
         public void QuerySubmitted<#= k #>(object sender, dotMorten.Xamarin.Forms.AutoSuggestBoxQuerySubmittedEventArgs e) {
+            QuerySubmitted(sender, e, <#= k #>);
         }
 <#
         }
     }
 #>
-
+        #endregion
     }
 }
 
