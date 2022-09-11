@@ -112,6 +112,7 @@ using System.Linq;
     string GetOneByMethodNamePrefix             = "getoneby";
     string Dict2TupleMethodName                 = "Dict2Tuple";
     string Tuple2DictMethodName                 = "Tuple2Dict";
+    string FilterRslt2FilterMethodName          = "FilterRslt2Filter";
 
     List<ModelViewUniqueKeyOfVwSerializable> uniqueKeys = new List<ModelViewUniqueKeyOfVwSerializable>();
     {
@@ -1134,6 +1135,43 @@ namespace <#= modelServiceNameSpace #> {
                         fltrValue = r.GetType().GetProperty(i).GetValue(r)
                     });
                 }
+            }
+            return rslt;
+        }
+        public <#= modelFilterInterfaceClassName #> <#= FilterRslt2FilterMethodName #>(<#= IWebServiceFilterRsltInterfaceClassName #> e, <#= modelFilterInterfaceClassName #> dest) {
+            <#= modelFilterInterfaceClassName #> flt = dest;
+            if(dest is null) {
+                flt = GetFilter();
+            }
+            if(e is null) return flt;
+            if((!string.IsNullOrEmpty(e.fltrError)) || string.IsNullOrEmpty(e.fltrName)) return flt;
+            switch(e.fltrName) {
+<#
+    foreach(ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) { 
+        if (prop.IsUsedByfilter) {
+#>
+                case "<#= GetModelPropertyName(prop, Model) #>":
+                    if (flt.<#= GetModelPropertyName(prop, Model) #> == null) flt.<#= GetModelPropertyName(prop, Model) #> = new List<<#= GetPropertyTypeName(prop) #>>();
+                    flt.<#= GetModelPropertyName(prop, Model) #>.Add((<#= GetPropertyTypeName(prop) #>)e.fltrValue);
+                    if (flt.<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #> == null) flt.<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #> = new List<string>();
+                    flt.<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #>.Add(e.fltrOperator);
+                    break;
+<#
+        }
+    }
+#>
+                default: break;
+            }
+            return flt;
+        }
+        public <#= modelFilterInterfaceClassName #> <#= FilterRslt2FilterMethodName #>(IList<<#= IWebServiceFilterRsltInterfaceClassName #>> src, <#= modelFilterInterfaceClassName #> dest) {
+            <#= modelFilterInterfaceClassName #> rslt = dest;
+            if(dest is null) {
+                rslt = GetFilter();
+            }
+            if(src is null) return rslt;
+            foreach(<#= IWebServiceFilterRsltInterfaceClassName #> e in src) {
+                <#= FilterRslt2FilterMethodName #>(e, rslt);
             }
             return rslt;
         }

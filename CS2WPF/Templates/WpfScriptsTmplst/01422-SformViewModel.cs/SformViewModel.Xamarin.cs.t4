@@ -209,6 +209,13 @@ using Prism.Navigation;
     string QuerySubmittedCommandPropertyName        = "QuerySubmitted";
     string GetManyByRepUnqMethodNamePrefix          = "getmanybyrepunq";
     string GetManyByRepPrimMethodNamePrefix         = "getmanybyrepprim";
+    string FullScanPropertyName                     = "FullScan";
+    string SearchDoSelectRowMethodName              = "SrchDoSlctRw";
+    string HiddenFilterAsFltRsltSuffix              = "HiddenFilterAsFltRslt";
+    string HiddenFilterByRowSuffix                  = "HiddenFilterByRow";
+    string FilterRslt2FilterMethodName              = "FilterRslt2Filter";
+    string ShowErrorMethodName                      = "ShowErrorMessage";
+    string UnfocusedCommandPropertyName             = "UnfocusedCommand";
 
     string OnDestroyPropertyName                    = "OnDestroy";
 
@@ -339,7 +346,7 @@ namespace <#= SformViewModelNameSpace #> {
         } // if(searchSchemas!= null) {...}
 #>    
 
-
+        bool CnFllscn = false;
         public <#= SformViewModelClassName #>(<#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName  #>, <#= modelServiceInterfaceClassName #> <#= FormRootServicePropertyName #>, 
 <#
         if(searchSchemas!= null) {
@@ -360,12 +367,10 @@ namespace <#= SformViewModelNameSpace #> {
             }
         } // if(searchSchemas!= null) {...}
 #>    
-
             IDialogService dialogService) {
             this.<#= AppSettingServicePropertyName #> = <#= AppSettingServicePropertyName #>;
             this.<#= FormRootServicePropertyName #> = <#= FormRootServicePropertyName #>;
             this._dialogService = dialogService;
-
 <#
         if(searchSchemas!= null) {
             List<ModelViewSerializable> smds = new List<ModelViewSerializable>();
@@ -386,6 +391,7 @@ namespace <#= SformViewModelNameSpace #> {
         } // if(searchSchemas!= null) {...}
 #>    
             _<#= TableMenuItemsVMPropertyName #> = GetDefault<#= TableMenuItemsVMPropertyName #>();
+            CnFllscn = (<#= AppSettingServicePropertyName #>.GetViewModelMask("<#= Model.ViewName #>") & 16) == 16;
         }
         #region INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;
@@ -432,6 +438,7 @@ namespace <#= SformViewModelNameSpace #> {
                 bool v = (bool)newValue;
                 if ((!<#= IsOnLoadedCalledPropertyName #>) && v) {
                     <#= IsOnLoadedCalledPropertyName #> = true;
+                    defineSearchMethod();
                     await onFilter();
                 } else {
                     <#= IsOnLoadedCalledPropertyName #> = v;
@@ -691,7 +698,23 @@ namespace <#= SformViewModelNameSpace #> {
                     if(mi.Command.CanExecute(mi)) lst.Add(mi.Caption);
                 } else lst.Add(mi.Caption);
             }
+            IList<<#= IWebServiceFilterMenuInterfaceClassName #>> timis = defineSearchMethodMenuItemsData();
+            foreach(<#= IWebServiceFilterMenuInterfaceClassName #> mi in timis) {
+                lst.Add(mi.Caption);
+            }
             string action = await Application.Current.MainPage.DisplayActionSheet("Table commands:", "Cancel", null, lst.ToArray());
+            if(action == "Cancel") return;
+            foreach(<#= IWebServiceFilterMenuInterfaceClassName #> mi in timis) {
+                if(mi.Caption == action) {
+                    if(<#= SearchMethodPropertyName #> == mi.Id) return;
+                    <#= IsSearchGridFlexPropertyName #> = false;
+                    <#= IsSearchDestroyedPropertyName #> = true;
+                    <#= IsSearchGridFlexPropertyName #> = true;
+                    <#= IsSearchDestroyedPropertyName #> = false;
+                    <#= SearchMethodPropertyName #> = mi.Id;
+                    return;
+                }
+            }
             foreach(<#= IWebServiceFilterMenuInterfaceClassName #> mi in <#= TableMenuItemsVMPropertyName #>) {
                 if(mi.Caption == action) {
                     if(mi.Id == "TableRefreshMI") {
@@ -816,6 +839,7 @@ namespace <#= SformViewModelNameSpace #> {
     }
 #>
             Actual<#= CurrentPagePropertyName #> = 0;
+            defineSearchMethod();
             await onFilter();
         }
         IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>> _<#= HiddenFiltersVMPropertyName #> = new ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>();
@@ -1060,10 +1084,43 @@ namespace <#= SformViewModelNameSpace #> {
         #endregion
 
         #region Filter
+        protected void ClearDataSource() {
+                <#= IsDsDestroyedPropertyName #> = true;
+                <#= DataSourcePropertyName #> = null;
+                <#= IsDsDestroyedPropertyName #> = false;
+        }
         protected async Task onFilter() {
             if(<#= IsDsDestroyedPropertyName #>) return;
             if ((<#= IsInQueryPropertyName #>) || (!<#= IsOnLoadedCalledPropertyName #>)) return;
             <#= IsInQueryPropertyName #> = true;
+            if(<#= SearchMethodPropertyName #> == "<#= NoSearchMethodPropertyName #>") {
+                ClearDataSource();
+                <#= DataSourcePropertyName #> = new ObservableCollection<<#= modelInterfaceClassName #>>();
+                <#= SelectedRowPropertyName #> = null;
+                <#= IsInQueryPropertyName #> = false;
+                return;
+            }
+
+<#
+        if(searchSchemas!= null) {
+            if(searchSchemas.Count > 0) {
+#>
+        switch (this.curIndexMenuItemsData.id) {
+<#
+            foreach(var sch in searchSchemas) {
+                ModelViewSerializable m2mModel = sch.Item1;
+#>
+            case "<#= ScanByVwModePropertyName + m2mModel.ViewName #>":  
+                <#= SearchDoSelectRowMethodName + m2mModel.ViewName #>();
+                return;
+<#
+            }
+#>
+        }
+<#
+            }
+        }
+#>
 
             <#= modelFilterInterfaceClassName #> flt  = <#= FormRootServicePropertyName #>.GetFilter();
             flt.page = this.<#= CurrentPagePropertyName #>; 
@@ -1209,9 +1266,7 @@ namespace <#= SformViewModelNameSpace #> {
             if (rw != null) {
                 indx = ds.IndexOf(rw);
                 if (indx > -1) {
-                    <#= IsDsDestroyedPropertyName #> = true;
-                    <#= DataSourcePropertyName #> = null;
-                    <#= IsDsDestroyedPropertyName #> = false;
+                    ClearDataSource();
                     ds.RemoveAt(indx);
                     <#= DataSourcePropertyName #> = ds;
                     //<#= InternalContentProperty #>Changed();
@@ -1288,8 +1343,109 @@ namespace <#= SformViewModelNameSpace #> {
     if(searchSchemas != null) {
         foreach(var sch in searchSchemas) {
             ModelViewSerializable m2mModel = sch.Item1;
+            ModelViewForeignKeySerializable foreignKey2Model = sch.Item2;
 #>
         #region <#= ScanByVwModePropertyName + m2mModel.ViewName + FilterDefinitionsPropertyName #>
+        protected void <#= SearchDoSelectRowMethodName + m2mModel.ViewName #>() {
+            <#= GetFilterInterfaceName(m2mModel) #> dtlflt = <#= FormServicePrefixPropertyName + m2mModel.ViewName #>.GetFilter();
+            dtlflt.page = this.<#= CurrentPagePropertyName #>; 
+            dtlflt.pagesize = this.<#= RowsPerPagePropertyName #>;
+            bool isFltSet = true;
+<#
+            foreach(KeyValuePair<ModelViewForeignKeySerializable,int> kvp in sch.Item3) {
+                ModelViewSerializable searchModel = GetViewByName(Context, kvp.Key.ViewName);
+                ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable = GetFirstPropOfFirstUniqueKey(searchModel);
+#>
+            if(isFltSet) {
+                if (<#= ScanByVwModePropertyName + m2mModel.ViewName + GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) + "Item" #> is null) {  
+                    isFltSet = false;
+                } else {
+                    IList<<#= IWebServiceFilterRsltInterfaceClassName #>> dfltrslt = 
+                        <#= FormServicePrefixPropertyName + m2mModel.ViewName #>.get<#= HiddenFilterAsFltRsltSuffix #>(this.<#= FormServicePrefixPropertyName + m2mModel.ViewName #>.get<#= HiddenFilterByRowSuffix #>(<#= ScanByVwModePropertyName + m2mModel.ViewName + GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) + "Item" #>, "<#= kvp.Key.NavigationName #>"));
+                    if (dfltrslt is null) {
+                        isFltSet = false;
+                    } else {
+                        <#= FormServicePrefixPropertyName + m2mModel.ViewName #>.<#= FilterRslt2FilterMethodName #>(dfltrslt, dtlflt);
+                    } 
+                } 
+            }
+<#
+            }
+#>
+            if(!isFltSet) {
+                <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("http", "Could not apply filter as not all attributes are set");
+            }
+            // by requirements all common foreignkey props have the same names for <#= m2mModel.ViewName #> and <#= Model.ViewName #>
+            foreach(var fld in reqHiddenProps["<#= m2mModel.ViewName #>"]) { 
+                <#= IWebServiceFilterRsltInterfaceClassName #> hf = this.<#= HiddenFiltersVMPropertyName #>.FirstOrDefault(f => f.fltrName == fld);
+                if(hf is not null) {
+                    <#= FormServicePrefixPropertyName + m2mModel.ViewName #>.<#= FilterRslt2FilterMethodName #>(hf, dtlflt);
+                }
+            }
+            foreach(var fld in extHiddenProps["<#= m2mModel.ViewName #>"]) { 
+                <#= IWebServiceFilterRsltInterfaceClassName #> hf = this.<#= HiddenFiltersVMPropertyName #>.FirstOrDefault(f => f.fltrName == fld);
+                if(hf is not null) {
+                    <#= FormServicePrefixPropertyName + m2mModel.ViewName #>.<#= FilterRslt2FilterMethodName #>(hf, dtlflt);
+                }
+            }
+            <#= GetPageInterfaceName(m2mModel) #> vd = await <#= FormServicePrefixPropertyName + m2mModel.ViewName #>.<#= GetManyByRepPrimMethodNamePrefix #>(dtlflt);
+            if(vd is null) {
+                ClearDataSource();
+                <#= DataSourcePropertyName #> = new ObservableCollection<<#= modelInterfaceClassName #>>();
+                <#= SelectedRowPropertyName #> = null;
+                return;
+            }
+            // <#= RowsPerPagePropertyName #> resets <#= CurrentPagePropertyName #> 
+            // so the order is important: Actual<#= RowsPerPagePropertyName #> must be the first one and Actual<#= CurrentPagePropertyName #> must be the second
+            Actual<#= RowsPerPagePropertyName #> = vd.pagesize;
+            Actual<#= CurrentPagePropertyName #> = vd.page;
+            <#= TotalCountPropertyName #> = vd.total; 
+            if(vd.Items is null) {
+                ClearDataSource();
+                <#= DataSourcePropertyName #> = new ObservableCollection<<#= modelInterfaceClassName #>>();
+                <#= SelectedRowPropertyName #> = null;
+                return;
+            }
+            if(vd.Items.Count < 1) {
+                ClearDataSource();
+                <#= DataSourcePropertyName #> = new ObservableCollection<<#= modelInterfaceClassName #>>();
+                <#= SelectedRowPropertyName #> = null;
+                return;
+            }
+            <#= GetFilterInterfaceName(Model) #> flt = <#= FormRootServicePropertyName #>.GetFilter();
+            flt.page = 0;
+            flt.pagesize = Actual<#= CurrentPagePropertyName #>;
+            foreach(var src in vd.Items) {
+                ILst<<#= IWebServiceFilterRsltInterfaceClassName #>> srcFlt = 
+                    <#= FormServicePrefixPropertyName + m2mModel.ViewName #>.get<#= HiddenFilterAsFltRsltSuffix #>(<#= FormServicePrefixPropertyName + m2mModel.ViewName #>.get<#= HiddenFilterByRowSuffix #>(src, "<#= foreignKey2Model.NavigationName #>"));
+                <#= FormRootServicePropertyName #>.<#= FilterRslt2FilterMethodName #>(srcFlt, flt);
+            }
+            <#= modelPageInterfaceClassName #> rslt = await this.<#= FormRootServicePropertyName #>.<#= GetManyByRepPrimMethodNamePrefix #>(flt);
+            if(rslt != null) {
+                // <#= RowsPerPagePropertyName #> resets <#= CurrentPagePropertyName #> 
+                // so the order is important: Actual<#= RowsPerPagePropertyName #> must be the first one and Actual<#= CurrentPagePropertyName #> must be the second
+                Actual<#= RowsPerPagePropertyName #> = rslt.pagesize;
+                Actual<#= CurrentPagePropertyName #> = rslt.page;
+                <#= TotalCountPropertyName #> = rslt.total; 
+                <#= SelectedRowPropertyName #> = null;
+                ObservableCollection<<#= modelInterfaceClassName #>> ds = <#= DataSourcePropertyName #> as ObservableCollection<<#= modelInterfaceClassName #>>;
+                <#= IsDsDestroyedPropertyName #> = true;
+                if (ds == null) { ds = new ObservableCollection<<#= modelInterfaceClassName #>>(); } else { ds.Clear(); }
+                <#= IsDsDestroyedPropertyName #> = false;
+                <#= DataSourcePropertyName #> = null; 
+                if(rslt.items != null) {
+                    foreach(<#= modelInterfaceClassName #> itm in rslt.items) {
+                        ds.Add(<#= FormRootServicePropertyName #>.<#= CopyToModelNotifyMethodName #>(itm, null));
+                    }
+                }
+                <#= DataSourcePropertyName #> = ds;
+                <#= SelectedRowPropertyName #> = <#= DataSourcePropertyName #>?.FirstOrDefault();
+            } else {
+                ClearDataSource();
+                <#= DataSourcePropertyName #> = new ObservableCollection<<#= modelInterfaceClassName #>>();
+                <#= SelectedRowPropertyName #> = null;
+            }
+        }
         protected IList<<#= IUniqServiceFilterDefInterfaceClassName #>> _<#= ScanByVwModePropertyName + m2mModel.ViewName + FilterDefinitionsPropertyName #> = 
             new List<<#= IUniqServiceFilterDefInterfaceClassName #>>() {
 <#
@@ -1462,6 +1618,7 @@ namespace <#= SformViewModelNameSpace #> {
 #>
                 case "<#= GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) #>":
                     <#= ScanByVwModePropertyName + m2mModel.ViewName + GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) + "Item" #> = tprm.ChosenSuggestion as <#= GetInterfaceName(searchModel) #>;
+                    <#= ScanByVwModePropertyName + m2mModel.ViewName + GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) + "ItemsSource" #> = null;
                     break;
 <#
             }
@@ -1474,6 +1631,40 @@ namespace <#= SformViewModelNameSpace #> {
         {
             return true;
         }
+        protected ICommand _<#= ScanByVwModePropertyName + m2mModel.ViewName + UnfocusedCommandPropertyName #> = null;
+        public ICommand <#= ScanByVwModePropertyName + m2mModel.ViewName + UnfocusedCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= ScanByVwModePropertyName + m2mModel.ViewName + UnfocusedCommandPropertyName #> ?? (_<#= ScanByVwModePropertyName + m2mModel.ViewName +  UnfocusedCommandPropertyName #> = new Command((prm) => <#= ScanByVwModePropertyName + m2mModel.ViewName +  UnfocusedCommandPropertyName #>Execute(prm), (prm) => <#= ScanByVwModePropertyName + m2mModel.ViewName +  UnfocusedCommandPropertyName #>CanExecute(prm)));
+            }
+        }
+        protected void <#= ScanByVwModePropertyName + m2mModel.ViewName +  UnfocusedCommandPropertyName #>Execute(object prm)
+        {
+            if ((<#= IsDsDestroyedPropertyName #>) || (prm is null)) return;
+            (object Cmpnt, object Sender, <#= IUniqServiceFilterDefInterfaceClassName #> FltDef) tprm  = 
+                ((object Cmpnt, object Sender, <#= IUniqServiceFilterDefInterfaceClassName #> FltDef))prm;
+            switch(tprm.FltDef.fltrName) {
+<#
+            foreach(KeyValuePair<ModelViewForeignKeySerializable,int> kvp in sch.Item3) {
+                ModelViewSerializable searchModel = GetViewByName(Context, kvp.Key.ViewName);
+                ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable = GetFirstPropOfFirstUniqueKey(searchModel);
+#>
+                case "<#= GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) #>":
+                    <#= ScanByVwModePropertyName + m2mModel.ViewName + GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) + "ItemsSource" #> = null;
+                    break;
+<#
+            }
+#>
+                default:
+                    break;
+            }
+        }
+        protected bool <#= ScanByVwModePropertyName + m2mModel.ViewName +  UnfocusedCommandPropertyName #>CanExecute(object prm) {
+            return true;
+        }
+
+
         #endregion
 <#
         }
@@ -1520,25 +1711,25 @@ namespace <#= SformViewModelNameSpace #> {
             }
         }
 
-        protected <#= GetInterfaceName(Model) #> _<#= ScanByUkModePropertyName + caption + "Item" #> = null;
-        public <#= GetInterfaceName(Model) #> <#= ScanByUkModePropertyName + caption + "Item" #> {
-            get {
-                return _<#= ScanByUkModePropertyName + caption + "Item" #>;
-            }
-            set {
-                if (_<#= ScanByUkModePropertyName + caption + "Item" #> != value) {
-                    _<#= ScanByUkModePropertyName + caption + "Item" #> = value;
-                    OnPropertyChanged();
 <#
             foreach(ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable in uniqueKeys[i].UniqueKeyProperties) {
 #>
-                    OnPropertyChanged("<#= ScanByUkModePropertyName + caption + GetModelPropertyName(modelViewPropertyOfVwSerializable, Model) + "Text" #>");
-<#
+        protected <#= GetInterfaceName(Model) #> _<#= ScanByUkModePropertyName + caption + GetModelPropertyName(modelViewPropertyOfVwSerializable, Model) + "Item" #> = null;
+        public <#= GetInterfaceName(Model) #> <#= ScanByUkModePropertyName + caption + GetModelPropertyName(modelViewPropertyOfVwSerializable, Model) + "Item" #> {
+            get {
+                return _<#= ScanByUkModePropertyName + caption + GetModelPropertyName(modelViewPropertyOfVwSerializable, Model) + "Item" #>;
             }
-#>
+            set {
+                if (_<#= ScanByUkModePropertyName + caption + GetModelPropertyName(modelViewPropertyOfVwSerializable, Model) + "Item" #> != value) {
+                    _<#= ScanByUkModePropertyName + caption + GetModelPropertyName(modelViewPropertyOfVwSerializable, Model) + "Item" #> = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged("<#= ScanByUkModePropertyName + caption + GetModelPropertyName(modelViewPropertyOfVwSerializable, Model) + "Text" #>");
                 }
             }
         }
+<#
+            }
+#>
         
         protected IList<<#= GetInterfaceName(Model) #>> _<#= ScanByUkModePropertyName + caption +  "ItemsSource" #> = null;
         public IList<<#= GetInterfaceName(Model) #>> <#= ScanByUkModePropertyName + caption + "ItemsSource" #> {
@@ -1559,7 +1750,7 @@ namespace <#= SformViewModelNameSpace #> {
         protected string _<#= ScanByUkModePropertyName + caption + GetModelPropertyName(modelViewPropertyOfVwSerializable, Model) + "Text" #> = null;
         public string <#= ScanByUkModePropertyName + caption + GetModelPropertyName(modelViewPropertyOfVwSerializable, Model) + "Text" #> {
             get {
-                <#= GetInterfaceName(Model) #> dmObj = <#= ScanByUkModePropertyName + caption + "Item" #>;
+                <#= GetInterfaceName(Model) #> dmObj = <#= ScanByUkModePropertyName + caption + GetModelPropertyName(modelViewPropertyOfVwSerializable, Model) + "Item" #>;
                 if(dmObj != null) {
 <#
         if(IsStringInputEx(modelViewPropertyOfVwSerializable, Model)) {
@@ -1631,11 +1822,11 @@ namespace <#= SformViewModelNameSpace #> {
                 default:
                     return;
             }
-            <#= GetInterfaceName(Model) #> itm = <#= ScanByUkModePropertyName + caption + "Item" #>;
+            <#= GetInterfaceName(Model) #> itm = null;
             <#= GetFilterInterfaceName(Model) #> fltr = <#= FormRootServicePropertyName #>.GetFilter();
             fltr.page = 0;
             fltr.pagesize = 15;
-            
+            bool runQuery = true;
 <#
         {
             int k = -1;
@@ -1644,11 +1835,16 @@ namespace <#= SformViewModelNameSpace #> {
                 if (!modelViewPropertyOfVwSerializable.IsUsedByfilter) continue;
                 if(IsUsebByForeignKey(Model, modelViewPropertyOfVwSerializable)) continue;
 #>
-            if ((k > <#= k #>) && (!(itm is null))) { 
-                fltr.<#= GetModelPropertyName(modelViewPropertyOfVwSerializable, Model) #> = new List<<#= GetPropertyTypeName(modelViewPropertyOfVwSerializable) #>>() { itm.<#= GetModelPropertyName(modelViewPropertyOfVwSerializable, Model)#> }; 
-                fltr.<#= GetFilterPropertyOperatorName(modelViewPropertyOfVwSerializable, Model, FilterOperatorSuffix)#> = new List<string>() { "<#= EqualOperator #>" };
+            itm = <#= ScanByUkModePropertyName + caption + GetModelPropertyName(modelViewPropertyOfVwSerializable, Model) + "Item" #>;
+            if (k > <#= k #>)  { 
+                if(itm is null) {
+                    runQuery = false;
+                } else {
+                    fltr.<#= GetModelPropertyName(modelViewPropertyOfVwSerializable, Model) #> = new List<<#= GetPropertyTypeName(modelViewPropertyOfVwSerializable) #>>() { itm.<#= GetModelPropertyName(modelViewPropertyOfVwSerializable, Model)#> }; 
+                    fltr.<#= GetFilterPropertyOperatorName(modelViewPropertyOfVwSerializable, Model, FilterOperatorSuffix)#> = new List<string>() { "<#= EqualOperator #>" };
+                }
              } else if(k == <#= k #>) { 
-                <#= ScanByUkModePropertyName + caption + "Item" #> = null;
+                <#= ScanByUkModePropertyName + caption + GetModelPropertyName(modelViewPropertyOfVwSerializable, Model) + "Item" #> = null;
                 <#= ScanByUkModePropertyName + caption + GetModelPropertyName(modelViewPropertyOfVwSerializable, Model) + "Text" #> = tprm.QueryText;
 <#
                 if(IsPropertyString(modelViewPropertyOfVwSerializable)) {
@@ -1672,11 +1868,15 @@ namespace <#= SformViewModelNameSpace #> {
             }
         }
 #>
-            <#= GetPageInterfaceName(Model) #> rslt = await <#= FormRootServicePropertyName #>.<#= localRouteManyName #>(fltr);
-            if(rslt is null) {
-                <#= ScanByUkModePropertyName + caption + "ItemsSource" #> = null;
+            if (runQuery) {
+                <#= GetPageInterfaceName(Model) #> rslt = await <#= FormRootServicePropertyName #>.<#= localRouteManyName #>(fltr);
+                if(rslt is null) {
+                    <#= ScanByUkModePropertyName + caption + "ItemsSource" #> = null;
+                } else {
+                    <#= ScanByUkModePropertyName + caption + "ItemsSource" #> = rslt.items;
+                }
             } else {
-                <#= ScanByUkModePropertyName + caption + "ItemsSource" #> = rslt.items;
+                <#= ScanByUkModePropertyName + caption + "ItemsSource" #> = null;
             }
         }
         protected bool <#= ScanByUkModePropertyName + caption + TextChangedCommandPropertyName #>CanExecute(object prm)
@@ -1696,9 +1896,42 @@ namespace <#= SformViewModelNameSpace #> {
             if ((<#= IsDsDestroyedPropertyName #>) || (prm is null)) return;
             (object Cmpnt, object Sender, <#= IUniqServiceFilterDefInterfaceClassName #> FltDef, object ChosenSuggestion, string QueryText) tprm  = 
                 ((object Cmpnt, object Sender, <#= IUniqServiceFilterDefInterfaceClassName #> FltDef, object ChosenSuggestion, string QueryText))prm;
-            <#= ScanByUkModePropertyName + caption + "Item" #> = tprm.ChosenSuggestion as <#= GetInterfaceName(Model) #>;
+            switch(tprm.FltDef.fltrName) {
+<#
+        {
+            foreach(ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable in uniqueKeys[i].UniqueKeyProperties) {
+                if (!modelViewPropertyOfVwSerializable.IsUsedByfilter) continue;
+                if(IsUsebByForeignKey(Model, modelViewPropertyOfVwSerializable)) continue;
+#>
+                case "<#= GetModelPropertyName(modelViewPropertyOfVwSerializable, Model) #>":
+                    <#= ScanByUkModePropertyName + caption + GetModelPropertyName(modelViewPropertyOfVwSerializable, Model) + "Item" #> = tprm.ChosenSuggestion as <#= GetInterfaceName(Model) #>;
+                    break;
+<#
+            }
+        }
+#>
+                default:
+                    return;
+            }
+            <#= ScanByUkModePropertyName + caption + "ItemsSource" #> = null;
         }
         protected bool <#= ScanByUkModePropertyName + caption +  QuerySubmittedCommandPropertyName #>CanExecute(object prm) {
+            return true;
+        }
+        protected ICommand _<#= ScanByUkModePropertyName + caption + UnfocusedCommandPropertyName #> = null;
+        public ICommand <#= ScanByUkModePropertyName + caption + UnfocusedCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= ScanByUkModePropertyName + caption + UnfocusedCommandPropertyName #> ?? (_<#= ScanByUkModePropertyName + caption +  UnfocusedCommandPropertyName #> = new Command((prm) => <#= ScanByUkModePropertyName + caption +  UnfocusedCommandPropertyName #>Execute(prm), (prm) => <#= ScanByUkModePropertyName + caption +  UnfocusedCommandPropertyName #>CanExecute(prm)));
+            }
+        }
+        protected void <#= ScanByUkModePropertyName + caption +  UnfocusedCommandPropertyName #>Execute(object prm)
+        {
+            if ((<#= IsDsDestroyedPropertyName #>) || (prm is null)) return;
+            <#= ScanByUkModePropertyName + caption + "ItemsSource" #> = null;
+        }
+        protected bool <#= ScanByUkModePropertyName + caption +  UnfocusedCommandPropertyName #>CanExecute(object prm) {
             return true;
         }
         #endregion
@@ -1707,6 +1940,224 @@ namespace <#= SformViewModelNameSpace #> {
         } // for(int i = 0; i < uniqueKeys.Count; i++) { ... }
     } // if (Model.IsWebApiSelectOneByPrimarykey) { ... }
 #>
+        #region SearchMethod
+<#
+    { 
+        if(searchSchemas!= null) {
+            if(searchSchemas.Count > 0) {
+                string mdlPrpsLst = "";
+                string mdlMptLst = "";
+                if(Model.ScalarProperties != null) {
+                    foreach(ModelViewPropertyOfVwSerializable msprp in Model.ScalarProperties) {
+                        if(msprp.IsUsedByfilter) {
+                            if(mdlMptLst == "")
+                                mdlMptLst = " \"" + GetModelPropertyName(msprp, Model) + "\"";
+                            else 
+                                mdlMptLst = mdlMptLst + ", \"" + GetModelPropertyName(msprp, Model) + "\"";
+                        }
+                    }
+                }
+                if(Model.ForeignKeys != null) {
+                    List<ModelViewPropertyOfVwSerializable> addedSclPrp = new List<ModelViewPropertyOfVwSerializable>();
+                    foreach(ModelViewForeignKeySerializable mdlFk in Model.ForeignKeys) {
+                        if(!IsForeigKeyMapedToScalars(mdlFk, Model)) continue;
+                        foreach(var fkp in mdlFk.ForeignKeyProps) {
+                            ModelViewPropertyOfVwSerializable sclPrp = GetScalarPropByOriginaPropName(fkp.OriginalPropertyName, Model);
+                            if(addedSclPrp.Any(p => p == sclPrp)) continue;
+                            addedSclPrp.Add(sclPrp);
+                            if(mdlPrpsLst == "")
+                                mdlPrpsLst = " \"" + GetModelPropertyName(sclPrp, Model) + "\"";
+                            else 
+                                mdlPrpsLst = mdlPrpsLst + ", \"" + GetModelPropertyName(sclPrp, Model) + "\"";
+                        }  // foreach(var fkp in mdlFk.ForeignKeyProps) { ... }
+                    } // foreach(ModelViewForeignKeySerializable mdlFk in Model.ForeignKeys) { ... }
+                } // if(Model.ForeignKeys != null) { ... }
+#>
+        IList<string> mdlDrctFkProps = new List<string>{ <#= mdlPrpsLst #> };
+        IList<string> mdlMptProps = new List<string>{ <#= mdlMptLst #> };
+        Dictionary<string, IList<string>> reqHiddenProps = new Dictionary<string, IList<string>>() {
+<#
+                foreach(var sch in searchSchemas) {
+                    string fldLst = "";
+                    ModelViewSerializable m2mModel = sch.Item1;
+                    List<KeyValuePair<ModelViewForeignKeySerializable,int>> otherFks = sch.Item4;
+                    if(otherFks != null) {
+                        foreach(var fk in otherFks) {
+                            foreach(var fkp in fk.Key.ForeignKeyProps) {
+                                ModelViewPropertyOfVwSerializable sclPrp = GetScalarPropByOriginaPropName(fkp.OriginalPropertyName, m2mModel);
+                                if(fldLst == "")
+                                    fldLst = " \"" + GetModelPropertyName(sclPrp, m2mModel) + "\"";
+                                else 
+                                    fldLst = fldLst + ", \"" + GetModelPropertyName(sclPrp, m2mModel) + "\"";
+                            }
+                        }
+                    }
+#>
+                    {"<#= m2mModel.ViewName #>", new List<string> { <#= fldLst #> }},
+<#
+                } // foreach(var sch in searchSchemas) { ... }
+#>
+        };
+        Dictionary<string, IList<string>> extHiddenProps = {
+<#
+                foreach(var sch in searchSchemas) {
+                    string fldLst = "";
+                    ModelViewSerializable m2mModel = sch.Item1;
+                    List<KeyValuePair<ModelViewForeignKeySerializable,int>> externalFks = sch.Item5;
+                    if(externalFks != null) {
+                        foreach(var fk in externalFks) {
+                            foreach(var fkp in fk.Key.ForeignKeyProps) {
+                                ModelViewPropertyOfVwSerializable sclPrp = GetScalarPropByOriginaPropName(fkp.OriginalPropertyName, m2mModel);
+                                if(fldLst == "")
+                                    fldLst = " \"" + GetModelPropertyName(sclPrp, m2mModel) + "\"";
+                                else 
+                                    fldLst = fldLst + ", \"" + GetModelPropertyName(sclPrp, m2mModel) + "\"";
+                            }
+                        }
+                    }
+#>
+                    {"<#= m2mModel.ViewName #>", new List<string> { <#= fldLst #>}},
+<#
+                } // foreach(var sch in searchSchemas) { ... }
+#>
+        };
+<#
+            } // if(searchSchemas.Count > 0) { ... }
+        } // if(searchSchemas!= null) { ... }
+    }
+#>
+        public void defineSearchMethod() {
+            if (<#= IsDsDestroyedPropertyName #>) return;
+            IList<<#= IWebServiceFilterMenuInterfaceClassName #>> timis = defineSearchMethodMenuItemsData();
+            if(timis is null) {
+                <#= SearchMethodPropertyName #> = "<#= NoSearchMethodPropertyName #>";
+                return;
+            }
+            if (timis.Any(t => t.Id == <#= SearchMethodPropertyName #>)) return;
+            if(timis.Count < 1) {
+                <#= SearchMethodPropertyName #> = "<#= NoSearchMethodPropertyName #>";
+                return;
+            }
+            <#= SearchMethodPropertyName #> = timis[0].Id;
+        }
+        public IList<<#= IWebServiceFilterMenuInterfaceClassName #>> defineSearchMethodMenuItemsData() {
+            if (<#= IsDsDestroyedPropertyName #>) return null;
+            IList<<#= IWebServiceFilterMenuInterfaceClassName #>> rslt = new List<<#= IWebServiceFilterMenuInterfaceClassName #>>();
+            bool hasNtExternal = true;
+<#
+    { 
+        // m2mMdl, m2mFk, searchFks, otherFks, externalFks
+        if(searchSchemas!= null) { 
+#>
+            IList<string> extHiddflt = new List<string>();
+            foreach(var f in <#= HiddenFiltersVMPropertyName #>) {
+                if(!mdlMptProps.Contains(f.fltrName)) extHiddflt.Add(f.fltrName);
+            }
+            hasNtExternal = extHiddflt.Count == 0;
+<#
+          if(searchSchemas.Count > 0) {
+#>
+            IList<string> crrMDFP = new List<string>();
+            foreach(var fld in mdlDrctFkProps) { 
+                if (<#= HiddenFiltersVMPropertyName #>.Any(f => f.fltrName == fld))
+                    crrMDFP.Add(fld);
+                }
+            }
+            bool doIns = false;
+<#
+            foreach(var sch in searchSchemas) {
+                ModelViewSerializable m2mModel = sch.Item1;
+#>
+            doIns = crrMDFP.length == this.reqHiddenProps["<#= m2mModel.ViewName #>"].Count;
+            if(doIns) {
+                doIns = (this.reqHiddenProps["<#= m2mModel.ViewName #>"].Count(s => crrMDFP.Contains(s))) == crrMDFP.Count;
+                
+                if(doIns) {
+                    if(hasNtExternal) {
+                        foreach (var fld in this.extHiddenProps["<#= m2mModel.ViewName #>"]) { 
+                            doIns = this.<#= HiddenFiltersVMPropertyName #>.Any(f => f.fltrName == fld);
+                            if(!doIns) break;
+                        }
+                    } else {
+                        doIns = extHiddflt.Count === this.extHiddenProps["<#= m2mModel.ViewName #>"].Count;
+                        if(doIns) doIns = extHiddflt.Count(s => this.extHiddenProps["<#= m2mModel.ViewName #>"].Contains(s)) === extHiddflt.Count;
+                    }
+                }
+            }
+            if(doIns) {
+                rslt.Add( 
+                    new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "<#= ScanByVwModePropertyName + m2mModel.ViewName #>", Caption="filter by <#= m2mModel.Title #>", IconName=<#= IconFontClassName #>.Refresh, IconColor=Color.Default, Enabled=true, Data=null, Command = <#= TableMenuItemsCommandPropertyName #>}
+                );
+            }
+<#
+            } // foreach(var sch in searchSchemas) { ... }
+          } // if(searchSchemas.Count > 0) { ... }
+        } // if(searchSchemas!= null) { ... }
+        if (Model.IsWebApiSelectOneByPrimarykey) {
+            for(int i = 0; i < uniqueKeys.Count; i++) { 
+                string indErrrorText = "";
+                bool indIsCorrect = CheckModelIfIndexIsCorrect(Model, uniqueKeys[i], out indErrrorText);
+                if (!indIsCorrect) {
+#>
+
+//
+// Could not generate fragment of code
+// Primary/Unique Index Is not correct:
+// <#= indErrrorText #>
+//
+
+<#
+                } else {
+                    string caption = "Primary";
+                    if(!uniqueKeys[i].IsPrimary) {
+                        caption = uniqueKeys[i].UniqueKeyName;
+                    }
+                    int UkPropsUsedByFltrCount = 0;
+                    foreach(ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable in uniqueKeys[i].UniqueKeyProperties) {
+                        if(uniqueKeys[i].IsPrimary) {
+                            UkPropsUsedByFltrCount++;
+                        } else {
+                            if (modelViewPropertyOfVwSerializable.IsUsedByfilter) {
+                                if(!IsUsebByForeignKey(Model, modelViewPropertyOfVwSerializable)) UkPropsUsedByFltrCount++;
+                            }
+                        }
+                    }
+                    string requiredForeigKeyPropList = GetRequiredForeignKeyProps(uniqueKeys[i], Model);
+                    if ((UkPropsUsedByFltrCount > 0) && (requiredForeigKeyPropList != null)) {
+#>
+            if(hasNtExternal) {
+                IList<string> reqFkPrps = new List<string><#= requiredForeigKeyPropList #>;
+                if(this.<#= HiddenFiltersVMPropertyName #>.Count() == reqFkPrps.Count) {
+                    bool insmi = true;
+                    foreach(var vmfn in reqFkPrps) {
+                        if(! <#= HiddenFiltersVMPropertyName #>.Any(hfp => vmfn == hfp.fltrName)) {
+                            insmi = false;
+                            break;
+                        }
+                    }
+                    if(insmi) {
+                        rslt.Add( 
+                            new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "<#= ScanByUkModePropertyName + caption #>", Caption="filter by <#= caption #>", IconName=<#= IconFontClassName #>.Refresh, IconColor=Color.Default, Enabled=true, Data=null, Command = <#= TableMenuItemsCommandPropertyName #>}
+                        );
+                    }
+                }
+            }
+
+<#
+                    } // if ((UkPropsUsedByFltrCount > 0) && (requiredForeigKeyPropList != null)) { ... }
+                } // if (!indIsCorrect) { ... } else { ... }
+            } // for(int i = 0; i < uniqueKeys.Count; i++) { ... }
+        } // if (Model.IsWebApiSelectOneByPrimarykey) { ... }
+    }
+#>
+            if(hasNtExternal && this.CnFllscn) {
+                rslt.Insert(
+                    0, new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "<#= FullScanPropertyName #>", Caption="full scan", IconName=<#= IconFontClassName #>.Refresh, IconColor=Color.Default, Enabled=true, Data=null, Command = <#= TableMenuItemsCommandPropertyName #>}
+                );
+            }
+            return rslt;
+        }
+        #endregion
     }
 }
 

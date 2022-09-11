@@ -78,6 +78,8 @@ using System.Collections;
     string IsGridFlexPropertyName               = "IsGridFlex";
     string TextChangedCommandPropertyName       = "TextChangedCommand";
     string QuerySubmittedCommandPropertyName    = "QuerySubmitted";
+    string QuerySubmittedExPropertyName         = "QuerySubmittedEx";
+    string UnfocusedCommandPropertyName         = "UnfocusedCommand";
 
 
     List<string> nmSpaces = new List<string>();
@@ -471,6 +473,16 @@ namespace <#= UniqServiceFilterUserControlNameSpace #> {
             get { return (ICommand)GetValue(<#= QuerySubmittedCommandPropertyName #>Property); }
             set { SetValue(<#= QuerySubmittedCommandPropertyName #>Property, value); }
         }
+
+        public static readonly BindableProperty <#= UnfocusedCommandPropertyName #>Property =
+            BindableProperty.Create(nameof(<#= UnfocusedCommandPropertyName #>), typeof(ICommand), typeof(<#= UniqServiceFilterUserControlClassName #>), 
+            null); 
+        public ICommand <#= UnfocusedCommandPropertyName #>
+        {
+            get { return (ICommand)GetValue(<#= UnfocusedCommandPropertyName #>Property); }
+            set { SetValue(<#= UnfocusedCommandPropertyName #>Property, value); }
+        }
+        
         protected void TextChanged(object sender, dotMorten.Xamarin.Forms.AutoSuggestBoxTextChangedEventArgs e, int k) {
             if((<#= IsDestroyedPropertyName #>) || (<#= FilterDefinitionsPropertyName #> == null)) return;
             if ((e == null) || (<#= FilterDefinitionsPropertyName #>.Count() < k ))  return;
@@ -484,7 +496,7 @@ namespace <#= UniqServiceFilterUserControlNameSpace #> {
                 if(cmd.CanExecute(prm)) cmd.Execute(prm);
             }
         }
-        protected void QuerySubmitted<#= k #>(object sender, dotMorten.Xamarin.Forms.AutoSuggestBoxQuerySubmittedEventArgs e, int k) {
+        protected void <#= QuerySubmittedExPropertyName #>(object sender, dotMorten.Xamarin.Forms.AutoSuggestBoxQuerySubmittedEventArgs e, int k) {
             if ((<#= IsDestroyedPropertyName #>) || (<#= FilterDefinitionsPropertyName #> == null)) return;
             if ((e == null) || (<#= FilterDefinitionsPropertyName #>.Count() < k ))  return;
             dotMorten.Xamarin.Forms.AutoSuggestBox asbsender = sender as dotMorten.Xamarin.Forms.AutoSuggestBox;
@@ -497,7 +509,19 @@ namespace <#= UniqServiceFilterUserControlNameSpace #> {
                 if(cmd.CanExecute(prm)) cmd.Execute(prm);
             }
         }
-
+        protected void Unfocused(object sender, int k) {
+            if ((<#= IsDestroyedPropertyName #>) || (<#= FilterDefinitionsPropertyName #> == null)) return;
+            if (<#= FilterDefinitionsPropertyName #>.Count() < k) return;
+            dotMorten.Xamarin.Forms.AutoSuggestBox asbsender = sender as dotMorten.Xamarin.Forms.AutoSuggestBox;
+            if(asbsender == null) return;
+            ICommand cmd = <#= UnfocusedCommandPropertyName #>;
+            if (cmd != null)
+            {
+                (object Cmpnt, object Sender, <#= IUniqServiceFilterDefInterfaceClassName #> FltDef) prm = 
+                    (this, sender, <#= FilterDefinitionsPropertyName #>[k-1]);
+                if(cmd.CanExecute(prm)) cmd.Execute(prm);
+            }
+        }
 <#
     for (int i = 0; i < 2; i++) {
         for(int j = 0; j < 4;j++) {
@@ -568,7 +592,10 @@ namespace <#= UniqServiceFilterUserControlNameSpace #> {
             TextChanged(sender, e, <#= k #>);
         }
         public void QuerySubmitted<#= k #>(object sender, dotMorten.Xamarin.Forms.AutoSuggestBoxQuerySubmittedEventArgs e) {
-            QuerySubmitted(sender, e, <#= k #>);
+            <#= QuerySubmittedExPropertyName #>(sender, e, <#= k #>);
+        }
+        public void Unfocused<#= k #>(object sender, FocusEventArgs e) {
+            Unfocused(sender, <#= k #>);
         }
 <#
         }

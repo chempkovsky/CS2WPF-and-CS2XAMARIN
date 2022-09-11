@@ -160,6 +160,7 @@
     string SearchMethodPropertyName          = "SearchMethod";
     string NoSearchMethodPropertyName        = "NoSearchMethod";
     string IsSearchGridFlexPropertyName      = "IsSearchGridFlex";
+    string UnfocusedCommandPropertyName      = "UnfocusedCommand";
 
     string wsfucPrefix = "clr-namespace:" + WebServiceFilterUserControlNameSpace;
     if(SformUserControlProject != WebServiceFilterUserControlProject) {
@@ -265,16 +266,17 @@
 
                                 <#= CaptionPropertyName #>="{Binding <#= CaptionPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
                                 <#= ShowBackBtnPropertyName #>="{Binding <#= ShowBackBtnPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
-                                <#= NavigationBackCommandPropertyName #>="{Binding <#= OnNavigationBackCommandPropertyName #>, Mode=OneTime, Source={x:Reference sformUsrCntrlRootNode}}"   
+                                <#= NavigationBackCommandPropertyName #>="{Binding <#= OnNavigationBackCommandPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"   
                                 <#= ContainerMenuItemsPropertyName #>="{Binding <#= ContainerMenuItemsPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
                                 <#= FilterHeightPropertyName #>="{Binding <#= FilterHeightPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
-                                <#= ContainerMenuItemsCommandPropertyName #>="{Binding <#= OnContainerMenuItemsCommandPropertyName #>, Mode=OneTime, Source={x:Reference sformUsrCntrlRootNode}}"
+                                <#= ContainerMenuItemsCommandPropertyName #>="{Binding <#= OnContainerMenuItemsCommandPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
 
                                 <#= FilterDefinitionsPropertyName #>="{Binding BindingContext.<#= ScanByVwModePropertyName + m2mModel.ViewName + FilterDefinitionsPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
-                                <#= FilterCommandPropertyName #>="{Binding BindingContext.<#= ApplyFilterCommandPropertyName #>, Mode=OneTime, Source={x:Reference sformUsrCntrlRootNode} }"
-                                <#= IsGridFlexPropertyName #>="{Binding BindingContext.<#= IsSearchGridFlexPropertyName #>, Mode=OneTime, Source={x:Reference sformUsrCntrlRootNode} }"
-                                <#= TextChangedCommandPropertyName #>="{Binding BindingContext.<#= ScanByVwModePropertyName + m2mModel.ViewName +  TextChangedCommandPropertyName #>, Mode=OneTime, Source={x:Reference sformUsrCntrlRootNode} }"
-                                <#= QuerySubmittedCommandPropertyName #>="{Binding BindingContext.<#= ScanByVwModePropertyName + m2mModel.ViewName +  QuerySubmittedCommandPropertyName #>, Mode=OneTime, Source={x:Reference sformUsrCntrlRootNode} }"
+                                <#= FilterCommandPropertyName #>="{Binding BindingContext.<#= ApplyFilterCommandPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode} }"
+                                <#= IsGridFlexPropertyName #>="{Binding BindingContext.<#= IsSearchGridFlexPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode} }"
+                                <#= TextChangedCommandPropertyName #>="{Binding BindingContext.<#= ScanByVwModePropertyName + m2mModel.ViewName +  TextChangedCommandPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode} }"
+                                <#= QuerySubmittedCommandPropertyName #>="{Binding BindingContext.<#= ScanByVwModePropertyName + m2mModel.ViewName +  QuerySubmittedCommandPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode} }"
+                                <#= UnfocusedCommandPropertyName #>="{Binding BindingContext.<#= ScanByVwModePropertyName + m2mModel.ViewName +  UnfocusedCommandPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode} }"
 <#
         {
             int k = 1;
@@ -283,8 +285,8 @@
                 ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable = GetFirstPropOfFirstUniqueKey(searchModel);
 
 #>
-                                ItemsSource<#= k #>="{Binding BindingContext.<#= ScanByVwModePropertyName + m2mModel.ViewName + GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) + "ItemsSource" #>, Mode=OneTime, Source={x:Reference sformUsrCntrlRootNode} }"
-                                Text<#= k #>="{Binding BindingContext.<#= ScanByVwModePropertyName + m2mModel.ViewName + GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) + "Text" #>, Mode=OneTime, Source={x:Reference sformUsrCntrlRootNode} }"
+                                ItemsSource<#= k #>="{Binding BindingContext.<#= ScanByVwModePropertyName + m2mModel.ViewName + GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) + "ItemsSource" #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode} }"
+                                Text<#= k #>="{Binding BindingContext.<#= ScanByVwModePropertyName + m2mModel.ViewName + GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) + "Text" #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode} }"
 <#
                 k++;
             }
@@ -321,24 +323,26 @@
 
                                 <#= CaptionPropertyName #>="{Binding <#= CaptionPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
                                 <#= ShowBackBtnPropertyName #>="{Binding <#= ShowBackBtnPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
-                                <#= NavigationBackCommandPropertyName #>="{Binding <#= OnNavigationBackCommandPropertyName #>, Mode=OneTime, Source={x:Reference sformUsrCntrlRootNode}}"   
+                                <#= NavigationBackCommandPropertyName #>="{Binding <#= OnNavigationBackCommandPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"   
                                 <#= ContainerMenuItemsPropertyName #>="{Binding <#= ContainerMenuItemsPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
                                 <#= FilterHeightPropertyName #>="{Binding <#= FilterHeightPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
-                                <#= ContainerMenuItemsCommandPropertyName #>="{Binding <#= OnContainerMenuItemsCommandPropertyName #>, Mode=OneTime, Source={x:Reference sformUsrCntrlRootNode}}"
+                                <#= ContainerMenuItemsCommandPropertyName #>="{Binding <#= OnContainerMenuItemsCommandPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
 
                                 <#= FilterDefinitionsPropertyName #>="{Binding BindingContext.<#= ScanByUkModePropertyName + caption + FilterDefinitionsPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
-                                <#= FilterCommandPropertyName #>="{Binding BindingContext.<#= ApplyFilterCommandPropertyName #>, Mode=OneTime, Source={x:Reference sformUsrCntrlRootNode} }"
-                                <#= IsGridFlexPropertyName #>="{Binding BindingContext.<#= IsSearchGridFlexPropertyName #>, Mode=OneTime, Source={x:Reference sformUsrCntrlRootNode} }"
+                                <#= FilterCommandPropertyName #>="{Binding BindingContext.<#= ApplyFilterCommandPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode} }"
+                                <#= IsGridFlexPropertyName #>="{Binding BindingContext.<#= IsSearchGridFlexPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode} }"
 
-                                <#= TextChangedCommandPropertyName #>="{Binding BindingContext.<#= ScanByUkModePropertyName + caption +  TextChangedCommandPropertyName #>, Mode=OneTime, Source={x:Reference sformUsrCntrlRootNode} }"
-                                <#= QuerySubmittedCommandPropertyName #>="{Binding BindingContext.<#= ScanByUkModePropertyName + caption +  QuerySubmittedCommandPropertyName #>, Mode=OneTime, Source={x:Reference sformUsrCntrlRootNode} }"
+                                <#= TextChangedCommandPropertyName #>="{Binding BindingContext.<#= ScanByUkModePropertyName + caption +  TextChangedCommandPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode} }"
+                                <#= QuerySubmittedCommandPropertyName #>="{Binding BindingContext.<#= ScanByUkModePropertyName + caption +  QuerySubmittedCommandPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode} }"
+                                <#= UnfocusedCommandPropertyName #>="{Binding BindingContext.<#= ScanByUkModePropertyName + caption +  UnfocusedCommandPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode} }"
+
 <#
         {
             int k = 1;
             foreach(ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable in uniqueKeys[i].UniqueKeyProperties) {
 #>
-                                Text<#= k #>="{Binding BindingContext.<#= ScanByUkModePropertyName + caption + GetModelPropertyName(modelViewPropertyOfVwSerializable, Model) + "Text" #>, Mode=OneTime, Source={x:Reference sformUsrCntrlRootNode} }"
-                                ItemsSource<#= k #>="{Binding BindingContext.<#= ScanByUkModePropertyName + caption + "ItemsSource" #>, Mode=OneTime, Source={x:Reference sformUsrCntrlRootNode} }"
+                                Text<#= k #>="{Binding BindingContext.<#= ScanByUkModePropertyName + caption + GetModelPropertyName(modelViewPropertyOfVwSerializable, Model) + "Text" #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode} }"
+                                ItemsSource<#= k #>="{Binding BindingContext.<#= ScanByUkModePropertyName + caption + "ItemsSource" #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode} }"
 <#
                 k++;
             }
@@ -363,9 +367,9 @@
                                 <#= FilterDefinitionsPropertyName #>="{Binding BindingContext.<#= FilterDefinitionsPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
                                 <#= ContainerMenuItemsPropertyName #>="{Binding <#= ContainerMenuItemsPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
                                 <#= FilterHeightPropertyName #>="{Binding <#= FilterHeightPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
-                                <#= ContainerMenuItemsCommandPropertyName #>="{Binding <#= OnContainerMenuItemsCommandPropertyName #>, Mode=OneTime, Source={x:Reference sformUsrCntrlRootNode}}"
-                                <#= NavigationBackCommandPropertyName #>="{Binding <#= OnNavigationBackCommandPropertyName #>, Mode=OneTime, Source={x:Reference sformUsrCntrlRootNode}}"   
-                                <#= FilterCommandPropertyName #>="{Binding BindingContext.<#= ApplyFilterCommandPropertyName #>, Mode=OneTime, Source={x:Reference sformUsrCntrlRootNode} }"
+                                <#= ContainerMenuItemsCommandPropertyName #>="{Binding <#= OnContainerMenuItemsCommandPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
+                                <#= NavigationBackCommandPropertyName #>="{Binding <#= OnNavigationBackCommandPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"   
+                                <#= FilterCommandPropertyName #>="{Binding BindingContext.<#= ApplyFilterCommandPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode} }"
                                 />
                         </ControlTemplate> 
 
