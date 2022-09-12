@@ -355,9 +355,18 @@ namespace <#= RlistPageViewModelNameSpace #> {
             if (foreignKeys == null) continue;
             if (foreignKeys.Count < 1) continue;
             foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
+                if (string.IsNullOrEmpty(detailViewClassName)) {
+#>
+//
+//  Warning:
+//  "<#= RlistPageFolder #>" type has not been generated for <#= detailViewName #>
+//
+<#
+                } else { 
 #>
                 new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "<#= RowMIPrefixPropertyName #><#= detailViewClassName #><#= foreignKey.NavigationName #>", <#= CaptionPropertyName #>="<#= detailView.PluralTitle #>: <#= foreignKey.NavigationName #>", IconName="ArrowRightBold", IconColor=Color.Default, Enabled=true, Data=null, FeedbackData=null, Command = <#= RowMenuItemsCommandPropertyName #>},
 <#
+                }
             }
         }
 #>
@@ -678,11 +687,20 @@ namespace <#= RlistPageViewModelNameSpace #> {
             if (foreignKeys == null) continue;
             if (foreignKeys.Count < 1) continue;
             foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
+                if (string.IsNullOrEmpty(detailViewClassName)) {
+#>
+//
+//  Warning:
+//  "<#= RlistPageFolder #>" type has not been generated for <#= detailViewName #>
+//
+<#
+                } else {
 #>
                 case "<#= RowMIPrefixPropertyName #><#= detailViewClassName #><#= foreignKey.NavigationName #>":
                     await <#= NavigateToDetailCommandPropertyName #>(arow, "<#= detailView.ViewName #>", "<#= foreignKey.NavigationName #>", "<#= detailViewClassName #>");
                     break;
 <#
+                } 
             }
         }
 
@@ -718,10 +736,19 @@ namespace <#= RlistPageViewModelNameSpace #> {
             if (foreignKeys == null) continue;
             if (foreignKeys.Count < 1) continue;
             foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
+                if (string.IsNullOrEmpty(detailViewClassName)) {
+#>
+//
+//  Warning:
+//  "<#= RlistPageFolder #>" type has not been generated for <#= detailViewName #>
+//
+<#
+                } else { 
 #>
                     case "<#= RowMIPrefixPropertyName #><#= detailViewClassName #><#= foreignKey.NavigationName #>":
                         return ((<#= AppSettingServicePropertyName #>.GetViewModelMask("<#= detailView.ViewName #>") & 1) == 1 );
 <#
+                }
             }
         }
 
