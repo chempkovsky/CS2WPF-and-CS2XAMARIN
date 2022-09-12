@@ -252,7 +252,16 @@
                 <ContentView.Resources>
                     <ResourceDictionary>
                         <ControlTemplate x:Key="<#= NoSearchMethodPropertyName #>">
-                                <Label Text="Search Method has not been selected"/>
+                            <usfuc:<#= UniqServiceFilterUserControlClassName #>
+                                <#= IsDestroyedPropertyName #>="{Binding BindingContext.<#= IsSearchDestroyedPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
+
+                                <#= CaptionPropertyName #>="{Binding <#= CaptionPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
+                                <#= ShowBackBtnPropertyName #>="{Binding <#= ShowBackBtnPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
+                                <#= NavigationBackCommandPropertyName #>="{Binding <#= OnNavigationBackCommandPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"   
+                                <#= ContainerMenuItemsPropertyName #>="{Binding <#= ContainerMenuItemsPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
+                                <#= FilterHeightPropertyName #>="{Binding <#= FilterHeightPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
+                                <#= ContainerMenuItemsCommandPropertyName #>="{Binding <#= OnContainerMenuItemsCommandPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
+                            />
                         </ControlTemplate> 
 
 <#
@@ -270,6 +279,7 @@
                                 <#= ContainerMenuItemsPropertyName #>="{Binding <#= ContainerMenuItemsPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
                                 <#= FilterHeightPropertyName #>="{Binding <#= FilterHeightPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
                                 <#= ContainerMenuItemsCommandPropertyName #>="{Binding <#= OnContainerMenuItemsCommandPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
+                                <#= HiddenFiltersPropertyName #>="{Binding BindingContext.<#= HiddenFiltersVMPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
 
                                 <#= FilterDefinitionsPropertyName #>="{Binding BindingContext.<#= ScanByVwModePropertyName + m2mModel.ViewName + FilterDefinitionsPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
                                 <#= FilterCommandPropertyName #>="{Binding BindingContext.<#= ApplyFilterCommandPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode} }"
@@ -327,6 +337,7 @@
                                 <#= ContainerMenuItemsPropertyName #>="{Binding <#= ContainerMenuItemsPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
                                 <#= FilterHeightPropertyName #>="{Binding <#= FilterHeightPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
                                 <#= ContainerMenuItemsCommandPropertyName #>="{Binding <#= OnContainerMenuItemsCommandPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
+                                <#= HiddenFiltersPropertyName #>="{Binding BindingContext.<#= HiddenFiltersVMPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
 
                                 <#= FilterDefinitionsPropertyName #>="{Binding BindingContext.<#= ScanByUkModePropertyName + caption + FilterDefinitionsPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode}}"
                                 <#= FilterCommandPropertyName #>="{Binding BindingContext.<#= ApplyFilterCommandPropertyName #>, Mode=OneWay, Source={x:Reference sformUsrCntrlRootNode} }"

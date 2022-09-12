@@ -1105,78 +1105,108 @@ namespace <#= SformViewModelNameSpace #> {
         if(searchSchemas!= null) {
             if(searchSchemas.Count > 0) {
 #>
-        switch (this.curIndexMenuItemsData.id) {
+            switch (<#= SearchMethodPropertyName #>) {
 <#
             foreach(var sch in searchSchemas) {
                 ModelViewSerializable m2mModel = sch.Item1;
 #>
-            case "<#= ScanByVwModePropertyName + m2mModel.ViewName #>":  
-                <#= SearchDoSelectRowMethodName + m2mModel.ViewName #>();
-                return;
+                case "<#= ScanByVwModePropertyName + m2mModel.ViewName #>":  
+                    <#= SearchDoSelectRowMethodName + m2mModel.ViewName #>();
+                    <#= IsInQueryPropertyName #> = false;
+                    return;
 <#
             }
 #>
-        }
+            }
 <#
             }
         }
 #>
 
-            <#= modelFilterInterfaceClassName #> flt  = <#= FormRootServicePropertyName #>.GetFilter();
-            flt.page = this.<#= CurrentPagePropertyName #>; 
-            flt.pagesize = this.<#= RowsPerPagePropertyName #>;
-            if(!string.IsNullOrEmpty(CurrentSortColumn)) {
-                string asc = "";
-                if("desc".Equals(CurrentSortdirection, System.StringComparison.OrdinalIgnoreCase)) {
-                    asc = "-";
+            if ((<#= SearchMethodPropertyName #> == "<#= FullScanPropertyName #>")
+<#
+    if (Model.IsWebApiSelectOneByPrimarykey) {
+        for(int i = 0; i < uniqueKeys.Count; i++) { 
+            string indErrrorText = "";
+            bool indIsCorrect = CheckModelIfIndexIsCorrect(Model, uniqueKeys[i], out indErrrorText);
+            if (!indIsCorrect) {
+#>
+
+// Could not generate fragment of code
+// Primary/Unique Index Is not correct:
+// <#= indErrrorText #>
+
+<#
+            } else {
+                string caption = "Primary";
+                if(!uniqueKeys[i].IsPrimary) {
+                    caption = uniqueKeys[i].UniqueKeyName;
                 }
-                flt.orderby = new List<string>() { asc + CurrentSortColumn };
+#>
+                || (<#= SearchMethodPropertyName #> == "<#= ScanByUkModePropertyName + caption #>")
+<#
             }
-            if(<#= CurrentFilterPropertyName #> != null) {
-                foreach(<#= IWebServiceFilterRsltInterfaceClassName #> e in <#= CurrentFilterPropertyName #>) {
-                    if((!string.IsNullOrEmpty(e.fltrError)) || string.IsNullOrEmpty(e.fltrName)) continue;
-                    switch(e.fltrName) {
+        }
+    }
+#>
+            ) {
+
+                <#= modelFilterInterfaceClassName #> flt  = <#= FormRootServicePropertyName #>.GetFilter();
+                flt.page = this.<#= CurrentPagePropertyName #>; 
+                flt.pagesize = this.<#= RowsPerPagePropertyName #>;
+                if(!string.IsNullOrEmpty(CurrentSortColumn)) {
+                    string asc = "";
+                    if("desc".Equals(CurrentSortdirection, System.StringComparison.OrdinalIgnoreCase)) {
+                        asc = "-";
+                    }
+                    flt.orderby = new List<string>() { asc + CurrentSortColumn };
+                }
+                if(<#= CurrentFilterPropertyName #> != null) {
+                    foreach(<#= IWebServiceFilterRsltInterfaceClassName #> e in <#= CurrentFilterPropertyName #>) {
+                        if((!string.IsNullOrEmpty(e.fltrError)) || string.IsNullOrEmpty(e.fltrName)) continue;
+                        switch(e.fltrName) {
 <#
     foreach(ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) { 
         if (prop.IsUsedByfilter) {
 #>
-                        case "<#= GetModelPropertyName(prop, Model) #>":
-                            if (flt.<#= GetModelPropertyName(prop, Model) #> == null) flt.<#= GetModelPropertyName(prop, Model) #> = new List<<#= GetPropertyTypeName(prop) #>>();
-                            flt.<#= GetModelPropertyName(prop, Model) #>.Add((<#= GetPropertyTypeName(prop) #>)e.fltrValue);
-                            if (flt.<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #> == null) flt.<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #> = new List<string>();
-                            flt.<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #>.Add(e.fltrOperator);
-                            break;
+                            case "<#= GetModelPropertyName(prop, Model) #>":
+                                if (flt.<#= GetModelPropertyName(prop, Model) #> == null) flt.<#= GetModelPropertyName(prop, Model) #> = new List<<#= GetPropertyTypeName(prop) #>>();
+                                flt.<#= GetModelPropertyName(prop, Model) #>.Add((<#= GetPropertyTypeName(prop) #>)e.fltrValue);
+                                if (flt.<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #> == null) flt.<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #> = new List<string>();
+                                flt.<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #>.Add(e.fltrOperator);
+                                break;
 <#
         }
     }
 #>
-                        default: break;
+                            default: break;
+                        }
                     }
                 }
-            }
-            <#= modelPageInterfaceClassName #> rslt = await this.<#= FormRootServicePropertyName #>.<#= GetWithFilterMethodName #>(flt);
-            if(rslt != null) {
-                // <#= RowsPerPagePropertyName #> resets <#= CurrentPagePropertyName #> 
-                // so the order is important: Actual<#= RowsPerPagePropertyName #> must be the first one and Actual<#= CurrentPagePropertyName #> must be the second
-                Actual<#= RowsPerPagePropertyName #> = rslt.pagesize;
-                Actual<#= CurrentPagePropertyName #> = rslt.page;
-                <#= TotalCountPropertyName #> = rslt.total; 
-                <#= SelectedRowPropertyName #> = null;
-                ObservableCollection<<#= modelInterfaceClassName #>> ds = <#= DataSourcePropertyName #> as ObservableCollection<<#= modelInterfaceClassName #>>;
-                <#= IsDsDestroyedPropertyName #> = true;
-                if (ds == null) { ds = new ObservableCollection<<#= modelInterfaceClassName #>>(); } else { ds.Clear(); }
-                <#= IsDsDestroyedPropertyName #> = false;
-                <#= DataSourcePropertyName #> = null; 
-                if(rslt.items != null) {
-                    foreach(<#= modelInterfaceClassName #> itm in rslt.items) {
-                        ds.Add(<#= FormRootServicePropertyName #>.<#= CopyToModelNotifyMethodName #>(itm, null));
+                <#= modelPageInterfaceClassName #> rslt = await this.<#= FormRootServicePropertyName #>.<#= GetWithFilterMethodName #>(flt);
+                if(rslt != null) {
+                    // <#= RowsPerPagePropertyName #> resets <#= CurrentPagePropertyName #> 
+                    // so the order is important: Actual<#= RowsPerPagePropertyName #> must be the first one and Actual<#= CurrentPagePropertyName #> must be the second
+                    Actual<#= RowsPerPagePropertyName #> = rslt.pagesize;
+                    Actual<#= CurrentPagePropertyName #> = rslt.page;
+                    <#= TotalCountPropertyName #> = rslt.total; 
+                    <#= SelectedRowPropertyName #> = null;
+                    ObservableCollection<<#= modelInterfaceClassName #>> ds = <#= DataSourcePropertyName #> as ObservableCollection<<#= modelInterfaceClassName #>>;
+                    <#= IsDsDestroyedPropertyName #> = true;
+                    if (ds == null) { ds = new ObservableCollection<<#= modelInterfaceClassName #>>(); } else { ds.Clear(); }
+                    <#= IsDsDestroyedPropertyName #> = false;
+                    <#= DataSourcePropertyName #> = null; 
+                    if(rslt.items != null) {
+                        foreach(<#= modelInterfaceClassName #> itm in rslt.items) {
+                            ds.Add(<#= FormRootServicePropertyName #>.<#= CopyToModelNotifyMethodName #>(itm, null));
+                        }
                     }
+                    <#= DataSourcePropertyName #> = ds;
+                    <#= SelectedRowPropertyName #> = <#= DataSourcePropertyName #>?.FirstOrDefault();
+                    // <#= InternalContentProperty #>Changed();
                 }
-                <#= DataSourcePropertyName #> = ds;
-                <#= SelectedRowPropertyName #> = <#= DataSourcePropertyName #>?.FirstOrDefault();
-                // <#= InternalContentProperty #>Changed();
+                <#= IsInQueryPropertyName #> = false;
             }
-            <#= IsInQueryPropertyName #> = false;
         }
         #endregion
         #region <#= SformAfterAddItemCommandPropertyName #>

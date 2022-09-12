@@ -26,9 +26,17 @@ using System.Collections;
     string convertHelperModelClassName   = GetModelClassName(Model, convertHelperModelFolder);
     string convertHelperModelNameSpace   = GetModelNameSpace(Model, convertHelperModelFolder);
 
+    string IWebServiceFilterRsltInterfaceFolder      = "00204-IWebServiceFilterRsltInterface.cs";
+    string IWebServiceFilterRsltInterfaceClassName   = GetModelClassName(Model, IWebServiceFilterRsltInterfaceFolder);
+    string IWebServiceFilterRsltInterfaceNameSpace   = GetModelNameSpace(Model, IWebServiceFilterRsltInterfaceFolder);
+
     string WebServiceFilterOperatorViewModelFolder      = "00213-WebServiceFilterOperatorViewModel.cs";
     string WebServiceFilterOperatorViewModelClassName   = GetModelClassName(Model, WebServiceFilterOperatorViewModelFolder);
     string WebServiceFilterOperatorViewModelNameSpace   = GetModelNameSpace(Model, WebServiceFilterOperatorViewModelFolder);
+
+    string WebServiceFilterRsltFolder      = "00214-WebServiceFilterRslt.cs";
+    string WebServiceFilterRsltClassName   = GetModelClassName(Model, WebServiceFilterRsltFolder);
+    string WebServiceFilterRsltNameSpace   = GetModelNameSpace(Model, WebServiceFilterRsltFolder);
 
     string WebServiceFilterMenuViewModelFolder          = "00217-WebServiceFilterMenuViewModel.cs";
     string WebServiceFilterMenuViewModelClassName       = GetModelClassName(Model, WebServiceFilterMenuViewModelFolder);
@@ -80,6 +88,7 @@ using System.Collections;
     string QuerySubmittedCommandPropertyName    = "QuerySubmitted";
     string QuerySubmittedExPropertyName         = "QuerySubmittedEx";
     string UnfocusedCommandPropertyName         = "UnfocusedCommand";
+    string HiddenFiltersPropertyName            = "HiddenFilters";
 
 
     List<string> nmSpaces = new List<string>();
@@ -90,8 +99,11 @@ using System.Collections;
         nmSpaces.Add(WebServiceFilterMenuViewModelNameSpace);
     if ((UniqServiceFilterUserControlNameSpace != convertHelperModelNameSpace) && (nmSpaces.IndexOf(convertHelperModelNameSpace) < 0)) 
         nmSpaces.Add(convertHelperModelNameSpace);
-    
-    
+    if ((UniqServiceFilterUserControlNameSpace != WebServiceFilterRsltNameSpace) && (nmSpaces.IndexOf(WebServiceFilterRsltNameSpace) < 0)) 
+        nmSpaces.Add(WebServiceFilterRsltNameSpace);
+    if ((UniqServiceFilterUserControlNameSpace != IWebServiceFilterRsltInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IWebServiceFilterRsltInterfaceNameSpace);
+        
 #>
 <# 
     foreach(string ns in nmSpaces) {
@@ -308,7 +320,74 @@ namespace <#= UniqServiceFilterUserControlNameSpace #> {
         }
         #endregion
 
+        #region <#= HiddenFiltersPropertyName #>
+        public static readonly BindableProperty <#= HiddenFiltersPropertyName #>Property =
+                BindableProperty.Create(
+                "<#= HiddenFiltersPropertyName #>", typeof(IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>),
+                typeof(<#= UniqServiceFilterUserControlClassName #>),
+                null);
+        public IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>> <#= HiddenFiltersPropertyName #>
+        {
+            get
+            {
+                return (IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>>)GetValue(<#= HiddenFiltersPropertyName #>Property);
+            }
+            set
+            {
+                SetValue(<#= HiddenFiltersPropertyName #>Property, value);
+            }
+        }
+        #endregion
+
         #region <#= OnFilterCommandPropertyName #>
+        protected IList<<#= IWebServiceFilterRsltInterfaceClassName #>> InternalDefineFilter()
+        {
+            IList<<#= IWebServiceFilterRsltInterfaceClassName #>> rslt = new List<<#= IWebServiceFilterRsltInterfaceClassName #>>();
+            if(<#= FilterDefinitionsPropertyName #> != null) {
+                int k = 1;
+                foreach (var flt in <#= FilterDefinitionsPropertyName #>)
+                {
+                    if(k > 8) break;
+                    object v = null;
+                    switch (k)
+                    {
+<#
+                    for(int k = 1; k < 9; k++) {
+#>
+                        case <#= k #>:
+                            v = <#= convertHelperModelClassName #>.TryToConvert(flt.fltrDataType, Text<#= k #>);
+                            break;
+<#
+                    }
+#>
+
+                        default:
+                            break;
+                    }
+                    if (v is null) break;
+                    rslt.Add(new <#= WebServiceFilterRsltClassName #>() { fltrName = flt.fltrName, fltrDataType = flt.fltrDataType, fltrOperator = "eq", fltrValue = v });
+                    k++;
+                }
+            }
+            if (<#= HiddenFiltersPropertyName #> != null)
+            {
+                foreach (<#= IWebServiceFilterRsltInterfaceClassName #> flt in <#= HiddenFiltersPropertyName #>)
+                {
+                    if (string.IsNullOrEmpty(flt.fltrError))
+                    {
+                        if ((flt.fltrValue != null) && (!string.IsNullOrEmpty(flt.fltrDataType)) && (!string.IsNullOrEmpty(flt.fltrOperator)))
+                        {
+                            object v = <#= convertHelperModelClassName #>.TryToConvert(flt.fltrDataType, flt.fltrValue);
+                            if (v != null)
+                            {
+                                rslt.Add(new <#= WebServiceFilterRsltClassName #>() { fltrName = flt.fltrName, fltrDataType = flt.fltrDataType, fltrOperator = flt.fltrOperator, fltrValue = v });
+                            }
+                        }
+                    }
+                }
+            }
+            return rslt;
+        }
         protected ICommand _<#= OnFilterCommandPropertyName #> = null;
         public ICommand <#= OnFilterCommandPropertyName #>
         {
@@ -323,7 +402,10 @@ namespace <#= UniqServiceFilterUserControlNameSpace #> {
             ICommand cmd = <#= FilterCommandPropertyName #>;
             if (cmd != null)
             {
-                if(cmd.CanExecute(this)) cmd.Execute(this);
+                IList<<#= IWebServiceFilterRsltInterfaceClassName #>> flt = InternalDefineFilter();
+                if(cmd.CanExecute(flt)) { 
+                    cmd.Execute(flt);
+                }
             }
         }
         protected bool <#= OnFilterCommandPropertyName #>CanExecute()
@@ -418,6 +500,17 @@ namespace <#= UniqServiceFilterUserControlNameSpace #> {
             RemoveBinding(<#= FilterHeightPropertyName #>Property);
             RemoveBinding(<#= TextChangedCommandPropertyName #>Property);
             RemoveBinding(<#= QuerySubmittedCommandPropertyName #>Property);
+            RemoveBinding(<#= HiddenFiltersPropertyName #>Property);
+            RemoveBinding(<#= TextChangedCommandPropertyName #>Property);
+            RemoveBinding(<#= UnfocusedCommandPropertyName #>Property);
+<#
+    for (int k = 1; k < 9; i++) {
+#>
+            RemoveBinding(ItemsSource<#= k #>Property);
+            RemoveBinding(Text<#= k #>Property);
+<#
+    }
+#>
             <#= IsGridFlexPropertyName #> = false;
             <#= FilterHeightPropertyName #> = -1d; // unsubscribe from event
             <#= NavigationBackCommandPropertyName #> = null;
@@ -427,7 +520,18 @@ namespace <#= UniqServiceFilterUserControlNameSpace #> {
             <#= QuerySubmittedCommandPropertyName #> = null;
             <#= ContainerMenuItemsCommandPropertyName #> = null;
             <#= FilterDefinitionsPropertyName #> = null;
+            <#= HiddenFiltersPropertyName #> = null;
+            <#= TextChangedCommandPropertyName #> = null;
+            <#= UnfocusedCommandPropertyName #> = null;
             <#= CurrentContainerMenuItemsPropertyName #>Clear();
+<#
+    for (int k = 1; k < 9; i++) {
+#>
+            ItemsSource<#= k #> = null;
+            Text<#= k #> = null;
+<#
+    }
+#>
         }
         private static void <#= IsDestroyedPropertyName #>Changed(BindableObject d, object oldValue, object newValue)
         {
