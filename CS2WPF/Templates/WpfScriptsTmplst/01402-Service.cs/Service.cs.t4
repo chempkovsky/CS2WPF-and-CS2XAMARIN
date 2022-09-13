@@ -113,6 +113,7 @@ using System.Linq;
     string Dict2TupleMethodName                 = "Dict2Tuple";
     string Tuple2DictMethodName                 = "Tuple2Dict";
     string FilterRslt2FilterMethodName          = "FilterRslt2Filter";
+    string rowPrim2FilterRsltMethodName         = "RowPrim2FilterRslt";
 
     List<ModelViewUniqueKeyOfVwSerializable> uniqueKeys = new List<ModelViewUniqueKeyOfVwSerializable>();
     {
@@ -1138,6 +1139,25 @@ namespace <#= modelServiceNameSpace #> {
             }
             return rslt;
         }
+        public IList<<#= IWebServiceFilterRsltInterfaceClassName #>> <#= rowPrim2FilterRsltMethodName #>(<#= GetInterfaceName(Model) #> r) {
+            IList<<#= IWebServiceFilterRsltInterfaceClassName #>> rslt = new List<<#= IWebServiceFilterRsltInterfaceClassName #>>();
+            if (r == null) return rslt;
+            foreach(string i in this._<#= ValuesSuffix #>.Keys) {
+                if(this._<#= ValuesSuffix #>[i].isinprimkey) {
+                    if (!(r.GetType().GetProperty(i).GetValue(r) is null)) {
+                        rslt.Add(new <#= WebServiceFilterRsltClassName #>{
+                            fltrName = i,
+                            fltrDataType = this._Values[i].dttp,
+                            fltrOperator = "eq",
+                            fltrValue = r.GetType().GetProperty(i).GetValue(r)
+                        });
+                    }
+                }
+            }
+            return rslt;
+        }
+
+        
         public <#= modelFilterInterfaceClassName #> <#= FilterRslt2FilterMethodName #>(<#= IWebServiceFilterRsltInterfaceClassName #> e, <#= modelFilterInterfaceClassName #> dest) {
             <#= modelFilterInterfaceClassName #> flt = dest;
             if(dest is null) {

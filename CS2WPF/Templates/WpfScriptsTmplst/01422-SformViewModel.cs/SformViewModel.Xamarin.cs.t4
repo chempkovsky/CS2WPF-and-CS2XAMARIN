@@ -216,6 +216,7 @@ using Prism.Navigation;
     string FilterRslt2FilterMethodName              = "FilterRslt2Filter";
     string ShowErrorMethodName                      = "ShowErrorMessage";
     string UnfocusedCommandPropertyName             = "UnfocusedCommand";
+    string rowPrim2FilterRsltMethodName             = "RowPrim2FilterRslt";
 
     string OnDestroyPropertyName                    = "OnDestroy";
 
@@ -267,7 +268,49 @@ using Prism.Navigation;
     // m2mMdl, m2mFk, searchFks, otherFks, externalFks
     List<Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>>> searchSchemas =
         GetSearchResources(Model, Context);
-
+    if(searchSchemas!= null) {
+        List<Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>>> tmpSchs = null;
+        foreach(var sch in searchSchemas) {
+            ModelViewSerializable m2mModel = sch.Item1;
+            if (!string.IsNullOrEmpty(GetModelNameSpace(m2mModel, modelServiceInterfaceFolder))) {
+                bool canAdd = true;
+                foreach(KeyValuePair<ModelViewForeignKeySerializable,int> kvp in sch.Item3) {
+                    ModelViewSerializable searchModel = GetViewByName(Context, kvp.Key.ViewName);
+                    if(searchModel == null) {
+#>
+//
+// Could not find <#= kvp.Key.ViewName #>
+//
+<#
+                        canAdd = false;
+                        break;
+                    }
+                    if (string.IsNullOrEmpty(GetModelNameSpace(searchModel, modelServiceInterfaceFolder))) {
+#>
+//
+// "<#= modelServiceInterfaceFolder #>" interface is not generated for <#= searchModel.ViewName #>
+//
+<#
+                        canAdd = false;
+                        break;
+                    }
+                }
+                if(canAdd) {
+                    if(tmpSchs == null) 
+                        tmpSchs = 
+                            new List<Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, List<KeyValuePair<ModelViewForeignKeySerializable, int>>, List<KeyValuePair<ModelViewForeignKeySerializable, int>>, List<KeyValuePair<ModelViewForeignKeySerializable, int>>>>();
+                    tmpSchs.Add(sch);
+                }
+            } else {
+#>
+//
+// "<#= modelServiceInterfaceFolder #>" interface is not generated for <#= m2mModel.ViewName #>
+//
+<#
+            }
+        }
+        searchSchemas = tmpSchs;
+    }
 
     if(searchSchemas!= null) {
         string msi = null;
@@ -298,9 +341,11 @@ using Prism.Navigation;
 #>
 <# 
     foreach(string ns in nmSpaces) {
+        if(!string.IsNullOrEmpty(ns)) {
 #>
 using <#= ns #>;
 <#
+        }
     }
 #>
 /*
@@ -1111,7 +1156,7 @@ namespace <#= SformViewModelNameSpace #> {
                 ModelViewSerializable m2mModel = sch.Item1;
 #>
                 case "<#= ScanByVwModePropertyName + m2mModel.ViewName #>":  
-                    <#= SearchDoSelectRowMethodName + m2mModel.ViewName #>();
+                    await <#= SearchDoSelectRowMethodName + m2mModel.ViewName #>();
                     <#= IsInQueryPropertyName #> = false;
                     return;
 <#
@@ -1376,7 +1421,7 @@ namespace <#= SformViewModelNameSpace #> {
             ModelViewForeignKeySerializable foreignKey2Model = sch.Item2;
 #>
         #region <#= ScanByVwModePropertyName + m2mModel.ViewName + FilterDefinitionsPropertyName #>
-        protected void <#= SearchDoSelectRowMethodName + m2mModel.ViewName #>() {
+        protected async Task <#= SearchDoSelectRowMethodName + m2mModel.ViewName #>() {
             <#= GetFilterInterfaceName(m2mModel) #> dtlflt = <#= FormServicePrefixPropertyName + m2mModel.ViewName #>.GetFilter();
             dtlflt.page = this.<#= CurrentPagePropertyName #>; 
             dtlflt.pagesize = this.<#= RowsPerPagePropertyName #>;
@@ -1391,7 +1436,7 @@ namespace <#= SformViewModelNameSpace #> {
                     isFltSet = false;
                 } else {
                     IList<<#= IWebServiceFilterRsltInterfaceClassName #>> dfltrslt = 
-                        <#= FormServicePrefixPropertyName + m2mModel.ViewName #>.get<#= HiddenFilterAsFltRsltSuffix #>(this.<#= FormServicePrefixPropertyName + m2mModel.ViewName #>.get<#= HiddenFilterByRowSuffix #>(<#= ScanByVwModePropertyName + m2mModel.ViewName + GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) + "Item" #>, "<#= kvp.Key.NavigationName #>"));
+                        <#= FormServicePrefixPropertyName + m2mModel.ViewName #>.get<#= HiddenFilterAsFltRsltSuffix #>(this.<#= FormServicePrefixPropertyName + searchModel.ViewName #>.get<#= HiddenFilterByRowSuffix #>(<#= ScanByVwModePropertyName + m2mModel.ViewName + GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) + "Item" #>, "<#= kvp.Key.NavigationName #>"));
                     if (dfltrslt is null) {
                         isFltSet = false;
                     } else {
@@ -1408,13 +1453,13 @@ namespace <#= SformViewModelNameSpace #> {
             // by requirements all common foreignkey props have the same names for <#= m2mModel.ViewName #> and <#= Model.ViewName #>
             foreach(var fld in reqHiddenProps["<#= m2mModel.ViewName #>"]) { 
                 <#= IWebServiceFilterRsltInterfaceClassName #> hf = this.<#= HiddenFiltersVMPropertyName #>.FirstOrDefault(f => f.fltrName == fld);
-                if(hf is not null) {
+                if(!(hf is null)) {
                     <#= FormServicePrefixPropertyName + m2mModel.ViewName #>.<#= FilterRslt2FilterMethodName #>(hf, dtlflt);
                 }
             }
             foreach(var fld in extHiddenProps["<#= m2mModel.ViewName #>"]) { 
                 <#= IWebServiceFilterRsltInterfaceClassName #> hf = this.<#= HiddenFiltersVMPropertyName #>.FirstOrDefault(f => f.fltrName == fld);
-                if(hf is not null) {
+                if(!(hf is null)) {
                     <#= FormServicePrefixPropertyName + m2mModel.ViewName #>.<#= FilterRslt2FilterMethodName #>(hf, dtlflt);
                 }
             }
@@ -1430,13 +1475,13 @@ namespace <#= SformViewModelNameSpace #> {
             Actual<#= RowsPerPagePropertyName #> = vd.pagesize;
             Actual<#= CurrentPagePropertyName #> = vd.page;
             <#= TotalCountPropertyName #> = vd.total; 
-            if(vd.Items is null) {
+            if(vd.items is null) {
                 ClearDataSource();
                 <#= DataSourcePropertyName #> = new ObservableCollection<<#= modelInterfaceClassName #>>();
                 <#= SelectedRowPropertyName #> = null;
                 return;
             }
-            if(vd.Items.Count < 1) {
+            if(vd.items.Count < 1) {
                 ClearDataSource();
                 <#= DataSourcePropertyName #> = new ObservableCollection<<#= modelInterfaceClassName #>>();
                 <#= SelectedRowPropertyName #> = null;
@@ -1445,10 +1490,9 @@ namespace <#= SformViewModelNameSpace #> {
             <#= GetFilterInterfaceName(Model) #> flt = <#= FormRootServicePropertyName #>.GetFilter();
             flt.page = 0;
             flt.pagesize = Actual<#= CurrentPagePropertyName #>;
-            foreach(var src in vd.Items) {
-                ILst<<#= IWebServiceFilterRsltInterfaceClassName #>> srcFlt = 
-                    <#= FormServicePrefixPropertyName + m2mModel.ViewName #>.get<#= HiddenFilterAsFltRsltSuffix #>(<#= FormServicePrefixPropertyName + m2mModel.ViewName #>.get<#= HiddenFilterByRowSuffix #>(src, "<#= foreignKey2Model.NavigationName #>"));
-                <#= FormRootServicePropertyName #>.<#= FilterRslt2FilterMethodName #>(srcFlt, flt);
+            foreach(var src in vd.items) {
+                // primary keys are identical for <#= m2mModel.ViewName #> and <#= Model.ViewName #>
+                <#= FormRootServicePropertyName #>.<#= FilterRslt2FilterMethodName #>(<#= FormServicePrefixPropertyName + m2mModel.ViewName #>.<#= rowPrim2FilterRsltMethodName #>(src), flt);
             }
             <#= modelPageInterfaceClassName #> rslt = await this.<#= FormRootServicePropertyName #>.<#= GetManyByRepPrimMethodNamePrefix #>(flt);
             if(rslt != null) {
@@ -1586,8 +1630,8 @@ namespace <#= SformViewModelNameSpace #> {
                 ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable = GetFirstPropOfFirstUniqueKey(searchModel);
 #>
                 case "<#= GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) #>":
-                    <#= ScanByVwModePropertyName + m2mModel.ViewName + GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) + "Item" #> = null;
-                    <#= ScanByVwModePropertyName + m2mModel.ViewName + GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) + "Text" #> = tprm.QueryText;
+                    _<#= ScanByVwModePropertyName + m2mModel.ViewName + GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) + "Item" #> = null;
+                    _<#= ScanByVwModePropertyName + m2mModel.ViewName + GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) + "Text" #> = tprm.QueryText;
                     {
                         <#= GetFilterInterfaceName(searchModel) #> fltr = <#= FormServicePrefixPropertyName + searchModel.ViewName #>.GetFilter();
                         fltr.page = 0;
@@ -2028,7 +2072,7 @@ namespace <#= SformViewModelNameSpace #> {
                 } // foreach(var sch in searchSchemas) { ... }
 #>
         };
-        Dictionary<string, IList<string>> extHiddenProps = {
+        Dictionary<string, IList<string>> extHiddenProps = new Dictionary<string, IList<string>>() {
 <#
                 foreach(var sch in searchSchemas) {
                     string fldLst = "";
@@ -2089,16 +2133,14 @@ namespace <#= SformViewModelNameSpace #> {
 #>
             IList<string> crrMDFP = new List<string>();
             foreach(var fld in mdlDrctFkProps) { 
-                if (<#= HiddenFiltersVMPropertyName #>.Any(f => f.fltrName == fld))
-                    crrMDFP.Add(fld);
-                }
+                if (<#= HiddenFiltersVMPropertyName #>.Any(f => f.fltrName == fld)) crrMDFP.Add(fld);
             }
             bool doIns = false;
 <#
             foreach(var sch in searchSchemas) {
                 ModelViewSerializable m2mModel = sch.Item1;
 #>
-            doIns = crrMDFP.length == this.reqHiddenProps["<#= m2mModel.ViewName #>"].Count;
+            doIns = crrMDFP.Count == this.reqHiddenProps["<#= m2mModel.ViewName #>"].Count;
             if(doIns) {
                 doIns = (this.reqHiddenProps["<#= m2mModel.ViewName #>"].Count(s => crrMDFP.Contains(s))) == crrMDFP.Count;
                 
@@ -2109,8 +2151,8 @@ namespace <#= SformViewModelNameSpace #> {
                             if(!doIns) break;
                         }
                     } else {
-                        doIns = extHiddflt.Count === this.extHiddenProps["<#= m2mModel.ViewName #>"].Count;
-                        if(doIns) doIns = extHiddflt.Count(s => this.extHiddenProps["<#= m2mModel.ViewName #>"].Contains(s)) === extHiddflt.Count;
+                        doIns = extHiddflt.Count == this.extHiddenProps["<#= m2mModel.ViewName #>"].Count;
+                        if(doIns) doIns = extHiddflt.Count(s => this.extHiddenProps["<#= m2mModel.ViewName #>"].Contains(s)) == extHiddflt.Count;
                     }
                 }
             }
