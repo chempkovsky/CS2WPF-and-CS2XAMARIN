@@ -1489,7 +1489,7 @@ namespace <#= SformViewModelNameSpace #> {
             }
             <#= GetFilterInterfaceName(Model) #> flt = <#= FormRootServicePropertyName #>.GetFilter();
             flt.page = 0;
-            flt.pagesize = Actual<#= CurrentPagePropertyName #>;
+            flt.pagesize = Actual<#= RowsPerPagePropertyName #>;
             foreach(var src in vd.items) {
                 // primary keys are identical for <#= m2mModel.ViewName #> and <#= Model.ViewName #>
                 <#= FormRootServicePropertyName #>.<#= FilterRslt2FilterMethodName #>(<#= FormServicePrefixPropertyName + m2mModel.ViewName #>.<#= rowPrim2FilterRsltMethodName #>(src), flt);
@@ -1567,7 +1567,7 @@ namespace <#= SformViewModelNameSpace #> {
                 }
             }
         }
-        protected string _<#= ScanByVwModePropertyName + m2mModel.ViewName + GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) + "Text" #> = null;
+        protected string _<#= ScanByVwModePropertyName + m2mModel.ViewName + GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) + "Text" #> = "";
         public string <#= ScanByVwModePropertyName + m2mModel.ViewName + GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) + "Text" #> {
             get {
                 <#= GetInterfaceName(searchModel) #> dmObj = <#= ScanByVwModePropertyName + m2mModel.ViewName + GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) + "Item" #> as <#= GetInterfaceName(searchModel) #>;
@@ -1599,7 +1599,10 @@ namespace <#= SformViewModelNameSpace #> {
             }
             set {
                 if(_<#= ScanByVwModePropertyName + m2mModel.ViewName + GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) + "Text" #> != value) {
-                    _<#= ScanByVwModePropertyName + m2mModel.ViewName + GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) + "Text" #> = value;
+                    if(value is null)
+                        _<#= ScanByVwModePropertyName + m2mModel.ViewName + GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) + "Text" #> = "";
+                    else
+                        _<#= ScanByVwModePropertyName + m2mModel.ViewName + GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) + "Text" #> = value;
                     OnPropertyChanged();
                 }
             }
@@ -1631,7 +1634,10 @@ namespace <#= SformViewModelNameSpace #> {
 #>
                 case "<#= GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) #>":
                     _<#= ScanByVwModePropertyName + m2mModel.ViewName + GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) + "Item" #> = null;
-                    _<#= ScanByVwModePropertyName + m2mModel.ViewName + GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) + "Text" #> = tprm.QueryText;
+                    string qstr = tprm.QueryText;
+                    if(qstr is null) qstr = "";
+                    if(_<#= ScanByVwModePropertyName + m2mModel.ViewName + GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) + "Text" #> == qstr) return;
+                    _<#= ScanByVwModePropertyName + m2mModel.ViewName + GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel) + "Text" #> = qstr;
                     {
                         <#= GetFilterInterfaceName(searchModel) #> fltr = <#= FormServicePrefixPropertyName + searchModel.ViewName #>.GetFilter();
                         fltr.page = 0;
@@ -1639,12 +1645,12 @@ namespace <#= SformViewModelNameSpace #> {
 <#
                 if(IsPropertyString(modelViewPropertyOfVwSerializable)) {
 #>
-                        fltr.<#= GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel)#> = new List<string>() { tprm.QueryText };
+                        fltr.<#= GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel)#> = new List<string>() { qstr };
 <#
                 } else {
 #>
                         <#= GetPropertyTypeName(modelViewPropertyOfVwSerializable) #> val;
-                        if (<#= GetPropertyTypeName(modelViewPropertyOfVwSerializable) #>.TryParse(tprm.QueryText, out val)) {
+                        if (<#= GetPropertyTypeName(modelViewPropertyOfVwSerializable) #>.TryParse(qstr, out val)) {
                             fltr.<#= GetModelPropertyName(modelViewPropertyOfVwSerializable, searchModel)#> = new List<<#= GetPropertyTypeName(modelViewPropertyOfVwSerializable) #>>() { val };
                         }
 <#
@@ -1821,7 +1827,7 @@ namespace <#= SformViewModelNameSpace #> {
 <#
             foreach(ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable in uniqueKeys[i].UniqueKeyProperties) {
 #>
-        protected string _<#= ScanByUkModePropertyName + caption + GetModelPropertyName(modelViewPropertyOfVwSerializable, Model) + "Text" #> = null;
+        protected string _<#= ScanByUkModePropertyName + caption + GetModelPropertyName(modelViewPropertyOfVwSerializable, Model) + "Text" #> = "";
         public string <#= ScanByUkModePropertyName + caption + GetModelPropertyName(modelViewPropertyOfVwSerializable, Model) + "Text" #> {
             get {
                 <#= GetInterfaceName(Model) #> dmObj = <#= ScanByUkModePropertyName + caption + GetModelPropertyName(modelViewPropertyOfVwSerializable, Model) + "Item" #>;
@@ -1854,7 +1860,10 @@ namespace <#= SformViewModelNameSpace #> {
             }
             set {
                 if(_<#= ScanByUkModePropertyName + caption + GetModelPropertyName(modelViewPropertyOfVwSerializable, Model) + "Text" #> != value) {
-                    _<#= ScanByUkModePropertyName + caption + GetModelPropertyName(modelViewPropertyOfVwSerializable, Model) + "Text" #> = value;
+                    if(value is null)
+                        _<#= ScanByUkModePropertyName + caption + GetModelPropertyName(modelViewPropertyOfVwSerializable, Model) + "Text" #> = "";
+                    else
+                        _<#= ScanByUkModePropertyName + caption + GetModelPropertyName(modelViewPropertyOfVwSerializable, Model) + "Text" #> = value;
                     OnPropertyChanged();
                 }
             }
@@ -1920,16 +1929,22 @@ namespace <#= SformViewModelNameSpace #> {
              } else if(k == <#= k #>) { 
                 <#= ScanByUkModePropertyName + caption + GetModelPropertyName(modelViewPropertyOfVwSerializable, Model) + "Item" #> = null;
                 <#= ScanByUkModePropertyName + caption + GetModelPropertyName(modelViewPropertyOfVwSerializable, Model) + "Text" #> = tprm.QueryText;
+                string qstr = tprm.QueryText;
+                if(qstr is null) qstr = "";
+                if(_<#= ScanByUkModePropertyName + caption + GetModelPropertyName(modelViewPropertyOfVwSerializable, Model) + "Text" #> == qstr) return;
+                _<#= ScanByUkModePropertyName + caption + GetModelPropertyName(modelViewPropertyOfVwSerializable, Model) + "Text" #> = qstr;
+
+
 <#
                 if(IsPropertyString(modelViewPropertyOfVwSerializable)) {
 #>
-                    fltr.<#= GetModelPropertyName(modelViewPropertyOfVwSerializable, Model)#> = new List<string>() { tprm.QueryText };
+                    fltr.<#= GetModelPropertyName(modelViewPropertyOfVwSerializable, Model)#> = new List<string>() { qstr };
 <#
                 } else {
 #>
                 {
                     <#= GetPropertyTypeName(modelViewPropertyOfVwSerializable) #> val;
-                    if (<#= GetPropertyTypeName(modelViewPropertyOfVwSerializable) #>.TryParse(tprm.QueryText, out val)) {
+                    if (<#= GetPropertyTypeName(modelViewPropertyOfVwSerializable) #>.TryParse(qstr, out val)) {
                         fltr.<#= GetModelPropertyName(modelViewPropertyOfVwSerializable, Model)#> = new List<<#= GetPropertyTypeName(modelViewPropertyOfVwSerializable) #>>() { val };
                     }
                 }
