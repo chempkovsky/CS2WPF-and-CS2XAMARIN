@@ -1,0 +1,76 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="System.String" name="DefaultProjectNameSpace" #>
+
+<#
+
+    string responsebindingmodelFolder                   = "00378-Responsebindingmodel.cs";
+    
+#>
+
+
+namespace <#= GetNameSpaceName(Model, responsebindingmodelFolder, DefaultProjectNameSpace) #>
+{
+    public class <#= GetEntityClassName(Model, responsebindingmodelFolder) #>
+    {
+
+        public string Status { get; set; } = null!;
+
+        public string Message { get; set; } = null!;
+
+    }
+}
+
+
+<#+
+    string GetEntityClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType) ) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        return refItem.FileName;
+    }
+    string GetNameSpaceName(ModelViewSerializable model, string currFolder, string  DefaultProjectNameSpace) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(currFolder)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable curItem= 
+            model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+        if (curItem == null) {
+            return result;
+        }
+        result = curItem.FileFolder.Replace("\\",".");
+        if(string.IsNullOrEmpty(DefaultProjectNameSpace)) {
+            return result;
+        } 
+        return DefaultProjectNameSpace + "." + result;
+    }
+
+
+#>

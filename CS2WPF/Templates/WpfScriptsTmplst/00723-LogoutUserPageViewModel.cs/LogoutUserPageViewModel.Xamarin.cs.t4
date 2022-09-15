@@ -154,10 +154,11 @@ namespace <#= LogoutUserPageViewModelNameSpace #> {
                 return _<#= OkCommandPropertyName #> ?? (_<#= OkCommandPropertyName #> = new Command((param) => <#= OkCommandPropertyName #>Action(param), (param) => <#= OkCommandPropertyName #>CanExecute(param)));
             }
         }
-        protected async void <#= OkCommandPropertyName #>Action(object param)
+//        protected async void <#= OkCommandPropertyName #>Action(object param)
+        protected void <#= OkCommandPropertyName #>Action(object param)
         {
-            bool model = await _<#= AppLoginServicePropertyName #>.<#= LogoutMethodName #>();
-            if (!model) return;
+            // bool model = await _<#= AppLoginServicePropertyName #>.<#= LogoutMethodName #>();
+            // if (!model) return;
             if(_<#= AppSettingServicePropertyName #> != null) {
                 _<#= AppSettingServicePropertyName #>.AuthInfo = null;
                 _<#= AppSettingServicePropertyName #>.Client.DefaultRequestHeaders.Authorization = null;

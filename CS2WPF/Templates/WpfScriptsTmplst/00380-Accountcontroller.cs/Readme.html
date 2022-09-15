@@ -1,0 +1,136 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>00380-Accountcontroller.cs</title>
+</head>
+<body>
+    <h3>(Context level) Readme for 00380-Accountcontroller.cs</h3>
+
+    <table cellspacing="5" border="1">
+        <tr>
+            <td>
+                Type
+            </td>
+            <td>
+                Backend service
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Recomended folder
+            </td>
+            <td>
+                "AspNet" WebApi C# project
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Generator group
+            </td>
+            <td>
+                Context level
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <strong>File type</strong>
+            </td>
+            <td>
+                C# WebApi controller
+            </td>
+        </tr>
+    </table>
+    <strong>
+        Remark #1:
+    </strong>
+    This C# class is Security Controller to Login, Change password, Register.<br>
+
+
+    <strong>
+        Remark #2:
+    </strong>
+    In the Program.cs file Of WebApi project the following code must be inserted.<br>
+
+    <pre><code>
+#region authentification
+    builder.Services.AddDbContext<ApplicationDbContext>(options =>
+        options.UseSqlServer(builder.Configuration.GetConnectionString("AuthConnection")));
+
+    builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+        .AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
+
+    builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+    }).AddJwtBearer(options =>
+    {
+        options.SaveToken = true;
+        options.RequireHttpsMetadata = true;
+        options.TokenValidationParameters = new TokenValidationParameters()
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidAudience = configuration["JWT:ValidAudience"],
+            ValidIssuer = configuration["JWT:ValidIssuer"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:Secret"]))
+        };
+    });
+    builder.Services.AddHttpContextAccessor();
+    
+#endregion
+
+// and later
+#region authentification
+    app.UseAuthentication();
+#endregion
+
+        
+    </code></pre>
+
+
+    <strong>
+        Remark #3:
+    </strong>
+    To get User name in the controller the following code mast be added.<br>
+
+    <pre><code>
+
+    public class SomeController : ControllerBase
+    {
+        private readonly UserManager<IdentityUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly IConfiguration _configuration;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
+        public SomeController(
+                    IHttpContextAccessor httpContextAccessor,
+                    UserManager<IdentityUser> userManager,
+                    RoleManager<IdentityRole> roleManager,
+                    IConfiguration configuration)
+        {
+            _userManager = userManager;
+            _roleManager = roleManager;
+            _configuration = configuration;
+            _httpContextAccessor = httpContextAccessor;
+        }
+
+        [HttpPost]
+        [Route("someroute")]
+        public async Task<ActionResult> SomeMethod(SomeType model)
+        {
+           ...
+
+            string? userName = _httpContextAccessor?.HttpContext?.User?.FindFirst(ClaimTypes.Name)?.Value;
+            var user = await _userManager.FindByNameAsync(userName);
+
+           ...
+        }
+
+    </code></pre>
+
+</body>
+</html>

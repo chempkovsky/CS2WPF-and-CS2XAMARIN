@@ -1,0 +1,192 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="System.String" name="DefaultProjectNameSpace" #>
+
+<#
+
+    string registerBindingModelFolder                   = "00370-Registerbindingmodel.cs";
+    string loginBindingModelFolder                      = "00374-Loginbindingmodel.cs";
+    string changepasswordBindingModelFolder             = "00376-Changepasswordbindingmodel.cs";
+    string responsebindingmodelFolder                   = "00378-Responsebindingmodel.cs";
+
+    string accountcontrollerFolder                      = "00380-Accountcontroller.cs";
+    
+#>
+
+using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+
+
+namespace <#= GetNameSpaceName(Model, accountcontrollerFolder, DefaultProjectNameSpace) #>
+{
+    [ApiController]
+    public class <#= GetEntityClassName(Model, accountcontrollerFolder) #> : ControllerBase
+    {
+        private readonly UserManager<IdentityUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly IConfiguration _configuration;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
+        public <#= GetEntityClassName(Model, accountcontrollerFolder) #>(
+                    IHttpContextAccessor httpContextAccessor,
+                    UserManager<IdentityUser> userManager,
+                    RoleManager<IdentityRole> roleManager,
+                    IConfiguration configuration)
+        {
+            _userManager = userManager;
+            _roleManager = roleManager;
+            _configuration = configuration;
+            _httpContextAccessor = httpContextAccessor;
+        }
+
+        [HttpPost]
+        [Route("token")]
+        public async Task<IActionResult> Login([FromBody] <#= GetEntityClassName(Model, loginBindingModelFolder) #> model)
+        {
+            var user = await _userManager.FindByNameAsync(model.UserName);
+            if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
+            {
+                var userRoles = await _userManager.GetRolesAsync(user);
+
+                var authClaims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.Name, user.UserName),
+                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                };
+
+                foreach (var userRole in userRoles)
+                {
+                    authClaims.Add(new Claim(ClaimTypes.Role, userRole));
+                }
+
+                var token = GetToken(authClaims);
+
+                return Ok(new
+                {
+                    token_type = "Bearer",
+                    user_name = model.UserName,
+                    access_token = new JwtSecurityTokenHandler().WriteToken(token),
+                    expiration = token.ValidTo
+                });
+            }
+            return Unauthorized();
+        }
+
+        [HttpPost]
+        [Route("api/[controller]/register")]
+        public async Task<IActionResult> Register([FromBody] <#= GetEntityClassName(Model, registerBindingModelFolder) #> model)
+        {
+            var userExists = await _userManager.FindByNameAsync(model.Email);
+            if (userExists != null)
+                return StatusCode(StatusCodes.Status500InternalServerError, new <#= GetEntityClassName(Model, responsebindingmodelFolder) #> { Status = "Error", Message = "User already exists!" });
+
+            IdentityUser user = new()
+            {
+                Email = model.Email,
+                SecurityStamp = Guid.NewGuid().ToString(),
+                UserName = model.Email
+            };
+            var result = await _userManager.CreateAsync(user, model.Password);
+            if (!result.Succeeded)
+                return StatusCode(StatusCodes.Status500InternalServerError, new <#= GetEntityClassName(Model, responsebindingmodelFolder) #> { Status = "Error", Message = "User creation failed! Please check user details and try again." });
+
+            return Ok(new <#= GetEntityClassName(Model, responsebindingmodelFolder) #> { Status = "Success", Message = "User created successfully!" });
+        }
+
+        private JwtSecurityToken GetToken(List<Claim> authClaims)
+        {
+            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
+
+            var token = new JwtSecurityToken(
+                issuer: _configuration["JWT:ValidIssuer"],
+                audience: _configuration["JWT:ValidAudience"],
+                expires: DateTime.Now.AddHours(8),
+                claims: authClaims,
+                signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
+                );
+
+            return token;
+        }
+
+        // POST api/Account/ChangePassword
+        [HttpPost]
+        [Route("api/[controller]/ChangePassword")]
+        public async Task<ActionResult> ChangePassword(<#= GetEntityClassName(Model, changepasswordBindingModelFolder) #> model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            string? userName = _httpContextAccessor?.HttpContext?.User?.FindFirst(ClaimTypes.Name)?.Value;
+            var user = await _userManager.FindByNameAsync(userName);
+            IdentityResult result = await _userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
+
+            if (!result.Succeeded)
+            {
+                return BadRequest(result);
+            }
+            return Ok();
+        }
+
+    }
+}
+
+
+<#+
+    string GetEntityClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType) ) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        return refItem.FileName;
+    }
+    string GetNameSpaceName(ModelViewSerializable model, string currFolder, string  DefaultProjectNameSpace) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(currFolder)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable curItem= 
+            model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+        if (curItem == null) {
+            return result;
+        }
+        result = curItem.FileFolder.Replace("\\",".");
+        if(string.IsNullOrEmpty(DefaultProjectNameSpace)) {
+            return result;
+        } 
+        return DefaultProjectNameSpace + "." + result;
+    }
+
+
+#>
