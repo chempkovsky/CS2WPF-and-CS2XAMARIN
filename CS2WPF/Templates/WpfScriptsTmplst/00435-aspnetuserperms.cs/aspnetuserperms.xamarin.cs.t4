@@ -14,35 +14,29 @@
 <#@ parameter type="System.String" name="DefaultProjectNameSpace" #>
 
 <#
-
-    string aspnetroleFolder             = "00400-aspnetrole.cs";
-    string aspnetuserroleFolder         = "00420-aspnetuserroles.cs";
-    string aspnetrolemaskFolder         = "00440-aspnetrolemask.cs";
-    
+    string aspnetuserpermsFolder            = "00435-aspnetuserperms.cs";
 #>
 
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 
-namespace <#= GetNameSpaceName(Model, aspnetroleFolder, DefaultProjectNameSpace) #>
+namespace <#= GetNameSpaceName(Model, aspnetuserpermsFolder, DefaultProjectNameSpace) #>
 {
-    public class <#= GetEntityClassName(Model, aspnetroleFolder) #>
+    public class <#= GetEntityClassName(Model, aspnetuserpermsFolder) #>
     {
-        [Required]
-        [Display(Description = "Role Id", Name = "Role Id", Prompt = "Enter Id", ShortName = "Id")]
-        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
-        [StringLength(128, MinimumLength = 1, ErrorMessage = "Invalid")]
-        public string Id { get; set; } = null!;
-
-        [Required]
-        [Display(Description = "Role Name", Name = "Role Name", Prompt = "Enter RoleName", ShortName = "Role Name")]
-        [StringLength(128, MinimumLength = 1, ErrorMessage = "Invalid")]
-        public string Name { get; set; } = null!;
-
-        public virtual ICollection<<#= GetEntityClassName(Model, aspnetuserroleFolder) #>> UserRoles { get; set; }= null!;
-        public virtual ICollection<<#= GetEntityClassName(Model, aspnetrolemaskFolder) #>> RoleMasks { get; set; }= null!;
         
+        [Required]
+        [Display(Description = "Model Name", Name = "Model Name", Prompt = "Enter ModelName", ShortName = "Name")]
+        [StringLength(50, MinimumLength = 1, ErrorMessage = "Invalid")]
+        public string ModelName { get; set; } = null!;
+
+
+        [Required]
+        [Display(Description = "User Perms", Name = "User Perms", Prompt = "Enter User Perms", ShortName = "User Perms")]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        public int UserPerms { get; set; }
+
     }
 }
 

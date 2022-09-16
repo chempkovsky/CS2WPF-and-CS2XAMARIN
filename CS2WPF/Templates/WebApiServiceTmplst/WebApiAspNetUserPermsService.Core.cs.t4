@@ -1,0 +1,479 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+#nullable disable
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
+
+<#
+
+    string GetAllMethodName         = "getall";
+    string GetWithFilterMethodName  = "getwithfilter";
+    string GetOneMethodName         = "getone";
+    string UpdateOneMethodName      = "updateone";
+    string AddOneMethodName         = "addone";
+    string DeleteOneMethodName      = "deleteone";
+    string GetOneByMethodNamePrefix = "getoneby";
+
+    string OperatorSufix = "Oprtr";
+    string webApiServiceNameSpace = GetDestinationNameSpace(Model);
+    string rootEntityNameSpace = GetRootEntityNameSpace(Model);
+    string dbContextNameSpace = GetDbContextNameSpace(Context);
+    string viewModelNameSpace = GetViewModelNameSpace(Model);
+    string webApiServicePrefix = GetWebApiServicePrefix(Model);
+    string webApiRoutePrefix =  GetWebApiRoutePrefix(Model);
+    List<String> locNavigationPaths = GetNavigationPaths(Model);
+
+    List<ModelViewUniqueKeyOfVwSerializable> uniqueKeys = new List<ModelViewUniqueKeyOfVwSerializable>();
+    {
+        ModelViewUniqueKeyOfVwSerializable pk = GetModelPrimaryKey(Model);
+        if (pk != null) uniqueKeys.Add(pk);
+        
+        GetModelUniqueKeys(Model, uniqueKeys);
+    }
+
+#>
+<# if (!string.IsNullOrEmpty(dbContextNameSpace)) {
+ if (!string.Equals(dbContextNameSpace, webApiServiceNameSpace)) { #>
+using <#= dbContextNameSpace #>;
+<# }} #>
+<# if (!string.IsNullOrEmpty(viewModelNameSpace)) {
+ if (!string.Equals(viewModelNameSpace, webApiServiceNameSpace)) {#>
+using <#= viewModelNameSpace #>;
+<# }} #>
+<# if (!string.IsNullOrEmpty(rootEntityNameSpace)) {
+ if (!string.Equals(rootEntityNameSpace, webApiServiceNameSpace)) {#>
+using <#= rootEntityNameSpace #>;
+<# }} #>
+
+namespace <#= webApiServiceNameSpace #> {
+
+//    [RoutePrefix("<#= webApiServicePrefix #>")]
+    [ApiController]
+    [Route("<#= webApiRoutePrefix #>")]
+    public class <#= Model.WebApiServiceName #>: ControllerBase
+    {
+        private readonly <#= Context.DbContextClassName #> db;
+
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public IHttpContextAccessor HttpContextAccessor
+        {
+            get
+            {
+                return _httpContextAccessor;
+            }
+        }
+
+        public <#= Model.WebApiServiceName #>(
+                    <#= Context.DbContextClassName #> context,
+                    IHttpContextAccessor httpContextAccessor)
+        {
+            _httpContextAccessor = httpContextAccessor;
+            db = context;
+        }
+
+        [HttpGet]
+        [Route("api/[controller]/<#= GetAllMethodName #>")]
+        public async Task<ActionResult<IEnumerable<<#=Model.ViewName#>>>> <#= GetAllMethodName #>()
+        {
+            string[] roles = _httpContextAccessor?.HttpContext?.User?.Claims.Where(c => c.Type == ClaimTypes.Role).Select(cl => cl.Value).ToArray();
+            if(roles == null) return new List<<#=Model.ViewName#>>();
+            return  await db.aspnetrolemaskDbSet.Where(u=> roles.Contains( u.RoleName))
+                .GroupBy(u => u.ModelPkRef)
+                .Select(g => new {
+                    ModelPkRef = g.Key,
+                    Mask1 = g.Sum(g => g.Mask1 ? 1 : 0) > 0,
+                    Mask2 = g.Sum(g => g.Mask2 ? 1 : 0) > 0,
+                    Mask3 = g.Sum(g => g.Mask3 ? 1 : 0) > 0,
+                    Mask4 = g.Sum(g => g.Mask4 ? 1 : 0) > 0,
+                    Mask5 = g.Sum(g => g.Mask5 ? 1 : 0) > 0
+                }).Join(db.aspnetmodellDbSet,
+                 o => o.ModelPkRef,
+                 i => i.ModelPk,
+                  (o, i) => new <#= Model.ViewName #>
+                  {
+                      ModelName = i.ModelName,
+                      UserPerms = (o.Mask1 ? 1 : 0) + (o.Mask2 ? 2 : 0) + (o.Mask3 ? 4 : 0) + (o.Mask4 ? 8 : 0) + (o.Mask5 ? 16 : 0)
+                  })
+                .ToListAsync();
+        } // the end of GetWithFilter()-method
+    }
+}
+
+<#+
+    String GetDestinationNameSpace(ModelViewSerializable model) {
+        string result = "";
+        if( !string.IsNullOrEmpty( model.WebApiServiceFolder ) ) {
+            result = model.WebApiServiceFolder.Replace("\\", ".");
+        }
+        if ( !string.IsNullOrEmpty(model.WebApiServiceDefaultProjectNameSpace) ) {
+            if (string.IsNullOrEmpty(result)) {
+                result = model.WebApiServiceDefaultProjectNameSpace;
+            } else {
+                result = model.WebApiServiceDefaultProjectNameSpace + "." + result;
+            }
+        }
+        return result;
+    }
+    String GetDbContextNameSpace(DbContextSerializable context) {
+        string result = context.DbContextFullClassName;
+        
+        if( !string.IsNullOrEmpty( result ) ) {
+            if( !string.IsNullOrEmpty(context.DbContextClassName) ) {
+                if(result.EndsWith("."+context.DbContextClassName)) {
+                    result = result.Substring(0, result.LastIndexOf("."+context.DbContextClassName));
+                }
+            }
+        }
+        return result;
+    }
+    String GetViewModelNameSpace(ModelViewSerializable model) {
+        string result = "";
+        if( !string.IsNullOrEmpty( model.ViewFolder ) ) {
+            result = model.ViewFolder.Replace("\\", ".");
+        }
+        if ( !string.IsNullOrEmpty(model.ViewDefaultProjectNameSpace) ) {
+            if (string.IsNullOrEmpty(result)) {
+                result = model.ViewDefaultProjectNameSpace;
+            } else {
+                result = model.ViewDefaultProjectNameSpace + "." + result;
+            }
+        }
+        return result;
+    }
+    String GetRootEntityNameSpace(ModelViewSerializable model) {
+        return model.RootEntityFullClassName.Substring(0, model.RootEntityFullClassName.LastIndexOf("." + model.RootEntityClassName));
+    }
+    List<String> GetNavigationPaths(ModelViewSerializable model) {
+        List<String> locPaths = new List<String>();
+        if(model.ScalarProperties == null) return locPaths;
+        foreach (ModelViewPropertyOfVwSerializable prop in model.ScalarProperties)
+        {
+            if (string.IsNullOrEmpty(prop.ForeignKeyNameChain)) continue;
+            if (locPaths.Exists(itm => (itm.StartsWith(prop.ForeignKeyNameChain + ".") || (itm.Equals(prop.ForeignKeyNameChain))))) continue;
+            string s = locPaths.Where(itm => (prop.ForeignKeyNameChain.StartsWith(itm + ".") || (itm.Equals(prop.ForeignKeyNameChain)))).FirstOrDefault();
+            if (!string.IsNullOrEmpty(s))
+            {
+                locPaths.Remove(s);
+            }
+            locPaths.Add(prop.ForeignKeyNameChain);
+        }
+        return locPaths;
+    }
+    String GenerateIncludePaths(String src) {
+        if (String.IsNullOrEmpty(src)) return "";
+        string[] sa = src.Split(new char[] { '.' });
+        StringBuilder sb = new StringBuilder(".Include(p => p." + sa[0] + ")");
+        for (int i = 1; i < sa.Length; i++)
+        {
+            sb.Append(".ThenInclude(p => p." + sa[i] + ")");
+        }
+        return sb.ToString();
+    }
+    String GetForeignKeyNameChain(String foreignKeyNameChain) {
+        if (String.IsNullOrEmpty(foreignKeyNameChain)) {
+            return "";
+        } else {
+            return foreignKeyNameChain + ".";
+        }
+    }
+    String GetForeignKeyNameChainAndProp(ModelViewPropertyOfVwSerializable sProp, ModelViewSerializable model) {
+        if (String.IsNullOrEmpty(sProp.ForeignKeyNameChain)) {
+            return sProp.OriginalPropertyName;
+        } else {
+            if((sProp.ForeignKeyNameChain == sProp.ForeignKeyName) && (model.ForeignKeys != null)) {
+                ModelViewForeignKeySerializable fk = model.ForeignKeys.Where(f => f.NavigationName == sProp.ForeignKeyName).FirstOrDefault();
+                if(fk != null) {
+                    if((fk.ForeignKeyProps != null) && (fk.PrincipalKeyProps != null)) {
+                        for(int i = 0; i < fk.PrincipalKeyProps.Count; i++) {
+                            if(i < fk.ForeignKeyProps.Count) {
+                                if(fk.PrincipalKeyProps[i].OriginalPropertyName == sProp.OriginalPropertyName) {
+                                    return fk.ForeignKeyProps[i].OriginalPropertyName;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return sProp.ForeignKeyNameChain + "." + sProp.OriginalPropertyName;
+        }
+    }
+
+
+
+    String GetWebApiServicePrefix(ModelViewSerializable model) {
+        string result = model.WebApiServiceName;
+        if( !string.IsNullOrEmpty( result ) ) {
+            if(result.EndsWith("Controller")) {
+                result = result.Substring(0, result.LastIndexOf("Controller"));
+            }
+            result = result.ToLower();
+        }
+        return result;
+    }
+    String GetWebApiRoutePrefix(ModelViewSerializable model) {
+        string result = model.WebApiRoutePrefix;
+        if( string.IsNullOrEmpty( result ) ) {
+            result = "";
+        }
+        return result;
+    }
+    String GetNullableType(ModelViewPropertySerializable prop) {
+        if (prop.UnderlyingTypeName.Equals("System.String")) {
+            return prop.UnderlyingTypeName;
+        } else {
+			return prop.UnderlyingTypeName +"?";
+        }
+    }
+    String GetChainedPropertyName(ModelViewPropertySerializable prop) {
+        if (String.IsNullOrEmpty(prop.ForeignKeyNameChain)) {
+            return prop.OriginalPropertyName;
+        } else {
+            return prop.ForeignKeyNameChain + "." + prop.OriginalPropertyName;
+        }
+    }
+    bool IsEntityTypeString(ModelViewPropertySerializable prop) {
+        return prop.UnderlyingTypeName.Equals("System.String");
+    }
+    bool IsEntityTypeBoolean(ModelViewPropertySerializable prop) {
+        return prop.UnderlyingTypeName.Equals("System.Boolean");
+    }
+    String GetFirstPrimKeyProperty(ModelViewSerializable model) {
+        return model.PrimaryKeyProperties.FirstOrDefault().OriginalPropertyName;
+    }
+    String GetLowerCasePropertyName(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+        string result = GetTypeScriptPropertyName(prop, model);
+        if (!string.IsNullOrEmpty(result)) {
+            result = result.ToLower();
+        }
+        return result;
+    }
+    bool IsRootEntityProperty(ModelViewPropertySerializable prop, ModelViewSerializable model) {
+        return string.IsNullOrEmpty(prop.ForeignKeyNameChain);
+    }
+    ModelViewEntityPropertySerializable  GetRootEntityProperty(ModelViewPropertySerializable prop, ModelViewSerializable model) {
+        if (string.IsNullOrEmpty(prop.ForeignKeyNameChain)) {
+            if (model.AllProperties != null) {
+                return model.AllProperties.Where(p => p.OriginalPropertyName == prop.OriginalPropertyName).FirstOrDefault();
+            }
+            return null;
+        }
+        if(model.ForeignKeys == null) return null;
+        ModelViewForeignKeySerializable fk = model.ForeignKeys.Where(f => f.NavigationName == prop.ForeignKeyNameChain).FirstOrDefault();
+        if(fk == null) return null;
+        if((fk.PrincipalKeyProps == null) || (fk.ForeignKeyProps == null)) return null;
+        int cnt = fk.PrincipalKeyProps.Count;
+        if (cnt > fk.ForeignKeyProps.Count) cnt = fk.ForeignKeyProps.Count;
+        for(int i = 0; i < cnt; i++) {
+            if(fk.PrincipalKeyProps[i].OriginalPropertyName == prop.OriginalPropertyName) {
+                return model.AllProperties.Where(p => p.OriginalPropertyName == fk.ForeignKeyProps[i].OriginalPropertyName).FirstOrDefault();
+            }
+        }
+        return null;
+    }
+
+    string FirstLetterToUpper(string str) {
+        if (str == null)
+            return null;
+        if (str.Length > 1)
+            return char.ToUpper(str[0]) + str.Substring(1);
+        return str.ToUpper();
+    }
+    string FirstLetterToLower(string str) {
+        if (str == null)
+            return null;
+        if (str.Length > 1)
+            return char.ToLower(str[0]) + str.Substring(1);
+        return str.ToUpper();
+    }
+    string GetTypeScriptPropertyName(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+        if (model.GenerateJSonAttribute) {
+            return prop.ViewPropertyName;
+        } else {
+            return FirstLetterToLower(prop.ViewPropertyName);
+        }
+    }
+    string GetFilterPropertyName(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+        if (model.GenerateJSonAttribute) {
+            return prop.JsonPropertyName;
+        } else {
+            return FirstLetterToLower(prop.ViewPropertyName);
+        }
+    }
+    string GetFilterPropertyOperatorName(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model, string operatorSufix) {
+        if (model.GenerateJSonAttribute) {
+            return prop.JsonPropertyName + operatorSufix;
+        } else {
+            return FirstLetterToLower(prop.ViewPropertyName) + operatorSufix;
+        }
+    }
+
+    ModelViewPropertyOfVwSerializable GetModelScalarPropByKeyProp(ModelViewSerializable model, ModelViewKeyPropertySerializable pk) {
+        ModelViewPropertyOfVwSerializable rslt = null;
+        if ((model == null) || (pk == null)) return null;
+        if (model.ScalarProperties == null) return null;
+        ModelViewPropertyOfVwSerializable scProp = 
+            model.ScalarProperties.Where(p => ((p.OriginalPropertyName == pk.OriginalPropertyName) && (string.IsNullOrEmpty(p.ForeignKeyNameChain)))).FirstOrDefault();
+        if (scProp != null) return scProp;
+        if (model.ForeignKeys != null) {
+            foreach(ModelViewForeignKeySerializable fk in model.ForeignKeys) {
+                scProp = null;
+                if ((fk.ForeignKeyProps != null) && (fk.PrincipalKeyProps != null)) {
+                    int cnt = fk.ForeignKeyProps.Count;
+                    if (cnt < fk.PrincipalKeyProps.Count)
+                    {
+                        cnt = fk.PrincipalKeyProps.Count;
+                    }
+                    for(int i = 0; i < cnt; i++)
+                    {
+                        if(fk.ForeignKeyProps[i].OriginalPropertyName == pk.OriginalPropertyName)
+                        {
+                            scProp=
+                                model.ScalarProperties.Where(p =>
+                                ((p.OriginalPropertyName == fk.PrincipalKeyProps[i].OriginalPropertyName) && (p.ForeignKeyNameChain == fk.NavigationName))).FirstOrDefault();
+                        }
+                        if(scProp != null) return scProp;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+    ModelViewUniqueKeyOfVwSerializable GetModelPrimaryKey(ModelViewSerializable model) {
+        ModelViewUniqueKeyOfVwSerializable rslt = null;    
+        if(model == null) return rslt;
+        if((model.PrimaryKeyProperties == null) || (model.ScalarProperties == null)) return rslt;
+        if((model.PrimaryKeyProperties.Count < 1) || (model.ScalarProperties.Count < 1)) return rslt;
+        foreach(ModelViewKeyPropertySerializable pk in model.PrimaryKeyProperties) {
+            ModelViewPropertyOfVwSerializable scProp = 
+                model.ScalarProperties.Where(p => ((p.OriginalPropertyName == pk.OriginalPropertyName) && (string.IsNullOrEmpty(p.ForeignKeyNameChain)))).FirstOrDefault();
+            if(scProp == null) {
+                scProp = GetModelScalarPropByKeyProp(model, pk);
+            }
+            if(scProp != null) {
+                if(rslt == null) rslt = new ModelViewUniqueKeyOfVwSerializable() {
+                    UniqueKeyName = null,
+                    IsPrimary = true,
+                    UniqueKeyProperties = new List<ModelViewPropertyOfVwSerializable>()
+                };
+                rslt.UniqueKeyProperties.Add(scProp);
+            }
+        }
+        return rslt;
+    }
+    List<ModelViewUniqueKeyOfVwSerializable> GetModelUniqueKeys(ModelViewSerializable model, List<ModelViewUniqueKeyOfVwSerializable> rsltKeys) {
+        if((model == null) || (rsltKeys == null)) return rsltKeys;
+        if ((model.UniqueKeys == null) || (model.ScalarProperties == null)) return rsltKeys;
+        foreach(ModelViewUniqueKeySerializable uk in model.UniqueKeys) {
+            if(uk.UniqueKeyProperties == null) continue;
+            if(uk.UniqueKeyProperties.Count < 1) continue;
+            ModelViewUniqueKeyOfVwSerializable rslt = null; 
+            foreach(ModelViewKeyPropertySerializable pk in uk.UniqueKeyProperties) {
+                ModelViewPropertyOfVwSerializable scProp = 
+                    model.ScalarProperties.Where(p => ((p.OriginalPropertyName == pk.OriginalPropertyName) && (string.IsNullOrEmpty(p.ForeignKeyNameChain)))).FirstOrDefault();
+                if(scProp == null) {
+                    scProp = GetModelScalarPropByKeyProp(model, pk);
+                }
+                if(scProp != null) {
+                    if(rslt == null) rslt = new ModelViewUniqueKeyOfVwSerializable() {
+                        UniqueKeyName = uk.UniqueKeyName,
+                        IsPrimary = false,
+                        UniqueKeyProperties = new List<ModelViewPropertyOfVwSerializable>()
+                    };
+                    rslt.UniqueKeyProperties.Add(scProp);
+                }
+            }
+            if(rslt != null) {
+                rsltKeys.Add(rslt);
+            }
+        }
+        return rsltKeys;
+    }
+    ModelViewUniqueKeyOfVwSerializable GetModelPrimKeyFromList(List<ModelViewUniqueKeyOfVwSerializable> uniqueKeys) {
+        if(uniqueKeys == null) return null;
+        return uniqueKeys.Where(u => u.IsPrimary).FirstOrDefault();
+    }
+    ModelViewUniqueKeyOfVwSerializable GetModelUniqueKeyByNameFromList(List<ModelViewUniqueKeyOfVwSerializable> uniqueKeys, string name) {
+        if (uniqueKeys == null) return null;
+        if(string.IsNullOrEmpty(name)) {
+            return uniqueKeys.Where(u => string.IsNullOrEmpty(u.UniqueKeyName)).FirstOrDefault();
+        } else {
+            return uniqueKeys.Where(u => u.UniqueKeyName == name).FirstOrDefault();
+        }
+    }
+    ModelViewUniqueKeySerializable GetModelUniqueKeyByNameFromModel(ModelViewSerializable model, string name) {
+        if (model == null) return null;
+        if (model.UniqueKeys == null) return null;
+        if(string.IsNullOrEmpty(name)) {
+            return model.UniqueKeys.Where(u => string.IsNullOrEmpty(u.UniqueKeyName)).FirstOrDefault();
+        } else {
+            return model.UniqueKeys.Where(u => u.UniqueKeyName == name).FirstOrDefault();
+        }
+    }
+    bool CheckModelIfIndexIsCorrect(ModelViewSerializable model,ModelViewUniqueKeyOfVwSerializable indx, out string error) {
+        if((model == null) || (indx == null)) {
+            error = "Input params is not defined";
+            return false;
+        }
+        if(indx.UniqueKeyProperties == null) {
+            error = "UniqueKeyProperties of the Index are not defined";
+            return false;
+        }
+        if(indx.UniqueKeyProperties.Count < 1) {
+            if(indx.IsPrimary)
+                error = "UniqueKeyProperties.Count of the Primary Index is less than 1";
+            else 
+                error = "UniqueKeyProperties.Count of the Unique Index (UniqueKeyName == "+ indx.UniqueKeyName + ") is less than 1";
+            return false;
+        }
+
+        if(indx.IsPrimary) {
+            if(model.PrimaryKeyProperties == null) {
+                error = "PrimaryKeyProperties of the model are not defined";
+                return false;
+            }
+            if (model.PrimaryKeyProperties.Count != indx.UniqueKeyProperties.Count) {
+                error = "Not all Index fields are included in the Model";
+                return false;
+            }
+        } else {
+            if(model.UniqueKeys == null) {
+                error = "UniqueKeys of the model are not defined (UniqueKeyName == "+ indx.UniqueKeyName + ")";
+                return false;
+            }
+            if(string.IsNullOrEmpty(indx.UniqueKeyName)) {
+                error = "The Name of the Index is not defined (UniqueKeyName)";
+                return false;
+            }
+            ModelViewUniqueKeySerializable mindx = model.UniqueKeys.Where(i => i.UniqueKeyName == indx.UniqueKeyName).FirstOrDefault();
+            if(mindx == null) {
+                error = "Could not find index in model by name (Unique Index Name == "+ indx.UniqueKeyName + ")";
+                return false;
+            }
+            if(mindx.UniqueKeyProperties == null) {
+                error = "UniqueKeyProperties of the Unique Index (Unique Index Name == "+ indx.UniqueKeyName + ") are not defined";
+                return false;
+            }
+            if(mindx.UniqueKeyProperties.Count != indx.UniqueKeyProperties.Count) {
+                error = "Not all Unique Index fields are included in the Model (Unique Index Name == "+ indx.UniqueKeyName + ")";
+                return false;
+            }
+        }
+        error = "";
+        return true;
+    }
+
+#>

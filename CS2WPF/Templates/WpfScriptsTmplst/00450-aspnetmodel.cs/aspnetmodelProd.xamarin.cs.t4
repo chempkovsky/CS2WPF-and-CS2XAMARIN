@@ -15,37 +15,38 @@
 
 <#
 
-    string aspnetroleFolder             = "00400-aspnetrole.cs";
-    string aspnetuserroleFolder         = "00420-aspnetuserroles.cs";
+    string aspnetmodelFolder            = "00450-aspnetmodel.cs";
     string aspnetrolemaskFolder         = "00440-aspnetrolemask.cs";
-    
+    string aspnetusermaskFolder         = "00430-aspnetusermask.cs";
+
 #>
 
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 
-namespace <#= GetNameSpaceName(Model, aspnetroleFolder, DefaultProjectNameSpace) #>
+namespace <#= GetNameSpaceName(Model, aspnetmodelFolder, DefaultProjectNameSpace) #>
 {
-    public class <#= GetEntityClassName(Model, aspnetroleFolder) #>
+    public class <#= GetEntityClassName(Model, aspnetmodelFolder) #>
     {
         [Required]
-        [Display(Description = "Role Id", Name = "Role Id", Prompt = "Enter Id", ShortName = "Id")]
-        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
-        [StringLength(128, MinimumLength = 1, ErrorMessage = "Invalid")]
-        public string Id { get; set; } = null!;
+        [Display(Description = "Model Id", Name = "Model Id", Prompt = "Enter Model Id", ShortName = "Id")]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        public int ModelPk { get; set; }
 
         [Required]
-        [Display(Description = "Role Name", Name = "Role Name", Prompt = "Enter RoleName", ShortName = "Role Name")]
-        [StringLength(128, MinimumLength = 1, ErrorMessage = "Invalid")]
-        public string Name { get; set; } = null!;
+        [Display(Description = "Model Name", Name = "Model Name", Prompt = "Enter ModelName", ShortName = "Name")]
+        [StringLength(50, MinimumLength = 1, ErrorMessage = "Invalid")]
+        public string ModelName { get; set; } = null!;
 
-        public virtual ICollection<<#= GetEntityClassName(Model, aspnetuserroleFolder) #>> UserRoles { get; set; }= null!;
+        [Display(Description = "Model Description", Name = "Model Description", Prompt = "Enter ModelDescription", ShortName = "Description")]
+        [StringLength(50, MinimumLength = 1, ErrorMessage = "Invalid")]
+        public string ModelDescription { get; set; } = null!;
+
         public virtual ICollection<<#= GetEntityClassName(Model, aspnetrolemaskFolder) #>> RoleMasks { get; set; }= null!;
-        
+
     }
 }
-
 
 <#+
     string GetEntityClassName(ModelViewSerializable model, string fileType) {

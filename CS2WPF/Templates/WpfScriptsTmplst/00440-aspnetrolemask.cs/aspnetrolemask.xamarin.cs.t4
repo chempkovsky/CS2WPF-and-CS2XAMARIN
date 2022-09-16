@@ -1,0 +1,119 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2WPF" #>
+<#@ import namespace="CS2WPF.Model" #>
+<#@ import namespace="CS2WPF.Model.Serializable" #>
+<#@ parameter type="CS2WPF.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="System.String" name="DefaultProjectNameSpace" #>
+
+<#
+    string aspnetroleFolder            = "00400-aspnetrole.cs";
+    string aspnetrolemaskFolder        = "00440-aspnetrolemask.cs";
+    string aspnetmodelFolder           = "00450-aspnetmodel.cs";
+
+#>
+
+using System.ComponentModel.DataAnnotations;
+
+
+namespace <#= GetNameSpaceName(Model, aspnetrolemaskFolder, DefaultProjectNameSpace) #>
+{
+    public class <#= GetEntityClassName(Model, aspnetrolemaskFolder) #>
+    {
+        
+        [Required]
+        [Display(Description = "Role Name", Name = "Role Name", Prompt = "Enter RoleName", ShortName = "Role Name")]
+        [StringLength(128, MinimumLength = 1, ErrorMessage = "Invalid")]
+        public string RoleName { get; set; } = null!;
+
+        [Display(Description = "Role Description", Name = "Role Description", Prompt = "Enter Role Description", ShortName = "Description")]
+        [StringLength(70, MinimumLength = 0, ErrorMessage = "Invalid")]
+        public string RoleDescription { get; set; } = null!;
+
+
+        [Display(Description = "Permission to Sel", Name = "Permission to Sel", Prompt = "Enter permission to Sel", ShortName = "Sel")]
+        [Required]
+        public bool Mask1 { get; set; }
+
+        [Display(Description = "Permission to Del", Name = "Permission to Del", Prompt = "Enter permission to Del", ShortName = "Del")]
+        [Required]
+        public bool Mask2 { get; set; }
+
+        [Display(Description = "Permission to Upd", Name = "Permission to Upd", Prompt = "Enter permission to Upd", ShortName = "Upd")]
+        [Required]
+        public bool Mask3 { get; set; }
+
+        [Display(Description = "Permission to Add", Name = "Permission to Add", Prompt = "Enter permission to Add", ShortName = "Add")]
+        [Required]
+        public bool Mask4 { get; set; }
+
+        [Display(Description = "Full scan permission", Name = "Full scan permission", Prompt = "Enter Full scan permission", ShortName = "FullScan")]
+        [Required]
+        public bool Mask5 { get; set; }
+
+        [Required]
+        [Display(Description = "Model Id", Name = "Model Id", Prompt = "Enter Model Id", ShortName = "Id")]
+        public int ModelPkRef { get; set; }
+
+        public virtual <#= GetEntityClassName(Model, aspnetmodelFolder) #> AspNetModel { get; set; } = null!;
+
+//-------------------------------------------
+// begin code to remove
+
+        public virtual <#= GetEntityClassName(Model, aspnetroleFolder) #> AspNetRole { get; set; } = null!;
+
+// end code to remove
+//-------------------------------------------
+
+    }
+}
+
+
+<#+
+    string GetEntityClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType) ) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        return refItem.FileName;
+    }
+    string GetNameSpaceName(ModelViewSerializable model, string currFolder, string  DefaultProjectNameSpace) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(currFolder)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable curItem= 
+            model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+        if (curItem == null) {
+            return result;
+        }
+        result = curItem.FileFolder.Replace("\\",".");
+        if(string.IsNullOrEmpty(DefaultProjectNameSpace)) {
+            return result;
+        } 
+        return DefaultProjectNameSpace + "." + result;
+    }
+
+
+#>

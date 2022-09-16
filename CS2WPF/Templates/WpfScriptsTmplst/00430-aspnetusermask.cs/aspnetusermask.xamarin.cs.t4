@@ -14,35 +14,60 @@
 <#@ parameter type="System.String" name="DefaultProjectNameSpace" #>
 
 <#
-
-    string aspnetroleFolder             = "00400-aspnetrole.cs";
-    string aspnetuserroleFolder         = "00420-aspnetuserroles.cs";
-    string aspnetrolemaskFolder         = "00440-aspnetrolemask.cs";
-    
+    string aspnetuserFolder             = "00410-aspnetuser.cs";
+    string aspnetusermaskFolder         = "00430-aspnetusermask.cs";
+    string aspnetmodelFolder            = "00450-aspnetmodel.cs";
 #>
 
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
+/*
+    This is a dummy(mock) class, and you must remove it from the project after generating the user interface.
+*/
 
-namespace <#= GetNameSpaceName(Model, aspnetroleFolder, DefaultProjectNameSpace) #>
+namespace <#= GetNameSpaceName(Model, aspnetusermaskFolder, DefaultProjectNameSpace) #>
 {
-    public class <#= GetEntityClassName(Model, aspnetroleFolder) #>
+    public class <#= GetEntityClassName(Model, aspnetusermaskFolder) #>
     {
-        [Required]
-        [Display(Description = "Role Id", Name = "Role Id", Prompt = "Enter Id", ShortName = "Id")]
-        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
-        [StringLength(128, MinimumLength = 1, ErrorMessage = "Invalid")]
-        public string Id { get; set; } = null!;
-
-        [Required]
-        [Display(Description = "Role Name", Name = "Role Name", Prompt = "Enter RoleName", ShortName = "Role Name")]
-        [StringLength(128, MinimumLength = 1, ErrorMessage = "Invalid")]
-        public string Name { get; set; } = null!;
-
-        public virtual ICollection<<#= GetEntityClassName(Model, aspnetuserroleFolder) #>> UserRoles { get; set; }= null!;
-        public virtual ICollection<<#= GetEntityClassName(Model, aspnetrolemaskFolder) #>> RoleMasks { get; set; }= null!;
         
+        [Required]
+        [Display(Description = "User Id", Name = "User Id", Prompt = "Enter Id", ShortName = "User Id")]
+        [StringLength(128, MinimumLength = 1, ErrorMessage = "Invalid")]
+        public string UserId { get; set; } = null!;
+
+        [Display(Description = "Permission to Sel", Name = "Permission to Sel", Prompt = "Enter permission to Sel", ShortName = "Sel")]
+        [Required]
+        public bool Mask1 { get; set; }
+
+        [Display(Description = "Permission to Del", Name = "Permission to Del", Prompt = "Enter permission to Del", ShortName = "Del")]
+        [Required]
+        public bool Mask2 { get; set; }
+
+        [Display(Description = "Permission to Upd", Name = "Permission to Upd", Prompt = "Enter permission to Upd", ShortName = "Upd")]
+        [Required]
+        public bool Mask3 { get; set; }
+
+        [Display(Description = "Permission to Add", Name = "Permission to Add", Prompt = "Enter permission to Add", ShortName = "Add")]
+        [Required]
+        public bool Mask4 { get; set; }
+        
+        [Display(Description = "Full scan permission", Name = "Full scan permission", Prompt = "Enter Full scan permission", ShortName = "FullScan")]
+        [Required]
+        public bool Mask5 { get; set; }
+
+//-------------------------------------------
+// begin code to remove
+
+        public virtual <#= GetEntityClassName(Model, aspnetuserFolder) #> AspNetUser { get; set; }= null!;
+
+        [Required]
+        [Display(Description = "Model Id", Name = "Model Id", Prompt = "Enter Model Id", ShortName = "Id")]
+        public int ModelPkRef { get; set; }
+
+        public virtual <#= GetEntityClassName(Model, aspnetmodelFolder) #> AspNetModel { get; set; } = null!;
+// end code to remove
+//-------------------------------------------
+
     }
 }
 

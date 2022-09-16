@@ -16,36 +16,35 @@
 <#
 
     string aspnetroleFolder             = "00400-aspnetrole.cs";
+    string aspnetuserFolder             = "00410-aspnetuser.cs";
     string aspnetuserroleFolder         = "00420-aspnetuserroles.cs";
-    string aspnetrolemaskFolder         = "00440-aspnetrolemask.cs";
-    
+
 #>
 
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 
-namespace <#= GetNameSpaceName(Model, aspnetroleFolder, DefaultProjectNameSpace) #>
+namespace <#= GetNameSpaceName(Model, aspnetuserroleFolder, DefaultProjectNameSpace) #>
 {
-    public class <#= GetEntityClassName(Model, aspnetroleFolder) #>
+    public class <#= GetEntityClassName(Model, aspnetuserroleFolder) #>
     {
         [Required]
-        [Display(Description = "Role Id", Name = "Role Id", Prompt = "Enter Id", ShortName = "Id")]
+        [Display(Description = "User Id", Name = "User Id", Prompt = "Enter Id", ShortName = "User Id")]
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         [StringLength(128, MinimumLength = 1, ErrorMessage = "Invalid")]
-        public string Id { get; set; } = null!;
+        public string UserId { get; set; } = null!;
 
         [Required]
-        [Display(Description = "Role Name", Name = "Role Name", Prompt = "Enter RoleName", ShortName = "Role Name")]
+        [Display(Description = "Role Id", Name = "Role Id", Prompt = "Enter Id", ShortName = "Role Id")]
         [StringLength(128, MinimumLength = 1, ErrorMessage = "Invalid")]
-        public string Name { get; set; } = null!;
+        public string RoleId { get; set; } = null!;
 
-        public virtual ICollection<<#= GetEntityClassName(Model, aspnetuserroleFolder) #>> UserRoles { get; set; }= null!;
-        public virtual ICollection<<#= GetEntityClassName(Model, aspnetrolemaskFolder) #>> RoleMasks { get; set; }= null!;
-        
+        public virtual <#= GetEntityClassName(Model, aspnetuserFolder) #> AspNetUser { get; set; } = null!;
+
+        public virtual <#= GetEntityClassName(Model, aspnetroleFolder) #> AspNetRole { get; set; } = null!;
     }
 }
-
 
 <#+
     string GetEntityClassName(ModelViewSerializable model, string fileType) {

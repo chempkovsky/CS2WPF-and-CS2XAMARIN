@@ -16,36 +16,66 @@
 <#
 
     string aspnetroleFolder             = "00400-aspnetrole.cs";
+    string aspnetuserFolder             = "00410-aspnetuser.cs";
     string aspnetuserroleFolder         = "00420-aspnetuserroles.cs";
+    string aspnetusermaskFolder         = "00430-aspnetusermask.cs";
+    string aspnetuserpermsFolder        = "00435-aspnetuserperms.cs";
+
     string aspnetrolemaskFolder         = "00440-aspnetrolemask.cs";
-    
+    string aspnetmodelFolder            = "00450-aspnetmodel.cs";
+    string aspnetdashboardFolder        = "00460-aspnetdashboard.cs";
+
+
+    string aspnetchckdbcontextFolder    = "00470-aspnetchckdbcontext.cs";
 #>
 
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
+/*
+    This is a dummy(mock) class, and you must remove it from the project after generating the user interface.
+*/
 
-namespace <#= GetNameSpaceName(Model, aspnetroleFolder, DefaultProjectNameSpace) #>
+namespace <#= GetNameSpaceName(Model, aspnetchckdbcontextFolder, DefaultProjectNameSpace) #>
 {
-    public class <#= GetEntityClassName(Model, aspnetroleFolder) #>
+    public class <#= GetEntityClassName(Model, aspnetchckdbcontextFolder) #> : DbContext
     {
-        [Required]
-        [Display(Description = "Role Id", Name = "Role Id", Prompt = "Enter Id", ShortName = "Id")]
-        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
-        [StringLength(128, MinimumLength = 1, ErrorMessage = "Invalid")]
-        public string Id { get; set; } = null!;
 
-        [Required]
-        [Display(Description = "Role Name", Name = "Role Name", Prompt = "Enter RoleName", ShortName = "Role Name")]
-        [StringLength(128, MinimumLength = 1, ErrorMessage = "Invalid")]
-        public string Name { get; set; } = null!;
+        public <#= GetEntityClassName(Model, aspnetchckdbcontextFolder) #>(DbContextOptions<<#= GetEntityClassName(Model, aspnetchckdbcontextFolder) #>> options)
+          : base(options)
+        {
+            Database.EnsureCreated();
+        }
 
-        public virtual ICollection<<#= GetEntityClassName(Model, aspnetuserroleFolder) #>> UserRoles { get; set; }= null!;
-        public virtual ICollection<<#= GetEntityClassName(Model, aspnetrolemaskFolder) #>> RoleMasks { get; set; }= null!;
-        
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<<#= GetEntityClassName(Model, aspnetmodelFolder) #>>().HasKey(p => p.ModelPk);
+            modelBuilder.Entity<<#= GetEntityClassName(Model, aspnetrolemaskFolder) #>>().HasKey(p => new { p.RoleName, p.ModelPkRef });
+
+            modelBuilder.Entity<<#= GetEntityClassName(Model, aspnetrolemaskFolder) #>>()
+                .HasOne(d => d.AspNetModel)
+                .WithMany(m => m.RoleMasks)
+                .HasForeignKey(d => d.ModelPkRef)
+                .HasPrincipalKey(p => p.ModelPk)
+                .IsRequired(true)
+                .OnDelete(DeleteBehavior.NoAction);
+        }
+
+        public DbSet< <#= GetEntityClassName(Model, aspnetmodelFolder) #> > aspnetmodellDbSet
+        {
+            get;
+            set;
+        }
+
+        public DbSet< <#= GetEntityClassName(Model, aspnetrolemaskFolder) #> > aspnetrolemaskDbSet
+        {
+            get;
+            set;
+        }
+
+
     }
 }
-
 
 <#+
     string GetEntityClassName(ModelViewSerializable model, string fileType) {
