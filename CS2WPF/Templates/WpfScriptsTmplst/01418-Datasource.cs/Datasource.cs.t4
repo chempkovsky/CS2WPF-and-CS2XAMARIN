@@ -437,12 +437,20 @@ namespace <#= datasourceNameSpace #> {
                     return Convert.ToDecimal(src) == Convert.ToDecimal(dest);
                 case "single":
                     return Convert.ToSingle(src) == Convert.ToSingle(dest);
+                case "datetimeoffset":
+                    DateTimeOffset ds,dd;
+                    if (DateTimeOffset.TryParse(src.ToString(), out ds) && DateTimeOffset.TryParse(dest.ToString(), out dd)) {
+                        return ds.EqualsExact(dd);
+                    }
+                    return false;
                 case "guid":
                     Guid gs,gd;
-                    if (Guid.TryParse(Convert.ToString(src), out gs) && Guid.TryParse(Convert.ToString(dest), out gd)) {
+                    if (Guid.TryParse(src.ToString(), out gs) && Guid.TryParse(dest.ToString(), out gd)) {
                         return (gs == gd);
                     }
                     return false;
+                case "boolean":
+                    return Convert.ToBoolean(src) == Convert.ToBoolean(dest);
                 case "date":
                 case "datetime":
                     return Convert.ToDateTime(src) == Convert.ToDateTime(dest);
@@ -517,6 +525,16 @@ namespace <#= datasourceNameSpace #> {
                 }
             }
         }
+        if (Model.ScalarProperties != null) {
+            foreach (ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) { 
+                if (GetCCharpDatatype(prop, Model) == "guid") {
+#>
+            DateTimeOffset dtofst;
+<#
+                    break;
+                }
+            }
+        }
 #>
             <#= modelClassName #> rslt = new <#= modelClassName #>(); 
 <#
@@ -539,8 +557,20 @@ namespace <#= datasourceNameSpace #> {
             if(locobjval is null) {
                 rslt.<#= GetModelPropertyName(prop, Model) #> = null;
             } else {
-                if(Guid.TryParce(locobjval.ToString(), out prs)) {
+                if(Guid.TryParse(locobjval.ToString(), out prs)) {
                     rslt.<#= GetModelPropertyName(prop, Model) #> = prs;
+                } else {
+                    rslt.<#= GetModelPropertyName(prop, Model) #> = null;
+                }
+            }
+<#
+                    } else if (GetCCharpDatatype(prop, Model) == "datetimeoffset") {
+#>
+            if(locobjval is null) {
+                rslt.<#= GetModelPropertyName(prop, Model) #> = null;
+            } else {
+                if(DateTimeOffset.TryParse(locobjval.ToString(), out dtofst)) {
+                    rslt.<#= GetModelPropertyName(prop, Model) #> = dtofst;
                 } else {
                     rslt.<#= GetModelPropertyName(prop, Model) #> = null;
                 }
@@ -559,12 +589,24 @@ namespace <#= datasourceNameSpace #> {
                     if (GetCCharpDatatype(prop, Model) == "guid") {
 #>
             if(locobjval is null) {
-                rslt.<#= GetModelPropertyName(prop, Model) #> = Guid.Empty;
+                rslt.<#= GetModelPropertyName(prop, Model) #> = default(Guid);
             } else {
-                if(Guid.TryParce(locobjval.ToString(), out prs)) {
+                if(Guid.TryParse(locobjval.ToString(), out prs)) {
                     rslt.<#= GetModelPropertyName(prop, Model) #> = prs;
                 } else {
-                    rslt.<#= GetModelPropertyName(prop, Model) #> = Guid.Empty;
+                    rslt.<#= GetModelPropertyName(prop, Model) #> = default(Guid);
+                }
+            }
+<#
+                    } else if (GetCCharpDatatype(prop, Model) == "datetimeoffset") {
+#>
+            if(locobjval is null) {
+                rslt.<#= GetModelPropertyName(prop, Model) #> = default(DateTimeOffset);
+            } else {
+                if(DateTimeOffset.TryParse(locobjval.ToString(), out dtofst)) {
+                    rslt.<#= GetModelPropertyName(prop, Model) #> = dtofst;
+                } else {
+                    rslt.<#= GetModelPropertyName(prop, Model) #> = default(DateTimeOffset);
                 }
             }
 <#
@@ -687,6 +729,14 @@ namespace <#= datasourceNameSpace #> {
                     break;
                 }
     }
+    foreach(ModelViewPropertyOfVwSerializable prop in mvuk.UniqueKeyProperties) {
+                if (GetCCharpDatatype(prop, Model) == "datetimeoffset") {
+#>  
+                        DateTimeOffset dtofst;
+<#
+                    break;
+                }
+    }
 #>  
 
 <#
@@ -708,8 +758,16 @@ namespace <#= datasourceNameSpace #> {
 <#
                     } else if (GetCCharpDatatype(prop, Model) == "guid") {
 #>
-                        if(Guid.TryParce(locobjval.ToString(), out prs) ) {
+                        if(Guid.TryParse(locobjval.ToString(), out prs) ) {
                             <#= "loc" + GetModelPropertyName(prop, Model) #> = prs;
+                        } else { 
+                            <#= "loc" + GetModelPropertyName(prop, Model) #> = null;
+                        }
+<#
+                    } else if (GetCCharpDatatype(prop, Model) == "datetimeoffset") {
+#>
+                        if(DateTimeOffset.TryParse(locobjval.ToString(), out dtofst) ) {
+                            <#= "loc" + GetModelPropertyName(prop, Model) #> = dtofst;
                         } else { 
                             <#= "loc" + GetModelPropertyName(prop, Model) #> = null;
                         }
@@ -735,8 +793,17 @@ namespace <#= datasourceNameSpace #> {
 <#
                     } else if (GetCCharpDatatype(prop, Model) == "guid") {
 #>
-                        if(Guid.TryParce(locobjval.ToString(), out prs) ) {
+                        if(Guid.TryParse(locobjval.ToString(), out prs) ) {
                             <#= "loc" + GetModelPropertyName(prop, Model) #> = prs;
+                        } else { 
+                            <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("http", "Not all propertes are correctly defined");
+                            return;
+                        }
+<#
+                    } else if (GetCCharpDatatype(prop, Model) == "datetimeoffset") {
+#>
+                        if(DateTimeOffset.TryParse(locobjval.ToString(), out dtofst) ) {
+                            <#= "loc" + GetModelPropertyName(prop, Model) #> = dtofst;
                         } else { 
                             <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("http", "Not all propertes are correctly defined");
                             return;
@@ -931,6 +998,14 @@ namespace <#= datasourceNameSpace #> {
                     break;
                 }
             }
+            foreach (ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) { 
+                if (GetCCharpDatatype(prop, Model) == "datetimeoffset") {
+#>
+            DateTimeOffset dtofst;
+<#
+                    break;
+                }
+            }
         }
 #>
             switch(propNm) {
@@ -960,8 +1035,23 @@ namespace <#= datasourceNameSpace #> {
                     if(value is null) {
                         flt.<#= GetModelPropertyName(prop, Model) #>.Add(null);
                     } else {
-                        if(Guid.TryParce(this.get<#= ValueSuffix #>("<#= GetModelPropertyName(prop, Model) #>").ToString(), out prs)) {
+                        if(Guid.TryParse(value.ToString(), out prs)) {
                             flt.<#= GetModelPropertyName(prop, Model) #>.Add(prs);
+                        } else {
+                            flt.<#= GetModelPropertyName(prop, Model) #>.Add(null);
+                        }
+                    }
+<#
+                } else if (GetCCharpDatatype(prop, Model) == "datetimeoffset") {
+#>
+                    if(flt.<#= GetModelPropertyName(prop, Model) #> == null) flt.<#= GetModelPropertyName(prop, Model) #> = new List<<#= GetPropertyTypeName(prop) #>>();
+                    if(flt.<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #> == null) flt.<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #> = new List< string > ();
+                    flt.<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #>.Add(Oprtr);
+                    if(value is null) {
+                        flt.<#= GetModelPropertyName(prop, Model) #>.Add(null);
+                    } else {
+                        if(DateTimeOffset.TryParse(value.ToString(), out dtofst)) {
+                            flt.<#= GetModelPropertyName(prop, Model) #>.Add(dtofst);
                         } else {
                             flt.<#= GetModelPropertyName(prop, Model) #>.Add(null);
                         }
@@ -985,11 +1075,20 @@ namespace <#= datasourceNameSpace #> {
 <#
                 if (GetCCharpDatatype(prop, Model) == "guid") {
 #>
-                    if ( Guid.TryParce(value.ToString(), out prs) ) {
+                    if ( Guid.TryParse(value.ToString(), out prs) ) {
                         if(flt.<#= GetModelPropertyName(prop, Model) #> == null) flt.<#= GetModelPropertyName(prop, Model) #> = new List<<#= GetPropertyTypeName(prop) #>>();
                         if(flt.<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #> == null) flt.<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #> = new List< string > ();
                         flt.<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #>.Add(Oprtr);
                         flt.<#= GetModelPropertyName(prop, Model) #>.Add(prs);
+                    }
+<#
+                } else if (GetCCharpDatatype(prop, Model) == "datetimeoffset") {
+#>
+                    if ( DateTimeOffset.TryParse(value.ToString(), out dtofst) ) {
+                        if(flt.<#= GetModelPropertyName(prop, Model) #> == null) flt.<#= GetModelPropertyName(prop, Model) #> = new List<<#= GetPropertyTypeName(prop) #>>();
+                        if(flt.<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #> == null) flt.<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #> = new List< string > ();
+                        flt.<#= GetFilterPropertyOperatorName(prop, Model, FilterOperatorSuffix) #>.Add(Oprtr);
+                        flt.<#= GetModelPropertyName(prop, Model) #>.Add(dtofst);
                     }
 <#
                 } else {
@@ -1212,8 +1311,18 @@ namespace <#= datasourceNameSpace #> {
 <#
                     } else if (GetCCharpDatatype(prop, Model) == "guid") {
 #>
-                    if(Guid.TryParce(locobjval.ToString(), out prs) ) {
+                    Guid prs;
+                    if(Guid.TryParse(locobjval.ToString(), out prs) ) {
                         <#= "loc" + GetModelPropertyName(prop, Model) #> = prs;
+                    } else { 
+                        <#= "loc" + GetModelPropertyName(prop, Model) #> = null;
+                    }
+<#
+                    } else if (GetCCharpDatatype(prop, Model) == "datetimeoffset") {
+#>
+                    DateTimeOffset dtofst;
+                    if(DateTimeOffset.TryParse(locobjval.ToString(), out dtofst) ) {
+                        <#= "loc" + GetModelPropertyName(prop, Model) #> = dtofst;
                     } else { 
                         <#= "loc" + GetModelPropertyName(prop, Model) #> = null;
                     }
@@ -1239,8 +1348,19 @@ namespace <#= datasourceNameSpace #> {
 <#
                     } else if (GetCCharpDatatype(prop, Model) == "guid") {
 #>
-                    if(Guid.TryParce(locobjval.ToString(), out prs) ) {
+                    Guid prs;
+                    if(Guid.TryParse(locobjval.ToString(), out prs) ) {
                         <#= "loc" + GetModelPropertyName(prop, Model) #> = prs;
+                    } else { 
+                        <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("http", "Not all propertes are correctly defined");
+                        return;
+                    }
+<#
+                    } else if (GetCCharpDatatype(prop, Model) == "datetimeoffset") {
+#>
+                    DateTimeOffset dtofst;
+                    if(DateTimeOffset.TryParse(locobjval.ToString(), out dtofst) ) {
+                        <#= "loc" + GetModelPropertyName(prop, Model) #> = dtofst;
                     } else { 
                         <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("http", "Not all propertes are correctly defined");
                         return;
@@ -1321,8 +1441,18 @@ namespace <#= datasourceNameSpace #> {
 <#
                     } else if (GetCCharpDatatype(prop, Model) == "guid") {
 #>
-                    if(Guid.TryParce(locobjval.ToString(), out prs) ) {
+                    Guid prs;
+                    if(Guid.TryParse(locobjval.ToString(), out prs) ) {
                         <#= "loc" + GetModelPropertyName(prop, Model) #> = prs;
+                    } else { 
+                        <#= "loc" + GetModelPropertyName(prop, Model) #> = null;
+                    }
+<#
+                    } else if (GetCCharpDatatype(prop, Model) == "datetimeoffset") {
+#>
+                    DateTimeOffset dtofst;
+                    if(DateTimeOffset.TryParse(locobjval.ToString(), out dtofst) ) {
+                        <#= "loc" + GetModelPropertyName(prop, Model) #> = dtofst;
                     } else { 
                         <#= "loc" + GetModelPropertyName(prop, Model) #> = null;
                     }
@@ -1348,14 +1478,24 @@ namespace <#= datasourceNameSpace #> {
 <#
                     } else if (GetCCharpDatatype(prop, Model) == "guid") {
 #>
-                    if(Guid.TryParce(locobjval.ToString(), out prs) ) {
+                    if(Guid.TryParse(locobjval.ToString(), out prs) ) {
                         <#= "loc" + GetModelPropertyName(prop, Model) #> = prs;
                     } else { 
                         <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("http", "Not all propertes are correctly defined");
                         return;
                     }
 <#
-                    } else {
+                } else if (GetCCharpDatatype(prop, Model) == "datetimeoffset") {
+#>
+                    DateTimeOffset dtofst;
+                    if(DateTimeOffset.TryParse(locobjval.ToString(), out dtofst) ) {
+                        <#= "loc" + GetModelPropertyName(prop, Model) #> = dtofst;
+                    } else { 
+                        <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("http", "Not all propertes are correctly defined");
+                        return;
+                    }
+<#
+                } else {
 #>
                     <#= "loc" + GetModelPropertyName(prop, Model) #> = <#= GetPropertyConvertMethod(prop, Model) #>(locobjval);
 <#
@@ -1504,8 +1644,18 @@ namespace <#= datasourceNameSpace #> {
 <#
                     } else if (GetCCharpDatatype(prop, Model) == "guid") {
 #>
-                if(Guid.TryParce(locobjval.ToString(), out prs) ) {
+                Guid prs;
+                if(Guid.TryParse(locobjval.ToString(), out prs) ) {
                     <#= "loc" + GetModelPropertyName(prop, Model) #> = prs;
+                } else { 
+                    <#= "loc" + GetModelPropertyName(prop, Model) #> = null;
+                }
+<#
+                    } else if (GetCCharpDatatype(prop, Model) == "datetimeoffset") {
+#>
+                DateTimeOffset dtofst;
+                if(DateTimeOffset.TryParse(locobjval.ToString(), out dtofst) ) {
+                    <#= "loc" + GetModelPropertyName(prop, Model) #> = dtofst;
                 } else { 
                     <#= "loc" + GetModelPropertyName(prop, Model) #> = null;
                 }
@@ -1531,14 +1681,24 @@ namespace <#= datasourceNameSpace #> {
 <#
                     } else if (GetCCharpDatatype(prop, Model) == "guid") {
 #>
-                if(Guid.TryParce(locobjval.ToString(), out prs) ) {
+                if(Guid.TryParse(locobjval.ToString(), out prs) ) {
                     <#= "loc" + GetModelPropertyName(prop, Model) #> = prs;
                 } else { 
                     <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("http", "Not all propertes are correctly defined");
                     return;
                 }
 <#
-                    } else {
+                } else if (GetCCharpDatatype(prop, Model) == "datetimeoffset") {
+#>
+                DateTimeOffset dtofst;
+                if(DateTimeOffset.TryParse(locobjval.ToString(), out dtofst) ) {
+                    <#= "loc" + GetModelPropertyName(prop, Model) #> = dtofst;
+                } else { 
+                    <#= AppSettingServicePropertyName #>.<#= ShowErrorMethodName #>("http", "Not all propertes are correctly defined");
+                    return;
+                }
+<#
+                } else {
 #>
                 <#= "loc" + GetModelPropertyName(prop, Model) #> = <#= GetPropertyConvertMethod(prop, Model) #>(locobjval);
 <#
@@ -1562,6 +1722,10 @@ namespace <#= datasourceNameSpace #> {
             }
         }
             #>);
+            if(data != null) {
+                this.<#= Interface2ValuesMethodName #>(data, false);
+                this.<#= OnDeletePropName #>?.Invoke(this,new EventArgs());
+            }
 <#
         }
     } else {
@@ -1570,12 +1734,6 @@ namespace <#= datasourceNameSpace #> {
 <#
     } // if (Model.IsWebApiUpdate) { ... } else { ... }
 #>
-            if(data != null) {
-                this.<#= Interface2ValuesMethodName #>(data, false);
-                this.<#= OnDeletePropName #>?.Invoke(this,new EventArgs());
-            }
-
-
         }
         protected void set<#= UnderHiddenFilterFieldsFieldName #>() {
             this._<#= UnderHiddenFilterFieldsFieldName #> = new List<string>();

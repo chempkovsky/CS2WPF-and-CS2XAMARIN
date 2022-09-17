@@ -457,11 +457,24 @@ namespace <#= AUDVformViewModelNameSpace #> {
                 if (GetCCharpDatatypeEx(modelViewUIFormPropertySerializable, Model) == "guid") {
 #>
                 Guid prs;
-                if(Guid.TryParce(locobjval.ToString(), out prs)) {
+                if(Guid.TryParse(value.ToString(), out prs)) {
                     if(this._<#=  GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #> == prs) return;
                     this._<#=  GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #> = prs;
                 } else {
-                    (!this._<#=  GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>.HasValue) return;
+                    if (!this._<#=  GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>.HasValue) return;
+                    this._<#=  GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #> = null;
+                }
+<#
+                } else if (GetCCharpDatatypeEx(modelViewUIFormPropertySerializable, Model) == "datetimeoffset") {
+#>
+                DateTimeOffset dtofst;
+                if(DateTimeOffset.TryParse(value.ToString(), out dtofst)) {
+                    if(this._<#=  GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>.HasValue) {
+                        if(dtofst.EqualsExact(this._<#=  GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>.Value)) return;
+                    }
+                    this._<#=  GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #> = dtofst;
+                } else {
+                    if (!this._<#=  GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>.HasValue) return;
                     this._<#=  GetModelPropertyNameEx(modelViewUIFormPropertySerializable, Model) #> = null;
                 }
 <#

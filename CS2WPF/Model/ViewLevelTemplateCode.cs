@@ -220,6 +220,8 @@ namespace CS2WPF.Model
                 case "date":
                 case "datetime":
                     return "Convert.ToDateTime";
+                case "boolean":
+                    return "Convert.ToBoolean";
                 default:
                     return "Convert.ToString";
             }
