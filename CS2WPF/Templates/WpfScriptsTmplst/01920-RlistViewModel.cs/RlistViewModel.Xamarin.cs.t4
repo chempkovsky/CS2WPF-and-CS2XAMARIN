@@ -1100,7 +1100,6 @@ namespace <#= RlistViewModelNameSpace #> {
                 } 
                 if (resetHF) { <#= HiddenFiltersPropertyName #> = hf; }
             }
-          
             if (prms.ContainsKey("<#= EformModeEnumClassName #>")) {
                 <#= EformModeEnumClassName #> mode = prms.GetValue<<#= EformModeEnumClassName #>>("<#= EformModeEnumClassName #>");
 <#
@@ -1113,8 +1112,10 @@ namespace <#= RlistViewModelNameSpace #> {
 <#
             }
 #>
-            
                 if ((mode == <#= EformModeEnumClassName #>.AddMode) || (mode == <#= EformModeEnumClassName #>.UpdateMode)) {
+<#
+    if (Model.IsWebApiSelectOneByPrimarykey) {
+#>          
                     // <#= GetInterfaceName(Model) #> tdata 
                     _ = <#= FormServicePrefix #><#= Model.ViewName #>.<#= GetOneMethodName #>(
 <#
@@ -1152,6 +1153,13 @@ namespace <#= RlistViewModelNameSpace #> {
                             <#= IsNavigatedBackPropertyName #> = false;
                         });
                     });
+<#
+    } else {
+#>
+// "select one" method is not defined for the <#= Model.ViewName #>
+<#
+    }
+#>          
                 } else {
                     <#= GetInterfaceName(Model) #> data = <#= FormServicePrefix #><#= Model.ViewName #>.<#= CopyToModelMethodName #>(null,null);
 <#

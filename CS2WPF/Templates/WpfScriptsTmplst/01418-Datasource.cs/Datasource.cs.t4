@@ -527,7 +527,7 @@ namespace <#= datasourceNameSpace #> {
         }
         if (Model.ScalarProperties != null) {
             foreach (ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) { 
-                if (GetCCharpDatatype(prop, Model) == "guid") {
+                if (GetCCharpDatatype(prop, Model) == "datetimeoffset") {
 #>
             DateTimeOffset dtofst;
 <#
@@ -1620,14 +1620,6 @@ namespace <#= datasourceNameSpace #> {
             object locobjval;
 <#
             foreach(ModelViewPropertyOfVwSerializable prop in primKeys) {
-                if (GetCCharpDatatype(prop, Model) == "guid") {
-#>
-            Guid prs;
-<#
-                    break;
-                }
-            }
-            foreach(ModelViewPropertyOfVwSerializable prop in primKeys) {
 #>  
             <#= GetPropertyTypeName(prop) #>  <#= "loc" + GetModelPropertyName(prop, Model) #>;
             locobjval = this.get<#= ValueSuffix #>("<#= GetModelPropertyName(prop, Model) #>"); 
@@ -1681,6 +1673,7 @@ namespace <#= datasourceNameSpace #> {
 <#
                     } else if (GetCCharpDatatype(prop, Model) == "guid") {
 #>
+                Guid prs;
                 if(Guid.TryParse(locobjval.ToString(), out prs) ) {
                     <#= "loc" + GetModelPropertyName(prop, Model) #> = prs;
                 } else { 

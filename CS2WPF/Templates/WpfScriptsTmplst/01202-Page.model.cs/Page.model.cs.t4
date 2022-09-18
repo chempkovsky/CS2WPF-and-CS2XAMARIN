@@ -59,7 +59,10 @@ namespace <#= modelPageNameSpace #> {
         [JsonConstructorAttribute]
         public <#= modelPageClassName #>(IList<<#= modelClassName #>> items) 
         {
-            this.items = new List<<#= modelInterfaceClassName #>>(items);
+            if(items is null)
+                this.items = new List<<#= modelInterfaceClassName #>>();
+            else
+                this.items = new List<<#= modelInterfaceClassName #>>(items);
         }
 
 <# if(Model.GenerateJSonAttribute) { #>

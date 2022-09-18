@@ -714,14 +714,14 @@ namespace <#= modelServiceNameSpace #> {
             if(prms == null) prms = "";
             try
             {
-                HttpResponseMessage response = await client.GetAsync(serviceUrl + "/" + "<#= GetOneMethodName #>" + prms);
+                HttpResponseMessage response = await client.GetAsync(serviceUrl + "/" + "<#= localRouteName #>" + prms);
                 response.EnsureSuccessStatusCode();
                 string responseBody = await response.Content.ReadAsStringAsync();
                 return  JsonConvert.DeserializeObject<<#= modelClassName #>>(responseBody) ;
             } 
             catch(Exception e) 
             {
-                string exceptionMsg = "<#= modelServiceClassName #>.<#= GetOneMethodName #> : " + e.Message;
+                string exceptionMsg = "<#= modelServiceClassName #>.<#= localRouteName #> : " + e.Message;
                 Exception inner = e.InnerException;
                 while (inner != null)
                 {

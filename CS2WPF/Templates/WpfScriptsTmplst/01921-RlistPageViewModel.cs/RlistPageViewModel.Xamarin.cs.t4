@@ -886,8 +886,10 @@ namespace <#= RlistPageViewModelNameSpace #> {
 <#
             }
 #>
-            
                 if ((mode == <#= EformModeEnumClassName #>.AddMode) || (mode == <#= EformModeEnumClassName #>.UpdateMode)) {
+<#
+    if (Model.IsWebApiSelectOneByPrimarykey) {
+#>          
                     // <#= GetInterfaceName(Model) #> tdata 
                     _ = <#= FormServicePrefix #><#= Model.ViewName #>.<#= GetOneMethodName #>(
 <#
@@ -924,6 +926,13 @@ namespace <#= RlistPageViewModelNameSpace #> {
                             <#= IsParentLoadedPropertyName #> = true;
                         });
                     });
+<#
+    } else {
+#>
+// "select one" method is not defined for the <#= Model.ViewName #>
+<#
+    }
+#>          
                 } else {
                     <#= GetInterfaceName(Model) #> data = <#= FormServicePrefix #><#= Model.ViewName #>.<#= CopyToModelMethodName #>(null,null);
 <#

@@ -1446,7 +1446,7 @@ namespace <#= AUDVformViewModelNameSpace #> {
         #endregion
 
         #region <#= FormControlModelVMPropertyName #>
-        protected async Task <#= OnFormControlModelChangedPropertyName #>() {
+        protected void <#= OnFormControlModelChangedPropertyName #>() {
 <#
             if (CurrentInputTypeId == 1) { // AddMode
 #>
@@ -1542,7 +1542,7 @@ namespace <#= AUDVformViewModelNameSpace #> {
                         });
                         _ = Task.Run(async () => {
                             try {
-                                await <#= OnFormControlModelChangedPropertyName #>();
+                                <#= OnFormControlModelChangedPropertyName #>();
 <#
             foreach(Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> fk in ForeignKeyNameChainList) {
                 if( !ForeignKeyNameChainList.Any(f => f.Item1.StartsWith(fk.Item1+".")) ) {
