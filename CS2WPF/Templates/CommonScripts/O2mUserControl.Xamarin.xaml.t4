@@ -1,0 +1,463 @@
+﻿<#
+
+    string ProxyUserControlFolder           = "00280-ProxyUserControl.xaml.cs";
+    string ProxyUserControlClassName        = GetContextModelClassName(Context, ProxyUserControlFolder);
+    string ProxyUserControlNameSpace        = GetContextModelNameSpace(Context, ProxyUserControlFolder);
+    string ProxyUserControlProject          = GetContextModelProjectName(Context, ProxyUserControlFolder);
+
+    string RegionAwareUserControlBaseFolder       = "00650-RegionAwareUserControlBase.xaml.cs";
+    string RegionAwareUserControlBaseClassName    = GetContextModelClassName(Context, RegionAwareUserControlBaseFolder);
+    string RegionAwareUserControlBaseNameSpace    = GetContextModelNameSpace(Context, RegionAwareUserControlBaseFolder);
+    string RegionAwareUserControlBaseProject      = GetContextModelProjectName(Context, RegionAwareUserControlBaseFolder);
+
+    string LformUserControlFolder           = "01596-LformUserControl.xaml.cs";
+    string LformUserControlClassName        = GetModelClassName(Model, LformUserControlFolder);
+    string LformUserControlNameSpace        = GetModelNameSpace(Model, LformUserControlFolder);
+    string LformUserControlProject          = GetModelProjectName(Model, LformUserControlFolder);
+    
+    string O2mUserControlFolder             = "01696-O2mUserControl.xaml.cs";
+    string O2mUserControlClassName          = GetModelClassName(Model, O2mUserControlFolder);
+    string O2mUserControlNameSpace          = GetModelNameSpace(Model, O2mUserControlFolder);
+    string O2mUserControlProject            = GetModelProjectName(Model, O2mUserControlFolder);
+
+    string O2mUserControlXamlFolder         = "01698-O2mUserControl.xaml";
+    string O2mUserControlXamlClassName      = GetModelClassName(Model, O2mUserControlXamlFolder);
+    string O2mUserControlXamlNameSpace      = GetModelNameSpace(Model, O2mUserControlXamlFolder);
+    string O2mUserControlXamlProject        = GetModelProjectName(Model, O2mUserControlXamlFolder);
+
+    string CaptionPropertyName              = "Caption";
+    string FilterHeightPropertyName         = "FilterHeight";
+    string ShowFilterPropertyName           = "ShowFilter";
+    string ShowAddFilterBtnPropertyName     = "ShowAddFilterBtn";
+    string ShowBackBtnPropertyName          = "ShowBackBtn";
+    string GridHeightPropertyName           = "GridHeight";
+    string TableMenuItemsPropertyName       = "TableMenuItems";
+    string RowMenuItemsPropertyName         = "RowMenuItems";
+    string ContainerMenuItemsPropertyName   = "ContainerMenuItems";
+    string HiddenFiltersPropertyName        = "HiddenFilters";
+    string SelectedRowCommandPropertyName   = "SelectedRowCommand";
+
+    string SformAfterAddItemPropertyName    = "SformAfterAddItem";
+    string SformAfterUpdItemPropertyName    = "SformAfterUpdItem";
+    string SformAfterDelItemPropertyName    = "SformAfterDelItem";
+
+    string TableMenuItemsCommandPropertyName    = "TableMenuItemsCommand";
+    string RowMenuItemsCommandPropertyName      = "RowMenuItemsCommand";
+    
+    string CanAddPropertyName                   = "CanAdd";
+    string CanUpdPropertyName                   = "CanUpdate";
+    string CanDelPropertyName                   = "CanDelete";
+
+    string CanAddDetailPropertyName                 = "CanAddDetail"; 
+    string CanUpdDetailPropertyName                 = "CanUpdateDetail"; 
+    string CanDelDetailPropertyName                 = "CanDeleteDetail"; 
+    string TableMenuItemsDetailPropertyName         = "TableMenuItemsDetail"; 
+    string RowMenuItemsDetailPropertyName           = "RowMenuItemsDetail"; 
+    string TableMenuItemsCommandDetailPropertyName  = "TableMenuItemsCommandDetail";
+    string RowMenuItemsCommandDetailPropertyName    = "RowMenuItemsCommandDetail";
+    string SelectedRowCommandDetailPropertyName     = "SelectedRowCommandDetail";
+    string HiddenFiltersDetailPropertyName          = "HiddenFiltersDetail"; 
+    string GridHeightDetailPropertyName             = "GridHeightDetail"; 
+    string FilterHeightDetailPropertyName           = "FilterHeightDetail"; 
+
+    string ShowAddFilterBtnDetailPropertyName       = "ShowAddFilterBtnDetail"; 
+    string ShowFilterDetailPropertyName             = "ShowFilterDetail"; 
+   
+    string RegionPropertyName                       = "Region";
+    string MasterRegionPropertyName                 = "MasterRegion";
+    string DetailRegionPropertyName                 = "DetailRegion";
+
+
+    string DetailsListPropertyName                  = "DetailsList"; 
+    string SelectedDetailsListItemPropertyName      = "SelectedDetailsListItem"; 
+    string IsDetailReadyPropertyName                = "IsDetailReady"; 
+
+    string TemplateViewSuffixPropertyName           = "TemplateView"; 
+
+    string IsParentLoadedPropertyName               = "IsParentLoaded";
+    string ContainerMenuItemsCommandPropertyName    = "ContainerMenuItemsCommand";
+    string OnContainerMenuItemsCommandPropertyName  = "OnContainerMenuItemsCommand";
+    string NavigationBackCommandPropertyName        = "NavigationBackCommand";
+    string OnNavigationBackCommandPropertyName      = "OnNavigationBackCommand";
+    string IsDestroyedPropertyName                  = "IsDestroyed";
+    string IsDetailDestroyedPropertyName            = "IsDetailDestroyed";
+    string IsSwitchingPropertyName                  = "IsSwitching";
+
+    string proxyPrefix = "clr-namespace:" + ProxyUserControlNameSpace;
+    if(ProxyUserControlProject != O2mUserControlProject) {
+        proxyPrefix = proxyPrefix + ";assembly=" + ProxyUserControlProject;
+    }
+    string lformPrefix = "clr-namespace:" + LformUserControlNameSpace;
+    if(LformUserControlProject != O2mUserControlProject) {
+        lformPrefix = lformPrefix + ";assembly=" + LformUserControlProject;
+    }
+    string ucwcmPrefix = "clr-namespace:" + RegionAwareUserControlBaseNameSpace;
+    if(RegionAwareUserControlBaseProject != O2mUserControlProject) {
+        ucwcmPrefix = ucwcmPrefix + ";assembly=" + RegionAwareUserControlBaseProject;
+    }
+
+    bool IsInTheSameModule = (LformUserControlProject == O2mUserControlProject);
+
+
+    List<ModelViewPropertyOfVwSerializable> primKeys= GetModelPrimaryKeyProps(Model);
+    List<string> detailViewNames =  GetDetailViews(Model, Context, null);
+    // List<string> detailViewNamesToExclude = new List<string>();
+    // m2mMdl, m2mFk, searchFks, otherFks, externalFks
+    Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>> tmpSearchSchema = null;
+
+#>
+
+<ucwcm:<#= RegionAwareUserControlBaseClassName #> x:Class="<#= O2mUserControlNameSpace #>.<#= O2mUserControlClassName #>"
+             xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:prism="http://prismlibrary.com" 
+             prism:ViewModelLocator.AutowireViewModel="True"
+             xmlns:ucwcm="<#= ucwcmPrefix #>"
+<#
+    if(IsInTheSameModule) {
+#>
+             xmlns:lfrm="<#= lformPrefix #>" 
+<#
+    } else {
+#>
+             xmlns:prx="<#= proxyPrefix #>" 
+<#
+    }
+#>
+
+<#
+    {
+        int id = -1;
+        foreach(string detailViewName in detailViewNames) {
+            if(detailViewNamesToExclude.Any(s => s == detailViewName)) continue;
+            id++;
+            ModelViewSerializable detailView = GetModelViewByName(Context, detailViewName);
+            if(detailView == null) {
+#>
+<!--  can not find the view by Name <#= detailViewName #> -->
+<#
+                continue;
+            }
+            List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detailView, null);
+            if (foreignKeys == null) {
+#>
+<!-- can not find Foreign Keys for <#= detailViewName #> -->
+<#
+                continue;
+            }
+            if (foreignKeys.Count < 1) {
+#>
+<!-- can not find Foreign Keys for <#= detailViewName #> -->
+<#
+                continue;
+            }
+            bool isM2m = false;
+            if(IsTableMatchesIndex(detailView)) {
+                if(AllPrimKeyPropsAreForeignKeysProps(detailView)) {
+                    if(ForeignKeysOrderedInsidePrimKey(detailView)) {
+                        isM2m = true;
+                    }
+                }
+            }
+            foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
+                if(isM2m) {
+                    // m2mMdl, m2mFk, searchFks, otherFks, externalFks
+                    tmpSearchSchema = DetailViewAsM2mMdl(detailView, Context);
+                    if (tmpSearchSchema != null) {
+                        int  cnt = 0;
+                        if(tmpSearchSchema.Item5 == null) continue;
+                        if(tmpSearchSchema.Item5.Count != 1) continue;
+                        if(tmpSearchSchema.Item4 != null) continue;
+                        if(tmpSearchSchema.Item5[0].Key != foreignKey) continue;
+                        ModelViewSerializable viewToNavigate = GetViewByName(Context, tmpSearchSchema.Item2.ViewName);
+                        string viewToNavigateClassName = GetModelClassName(viewToNavigate, LformUserControlFolder);
+                        string viewToNavigateLformUserControlProject  = GetModelProjectName(viewToNavigate, LformUserControlFolder);
+                        if (viewToNavigateLformUserControlProject == O2mUserControlProject) {
+                            string locallformPrefix = "clr-namespace:" + GetModelNameSpace(detailView, LformUserControlFolder);
+#>
+             xmlns:lfrm<#= id #>="<#= locallformPrefix #>" 
+<#
+                        } // if (viewToNavigateLformUserControlProject != O2mUserControlProject) { ... }
+                    } // if (tmpSearchSchema != null) { ... }
+                } // if(isM2m) { ... }
+                string localLformUserControlProject  = GetModelProjectName(detailView, LformUserControlFolder);
+                if (localLformUserControlProject == O2mUserControlProject) {
+                    string locallformPrefix = "clr-namespace:" + GetModelNameSpace(detailView, LformUserControlFolder);
+#>
+             xmlns:lfrm<#= id #>="<#= locallformPrefix #>" 
+<#
+                }
+            } // foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) { ... }
+        } // foreach(string detailViewName in detailViewNames) { ... }
+    } // { ... }
+#>
+
+             x:Name="o2mUsrCntrlRootNode"
+             >
+    <StackLayout>
+        <ActivityIndicator 
+                IsVisible="{Binding BindingContext.<#= IsSwitchingPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}"
+                IsRunning="{Binding BindingContext.<#= IsSwitchingPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}"/>
+        <!-- <ProgressBar 
+                         Progress="0.75"
+                         IsVisible="{Binding BindingContext.<#= IsSwitchingPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}"/>-->
+
+<#
+    if(IsInTheSameModule) {
+#>
+        <lfrm:<#= LformUserControlClassName #>  
+<#
+    } else {
+#>
+        <prx:<#= ProxyUserControlClassName #> 
+            prism:RegionManager.RegionName="<#= LformUserControlClassName #><#= MasterRegionPropertyName #>"
+<#
+    }
+#>
+            <#= IsDestroyedPropertyName #>="{Binding BindingContext.<#= IsDestroyedPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+            <#= ContainerMenuItemsPropertyName #>="{Binding <#= ContainerMenuItemsPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+            <#= ContainerMenuItemsCommandPropertyName #>="{Binding <#= OnContainerMenuItemsCommandPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}"
+
+            <#= ShowBackBtnPropertyName #>="{Binding BindingContext.<#= ShowBackBtnPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+            <#= NavigationBackCommandPropertyName #>="{Binding BindingContext.<#= OnNavigationBackCommandPropertyName #>, Source={x:Reference o2mUsrCntrlRootNode}}"                                
+
+            <#= CaptionPropertyName #>="{Binding BindingContext.<#= CaptionPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+            <#= FilterHeightPropertyName #>="{Binding BindingContext.<#= FilterHeightPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+            <#= ShowFilterPropertyName #>="{Binding BindingContext.<#= ShowFilterPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+            <#= ShowAddFilterBtnPropertyName #>="{Binding BindingContext.<#= ShowAddFilterBtnPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+            <#= GridHeightPropertyName #>="{Binding <#= GridHeightPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+            <#= HiddenFiltersPropertyName #>="{Binding BindingContext.<#= HiddenFiltersPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+            <#= SelectedRowCommandPropertyName #>="{Binding BindingContext.<#= SelectedRowCommandPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+            <#= TableMenuItemsCommandPropertyName #>="{Binding BindingContext.<#= TableMenuItemsCommandPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+            <#= RowMenuItemsCommandPropertyName #>="{Binding BindingContext.<#= RowMenuItemsCommandPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+            <#= TableMenuItemsPropertyName #>="{Binding BindingContext.<#= TableMenuItemsPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+            <#= RowMenuItemsPropertyName #>="{Binding BindingContext.<#= RowMenuItemsPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+            <#= CanAddPropertyName #>="{Binding BindingContext.<#= CanAddPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+            <#= CanUpdPropertyName #>="{Binding BindingContext.<#= CanUpdPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+            <#= CanDelPropertyName #>="{Binding BindingContext.<#= CanDelPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+            <#= IsParentLoadedPropertyName #>="{Binding BindingContext.<#= IsParentLoadedPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+            
+            />
+
+        <StackLayout>
+            <Label Text="Selected detail"/>
+            <Picker ItemsSource="{Binding BindingContext.<#= DetailsListPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+                    ItemDisplayBinding="{Binding <#= CaptionPropertyName #>}" 
+                    SelectedItem="{Binding BindingContext.<#= SelectedDetailsListItemPropertyName #>, Source={x:Reference o2mUsrCntrlRootNode}, Mode=TwoWay}">
+            </Picker>
+        </StackLayout>
+
+        <ContentView ControlTemplate="{StaticResource NoMasterRowIsSelectedView}">
+            <ContentView.Resources>
+                <ResourceDictionary>
+                    <ControlTemplate x:Key="NoMasterRowIsSelectedView">
+                            <Label Text="Master row not selected or access denied for detail" />
+                    </ControlTemplate> 
+<#
+    {
+        int id = -1;
+        foreach(string detailViewName in detailViewNames) {
+            if(detailViewNamesToExclude.Any(s => s == detailViewName)) continue;
+            id++;
+            ModelViewSerializable detailView = GetModelViewByName(Context, detailViewName);
+            if(detailView == null) {
+#>
+<!--  can not find the view by Name <#= detailViewName #> -->
+<#
+                continue;
+            }
+            List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detailView, null);
+            if (foreignKeys == null) {
+#>
+<!--  can not find Foreign Keys for <#= detailViewName #> -->
+<#
+                continue;
+            }
+            if (foreignKeys.Count < 1) {
+#>
+<!--  can not find Foreign Keys for <#= detailViewName #> -->
+<#
+                continue;
+            }
+            bool isM2m = false;
+            if(IsTableMatchesIndex(detailView)) {
+                if(AllPrimKeyPropsAreForeignKeysProps(detailView)) {
+                    if(ForeignKeysOrderedInsidePrimKey(detailView)) {
+                        isM2m = true;
+                    }
+                }
+            }
+            foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
+                if(isM2m) {
+                    // m2mMdl, m2mFk, searchFks, otherFks, externalFks
+                    tmpSearchSchema = DetailViewAsM2mMdl(detailView, Context);
+                    if (tmpSearchSchema != null) {
+                        int  cnt = 0;
+                        if(tmpSearchSchema.Item5 == null) continue;
+                        if(tmpSearchSchema.Item5.Count != 1) continue;
+                        if(tmpSearchSchema.Item4 != null) continue;
+                        if(tmpSearchSchema.Item5[0].Key != foreignKey) continue;
+                        ModelViewSerializable viewToNavigate = GetViewByName(Context, tmpSearchSchema.Item2.ViewName);
+                        string viewToNavigateClassName = GetModelClassName(viewToNavigate, LformUserControlFolder);
+                        string viewToNavigateLformUserControlProject  = GetModelProjectName(viewToNavigate, LformUserControlFolder);
+#>
+                    <ControlTemplate x:Key="<#= viewToNavigateClassName #><#= TemplateViewSuffixPropertyName #>">
+<#
+                        if (viewToNavigateLformUserControlProject == O2mUserControlProject) {
+#>
+                        <lfrm<#= id #>:<#= GetModelClassName(detailView, LformUserControlFolder) #> 
+<#
+                        } else {
+#>
+                        <prx:<#= ProxyUserControlClassName #> 
+                            prism:RegionManager.RegionName="<#= viewToNavigateClassName #><#= DetailRegionPropertyName #>"
+<#
+                        }
+#>
+                            <#= IsDestroyedPropertyName #>="{Binding BindingContext.<#= IsDetailDestroyedPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+                            <#= CaptionPropertyName #>="{Binding BindingContext.<#= SelectedDetailsListItemPropertyName #>.<#= CaptionPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+                            <#= FilterHeightPropertyName #>="{Binding BindingContext.<#= FilterHeightDetailPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+                            <#= ShowFilterPropertyName #>="{Binding BindingContext.<#= ShowFilterDetailPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+                            <#= ShowAddFilterBtnPropertyName #>="{Binding BindingContext.<#= ShowAddFilterBtnDetailPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+                            <#= GridHeightPropertyName #>="{Binding BindingContext.<#= GridHeightDetailPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+                            <#= ShowBackBtnPropertyName #>="False" 
+                            <#= HiddenFiltersPropertyName #>="{Binding BindingContext.<#= HiddenFiltersDetailPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+                            <#= SelectedRowCommandPropertyName #>="{Binding BindingContext.<#= SelectedRowCommandDetailPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+                            <#= TableMenuItemsCommandPropertyName #>="{Binding BindingContext.<#= TableMenuItemsCommandDetailPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+                            <#= RowMenuItemsCommandPropertyName #>="{Binding BindingContext.<#= RowMenuItemsCommandDetailPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+                            <#= TableMenuItemsPropertyName #>="{Binding BindingContext.<#= TableMenuItemsDetailPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+                            <#= RowMenuItemsPropertyName #>="{Binding BindingContext.<#= RowMenuItemsDetailPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+                            <#= CanAddPropertyName #>="{Binding BindingContext.<#= CanAddDetailPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+                            <#= CanUpdPropertyName #>="{Binding BindingContext.<#= CanUpdDetailPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+                            <#= CanDelPropertyName #>="{Binding BindingContext.<#= CanDelDetailPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+                            <#= IsParentLoadedPropertyName #>="{Binding BindingContext.<#= IsDetailReadyPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+                            />
+                    </ControlTemplate>
+<#
+                    } // the end of if (tmpSearchSchema != null) { ... }
+                } // the end of if(isM2m) { ... }
+                string detailViewClassName = GetModelClassName(detailView, LformUserControlFolder);
+                string localLformUserControlProject  = GetModelProjectName(detailView, LformUserControlFolder);
+#>
+                    <ControlTemplate x:Key="<#= detailViewClassName #><#= TemplateViewSuffixPropertyName #>">
+<#
+                if (localLformUserControlProject == O2mUserControlProject)
+                {
+#>
+                        <lfrm<#= id #>:<#= GetModelClassName(detailView, LformUserControlFolder) #> 
+<#
+                } else {
+#>
+                        <prx:<#= ProxyUserControlClassName #> 
+                            prism:RegionManager.RegionName="<#= detailViewClassName #><#= DetailRegionPropertyName #>"
+<#
+                }
+#>
+                            <#= IsDestroyedPropertyName #>="{Binding BindingContext.<#= IsDetailDestroyedPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+                            <#= CaptionPropertyName #>="{Binding BindingContext.<#= SelectedDetailsListItemPropertyName #>.<#= CaptionPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+                            <#= FilterHeightPropertyName #>="{Binding BindingContext.<#= FilterHeightDetailPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+                            <#= ShowFilterPropertyName #>="{Binding BindingContext.<#= ShowFilterDetailPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+                            <#= ShowAddFilterBtnPropertyName #>="{Binding BindingContext.<#= ShowAddFilterBtnDetailPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+                            <#= GridHeightPropertyName #>="{Binding BindingContext.<#= GridHeightDetailPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+                            <#= ShowBackBtnPropertyName #>="False" 
+                            <#= HiddenFiltersPropertyName #>="{Binding BindingContext.<#= HiddenFiltersDetailPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+                            <#= SelectedRowCommandPropertyName #>="{Binding BindingContext.<#= SelectedRowCommandDetailPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+                            <#= TableMenuItemsCommandPropertyName #>="{Binding BindingContext.<#= TableMenuItemsCommandDetailPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+                            <#= RowMenuItemsCommandPropertyName #>="{Binding BindingContext.<#= RowMenuItemsCommandDetailPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+                            <#= TableMenuItemsPropertyName #>="{Binding BindingContext.<#= TableMenuItemsDetailPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+                            <#= RowMenuItemsPropertyName #>="{Binding BindingContext.<#= RowMenuItemsDetailPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+                            <#= CanAddPropertyName #>="{Binding BindingContext.<#= CanAddDetailPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+                            <#= CanUpdPropertyName #>="{Binding BindingContext.<#= CanUpdDetailPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+                            <#= CanDelPropertyName #>="{Binding BindingContext.<#= CanDelDetailPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+                            <#= IsParentLoadedPropertyName #>="{Binding BindingContext.<#= IsDetailReadyPropertyName #>, Mode=OneWay, Source={x:Reference o2mUsrCntrlRootNode}}" 
+                            />
+                    </ControlTemplate>
+<#
+            } // foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) { ... }
+        } // foreach(string detailViewName in detailViewNames) { ... }
+    } // { ... }
+#>
+                </ResourceDictionary>
+            </ContentView.Resources>
+            <ContentView.Triggers>
+<#
+    {
+        int id = -1;
+        foreach(string detailViewName in detailViewNames) {
+            if(detailViewNamesToExclude.Any(s => s == detailViewName)) continue;
+            id++;
+            ModelViewSerializable detailView = GetModelViewByName(Context, detailViewName);
+            if(detailView == null) {
+#>
+<!--  can not find the view by Name <#= detailViewName #> -->
+<#
+                continue;
+            }
+            List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detailView, null);
+            if (foreignKeys == null) {
+#>
+<!--  can not find Foreign Keys for <#= detailViewName #> -->
+<#
+                continue;
+            }
+            if (foreignKeys.Count < 1) {
+#>
+<!--  can not find Foreign Keys for <#= detailViewName #> -->
+<#
+                continue;
+            }
+            bool isM2m = false;
+            if(IsTableMatchesIndex(detailView)) {
+                if(AllPrimKeyPropsAreForeignKeysProps(detailView)) {
+                    if(ForeignKeysOrderedInsidePrimKey(detailView)) {
+                        isM2m = true;
+                    }
+                }
+            }
+            foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
+                if(isM2m) {
+                    // m2mMdl, m2mFk, searchFks, otherFks, externalFks
+                    tmpSearchSchema = DetailViewAsM2mMdl(detailView, Context);
+                    if (tmpSearchSchema != null) {
+                        int  cnt = 0;
+                        if(tmpSearchSchema.Item5 == null) continue;
+                        if(tmpSearchSchema.Item5.Count != 1) continue;
+                        if(tmpSearchSchema.Item4 != null) continue;
+                        if(tmpSearchSchema.Item5[0].Key != foreignKey) continue;
+                        ModelViewSerializable viewToNavigate = GetViewByName(Context, tmpSearchSchema.Item2.ViewName);
+                        string viewToNavigateClassName = GetModelClassName(viewToNavigate, LformUserControlFolder);
+#>
+                    <MultiTrigger TargetType="ContentView">
+                        <MultiTrigger.Conditions>
+                            <BindingCondition Binding="{Binding BindingContext.<#= SelectedDetailsListItemPropertyName #>.<#= RegionPropertyName #>, Source={x:Reference o2mUsrCntrlRootNode}}" Value="<#= viewToNavigateClassName #><#= DetailRegionPropertyName #>"/>
+                            <BindingCondition Binding="{Binding BindingContext.<#= IsDetailReadyPropertyName #>, Source={x:Reference o2mUsrCntrlRootNode}}" Value="True"/>
+                        </MultiTrigger.Conditions>
+                        <Setter Property="ControlTemplate" Value="{StaticResource <#= viewToNavigateClassName #><#= TemplateViewSuffixPropertyName #>}" />
+                    </MultiTrigger>
+<#
+                    } // the end of if (tmpSearchSchema != null) { ... }
+                } // the end of if(isM2m) { ... }
+                string detailViewClassName = GetModelClassName(detailView, LformUserControlFolder);
+#>
+                    <MultiTrigger TargetType="ContentView">
+                        <MultiTrigger.Conditions>
+                            <BindingCondition Binding="{Binding BindingContext.<#= SelectedDetailsListItemPropertyName #>.<#= RegionPropertyName #>, Source={x:Reference o2mUsrCntrlRootNode}}" Value="<#= detailViewClassName #><#= DetailRegionPropertyName #>"/>
+                            <BindingCondition Binding="{Binding BindingContext.<#= IsDetailReadyPropertyName #>, Source={x:Reference o2mUsrCntrlRootNode}}" Value="True"/>
+                        </MultiTrigger.Conditions>
+                        <Setter Property="ControlTemplate" Value="{StaticResource <#= detailViewClassName #><#= TemplateViewSuffixPropertyName #>}" />
+                    </MultiTrigger>
+<#
+            } // foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) { ... }
+        } // foreach(string detailViewName in detailViewNames) { ... }
+    } // { ... }
+#>
+                    <MultiTrigger TargetType="ContentView">
+                        <MultiTrigger.Conditions>
+                            <BindingCondition Binding="{Binding BindingContext.<#= IsDetailReadyPropertyName #>, Source={x:Reference o2mUsrCntrlRootNode}}" Value="False"/>
+                        </MultiTrigger.Conditions>
+                        <Setter Property="ControlTemplate" Value="{StaticResource NoMasterRowIsSelectedView}" />
+                    </MultiTrigger>
+            </ContentView.Triggers>
+        </ContentView>
+    </StackLayout>
+</ucwcm:<#= RegionAwareUserControlBaseClassName #>>

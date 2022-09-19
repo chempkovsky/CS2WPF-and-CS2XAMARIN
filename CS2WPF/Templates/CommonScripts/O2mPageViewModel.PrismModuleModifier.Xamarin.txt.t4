@@ -1,0 +1,518 @@
+﻿<#
+
+    string EformModeEnumFolder                      = "00026-EformModeEnum.cs";
+    string EformModeEnumClassName                   = GetContextModelClassName(Context, EformModeEnumFolder);
+    string EformModeEnumNameSpace                   = GetContextModelNameSpace(Context, EformModeEnumFolder);
+
+    string IAppGlblSettingsServiceFolder            = "00080-IAppGlblSettingsService.cs";
+    string IAppGlblSettingsServiceClassName         = GetContextModelClassName(Context, IAppGlblSettingsServiceFolder);
+    string IAppGlblSettingsServiceNameSpace         = GetContextModelNameSpace(Context, IAppGlblSettingsServiceFolder);
+
+    string ISformViewModelInterfaceFolder           = "00198-ISformViewModelInterface.cs";
+    string ISformViewModelInterfaceClassName        = GetContextModelClassName(Context, ISformViewModelInterfaceFolder);
+    string ISformViewModelInterfaceNameSpace        = GetContextModelNameSpace(Context, ISformViewModelInterfaceFolder);
+
+    string IWebServiceFilterRsltInterfaceFolder     = "00204-IWebServiceFilterRsltInterface.cs";
+    string IWebServiceFilterRsltInterfaceClassName  = GetContextModelClassName(Context, IWebServiceFilterRsltInterfaceFolder);
+    string IWebServiceFilterRsltInterfaceNameSpace  = GetContextModelNameSpace(Context, IWebServiceFilterRsltInterfaceFolder);
+
+    string IWebServiceFilterMenuInterfaceFolder     = "00206-IWebServiceFilterMenuInterface.cs";
+    string IWebServiceFilterMenuInterfaceClassName  = GetContextModelClassName(Context, IWebServiceFilterMenuInterfaceFolder);
+    string IWebServiceFilterMenuInterfaceNameSpace  = GetContextModelNameSpace(Context, IWebServiceFilterMenuInterfaceFolder);
+
+    string WebServiceFilterRsltViewModelFolder      = "00215-WebServiceFilterRsltViewModel.cs";
+    string WebServiceFilterRsltViewModelClassName   = GetContextModelClassName(Context, WebServiceFilterRsltViewModelFolder);
+    string WebServiceFilterRsltViewModelNameSpace   = GetContextModelNameSpace(Context, WebServiceFilterRsltViewModelFolder);
+
+    string WebServiceFilterMenuViewModelFolder      = "00217-WebServiceFilterMenuViewModel.cs";
+    string WebServiceFilterMenuViewModelClassName   = GetContextModelClassName(Context, WebServiceFilterMenuViewModelFolder);
+    string WebServiceFilterMenuViewModelNameSpace   = GetContextModelNameSpace(Context, WebServiceFilterMenuViewModelFolder);
+
+    string IO2mListItemInterfaceFolder              = "00600-IO2mListItemInterface.cs";
+    string IO2mListItemInterfaceClassName           = GetContextModelClassName(Context, IO2mListItemInterfaceFolder);
+    string IO2mListItemInterfaceNameSpace           = GetContextModelNameSpace(Context, IO2mListItemInterfaceFolder);
+
+    string O2mListItemViewModelFolder               = "00602-O2mListItemViewModel.cs";
+    string O2mListItemViewModelClassName            = GetContextModelClassName(Context, O2mListItemViewModelFolder);
+    string O2mListItemViewModelNameSpace            = GetContextModelNameSpace(Context, O2mListItemViewModelFolder);
+
+    string AccessDeniedPageFolder                   = "00679-AccessDeniedPage.xaml.cs";
+    string AccessDeniedPageClassName                = GetContextModelClassName(Context, AccessDeniedPageFolder);
+    string AccessDeniedPageNameSpace                = GetContextModelNameSpace(Context, AccessDeniedPageFolder);
+
+    string PageNotFoundPageFolder                   = "00685-PageNotFoundPage.xaml.cs";
+    string PageNotFoundPageClassName                = GetContextModelClassName(Context, PageNotFoundPageFolder);
+    string PageNotFoundPageNameSpace                = GetContextModelNameSpace(Context, PageNotFoundPageFolder);
+
+    string modelInterfaceFolder                     = "01100-Interface.cs";
+    string modelInterfaceClassName                  = GetInterfaceName(Model);
+    string modelInterfaceNameSpace                  = GetModelNameSpace(Model, modelInterfaceFolder);
+
+
+    string LformUserControlFolder           = "01596-LformUserControl.xaml.cs";
+    string LformUserControlClassName        = GetModelClassName(Model, LformUserControlFolder);
+    string LformUserControlNameSpace        = GetModelNameSpace(Model, LformUserControlFolder);
+    string LformUserControlProject          = GetModelProjectName(Model, LformUserControlFolder);
+
+    string O2mPageXamlFolder                = "01699-O2mPage.xaml";
+    string O2mPageXamlClassName             = GetModelClassName(Model, O2mPageXamlFolder);
+    string O2mPageXamlNameSpace             = GetModelNameSpace(Model, O2mPageXamlFolder);
+    string O2mPageXamlProject               = GetModelProjectName(Model, O2mPageXamlFolder);
+
+    string O2mPageFolder                   = "01697-O2mPage.xaml.cs";
+    string O2mPageClassName                = GetModelClassName(Model, O2mPageFolder);
+    string O2mPageNameSpace                = GetModelNameSpace(Model, O2mPageFolder);
+    string O2mPageProject                  = GetModelProjectName(Model, O2mPageFolder);
+
+    string O2mPageViewModelFolder           = "01701-O2mPageViewModel.cs";
+    string O2mPageViewModelClassName        = GetModelClassName(Model, O2mPageViewModelFolder);
+    string O2mPageViewModelNameSpace        = GetModelNameSpace(Model, O2mPageViewModelFolder);
+
+
+    string HiddenFiltersPropertyName                = "HiddenFilters";
+    string TableMenuItemsPropertyName               = "TableMenuItems";
+    string RowMenuItemsPropertyName                 = "RowMenuItems";
+    string RegionPropertyName                       = "Region";
+    string RdlistPageRegionPropertyName             = "RdlistPageRegion";
+    string MasterRegionPropertyName                 = "MasterRegion";
+    string DetailRegionPropertyName                 = "DetailRegion";
+
+    string TableMenuItemsCommandPropertyName        = "TableMenuItemsCommand";
+    string RowMenuItemsCommandPropertyName          = "RowMenuItemsCommand";
+    string SelectedRowPropertyName                  = "SelectedRow";
+    string SelectedRowCommandPropertyName           = "SelectedRowCommand";
+
+    string CanAddPropertyName                       = "CanAdd";
+    string CanUpdPropertyName                       = "CanUpdate";
+    string CanDelPropertyName                       = "CanDelete";
+
+
+    string FormControlModelPropertyName             = "FormControlModel";
+    string CaptionPropertyName                      = "Caption";
+    string EformModePropertyName                    = "EformMode";
+    string ShowSubmitPropertyName                   = "ShowSubmit";
+    string FormServicePrefix                        = "FrmSrv";
+    string RowMIPrefixPropertyName                  = "RowMI";
+    string GridHeightPropertyName                   = "GridHeight";
+    string FilterHeightPropertyName                 = "FilterHeight";
+
+
+    string CanAddDetailPropertyName                 = "CanAddDetail"; 
+    string CanUpdDetailPropertyName                 = "CanUpdateDetail"; 
+    string CanDelDetailPropertyName                 = "CanDeleteDetail"; 
+    string TableMenuItemsDetailPropertyName         = "TableMenuItemsDetail"; 
+    string RowMenuItemsDetailPropertyName           = "RowMenuItemsDetail"; 
+    string TableMenuItemsCommandDetailPropertyName  = "TableMenuItemsCommandDetail";
+    string RowMenuItemsCommandDetailPropertyName    = "RowMenuItemsCommandDetail";
+    string SelectedRowDetailPropertyName            = "SelectedRowDetail";
+    string SelectedRowCommandDetailPropertyName     = "SelectedRowCommandDetail";
+    string HiddenFiltersDetailPropertyName          = "HiddenFiltersDetail"; 
+    string GridHeightDetailPropertyName             = "GridHeightDetail"; 
+    string FilterHeightDetailPropertyName           = "FilterHeightDetail"; 
+    string IsDetailReadyPropertyName                = "IsDetailReady"; 
+
+    string SelectedDetailsListItemPropertyName      = "SelectedDetailsListItem"; 
+    string DetailsListPropertyName                  = "DetailsList"; 
+    string AppSettingServicePropertyName            = "GlblSettingsSrv";
+    string ForeignKeyDetailsName                    = "ForeignKeyDetails";
+
+    string IsParentLoadedPropertyName               = "IsParentLoaded";
+
+    string DefaultGridHeightMethodName              = "DefaultGridHeight";
+    string DefaultFilterHeightMethodName            = "DefaultFilterHeight";
+    string ExpandedGridHeightMethodName             = "ExpandedGridHeight";
+    string ExpandedFilterHeightMethodName           = "ExpandedFilterHeight";
+
+
+    List<ModelViewPropertyOfVwSerializable> primKeys = GetModelPrimaryKeyProps(Model);
+    List<string> detailViewNames =  GetDetailViews(Model, Context, null);
+    // List<string> detailViewNamesToExclude = new List<string>();
+    // m2mMdl, m2mFk, searchFks, otherFks, externalFks
+    Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>> tmpSearchSchema = null;
+
+
+
+    List<string> nmSpaces = new List<string>();
+    if ((O2mPageViewModelNameSpace != IWebServiceFilterRsltInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IWebServiceFilterRsltInterfaceNameSpace);
+    if ((O2mPageViewModelNameSpace != WebServiceFilterRsltViewModelNameSpace) && (nmSpaces.IndexOf(WebServiceFilterRsltViewModelNameSpace) < 0)) 
+        nmSpaces.Add(WebServiceFilterRsltViewModelNameSpace);
+    if ((O2mPageViewModelNameSpace != IAppGlblSettingsServiceNameSpace) && (nmSpaces.IndexOf(IAppGlblSettingsServiceNameSpace) < 0)) 
+        nmSpaces.Add(IAppGlblSettingsServiceNameSpace);
+    if ((O2mPageViewModelNameSpace != WebServiceFilterMenuViewModelNameSpace) && (nmSpaces.IndexOf(WebServiceFilterMenuViewModelNameSpace) < 0)) 
+        nmSpaces.Add(WebServiceFilterMenuViewModelNameSpace);
+    if ((O2mPageViewModelNameSpace != IWebServiceFilterMenuInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterMenuInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IWebServiceFilterMenuInterfaceNameSpace);
+    if ((O2mPageViewModelNameSpace != IWebServiceFilterMenuInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterMenuInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IWebServiceFilterMenuInterfaceNameSpace);
+    if ((O2mPageViewModelNameSpace != EformModeEnumNameSpace) && (nmSpaces.IndexOf(EformModeEnumNameSpace) < 0)) 
+        nmSpaces.Add(EformModeEnumNameSpace);
+    if ((O2mPageViewModelNameSpace != modelInterfaceNameSpace) && (nmSpaces.IndexOf(modelInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(modelInterfaceNameSpace);
+    if ((O2mPageViewModelNameSpace != ISformViewModelInterfaceNameSpace) && (nmSpaces.IndexOf(ISformViewModelInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(ISformViewModelInterfaceNameSpace);
+    if ((O2mPageViewModelNameSpace != IO2mListItemInterfaceNameSpace) && (nmSpaces.IndexOf(IO2mListItemInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IO2mListItemInterfaceNameSpace);
+    if ((O2mPageViewModelNameSpace != O2mListItemViewModelNameSpace) && (nmSpaces.IndexOf(O2mListItemViewModelNameSpace) < 0)) 
+        nmSpaces.Add(O2mListItemViewModelNameSpace);
+    
+    bool IsInTheSameModule = (LformUserControlProject == O2mPageProject);
+    
+    
+#>
+{
+"PrismMMMCallItems": [
+
+<#
+    if (LformUserControlProject != O2mPageProject) {
+#>
+    {
+    "Description": [
+
+    '"<#= LformUserControlClassName #>" UserControl is defined in the "<#= LformUserControlProject #>"-project.',
+    'In the file of IModule-class of "<#= LformUserControlProject #>"-project the following line of code must be inserted:',
+    ' ',
+    '    public void OnInitialized(IContainerProvider containerProvider)',
+    '    {',
+    '        ...',
+    '        IRegionManager regionManager = containerProvider.Resolve(typeof(IRegionManager)) as IRegionManager;',
+    '        if (regionManager != null)',
+    '        {',
+    '            ...',
+    '            // According to requirements of the "<#= O2mPageViewModelClassName #>.cs"-file of "<#= O2mPageProject #>"-project. ',
+    '            regionManager.RegisterViewWithRegion("<#= LformUserControlClassName #><#= MasterRegionPropertyName #>", typeof(<#= LformUserControlClassName #>));',
+    '            ...',
+    '        }',
+    '        ...',
+    '    }'
+    ],
+
+<#
+{
+    string LformUserControlNameSpaceAndClassName            = LformUserControlNameSpace + "." + LformUserControlClassName;
+    string destProjectName                                  = GetModelProjectUniqueName(Model, LformUserControlFolder);
+    string destImplementedInterface                         = "Prism.Modularity.IModule";
+    string destMethodName                                   = "OnInitialized";
+    string[] destMethodParamTypes                           = new string[] {"Prism.Ioc.IContainerProvider"};
+    string destMethodAccessType                             = "public";
+    string destMethodParamTypeForVar                        = "Prism.Ioc.IContainerProvider";
+    string invocationVarType                                = "Prism.Regions.IRegionManager";
+    string invocationMethodName                             = "RegisterViewWithRegion";
+    string[] invocationGenerics                             = new string[]{};
+    string[] invocationParams                               = new string[]{"\"" + LformUserControlClassName + MasterRegionPropertyName  +"\"", "typeof("+LformUserControlNameSpaceAndClassName+")"};
+    //result = PrismModifier.UpdateMethodWithVarIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType, destMethodParamTypeForVar,
+    //                    invocationVarType, invocationMethodName, invocationGenerics, invocationParams);
+#>
+    "MethodName": 'UpdateMethodWithVarIdentifier',
+    "DestProjectName": '<#= destProjectName #>',
+    "DestImplementedInterface": '<#= destImplementedInterface #>',
+    "DestMethodName": '<#= destMethodName #>',
+    "DestMethodParamTypes": ['<#= destMethodParamTypes[0] #>'],
+    "DestMethodAccessType": '<#= destMethodAccessType #>',
+    "DestMethodParamTypeForVar": '<#= destMethodParamTypeForVar #>',
+    "InvocationVarType": '<#= invocationVarType #>',
+    "InvocationParamType": '',
+    "InvocationClassType": '',
+    "InvocationMethodName": '<#= invocationMethodName #>',
+    "InvocationGenerics": [],
+    "InvocationParams": ['<#= invocationParams[0] #>','<#= invocationParams[1] #>'],
+    "StepDescription": 'Insertion the line : regionManager.RegisterViewWithRegion("<#= LformUserControlClassName #><#= MasterRegionPropertyName #>", typeof(<#= LformUserControlClassName #>));'
+    },
+<#
+
+}
+    } // if (LformUserControlProject != O2mPageProject) { ... }
+
+        foreach(string detailViewName in detailViewNames) {
+            if(detailViewNamesToExclude.Any(s => s == detailViewName)) continue;
+            ModelViewSerializable detailView = GetModelViewByName(Context, detailViewName);
+            if(detailView == null) {
+#>
+<!--  can not find the view by Name <#= detailViewName #> -->
+<#
+                continue;
+            }
+            List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detailView, null);
+            if (foreignKeys == null) {
+#>
+<!-- can not find Foreign Keys for <#= detailViewName #> -->
+<#
+                continue;
+            }
+            if (foreignKeys.Count < 1) {
+#>
+<!-- can not find Foreign Keys for <#= detailViewName #> -->
+<#
+                continue;
+            }
+            bool isM2m = false;
+            if(IsTableMatchesIndex(detailView)) {
+                if(AllPrimKeyPropsAreForeignKeysProps(detailView)) {
+                    if(ForeignKeysOrderedInsidePrimKey(detailView)) {
+                        isM2m = true;
+                    }
+                }
+            }
+            foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
+                if(isM2m) {
+                    // m2mMdl, m2mFk, searchFks, otherFks, externalFks
+                    tmpSearchSchema = DetailViewAsM2mMdl(detailView, Context);
+                    if (tmpSearchSchema != null) {
+                        int  cnt = 0;
+                        if(tmpSearchSchema.Item5 == null) continue;
+                        if(tmpSearchSchema.Item5.Count != 1) continue;
+                        if(tmpSearchSchema.Item4 != null) continue;
+                        if(tmpSearchSchema.Item5[0].Key != foreignKey) continue;
+                        ModelViewSerializable viewToNavigate = GetViewByName(Context, tmpSearchSchema.Item2.ViewName);
+                        string viewToNavigateClassName = GetModelClassName(viewToNavigate, LformUserControlFolder);
+                        string viewToNavigateLformUserControlProject  = GetModelProjectName(viewToNavigate, LformUserControlFolder);
+                        string viewToNavigateNameSpace  = GetModelNameSpace(viewToNavigate, LformUserControlFolder);
+                        if (viewToNavigateLformUserControlProject != O2mPageProject) {
+#>
+    {
+    "Description": [
+    '"<#= viewToNavigateClassName #>" UserControl is defined in the "<#= viewToNavigateLformUserControlProject #>"-project.',
+    'In the file of IModule-class of "<#= viewToNavigateLformUserControlProject #>"-project the following line of code must be inserted:',
+    ' ',
+    '    public void OnInitialized(IContainerProvider containerProvider)',
+    '    {',
+    '        ...',
+    '        IRegionManager regionManager = containerProvider.Resolve(typeof(IRegionManager)) as IRegionManager;',
+    '        if (regionManager != null)',
+    '        {',
+    '            ...',
+    '            // According to requirements of the "<#= O2mPageViewModelClassName #>.cs"-file of "<#= O2mPageProject #>"-project. ',
+    '            regionManager.RegisterViewWithRegion("<#= viewToNavigateClassName #><#= DetailRegionPropertyName #>", typeof(<#= viewToNavigateClassName #>));',
+    '            ...',
+    '        }',
+    '        ...',
+    '    }'
+    ],
+
+<#
+{
+    string detailViewNameSpaceAndClassName                  = viewToNavigateNameSpace + "." + viewToNavigateClassName;
+    string destProjectName                                  = GetModelProjectUniqueName(detailView, LformUserControlFolder);
+    string destImplementedInterface                         = "Prism.Modularity.IModule";
+    string destMethodName                                   = "OnInitialized";
+    string[] destMethodParamTypes                           = new string[] {"Prism.Ioc.IContainerProvider"};
+    string destMethodAccessType                             = "public";
+    string destMethodParamTypeForVar                        = "Prism.Ioc.IContainerProvider";
+    string invocationVarType                                = "Prism.Regions.IRegionManager";
+    string invocationMethodName                             = "RegisterViewWithRegion";
+    string[] invocationGenerics                             = new string[]{};
+    string[] invocationParams                               = new string[]{"\"" + viewToNavigateClassName + DetailRegionPropertyName  +"\"", "typeof("+detailViewNameSpaceAndClassName+")"};
+    //result = PrismModifier.UpdateMethodWithVarIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType, destMethodParamTypeForVar,
+    //                    invocationVarType, invocationMethodName, invocationGenerics, invocationParams);
+#>
+    "MethodName": 'UpdateMethodWithVarIdentifier',
+    "DestProjectName": '<#= destProjectName #>',
+    "DestImplementedInterface": '<#= destImplementedInterface #>',
+    "DestMethodName": '<#= destMethodName #>',
+    "DestMethodParamTypes": ['Prism.Ioc.IContainerProvider'],
+    "DestMethodAccessType": '<#= destMethodAccessType #>',
+    "DestMethodParamTypeForVar": '<#= destMethodParamTypeForVar #>',
+    "InvocationVarType": '<#= invocationVarType #>',
+    "InvocationParamType": '',
+    "InvocationClassType": '',
+    "InvocationMethodName": '<#= invocationMethodName #>',
+    "InvocationGenerics": [],
+    "InvocationParams": ['<#= invocationParams[0] #>','<#= invocationParams[1] #>'],
+    "StepDescription": 'Insertion the line : regionManager.RegisterViewWithRegion("<#= viewToNavigateClassName #><#= DetailRegionPropertyName #>", typeof(<#= viewToNavigateClassName #>));'
+    },
+<#
+}
+                        } // if (viewToNavigateLformUserControlProject != O2mPageProject) { ... }
+                    } // if (tmpSearchSchema != null) { ... }
+                } // if(isM2m) { ... }
+                string localLformUserControlProject  = GetModelProjectName(detailView, LformUserControlFolder);
+                string detailViewNameSpace  = GetModelNameSpace(detailView, LformUserControlFolder);
+                string detailViewClassName = GetModelClassName(detailView, LformUserControlFolder);
+                if (localLformUserControlProject != O2mPageProject) {
+#>
+    {
+    "Description": [
+    '"<#= detailViewClassName #>" UserControl is defined in the "<#= localLformUserControlProject #>"-project.',
+    'In the file of IModule-class of "<#= localLformUserControlProject #>"-project the following line of code must be inserted:',
+    ' ',
+    '    public void OnInitialized(IContainerProvider containerProvider)',
+    '    {',
+    '        ...',
+    '        IRegionManager regionManager = containerProvider.Resolve(typeof(IRegionManager)) as IRegionManager;',
+    '        if (regionManager != null)',
+    '        {',
+    '            ...',
+    '            // According to requirements of the "<#= O2mPageViewModelClassName #>.cs"-file of "<#= O2mPageProject #>"-project. ',
+    '            regionManager.RegisterViewWithRegion("<#= detailViewClassName #><#= DetailRegionPropertyName #>", typeof(<#= detailViewClassName #>));',
+    '            ...',
+    '        }',
+    '        ...',
+    '    }'
+    ],
+
+<#
+{
+    string detailViewNameSpaceAndClassName                  = detailViewNameSpace + "." + detailViewClassName;
+    string destProjectName                                  = GetModelProjectUniqueName(detailView, LformUserControlFolder);
+    string destImplementedInterface                         = "Prism.Modularity.IModule";
+    string destMethodName                                   = "OnInitialized";
+    string[] destMethodParamTypes                           = new string[] {"Prism.Ioc.IContainerProvider"};
+    string destMethodAccessType                             = "public";
+    string destMethodParamTypeForVar                        = "Prism.Ioc.IContainerProvider";
+    string invocationVarType                                = "Prism.Regions.IRegionManager";
+    string invocationMethodName                             = "RegisterViewWithRegion";
+    string[] invocationGenerics                             = new string[]{};
+    string[] invocationParams                               = new string[]{"\"" + detailViewClassName + DetailRegionPropertyName  +"\"", "typeof("+detailViewNameSpaceAndClassName+")"};
+    //result = PrismModifier.UpdateMethodWithVarIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType, destMethodParamTypeForVar,
+    //                    invocationVarType, invocationMethodName, invocationGenerics, invocationParams);
+#>
+    "MethodName": 'UpdateMethodWithVarIdentifier',
+    "DestProjectName": '<#= destProjectName #>',
+    "DestImplementedInterface": '<#= destImplementedInterface #>',
+    "DestMethodName": '<#= destMethodName #>',
+    "DestMethodParamTypes": ['Prism.Ioc.IContainerProvider'],
+    "DestMethodAccessType": '<#= destMethodAccessType #>',
+    "DestMethodParamTypeForVar": '<#= destMethodParamTypeForVar #>',
+    "InvocationVarType": '<#= invocationVarType #>',
+    "InvocationParamType": '',
+    "InvocationClassType": '',
+    "InvocationMethodName": '<#= invocationMethodName #>',
+    "InvocationGenerics": [],
+    "InvocationParams": ['<#= invocationParams[0] #>','<#= invocationParams[1] #>'],
+    "StepDescription": 'Insertion the line : regionManager.RegisterViewWithRegion("<#= detailViewClassName #><#= DetailRegionPropertyName #>", typeof(<#= detailViewClassName #>));'
+    },
+<#
+}
+                } // if (localLformUserControlProject != O2mPageProject) { ... }
+            } // foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) { ... }
+        } // foreach(string detailViewName in detailViewNames) { ... }
+#>
+
+    {
+    "Description": [
+    '"<#= O2mPageClassName #>" UserControl is defined in the "<#= O2mPageProject #>"-project.',
+    'In the file of IModule-class of "<#= O2mPageProject #>"-project the following line of code must be inserted:',
+    ' ',
+    '    public void RegisterTypes(IContainerRegistry containerRegistry)',
+    '    {',
+    '        ...',
+    '        // According to requirements of the "<#= O2mPageViewModelClassName #>.cs"-file of "<#= O2mPageProject #>"-project. ',
+    '        ViewModelLocationProvider.Register<<#= O2mPageClassName #>, <#= O2mPageViewModelClassName #>>();',
+    '        // According to requirements of the "<#= O2mPageViewModelClassName #>.cs"-file of "<#= O2mPageProject #>"-project. ',
+    '        containerRegistry.RegisterForNavigation<<#= O2mPageClassName #>, <#= O2mPageViewModelClassName #>>("<#= O2mPageClassName #>");',
+    '        // Only if you need to get an instance of controls, insert two lines below',
+    '        // According to requirements of the "<#= O2mPageViewModelClassName #>.cs"-file of "<#= O2mPageProject #>"-project. ',
+    '        // containerRegistry.Register<ContentPage, <#= O2mPageClassName #>>("<#= O2mPageClassName #>");',
+    '        ...',
+    '    }',
+    ],
+
+<#
+    {
+    string O2mPageNameSpaceAndClassName                     = O2mPageNameSpace + "." + O2mPageClassName;
+    string O2mPageViewModelNameSpaceAndClassName            = O2mPageViewModelNameSpace + "." + O2mPageViewModelClassName;
+    string destProjectName                                  = GetModelProjectUniqueName(Model, O2mPageFolder);
+    string destImplementedInterface                         = "Prism.Modularity.IModule";
+    string destMethodName                                   = "RegisterTypes";
+    string[] destMethodParamTypes                           = new string[] {"Prism.Ioc.IContainerRegistry"};
+    string destMethodAccessType                             = "public";
+    string invocationClassType                              = "Prism.Mvvm.ViewModelLocationProvider";
+    string invocationMethodName                             = "Register";
+    string[] invocationGenerics                             = new string[]{O2mPageNameSpaceAndClassName, O2mPageViewModelNameSpaceAndClassName};
+    string[] invocationParams                               = new string[]{};
+    //result = PrismModifier.UpdateMethodWithClassIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType,
+    //                    invocationClassType, invocationMethodName, invocationGenerics, invocationParams);
+#>
+    "MethodName": 'UpdateMethodWithClassIdentifier',
+    "DestProjectName": '<#= destProjectName #>',
+    "DestImplementedInterface": '<#= destImplementedInterface #>',
+    "DestMethodName": '<#= destMethodName #>',
+    "DestMethodParamTypes": ['<#= destMethodParamTypes[0] #>'],
+    "DestMethodAccessType": '<#= destMethodAccessType #>',
+    "DestMethodParamTypeForVar": '',
+    "InvocationVarType": '',
+    "InvocationParamType": '',
+    "InvocationClassType": '<#= invocationClassType #>',
+    "InvocationMethodName": '<#= invocationMethodName #>',
+    "InvocationGenerics": ['<#= invocationGenerics[0] #>','<#= invocationGenerics[1] #>'],
+    "InvocationParams": [],
+    "StepDescription": 'Insertion the line : ViewModelLocationProvider.Register<<#= O2mPageClassName #>, <#= O2mPageViewModelClassName #>>();'
+    },
+<#
+
+    }
+{
+    string O2mPageNameSpaceAndClassName                     = O2mPageNameSpace + "." + O2mPageClassName;
+    string O2mPageViewModelNameSpaceAndClassName                = O2mPageViewModelNameSpace + "." + O2mPageViewModelClassName;
+    string destProjectName                                  = GetModelProjectUniqueName(Model, O2mPageFolder);
+    string destImplementedInterface                         = "Prism.Modularity.IModule";
+    string destMethodName                                   = "RegisterTypes";
+    string[] destMethodParamTypes                           = new string[] {"Prism.Ioc.IContainerRegistry"};
+    string destMethodAccessType                             = "public";
+    string invocationParamType                              = "Prism.Ioc.IContainerRegistry";
+    string invocationMethodName                             = "RegisterForNavigation";
+    string[] invocationGenerics                             = new string[]{O2mPageNameSpaceAndClassName, O2mPageViewModelNameSpaceAndClassName};
+    string[] invocationParams                               = new string[]{"\"" + O2mPageClassName + "\""};
+    //result = PrismModifier.UpdateMethodWithParamIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType,
+    //                    invocationParamType, invocationMethodName, invocationGenerics, invocationParams);
+#>  
+   {
+    "Description": [],
+    "MethodName": 'UpdateMethodWithParamIdentifier',
+    "DestProjectName": '<#= destProjectName #>',
+    "DestImplementedInterface": '<#= destImplementedInterface #>',
+    "DestMethodName": '<#= destMethodName #>',
+    "DestMethodParamTypes": ['<#= destMethodParamTypes[0] #>'],
+    "DestMethodAccessType": '<#= destMethodAccessType #>',
+    "DestMethodParamTypeForVar": '',
+    "InvocationVarType": '',
+    "InvocationParamType": '<#= invocationParamType #>',
+    "InvocationClassType": '',
+    "InvocationMethodName": '<#= invocationMethodName #>',
+    "InvocationGenerics": ['<#= invocationGenerics[0] #>','<#= invocationGenerics[1] #>'],
+    "InvocationParams": ['<#= invocationParams[0]  #>'],
+    "StepDescription": 'Insertion the line : containerRegistry.RegisterForNavigation<<#= O2mPageClassName #>, <#= O2mPageViewModelClassName #>>("<#= O2mPageClassName #>");'
+    },
+<#
+
+}
+{
+    string O2mPageNameSpaceAndClassName                     = O2mPageNameSpace + "." + O2mPageClassName;
+    string O2mPageViewModelNameSpaceAndClassName            = O2mPageViewModelNameSpace + "." + O2mPageViewModelClassName;
+    string destProjectName                                  = GetModelProjectUniqueName(Model, O2mPageFolder);
+    string destImplementedInterface                         = "Prism.Modularity.IModule";
+    string destMethodName                                   = "RegisterTypes";
+    string[] destMethodParamTypes                           = new string[] {"Prism.Ioc.IContainerRegistry"};
+    string destMethodAccessType                             = "public";
+    string invocationParamType                              = "Prism.Ioc.IContainerRegistry";
+    string invocationMethodName                             = "Register";
+    string[] invocationGenerics                             = new string[]{"Xamarin.Forms.ContentPage",O2mPageNameSpaceAndClassName};
+    string[] invocationParams                               = new string[]{"\"" + O2mPageClassName + "\""};
+    //result = PrismModifier.UpdateMethodWithParamIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType,
+    //                    invocationParamType, invocationMethodName, invocationGenerics, invocationParams);
+#>  
+   {
+    "Description": [],
+    "MethodName": 'UpdateMethodWithParamIdentifier',
+    "DestProjectName": '<#= destProjectName #>',
+    "DestImplementedInterface": '<#= destImplementedInterface #>',
+    "DestMethodName": '<#= destMethodName #>',
+    "DestMethodParamTypes": ['<#= destMethodParamTypes[0] #>'],
+    "DestMethodAccessType": '<#= destMethodAccessType #>',
+    "DestMethodParamTypeForVar": '',
+    "InvocationVarType": '',
+    "InvocationParamType": '<#= invocationParamType #>',
+    "InvocationClassType": '',
+    "InvocationMethodName": '<#= invocationMethodName #>',
+    "InvocationGenerics": ['<#= invocationGenerics[0] #>', '<#= invocationGenerics[1] #>'],
+    "InvocationParams": ['<#= invocationParams[0]  #>'],
+    "StepDescription": 'Insertion the line : containerRegistry.Register<ContentPage, <#= O2mPageClassName #>>("<#= O2mPageClassName #>");'
+    },
+<#
+
+}
+#>
+    ]
+}
+
+

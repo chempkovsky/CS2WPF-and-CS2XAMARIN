@@ -1,0 +1,1076 @@
+﻿using System;
+using Xamarin.Forms;
+using System.Linq;
+using System.ComponentModel;
+using Prism.Regions.Navigation;
+using System.Windows.Input;
+using System.Collections.ObjectModel;
+using System.Threading.Tasks;
+using System.Runtime.CompilerServices;
+using System.Collections.Generic;
+using Prism.Navigation;
+
+<#
+
+    string EformModeEnumFolder                      = "00026-EformModeEnum.cs";
+    string EformModeEnumClassName                   = GetContextModelClassName(Context, EformModeEnumFolder);
+    string EformModeEnumNameSpace                   = GetContextModelNameSpace(Context, EformModeEnumFolder);
+
+    string IAppGlblSettingsServiceFolder            = "00080-IAppGlblSettingsService.cs";
+    string IAppGlblSettingsServiceClassName         = GetContextModelClassName(Context, IAppGlblSettingsServiceFolder);
+    string IAppGlblSettingsServiceNameSpace         = GetContextModelNameSpace(Context, IAppGlblSettingsServiceFolder);
+
+    string ISformViewModelInterfaceFolder           = "00198-ISformViewModelInterface.cs";
+    string ISformViewModelInterfaceClassName        = GetContextModelClassName(Context, ISformViewModelInterfaceFolder);
+    string ISformViewModelInterfaceNameSpace        = GetContextModelNameSpace(Context, ISformViewModelInterfaceFolder);
+
+    string IWebServiceFilterRsltInterfaceFolder     = "00204-IWebServiceFilterRsltInterface.cs";
+    string IWebServiceFilterRsltInterfaceClassName  = GetContextModelClassName(Context, IWebServiceFilterRsltInterfaceFolder);
+    string IWebServiceFilterRsltInterfaceNameSpace  = GetContextModelNameSpace(Context, IWebServiceFilterRsltInterfaceFolder);
+
+    string IWebServiceFilterMenuInterfaceFolder     = "00206-IWebServiceFilterMenuInterface.cs";
+    string IWebServiceFilterMenuInterfaceClassName  = GetContextModelClassName(Context, IWebServiceFilterMenuInterfaceFolder);
+    string IWebServiceFilterMenuInterfaceNameSpace  = GetContextModelNameSpace(Context, IWebServiceFilterMenuInterfaceFolder);
+
+    string WebServiceFilterRsltViewModelFolder      = "00215-WebServiceFilterRsltViewModel.cs";
+    string WebServiceFilterRsltViewModelClassName   = GetContextModelClassName(Context, WebServiceFilterRsltViewModelFolder);
+    string WebServiceFilterRsltViewModelNameSpace   = GetContextModelNameSpace(Context, WebServiceFilterRsltViewModelFolder);
+
+    string WebServiceFilterMenuViewModelFolder      = "00217-WebServiceFilterMenuViewModel.cs";
+    string WebServiceFilterMenuViewModelClassName   = GetContextModelClassName(Context, WebServiceFilterMenuViewModelFolder);
+    string WebServiceFilterMenuViewModelNameSpace   = GetContextModelNameSpace(Context, WebServiceFilterMenuViewModelFolder);
+
+    string IO2mListItemInterfaceFolder              = "00600-IO2mListItemInterface.cs";
+    string IO2mListItemInterfaceClassName           = GetContextModelClassName(Context, IO2mListItemInterfaceFolder);
+    string IO2mListItemInterfaceNameSpace           = GetContextModelNameSpace(Context, IO2mListItemInterfaceFolder);
+
+    string O2mListItemViewModelFolder               = "00602-O2mListItemViewModel.cs";
+    string O2mListItemViewModelClassName            = GetContextModelClassName(Context, O2mListItemViewModelFolder);
+    string O2mListItemViewModelNameSpace            = GetContextModelNameSpace(Context, O2mListItemViewModelFolder);
+
+    string RegionAwareViewModelBaseFolder           = "00648-RegionAwareViewModelBase.cs";
+    string RegionAwareViewModelBaseClassName        = GetContextModelClassName(Context, RegionAwareViewModelBaseFolder);
+    string RegionAwareViewModelBaseNameSpace        = GetContextModelNameSpace(Context, RegionAwareViewModelBaseFolder);
+
+    string AccessDeniedUserControlFolder            = "00678-AccessDeniedUserControl.xaml.cs";
+    string AccessDeniedUserControlClassName         = GetContextModelClassName(Context, AccessDeniedUserControlFolder);
+    string AccessDeniedUserControlNameSpace         = GetContextModelNameSpace(Context, AccessDeniedUserControlFolder);
+
+    string PageNotFoundUserControlFolder            = "00684-PageNotFoundUserControl.xaml.cs";
+    string PageNotFoundUserControlClassName         = GetContextModelClassName(Context, PageNotFoundUserControlFolder);
+    string PageNotFoundUserControlNameSpace         = GetContextModelNameSpace(Context, PageNotFoundUserControlFolder);
+
+    string modelInterfaceFolder                     = "01100-Interface.cs";
+    string modelInterfaceClassName                  = GetInterfaceName(Model);
+    string modelInterfaceNameSpace                  = GetModelNameSpace(Model, modelInterfaceFolder);
+
+    string modelServiceInterfaceFolder              = "01400-Service.interface.cs";
+    string modelServiceInterfaceNameSpace           = GetModelNameSpace(Model, modelServiceInterfaceFolder);
+
+    string LformUserControlFolder           = "01596-LformUserControl.xaml.cs";
+    string LformUserControlClassName        = GetModelClassName(Model, LformUserControlFolder);
+    string LformUserControlNameSpace        = GetModelNameSpace(Model, LformUserControlFolder);
+    string LformUserControlProject          = GetModelProjectName(Model, LformUserControlFolder);
+
+    string O2mUserControlFolder             = "01696-O2mUserControl.xaml.cs";
+    string O2mUserControlClassName          = GetModelClassName(Model, O2mUserControlFolder);
+    string O2mUserControlNameSpace          = GetModelNameSpace(Model, O2mUserControlFolder);
+    string O2mUserControlProject            = GetModelProjectName(Model, O2mUserControlFolder);
+
+    string O2mViewModelFolder               = "01700-O2mViewModel.cs";
+    string O2mViewModelClassName            = GetModelClassName(Model, O2mViewModelFolder);
+    string O2mViewModelNameSpace            = GetModelNameSpace(Model, O2mViewModelFolder);
+
+
+    string HiddenFiltersPropertyName                = "HiddenFilters";
+    string TableMenuItemsPropertyName               = "TableMenuItems";
+    string RowMenuItemsPropertyName                 = "RowMenuItems";
+    string RegionPropertyName                       = "Region";
+    string RdlistPageRegionPropertyName             = "RdlistPageRegion";
+    string MasterRegionPropertyName                 = "MasterRegion";
+    string DetailRegionPropertyName                 = "DetailRegion";
+
+    string TableMenuItemsCommandPropertyName        = "TableMenuItemsCommand";
+    string RowMenuItemsCommandPropertyName          = "RowMenuItemsCommand";
+    string SelectedRowPropertyName                  = "SelectedRow";
+    string SelectedRowCommandPropertyName           = "SelectedRowCommand";
+
+    string CanAddPropertyName                       = "CanAdd";
+    string CanUpdPropertyName                       = "CanUpdate";
+    string CanDelPropertyName                       = "CanDelete";
+
+
+    string FormControlModelPropertyName             = "FormControlModel";
+    string CaptionPropertyName                      = "Caption";
+    string EformModePropertyName                    = "EformMode";
+    string ShowSubmitPropertyName                   = "ShowSubmit";
+    string FormServicePrefix                        = "FrmSrv";
+    string FormRootServicePropertyName              = "FrmRootSrv";
+
+    string RowMIPrefixPropertyName                  = "RowMI";
+
+
+    string CanAddDetailPropertyName                 = "CanAddDetail"; 
+    string CanUpdDetailPropertyName                 = "CanUpdateDetail"; 
+    string CanDelDetailPropertyName                 = "CanDeleteDetail"; 
+    string TableMenuItemsDetailPropertyName         = "TableMenuItemsDetail"; 
+    string RowMenuItemsDetailPropertyName           = "RowMenuItemsDetail"; 
+    string TableMenuItemsCommandDetailPropertyName  = "TableMenuItemsCommandDetail";
+    string RowMenuItemsCommandDetailPropertyName    = "RowMenuItemsCommandDetail";
+    string SelectedRowDetailPropertyName            = "SelectedRowDetail";
+    string SelectedRowCommandDetailPropertyName     = "SelectedRowCommandDetail";
+    string HiddenFiltersDetailPropertyName          = "HiddenFiltersDetail"; 
+    string IsDetailReadyPropertyName                = "IsDetailReady"; 
+    string IsDetailDestroyedPropertyName            = "IsDetailDestroyed";
+
+    string SelectedDetailsListItemPropertyName      = "SelectedDetailsListItem"; 
+    string DetailsListPropertyName                  = "DetailsList"; 
+    string AppSettingServicePropertyName            = "GlblSettingsSrv";
+    string ForeignKeyDetailsName                    = "ForeignKeyDetails";
+
+    string IsParentLoadedPropertyName               = "IsParentLoaded";
+
+    string CurrentNavigationContextPropertyName     = "CurrentNavigationContext";
+    string ShowBackBtnPropertyName                  = "ShowBackBtn";
+    string OnNavigationBackCommandPropertyName      = "OnNavigationBackCommand";
+
+    string CanAddDetailParentPropertyName           = "CanAddDetailParent"; 
+    string CanUpdDetailParentPropertyName           = "CanUpdateDetailParent"; 
+    string CanDelDetailParentPropertyName           = "CanDeleteDetailParent"; 
+    string CanAddParentPropertyName                 = "CanAddParent";
+    string CanUpdParentPropertyName                 = "CanUpdateParent";
+    string CanDelParentPropertyName                 = "CanDeleteParent";
+    string IsDestroyedPropertyName                  = "IsDestroyed";
+    string OnDestroyedPropertyName                  = "OnDestroyed";
+    string OnDestroyPropertyName                    = "OnDestroy";
+    string IsSwitchingPropertyName                  = "IsSwitching";
+    string HiddenFilterByRowSuffix                  = "HiddenFilterByRow";
+    string HiddenFilterAsFltRsltSuffix              = "HiddenFilterAsFltRslt";
+
+
+    List<ModelViewPropertyOfVwSerializable> primKeys= GetModelPrimaryKeyProps(Model);
+    List<string> detailViewNames =  GetDetailViews(Model, Context, null);
+    List<string> usedDetailViewNames =  new List<string>();
+//    List<string> detailViewNamesToExclude = new List<string>();
+    // m2mMdl, m2mFk, searchFks, otherFks, externalFks
+    Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>> tmpSearchSchema = null;
+
+
+    List<string> nmSpaces = new List<string>();
+    if ((O2mViewModelNameSpace != IWebServiceFilterRsltInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IWebServiceFilterRsltInterfaceNameSpace);
+    if ((O2mViewModelNameSpace != WebServiceFilterRsltViewModelNameSpace) && (nmSpaces.IndexOf(WebServiceFilterRsltViewModelNameSpace) < 0)) 
+        nmSpaces.Add(WebServiceFilterRsltViewModelNameSpace);
+    if ((O2mViewModelNameSpace != IAppGlblSettingsServiceNameSpace) && (nmSpaces.IndexOf(IAppGlblSettingsServiceNameSpace) < 0)) 
+        nmSpaces.Add(IAppGlblSettingsServiceNameSpace);
+    if ((O2mViewModelNameSpace != WebServiceFilterMenuViewModelNameSpace) && (nmSpaces.IndexOf(WebServiceFilterMenuViewModelNameSpace) < 0)) 
+        nmSpaces.Add(WebServiceFilterMenuViewModelNameSpace);
+    if ((O2mViewModelNameSpace != IWebServiceFilterMenuInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterMenuInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IWebServiceFilterMenuInterfaceNameSpace);
+    if ((O2mViewModelNameSpace != IWebServiceFilterMenuInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterMenuInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IWebServiceFilterMenuInterfaceNameSpace);
+    if ((O2mViewModelNameSpace != EformModeEnumNameSpace) && (nmSpaces.IndexOf(EformModeEnumNameSpace) < 0)) 
+        nmSpaces.Add(EformModeEnumNameSpace);
+    if ((O2mViewModelNameSpace != modelInterfaceNameSpace) && (nmSpaces.IndexOf(modelInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(modelInterfaceNameSpace);
+    if ((O2mViewModelNameSpace != ISformViewModelInterfaceNameSpace) && (nmSpaces.IndexOf(ISformViewModelInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(ISformViewModelInterfaceNameSpace);
+    if ((O2mViewModelNameSpace != IO2mListItemInterfaceNameSpace) && (nmSpaces.IndexOf(IO2mListItemInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(IO2mListItemInterfaceNameSpace);
+    if ((O2mViewModelNameSpace != O2mListItemViewModelNameSpace) && (nmSpaces.IndexOf(O2mListItemViewModelNameSpace) < 0)) 
+        nmSpaces.Add(O2mListItemViewModelNameSpace);
+    if ((O2mViewModelNameSpace != RegionAwareViewModelBaseNameSpace) && (nmSpaces.IndexOf(RegionAwareViewModelBaseNameSpace) < 0)) 
+        nmSpaces.Add(RegionAwareViewModelBaseNameSpace);
+    if ((O2mViewModelNameSpace != modelServiceInterfaceNameSpace) && (nmSpaces.IndexOf(modelServiceInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(modelServiceInterfaceNameSpace);
+        
+
+    
+    bool IsInTheSameModule = (LformUserControlProject == O2mUserControlProject);
+    
+    
+#>
+<# 
+    foreach(string ns in nmSpaces) {
+#>
+using <#= ns #>;
+<#
+    }
+#>
+/*
+
+<#
+    if (LformUserControlProject != O2mUserControlProject) {
+#>
+    "<#= LformUserControlClassName #>" UserControl is defined in the "<#= LformUserControlProject #>"-project.
+    In the file of IModule-class of "<#= LformUserControlProject #>"-project the following line of code must be inserted:
+
+        public void OnInitialized(IContainerProvider containerProvider)
+        {
+            ...
+            IRegionManager regionManager = containerProvider.Resolve(typeof(IRegionManager)) as IRegionManager;
+            if (regionManager != null)
+            {
+                ...
+                // According to requirements of the "<#= O2mViewModelClassName #>.cs"-file of "<#= O2mUserControlProject #>"-project. 
+                regionManager.RegisterViewWithRegion("<#= LformUserControlClassName #><#= MasterRegionPropertyName #>", typeof(<#= LformUserControlClassName #>));
+                ...
+            }
+            ...
+        }
+<#
+    }
+#>
+
+<#
+        foreach(string detailViewName in detailViewNames) {
+            if(detailViewNamesToExclude.Any(s => s == detailViewName)) continue;
+            ModelViewSerializable detailView = GetModelViewByName(Context, detailViewName);
+            if(detailView == null) {
+#>
+///// can not find the view by Name <#= detailViewName #>
+<#
+                continue;
+            }
+            List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detailView, null);
+            if (foreignKeys == null) {
+#>
+///// can not find Foreign Keys for <#= detailViewName #>
+<#
+                continue;
+            }
+            if (foreignKeys.Count < 1) {
+#>
+///// can not find Foreign Keys for <#= detailViewName #>
+<#
+                continue;
+            }
+            bool isM2m = false;
+            if(IsTableMatchesIndex(detailView)) {
+                if(AllPrimKeyPropsAreForeignKeysProps(detailView)) {
+                    if(ForeignKeysOrderedInsidePrimKey(detailView)) {
+                        isM2m = true;
+                    }
+                }
+            }
+            foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
+                if(isM2m) {
+                    // m2mMdl, m2mFk, searchFks, otherFks, externalFks
+                    tmpSearchSchema = DetailViewAsM2mMdl(detailView, Context);
+                    if (tmpSearchSchema != null) {
+                        int  cnt = 0;
+                        if(tmpSearchSchema.Item5 == null) continue;
+                        if(tmpSearchSchema.Item5.Count != 1) continue;
+                        if(tmpSearchSchema.Item4 != null) continue;
+                        if(tmpSearchSchema.Item5[0].Key != foreignKey) continue;
+                        ModelViewSerializable viewToNavigate = GetViewByName(Context, tmpSearchSchema.Item2.ViewName);
+                        if (!usedDetailViewNames.Any(s => s == tmpSearchSchema.Item2.ViewName)) {
+                            usedDetailViewNames.Add(tmpSearchSchema.Item2.ViewName);
+                        }
+                        string viewToNavigateClassName = GetModelClassName(viewToNavigate, LformUserControlFolder);
+                        string viewToNavigateLformUserControlProject  = GetModelProjectName(viewToNavigate, LformUserControlFolder);
+                        if (viewToNavigateLformUserControlProject != O2mUserControlProject) {
+#>
+    "<#= viewToNavigateClassName #>" UserControl is defined in the "<#= viewToNavigateLformUserControlProject #>"-project.
+    In the file of IModule-class of "<#= viewToNavigateLformUserControlProject #>"-project the following line of code must be inserted:
+
+        public void OnInitialized(IContainerProvider containerProvider)
+        {
+            ...
+            IRegionManager regionManager = containerProvider.Resolve(typeof(IRegionManager)) as IRegionManager;
+            if (regionManager != null)
+            {
+                ...
+                // According to requirements of the "<#= O2mViewModelClassName #>.cs"-file of "<#= O2mUserControlProject #>"-project. 
+                regionManager.RegisterViewWithRegion("<#= viewToNavigateClassName #><#= DetailRegionPropertyName #>", typeof(<#= viewToNavigateClassName #>));
+                ...
+            }
+            ...
+        }
+<#
+                        }  // the end of if (localLformUserControlProject != O2mUserControlProject) {...}
+                    } // the end of if (tmpSearchSchema != null) { ... }
+                } // the end of if(isM2m) { ... }
+                if (!usedDetailViewNames.Any(s => s == detailView.ViewName)) {
+                    usedDetailViewNames.Add(detailView.ViewName);
+                }
+                string detailViewClassName = GetModelClassName(detailView, LformUserControlFolder);
+                string localLformUserControlProject  = GetModelProjectName(detailView, LformUserControlFolder);
+                if (localLformUserControlProject != O2mUserControlProject) {
+#>
+    "<#= detailViewClassName #>" UserControl is defined in the "<#= localLformUserControlProject #>"-project.
+    In the file of IModule-class of "<#= localLformUserControlProject #>"-project the following line of code must be inserted:
+
+        public void OnInitialized(IContainerProvider containerProvider)
+        {
+            ...
+            IRegionManager regionManager = containerProvider.Resolve(typeof(IRegionManager)) as IRegionManager;
+            if (regionManager != null)
+            {
+                ...
+                // According to requirements of the "<#= O2mViewModelClassName #>.cs"-file of "<#= O2mUserControlProject #>"-project. 
+                regionManager.RegisterViewWithRegion("<#= detailViewClassName #><#= DetailRegionPropertyName #>", typeof(<#= detailViewClassName #>));
+                ...
+            }
+            ...
+        }
+<#
+                } // the end of if (localLformUserControlProject != O2mUserControlProject) {...}
+            } // the end of foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) { ... }
+        }  // the end of foreach(string detailViewName in detailViewNames) { ... }
+#>
+
+    "<#= O2mUserControlClassName #>" UserControl is defined in the "<#= O2mUserControlProject #>"-project.
+    In the file of IModule-class of "<#= O2mUserControlProject #>"-project the following line of code must be inserted:
+
+        public void RegisterTypes(IContainerRegistry containerRegistry)
+        {
+            ...
+            // According to requirements of the "<#= O2mViewModelClassName #>.cs"-file of "<#= O2mUserControlProject #>"-project. 
+            ViewModelLocationProvider.Register<<#= O2mUserControlClassName #>, <#= O2mViewModelClassName #>>();
+            // According to requirements of the "<#= O2mViewModelClassName #>.cs"-file of "<#= O2mUserControlProject #>"-project. 
+            containerRegistry.RegisterForRegionNavigation<<#= O2mUserControlClassName #>, <#= O2mViewModelClassName #>>("<#= O2mUserControlClassName #>");
+            // According to requirements of the "<#= O2mViewModelClassName #>.cs"-file of "<#= O2mUserControlProject #>"-project. 
+            containerRegistry.Register<ContentView, <#= O2mUserControlClassName #>>("<#= O2mUserControlClassName #>");
+            ...
+        }
+*/
+
+<#
+    foreach(var dvnm in usedDetailViewNames) {
+        ModelViewSerializable detailView = GetModelViewByName(Context, dvnm);
+        if(detailView is null) continue;
+        modelServiceInterfaceNameSpace    = GetModelNameSpace(detailView, modelServiceInterfaceFolder);
+        if ((O2mViewModelNameSpace != modelServiceInterfaceNameSpace) && (nmSpaces.IndexOf(modelServiceInterfaceNameSpace) < 0)) {
+#>
+using <#= modelServiceInterfaceNameSpace #>;
+<#
+        }
+    }
+#>
+
+
+
+
+namespace <#= O2mViewModelNameSpace #> {
+
+    public class <#= O2mViewModelClassName #>: <#= RegionAwareViewModelBaseClassName #>, IRegionAware 
+    {
+        protected <#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName #>=null;
+        protected <#= GetModelServiceInterfaceName(Model) #> <#= FormRootServicePropertyName #><#= Model.ViewName #> = null;
+<#
+    foreach(var dvnm in usedDetailViewNames) {
+        ModelViewSerializable detailView = GetModelViewByName(Context, dvnm);
+#>
+        protected <#= GetModelServiceInterfaceName(detailView) #> <#= FormServicePrefix #><#= dvnm #> = null;
+<#
+    }
+#>
+        public <#= O2mViewModelClassName #>(<#= GetModelServiceInterfaceName(Model) #> _<#= FormRootServicePropertyName #><#= Model.ViewName #>, 
+<#
+    foreach(var dvnm in usedDetailViewNames) {
+        ModelViewSerializable detailView = GetModelViewByName(Context, dvnm);
+#>
+            <#= GetModelServiceInterfaceName(detailView) #> _<#= FormServicePrefix #><#= dvnm #>,
+<#
+    }
+#>
+            <#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName  #>) {
+            this.<#= AppSettingServicePropertyName #> = <#= AppSettingServicePropertyName #>;
+            this.<#= FormRootServicePropertyName #><#= Model.ViewName #> = _<#= FormRootServicePropertyName #><#= Model.ViewName #>;
+<#
+    foreach(var dvnm in usedDetailViewNames) {
+        ModelViewSerializable detailView = GetModelViewByName(Context, dvnm);
+#>
+            this.<#= FormServicePrefix #><#= dvnm #> = _<#= FormServicePrefix #><#= dvnm #>;
+<#
+    }
+#>
+            PermissionMask = <#= AppSettingServicePropertyName #>.GetViewModelMask("<#= Model.ViewName #>");
+            _<#= TableMenuItemsPropertyName #> = GetDefault<#= TableMenuItemsPropertyName #>();
+            _<#= RowMenuItemsPropertyName #> = GetDefault<#= RowMenuItemsPropertyName #>();
+            _<#= TableMenuItemsDetailPropertyName #> = GetDefault<#= TableMenuItemsDetailPropertyName #>();
+            _<#= RowMenuItemsDetailPropertyName #> = GetDefault<#= RowMenuItemsDetailPropertyName #>();
+        }
+
+        protected int PermissionMask = 0; 
+
+        public bool <#= CanAddPropertyName #>
+        { 
+            get
+            {
+                return ((PermissionMask & 8) == 8) && <#= CanAddParentPropertyName #>;
+            }
+        }
+        public bool <#= CanUpdPropertyName #>
+        { 
+            get
+            {
+                return ((PermissionMask & 4) == 4) && <#= CanUpdParentPropertyName #>;
+            }
+        }
+        public bool <#= CanDelPropertyName #>
+        { 
+            get
+            {
+                return ((PermissionMask & 2) == 2) && <#= CanDelParentPropertyName #>;
+            }
+        }
+
+        public bool <#= CanAddDetailPropertyName #>
+        { 
+            get
+            {
+                return <#= CanAddDetailParentPropertyName #> && ((PermissionMaskDetail & 8) == 8);
+            }
+        }
+        public bool <#= CanUpdDetailPropertyName #>
+        { 
+            get
+            {
+                return <#= CanUpdDetailParentPropertyName #> && ((PermissionMaskDetail & 4) == 4);
+            }
+        }
+        public bool <#= CanDelDetailPropertyName #>
+        { 
+            get
+            {
+                return <#= CanDelDetailParentPropertyName #> && ((PermissionMaskDetail & 2) == 2);
+            }
+        }
+
+        public bool <#= IsSwitchingPropertyName #>
+        {
+            get { return !<#= IsParentLoadedPropertyName #>; }
+        }
+
+        #region <#= IsParentLoadedPropertyName #>
+        bool _<#= IsParentLoadedPropertyName #> = false;
+        public bool <#= IsParentLoadedPropertyName #>
+        { 
+            get
+            {
+                return _<#= IsParentLoadedPropertyName #>;
+            }
+            set {
+                if(_<#= IsParentLoadedPropertyName #> != value) {
+                    _<#= IsParentLoadedPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+
+        #region <#= CaptionPropertyName #>
+        string _<#= CaptionPropertyName #> = "<#= Model.PluralTitle #>";
+        public string <#= CaptionPropertyName #>
+        { 
+            get
+            {
+                return _<#= CaptionPropertyName #>;
+            }
+            set {
+                if(_<#= CaptionPropertyName #> != value) {
+                    _<#= CaptionPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+        #region <#= RowMenuItemsPropertyName #>
+        protected ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>> GetDefault<#= RowMenuItemsPropertyName #>() {
+            return new ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>>();
+        }
+        protected IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> _<#= RowMenuItemsPropertyName #> = null;
+        public IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> <#= RowMenuItemsPropertyName #>
+        { 
+            get
+            {
+                return _<#= RowMenuItemsPropertyName #>;
+            }
+            set
+            {
+                if (_<#= RowMenuItemsPropertyName #> != value)
+                {
+                    _<#= RowMenuItemsPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+        #region <#= TableMenuItemsPropertyName #>
+        protected ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>> GetDefault<#= TableMenuItemsPropertyName #>() {
+            return new ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>>();
+        }
+        protected IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> _<#= TableMenuItemsPropertyName #> = null;
+        public IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> <#= TableMenuItemsPropertyName #>
+        { 
+            get
+            {
+                return _<#= TableMenuItemsPropertyName #>;
+            }
+            set
+            {
+                if (_<#= TableMenuItemsPropertyName #> != value)
+                {
+                    _<#= TableMenuItemsPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+
+        #region <#= HiddenFiltersPropertyName #>
+        IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>> _<#= HiddenFiltersPropertyName #> = new ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>();
+        public IEnumerable<IWebServiceFilterRsltInterface> <#= HiddenFiltersPropertyName #>
+        {
+            get
+            {
+                return _<#= HiddenFiltersPropertyName #>;
+            }
+            set
+            {
+                if (_<#= HiddenFiltersPropertyName #> != value)
+                {
+                    _<#= HiddenFiltersPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+
+        protected void OnNavigationResult(IRegionNavigationResult navResult) {
+            if (navResult.Result.HasValue) {
+                if (navResult.Result.Value) return;
+            }
+            string navErrorMsg = "Unknown Navigation Error";
+            if (navResult.Error != null)
+            {
+                navErrorMsg = navResult.Error.Message;
+                Exception inner = navResult.Error.InnerException;
+                while (inner != null)
+                {
+                    navErrorMsg = navErrorMsg + ": " + inner.Message;
+                    inner = inner.InnerException;
+                }
+            }
+            navResult.Context.NavigationService.RequestNavigate(new Uri("<#= PageNotFoundUserControlClassName #>", UriKind.Relative));
+            <#= AppSettingServicePropertyName #>.ShowErrorMessage("Navigation Exception", navErrorMsg);
+        }
+        #region <#= TableMenuItemsCommandPropertyName #>
+        protected ICommand _<#= TableMenuItemsCommandPropertyName #> = null;
+        public ICommand <#= TableMenuItemsCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= TableMenuItemsCommandPropertyName #> ?? (_<#= TableMenuItemsCommandPropertyName #> = new Command((p) => <#= TableMenuItemsCommandPropertyName #>Execute(p), (p) => <#= TableMenuItemsCommandPropertyName #>CanExecute(p)));
+            }
+        }
+        protected async void <#= TableMenuItemsCommandPropertyName #>Execute(object prm)
+        {
+        }
+        protected bool <#= TableMenuItemsCommandPropertyName #>CanExecute(object prm)
+        {
+            return true; 
+        }
+        #endregion
+
+
+        #region <#= RowMenuItemsCommandPropertyName #>
+        protected ICommand _<#= RowMenuItemsCommandPropertyName #> = null;
+        public ICommand <#= RowMenuItemsCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= RowMenuItemsCommandPropertyName #> ?? (_<#= RowMenuItemsCommandPropertyName #> = new Command((p) => <#= RowMenuItemsCommandPropertyName #>Execute(p), (p) => <#= RowMenuItemsCommandPropertyName #>CanExecute(p)));
+            }
+        }
+        protected void <#= RowMenuItemsCommandPropertyName #>Execute(object prm)
+        {
+        }
+        protected bool <#= RowMenuItemsCommandPropertyName #>CanExecute(object prm)
+        {
+            return true; 
+        }
+        #endregion
+
+        #region <#= SelectedRowPropertyName #>
+        protected object _<#= SelectedRowPropertyName #> = null;
+        public object <#= SelectedRowPropertyName #> {
+            get {
+                return _<#= SelectedRowPropertyName #>;
+            }
+            set {
+                if(_<#= SelectedRowPropertyName #> != value) {
+                    _<#= SelectedRowPropertyName #> = value;
+                    OnPropertyChanged();
+                    DefineHiddenDetailFilter();
+                }
+            }
+        }
+        #endregion
+
+       #region <#= SelectedRowCommandPropertyName #>
+       protected ICommand _<#= SelectedRowCommandPropertyName #> = null;
+       public ICommand <#= SelectedRowCommandPropertyName #>
+       {
+           get
+           {
+               return _<#= SelectedRowCommandPropertyName #> ?? (_<#= SelectedRowCommandPropertyName #> = new Command((p) => <#= SelectedRowCommandPropertyName #>Execute(p), (p) => <#= SelectedRowCommandPropertyName #>CanExecute(p)));
+           }
+       }
+       protected void <#= SelectedRowCommandPropertyName #>Execute(object prm)
+       {
+           <#= SelectedRowPropertyName #> = prm;
+       }
+       protected bool <#= SelectedRowCommandPropertyName #>CanExecute(object prm)
+       {
+           return true; 
+       }
+       #endregion
+
+       #region IRegionAware
+       public bool IsNavigationTarget(INavigationContext navigationContext) {
+            return true;
+       }
+       public void OnNavigatedFrom(INavigationContext navigationContext) {
+            <#= CurrentNavigationContextPropertyName #> = null;
+       }
+       public async void OnNavigatedTo(INavigationContext navigationContext) {
+            if(<#= IsDestroyedPropertyName #>) return;
+            INavigationParameters prms = navigationContext.Parameters;
+            PermissionMask = <#= AppSettingServicePropertyName #>.GetViewModelMask("<#= Model.ViewName #>");
+            if ((PermissionMask & 1) != 1) {
+                if (navigationContext.NavigationService.Journal.CurrentEntry.Uri.OriginalString == "<#= AccessDeniedUserControlClassName #>")
+                {
+                    navigationContext.NavigationService.RequestNavigate(new Uri("<#= AccessDeniedUserControlClassName #>", UriKind.Relative), OnNavigationResult);
+                    return;
+                }
+                else if(navigationContext.NavigationService.Journal.CanGoBack) {
+                    // it should be intercepted by prev item in navigation chain
+                    throw new Exception("Access Denied to navigate <#= Model.ViewName #>");
+                } else {
+                    // this is a first item in navigation chain, so navigationContext.Parameters are not expected
+                    navigationContext.NavigationService.RequestNavigate(new Uri("<#= AccessDeniedUserControlClassName #>", UriKind.Relative), OnNavigationResult);
+                    return;
+                }
+            }
+            <#= CurrentNavigationContextPropertyName #> = navigationContext;
+            OnPropertyChanged("<#= ShowBackBtnPropertyName #>");
+            (<#= OnNavigationBackCommandPropertyName #> as Command).ChangeCanExecute();
+            OnPropertyChanged("<#= CanAddPropertyName  #>");
+            OnPropertyChanged("<#= CanUpdPropertyName  #>");
+            OnPropertyChanged("<#= CanDelPropertyName  #>");
+
+            if(!<#= IsParentLoadedPropertyName #>) {
+                ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>> hf = new ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>();
+<#
+            foreach(ModelViewPropertyOfVwSerializable sclrProp in Model.ScalarProperties) {
+#>          
+                if(prms.ContainsKey("<#= GetModelPropertyName(sclrProp, Model) #>")) {
+                        hf.Add(new <#= WebServiceFilterRsltViewModelClassName #>() {
+                            fltrName = "<#= GetModelPropertyName(sclrProp, Model) #>",
+                            fltrDataType = "<#= GetCCharpDatatype(sclrProp, Model) #>",
+                            fltrOperator = "eq",
+                            fltrValue = prms.GetValue<<#= GetPropertyTypeName(sclrProp) #>>("<#= GetModelPropertyName(sclrProp, Model) #>"),
+                            fltrError = null
+                        });
+                }
+<#
+            }
+#>          
+                ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>> chf = <#= HiddenFiltersPropertyName #> as ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>;
+                bool resetHF = chf.Count != hf.Count;
+                if ((!resetHF) && (hf.Count > 0)) {
+                    foreach(<#= IWebServiceFilterRsltInterfaceClassName #> citm in chf) {
+                        <#= IWebServiceFilterRsltInterfaceClassName #> itm = hf.Where(h => h.fltrName == citm.fltrName).FirstOrDefault();
+                        if(itm == null)
+                        {
+                            resetHF = true;
+                            break;
+                        }
+                        if (!(itm.fltrValue == citm.fltrValue))
+                        {
+                            resetHF = true;
+                            break;
+                        }
+                    }
+                } 
+                if (resetHF) { <#= HiddenFiltersPropertyName #> = hf; }
+            }
+            <#= IsParentLoadedPropertyName #> = true;
+            await Device.InvokeOnMainThreadAsync(async () =>
+            {
+                await Task.Delay(1);
+                OnPropertyChanged("<#= IsSwitchingPropertyName #>");
+            });
+        }
+        #endregion
+        #region <#= ShowBackBtnPropertyName #>
+        public bool <#= ShowBackBtnPropertyName #> {
+            get {
+                return (<#= CurrentNavigationContextPropertyName #> == null) ?  false : <#= CurrentNavigationContextPropertyName #>.NavigationService.Journal.CanGoBack;
+            }
+        }
+        #endregion
+        #region <#= OnNavigationBackCommandPropertyName #>
+        protected ICommand _<#= OnNavigationBackCommandPropertyName #> = null;
+        public ICommand <#= OnNavigationBackCommandPropertyName #>
+        {
+            get
+            {
+                return _<#= OnNavigationBackCommandPropertyName #> ?? (_<#= OnNavigationBackCommandPropertyName #> = new Command(() => <#= OnNavigationBackCommandPropertyName #>Execute(), () => <#= OnNavigationBackCommandPropertyName #>CanExecute()));
+            }
+        }
+        protected void <#= OnNavigationBackCommandPropertyName #>Execute()
+        {
+            if(<#= IsDestroyedPropertyName #>) return;
+            if (<#= CurrentNavigationContextPropertyName #> != null) {
+                if(<#= CurrentNavigationContextPropertyName #>.NavigationService.Journal.CanGoBack) {
+                    <#= CurrentNavigationContextPropertyName #>.NavigationService.Journal.GoBack();
+                }
+            }
+        }
+        protected bool <#= OnNavigationBackCommandPropertyName #>CanExecute()
+        {
+            return (<#= CurrentNavigationContextPropertyName #> == null) ?  false : <#= CurrentNavigationContextPropertyName #>.NavigationService.Journal.CanGoBack;
+        }
+        #endregion
+
+        #region <#= TableMenuItemsDetailPropertyName #>
+        protected ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>> GetDefault<#= TableMenuItemsDetailPropertyName #>() {
+            return new ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>>();
+        }
+        protected IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> _<#= TableMenuItemsDetailPropertyName #> = null;
+        public IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> <#= TableMenuItemsDetailPropertyName #>
+        { 
+            get
+            {
+                return _<#= TableMenuItemsDetailPropertyName #>;
+            }
+            set
+            {
+                if (_<#= TableMenuItemsDetailPropertyName #> != value)
+                {
+                    _<#= TableMenuItemsDetailPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+        #region <#= RowMenuItemsDetailPropertyName #>
+        protected ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>> GetDefault<#= RowMenuItemsDetailPropertyName #>() {
+            return new ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>>();
+        }
+        protected IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> _<#= RowMenuItemsDetailPropertyName #> = null;
+        public IEnumerable<<#= IWebServiceFilterMenuInterfaceClassName #>> <#= RowMenuItemsDetailPropertyName #>
+        { 
+            get
+            {
+                return _<#= RowMenuItemsDetailPropertyName #>;
+            }
+            set
+            {
+                if (_<#= RowMenuItemsDetailPropertyName #> != value)
+                {
+                    _<#= RowMenuItemsDetailPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+        #region <#= TableMenuItemsCommandDetailPropertyName #>
+        protected ICommand _<#= TableMenuItemsCommandDetailPropertyName #> = null;
+        public ICommand <#= TableMenuItemsCommandDetailPropertyName #>
+        {
+            get
+            {
+                return _<#= TableMenuItemsCommandDetailPropertyName #> ?? (_<#= TableMenuItemsCommandDetailPropertyName #> = new Command((p) => <#= TableMenuItemsCommandDetailPropertyName #>Execute(p), (p) => <#= TableMenuItemsCommandDetailPropertyName #>CanExecute(p)));
+            }
+        }
+        protected async void <#= TableMenuItemsCommandDetailPropertyName #>Execute(object prm)
+        {
+        }
+        protected bool <#= TableMenuItemsCommandDetailPropertyName #>CanExecute(object prm)
+        {
+            return true; 
+        }
+        #endregion
+        #region <#= RowMenuItemsCommandDetailPropertyName #>
+        protected ICommand _<#= RowMenuItemsCommandDetailPropertyName #> = null;
+        public ICommand <#= RowMenuItemsCommandDetailPropertyName #>
+        {
+            get
+            {
+                return _<#= RowMenuItemsCommandDetailPropertyName #> ?? (_<#= RowMenuItemsCommandDetailPropertyName #> = new Command((p) => <#= RowMenuItemsCommandDetailPropertyName #>Execute(p), (p) => <#= RowMenuItemsCommandDetailPropertyName #>CanExecute(p)));
+            }
+        }
+        protected void <#= RowMenuItemsCommandDetailPropertyName #>Execute(object prm)
+        {
+        }
+        protected bool <#= RowMenuItemsCommandDetailPropertyName #>CanExecute(object prm)
+        {
+            return true; 
+        }
+        #endregion
+        #region <#= SelectedRowCommandDetailPropertyName #>
+        protected ICommand _<#= SelectedRowCommandDetailPropertyName #> = null;
+        public ICommand <#= SelectedRowCommandDetailPropertyName #>
+        {
+            get
+            {
+                return _<#= SelectedRowCommandDetailPropertyName #> ?? (_<#= SelectedRowCommandDetailPropertyName #> = new Command((p) => <#= SelectedRowCommandDetailPropertyName #>Execute(p), (p) => <#= SelectedRowCommandDetailPropertyName #>CanExecute(p)));
+            }
+        }
+        protected void <#= SelectedRowCommandDetailPropertyName #>Execute(object prm)
+        {
+            <#= SelectedRowDetailPropertyName #> = prm;
+        }
+        protected bool <#= SelectedRowCommandDetailPropertyName #>CanExecute(object prm)
+        {
+            return true; 
+        }
+        #endregion
+        #region <#= SelectedRowDetailPropertyName #>
+        protected object _<#= SelectedRowDetailPropertyName #> = null;
+        public object <#= SelectedRowDetailPropertyName #> {
+            get {
+                return _<#= SelectedRowDetailPropertyName #>;
+            }
+            set {
+                if(_<#= SelectedRowDetailPropertyName #> != value) {
+                    _<#= SelectedRowDetailPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+
+
+        #region <#= IsDetailReadyPropertyName #>
+        protected int PermissionMaskDetail = 0; 
+        public bool <#= IsDetailReadyPropertyName #>
+        { 
+            get
+            {
+                 return <#= HiddenFiltersDetailPropertyName #>.Any() && (<#= SelectedRowPropertyName #> != null) && ((PermissionMaskDetail & 1) == 1);
+            }
+        }
+        #endregion
+        #region <#= HiddenFiltersDetailPropertyName #>
+        IEnumerable<<#= IWebServiceFilterRsltInterfaceClassName #>> _<#= HiddenFiltersDetailPropertyName #> = new ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>();
+        public IEnumerable<IWebServiceFilterRsltInterface> <#= HiddenFiltersDetailPropertyName #>
+        {
+            get
+            {
+                return _<#= HiddenFiltersDetailPropertyName #>;
+            }
+            set
+            {
+                if (_<#= HiddenFiltersDetailPropertyName #> != value)
+                {
+                    _<#= HiddenFiltersDetailPropertyName #> = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged("<#= IsDetailDestroyedPropertyName #>");
+                    OnPropertyChanged("<#= IsDetailReadyPropertyName #>");
+                    OnPropertyChanged("<#= CanDelDetailPropertyName #>");
+                    OnPropertyChanged("<#= CanUpdDetailPropertyName #>");
+                    OnPropertyChanged("<#= CanAddDetailPropertyName #>");
+                }
+            }
+        }
+        #endregion
+        #region <#= SelectedDetailsListItemPropertyName #>
+        protected <#= IO2mListItemInterfaceClassName #> _<#= SelectedDetailsListItemPropertyName #> = null;
+        public <#= IO2mListItemInterfaceClassName #> <#= SelectedDetailsListItemPropertyName #> 
+        {
+            get { return _<#= SelectedDetailsListItemPropertyName #>; }
+            set {
+                if(_<#= SelectedDetailsListItemPropertyName #> != value) {
+                    <#= IsDetailDestroyedPropertyName #> = true;
+                    <#= IsDetailDestroyedPropertyName #> = false;
+                    _<#= SelectedDetailsListItemPropertyName #> = value;
+                    OnPropertyChanged();
+                    DefineHiddenDetailFilter();
+                }
+            }
+        }
+        #endregion
+        #region <#= DetailsListPropertyName #>
+        ObservableCollection<<#= IO2mListItemInterfaceClassName #>> _<#= DetailsListPropertyName #> = new ObservableCollection<<#= IO2mListItemInterfaceClassName #>>() {
+<#
+        foreach(string detailViewName in detailViewNames) {
+            if(detailViewNamesToExclude.Any(s => s == detailViewName)) continue;
+            ModelViewSerializable detailView = GetModelViewByName(Context, detailViewName);
+            if(detailView == null) {
+#>
+///// can not find the view by Name <#= detailViewName #>
+<#
+                continue;
+            }
+            List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detailView, null);
+            if (foreignKeys == null) {
+#>
+///// can not find Foreign Keys for <#= detailViewName #>
+<#
+                continue;
+            }
+            if (foreignKeys.Count < 1) {
+#>
+///// can not find Foreign Keys for <#= detailViewName #>
+<#
+                continue;
+            }
+            bool isM2m = false;
+            if(IsTableMatchesIndex(detailView)) {
+                if(AllPrimKeyPropsAreForeignKeysProps(detailView)) {
+                    if(ForeignKeysOrderedInsidePrimKey(detailView)) {
+                        isM2m = true;
+                    }
+                }
+            }
+            foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
+                if(isM2m) {
+                    // m2mMdl, m2mFk, searchFks, otherFks, externalFks
+                    tmpSearchSchema = DetailViewAsM2mMdl(detailView, Context);
+                    if (tmpSearchSchema != null) {
+                        int  cnt = 0;
+                        if(tmpSearchSchema.Item5 == null) continue;
+                        if(tmpSearchSchema.Item5.Count != 1) continue;
+                        if(tmpSearchSchema.Item4 != null) continue;
+                        if(tmpSearchSchema.Item5[0].Key != foreignKey) continue;
+                        ModelViewSerializable viewToNavigate = GetViewByName(Context, tmpSearchSchema.Item2.ViewName);
+                        string viewToNavigateClassName = GetModelClassName(viewToNavigate, LformUserControlFolder);
+#>
+                new <#= O2mListItemViewModelClassName #>() {<#= CaptionPropertyName #> = "<#= viewToNavigate.PluralTitle #>: <#= foreignKey.NavigationName #>", <#= ForeignKeyDetailsName #> = "<#= viewToNavigateClassName #>:<#= foreignKey.NavigationName #>",  <#= RegionPropertyName #> = "<#= viewToNavigateClassName #><#= DetailRegionPropertyName #>" },
+<#
+                    }
+                }
+                string detailViewClassName = GetModelClassName(detailView, LformUserControlFolder);
+#>
+                new <#= O2mListItemViewModelClassName #>() {<#= CaptionPropertyName #> = "<#= detailView.PluralTitle #>: <#= foreignKey.NavigationName #>", <#= ForeignKeyDetailsName #> = "<#= detailViewClassName #>:<#= foreignKey.NavigationName #>",  <#= RegionPropertyName #> = "<#= detailViewClassName #><#= DetailRegionPropertyName #>" },
+<#
+            }
+        }
+#>
+        };
+        public IEnumerable<<#= IO2mListItemInterfaceClassName #>> <#= DetailsListPropertyName #> { get { return _<#= DetailsListPropertyName #>; } }
+        #endregion
+
+        #region DefineHiddenDetailFilter
+        protected void DefineHiddenDetailFilter() {
+            if(<#= IsDestroyedPropertyName #>) return;
+            PermissionMaskDetail = 0;
+            ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>> chfd = new ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>();
+            IList<<#= IWebServiceFilterRsltInterfaceClassName #>> tmpFlt = null;
+            <#= modelInterfaceClassName  #>  selectedMasterRow  = <#= SelectedRowPropertyName #> as <#= modelInterfaceClassName  #>;
+            if((<#= SelectedDetailsListItemPropertyName #> != null) && (selectedMasterRow != null)) {
+                switch(<#= SelectedDetailsListItemPropertyName #>.<#= ForeignKeyDetailsName #>) {
+<#
+        foreach(string detailViewName in detailViewNames) {
+            if(detailViewNamesToExclude.Any(s => s == detailViewName)) continue;
+            ModelViewSerializable detailView = GetModelViewByName(Context, detailViewName);
+            if(detailView == null) {
+#>
+///// can not find the view by Name <#= detailViewName #>
+<#
+                continue;
+            }
+            List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detailView, null);
+            if (foreignKeys == null) {
+#>
+///// can not find Foreign Keys for <#= detailViewName #>
+<#
+                continue;
+            }
+            if (foreignKeys.Count < 1) {
+#>
+///// can not find Foreign Keys for <#= detailViewName #>
+<#
+                continue;
+            }
+            bool isM2m = false;
+            if(IsTableMatchesIndex(detailView)) {
+                if(AllPrimKeyPropsAreForeignKeysProps(detailView)) {
+                    if(ForeignKeysOrderedInsidePrimKey(detailView)) {
+                        isM2m = true;
+                    }
+                }
+            }
+            foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
+                if(isM2m) {
+                    // m2mMdl, m2mFk, searchFks, otherFks, externalFks
+                    tmpSearchSchema = DetailViewAsM2mMdl(detailView, Context);
+                    if (tmpSearchSchema != null) {
+                        int  cnt = 0;
+                        if(tmpSearchSchema.Item5 == null) continue;
+                        if(tmpSearchSchema.Item5.Count != 1) continue;
+                        if(tmpSearchSchema.Item4 != null) continue;
+                        if(tmpSearchSchema.Item5[0].Key != foreignKey) continue;
+                        ModelViewSerializable viewToNavigate = GetViewByName(Context, tmpSearchSchema.Item2.ViewName);
+                        string viewToNavigateClassName = GetModelClassName(viewToNavigate, LformUserControlFolder);
+#>
+                    case "<#= viewToNavigateClassName #>:<#= foreignKey.NavigationName #>":
+                        PermissionMaskDetail = <#= AppSettingServicePropertyName #>.GetViewModelMask("<#= tmpSearchSchema.Item2.ViewName #>");
+                        tmpFlt = this.<#= FormServicePrefix #><#= tmpSearchSchema.Item2.ViewName #>.get<#= HiddenFilterAsFltRsltSuffix #>(this.<#= FormRootServicePropertyName #><#= Model.ViewName #>.get<#= HiddenFilterByRowSuffix #>(selectedMasterRow, "<#= foreignKey.NavigationName #>"));
+                        break;
+<#
+                    }
+                }
+                string detailViewClassName = GetModelClassName(detailView, LformUserControlFolder);
+#>
+                    case "<#= detailViewClassName #>:<#= foreignKey.NavigationName #>":
+                        PermissionMaskDetail = <#= AppSettingServicePropertyName #>.GetViewModelMask("<#= detailViewName #>");
+                        tmpFlt = this.<#= FormServicePrefix #><#= detailViewName #>.get<#= HiddenFilterAsFltRsltSuffix #>(this.<#= FormRootServicePropertyName #><#= Model.ViewName #>.get<#= HiddenFilterByRowSuffix #>(selectedMasterRow, "<#= foreignKey.NavigationName #>"));
+                        break;
+<#
+            }
+        }
+#>
+                    default:
+                        break;
+                }
+            }
+            if(tmpFlt != null) {
+                foreach(var fltItm in tmpFlt) {
+                    chfd.Add(fltItm);
+                }
+            }
+            <#= HiddenFiltersDetailPropertyName #> = chfd;
+        }
+        #endregion
+
+        #region <#= OnDestroyPropertyName #>
+        public override void <#= OnDestroyPropertyName #>() {
+            base.<#= OnDestroyPropertyName #>();
+            OnPropertyChanged("<#= IsDetailDestroyedPropertyName #>");
+            _<#= TableMenuItemsPropertyName #> = null;
+            _<#= RowMenuItemsPropertyName #> = null;
+            _<#= TableMenuItemsDetailPropertyName #> = null;
+            _<#= RowMenuItemsDetailPropertyName #> = null;
+            _<#= HiddenFiltersDetailPropertyName #> = null;
+            _<#= SelectedRowDetailPropertyName #> = null;
+            _<#= SelectedRowPropertyName #> = null;
+        }
+        #endregion
+
+        #region <#= IsDetailDestroyedPropertyName #>
+        protected bool _<#= IsDetailDestroyedPropertyName #> = false;
+        public bool <#= IsDetailDestroyedPropertyName #> {
+            get {
+                return _<#= IsDetailDestroyedPropertyName #> || <#= IsDestroyedPropertyName #> || (!<#= IsDetailReadyPropertyName #>);
+            }
+            set {
+                if(_<#= IsDetailDestroyedPropertyName #> != value) {
+                    _<#= IsDetailDestroyedPropertyName #> = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+
+    }
+}
+
+
+
