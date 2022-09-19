@@ -78,6 +78,8 @@ using Prism.Navigation;
     string modelInterfaceClassName                  = GetInterfaceName(Model);
     string modelInterfaceNameSpace                  = GetModelNameSpace(Model, modelInterfaceFolder);
 
+    string modelServiceInterfaceFolder              = "01400-Service.interface.cs";
+    string modelServiceInterfaceNameSpace           = GetModelNameSpace(Model, modelServiceInterfaceFolder);
 
     string LformUserControlFolder           = "01596-LformUserControl.xaml.cs";
     string LformUserControlClassName        = GetModelClassName(Model, LformUserControlFolder);
@@ -117,6 +119,8 @@ using Prism.Navigation;
     string EformModePropertyName                    = "EformMode";
     string ShowSubmitPropertyName                   = "ShowSubmit";
     string FormServicePrefix                        = "FrmSrv";
+    string FormRootServicePropertyName              = "FrmRootSrv";
+
     string RowMIPrefixPropertyName                  = "RowMI";
 
 
@@ -160,6 +164,7 @@ using Prism.Navigation;
 
     List<ModelViewPropertyOfVwSerializable> primKeys= GetModelPrimaryKeyProps(Model);
     List<string> detailViewNames =  GetDetailViews(Model, Context, null);
+    List<string> usedDetailViewNames =  new List<string>();
     List<string> detailViewNamesToExclude = new List<string>();
     // m2mMdl, m2mFk, searchFks, otherFks, externalFks
     Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>> tmpSearchSchema = null;
@@ -190,6 +195,10 @@ using Prism.Navigation;
         nmSpaces.Add(O2mListItemViewModelNameSpace);
     if ((O2mViewModelNameSpace != RegionAwareViewModelBaseNameSpace) && (nmSpaces.IndexOf(RegionAwareViewModelBaseNameSpace) < 0)) 
         nmSpaces.Add(RegionAwareViewModelBaseNameSpace);
+    if ((O2mViewModelNameSpace != modelServiceInterfaceNameSpace) && (nmSpaces.IndexOf(modelServiceInterfaceNameSpace) < 0)) 
+        nmSpaces.Add(modelServiceInterfaceNameSpace);
+        
+
     
     bool IsInTheSameModule = (LformUserControlProject == O2mUserControlProject);
     
@@ -269,6 +278,9 @@ using <#= ns #>;
                         if(tmpSearchSchema.Item4 != null) continue;
                         if(tmpSearchSchema.Item5[0].Key != foreignKey) continue;
                         ModelViewSerializable viewToNavigate = GetViewByName(Context, tmpSearchSchema.Item2.ViewName);
+                        if (!usedDetailViewNames.Any(s => s == tmpSearchSchema.Item2.ViewName)) {
+                            usedDetailViewNames.Add(tmpSearchSchema.Item2.ViewName);
+                        }
                         string viewToNavigateClassName = GetModelClassName(viewToNavigate, LformUserControlFolder);
                         string viewToNavigateLformUserControlProject  = GetModelProjectName(viewToNavigate, LformUserControlFolder);
                         if (viewToNavigateLformUserControlProject != O2mUserControlProject) {
@@ -293,6 +305,9 @@ using <#= ns #>;
                         }  // the end of if (localLformUserControlProject != O2mUserControlProject) {...}
                     } // the end of if (tmpSearchSchema != null) { ... }
                 } // the end of if(isM2m) { ... }
+                if (!usedDetailViewNames.Any(s => s == detailView.ViewName)) {
+                    usedDetailViewNames.Add(detailView.ViewName);
+                }
                 string detailViewClassName = GetModelClassName(detailView, LformUserControlFolder);
                 string localLformUserControlProject  = GetModelProjectName(detailView, LformUserControlFolder);
                 if (localLformUserControlProject != O2mUserControlProject) {
@@ -335,15 +350,56 @@ using <#= ns #>;
         }
 */
 
+<#
+    foreach(var dvnm in usedDetailViewNames) {
+        ModelViewSerializable detailView = GetModelViewByName(Context, dvnm);
+        if(detailView is null) continue;
+        modelServiceInterfaceNameSpace    = GetModelNameSpace(detailView, modelServiceInterfaceFolder);
+        if ((O2mViewModelNameSpace != modelServiceInterfaceNameSpace) && (nmSpaces.IndexOf(modelServiceInterfaceNameSpace) < 0)) {
+#>
+using <#= modelServiceInterfaceNameSpace #>;
+<#
+        }
+    }
+#>
+
+
+
+
 namespace <#= O2mViewModelNameSpace #> {
 
     public class <#= O2mViewModelClassName #>: <#= RegionAwareViewModelBaseClassName #>, IRegionAware 
     {
         protected <#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName #>=null;
-        protected <#= GetModelServiceInterfaceName(Model) #> <#= FormServicePrefix #><#= Model.ViewName #> = null;
-        public <#= O2mViewModelClassName #>(<#= GetModelServiceInterfaceName(Model) #> _<#= FormServicePrefix #><#= Model.ViewName #>, <#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName  #>) {
+        protected <#= GetModelServiceInterfaceName(Model) #> <#= FormRootServicePropertyName #><#= Model.ViewName #> = null;
+<#
+    foreach(var dvnm in usedDetailViewNames) {
+        ModelViewSerializable detailView = GetModelViewByName(Context, dvnm);
+#>
+        protected <#= GetModelServiceInterfaceName(detailView) #> <#= FormServicePrefix #><#= dvnm #> = null;
+<#
+    }
+#>
+        public <#= O2mViewModelClassName #>(<#= GetModelServiceInterfaceName(Model) #> _<#= FormRootServicePropertyName #><#= Model.ViewName #>, 
+<#
+    foreach(var dvnm in usedDetailViewNames) {
+        ModelViewSerializable detailView = GetModelViewByName(Context, dvnm);
+#>
+            <#= GetModelServiceInterfaceName(detailView) #> _<#= FormServicePrefix #><#= dvnm #>,
+<#
+    }
+#>
+            <#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName  #>) {
             this.<#= AppSettingServicePropertyName #> = <#= AppSettingServicePropertyName #>;
-            this.<#= FormServicePrefix #><#= Model.ViewName #> = _<#= FormServicePrefix #><#= Model.ViewName #>;
+            this.<#= FormRootServicePropertyName #><#= Model.ViewName #> = _<#= FormRootServicePropertyName #><#= Model.ViewName #>;
+<#
+    foreach(var dvnm in usedDetailViewNames) {
+        ModelViewSerializable detailView = GetModelViewByName(Context, dvnm);
+#>
+            this.<#= FormServicePrefix #><#= dvnm #> = _<#= FormServicePrefix #><#= dvnm #>;
+<#
+    }
+#>
             PermissionMask = <#= AppSettingServicePropertyName #>.GetViewModelMask("<#= Model.ViewName #>");
             _<#= TableMenuItemsPropertyName #> = GetDefault<#= TableMenuItemsPropertyName #>();
             _<#= RowMenuItemsPropertyName #> = GetDefault<#= RowMenuItemsPropertyName #>();
@@ -969,8 +1025,8 @@ namespace <#= O2mViewModelNameSpace #> {
                         string viewToNavigateClassName = GetModelClassName(viewToNavigate, LformUserControlFolder);
 #>
                     case "<#= viewToNavigateClassName #>:<#= foreignKey.NavigationName #>":
-                        PermissionMaskDetail = <#= AppSettingServicePropertyName #>.GetViewModelMask("<#= viewToNavigate.ViewName #>");
-                        tmpFlt = this.<#= FormServicePrefix #><#= Model.ViewName #>.get<#= HiddenFilterAsFltRsltSuffix #>(this.<#= FormServicePrefix #><#= Model.ViewName #>.get<#= HiddenFilterByRowSuffix #>(selectedMasterRow, "<#= foreignKey.NavigationName #>"));
+                        PermissionMaskDetail = <#= AppSettingServicePropertyName #>.GetViewModelMask("<#= tmpSearchSchema.Item2.ViewName #>");
+                        tmpFlt = this.<#= FormServicePrefix #><#= tmpSearchSchema.Item2.ViewName #>.get<#= HiddenFilterAsFltRsltSuffix #>(this.<#= FormRootServicePropertyName #><#= Model.ViewName #>.get<#= HiddenFilterByRowSuffix #>(selectedMasterRow, "<#= foreignKey.NavigationName #>"));
                         break;
 <#
                     }
@@ -979,7 +1035,7 @@ namespace <#= O2mViewModelNameSpace #> {
 #>
                     case "<#= detailViewClassName #>:<#= foreignKey.NavigationName #>":
                         PermissionMaskDetail = <#= AppSettingServicePropertyName #>.GetViewModelMask("<#= detailViewName #>");
-                        tmpFlt = this.<#= FormServicePrefix #><#= Model.ViewName #>.get<#= HiddenFilterAsFltRsltSuffix #>(this.<#= FormServicePrefix #><#= Model.ViewName #>.get<#= HiddenFilterByRowSuffix #>(selectedMasterRow, "<#= foreignKey.NavigationName #>"));
+                        tmpFlt = this.<#= FormServicePrefix #><#= detailViewName #>.get<#= HiddenFilterAsFltRsltSuffix #>(this.<#= FormRootServicePropertyName #><#= Model.ViewName #>.get<#= HiddenFilterByRowSuffix #>(selectedMasterRow, "<#= foreignKey.NavigationName #>"));
                         break;
 <#
             }

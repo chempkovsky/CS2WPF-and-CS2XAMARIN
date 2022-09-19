@@ -187,7 +187,7 @@
                         ModelViewSerializable viewToNavigate = GetViewByName(Context, tmpSearchSchema.Item2.ViewName);
                         string viewToNavigateClassName = GetModelClassName(viewToNavigate, LformUserControlFolder);
                         string viewToNavigateLformUserControlProject  = GetModelProjectName(viewToNavigate, LformUserControlFolder);
-                        if (viewToNavigateLformUserControlProject != O2mUserControlProject) {
+                        if (viewToNavigateLformUserControlProject == O2mUserControlProject) {
                             string locallformPrefix = "clr-namespace:" + GetModelNameSpace(detailView, LformUserControlFolder);
 #>
              xmlns:lfrm<#= id #>="<#= locallformPrefix #>" 
@@ -196,7 +196,7 @@
                     } // if (tmpSearchSchema != null) { ... }
                 } // if(isM2m) { ... }
                 string localLformUserControlProject  = GetModelProjectName(detailView, LformUserControlFolder);
-                if (localLformUserControlProject != O2mUserControlProject) {
+                if (localLformUserControlProject == O2mUserControlProject) {
                     string locallformPrefix = "clr-namespace:" + GetModelNameSpace(detailView, LformUserControlFolder);
 #>
              xmlns:lfrm<#= id #>="<#= locallformPrefix #>" 
