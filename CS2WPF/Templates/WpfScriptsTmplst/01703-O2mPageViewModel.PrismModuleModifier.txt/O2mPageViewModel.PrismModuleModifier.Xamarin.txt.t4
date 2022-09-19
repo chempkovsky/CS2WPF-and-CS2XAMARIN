@@ -138,8 +138,13 @@
     string ExpandedFilterHeightMethodName           = "ExpandedFilterHeight";
 
 
-    List<string> detailViews = GetDetailViews(Model, Context, null);
     List<ModelViewPropertyOfVwSerializable> primKeys = GetModelPrimaryKeyProps(Model);
+    List<string> detailViewNames =  GetDetailViews(Model, Context, null);
+    List<string> detailViewNamesToExclude = new List<string>();
+    // m2mMdl, m2mFk, searchFks, otherFks, externalFks
+    Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>> tmpSearchSchema = null;
+
+
 
     List<string> nmSpaces = new List<string>();
     if ((O2mPageViewModelNameSpace != IWebServiceFilterRsltInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace) < 0)) 
@@ -230,26 +235,114 @@
 <#
 
 }
-    }
-        foreach(string detailViewName in detailViews) {
+    } // if (LformUserControlProject != O2mPageProject) { ... }
+
+        foreach(string detailViewName in detailViewNames) {
+            if(detailViewNamesToExclude.Any(s => s == detailViewName)) continue;
             ModelViewSerializable detailView = GetModelViewByName(Context, detailViewName);
             if(detailView == null) {
 #>
-/////  can not find the view by Name <#= detailViewName #> 
+<!--  can not find the view by Name <#= detailViewName #> -->
 <#
                 continue;
             }
-            string detailViewClassName = GetModelClassName(detailView, LformUserControlFolder);
-            string detailViewNameSpace  = GetModelNameSpace(detailView, LformUserControlFolder);
-            if (string.IsNullOrEmpty(detailViewClassName)) {
+            List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detailView, null);
+            if (foreignKeys == null) {
 #>
-/////  can not find Lform User control for the view which named: <#= detailViewName #> 
+<!-- can not find Foreign Keys for <#= detailViewName #> -->
 <#
                 continue;
             }
-            string localLformUserControlProject  = GetModelProjectName(detailView, LformUserControlFolder);
-            if (localLformUserControlProject != O2mPageProject) {
+            if (foreignKeys.Count < 1) {
+#>
+<!-- can not find Foreign Keys for <#= detailViewName #> -->
+<#
+                continue;
+            }
+            bool isM2m = false;
+            if(IsTableMatchesIndex(detailView)) {
+                if(AllPrimKeyPropsAreForeignKeysProps(detailView)) {
+                    if(ForeignKeysOrderedInsidePrimKey(detailView)) {
+                        isM2m = true;
+                    }
+                }
+            }
+            foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
+                if(isM2m) {
+                    // m2mMdl, m2mFk, searchFks, otherFks, externalFks
+                    tmpSearchSchema = DetailViewAsM2mMdl(detailView, Context);
+                    if (tmpSearchSchema != null) {
+                        int  cnt = 0;
+                        if(tmpSearchSchema.Item5 == null) continue;
+                        if(tmpSearchSchema.Item5.Count != 1) continue;
+                        if(tmpSearchSchema.Item4 != null) continue;
+                        if(tmpSearchSchema.Item5[0].Key != foreignKey) continue;
+                        ModelViewSerializable viewToNavigate = GetViewByName(Context, tmpSearchSchema.Item2.ViewName);
+                        string viewToNavigateClassName = GetModelClassName(viewToNavigate, LformUserControlFolder);
+                        string viewToNavigateLformUserControlProject  = GetModelProjectName(viewToNavigate, LformUserControlFolder);
+                        string viewToNavigateNameSpace  = GetModelNameSpace(viewToNavigate, LformUserControlFolder);
+                        if (viewToNavigateLformUserControlProject != O2mPageProject) {
+#>
+    {
+    "Description": [
+    '"<#= viewToNavigateClassName #>" UserControl is defined in the "<#= viewToNavigateLformUserControlProject #>"-project.',
+    'In the file of IModule-class of "<#= viewToNavigateLformUserControlProject #>"-project the following line of code must be inserted:',
+    ' ',
+    '    public void OnInitialized(IContainerProvider containerProvider)',
+    '    {',
+    '        ...',
+    '        IRegionManager regionManager = containerProvider.Resolve(typeof(IRegionManager)) as IRegionManager;',
+    '        if (regionManager != null)',
+    '        {',
+    '            ...',
+    '            // According to requirements of the "<#= O2mPageViewModelClassName #>.cs"-file of "<#= O2mPageProject #>"-project. ',
+    '            regionManager.RegisterViewWithRegion("<#= viewToNavigateClassName #><#= DetailRegionPropertyName #>", typeof(<#= viewToNavigateClassName #>));',
+    '            ...',
+    '        }',
+    '        ...',
+    '    }'
+    ],
 
+<#
+{
+    string detailViewNameSpaceAndClassName                  = viewToNavigateNameSpace + "." + viewToNavigateClassName;
+    string destProjectName                                  = GetModelProjectUniqueName(detailView, LformUserControlFolder);
+    string destImplementedInterface                         = "Prism.Modularity.IModule";
+    string destMethodName                                   = "OnInitialized";
+    string[] destMethodParamTypes                           = new string[] {"Prism.Ioc.IContainerProvider"};
+    string destMethodAccessType                             = "public";
+    string destMethodParamTypeForVar                        = "Prism.Ioc.IContainerProvider";
+    string invocationVarType                                = "Prism.Regions.IRegionManager";
+    string invocationMethodName                             = "RegisterViewWithRegion";
+    string[] invocationGenerics                             = new string[]{};
+    string[] invocationParams                               = new string[]{"\"" + viewToNavigateClassName + DetailRegionPropertyName  +"\"", "typeof("+detailViewNameSpaceAndClassName+")"};
+    //result = PrismModifier.UpdateMethodWithVarIdentifier(destProjectName,  destImplementedInterface, destMethodName, destMethodParamTypes, destMethodAccessType, destMethodParamTypeForVar,
+    //                    invocationVarType, invocationMethodName, invocationGenerics, invocationParams);
+#>
+    "MethodName": 'UpdateMethodWithVarIdentifier',
+    "DestProjectName": '<#= destProjectName #>',
+    "DestImplementedInterface": '<#= destImplementedInterface #>',
+    "DestMethodName": '<#= destMethodName #>',
+    "DestMethodParamTypes": ['Prism.Ioc.IContainerProvider'],
+    "DestMethodAccessType": '<#= destMethodAccessType #>',
+    "DestMethodParamTypeForVar": '<#= destMethodParamTypeForVar #>',
+    "InvocationVarType": '<#= invocationVarType #>',
+    "InvocationParamType": '',
+    "InvocationClassType": '',
+    "InvocationMethodName": '<#= invocationMethodName #>',
+    "InvocationGenerics": [],
+    "InvocationParams": ['<#= invocationParams[0] #>','<#= invocationParams[1] #>'],
+    "StepDescription": 'Insertion the line : regionManager.RegisterViewWithRegion("<#= viewToNavigateClassName #><#= DetailRegionPropertyName #>", typeof(<#= viewToNavigateClassName #>));'
+    },
+<#
+}
+                        } // if (viewToNavigateLformUserControlProject != O2mPageProject) { ... }
+                    } // if (tmpSearchSchema != null) { ... }
+                } // if(isM2m) { ... }
+                string localLformUserControlProject  = GetModelProjectName(detailView, LformUserControlFolder);
+                string detailViewNameSpace  = GetModelNameSpace(detailView, LformUserControlFolder);
+                string detailViewClassName = GetModelClassName(detailView, LformUserControlFolder);
+                if (localLformUserControlProject != O2mPageProject) {
 #>
     {
     "Description": [
@@ -303,10 +396,10 @@
     "StepDescription": 'Insertion the line : regionManager.RegisterViewWithRegion("<#= detailViewClassName #><#= DetailRegionPropertyName #>", typeof(<#= detailViewClassName #>));'
     },
 <#
-
 }
-            }
-        }
+                } // if (localLformUserControlProject != O2mPageProject) { ... }
+            } // foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) { ... }
+        } // foreach(string detailViewName in detailViewNames) { ... }
 #>
 
     {

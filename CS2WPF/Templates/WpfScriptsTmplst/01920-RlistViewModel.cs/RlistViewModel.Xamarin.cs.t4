@@ -209,8 +209,15 @@ using Prism.Regions;
     string CanDelChangedPropertyName            = "CanDeleteChanged";
 
 
-    List<string> detailViews = GetDetailViews(Model, Context, null);
+    List<string> detailViewNames = GetDetailViews(Model, Context, null);
     List<ModelViewPropertyOfVwSerializable> primKeys = GetModelPrimaryKeyProps(Model);
+    List<string> detailViewNamesToExclude = new List<string>();
+    // m2mMdl, m2mFk, searchFks, otherFks, externalFks
+    Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>> tmpSearchSchema = null;
+    // m2mMdl, m2mFk, searchFks, otherFks, externalFks
+    List<Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>>> searchSchemas =
+        GetSearchResources(Model, Context);
+
 
     List<string> nmSpaces = new List<string>();
     if ((RlistViewModelNameSpace != IWebServiceFilterRsltInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace) < 0)) 
@@ -364,187 +371,6 @@ namespace <#= RlistViewModelNameSpace #> {
         }
         #endregion
 
-<#
-    if(false) { // region management does not work: 
-#>
-        #region <#= MasterPanelComboItemPropertyName #>
-        string _<#= MasterPanelRegionPropertyName #> = "";
-        public string <#= MasterPanelRegionPropertyName #> {
-            get
-            {
-                return _<#= MasterPanelRegionPropertyName #>;
-            }
-        }
-        public int <#= ShowMasterPanelComboPropertyName #>
-        {
-            get
-            {
-                return (_<#= IsMasterPanelPropertyName #> && (_<#= MasterPanelComboItemsPropertyName #>.Count() > 1)) ? 1 : 0;
-            }
-        }
-        protected bool _<#= IsMasterPanelPropertyName #> = true;
-        public bool <#= IsMasterPanelPropertyName #>
-        { 
-            get
-            {
-                return _<#= IsMasterPanelPropertyName #>;
-            }
-            set {
-                if(_<#= IsMasterPanelPropertyName #> != value) {
-                    if(!_<#= IsMasterPanelPropertyName #>) {
-                        if (regionManager.Regions.Any(r => r.Name == <#= MasterPanelRegionPropertyName #>))
-                        {
-                            regionManager.Regions.Remove(<#= MasterPanelRegionPropertyName #>);
-                        }
-                    }
-                    _<#= IsMasterPanelPropertyName #> = value;
-                    OnPropertyChanged();
-                    OnPropertyChanged("<#= ShowMasterPanelComboPropertyName #>");
-                }
-            }
-        }
-        protected IList<<#= IWebServiceFilterMenuInterfaceClassName #>> GetDefault<#= MasterPanelComboItemsPropertyName #>() {
-            List<<#= IWebServiceFilterMenuInterfaceClassName #>> rslt = new List<<#= IWebServiceFilterMenuInterfaceClassName #>>()  {
-                new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "<#= MasterPanelHideDetailsPropertyName #>", Caption="<#= MasterPanelHideDetailsCaption #>", IconName="TableEdit", IconColor=Color.Default, Enabled=true, Data=null, Command = null}
-            };
-<#
-        foreach(string detailViewName in detailViews) {
-            ModelViewSerializable detailView = GetModelViewByName(Context, detailViewName);
-            if(detailView == null) {
-#>
-///// can not find the view by Name <#= detailViewName #>
-<#
-                continue;
-            }
-            string detailViewClassName = GetModelClassName(detailView, RlistUserControlFolder);
-            List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detailView, null);
-            if (foreignKeys == null) continue;
-            if (foreignKeys.Count < 1) continue;
-            foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
-                if (string.IsNullOrEmpty(detailViewClassName)) {
-#>
-//
-//  Warning:
-//  "<#= RlistUserControlFolder #>" type has not been generated for <#= detailViewName #>
-//
-<#
-                } else { 
-#>
-            if (((<#= AppSettingServicePropertyName #>.GetViewModelMask("<#= detailView.ViewName #>") & 1) == 1 )) {
-                rslt.Add(new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "<#= RowMIPrefixPropertyName #><#= detailViewClassName #><#= foreignKey.NavigationName #>", <#= CaptionPropertyName #>="<#= detailView.PluralTitle #>: <#= foreignKey.NavigationName #>", IconName="ArrowRightBold", IconColor=Color.Default, Enabled=true, Data=null, FeedbackData=null, Command = null});
-            }
-<#
-                }
-            }
-        }
-#>
-            return rslt;
-        }
-        protected IList<<#= IWebServiceFilterMenuInterfaceClassName #>> _<#= MasterPanelComboItemsPropertyName #> = null;
-        public IList<<#= IWebServiceFilterMenuInterfaceClassName #>> <#= MasterPanelComboItemsPropertyName #>
-        { 
-            get
-            {
-                return _<#= MasterPanelComboItemsPropertyName #>;
-            }
-            set
-            {
-                if (_<#= MasterPanelComboItemsPropertyName #> != value)
-                {
-                    _<#= MasterPanelComboItemsPropertyName #> = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-        protected <#= IWebServiceFilterMenuInterfaceClassName #> _<#= MasterPanelComboItemPropertyName #>=null;
-        public <#= IWebServiceFilterMenuInterfaceClassName #> <#= MasterPanelComboItemPropertyName #>
-        {
-            get
-            {
-                return _<#= MasterPanelComboItemPropertyName #>;
-            }
-            set
-            {
-                if (_<#= MasterPanelComboItemPropertyName #> != value)
-                {
-                    _<#= MasterPanelComboItemPropertyName #> = value;
-                    OnPropertyChanged();
-                    DetailNavigateTo();
-                }
-            }
-        }
-        protected void DetailNavigateTo() {
-            if (<#= IsDestroyedPropertyName #>) return;
-            if (!regionManager.Regions.Any(r => r.Name == <#= MasterPanelRegionPropertyName #>)) return;
-            <#= modelInterfaceClassName #> selected = this.<#= SelectedRowPropertyName #> as <#= modelInterfaceClassName #>;
-            if((<#= MasterPanelComboItemPropertyName #> == null) || (selected == null)) {
-                this.regionManager.Regions[<#= MasterPanelRegionPropertyName #>].NavigationService.Journal.Clear();
-                this.regionManager.Regions[<#= MasterPanelRegionPropertyName #>].RemoveAll();
-                return;
-            }
-            if(<#= MasterPanelComboItemPropertyName #> == <#= MasterPanelComboItemsPropertyName #>[0]) {
-                this.regionManager.Regions[<#= MasterPanelRegionPropertyName #>].NavigationService.Journal.Clear();
-                this.regionManager.Regions[<#= MasterPanelRegionPropertyName #>].RemoveAll();
-                return;
-            }
-            NavigationParameters navigationParameters = new NavigationParameters();
-            switch(<#= MasterPanelComboItemPropertyName #>.Id){
-<#
-        foreach(string detailViewName in detailViews) {
-            ModelViewSerializable detailView = GetModelViewByName(Context, detailViewName);
-            if(detailView == null) {
-#>
-///// can not find the view by Name <#= detailViewName #>
-<#
-                continue;
-            }
-            string detailViewClassName = GetModelClassName(detailView, RlistUserControlFolder);
-            List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detailView, null);
-            if (foreignKeys == null) continue;
-            if (foreignKeys.Count < 1) continue;
-            foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
-                if (string.IsNullOrEmpty(detailViewClassName)) {
-#>
-//
-//  Warning:
-//  "<#= RlistUserControlFolder #>" type has not been generated for <#= detailViewName #>
-//
-<#
-                } else { 
-#>
-                case "<#= RowMIPrefixPropertyName #><#= detailViewClassName #><#= foreignKey.NavigationName #>": 
-                    if (((<#= AppSettingServicePropertyName #>.GetViewModelMask("<#= detailView.ViewName #>") & 1) != 1 )) {
-                        this.regionManager.Regions[<#= MasterPanelRegionPropertyName #>].NavigationService.Journal.Clear();
-                        this.regionManager.Regions[<#= MasterPanelRegionPropertyName #>].NavigationService.RequestNavigate(new Uri("<#= AccessDeniedUserControlClassName #>", UriKind.Relative), OnNavigationResult);
-                        return;
-                    }
-                    navigationParameters.Add("<#= HiddenFiltersParamPropertyName #>", this.<#= FormServicePrefix #><#= Model.ViewName #>.get<#= HiddenFilterByRowSuffix #>(selected, "<#= foreignKey.NavigationName #>"));
-                    navigationParameters.Add("<#= IsMasterPanelPropertyName #>", false);
-                    navigationParameters.Add("<#= IsParentLoadedPropertyName #>", false);
-                    navigationParameters.Add("<#= ShowFilterPropertyName #>", true);
-                    navigationParameters.Add("<#= ShowAddFilterBtnPropertyName #>", true);
-                    navigationParameters.Add("<#= CanAddPropertyName #>", true);
-                    navigationParameters.Add("<#= CanUpdPropertyName #>", true);
-                    navigationParameters.Add("<#= CanDelPropertyName #>", true);
-                    this.regionManager.Regions[<#= MasterPanelRegionPropertyName #>].NavigationService.Journal.Clear();
-                    this.regionManager.Regions[<#= MasterPanelRegionPropertyName #>].NavigationService.RequestNavigate(new Uri("<#= detailViewClassName #>", UriKind.Relative), OnNavigationResult, navigationParameters);
-                    break;
-<#
-                }
-            }
-        }
-#>
-                default:
-                    break;
-            }
-        }
-        #endregion
-
-
-<#
-    } // the end of  if(false) { // region management does not work: }
-#>
-
         #region <#= NavigateToDetailCommandPropertyName #>
         public void <#= NavigateToDetailCommandPropertyName #>(<#= modelInterfaceClassName #> selected, string detailVwNm, string fkNvNm, string detailVwClNm) { 
             if (<#= IsDestroyedPropertyName #>) return;
@@ -566,7 +392,8 @@ namespace <#= RlistViewModelNameSpace #> {
                 new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "<#= RowDelMIPropertyName #>", Caption="Delete item", IconName="TableRemove", IconColor=Color.Default, Enabled=true, Data=null, Command = <#= RowMenuItemsCommandPropertyName #>},
                 new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "<#= RowViewMIPropertyName #>", Caption="View item", IconName="TableEdit", IconColor=Color.Default, Enabled=true, Data=null, Command = <#= RowMenuItemsCommandPropertyName #>},
 <#
-        foreach(string detailViewName in detailViews) {
+        foreach(string detailViewName in detailViewNames) {
+            if(detailViewNamesToExclude.Any(s => s == detailViewName)) continue;
             ModelViewSerializable detailView = GetModelViewByName(Context, detailViewName);
             if(detailView == null) {
 #>
@@ -574,23 +401,48 @@ namespace <#= RlistViewModelNameSpace #> {
 <#
                 continue;
             }
-            string detailViewClassName = GetModelClassName(detailView, RlistUserControlFolder);
             List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detailView, null);
-            if (foreignKeys == null) continue;
-            if (foreignKeys.Count < 1) continue;
-            foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
-                if (string.IsNullOrEmpty(detailViewClassName)) {
+            if (foreignKeys == null) {
 #>
-//
-//  Warning:
-//  "<#= RlistUserControlFolder #>" type has not been generated for <#= detailViewName #>
-//
+///// can not find Foreign Keys for <#= detailViewName #>
 <#
-                } else { 
+                continue;
+            }
+            if (foreignKeys.Count < 1) {
+#>
+///// can not find Foreign Keys for <#= detailViewName #>
+<#
+                continue;
+            }
+            bool isM2m = false;
+            if(IsTableMatchesIndex(detailView)) {
+                if(AllPrimKeyPropsAreForeignKeysProps(detailView)) {
+                    if(ForeignKeysOrderedInsidePrimKey(detailView)) {
+                        isM2m = true;
+                    }
+                }
+            }
+            foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
+                if(isM2m) {
+                    // m2mMdl, m2mFk, searchFks, otherFks, externalFks
+                    tmpSearchSchema = DetailViewAsM2mMdl(detailView, Context);
+                    if (tmpSearchSchema != null) {
+                        int  cnt = 0;
+                        if(tmpSearchSchema.Item5 == null) continue;
+                        if(tmpSearchSchema.Item5.Count != 1) continue;
+                        if(tmpSearchSchema.Item4 != null) continue;
+                        if(tmpSearchSchema.Item5[0].Key != foreignKey) continue;
+                        ModelViewSerializable viewToNavigate = GetViewByName(Context, tmpSearchSchema.Item2.ViewName);
+                        string viewToNavigateClassName = GetModelClassName(viewToNavigate, RlistUserControlFolder);
+#>
+                new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "<#= RowMIPrefixPropertyName #><#= viewToNavigateClassName #><#= foreignKey.NavigationName #>", <#= CaptionPropertyName #>="<#= viewToNavigate.PluralTitle #>: <#= foreignKey.NavigationName #>", IconName="ArrowRightBold", IconColor=Color.Default, Enabled=true, Data=null, FeedbackData=null, Command = <#= RowMenuItemsCommandPropertyName #>},
+<#
+                    }
+                }
+                string detailViewClassName = GetModelClassName(detailView, RlistUserControlFolder);
 #>
                 new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "<#= RowMIPrefixPropertyName #><#= detailViewClassName #><#= foreignKey.NavigationName #>", <#= CaptionPropertyName #>="<#= detailView.PluralTitle #>: <#= foreignKey.NavigationName #>", IconName="ArrowRightBold", IconColor=Color.Default, Enabled=true, Data=null, FeedbackData=null, Command = <#= RowMenuItemsCommandPropertyName #>},
 <#
-                }
             }
         }
 #>
@@ -877,9 +729,9 @@ namespace <#= RlistViewModelNameSpace #> {
                 case "<#= RowViewMIPropertyName #>":
                     <#= SformViewItemCommandPropertyName #>(arow);
                     break;
-
 <#
-        foreach(string detailViewName in detailViews) {
+        foreach(string detailViewName in detailViewNames) {
+            if(detailViewNamesToExclude.Any(s => s == detailViewName)) continue;
             ModelViewSerializable detailView = GetModelViewByName(Context, detailViewName);
             if(detailView == null) {
 #>
@@ -887,28 +739,54 @@ namespace <#= RlistViewModelNameSpace #> {
 <#
                 continue;
             }
-            string detailViewClassName = GetModelClassName(detailView, RlistUserControlFolder);
             List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detailView, null);
-            if (foreignKeys == null) continue;
-            if (foreignKeys.Count < 1) continue;
-            foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
-                if (string.IsNullOrEmpty(detailViewClassName)) {
+            if (foreignKeys == null) {
 #>
-//
-//  Warning:
-//  "<#= RlistUserControlFolder #>" type has not been generated for <#= detailViewName #>
-//
+///// can not find Foreign Keys for <#= detailViewName #>
 <#
-                } else { 
+                continue;
+            }
+            if (foreignKeys.Count < 1) {
 #>
-                case "<#= RowMIPrefixPropertyName #><#= detailViewClassName #><#= foreignKey.NavigationName #>":
-                    <#= NavigateToDetailCommandPropertyName #>(arow, "<#= detailView.ViewName #>", "<#= foreignKey.NavigationName #>", "<#= detailViewClassName #>");
-                    break;
+///// can not find Foreign Keys for <#= detailViewName #>
 <#
+                continue;
+            }
+            bool isM2m = false;
+            if(IsTableMatchesIndex(detailView)) {
+                if(AllPrimKeyPropsAreForeignKeysProps(detailView)) {
+                    if(ForeignKeysOrderedInsidePrimKey(detailView)) {
+                        isM2m = true;
+                    }
                 }
             }
-        }
-
+            foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
+                if(isM2m) {
+                    // m2mMdl, m2mFk, searchFks, otherFks, externalFks
+                    tmpSearchSchema = DetailViewAsM2mMdl(detailView, Context);
+                    if (tmpSearchSchema != null) {
+                        int  cnt = 0;
+                        if(tmpSearchSchema.Item5 == null) continue;
+                        if(tmpSearchSchema.Item5.Count != 1) continue;
+                        if(tmpSearchSchema.Item4 != null) continue;
+                        if(tmpSearchSchema.Item5[0].Key != foreignKey) continue;
+                        ModelViewSerializable viewToNavigate = GetViewByName(Context, tmpSearchSchema.Item2.ViewName);
+                        string viewToNavigateClassName = GetModelClassName(viewToNavigate, RlistUserControlFolder);
+#>
+                    case "<#= RowMIPrefixPropertyName #><#= viewToNavigateClassName #><#= foreignKey.NavigationName #>":
+                        <#= NavigateToDetailCommandPropertyName #>(arow, "<#= viewToNavigate.ViewName #>", "<#= foreignKey.NavigationName #>", "<#= viewToNavigateClassName #>");
+                        break;
+<#
+                    }
+                }
+                string detailViewClassName = GetModelClassName(detailView, RlistUserControlFolder);
+#>
+                    case "<#= RowMIPrefixPropertyName #><#= detailViewClassName #><#= foreignKey.NavigationName #>":
+                        <#= NavigateToDetailCommandPropertyName #>(arow, "<#= detailView.ViewName #>", "<#= foreignKey.NavigationName #>", "<#= detailViewClassName #>");
+                        break;
+<#
+            } // the end of foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) { ... }
+        } // the end of foreach(string detailViewName in detailViewNames) { ... }
 #>
                 default:
                     break;
@@ -926,9 +804,9 @@ namespace <#= RlistViewModelNameSpace #> {
                         return <#= CanDelPropertyName #>;
                     case "<#= RowViewMIPropertyName #>":
                         return true;
-
 <#
-        foreach(string detailViewName in detailViews) {
+        foreach(string detailViewName in detailViewNames) {
+            if(detailViewNamesToExclude.Any(s => s == detailViewName)) continue;
             ModelViewSerializable detailView = GetModelViewByName(Context, detailViewName);
             if(detailView == null) {
 #>
@@ -936,27 +814,52 @@ namespace <#= RlistViewModelNameSpace #> {
 <#
                 continue;
             }
-            string detailViewClassName = GetModelClassName(detailView, RlistUserControlFolder);
             List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detailView, null);
-            if (foreignKeys == null) continue;
-            if (foreignKeys.Count < 1) continue;
-            foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
-                if (string.IsNullOrEmpty(detailViewClassName)) {
+            if (foreignKeys == null) {
 #>
-//
-//  Warning:
-//  "<#= RlistUserControlFolder #>" type has not been generated for <#= detailViewName #>
-//
+///// can not find Foreign Keys for <#= detailViewName #>
 <#
-                } else { 
+                continue;
+            }
+            if (foreignKeys.Count < 1) {
+#>
+///// can not find Foreign Keys for <#= detailViewName #>
+<#
+                continue;
+            }
+            bool isM2m = false;
+            if(IsTableMatchesIndex(detailView)) {
+                if(AllPrimKeyPropsAreForeignKeysProps(detailView)) {
+                    if(ForeignKeysOrderedInsidePrimKey(detailView)) {
+                        isM2m = true;
+                    }
+                }
+            }
+            foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
+                if(isM2m) {
+                    // m2mMdl, m2mFk, searchFks, otherFks, externalFks
+                    tmpSearchSchema = DetailViewAsM2mMdl(detailView, Context);
+                    if (tmpSearchSchema != null) {
+                        int  cnt = 0;
+                        if(tmpSearchSchema.Item5 == null) continue;
+                        if(tmpSearchSchema.Item5.Count != 1) continue;
+                        if(tmpSearchSchema.Item4 != null) continue;
+                        if(tmpSearchSchema.Item5[0].Key != foreignKey) continue;
+                        ModelViewSerializable viewToNavigate = GetViewByName(Context, tmpSearchSchema.Item2.ViewName);
+                        string viewToNavigateClassName = GetModelClassName(viewToNavigate, RlistUserControlFolder);
+#>
+                    case "<#= RowMIPrefixPropertyName #><#= viewToNavigateClassName #><#= foreignKey.NavigationName #>":
+                        return ((<#= AppSettingServicePropertyName #>.GetViewModelMask("<#= viewToNavigate.ViewName #>") & 1) == 1);
+<#
+                    }
+                }
+                string detailViewClassName = GetModelClassName(detailView, RlistUserControlFolder);
 #>
                     case "<#= RowMIPrefixPropertyName #><#= detailViewClassName #><#= foreignKey.NavigationName #>":
                         return ((<#= AppSettingServicePropertyName #>.GetViewModelMask("<#= detailView.ViewName #>") & 1) == 1);
 <#
-                }
-            }
-        }
-
+            } // the end of foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) { ... }
+        } // the end of foreach(string detailViewName in detailViewNames) { ... }
 #>
                     default:
                         break;

@@ -154,9 +154,16 @@ using Prism.Navigation;
     string OnDestroyedPropertyName                  = "OnDestroyed";
     string OnDestroyPropertyName                    = "OnDestroy";
     string IsSwitchingPropertyName                  = "IsSwitching";
+    string HiddenFilterByRowSuffix                  = "HiddenFilterByRow";
+    string HiddenFilterAsFltRsltSuffix              = "HiddenFilterAsFltRslt";
 
-    List<string> detailViews = GetDetailViews(Model, Context, null);
-    List<ModelViewPropertyOfVwSerializable> primKeys = GetModelPrimaryKeyProps(Model);
+
+    List<ModelViewPropertyOfVwSerializable> primKeys= GetModelPrimaryKeyProps(Model);
+    List<string> detailViewNames =  GetDetailViews(Model, Context, null);
+    List<string> detailViewNamesToExclude = new List<string>();
+    // m2mMdl, m2mFk, searchFks, otherFks, externalFks
+    Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>> tmpSearchSchema = null;
+
 
     List<string> nmSpaces = new List<string>();
     if ((O2mViewModelNameSpace != IWebServiceFilterRsltInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace) < 0)) 
@@ -220,28 +227,76 @@ using <#= ns #>;
     }
 #>
 
-
 <#
-        foreach(string detailViewName in detailViews) {
+        foreach(string detailViewName in detailViewNames) {
+            if(detailViewNamesToExclude.Any(s => s == detailViewName)) continue;
             ModelViewSerializable detailView = GetModelViewByName(Context, detailViewName);
             if(detailView == null) {
 #>
-/////  can not find the view by Name <#= detailViewName #> 
+///// can not find the view by Name <#= detailViewName #>
 <#
                 continue;
             }
-            string detailViewClassName = GetModelClassName(detailView, LformUserControlFolder);
-            if (string.IsNullOrEmpty(detailViewClassName)) {
+            List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detailView, null);
+            if (foreignKeys == null) {
 #>
-/////  can not find Lform User control for the view which named: <#= detailViewName #> 
+///// can not find Foreign Keys for <#= detailViewName #>
 <#
                 continue;
             }
-            string localLformUserControlProject  = GetModelProjectName(detailView, LformUserControlFolder);
-            if (localLformUserControlProject != O2mUserControlProject) {
+            if (foreignKeys.Count < 1) {
+#>
+///// can not find Foreign Keys for <#= detailViewName #>
+<#
+                continue;
+            }
+            bool isM2m = false;
+            if(IsTableMatchesIndex(detailView)) {
+                if(AllPrimKeyPropsAreForeignKeysProps(detailView)) {
+                    if(ForeignKeysOrderedInsidePrimKey(detailView)) {
+                        isM2m = true;
+                    }
+                }
+            }
+            foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
+                if(isM2m) {
+                    // m2mMdl, m2mFk, searchFks, otherFks, externalFks
+                    tmpSearchSchema = DetailViewAsM2mMdl(detailView, Context);
+                    if (tmpSearchSchema != null) {
+                        int  cnt = 0;
+                        if(tmpSearchSchema.Item5 == null) continue;
+                        if(tmpSearchSchema.Item5.Count != 1) continue;
+                        if(tmpSearchSchema.Item4 != null) continue;
+                        if(tmpSearchSchema.Item5[0].Key != foreignKey) continue;
+                        ModelViewSerializable viewToNavigate = GetViewByName(Context, tmpSearchSchema.Item2.ViewName);
+                        string viewToNavigateClassName = GetModelClassName(viewToNavigate, LformUserControlFolder);
+                        string viewToNavigateLformUserControlProject  = GetModelProjectName(viewToNavigate, LformUserControlFolder);
+                        if (viewToNavigateLformUserControlProject != O2mUserControlProject) {
+#>
+    "<#= viewToNavigateClassName #>" UserControl is defined in the "<#= viewToNavigateLformUserControlProject #>"-project.
+    In the file of IModule-class of "<#= viewToNavigateLformUserControlProject #>"-project the following line of code must be inserted:
 
+        public void OnInitialized(IContainerProvider containerProvider)
+        {
+            ...
+            IRegionManager regionManager = containerProvider.Resolve(typeof(IRegionManager)) as IRegionManager;
+            if (regionManager != null)
+            {
+                ...
+                // According to requirements of the "<#= O2mViewModelClassName #>.cs"-file of "<#= O2mUserControlProject #>"-project. 
+                regionManager.RegisterViewWithRegion("<#= viewToNavigateClassName #><#= DetailRegionPropertyName #>", typeof(<#= viewToNavigateClassName #>));
+                ...
+            }
+            ...
+        }
+<#
+                        }  // the end of if (localLformUserControlProject != O2mUserControlProject) {...}
+                    } // the end of if (tmpSearchSchema != null) { ... }
+                } // the end of if(isM2m) { ... }
+                string detailViewClassName = GetModelClassName(detailView, LformUserControlFolder);
+                string localLformUserControlProject  = GetModelProjectName(detailView, LformUserControlFolder);
+                if (localLformUserControlProject != O2mUserControlProject) {
 #>
-   
     "<#= detailViewClassName #>" UserControl is defined in the "<#= localLformUserControlProject #>"-project.
     In the file of IModule-class of "<#= localLformUserControlProject #>"-project the following line of code must be inserted:
 
@@ -259,10 +314,10 @@ using <#= ns #>;
             ...
         }
 <#
-            }
-        }
+                } // the end of if (localLformUserControlProject != O2mUserControlProject) {...}
+            } // the end of foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) { ... }
+        }  // the end of foreach(string detailViewName in detailViewNames) { ... }
 #>
-
 
     "<#= O2mUserControlClassName #>" UserControl is defined in the "<#= O2mUserControlProject #>"-project.
     In the file of IModule-class of "<#= O2mUserControlProject #>"-project the following line of code must be inserted:
@@ -532,8 +587,6 @@ namespace <#= O2mViewModelNameSpace #> {
        }
        #endregion
 
-
-
        #region IRegionAware
        public bool IsNavigationTarget(INavigationContext navigationContext) {
             return true;
@@ -641,11 +694,6 @@ namespace <#= O2mViewModelNameSpace #> {
             return (<#= CurrentNavigationContextPropertyName #> == null) ?  false : <#= CurrentNavigationContextPropertyName #>.NavigationService.Journal.CanGoBack;
         }
         #endregion
-
-
-
-
-
 
         #region <#= TableMenuItemsDetailPropertyName #>
         protected ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>> GetDefault<#= TableMenuItemsDetailPropertyName #>() {
@@ -809,7 +857,8 @@ namespace <#= O2mViewModelNameSpace #> {
         #region <#= DetailsListPropertyName #>
         ObservableCollection<<#= IO2mListItemInterfaceClassName #>> _<#= DetailsListPropertyName #> = new ObservableCollection<<#= IO2mListItemInterfaceClassName #>>() {
 <#
-        foreach(string detailViewName in detailViews) {
+        foreach(string detailViewName in detailViewNames) {
+            if(detailViewNamesToExclude.Any(s => s == detailViewName)) continue;
             ModelViewSerializable detailView = GetModelViewByName(Context, detailViewName);
             if(detailView == null) {
 #>
@@ -817,20 +866,47 @@ namespace <#= O2mViewModelNameSpace #> {
 <#
                 continue;
             }
-            string detailViewClassName = GetModelClassName(detailView, LformUserControlFolder);
-            if (string.IsNullOrEmpty(detailViewClassName)) {
+            List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detailView, null);
+            if (foreignKeys == null) {
 #>
-/////  can not find Lform User control for the view which named: <#= detailViewName #> 
+///// can not find Foreign Keys for <#= detailViewName #>
 <#
                 continue;
             }
-
-            List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detailView, null);
-            if (foreignKeys == null) continue;
-            if (foreignKeys.Count < 1) continue;
-            foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
+            if (foreignKeys.Count < 1) {
 #>
-            new <#= O2mListItemViewModelClassName #>() {<#= CaptionPropertyName #> = "<#= detailView.PluralTitle #>: <#= foreignKey.NavigationName #>", <#= ForeignKeyDetailsName #> = "<#= detailViewClassName #>:<#= foreignKey.NavigationName #>",  <#= RegionPropertyName #> = "<#= detailViewClassName #><#= DetailRegionPropertyName #>" },
+///// can not find Foreign Keys for <#= detailViewName #>
+<#
+                continue;
+            }
+            bool isM2m = false;
+            if(IsTableMatchesIndex(detailView)) {
+                if(AllPrimKeyPropsAreForeignKeysProps(detailView)) {
+                    if(ForeignKeysOrderedInsidePrimKey(detailView)) {
+                        isM2m = true;
+                    }
+                }
+            }
+            foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
+                if(isM2m) {
+                    // m2mMdl, m2mFk, searchFks, otherFks, externalFks
+                    tmpSearchSchema = DetailViewAsM2mMdl(detailView, Context);
+                    if (tmpSearchSchema != null) {
+                        int  cnt = 0;
+                        if(tmpSearchSchema.Item5 == null) continue;
+                        if(tmpSearchSchema.Item5.Count != 1) continue;
+                        if(tmpSearchSchema.Item4 != null) continue;
+                        if(tmpSearchSchema.Item5[0].Key != foreignKey) continue;
+                        ModelViewSerializable viewToNavigate = GetViewByName(Context, tmpSearchSchema.Item2.ViewName);
+                        string viewToNavigateClassName = GetModelClassName(viewToNavigate, LformUserControlFolder);
+#>
+                new <#= O2mListItemViewModelClassName #>() {<#= CaptionPropertyName #> = "<#= viewToNavigate.PluralTitle #>: <#= foreignKey.NavigationName #>", <#= ForeignKeyDetailsName #> = "<#= viewToNavigateClassName #>:<#= foreignKey.NavigationName #>",  <#= RegionPropertyName #> = "<#= viewToNavigateClassName #><#= DetailRegionPropertyName #>" },
+<#
+                    }
+                }
+                string detailViewClassName = GetModelClassName(detailView, LformUserControlFolder);
+#>
+                new <#= O2mListItemViewModelClassName #>() {<#= CaptionPropertyName #> = "<#= detailView.PluralTitle #>: <#= foreignKey.NavigationName #>", <#= ForeignKeyDetailsName #> = "<#= detailViewClassName #>:<#= foreignKey.NavigationName #>",  <#= RegionPropertyName #> = "<#= detailViewClassName #><#= DetailRegionPropertyName #>" },
 <#
             }
         }
@@ -844,11 +920,13 @@ namespace <#= O2mViewModelNameSpace #> {
             if(<#= IsDestroyedPropertyName #>) return;
             PermissionMaskDetail = 0;
             ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>> chfd = new ObservableCollection<<#= IWebServiceFilterRsltInterfaceClassName #>>();
+            IList<<#= IWebServiceFilterRsltInterfaceClassName #>> tmpFlt = null;
             <#= modelInterfaceClassName  #>  selectedMasterRow  = <#= SelectedRowPropertyName #> as <#= modelInterfaceClassName  #>;
             if((<#= SelectedDetailsListItemPropertyName #> != null) && (selectedMasterRow != null)) {
                 switch(<#= SelectedDetailsListItemPropertyName #>.<#= ForeignKeyDetailsName #>) {
 <#
-        foreach(string detailViewName in detailViews) {
+        foreach(string detailViewName in detailViewNames) {
+            if(detailViewNamesToExclude.Any(s => s == detailViewName)) continue;
             ModelViewSerializable detailView = GetModelViewByName(Context, detailViewName);
             if(detailView == null) {
 #>
@@ -856,48 +934,64 @@ namespace <#= O2mViewModelNameSpace #> {
 <#
                 continue;
             }
-            string detailViewClassName = GetModelClassName(detailView, LformUserControlFolder);
-            if (string.IsNullOrEmpty(detailViewClassName)) {
-#>
-/////  can not find Lform User control for the view which named: <#= detailViewName #> 
-<#
-                continue;
-            }
             List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detailView, null);
             if (foreignKeys == null) {
+#>
+///// can not find Foreign Keys for <#= detailViewName #>
+<#
                 continue;
             }
             if (foreignKeys.Count < 1) {
+#>
+///// can not find Foreign Keys for <#= detailViewName #>
+<#
                 continue;
             }
+            bool isM2m = false;
+            if(IsTableMatchesIndex(detailView)) {
+                if(AllPrimKeyPropsAreForeignKeysProps(detailView)) {
+                    if(ForeignKeysOrderedInsidePrimKey(detailView)) {
+                        isM2m = true;
+                    }
+                }
+            }
             foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
+                if(isM2m) {
+                    // m2mMdl, m2mFk, searchFks, otherFks, externalFks
+                    tmpSearchSchema = DetailViewAsM2mMdl(detailView, Context);
+                    if (tmpSearchSchema != null) {
+                        int  cnt = 0;
+                        if(tmpSearchSchema.Item5 == null) continue;
+                        if(tmpSearchSchema.Item5.Count != 1) continue;
+                        if(tmpSearchSchema.Item4 != null) continue;
+                        if(tmpSearchSchema.Item5[0].Key != foreignKey) continue;
+                        ModelViewSerializable viewToNavigate = GetViewByName(Context, tmpSearchSchema.Item2.ViewName);
+                        string viewToNavigateClassName = GetModelClassName(viewToNavigate, LformUserControlFolder);
+#>
+                    case "<#= viewToNavigateClassName #>:<#= foreignKey.NavigationName #>":
+                        PermissionMaskDetail = <#= AppSettingServicePropertyName #>.GetViewModelMask("<#= viewToNavigate.ViewName #>");
+                        tmpFlt = this.<#= FormServicePrefix #><#= Model.ViewName #>.get<#= HiddenFilterAsFltRsltSuffix #>(this.<#= FormServicePrefix #><#= Model.ViewName #>.get<#= HiddenFilterByRowSuffix #>(selectedMasterRow, "<#= foreignKey.NavigationName #>"));
+                        break;
+<#
+                    }
+                }
+                string detailViewClassName = GetModelClassName(detailView, LformUserControlFolder);
 #>
                     case "<#= detailViewClassName #>:<#= foreignKey.NavigationName #>":
                         PermissionMaskDetail = <#= AppSettingServicePropertyName #>.GetViewModelMask("<#= detailViewName #>");
-<#
-                    foreach(ModelViewPropertyOfVwSerializable primKey in primKeys) {
-                        List<ModelViewPropertyOfVwSerializable> detailProps = GetDetailViewForeignKeyProps(Model, primKey, detailView, foreignKey, null);
-                        foreach(ModelViewPropertyOfVwSerializable detailProp in detailProps) {
-#>
-                        chfd.Add(new <#= WebServiceFilterRsltViewModelClassName #>() {
-                            fltrName = "<#= GetModelPropertyName(detailProp, detailView) #>",
-                            fltrDataType = "<#= GetCCharpDatatype(detailProp, detailView) #>",
-                            fltrOperator = "eq",
-                            fltrValue = selectedMasterRow.<#= GetModelPropertyName(primKey, Model) #>,
-                            fltrError = null
-                        });
-<#
-                        }
-                    }
-#>
+                        tmpFlt = this.<#= FormServicePrefix #><#= Model.ViewName #>.get<#= HiddenFilterAsFltRsltSuffix #>(this.<#= FormServicePrefix #><#= Model.ViewName #>.get<#= HiddenFilterByRowSuffix #>(selectedMasterRow, "<#= foreignKey.NavigationName #>"));
                         break;
 <#
-
             }
         }
 #>
                     default:
                         break;
+                }
+            }
+            if(tmpFlt != null) {
+                foreach(var fltItm in tmpFlt) {
+                    chfd.Add(fltItm);
                 }
             }
             <#= HiddenFiltersDetailPropertyName #> = chfd;
