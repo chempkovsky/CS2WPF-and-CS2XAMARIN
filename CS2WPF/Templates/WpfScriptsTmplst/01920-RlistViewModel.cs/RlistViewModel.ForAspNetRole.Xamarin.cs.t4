@@ -1,5 +1,6 @@
 ﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
-<#@ output extension="jsonpmm2txt" #>
+<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
 <#@ assembly name="System.Core" #>
 <#@ import namespace="System" #>
 <#@ import namespace="System.Linq" #>
@@ -13,6 +14,6 @@
 <#@ parameter type="CS2WPF.Model.Serializable.DbContextSerializable" name="Context" #>
 <#@ include file="..\..\CommonScripts\ViewLevel.t4" #>
 <#
-    List<string> detailViewNamesToExclude = new List<string>();
+    List<string> detailViewNamesToExclude = new List<string>() { "aspnetuserrolesView"}; 
 #>
-<#@ include file="..\..\CommonScripts\RdlistPageViewModel.PrismModuleModifier.Xamarin.txt.t4" #>
+<#@ include file="..\..\CommonScripts\RlistViewModel.Xamarin.cs.t4" #>
