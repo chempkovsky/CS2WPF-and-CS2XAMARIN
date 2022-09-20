@@ -20,6 +20,7 @@ using System.Windows.Input;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Prism.Ioc;
+using System.Collections.Generic;
 
 <#
 
@@ -212,11 +213,19 @@ namespace <#= MainFlyoutPageViewModelNameSpace #> {
             }
             else
             {
-                IAspnetusermaskViewServicePermission ServicePermission = _containerProvider.Resolve<IAspnetusermaskViewServicePermission>();
+                IAspnetuserpermsViewService ServicePermission = _containerProvider.Resolve<IAspnetuserpermsViewService>();
                 await MainThread.InvokeOnMainThreadAsync(async () => 
                 {
-                    IaspnetusermaskViewPage rslt = await ServicePermission.getcurrusermasks();
-                    (sender as IAppGlblSettingsService).Permissions = ServicePermission.src2array(rslt);
+                    IList<IAspnetuserpermsView> rslt = await ServicePermission.getall();
+                    var Permissions = (sender as IAppGlblSettingsService).GetEmptyPermissions();
+                    if (rslt != null)
+                    {
+                        foreach(var itm in rslt)
+                        {
+                            Permissions.Add(itm.ModelName, itm.UserPerms);
+                        }
+                    }
+                    (sender as IAppGlblSettingsService).Permissions = Permissions;
                     (sender as IAppGlblSettingsService).NavigateTo("HomePage");
                 });
                 return;

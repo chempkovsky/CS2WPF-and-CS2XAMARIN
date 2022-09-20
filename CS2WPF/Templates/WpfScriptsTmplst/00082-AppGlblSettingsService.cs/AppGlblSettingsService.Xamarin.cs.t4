@@ -190,16 +190,32 @@ namespace <#= AppGlblSettingsServiceNameSpace #> {
         public string GetWebApiPrefix(string ViewName)
         {
             string rslt = "";
-            if(!string.IsNullOrEmpty(ViewName))
+            if (!string.IsNullOrEmpty(ViewName))
             {
-                if (Device.RuntimePlatform == Device.Android)
+                if (ViewName.StartsWith("Lpd") || ViewName.StartsWith("Lpr"))
                 {
-                
-                    rslt = "http://10.0.2.2:52157/";  
+                    if (Device.RuntimePlatform == Device.Android)
+                    {
+
+                        rslt = "http://10.0.2.2:5055/";
+                    }
+                    else
+                    {
+                        return "http://localhost:5055/";
+                    }
+
                 }
                 else
                 {
-                    return "http://localhost:52157/";
+                    if (Device.RuntimePlatform == Device.Android)
+                    {
+
+                        rslt = "http://10.0.2.2:5165/";
+                    }
+                    else
+                    {
+                        return "http://localhost:5165/";
+                    }
                 }
             }
             return rslt;
@@ -208,10 +224,11 @@ namespace <#= AppGlblSettingsServiceNameSpace #> {
         {
             if (Device.RuntimePlatform == Device.Android)
             {
-                return "http://10.0.2.2:52157/";  
-            } else
+                return "http://10.0.2.2:52157/";
+            }
+            else
             {
-                return "http://localhost:52157/";
+                return "http://localhost:5165/";
             }
         }
         public double getDialogWidth(string ViewName)  {
@@ -280,18 +297,8 @@ namespace <#= AppGlblSettingsServiceNameSpace #> {
             }
             return rslt;
         }
-        Dictionary<string, int> Views = new Dictionary<string, int>()
-        {
-            { "LitAuthorView", 0 },
-            { "LitBookView", 1 },
-        };
-        Dictionary<string, int> Dashboards = new Dictionary<string, int>()
-        {
-            { "ManuscriptDFeatureFtrComponent", 0 },
-            { "ManuscriptRFeatureFtrComponent", 1 },
-        };
-        int[] _Permissions = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-        public int[] Permissions
+        Dictionary<string, int> _Permissions = new Dictionary<string, int>();
+        public Dictionary<string, int> Permissions
         {
             get 
             {
@@ -302,12 +309,23 @@ namespace <#= AppGlblSettingsServiceNameSpace #> {
                 _Permissions = value;
             }
         }
-        public int[] GetEmptyPermissions() {
-            return new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+        public Dictionary<string, int> GetEmptyPermissions() {
+            return new Dictionary<string, int>();
         }
         public int GetViewModelMask(string vwModel) {
 
-            return 15; // delete this line when vwModels is ready
+            return 31; // delete this line when vwModels is ready
+            if ((Permissions == null) || (string.IsNullOrEmpty(vwModel))) return 0;
+            if(Permissions.ContainsKey(vwModel)) {
+                return Permissions[vwModel];
+            }
+            return 0;
+        }
+
+/*
+        public int GetViewModelMask(string vwModel) {
+
+            return 31; // delete this line when vwModels is ready
             if (Permissions == null) return 0;
             int pk = 0;
             if (!Views.TryGetValue(vwModel, out pk)) return 0;
@@ -337,6 +355,7 @@ namespace <#= AppGlblSettingsServiceNameSpace #> {
             }
             return rslt;
         }
+*/
         protected HttpClient _Client = null;
         public HttpClient Client 
         { 
