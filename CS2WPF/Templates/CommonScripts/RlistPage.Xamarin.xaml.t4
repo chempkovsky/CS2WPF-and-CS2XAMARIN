@@ -1,0 +1,211 @@
+﻿<#
+
+    string ProxyUserControlFolder           = "00280-ProxyUserControl.xaml.cs";
+    string ProxyUserControlClassName        = GetContextModelClassName(Context, ProxyUserControlFolder);
+    string ProxyUserControlNameSpace        = GetContextModelNameSpace(Context, ProxyUserControlFolder);
+    string ProxyUserControlProject          = GetContextModelProjectName(Context, ProxyUserControlFolder);
+
+    string SformUserControlFolder           = "01420-SformUserControl.xaml.cs";
+    string SformUserControlClassName        = GetModelClassName(Model, SformUserControlFolder);
+    string SformUserControlNameSpace        = GetModelNameSpace(Model, SformUserControlFolder);
+    string SformUserControlProject          = GetModelProjectName(Model, SformUserControlFolder);
+    
+
+    string RlistPageFolder                  = "01917-RlistPage.xaml.cs";
+    string RlistPageClassName               = GetModelClassName(Model, RlistPageFolder);
+    string RlistPageNameSpace               = GetModelNameSpace(Model, RlistPageFolder);
+    string RlistPageProject                 = GetModelProjectName(Model, RlistPageFolder);
+    
+    string RlistPageXamlFolder              = "01919-RlistPage.xaml";
+    string RlistPageXamlClassName           = GetModelClassName(Model, RlistPageXamlFolder);
+    string RlistPageXamlNameSpace           = GetModelNameSpace(Model, RlistPageXamlFolder);
+    string RlistPageXamlProject             = GetModelProjectName(Model, RlistPageXamlFolder);
+
+
+    string CaptionPropertyName              = "Caption";
+    string FilterHeightPropertyName         = "FilterHeight";
+    string ShowFilterPropertyName           = "ShowFilter";
+    string ShowAddFilterBtnPropertyName     = "ShowAddFilterBtn";
+    string ShowBackBtnPropertyName          = "ShowBackBtn";
+    string GridHeightPropertyName           = "GridHeight";
+    string TableMenuItemsPropertyName       = "TableMenuItems";
+    string RowMenuItemsPropertyName         = "RowMenuItems";
+    string ContainerMenuItemsPropertyName   = "ContainerMenuItems";
+    string HiddenFiltersPropertyName        = "HiddenFilters";
+    string SelectedRowCommandPropertyName   = "SelectedRowCommand";
+
+    string SformAfterAddItemPropertyName    = "SformAfterAddItem";
+    string SformAfterUpdItemPropertyName    = "SformAfterUpdItem";
+    string SformAfterDelItemPropertyName    = "SformAfterDelItem";
+
+    string TableMenuItemsCommandPropertyName    = "TableMenuItemsCommand";
+    string RowMenuItemsCommandPropertyName      = "RowMenuItemsCommand";
+    
+    string CanAddPropertyName                   = "CanAdd";
+    string CanUpdPropertyName                   = "CanUpdate";
+    string CanDelPropertyName                   = "CanDelete";
+
+
+    string RegionPropertyName                   = "Region";
+    string RlistPageRegionPropertyName          = "RlistPageRegion";
+    string IsParentLoadedPropertyName           = "IsParentLoaded";
+    string IsDestroyedPropertyName              = "IsDestroyed";
+    
+    string DetailsListPropertyName              = "DetailsList"; 
+    string SelectedDetailsListItemPropertyName  = "SelectedDetailsListItem"; 
+    string IsDetailVisiblePropertyName          = "IsDetailVisible";
+    string DetailRegionPropertyName             = "DetailRegion";
+
+
+    List<ModelViewPropertyOfVwSerializable> primKeys = GetModelPrimaryKeyProps(Model);
+    List<string> detailViewNames =  GetDetailViews(Model, Context, null);
+//    List<string> detailViewNamesToExclude = new List<string>();
+    // m2mMdl, m2mFk, searchFks, otherFks, externalFks
+    Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>> tmpSearchSchema = null;
+
+    // check if there exists detailView for the given View
+    bool detailViewExists = false;
+    string detailViewControlFolderType = "01916-RlistUserControl.xaml.cs";
+    {
+        foreach(string detailViewName in detailViewNames) {
+            if(detailViewNamesToExclude.Any(s => s == detailViewName)) continue;
+            ModelViewSerializable detailView = GetModelViewByName(Context, detailViewName);
+            if(detailView == null) continue;
+            List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detailView, null);
+            if (foreignKeys == null) continue;
+            if (foreignKeys.Count < 1) continue;
+            bool isM2m = false;
+            if(IsTableMatchesIndex(detailView)) {
+                if(AllPrimKeyPropsAreForeignKeysProps(detailView)) {
+                    if(ForeignKeysOrderedInsidePrimKey(detailView)) {
+                        isM2m = true;
+                    }
+                }
+            }
+            foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
+                if(isM2m) {
+                    // m2mMdl, m2mFk, searchFks, otherFks, externalFks
+                    tmpSearchSchema = DetailViewAsM2mMdl(detailView, Context);
+                    if (tmpSearchSchema != null) {
+                        int  cnt = 0;
+                        if(tmpSearchSchema.Item5 == null) continue;
+                        if(tmpSearchSchema.Item5.Count != 1) continue;
+                        if(tmpSearchSchema.Item4 != null) continue;
+                        if(tmpSearchSchema.Item5[0].Key != foreignKey) continue;
+                        ModelViewSerializable viewToNavigate = GetViewByName(Context, tmpSearchSchema.Item2.ViewName);
+                        string viewToNavigateControlClassName = GetModelClassName(viewToNavigate, detailViewControlFolderType);
+                        string viewToNavigateControlProject  = GetModelProjectName(viewToNavigate, detailViewControlFolderType);
+                        if (!(string.IsNullOrEmpty(viewToNavigateControlClassName) || string.IsNullOrEmpty(viewToNavigateControlProject))) {
+                            detailViewExists = true;
+                            break;
+                        }
+                    }
+                }
+                string detailViewControlClassName = GetModelClassName(detailView, detailViewControlFolderType);
+                string detailViewControlProject  = GetModelProjectName(detailView, detailViewControlFolderType);
+                if (!(string.IsNullOrEmpty(detailViewControlClassName) || string.IsNullOrEmpty(detailViewControlProject))) {
+                    detailViewExists = true;
+                }
+                if(detailViewExists) break;
+            }
+            if(detailViewExists) break;
+        }
+    }
+
+    string proxyPrefix = "clr-namespace:" + ProxyUserControlNameSpace;
+    if(ProxyUserControlProject != RlistPageProject) {
+        proxyPrefix = proxyPrefix + ";assembly=" + ProxyUserControlProject;
+    }
+    string sformPrefix = "clr-namespace:" + SformUserControlNameSpace;
+    if(SformUserControlProject != RlistPageProject) {
+        sformPrefix = sformPrefix + ";assembly=" + SformUserControlProject;
+    }
+
+    bool IsInTheSameModule = (SformUserControlProject == RlistPageProject);
+
+#>
+
+<ContentPage x:Class="<#= RlistPageNameSpace #>.<#= RlistPageClassName #>"
+             xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:prism="http://prismlibrary.com" 
+             prism:ViewModelLocator.AutowireViewModel="True"
+
+<#
+    if(IsInTheSameModule) {
+#>
+             xmlns:sfrm="<#= sformPrefix #>" 
+<#
+    } 
+    if ((!IsInTheSameModule) || detailViewExists) {
+#>
+             xmlns:prx="<#= proxyPrefix #>" 
+<#
+    }
+#>
+
+             x:Name="rlistUsrCntrlRootNode"
+             >
+    <ScrollView Orientation="Vertical" VerticalOptions="StartAndExpand">
+        <Grid    RowDefinitions="Auto, Auto, Auto" ColumnDefinitions="*">
+<#
+    if(IsInTheSameModule) {
+#>
+            <sfrm:<#= SformUserControlClassName #> Grid.Row="0" Grid.Column="0"
+<#
+    } else {
+#>
+            <prx:<#= ProxyUserControlClassName #>  Grid.Row="0" Grid.Column="0" 
+                prism:RegionManager.RegionName="<#= SformUserControlClassName #><#= RlistPageRegionPropertyName #>"
+<#
+    }
+#>
+                <#= IsDestroyedPropertyName #>="{Binding <#= IsDestroyedPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}" 
+                <#= CaptionPropertyName #>="{Binding BindingContext.<#= CaptionPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}" 
+                <#= FilterHeightPropertyName #>="{Binding BindingContext.<#= FilterHeightPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}" 
+                <#= ShowFilterPropertyName #>="True" 
+                <#= ShowAddFilterBtnPropertyName #>="True" 
+                <#= GridHeightPropertyName #>="{Binding BindingContext.<#= GridHeightPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}" 
+                <#= ShowBackBtnPropertyName #>="False" 
+                <#= HiddenFiltersPropertyName #>="{Binding BindingContext.<#= HiddenFiltersPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}" 
+                <#= SelectedRowCommandPropertyName #>="{Binding BindingContext.<#= SelectedRowCommandPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}" 
+                <#= SformAfterAddItemPropertyName #>="{Binding BindingContext.<#= SformAfterAddItemPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}" 
+                <#= SformAfterUpdItemPropertyName #>="{Binding BindingContext.<#= SformAfterUpdItemPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}" 
+                <#= SformAfterDelItemPropertyName #>="{Binding BindingContext.<#= SformAfterDelItemPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}" 
+                <#= TableMenuItemsCommandPropertyName #>="{Binding BindingContext.<#= TableMenuItemsCommandPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}" 
+                <#= RowMenuItemsCommandPropertyName #>="{Binding BindingContext.<#= RowMenuItemsCommandPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}" 
+                <#= TableMenuItemsPropertyName #>="{Binding BindingContext.<#= TableMenuItemsPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}" 
+                <#= RowMenuItemsPropertyName #>="{Binding BindingContext.<#= RowMenuItemsPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}" 
+                <#= IsParentLoadedPropertyName #>="{Binding BindingContext.<#= IsParentLoadedPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}" 
+                />
+<#
+    if(detailViewExists) {
+#>
+            <StackLayout Grid.Row="1" Grid.Column="0">
+                <Label Text="Selected detail"/>
+                <Picker ItemsSource="{Binding BindingContext.<#= DetailsListPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}" 
+                        ItemDisplayBinding="{Binding <#= CaptionPropertyName #>}" 
+                        SelectedItem="{Binding BindingContext.<#= SelectedDetailsListItemPropertyName #>, Source={x:Reference rlistUsrCntrlRootNode}, Mode=TwoWay}">
+                </Picker>
+            </StackLayout>
+
+            <prx:<#= ProxyUserControlClassName #> Grid.Row="2" Grid.Column="0"
+                prism:RegionManager.RegionName="<#= RlistPageClassName #><#= DetailRegionPropertyName #>"
+                IsVisible="{Binding BindingContext.<#= IsDetailVisiblePropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}"
+                <#= IsDestroyedPropertyName #>="{Binding <#= IsDestroyedPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}" 
+                <#= ShowAddFilterBtnPropertyName #>="True" 
+                <#= ShowFilterPropertyName #>="True" 
+                <#= GridHeightPropertyName #>="{Binding BindingContext.<#= GridHeightPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}"
+                <#= FilterHeightPropertyName #>="{Binding BindingContext.<#= FilterHeightPropertyName #>, Mode=OneWay, Source={x:Reference rlistUsrCntrlRootNode}}"
+                <#= CanAddPropertyName #>="True" 
+                <#= CanUpdPropertyName #>="True" 
+                <#= CanDelPropertyName #>="True" 
+            />
+<#
+    }
+#>
+        </Grid>
+    </ScrollView>
+</ContentPage>
+
+

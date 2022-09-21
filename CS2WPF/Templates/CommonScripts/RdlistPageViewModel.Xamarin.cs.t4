@@ -2,6 +2,7 @@
 using Xamarin.Forms;
 using System.Linq;
 using System.ComponentModel;
+using Prism.Regions;
 using Prism.Regions.Navigation;
 using System.Windows.Input;
 using System.Collections.ObjectModel;
@@ -40,6 +41,14 @@ using Prism.Navigation;
     string WebServiceFilterMenuViewModelClassName   = GetContextModelClassName(Context, WebServiceFilterMenuViewModelFolder);
     string WebServiceFilterMenuViewModelNameSpace   = GetContextModelNameSpace(Context, WebServiceFilterMenuViewModelFolder);
 
+    string IO2mListItemInterfaceFolder              = "00600-IO2mListItemInterface.cs";
+    string IO2mListItemInterfaceClassName           = GetContextModelClassName(Context, IO2mListItemInterfaceFolder);
+    string IO2mListItemInterfaceNameSpace           = GetContextModelNameSpace(Context, IO2mListItemInterfaceFolder);
+
+    string O2mListItemViewModelFolder               = "00602-O2mListItemViewModel.cs";
+    string O2mListItemViewModelClassName            = GetContextModelClassName(Context, O2mListItemViewModelFolder);
+    string O2mListItemViewModelNameSpace            = GetContextModelNameSpace(Context, O2mListItemViewModelFolder);
+
     string AccessDeniedPageFolder                   = "00679-AccessDeniedPage.xaml.cs";
     string AccessDeniedPageClassName                = GetContextModelClassName(Context, AccessDeniedPageFolder);
     string AccessDeniedPageNameSpace                = GetContextModelNameSpace(Context, AccessDeniedPageFolder);
@@ -59,10 +68,6 @@ using Prism.Navigation;
     string LformUserControlProject          = GetModelProjectName(Model, LformUserControlFolder);
 
 
-    string ReditPageFolder                  = "01817-ReditPage.xaml.cs";
-    string ReditPageClassName               = GetModelClassName(Model, ReditPageFolder);
-    string ReditPageNameSpace               = GetModelNameSpace(Model, ReditPageFolder);
-           
     string RdlistPageFolder                  = "02017-RdlistPage.xaml.cs";
     string RdlistPageClassName               = GetModelClassName(Model, RdlistPageFolder);
     string RdlistPageNameSpace               = GetModelNameSpace(Model, RdlistPageFolder);
@@ -136,6 +141,12 @@ using Prism.Navigation;
     string NavigateToDetailCommandPropertyName  = "NavigateToDetailCommand";
     string HiddenFilterByRowSuffix              = "HiddenFilterByRow";
 
+    string IsDetailVisiblePropertyName          = "IsDetailVisible";
+    string DetailsListPropertyName              = "DetailsList"; 
+    string SelectedDetailsListItemPropertyName  = "SelectedDetailsListItem"; 
+    string ForeignKeyDetailsName                = "ForeignKeyDetails";
+    string DetailRegionPropertyName             = "DetailRegion";
+    string NavigateToO2mPropertyName            = "NavigateToO2m";
 
 
     List<string> detailViewNames = GetDetailViews(Model, Context, null);
@@ -146,6 +157,56 @@ using Prism.Navigation;
     // m2mMdl, m2mFk, searchFks, otherFks, externalFks
     List<Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>>> searchSchemas =
         GetSearchResources(Model, Context);
+
+    // check if there exists detailView for the given View
+    bool detailViewExists = false;
+    string detailViewControlFolderType = "02016-RdlistUserControl.xaml.cs";
+    {
+        foreach(string detailViewName in detailViewNames) {
+            if(detailViewNamesToExclude.Any(s => s == detailViewName)) continue;
+            ModelViewSerializable detailView = GetModelViewByName(Context, detailViewName);
+            if(detailView == null) continue;
+            List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detailView, null);
+            if (foreignKeys == null) continue;
+            if (foreignKeys.Count < 1) continue;
+            bool isM2m = false;
+            if(IsTableMatchesIndex(detailView)) {
+                if(AllPrimKeyPropsAreForeignKeysProps(detailView)) {
+                    if(ForeignKeysOrderedInsidePrimKey(detailView)) {
+                        isM2m = true;
+                    }
+                }
+            }
+            foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
+                if(isM2m) {
+                    // m2mMdl, m2mFk, searchFks, otherFks, externalFks
+                    tmpSearchSchema = DetailViewAsM2mMdl(detailView, Context);
+                    if (tmpSearchSchema != null) {
+                        int  cnt = 0;
+                        if(tmpSearchSchema.Item5 == null) continue;
+                        if(tmpSearchSchema.Item5.Count != 1) continue;
+                        if(tmpSearchSchema.Item4 != null) continue;
+                        if(tmpSearchSchema.Item5[0].Key != foreignKey) continue;
+                        ModelViewSerializable viewToNavigate = GetViewByName(Context, tmpSearchSchema.Item2.ViewName);
+                        string viewToNavigateControlClassName = GetModelClassName(viewToNavigate, detailViewControlFolderType);
+                        string viewToNavigateControlProject  = GetModelProjectName(viewToNavigate, detailViewControlFolderType);
+                        if (!(string.IsNullOrEmpty(viewToNavigateControlClassName) || string.IsNullOrEmpty(viewToNavigateControlProject))) {
+                            detailViewExists = true;
+                            break;
+                        }
+                    }
+                }
+                string detailViewControlClassName = GetModelClassName(detailView, detailViewControlFolderType);
+                string detailViewControlProject  = GetModelProjectName(detailView, detailViewControlFolderType);
+                if (!(string.IsNullOrEmpty(detailViewControlClassName) || string.IsNullOrEmpty(detailViewControlProject))) {
+                    detailViewExists = true;
+                }
+                if(detailViewExists) break;
+            }
+            if(detailViewExists) break;
+        }
+    }
+
 
     List<string> nmSpaces = new List<string>();
     if ((RdlistPageViewModelNameSpace != IWebServiceFilterRsltInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace) < 0)) 
@@ -166,6 +227,12 @@ using Prism.Navigation;
         nmSpaces.Add(modelInterfaceNameSpace);
     if ((RdlistPageViewModelNameSpace != ISformViewModelInterfaceNameSpace) && (nmSpaces.IndexOf(ISformViewModelInterfaceNameSpace) < 0)) 
         nmSpaces.Add(ISformViewModelInterfaceNameSpace);
+    if(detailViewExists) {
+        if ((RdlistPageViewModelNameSpace != IO2mListItemInterfaceNameSpace) && (nmSpaces.IndexOf(IO2mListItemInterfaceNameSpace) < 0)) 
+            nmSpaces.Add(IO2mListItemInterfaceNameSpace);
+        if ((RdlistPageViewModelNameSpace != O2mListItemViewModelNameSpace) && (nmSpaces.IndexOf(O2mListItemViewModelNameSpace) < 0)) 
+            nmSpaces.Add(O2mListItemViewModelNameSpace);
+    }
 
     bool IsInTheSameModule = (LformUserControlProject == RdlistPageProject);
     
@@ -227,15 +294,41 @@ namespace <#= RdlistPageViewModelNameSpace #> {
         protected <#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName #>=null;
         protected <#= GetModelServiceInterfaceName(Model) #> <#= FormServicePrefix #><#= Model.ViewName #> = null;
         protected INavigationService _navigationService;
-        public <#= RdlistPageViewModelClassName #>(<#= GetModelServiceInterfaceName(Model) #> _<#= FormServicePrefix #><#= Model.ViewName #>, <#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName  #>, INavigationService navigationService) {
+<#
+    if(detailViewExists) {
+#>
+        protected IRegionManager regionManager;
+        public <#= RdlistPageViewModelClassName #>(IRegionManager _regionManager, <#= GetModelServiceInterfaceName(Model) #> _<#= FormServicePrefix #><#= Model.ViewName #>, 
+<#
+    } else {
+#>
+        public <#= RdlistPageViewModelClassName #>(<#= GetModelServiceInterfaceName(Model) #> _<#= FormServicePrefix #><#= Model.ViewName #>, 
+<#
+    }
+#>
+            <#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName  #>, INavigationService navigationService) {
             this.<#= AppSettingServicePropertyName #> = <#= AppSettingServicePropertyName #>;
             this.<#= FormServicePrefix #><#= Model.ViewName #> = _<#= FormServicePrefix #><#= Model.ViewName #>;
             this._navigationService = navigationService;
             PermissionMask = <#= AppSettingServicePropertyName #>.GetViewModelMask("<#= Model.ViewName #>");
             _<#= TableMenuItemsPropertyName #> = GetDefault<#= TableMenuItemsPropertyName #>();
             _<#= RowMenuItemsPropertyName #> = GetDefault<#= RowMenuItemsPropertyName #>();
+<#
+    if(detailViewExists) {
+#>
+            this.regionManager = _regionManager;
+            this._<#= DetailsListPropertyName #> = this.get<#= DetailsListPropertyName #>();
+            this._<#= SelectedDetailsListItemPropertyName #> = this._<#= DetailsListPropertyName #>[0];
+            _<#= GridHeightPropertyName #> = this.<#= AppSettingServicePropertyName #>.<#= DefaultGridHeightMethodName #>("<#= RdlistPageXamlFolder #>");
+            _<#= FilterHeightPropertyName #> = this.<#= AppSettingServicePropertyName #>.<#= DefaultFilterHeightMethodName #>("<#= RdlistPageXamlFolder #>");
+<#
+    } else {
+#>
             _<#= GridHeightPropertyName #> = this.<#= AppSettingServicePropertyName #>.<#= ExpandedGridHeightMethodName #>("<#= RdlistPageXamlFolder #>");
             _<#= FilterHeightPropertyName #> = this.<#= AppSettingServicePropertyName #>.<#= ExpandedFilterHeightMethodName #>("<#= RdlistPageXamlFolder #>");
+<#
+    }
+#>
         }
         #region INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;
@@ -345,15 +438,31 @@ namespace <#= RdlistPageViewModelNameSpace #> {
                         if(tmpSearchSchema.Item5[0].Key != foreignKey) continue;
                         ModelViewSerializable viewToNavigate = GetViewByName(Context, tmpSearchSchema.Item2.ViewName);
                         string viewToNavigateClassName = GetModelClassName(viewToNavigate, RdlistPageFolder);
+                        if(string.IsNullOrEmpty(viewToNavigateClassName)) {
+#>
+//
+// for <#= tmpSearchSchema.Item2.ViewName #> could not find Clanss Name by <#= RdlistPageFolder #>
+//
+<#
+                        } else {
 #>
                 new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "<#= RowMIPrefixPropertyName #><#= viewToNavigateClassName #><#= foreignKey.NavigationName #>", <#= CaptionPropertyName #>="<#= viewToNavigate.PluralTitle #>: <#= foreignKey.NavigationName #>", IconName="ArrowRightBold", IconColor=Color.Default, Enabled=true, Data=null, FeedbackData=null, Command = <#= RowMenuItemsCommandPropertyName #>},
 <#
+                        }
                     }
                 }
                 string detailViewClassName = GetModelClassName(detailView, RdlistPageFolder);
+                if(string.IsNullOrEmpty(detailViewClassName)) {
+#>
+//
+// for <#= detailViewName #> could not find Class Name by <#= RdlistPageFolder #>
+//
+<#
+                } else {
 #>
                 new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "<#= RowMIPrefixPropertyName #><#= detailViewClassName #><#= foreignKey.NavigationName #>", <#= CaptionPropertyName #>="<#= detailView.PluralTitle #>: <#= foreignKey.NavigationName #>", IconName="ArrowRightBold", IconColor=Color.Default, Enabled=true, Data=null, FeedbackData=null, Command = <#= RowMenuItemsCommandPropertyName #>},
 <#
+                }
             }
         }
 #>
@@ -677,17 +786,25 @@ namespace <#= RdlistPageViewModelNameSpace #> {
         #endregion
 
         #region <#= SelectedRowPropertyName #>
-        //protected object _<#= SelectedRowPropertyName #> = null;
-        //public object <#= SelectedRowPropertyName #> {
-        //    get {
-        //    }
-        //    set {
-        //        if(_<#= SelectedRowPropertyName #> != value) {
-        //            _<#= SelectedRowPropertyName #> = value;
-        //            OnPropertyChanged();
-        //        }
-        //    }
-        //}
+<#
+    if(detailViewExists) {
+#>
+        protected object _<#= SelectedRowPropertyName #> = null;
+        public object <#= SelectedRowPropertyName #> {
+            get {
+                return _<#= SelectedRowPropertyName #>;
+            }
+            set {
+                if(_<#= SelectedRowPropertyName #> != value) {
+                    _<#= SelectedRowPropertyName #> = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged("<#= IsDetailVisiblePropertyName #>");
+                }
+            }
+        }
+<#
+    }
+#>
         #endregion
 
        #region <#= SelectedRowCommandPropertyName #>
@@ -701,7 +818,14 @@ namespace <#= RdlistPageViewModelNameSpace #> {
        }
        protected void <#= SelectedRowCommandPropertyName #>Execute(object prm)
        {
-           // <#= SelectedRowPropertyName #> = prm;
+<#
+    if(detailViewExists) {
+#>
+           <#= SelectedRowPropertyName #> = prm;
+           <#= NavigateToO2mPropertyName #>();
+<#
+    }
+#>
        }
        protected bool <#= SelectedRowCommandPropertyName #>CanExecute(object prm)
        {
@@ -813,6 +937,165 @@ namespace <#= RdlistPageViewModelNameSpace #> {
             _<#= FilterHeightPropertyName #> = -1d;
         }
         #endregion
+
+<#
+    if(detailViewExists) {
+#>
+        #region <#= IsDetailVisiblePropertyName #>
+        public bool <#= IsDetailVisiblePropertyName #> {
+            get {
+                if ((<#= SelectedRowPropertyName #> is null) || (<#= SelectedDetailsListItemPropertyName #> is null)) return false;
+                return (!string.IsNullOrEmpty(<#= SelectedDetailsListItemPropertyName #>.<#= ForeignKeyDetailsName #>));
+            }
+        }
+        #endregion
+
+        #region <#= SelectedDetailsListItemPropertyName #>
+        protected <#= IO2mListItemInterfaceClassName #> _<#= SelectedDetailsListItemPropertyName #> = null;
+        public <#= IO2mListItemInterfaceClassName #> <#= SelectedDetailsListItemPropertyName #> 
+        {
+            get { return _<#= SelectedDetailsListItemPropertyName #>; }
+            set {
+                if(_<#= SelectedDetailsListItemPropertyName #> != value) {
+                    _<#= SelectedDetailsListItemPropertyName #> = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged("<#= IsDetailVisiblePropertyName #>");
+                    <#= NavigateToO2mPropertyName #>();
+                }
+            }
+        }
+        #endregion
+
+        #region <#= DetailsListPropertyName #>
+        ObservableCollection<<#= IO2mListItemInterfaceClassName #>> _<#= DetailsListPropertyName #>;
+        public IEnumerable<<#= IO2mListItemInterfaceClassName #>> <#= DetailsListPropertyName #> { get { return _<#= DetailsListPropertyName #>; } }
+        ObservableCollection<<#= IO2mListItemInterfaceClassName #>> get<#= DetailsListPropertyName #>() {
+            ObservableCollection<<#= IO2mListItemInterfaceClassName #>> rslt = new ObservableCollection<<#= IO2mListItemInterfaceClassName #>>() {
+                    new <#= O2mListItemViewModelClassName #>() {<#= CaptionPropertyName #> = "Hide Details", <#= ForeignKeyDetailsName #> = "",  <#= RegionPropertyName #> = "" }
+                };
+<#
+        foreach(string detailViewName in detailViewNames) {
+            if(detailViewNamesToExclude.Any(s => s == detailViewName)) continue;
+            ModelViewSerializable detailView = GetModelViewByName(Context, detailViewName);
+            if(detailView == null) {
+#>
+///// can not find the view by Name <#= detailViewName #>
+<#
+                continue;
+            }
+            List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detailView, null);
+            if (foreignKeys == null) {
+#>
+///// can not find Foreign Keys for <#= detailViewName #>
+<#
+                continue;
+            }
+            if (foreignKeys.Count < 1) {
+#>
+///// can not find Foreign Keys for <#= detailViewName #>
+<#
+                continue;
+            }
+            bool isM2m = false;
+            if(IsTableMatchesIndex(detailView)) {
+                if(AllPrimKeyPropsAreForeignKeysProps(detailView)) {
+                    if(ForeignKeysOrderedInsidePrimKey(detailView)) {
+                        isM2m = true;
+                    }
+                }
+            }
+            foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
+                if(isM2m) {
+                    // m2mMdl, m2mFk, searchFks, otherFks, externalFks
+                    tmpSearchSchema = DetailViewAsM2mMdl(detailView, Context);
+                    if (tmpSearchSchema != null) {
+                        int  cnt = 0;
+                        if(tmpSearchSchema.Item5 == null) continue;
+                        if(tmpSearchSchema.Item5.Count != 1) continue;
+                        if(tmpSearchSchema.Item4 != null) continue;
+                        if(tmpSearchSchema.Item5[0].Key != foreignKey) continue;
+                        ModelViewSerializable viewToNavigate = GetViewByName(Context, tmpSearchSchema.Item2.ViewName);
+                        string viewToNavigateClassName = GetModelClassName(viewToNavigate, detailViewControlFolderType);
+                        if(string.IsNullOrEmpty(viewToNavigateClassName)) {
+#>
+//
+// for <#= tmpSearchSchema.Item2.ViewName #> could not find Clanss Name by <#= detailViewControlFolderType #>
+//
+<#
+                        } else {
+
+#>
+                if((<#= AppSettingServicePropertyName #>.GetViewModelMask("<#= tmpSearchSchema.Item2.ViewName #>") & 1) == 1)
+                    rslt.Add(new <#= O2mListItemViewModelClassName #>() {<#= CaptionPropertyName #> = "<#= viewToNavigate.PluralTitle #>: <#= foreignKey.NavigationName #>", <#= ForeignKeyDetailsName #> = "<#= foreignKey.NavigationName #>",  <#= RegionPropertyName #> = "<#= viewToNavigateClassName #>" });
+<#
+                        }
+                    }
+                }
+                string detailViewClassName = GetModelClassName(detailView, detailViewControlFolderType);
+                if(string.IsNullOrEmpty(detailViewClassName)) {
+#>
+//
+// for <#= detailViewName #> could not find Clanss Name by <#= detailViewControlFolderType #>
+//
+<#
+                } else {
+#>
+                if((<#= AppSettingServicePropertyName #>.GetViewModelMask("<#= detailViewName #>") & 1) == 1)
+                    rslt.Add(new <#= O2mListItemViewModelClassName #>() {<#= CaptionPropertyName #> = "<#= detailView.PluralTitle #>: <#= foreignKey.NavigationName #>", <#= ForeignKeyDetailsName #> = "<#= foreignKey.NavigationName #>",  <#= RegionPropertyName #> = "<#= detailViewClassName #>" });
+<#
+                }
+            }
+        }
+#>
+            return rslt;
+        }
+        #endregion
+
+        #region <#= NavigateToO2mPropertyName #>
+        public void <#= NavigateToO2mPropertyName #>() {
+            if (<#= IsDestroyedPropertyName #> || (<#= SelectedDetailsListItemPropertyName #> is null) || (<#= SelectedRowPropertyName #> is null)) return;
+            if (string.IsNullOrEmpty(<#= SelectedDetailsListItemPropertyName #>.<#= ForeignKeyDetailsName #>)) return;
+            var rgn = regionManager.Regions["<#= RdlistPageClassName #><#= DetailRegionPropertyName #>"];
+            if(rgn != null) {
+                foreach (var vw in rgn.Views)
+                {
+                    if(vw.BindingContext != null)
+                    {
+                        var prop = vw.BindingContext.GetType().GetProperty("<#= IsParentLoadedPropertyName #>");
+                        if(prop != null)
+                            prop.SetValue(vw.BindingContext, false);
+                    }
+                }
+                rgn.NavigationService.Journal.Clear();
+            }
+            INavigationParameters navigationParameters = new NavigationParameters();
+            navigationParameters.Add("<#= HiddenFiltersParamPropertyName #>", this.<#= FormServicePrefix #><#= Model.ViewName #>.get<#= HiddenFilterByRowSuffix #>(<#= SelectedRowPropertyName #> as <#= modelInterfaceClassName #>, <#= SelectedDetailsListItemPropertyName #>.<#= ForeignKeyDetailsName #>));  
+            regionManager.RequestNavigate("<#= RdlistPageClassName #><#= DetailRegionPropertyName #>", <#= SelectedDetailsListItemPropertyName #>.<#= RegionPropertyName #>, OnRegionNavigationResult, navigationParameters);
+        }
+        #endregion
+
+        #region OnRegionNavigationResult
+        protected void OnRegionNavigationResult(IRegionNavigationResult navResult) {
+                if(<#= IsDestroyedPropertyName #>) return;
+                if(navResult.Result.HasValue) { if(navResult.Result.Value) return; }
+                string navErrorMsg = "Unknown Navigation Error";
+                if (navResult.Error != null)
+                {
+                    navErrorMsg = navResult.Error.Message;
+                    Exception inner = navResult.Error.InnerException;
+                    while (inner != null)
+                    {
+                        navErrorMsg = navErrorMsg + ": " + inner.Message;
+                        inner = inner.InnerException;
+                    }
+                }
+                <#= AppSettingServicePropertyName #>.ShowErrorMessage("Navigation Exception", navErrorMsg);
+        }
+        #endregion
+
+<#
+    }  // if(detailViewExists) { ... }
+#>
 
     }
 }
