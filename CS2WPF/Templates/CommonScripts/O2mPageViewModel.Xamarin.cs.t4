@@ -218,7 +218,6 @@ using <#= ns #>;
 
 <#
         foreach(string detailViewName in detailViewNames) {
-            if(detailViewNamesToExclude.Any(s => s == detailViewName)) continue;
             ModelViewSerializable detailView = GetModelViewByName(Context, detailViewName);
             if(detailView == null) {
 #>
@@ -257,6 +256,7 @@ using <#= ns #>;
                         if(tmpSearchSchema.Item5.Count != 1) continue;
                         if(tmpSearchSchema.Item4 != null) continue;
                         if(tmpSearchSchema.Item5[0].Key != foreignKey) continue;
+                        if(detailViewNamesToExclude.Any(s => s == tmpSearchSchema.Item2.ViewName)) continue;
                         ModelViewSerializable viewToNavigate = GetViewByName(Context, tmpSearchSchema.Item2.ViewName);
                         if (!usedDetailViewNames.Any(s => s == tmpSearchSchema.Item2.ViewName)) {
                             usedDetailViewNames.Add(tmpSearchSchema.Item2.ViewName);
@@ -285,6 +285,7 @@ using <#= ns #>;
                         } // if (viewToNavigateLformUserControlProject != O2mPageProject) { ... }
                     } // if (tmpSearchSchema != null) { ... }
                 } // if(isM2m) { ... }
+                if(detailViewNamesToExclude.Any(s => s == detailViewName)) continue;
                 if (!usedDetailViewNames.Any(s => s == detailView.ViewName)) {
                     usedDetailViewNames.Add(detailView.ViewName);
                 }
@@ -975,7 +976,6 @@ namespace <#= O2mPageViewModelNameSpace #> {
         ObservableCollection<<#= IO2mListItemInterfaceClassName #>> _<#= DetailsListPropertyName #> = new ObservableCollection<<#= IO2mListItemInterfaceClassName #>>() {
 <#
         foreach(string detailViewName in detailViewNames) {
-            if(detailViewNamesToExclude.Any(s => s == detailViewName)) continue;
             ModelViewSerializable detailView = GetModelViewByName(Context, detailViewName);
             if(detailView == null) {
 #>
@@ -1014,6 +1014,7 @@ namespace <#= O2mPageViewModelNameSpace #> {
                         if(tmpSearchSchema.Item5.Count != 1) continue;
                         if(tmpSearchSchema.Item4 != null) continue;
                         if(tmpSearchSchema.Item5[0].Key != foreignKey) continue;
+                        if(detailViewNamesToExclude.Any(s => s == tmpSearchSchema.Item2.ViewName)) continue;
                         ModelViewSerializable viewToNavigate = GetViewByName(Context, tmpSearchSchema.Item2.ViewName);
                         string viewToNavigateClassName = GetModelClassName(viewToNavigate, LformUserControlFolder);
 #>
@@ -1021,6 +1022,7 @@ namespace <#= O2mPageViewModelNameSpace #> {
 <#
                     } // if (tmpSearchSchema != null) { ... }
                 } // if(isM2m) { ... }
+                if(detailViewNamesToExclude.Any(s => s == detailViewName)) continue;
                 string detailViewClassName = GetModelClassName(detailView, LformUserControlFolder);
 #>
             new <#= O2mListItemViewModelClassName #>() {<#= CaptionPropertyName #> = "<#= detailView.PluralTitle #>: <#= foreignKey.NavigationName #>", <#= ForeignKeyDetailsName #> = "<#= detailViewClassName #>:<#= foreignKey.NavigationName #>",  <#= RegionPropertyName #> = "<#= detailViewClassName #><#= DetailRegionPropertyName #>" },
@@ -1043,7 +1045,6 @@ namespace <#= O2mPageViewModelNameSpace #> {
                 switch(<#= SelectedDetailsListItemPropertyName #>.<#= ForeignKeyDetailsName #>) {
 <#
         foreach(string detailViewName in detailViewNames) {
-            if(detailViewNamesToExclude.Any(s => s == detailViewName)) continue;
             ModelViewSerializable detailView = GetModelViewByName(Context, detailViewName);
             if(detailView == null) {
 #>
@@ -1082,6 +1083,7 @@ namespace <#= O2mPageViewModelNameSpace #> {
                         if(tmpSearchSchema.Item5.Count != 1) continue;
                         if(tmpSearchSchema.Item4 != null) continue;
                         if(tmpSearchSchema.Item5[0].Key != foreignKey) continue;
+                        if(detailViewNamesToExclude.Any(s => s == tmpSearchSchema.Item2.ViewName)) continue;
                         ModelViewSerializable viewToNavigate = GetViewByName(Context, tmpSearchSchema.Item2.ViewName);
                         string viewToNavigateClassName = GetModelClassName(viewToNavigate, LformUserControlFolder);
 #>
@@ -1092,6 +1094,7 @@ namespace <#= O2mPageViewModelNameSpace #> {
 <#
                     } // if (tmpSearchSchema != null) { ... }
                 } // if(isM2m) { ... }
+                if(detailViewNamesToExclude.Any(s => s == detailViewName)) continue;
                 string detailViewClassName = GetModelClassName(detailView, LformUserControlFolder);
 #>
                     case "<#= detailViewClassName #>:<#= foreignKey.NavigationName #>":

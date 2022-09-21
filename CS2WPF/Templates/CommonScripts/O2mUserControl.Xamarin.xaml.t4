@@ -129,7 +129,6 @@
     {
         int id = -1;
         foreach(string detailViewName in detailViewNames) {
-            if(detailViewNamesToExclude.Any(s => s == detailViewName)) continue;
             id++;
             ModelViewSerializable detailView = GetModelViewByName(Context, detailViewName);
             if(detailView == null) {
@@ -169,6 +168,7 @@
                         if(tmpSearchSchema.Item5.Count != 1) continue;
                         if(tmpSearchSchema.Item4 != null) continue;
                         if(tmpSearchSchema.Item5[0].Key != foreignKey) continue;
+                        if(detailViewNamesToExclude.Any(s => s == tmpSearchSchema.Item2.ViewName)) continue;
                         ModelViewSerializable viewToNavigate = GetViewByName(Context, tmpSearchSchema.Item2.ViewName);
                         string viewToNavigateClassName = GetModelClassName(viewToNavigate, LformUserControlFolder);
                         string viewToNavigateLformUserControlProject  = GetModelProjectName(viewToNavigate, LformUserControlFolder);
@@ -180,6 +180,7 @@
                         } // if (viewToNavigateLformUserControlProject != O2mUserControlProject) { ... }
                     } // if (tmpSearchSchema != null) { ... }
                 } // if(isM2m) { ... }
+                if(detailViewNamesToExclude.Any(s => s == detailViewName)) continue;
                 string localLformUserControlProject  = GetModelProjectName(detailView, LformUserControlFolder);
                 if (localLformUserControlProject == O2mUserControlProject) {
                     string locallformPrefix = "clr-namespace:" + GetModelNameSpace(detailView, LformUserControlFolder);
@@ -257,7 +258,6 @@
     {
         int id = -1;
         foreach(string detailViewName in detailViewNames) {
-            if(detailViewNamesToExclude.Any(s => s == detailViewName)) continue;
             id++;
             ModelViewSerializable detailView = GetModelViewByName(Context, detailViewName);
             if(detailView == null) {
@@ -297,6 +297,7 @@
                         if(tmpSearchSchema.Item5.Count != 1) continue;
                         if(tmpSearchSchema.Item4 != null) continue;
                         if(tmpSearchSchema.Item5[0].Key != foreignKey) continue;
+                        if(detailViewNamesToExclude.Any(s => s == tmpSearchSchema.Item2.ViewName)) continue;
                         ModelViewSerializable viewToNavigate = GetViewByName(Context, tmpSearchSchema.Item2.ViewName);
                         string viewToNavigateClassName = GetModelClassName(viewToNavigate, LformUserControlFolder);
                         string viewToNavigateLformUserControlProject  = GetModelProjectName(viewToNavigate, LformUserControlFolder);
@@ -336,6 +337,7 @@
 <#
                     } // the end of if (tmpSearchSchema != null) { ... }
                 } // the end of if(isM2m) { ... }
+                if(detailViewNamesToExclude.Any(s => s == detailViewName)) continue;
                 string detailViewClassName = GetModelClassName(detailView, LformUserControlFolder);
                 string localLformUserControlProject  = GetModelProjectName(detailView, LformUserControlFolder);
 #>
@@ -384,7 +386,6 @@
     {
         int id = -1;
         foreach(string detailViewName in detailViewNames) {
-            if(detailViewNamesToExclude.Any(s => s == detailViewName)) continue;
             id++;
             ModelViewSerializable detailView = GetModelViewByName(Context, detailViewName);
             if(detailView == null) {
@@ -424,6 +425,7 @@
                         if(tmpSearchSchema.Item5.Count != 1) continue;
                         if(tmpSearchSchema.Item4 != null) continue;
                         if(tmpSearchSchema.Item5[0].Key != foreignKey) continue;
+                        if(detailViewNamesToExclude.Any(s => s == tmpSearchSchema.Item2.ViewName)) continue;
                         ModelViewSerializable viewToNavigate = GetViewByName(Context, tmpSearchSchema.Item2.ViewName);
                         string viewToNavigateClassName = GetModelClassName(viewToNavigate, LformUserControlFolder);
 #>
@@ -438,6 +440,7 @@
                     } // the end of if (tmpSearchSchema != null) { ... }
                 } // the end of if(isM2m) { ... }
                 string detailViewClassName = GetModelClassName(detailView, LformUserControlFolder);
+                if(detailViewNamesToExclude.Any(s => s == detailViewName)) continue;
 #>
                     <MultiTrigger TargetType="ContentView">
                         <MultiTrigger.Conditions>

@@ -263,6 +263,7 @@
                         if(tmpSearchSchema.Item5.Count != 1) continue;
                         if(tmpSearchSchema.Item4 != null) continue;
                         if(tmpSearchSchema.Item5[0].Key != foreignKey) continue;
+                        if(detailViewNamesToExclude.Any(s => s == tmpSearchSchema.Item2.ViewName)) continue;
                         ModelViewSerializable viewToNavigate = GetViewByName(Context, tmpSearchSchema.Item2.ViewName);
                         string viewToNavigateClassName = GetModelClassName(viewToNavigate, LformUserControlFolder);
                         string viewToNavigateLformUserControlProject  = GetModelProjectName(viewToNavigate, LformUserControlFolder);

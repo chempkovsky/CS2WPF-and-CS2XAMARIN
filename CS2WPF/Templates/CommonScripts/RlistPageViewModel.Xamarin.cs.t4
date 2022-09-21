@@ -191,7 +191,6 @@ using Xamarin.Essentials;
     string detailViewControlFolderType = "01916-RlistUserControl.xaml.cs";
     {
         foreach(string detailViewName in detailViewNames) {
-            if(detailViewNamesToExclude.Any(s => s == detailViewName)) continue;
             ModelViewSerializable detailView = GetModelViewByName(Context, detailViewName);
             if(detailView == null) continue;
             List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detailView, null);
@@ -215,6 +214,7 @@ using Xamarin.Essentials;
                         if(tmpSearchSchema.Item5.Count != 1) continue;
                         if(tmpSearchSchema.Item4 != null) continue;
                         if(tmpSearchSchema.Item5[0].Key != foreignKey) continue;
+                        if(detailViewNamesToExclude.Any(s => s == tmpSearchSchema.Item2.ViewName)) continue;
                         ModelViewSerializable viewToNavigate = GetViewByName(Context, tmpSearchSchema.Item2.ViewName);
                         string viewToNavigateControlClassName = GetModelClassName(viewToNavigate, detailViewControlFolderType);
                         string viewToNavigateControlProject  = GetModelProjectName(viewToNavigate, detailViewControlFolderType);
@@ -222,8 +222,9 @@ using Xamarin.Essentials;
                             detailViewExists = true;
                             break;
                         }
-                    }
-                }
+                    } // if (tmpSearchSchema != null) { ... }
+                } // if(isM2m) { ... }
+                if(detailViewNamesToExclude.Any(s => s == detailViewName)) continue;
                 string detailViewControlClassName = GetModelClassName(detailView, detailViewControlFolderType);
                 string detailViewControlProject  = GetModelProjectName(detailView, detailViewControlFolderType);
                 if (!(string.IsNullOrEmpty(detailViewControlClassName) || string.IsNullOrEmpty(detailViewControlProject))) {
@@ -430,7 +431,6 @@ namespace <#= RlistPageViewModelNameSpace #> {
                 new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "<#= RowViewMIPropertyName #>", Caption="View item", IconName="TableEdit", IconColor=Color.Default, Enabled=true, Data=null, Command = <#= RowMenuItemsCommandPropertyName #>},
 <#
         foreach(string detailViewName in detailViewNames) {
-            if(detailViewNamesToExclude.Any(s => s == detailViewName)) continue;
             ModelViewSerializable detailView = GetModelViewByName(Context, detailViewName);
             if(detailView == null) {
 #>
@@ -469,6 +469,7 @@ namespace <#= RlistPageViewModelNameSpace #> {
                         if(tmpSearchSchema.Item5.Count != 1) continue;
                         if(tmpSearchSchema.Item4 != null) continue;
                         if(tmpSearchSchema.Item5[0].Key != foreignKey) continue;
+                        if(detailViewNamesToExclude.Any(s => s == tmpSearchSchema.Item2.ViewName)) continue;
                         ModelViewSerializable viewToNavigate = GetViewByName(Context, tmpSearchSchema.Item2.ViewName);
                         string viewToNavigateClassName = GetModelClassName(viewToNavigate, RlistPageFolder);
                         if(string.IsNullOrEmpty(viewToNavigateClassName)) {
@@ -483,8 +484,9 @@ namespace <#= RlistPageViewModelNameSpace #> {
                 new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "<#= RowMIPrefixPropertyName #><#= viewToNavigateClassName #><#= foreignKey.NavigationName #>", <#= CaptionPropertyName #>="<#= viewToNavigate.PluralTitle #>: <#= foreignKey.NavigationName #>", IconName="ArrowRightBold", IconColor=Color.Default, Enabled=true, Data=null, FeedbackData=null, Command = <#= RowMenuItemsCommandPropertyName #>},
 <#
                         }
-                    }
-                }
+                    } // if (tmpSearchSchema != null) { ... }
+                } // if(isM2m) { ... }
+                if(detailViewNamesToExclude.Any(s => s == detailViewName)) continue;
                 string detailViewClassName = GetModelClassName(detailView, RlistPageFolder);
                 if(string.IsNullOrEmpty(detailViewClassName)) {
 #>
@@ -803,7 +805,6 @@ namespace <#= RlistPageViewModelNameSpace #> {
                     break;
 <#
         foreach(string detailViewName in detailViewNames) {
-            if(detailViewNamesToExclude.Any(s => s == detailViewName)) continue;
             ModelViewSerializable detailView = GetModelViewByName(Context, detailViewName);
             if(detailView == null) {
 #>
@@ -842,6 +843,7 @@ namespace <#= RlistPageViewModelNameSpace #> {
                         if(tmpSearchSchema.Item5.Count != 1) continue;
                         if(tmpSearchSchema.Item4 != null) continue;
                         if(tmpSearchSchema.Item5[0].Key != foreignKey) continue;
+                        if(detailViewNamesToExclude.Any(s => s == tmpSearchSchema.Item2.ViewName)) continue;
                         ModelViewSerializable viewToNavigate = GetViewByName(Context, tmpSearchSchema.Item2.ViewName);
                         string viewToNavigateClassName = GetModelClassName(viewToNavigate, RlistPageFolder);
 #>
@@ -849,8 +851,9 @@ namespace <#= RlistPageViewModelNameSpace #> {
                         await <#= NavigateToDetailCommandPropertyName #>(arow, "<#= viewToNavigate.ViewName #>", "<#= foreignKey.NavigationName #>", "<#= viewToNavigateClassName #>");
                         break;
 <#
-                    }
-                }
+                    } // if (tmpSearchSchema != null) { ... }
+                } // if(isM2m) { ... }
+                if(detailViewNamesToExclude.Any(s => s == detailViewName)) continue;
                 string detailViewClassName = GetModelClassName(detailView, RlistPageFolder);
 #>
                     case "<#= RowMIPrefixPropertyName #><#= detailViewClassName #><#= foreignKey.NavigationName #>":
@@ -878,7 +881,6 @@ namespace <#= RlistPageViewModelNameSpace #> {
                         return true;
 <#
         foreach(string detailViewName in detailViewNames) {
-            if(detailViewNamesToExclude.Any(s => s == detailViewName)) continue;
             ModelViewSerializable detailView = GetModelViewByName(Context, detailViewName);
             if(detailView == null) {
 #>
@@ -917,14 +919,16 @@ namespace <#= RlistPageViewModelNameSpace #> {
                         if(tmpSearchSchema.Item5.Count != 1) continue;
                         if(tmpSearchSchema.Item4 != null) continue;
                         if(tmpSearchSchema.Item5[0].Key != foreignKey) continue;
+                        if(detailViewNamesToExclude.Any(s => s == tmpSearchSchema.Item2.ViewName)) continue;
                         ModelViewSerializable viewToNavigate = GetViewByName(Context, tmpSearchSchema.Item2.ViewName);
                         string viewToNavigateClassName = GetModelClassName(viewToNavigate, RlistPageFolder);
 #>
                     case "<#= RowMIPrefixPropertyName #><#= viewToNavigateClassName #><#= foreignKey.NavigationName #>":
                         return ((<#= AppSettingServicePropertyName #>.GetViewModelMask("<#= viewToNavigate.ViewName #>") & 1) == 1);
 <#
-                    }
-                }
+                    } // if (tmpSearchSchema != null) { ... }
+                } // if(isM2m) { ... }
+                if(detailViewNamesToExclude.Any(s => s == detailViewName)) continue;
                 string detailViewClassName = GetModelClassName(detailView, RlistPageFolder);
 #>
                     case "<#= RowMIPrefixPropertyName #><#= detailViewClassName #><#= foreignKey.NavigationName #>":
@@ -1206,7 +1210,6 @@ namespace <#= RlistPageViewModelNameSpace #> {
                 };
 <#
         foreach(string detailViewName in detailViewNames) {
-            if(detailViewNamesToExclude.Any(s => s == detailViewName)) continue;
             ModelViewSerializable detailView = GetModelViewByName(Context, detailViewName);
             if(detailView == null) {
 #>
@@ -1245,6 +1248,7 @@ namespace <#= RlistPageViewModelNameSpace #> {
                         if(tmpSearchSchema.Item5.Count != 1) continue;
                         if(tmpSearchSchema.Item4 != null) continue;
                         if(tmpSearchSchema.Item5[0].Key != foreignKey) continue;
+                        if(detailViewNamesToExclude.Any(s => s == tmpSearchSchema.Item2.ViewName)) continue;
                         ModelViewSerializable viewToNavigate = GetViewByName(Context, tmpSearchSchema.Item2.ViewName);
                         string viewToNavigateClassName = GetModelClassName(viewToNavigate, detailViewControlFolderType);
                         if(string.IsNullOrEmpty(viewToNavigateClassName)) {
@@ -1260,8 +1264,9 @@ namespace <#= RlistPageViewModelNameSpace #> {
                     rslt.Add(new <#= O2mListItemViewModelClassName #>() {<#= CaptionPropertyName #> = "<#= viewToNavigate.PluralTitle #>: <#= foreignKey.NavigationName #>", <#= ForeignKeyDetailsName #> = "<#= foreignKey.NavigationName #>",  <#= RegionPropertyName #> = "<#= viewToNavigateClassName #>" });
 <#
                         }
-                    }
-                }
+                    } // if (tmpSearchSchema != null) { ... }
+                } // if(isM2m) { ... }
+                if(detailViewNamesToExclude.Any(s => s == detailViewName)) continue;
                 string detailViewClassName = GetModelClassName(detailView, detailViewControlFolderType);
                 if(string.IsNullOrEmpty(detailViewClassName)) {
 #>
