@@ -141,6 +141,7 @@ using Prism.Navigation;
     string udialogNamePropertyName                  = "udialogName";
     string ddialogNamePropertyName                  = "ddialogName";
     string vdialogNamePropertyName                  = "vdialogName";
+    string viewModelNamePropertyName                = "viewModelName";
     string IsParentLoadedPropertyName               = "IsParentLoaded";
     string OnDestroyPropertyName                    = "OnDestroy";
     string IsDestroyedPropertyName                  = "IsDestroyed";
@@ -190,13 +191,14 @@ namespace <#= LformViewModelBaseNameSpace #> {
         protected string <#= udialogNamePropertyName #> = "noname";
         protected string <#= ddialogNamePropertyName #> = "noname";
         protected string <#= vdialogNamePropertyName #> = "noname";
-
+        protected string <#= viewModelNamePropertyName #> = "noname";
 
         public <#= LformViewModelBaseClassName #>(<#= IAppGlblSettingsServiceClassName #> <#= AppSettingServicePropertyName  #>, IDialogService dialogService) {
             this.<#= AppSettingServicePropertyName #> = <#= AppSettingServicePropertyName #>;
             this._dialogService = dialogService;
-            _<#= TableMenuItemsVMPropertyName #> = GetDefault<#= TableMenuItemsVMPropertyName #>();
-            _<#= RowMenuItemsVMPropertyName #> = GetDefault<#= RowMenuItemsVMPropertyName #>();
+            // next two lines must be called inside inherited class after "<#= viewModelNamePropertyName #>"-field defined
+            // _<#= TableMenuItemsVMPropertyName #> = GetDefault<#= TableMenuItemsVMPropertyName #>();
+            // _<#= RowMenuItemsVMPropertyName #> = GetDefault<#= RowMenuItemsVMPropertyName #>();
         }
         #region INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;
@@ -273,8 +275,9 @@ namespace <#= LformViewModelBaseNameSpace #> {
         #endregion
         #region <#= TableMenuItemsPropertyChangedPropertyName #>
         protected ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>> GetDefault<#= TableMenuItemsVMPropertyName #>() {
+            bool enbld = ((<#= AppSettingServicePropertyName #>.GetViewModelMask(<#= viewModelNamePropertyName #>) & 8) != 8);
             return new ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>>()  {
-                new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "TableAddMI", Caption="Add Item", IconName="TablePlus", IconColor=Color.Default, Enabled=true, Data=null, Command = <#= TableMenuItemsCommandPropertyName #>},
+                new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "TableAddMI", Caption="Add Item", IconName="TablePlus", IconColor=Color.Default, Enabled=enbld, Data=null, Command = <#= TableMenuItemsCommandPropertyName #>}
             };
         }
         public void <#= TableMenuItemsPropertyChangedPropertyName #>(object Sender, object OldValue, object NewValue) {
@@ -309,11 +312,14 @@ namespace <#= LformViewModelBaseNameSpace #> {
         #endregion
         #region <#= RowMenuItemsPropertyChangedPropertyName #>
         protected ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>> GetDefault<#= RowMenuItemsVMPropertyName #>() {
-            return new ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>>()  {
-                new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "RowUpdMI", Caption="Update item", IconName="TableEdit", IconColor=Color.Default, Enabled=true, Data=null, Command = <#= RowMenuItemsCommandPropertyName #>},
-                new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "RowDelMI", Caption="Delete item", IconName="TableRemove", IconColor=Color.Default, Enabled=true, Data=null, Command = <#= RowMenuItemsCommandPropertyName #>},
-                new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "RowViewMI", Caption="View item", IconName="TableEdit", IconColor=Color.Default, Enabled=true, Data=null, Command = <#= RowMenuItemsCommandPropertyName #>},
-            };
+            ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>> rslt = new ObservableCollection<<#= IWebServiceFilterMenuInterfaceClassName #>>();
+            bool enbld = ((<#= AppSettingServicePropertyName #>.GetViewModelMask(<#= viewModelNamePropertyName #>) & 4) != 4 );
+            rslt.Add(new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "RowUpdMI", Caption="Update item", IconName="TableEdit", IconColor=Color.Default, Enabled=enbld, Data=null, Command = <#= RowMenuItemsCommandPropertyName #>});
+            enbld = ((<#= AppSettingServicePropertyName #>.GetViewModelMask(<#= viewModelNamePropertyName #>) & 2) != 2 );
+            rslt.Add(new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "RowDelMI", Caption="Delete item", IconName="TableRemove", IconColor=Color.Default, Enabled=enbld, Data=null, Command = <#= RowMenuItemsCommandPropertyName #>});
+            enbld = true;
+            rslt.Add(new <#= WebServiceFilterMenuViewModelClassName #>() { Id = "RowViewMI", Caption="View item", IconName="TableEdit", IconColor=Color.Default, Enabled=enbld, Data=null, Command = <#= RowMenuItemsCommandPropertyName #>});
+            return rslt;
         }
         public void <#= RowMenuItemsPropertyChangedPropertyName #>(object Sender, object OldValue, object NewValue) {
             if(<#= IsDestroyedPropertyName #>) return;
