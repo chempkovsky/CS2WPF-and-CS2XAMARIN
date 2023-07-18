@@ -292,8 +292,7 @@ using Xamarin.Essentials;
         }
     }
 
-
-
+    List<Tuple<string, string, ModelViewSerializable>> intersectFkMdls = GetIntersectedForeigKeysMappingsEx(Model, Context, ForeignKeyNameChainList);
 
     List<string> nmSpaces = new List<string>();
     if ((AUDVformViewModelNameSpace != IWebServiceFilterRsltInterfaceNameSpace) && (nmSpaces.IndexOf(IWebServiceFilterRsltInterfaceNameSpace) < 0)) 
@@ -668,7 +667,7 @@ namespace <#= AUDVformViewModelNameSpace #> {
             this.<#= AppSettingServicePropertyName #> = _<#= AppSettingServicePropertyName #>;
             this.dialogService = _dialogService;
             this.<#= RootDataSource #> = _<#= RootDataSource #>;
-            this.<#= RootDataSource #>.<#= InitMethodName #>(null, null, new List<string>{<#= GetCurrentDirectNavs(ForeignKeyNameChainList, "") #>},"");
+            this.<#= RootDataSource #>.<#= InitMethodName #>(null, null, new List<string>{<#= GetCurrentDirectNavs(ForeignKeyNameChainList, "") #>},"",null);
             this.<#= RootDataSource #>.set<#= IsNewSuffix #>(false);
             this.<#= RootDataSource #>.<#= AfterPropsChangedPropName #> += this.<#= RootDataSource + AfterPropsChangedPropName #>;
 
@@ -700,9 +699,14 @@ namespace <#= AUDVformViewModelNameSpace #> {
         if(string.IsNullOrEmpty(directNavigation)){
             throw new Exception("For [Foreign Key Name Chain]=" + fk.Item1 + " can not find direct detail");
         }
+        string clearIgnorFlds = GetDsClearIgnoryFields(Model, fk, ForeignKeyNameChainList);
+        string ignoreFldsLst = "null";
+        if(!string.IsNullOrEmpty(clearIgnorFlds)) {
+            ignoreFldsLst = "new List<string>{" + clearIgnorFlds + "}";
+        }
 #>
             this.<#= GetModelPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #> = _<#= GetModelPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>;
-            this.<#= GetModelPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= InitMethodName #>("<#= detailViewName #>", "<#= directNavigation #>", new List<string>{<#= GetCurrentDirectNavs(ForeignKeyNameChainList, fk.Item1) #>},"<#= fk.Item1 #>");
+            this.<#= GetModelPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= InitMethodName #>("<#= detailViewName #>", "<#= directNavigation #>", new List<string>{<#= GetCurrentDirectNavs(ForeignKeyNameChainList, fk.Item1) #>},"<#= fk.Item1 #>", <#= ignoreFldsLst #>);
             this.<#= GetModelPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.set<#= IsNewSuffix #>(false);
             this.<#= GetModelPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= AfterPropsChangedPropName #> += this.<#= GetModelPropertyNameWithSufix(fk.Item3, Model, AfterPropsChangedPropName) #>;
             this.<#= GetModelPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= AfterMasterChangedPropName #> += this.<#= GetModelPropertyNameWithSufix(fk.Item3, Model, AfterMasterChangedPropName) #>;
