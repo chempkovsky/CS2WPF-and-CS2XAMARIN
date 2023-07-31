@@ -795,7 +795,20 @@ namespace <#= AUDVformViewModelNameSpace #> {
                 return;
             }
             string msgfiledName = filedName;
+<#
+            foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) {
+                if (
+                    ((GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, CurrentInputTypeId) == InputTypeEnum.Combo) && modelViewUIFormPropertySerializable.IsShownInView && IsPropertyRequiredInViewEx(modelViewUIFormPropertySerializable, Model))
+                    ||
+                    ((GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, CurrentInputTypeId) == InputTypeEnum.Typeahead)  && modelViewUIFormPropertySerializable.IsShownInView)
+                    ) { 
+#>
             RequiredAttribute requiredAttribute;
+<#
+                        break;
+                }
+            }              
+#>
             string msg = null;
             switch(filedName) {
 <#

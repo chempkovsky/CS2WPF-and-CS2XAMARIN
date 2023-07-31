@@ -636,12 +636,12 @@ namespace <#= datasourceNameSpace #> {
             if(v.get<#= CurrentViewNameFieldName #>() != this._<#= ClientViewNameFieldName #>) return;
             bool clntNtChngd = true;
             IList<string> ignrFlds = new List<string>();
-            bool aftrMstrChngd: boolean = false;
+            bool aftrMstrChngd = false;
 
             Dictionary<(string viewNm, string navNm, string propNm), string> <#= ClientToMasterFieldsMapFieldName #> = this.<#= formRootService #>.get<#= ClientToMasterFieldsMapFieldName #>();
             foreach(var lkey in <#= ClientToMasterFieldsMapFieldName #>.Keys) {
                 if ((lkey.viewNm != this._<#= ClientViewNameFieldName #>) || (lkey.navNm != this._<#= DirectNavigationFieldName #>)) continue;
-                string dstnm = <#= ClientToMasterFieldsMapFieldName #>[lkey]
+                string dstnm = <#= ClientToMasterFieldsMapFieldName #>[lkey];
                 object src = v.get<#= ValueSuffix #>(lkey.propNm);
                 object dst = this.get<#= ValueSuffix #>(dstnm);
                 ignrFlds.Add(dstnm);
@@ -1032,7 +1032,7 @@ namespace <#= datasourceNameSpace #> {
             IList<<#= IWebServiceFilterRsltInterfaceClassName #>> rslt = new List<<#= IWebServiceFilterRsltInterfaceClassName #>>();
             Dictionary<(string viewNm, string navNm, string propNm), (bool isMstrReq, string propNm)> <#= MasterToClientKeyFieldsMapFieldName #> = this.<#= formRootService #>.get<#= MasterToClientKeyFieldsMapFieldName #>();
             foreach(var lkey in <#= MasterToClientKeyFieldsMapFieldName #>.Keys) {
-                if(this._<#= CurrDirectMasterNavsFieldName #>.IndexOf(lkey.propNm) < 0) continue;
+                if(this._<#= CurrDirectMasterNavsFieldName #>.IndexOf(lkey.navNm) < 0) continue;
                 if (this.isSet<#= ValueSuffix #>(<#= MasterToClientKeyFieldsMapFieldName #>[lkey].propNm)) {
                     rslt.Add(new <#= WebServiceFilterRsltClassName #>{
                         fltrName = <#= MasterToClientKeyFieldsMapFieldName #>[lkey].propNm,
