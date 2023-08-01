@@ -927,7 +927,7 @@ namespace <#= datasourceNameSpace #> {
                             if (fk.ForeignKeyProps.Any(p => p.OriginalPropertyName == sclrProp.OriginalPropertyName)) {
                                 codenotadded = false;
 #>
-            if ((ignrFlds != null) && (!ignrFlds.Contains("<#= GetModelPropertyName(sclrProp, Model) #>"))) {
+            if ((ignrFlds == null) || (!ignrFlds.Contains("<#= GetModelPropertyName(sclrProp, Model) #>"))) {
                 if(!this.is<#= UnderHiddenFilterFieldsFieldName #>("<#= GetModelPropertyName(sclrProp, Model) #>")) {
                     if(this._<#= CurrDirectMasterNavsFieldName #>.IndexOf("<#= fk.NavigationName #>") < 0) {
                         if(this.isSet<#= ValueSuffix #>("<#= GetModelPropertyName(sclrProp, Model) #>")) {
@@ -943,7 +943,7 @@ namespace <#= datasourceNameSpace #> {
                     }
                     if(codenotadded) {
 #>
-            if ((ignrFlds != null) && (!ignrFlds.Contains("<#= GetModelPropertyName(sclrProp, Model) #>"))) {
+            if ((ignrFlds == null) || (!ignrFlds.Contains("<#= GetModelPropertyName(sclrProp, Model) #>"))) {
                 if(!this.is<#= UnderHiddenFilterFieldsFieldName #>("<#= GetModelPropertyName(sclrProp, Model) #>")) {
                     if(this.isSet<#= ValueSuffix #>("<#= GetModelPropertyName(sclrProp, Model) #>")) {
                         this.clear<#= ValueSuffix #>("<#= GetModelPropertyName(sclrProp, Model) #>");
@@ -955,7 +955,7 @@ namespace <#= datasourceNameSpace #> {
                     }
                 } else {
 #>
-            if ((ignrFlds != null) && (!ignrFlds.Contains("<#= GetModelPropertyName(sclrProp, Model) #>"))) {
+            if ((ignrFlds == null) || (!ignrFlds.Contains("<#= GetModelPropertyName(sclrProp, Model) #>"))) {
                 if(!this.is<#= UnderHiddenFilterFieldsFieldName #>("<#= GetModelPropertyName(sclrProp, Model) #>")) {
                     if(this._<#= CurrDirectMasterNavsFieldName #>.IndexOf(this.<#= formRootService #>.getFk<#= ValueSuffix #>("<#= GetModelPropertyName(sclrProp, Model) #>")) < 0) {
                         if(this.isSet<#= ValueSuffix #>("<#= GetModelPropertyName(sclrProp, Model) #>")) {

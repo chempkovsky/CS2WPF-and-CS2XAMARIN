@@ -136,9 +136,18 @@
 
     bool ModelHasAutoCompleteTextBox = false;
     foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) {
-        ModelHasAutoCompleteTextBox = ModelHasAutoCompleteTextBox ?  ModelHasAutoCompleteTextBox :
-            (modelViewUIFormPropertySerializable.InputTypeWhenAdd == InputTypeEnum.Typeahead);
+        if(InputTypeId == 1) {
+            ModelHasAutoCompleteTextBox = modelViewUIFormPropertySerializable.InputTypeWhenAdd == InputTypeEnum.Typeahead;
+        } else if(InputTypeId == 2) {
+            ModelHasAutoCompleteTextBox = modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.Typeahead;
+        } else  {
+            ModelHasAutoCompleteTextBox =modelViewUIFormPropertySerializable.InputTypeWhenDelete == InputTypeEnum.Typeahead;
+        }
+        if(ModelHasAutoCompleteTextBox) break;
     }
+
+
+
 
     string RootNodeName = AUDVformUserControlClassName.ToLower() + "rootnode";
 
